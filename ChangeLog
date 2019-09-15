@@ -1,0 +1,11 @@
+2019-09-03:
+
+Handle implicit multiplication in lexer/grammar.
+
+2019-06-16:
+
+Finalized expression parsing, tested for leaks and crashes, fixes.
+
+2019-06-08:
+
+Started working on the Flex/Bison based expression parser.

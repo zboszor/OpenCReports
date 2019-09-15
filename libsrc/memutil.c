@@ -1,0 +1,162 @@
+/*
+ * Memory utilities
+ *
+ * Copyright (C) 2019 Zoltán Böszörményi <zboszor@gmail.com>
+ * See COPYING.LGPLv3 in the toplevel directory.
+ */
+
+#include <stdlib.h>
+#include <string.h>
+
+#include "opencreport.h"
+#include "memutil.h"
+
+ocrpt_mem_malloc_t ocrpt_mem_malloc0 = malloc;
+ocrpt_mem_realloc_t ocrpt_mem_realloc0 = realloc;
+ocrpt_mem_free_t ocrpt_mem_free0 = (ocrpt_mem_free_t)free;
+ocrpt_mem_strdup_t ocrpt_mem_strdup0 = strdup;
+ocrpt_mem_strndup_t ocrpt_mem_strndup0 = strndup;
+
+void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc, ocrpt_mem_realloc_t rrealloc, ocrpt_mem_free_t rfree, ocrpt_mem_strdup_t rstrdup, ocrpt_mem_strndup_t rstrndup) {
+	ocrpt_mem_malloc0 = rmalloc;
+	ocrpt_mem_realloc0 = rrealloc;
+	ocrpt_mem_free0 = rfree;
+	ocrpt_mem_strdup0 = rstrdup;
+	ocrpt_mem_strndup0 = rstrndup;
+}
+
+ocrpt_string *ocrpt_mem_string_new(const char *str) {
+	ocrpt_string *string = ocrpt_mem_malloc(sizeof(ocrpt_string));
+
+	if (!string)
+		return NULL;
+
+	if (!str) {
+		string->str = NULL;
+		string->allocated_len = 0;
+		string->len = 0;
+	} else {
+		string->str = ocrpt_mem_strdup(str);
+
+		if (!string->str) {
+			ocrpt_mem_free(string);
+			return NULL;
+		}
+
+		string->len = strlen(string->str);
+		string->allocated_len = string->len + 1;
+	}
+
+	return string;
+}
+
+ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, const size_t len) {
+	ocrpt_string *string = ocrpt_mem_malloc(sizeof(ocrpt_string));
+
+	if (!string)
+		return NULL;
+
+	string->str = ocrpt_mem_malloc(len);
+	if (!string->str) {
+		ocrpt_mem_free(string);
+		return NULL;
+	}
+
+	string->allocated_len = len;
+
+	if (!str) {
+		string->str[0] = 0;
+		string->len = 0;
+	} else {
+		char *end = stpncpy(string->str, str, len - 1);
+
+		*end = 0;
+		string->len = end - string->str;
+	}
+
+	return string;
+}
+
+char *ocrpt_mem_string_free(ocrpt_string *string, int free_str) {
+	char *str;
+
+	if (!string)
+		return NULL;
+
+	if (free_str) {
+		ocrpt_mem_free(string->str);
+		str = NULL;
+	} else
+		str = string->str;
+
+	ocrpt_mem_free(string);
+
+	return str;
+}
+
+void ocrpt_mem_string_append_len(ocrpt_string *string, const char *str, const size_t len) {
+	char *end;
+
+	if (!string)
+		return;
+	if (!str)
+		return;
+
+	if (string->allocated_len < string->len + len + 1) {
+		char *strnew = ocrpt_mem_realloc(string->str, string->len + len + 1);
+
+		if (!strnew)
+			return;
+
+		string->allocated_len = string->len + len + 1;
+		string->str = strnew;
+	}
+
+	end = stpncpy(&string->str[string->len], str, len);
+	*end = 0;
+	string->len = end - string->str;
+}
+
+void ocrpt_mem_string_append(ocrpt_string *string, const char *str) {
+	size_t newlen;
+	char *end;
+
+	if (!string)
+		return;
+	if (!str)
+		return;
+
+	newlen = strlen(str);
+
+	if (string->allocated_len < string->len + newlen + 1) {
+		char *strnew = ocrpt_mem_realloc(string->str, string->len + newlen + 1);
+
+		if (!strnew)
+			return;
+
+		string->allocated_len = string->len + newlen + 1;
+		string->str = strnew;
+	}
+
+	end = stpncpy(&string->str[string->len], str, newlen);
+	*end = 0;
+	string->len = end - string->str;
+}
+
+void ocrpt_mem_string_append_c(ocrpt_string *string, const char c) {
+	if (!string)
+		return;
+
+	if (string->allocated_len < string->len + 2) {
+		char *strnew = ocrpt_mem_realloc(string->str, string->len + 2);
+
+		if (!strnew)
+			return;
+
+		string->allocated_len = string->len + 2;
+		string->str = strnew;
+	}
+
+	string->str[string->len++] = c;
+	string->str[string->len] = 0;
+}

@@ -1,0 +1,475 @@
+<chapter label="1" id="expressions">
+	<title>Expressions in OpenCReports</title>
+	<sect1>
+		<title>Introduction</title>
+		<para>
+			Expressions in OpenCReports are based on Flex lexer and Bison grammar
+			that provide a solid and extensible basis for report expressions.
+		</para>
+	</sect1>
+	<sect1>
+		<title>Constants</title>
+		<sect2>
+			<title>String literals</title>
+			<para>
+				String literals in OpenCReports can be either single or double quoted.
+				Some examples:
+				<programlisting>
+"apple"
+&#8217;apple&#8217;
+"I&#8217;ve eaten an apple"
+&#8217;This an "apple".&#8217;
+				</programlisting>
+				The values of these strings are:
+				<programlisting>
+apple
+apple
+I&#8217;ve eaten an apple
+This an "apple".
+				</programlisting>
+				We can see how the other quoting character can be used as part
+				of the string value.
+			</para>
+			<para>
+				String literals can also use BASIC language style double quoting
+				to embed a single quoting character used for quoting the string
+				itself:
+				<programlisting>
+&#8217;apple&#8217;&#8217;&#8217;
+&#8217;apple&#8217;&#8217;pear&#8217;
+&#8217;apple&#8217;&#8217;&#8217;&#8217;pear&#8217;
+"apple"""
+"apple""pear"
+"apple""""pear"
+				</programlisting>			
+				The values of these strings are:
+				<programlisting>
+apple&#8217;
+apple&#8217;pear
+apple&#8217;&#8217;pear
+apple"
+apple"pear
+apple""pear
+				</programlisting>
+			</para>
+			<para>
+				String literals can also use C language string continuation if
+				there's at least one whitespace character (space, TAB or new line)
+				between doubled quoting characters. String continuation can also
+				switch quoting characters without whitespace between quoting.
+				<programlisting>
+"apple" "pear"
+"apple" &#8217;pear&#8217;
+"apple"&#8217;pear&#8217;
+				</programlisting>
+				The value of all these strings is:
+				<programlisting>
+applepear
+				</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Numeric constants</title>
+			<para>
+				Numeric values in OpenCReports are handled with GNU MPFR with
+				arbitrary precision, by default 256 bits. This allows for
+				very high precision, i.e. very long numbers. This is good
+				for directly using e.g. arbitrary precision
+				<literal>numeric</literal> type columns from PostgreSQL.
+			</para>
+			<para>
+				Numeric constants can be integer or fractional numbers with or
+				without the so called <emphasis>e-notation</emphasis>. Some examples:
+				<programlisting>
+1
+1.234
+1e4
+1e-4
+1.234e-5
+				</programlisting>
+				E notation means that that number preceding the letter "e" or
+				"E" is multiplied by ten to the power of the number after the
+				letter "e" or "E", the latter being an integer value. The
+				values of the above examples are:
+				<programlisting>
+1
+1.234
+10000
+0.0001
+0.00001234
+				</programlisting>
+			</para>
+			<para>
+				Numbers greater than 0 and less than 1 can be written with
+				or without the leading zero.
+				<programlisting>
+0.123
+.123
+				</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Boolean constants</title>
+			<para>
+				Boolean constants evalutate to numeric constans
+				<literal>1</literal> and <literal>0</literal>.
+				The boolean constants are:
+				<programlisting>
+yes
+no
+true
+false
+				</programlisting>
+			</para>
+		</sect2>
+	</sect1>
+	<sect1>
+		<title>Identifiers</title>
+		<para>
+			In OpenCReports expressions, identifiers can reference query column
+			names, environment variables, internal variables and custom
+			report variables. Their values are evaluated or computed
+			during the report execution.
+		</para>
+		<para>
+			Identifiers are in the format <literal>[[domain].]identifier</literal>
+			where the domain name or the dot are optional.
+		</para>
+		<para>
+			OpenCReports is using the UTF-8 encoding. This means that valid
+			<literal>domain</literal> and <literal>identifier</literal>
+			names may start with an underscore or UTF-8 letters and may
+			contain underscore, UTF-8 letters and numbers in subsequent
+			characters. Examples:
+			<programlisting>
+valid_field_name
+_valid_field_name5
+query2.column1
+mező_név
+lekérdezés.mező_név
+			</programlisting>
+		</para>
+		<para>
+			Both <literal>domain</literal> and <literal>identifier</literal>
+			names may be quoted or unquoted. Quoting identifiers allows
+			using semi-reserved and reserved words as identifers and also
+			allow special characters in identifier names. Examples:
+			<programlisting>
+query.column1
+query."column2"
+query."column with space in the name"
+"query2".column3
+"query2"."and"
+			</programlisting>
+		</para>
+		<para>
+			Semi-reserved words are the boolean constants. They can be used
+			as identifiers with dot-prefixed identifier names without
+			a domain name:
+			<programlisting>
+.yes
+.no
+.true
+.false
+yes.no
+			</programlisting>
+			These can also be used as quoted identifiers:
+			<programlisting>
+."yes"
+."no"
+."true"
+."false"
+"true"."false"
+			</programlisting>
+			They can also be used in domain-qualified identifiers with
+			or without quoting either the domain name or the identifier.
+		</para>
+		<para>
+			Reserved words are the ones that can appear as operator names:
+			<literal>and</literal> and <literal>or</literal>. They cannot
+			be used with dot-prefixed operator names, as it would cause
+			an expression syntax error. But they can be used as quoted
+			identifiers, in case you would want to use such a query name
+			and column name:
+			<programlisting>
+."and"
+."or"
+"and"."or"
+			</programlisting>
+		</para>
+		<sect2>
+			<title>Special identifier domains</title>
+			<para>
+				Unquoted domain <literal>m</literal> indicates the domain
+				of environment variables. The list of environment variables
+				depend on the languange binding. In C, it's the variables
+				in the operating environment. In PHP, they are the global
+				PHP variables. Example:
+				<programlisting>
+m.current_date
+				</programlisting>
+			</para>
+			<para>
+				Unquoted domain <literal>r</literal> indicates the domain
+				of internal report variables, like the current page of the
+				report or total number of pages. The latter implies delayed
+				evaluation, where the complete report is paginated. Example:
+				<programlisting>
+r.totpages
+				</programlisting>
+			</para>
+			<para>
+				Domain <literal>v</literal> signifies custom report variables,
+				used e.g. in breaks or to shortcut expressions. Example:
+				<programlisting>
+v.break1
+				</programlisting>
+			</para>
+			<para>
+				When these identifier domains are quoted, they lose their
+				special meaning and these identifiers become query
+				identifiers. Of course, in this case, such a query name must
+				exist and the query must have such a column name specified
+				in the identifier. Examples:
+				<programlisting>
+"m".current_date
+"r".totpages
+"v".break1
+				</programlisting>
+			</para>
+		</sect2>
+	</sect1>
+	<sect1>
+		<title>Operators and functions</title>
+		<para>
+			OpenCReports expressions can use several operators and functions.
+			The operator precedence is mostly as expected from the C
+			programming language. One notable exception is implicit
+			multiplication. The precedence classes are as below,
+			in increasing order of precedence.
+		</para>
+		<sect2>
+			<title>Ternary operator</title>
+			<para>
+				The ternary operator is as in the C language:
+				<programlisting>
+expression1 ? expression2 : expression3
+				</programlisting>
+				It's evaluated as follows: if <literal>expression1</literal>
+				is <literal>true</literal> (i.e. non-zero), then the
+				result is the <literal>expression2</literal>, otherwise it's
+				<literal>expression3</literal>. It is the same as the
+				<literal>iif</literal> function below.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Logical operators with two operands</title>
+			<para>
+				Logical OR can be written as <literal>||</literal> or
+				<literal>or</literal>. Example: <literal>a || b</literal>
+			</para>
+			<para>
+				Logical AND can be written as <literal>&&</literal> or
+				<literal>and</literal>. Logical AND has precedence over OR.
+				Example: <literal>a && b</literal>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Bitwise operators with two operands</title>
+			<para>
+			The bitwise operators in this precedence class and in their
+			increasing order of precedence are:
+			binary OR (<literal>|</literal>),
+			binary XOR (<literal>^</literal>) and
+			binary AND (<literal>&</literal>).
+			</para>
+		</sect2>
+		<sect2>
+			<title>Equality and inequality comparison operators</title>
+			<para>
+				The equality comparison operator can be written as
+				<literal>=</literal> or <literal>==</literal>.
+			</para>
+			<para>
+				The inequality comparison operator can be written as
+				<literal>&lt;&gt;</literal> or <literal>!=</literal>.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Other comparison operators</title>
+			<para>
+				Less-than (<literal>&lt;</literal>),
+				less-or-equal (<literal>&lt;=</literal>),
+				greater-than (<literal>&gt;</literal>) and
+				greater-or-equal (<literal>&gt;=</literal>).
+			</para>
+		</sect2>
+		<sect2>
+			<title>Bitwise shifts</title>
+			<para>
+				Bitwise shift left (<literal>a &gt;&gt; b</literal>) and
+				bitwise shift right (<literal>a &lt;&lt; b</literal>).
+			</para>
+		</sect2>
+		<sect2>
+			<title>Addition and subtraction</title>
+			<para>
+				<literal>a + b</literal> and <literal>a - b</literal>.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Multiplication, division and modulo (remainder)</title>
+			<para>
+				<literal>a * b</literal>, <literal>a / b</literal> and
+				<literal>a % b</literal>.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Unary plus and minus, logical and bitwise NOT, prefix increment and decrement</title>
+			<para>
+				Unary plus (<literal>+a</literal>), unary minus (<literal>-a</literal>),
+				logical NOT (<literal>!a</literal>), bitwise NOT (<literal>~a</literal>),
+				prefix increment (<literal>++a</literal>) and prefix
+				decrement (<literal>--a</literal>).
+			</para>
+		</sect2>
+		<sect2>
+			<title>Postfix increment and decrement</title>
+			<para>
+				Postfix increment (<literal>a++</literal>) and decrement
+				(<literal>a--</literal>).
+			</para>
+		</sect2>
+		<sect2>
+			<title>Function calls and implicit multiplication</title>
+			<para>
+				Function calls execute a function on operands:
+				<literal>function(operand[, ...])</literal>. A function name
+				is a single word known by OpenCReports at the time of parsing,
+				either as a built-in function, or a user-supplied one.
+				The function name cannot have a leading dot or be a
+				domain-qualified identifier.
+			</para>
+			<para>
+				Implicit multiplication is when e.g. a numeric constant and
+				an identifier are in juxtaposition, in other words they are
+				written side by side without any whitespace delimiters.
+				Implicit multiplication is applicable in these situations:
+				<itemizedlist>
+					<listitem>
+						<para>
+							A numeric constant juxtaposed with an identifier,
+							the numeric constant is the on the left side.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							A numeric constant juxtaposed with an expression inside
+							parentheses.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							An identifier juxtaposed with an expression inside
+							parentheses. This is only valid if there is a single expression
+							inside the parentheses. A comma delimited series of expressions
+							are treated as a function call.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							An expression inside parentheses juxtaposed with a numeric constant.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							An expression inside parentheses juxtaposed with an identifier.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Two expressions inside parentheses juxtaposed with each other.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				Implicit multiplication is NOT applicable in these situations:
+				<itemizedlist>
+					<listitem>
+						<para>
+							An identifier juxtaposed with a numeric constant,
+							the numeric constant is the on the right side.
+							An identifier name can include digits as the
+							second and subsequent characters, so the numeric
+							constant, at least the integer part simply
+							becomes part of the identifier.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							An identifier juxtaposed with another identifier.
+							The reason is the same as above: in this case,
+							there are only a single identifier according to
+							token matching.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Parentheses</title>
+			<para>
+				Parenthesized expressions are always computed first.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Token matching, precendence and syntax errors</title>
+			<para>
+				Expression parsing works on two levels: token matching (the
+				job of Flex) and applying grammar (the job of Bison).
+				Token matching breaks up the expression string into tokens
+				in a greedy way: without whitepace delimiters, the longest
+				possible token is chosen.
+			</para>
+			<para>
+				This may lead to slight confusion when coupled with
+				implicit multiplication. For example, the expression
+				<literal>2e-1e</literal> is broken up into two tokens:
+				<literal>2e-1</literal> juxtaposed with
+				<literal>e</literal>. The first token is interpreted as
+				a numeric constant using <emphasis>e-notation</emphasis>
+				(so that it will mean <literal>2 * 10^(-1)</literal>) and
+				the second is the identifier <literal>e</literal>, leading
+				to the meaning <literal>0.2 * e</literal>. This is
+				unambiguous for the computer, but can be somewhat confusing
+				to the the user reading or writing expressions. To avoid
+				any confusion, don't use implicit multiplication and use
+				whitespace and parentheses gratituously.
+			</para>
+			<para>
+				Expression parsing handles precedence and whitespaces.
+				For example, these below do not mean the same thing:
+				<programlisting>
+a++ + ++b
+a+++++b
+				</programlisting>
+				The former is obvious, but the latter may be a little
+				surprising: <literal>(a++)++ + b</literal>, but not when
+				considering precedence and the Flex lexer behaviour to
+				match the the longest known token first. In this case,
+				to make the expression unambiguous, whitespace or parenthesis
+				should be used. Another ambiguous example:
+				<programlisting>
+a++b
+				</programlisting>
+				The above may be interpreted as <literal>a + +b</literal>
+				but since no whitespace is used, Flex is free to interpret
+				it as <literal>a++ b</literal>, because <literal>++</literal>
+				is longer than <literal>+</literal>, so the former is matched
+				first as an operator token. This is a syntax error and
+				expression parsing throws an error for it.
+			</para>
+		</sect2>
+	</sect1>
+</chapter>
