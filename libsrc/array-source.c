@@ -90,10 +90,6 @@ static bool ocrpt_array_isdone(ocrpt_query *query) {
 	if (result == NULL)
 		return true;
 
-	if (result->isdone) {
-		for (i = 0; i < query->cols; i++)
-			query->result[i].result.isnull = true;
-	}
 	return result->isdone;
 }
 
