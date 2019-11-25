@@ -6,13 +6,18 @@
 #ifndef _OPENCREPORTS_FUNCTIONS_H_
 #define _OPENCREPORTS_FUNCTIONS_H_
 
+#include <stdbool.h>
+
 #include "opencreport.h"
 #include "exprutil.h"
 
-typedef ocrpt_expr *(*ocrpt_function_call)(opencreport *, int, ocrpt_expr *);
+typedef void (*ocrpt_function_call)(opencreport *, ocrpt_expr *);
 
 struct ocrpt_function {
 	const char *fname;
+	const int n_ops;
+	const bool commutative;
+	const bool associative;
 	ocrpt_function_call func;
 };
 

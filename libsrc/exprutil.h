@@ -8,12 +8,14 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <time.h>
-#include <mpfr.h>
-#include "opencreport.h"
+
+#include <opencreport.h>
+#include "functions.h"
 
 /*
  * Used as both main type of an expression and subtype
+ * The first part of the definitions are the same as
+ * enum ocrpt_result_type in the public opencreport.h
  */
 enum ocrpt_expr_type {
 	/*
@@ -22,14 +24,16 @@ enum ocrpt_expr_type {
 	OCRPT_EXPR_ERROR,
 
 	/*
-	 * Constants or can be evaluated early
+	 * Constants
 	 */
 	OCRPT_EXPR_STRING,
 	OCRPT_EXPR_NUMBER,
 	OCRPT_EXPR_DATETIME,
-	OCRPT_EXPR_MVAR,
 
-	/* Internal variables */
+	/*
+	 * Pre-set variable that can be evaluated early
+	 */
+	OCRPT_EXPR_MVAR,
 
 	/*
 	 * Internal variables, identifiers resolved from queries and
@@ -40,49 +44,14 @@ enum ocrpt_expr_type {
 	OCRPT_EXPR_VVAR,
 	OCRPT_EXPR_IDENT,
 	OCRPT_EXPR,
-
-	/*
-	 * Flattened values and expressions
-	 *
-	 * Used by the executor that reference constants and
-	 * other flattened expressions.
-	 */
-	OCRPT_NUMBER_VALUE,
-	OCRPT_FLAT_EXPR,
 };
 
-/*
- * Flattened ops for (flattened) expressions
- * "type" indicates the underlying array
- *    i.e.: constants, various identifiers and expressions
- * "idx" is the array index into the array indicated by "type"
- */
-struct ocrpt_flat_expr {
-	enum ocrpt_expr_type type;
-	uint32_t idx;
-};
-typedef struct ocrpt_flat_expr ocrpt_flat_expr;
-
-struct ocrpt_united_expr {
-	enum ocrpt_expr_type type;
-	union {
-		ocrpt_expr *op;
-		ocrpt_flat_expr fop;
-	};
-};
-typedef struct ocrpt_united_expr ocrpt_united_expr;
+#define ocrpt_expr_is_const(x) ((x)->type == OCRPT_EXPR_STRING || (x)->type == OCRPT_EXPR_NUMBER || (x)->type == OCRPT_EXPR_DATETIME)
 
 struct ocrpt_expr {
 	enum ocrpt_expr_type type;
-	uint32_t n_ops;
-	union {
-		/* Original lexer token and computed string value for expression */
-		const char *string;
-		/* Converted numeric constant or computed numeric value for expression */
-		mpfr_t number;
-		/* Datetime value */
-		struct tm datetime;
-	};
+	bool result_owned;
+	struct ocrpt_result *result;
 	union {
 		/*
 		 * Identifiers: computed report variables,
@@ -91,16 +60,17 @@ struct ocrpt_expr {
 		struct {
 			const char *query;
 			const char *name;
-			enum ocrpt_expr_type ident_type;
 			bool dotprefixed;
 		};
 
 		struct {
-			const char *fname;
-			enum ocrpt_expr_type expr_type;
-			ocrpt_united_expr *uops;
+			const ocrpt_function *func;
+			ocrpt_expr **ops;
+			uint32_t n_ops;
 		};
 	};
 };
+
+ocrpt_result *ocrpt_expr_make_error_result(ocrpt_expr *e, const char *error);
 
 #endif

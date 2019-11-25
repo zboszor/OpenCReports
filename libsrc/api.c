@@ -16,13 +16,14 @@
 #include "memutil.h"
 #include "scanner.h"
 #include "opencreport-private.h"
+#include "datasource.h"
 
 char cwdpath[PATH_MAX];
 static ocrpt_paper *papersizes;
 static const ocrpt_paper *system_paper;
 int n_papersizes;
 
-opencreport *ocrpt_init(void) {
+DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	opencreport *o = (opencreport *)ocrpt_mem_malloc(sizeof(struct opencreport));
 
 	if (!o)
@@ -34,19 +35,43 @@ opencreport *ocrpt_init(void) {
 	o->prec = OCRPT_MPFR_PRECISION_BITS;
 	o->rndmode = MPFR_RNDN;
 
+	ocrpt_add_array_datasource(o, "array");
+
 	return o;
 }
 
-void ocrpt_free(opencreport *o) {
+static void ocrpt_free_datasource(const void *sptr) {
+	const ocrpt_datasource *s = sptr;
+
+	ocrpt_strfree(s->name);
+	iconv_close(s->encoder);
+	ocrpt_mem_free(s);
+}
+
+DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
+	/*
+	 * ocrpt_free_query() or ocrpt_free_query0()
+	 * must not be called from a List iterator on
+	 * o->queries since ocrpt_free_query0() modifies
+	 * o->queries.
+	 */
+	while (o->queries) {
+		ocrpt_query *q = (ocrpt_query *)o->queries->data;
+		ocrpt_free_query(o, q);
+	}
+
+	list_free_deep(o->datasources, ocrpt_free_datasource);
+
 	ocrpt_free_parts(o);
+
 	ocrpt_mem_free(o);
 }
 
-void ocrpt_set_numeric_precision_bits(opencreport *o, mpfr_prec_t prec) {
+DLL_EXPORT_SYM void ocrpt_set_numeric_precision_bits(opencreport *o, mpfr_prec_t prec) {
 	o->prec = prec;
 }
 
-void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode) {
+DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode) {
 	o->rndmode = rndmode;
 }
 
@@ -62,24 +87,24 @@ static int paperfindcmp(const void *key, const void *a) {
 	return strcasecmp(key, ((ocrpt_paper *)a)->name);
 }
 
-const ocrpt_paper *ocrpt_get_paper_by_name(const char *paper) {
+DLL_EXPORT_SYM const ocrpt_paper *ocrpt_get_paper_by_name(const char *paper) {
 	return bsearch(paper, papersizes, n_papersizes, sizeof(ocrpt_paper), paperfindcmp);
 }
 
-const ocrpt_paper *ocrpt_get_system_paper(void) {
+DLL_EXPORT_SYM const ocrpt_paper *ocrpt_get_system_paper(void) {
 	return system_paper;
 }
 
-const ocrpt_paper *ocrpt_get_paper(opencreport *o) {
+DLL_EXPORT_SYM const ocrpt_paper *ocrpt_get_paper(opencreport *o) {
 	return o->paper;
 }
 
-void ocrpt_set_paper(opencreport *o, const ocrpt_paper *paper) {
+DLL_EXPORT_SYM void ocrpt_set_paper(opencreport *o, const ocrpt_paper *paper) {
 	o->paper0 = *paper;
 	o->paper = &o->paper0;
 }
 
-void ocrpt_set_paper_by_name(opencreport *o, const char *papername) {
+DLL_EXPORT_SYM void ocrpt_set_paper_by_name(opencreport *o, const char *papername) {
 	const ocrpt_paper *paper = ocrpt_get_paper_by_name(papername);
 
 	if (!paper)
@@ -88,12 +113,12 @@ void ocrpt_set_paper_by_name(opencreport *o, const char *papername) {
 	o->paper = paper;
 }
 
-const ocrpt_paper *ocrpt_paper_first(opencreport *o) {
+DLL_EXPORT_SYM const ocrpt_paper *ocrpt_paper_first(opencreport *o) {
 	o->paper_iterator_idx = 0;
 	return &papersizes[o->paper_iterator_idx];
 }
 
-const ocrpt_paper *ocrpt_paper_next(opencreport *o) {
+DLL_EXPORT_SYM const ocrpt_paper *ocrpt_paper_next(opencreport *o) {
 	if (o->paper_iterator_idx >= n_papersizes)
 		return NULL;
 

@@ -7,6 +7,7 @@
 #ifndef _MEMUTIL_H_
 #define _MEMUTIL_H_
 
+#include <stdbool.h>
 #include <stddef.h> /* for size_t */
 #include "opencreport.h"
 
@@ -21,7 +22,7 @@ ocrpt_string *ocrpt_mem_string_new(const char *str);
 
 ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, const size_t len);
 
-char *ocrpt_mem_string_free(ocrpt_string *string, int free_str);
+char *ocrpt_mem_string_free(ocrpt_string *string, bool free_str);
 
 void ocrpt_mem_string_append_len(ocrpt_string *string, const char *str, const size_t len);
 

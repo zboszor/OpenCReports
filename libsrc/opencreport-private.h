@@ -7,9 +7,11 @@
 #define _OPENCREPORTS_PRIVATE_H_
 
 #include <stdlib.h>
+#include <opencreport.h>
 #include "listutil.h"
 #include "exprutil.h"
-#include "opencreport.h"
+
+#define UNUSED __attribute__((unused))
 
 struct opencreport_part {
 	const char *xmlbuf;
@@ -23,6 +25,12 @@ struct opencreport {
 	const ocrpt_paper *paper;
 	ocrpt_paper paper0;
 	int paper_iterator_idx;
+
+	/* List and array of struct ocrpt_datasource */
+	List *datasources;
+
+	/* List and array of struct ocrpt_query */
+	List *queries;
 
 	/* List of struct opencreports_part */
 	List *parts;

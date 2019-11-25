@@ -5,19 +5,21 @@
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
+#include <config.h>
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "opencreport.h"
 #include "memutil.h"
 
-ocrpt_mem_malloc_t ocrpt_mem_malloc0 = malloc;
-ocrpt_mem_realloc_t ocrpt_mem_realloc0 = realloc;
-ocrpt_mem_free_t ocrpt_mem_free0 = (ocrpt_mem_free_t)free;
-ocrpt_mem_strdup_t ocrpt_mem_strdup0 = strdup;
-ocrpt_mem_strndup_t ocrpt_mem_strndup0 = strndup;
+DLL_EXPORT_SYM ocrpt_mem_malloc_t ocrpt_mem_malloc0 = malloc;
+DLL_EXPORT_SYM ocrpt_mem_realloc_t ocrpt_mem_realloc0 = realloc;
+DLL_EXPORT_SYM ocrpt_mem_free_t ocrpt_mem_free0 = (ocrpt_mem_free_t)free;
+DLL_EXPORT_SYM ocrpt_mem_strdup_t ocrpt_mem_strdup0 = strdup;
+DLL_EXPORT_SYM ocrpt_mem_strndup_t ocrpt_mem_strndup0 = strndup;
 
-void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc, ocrpt_mem_realloc_t rrealloc, ocrpt_mem_free_t rfree, ocrpt_mem_strdup_t rstrdup, ocrpt_mem_strndup_t rstrndup) {
+DLL_EXPORT_SYM void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc, ocrpt_mem_realloc_t rrealloc, ocrpt_mem_free_t rfree, ocrpt_mem_strdup_t rstrdup, ocrpt_mem_strndup_t rstrndup) {
 	ocrpt_mem_malloc0 = rmalloc;
 	ocrpt_mem_realloc0 = rrealloc;
 	ocrpt_mem_free0 = rfree;
@@ -25,7 +27,7 @@ void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc, ocrpt_mem_realloc_t r
 	ocrpt_mem_strndup0 = rstrndup;
 }
 
-ocrpt_string *ocrpt_mem_string_new(const char *str) {
+DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new(const char *str) {
 	ocrpt_string *string = ocrpt_mem_malloc(sizeof(ocrpt_string));
 
 	if (!string)
@@ -50,7 +52,7 @@ ocrpt_string *ocrpt_mem_string_new(const char *str) {
 	return string;
 }
 
-ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, const size_t len) {
+DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, const size_t len) {
 	ocrpt_string *string = ocrpt_mem_malloc(sizeof(ocrpt_string));
 
 	if (!string)
@@ -77,7 +79,7 @@ ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, const size_t len) {
 	return string;
 }
 
-char *ocrpt_mem_string_free(ocrpt_string *string, int free_str) {
+DLL_EXPORT_SYM char *ocrpt_mem_string_free(ocrpt_string *string, bool free_str) {
 	char *str;
 
 	if (!string)
@@ -138,7 +140,7 @@ void ocrpt_mem_string_append(ocrpt_string *string, const char *str) {
 		string->str = strnew;
 	}
 
-	end = stpncpy(&string->str[string->len], str, newlen);
+	end = stpncpy(&string->str[string->len], str, newlen + 1);
 	*end = 0;
 	string->len = end - string->str;
 }

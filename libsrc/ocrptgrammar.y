@@ -5,6 +5,9 @@
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
+#include <config.h>
+
+#include <alloca.h>
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -50,7 +53,7 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, const char *fname, int alloc, Lis
 
 %}
 
-%pure-parser
+%define api.pure full
 %expect 0
 %locations
 
@@ -370,7 +373,7 @@ void parser_init(base_yy_extra_type *yyext, opencreport *o) {
 	yyext->err = NULL;
 }
 
-ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, char **err) {
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, char **err) {
 	yyscan_t yyscanner;
 	base_yy_extra_type yyextra;
 	int yyresult = 1;
@@ -450,12 +453,14 @@ static ocrpt_expr *newblankexpr(yyscan_t yyscanner, int type, uint32_t n_ops) {
 	if (!e)
 		parser_yyerror("out of memory");
 
+	memset(e, 0, sizeof(ocrpt_expr));
+
 	parser_yyget_extra(yyscanner)->last_expr = e;
 	parser_yyget_extra(yyscanner)->parsed_exprs = list_prepend(parser_yyget_extra(yyscanner)->parsed_exprs, e);
 
 	e->type = type;
 	e->n_ops = n_ops;
-	e->uops = (n_ops > 0 ? ocrpt_mem_malloc(n_ops * sizeof(ocrpt_united_expr)) : NULL);
+	e->ops = (n_ops > 0 ? ocrpt_mem_malloc(n_ops * sizeof(ocrpt_expr *)) : NULL);
 
 	return e;
 }
@@ -463,7 +468,11 @@ static ocrpt_expr *newblankexpr(yyscan_t yyscanner, int type, uint32_t n_ops) {
 static ocrpt_expr *newstring(yyscan_t yyscanner, const char *s) {
 	ocrpt_expr *e = newblankexpr(yyscanner, OCRPT_EXPR_STRING, 0);
 
-	e->string = s;
+	e->result = ocrpt_mem_malloc(sizeof(ocrpt_result));
+	memset(e->result, 0, sizeof(ocrpt_result));
+	e->result_owned = true;
+	e->result->string = s;
+	e->result->string_owned = true;
 	parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, s);
 
 	return e;
@@ -472,8 +481,14 @@ static ocrpt_expr *newstring(yyscan_t yyscanner, const char *s) {
 static ocrpt_expr *newnumber(yyscan_t yyscanner, const char *n) {
 	ocrpt_expr *e = newblankexpr(yyscanner, OCRPT_EXPR_NUMBER, 0);
 
-	e->string = n;
+	e->result = ocrpt_mem_malloc(sizeof(ocrpt_result));
+	memset(e->result, 0, sizeof(ocrpt_result));
+	e->result_owned = true;
 	parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, n);
+	mpfr_init2(e->result->number, parser_yyget_extra(yyscanner)->o->prec);
+	mpfr_set_str(e->result->number, n, 10, parser_yyget_extra(yyscanner)->o->rndmode);
+	e->result->number_initialized = true;
+	ocrpt_strfree(n);
 
 	return e;
 }
@@ -509,14 +524,28 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, const char *fname, int alloc, Lis
 		parser_yyerror("invalid function name");
 	}
 
+	if (f->n_ops > 0 && f->n_ops != list_length(l)) {
+		char *msg;
+		int len;
+
+		if (!alloc)
+			ocrpt_strfree(fname);
+
+		len = snprintf(NULL, 0, "invalid number of operands for %s", f->fname);
+		msg = alloca(len + 1);
+		sprintf(msg, "invalid number of operands for %s", f->fname);
+		parser_yyerror(msg);
+	}
+
 	e = newblankexpr(yyscanner, OCRPT_EXPR, list_length(l));
 	parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, fname);
-	e->fname = (alloc ? ocrpt_mem_strdup(fname) : fname);
+	if (!alloc)
+		ocrpt_strfree(fname);
+	e->func = f;
 
 	for (ptr = l, idx = 0; ptr; ptr = ptr->next, idx++) {
 		parser_yyget_extra(yyscanner)->parsed_exprs = list_remove(parser_yyget_extra(yyscanner)->parsed_exprs, ptr->data);
-		e->uops[idx].type = OCRPT_EXPR;
-		e->uops[idx].op = (ocrpt_expr *)ptr->data;
+		e->ops[idx] = (ocrpt_expr *)ptr->data;
 	}
 
 	parser_yyget_extra(yyscanner)->parsed_arglist = NULL;

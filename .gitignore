@@ -47,6 +47,8 @@ doc/*.pdf
 
 # Binaries
 libsrc/ocrpt_grammar_test
+libsrc/ocrpt_expr_test
+libsrc/ocrpt_array_test
 libsrc/ocrpt_paper_test
 
 # Misc

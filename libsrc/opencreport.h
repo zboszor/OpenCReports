@@ -3,9 +3,12 @@
  * Copyright (C) 2019 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
-#ifndef _OPENCREPORTS_H_
-#define _OPENCREPORTS_H_
+#ifndef _OPENCREPORT_H_
+#define _OPENCREPORT_H_
 
+#include <stdbool.h>
+#include <stdint.h>
+#include <time.h>
 #include <mpfr.h>
 
 /* Main report structure type */
@@ -14,6 +17,57 @@ typedef struct opencreport opencreport;
 
 struct ocrpt_expr;
 typedef struct ocrpt_expr ocrpt_expr;
+
+enum ocrpt_result_type {
+	/*
+	 * Error in parsing or evaluation
+	 */
+	OCRPT_RESULT_ERROR,
+
+	/*
+	 * Constants
+	 */
+	OCRPT_RESULT_STRING,
+	OCRPT_RESULT_NUMBER,
+	OCRPT_RESULT_DATETIME
+};
+
+struct ocrpt_result {
+	enum ocrpt_result_type type;
+	/* Original lexer token or (computed) string value for expression */
+	const char *string;
+	/* Converted numeric constant or computed numeric value for expression */
+	mpfr_t number;
+	bool number_initialized;
+	bool string_owned;
+	bool isnull;
+	/* Datetime value */
+	struct tm datetime;
+};
+typedef struct ocrpt_result ocrpt_result;
+
+struct ocrpt_query;
+typedef struct ocrpt_query ocrpt_query;
+
+struct ocrpt_query_result {
+	const char *name;
+	bool name_allocated;
+	ocrpt_result result;
+};
+typedef struct ocrpt_query_result ocrpt_query_result;
+
+struct ocrpt_input {
+	void (*describe)(ocrpt_query *, ocrpt_query_result **, int32_t *);
+	void (*rewind)(ocrpt_query *);
+	bool (*next)(ocrpt_query *);
+	bool (*isdone)(ocrpt_query *);
+	void (*free)(ocrpt_query *);
+};
+
+typedef struct ocrpt_input ocrpt_input;
+
+struct ocrpt_datasource;
+typedef struct ocrpt_datasource ocrpt_datasource;
 
 struct ocrpt_paper {
 	const char *name;
@@ -48,14 +102,36 @@ void ocrpt_set_numeric_precision_bits(opencreport *o, mpfr_prec_t prec);
  * Set MPFR rounding mode
  */
 void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode);
+
+/********************************
+ * Expression related functions *
+ ********************************/
+
 /*
  * Create an expression parse tree from an expression string
  */
 ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, char **err);
 /*
+ * Optimize expression after parsing
+ */
+void ocrpt_expr_optimize(opencreport *o, ocrpt_expr *e);
+/*
+ * Resolve variable references in the expression
+ */
+void ocrpt_expr_resolve(opencreport *o, ocrpt_expr *e);
+/*
+ * Evaluate the expression, i.e. compute its ocrpt_result
+ * It must be called after ocrpt_navigate_next(), see below.
+ */
+ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_expr *e);
+/*
  * Print an expression on stdout. Good for unit testing.
  */
 void ocrpt_expr_print(ocrpt_expr *e);
+/*
+ * Print the result data. Good for unit testing.
+ */
+void ocrpt_expr_result_print(ocrpt_result *r);
 /*
  * Count the number of expression nodes
  */
@@ -64,9 +140,11 @@ int ocrpt_expr_nodes(ocrpt_expr *e);
  * Free an expression parse tree
  */
 void ocrpt_free_expr(ocrpt_expr *e);
-/*
- * Memory handling wrappers
- */
+
+/****************************
+ * Memory handling wrappers *
+ ****************************/
+
 typedef void *(*ocrpt_mem_malloc_t)(size_t);
 typedef void *(*ocrpt_mem_realloc_t)(void *, size_t);
 typedef void (*ocrpt_mem_free_t)(const void *);
@@ -94,9 +172,9 @@ static inline void *ocrpt_mem_strndup(const char *ptr, size_t sz) { return (ptr 
 
 void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc, ocrpt_mem_realloc_t rrealloc, ocrpt_mem_free_t rfree, ocrpt_mem_strdup_t rstrdup, ocrpt_mem_strndup_t rstrndup);
 
-/*
- * Paper size related functions
- */
+/********************************
+ * Paper size related functions *
+ ********************************/
 
 /*
  * System default paper name and size
@@ -127,6 +205,63 @@ const ocrpt_paper *ocrpt_get_paper(opencreport *o);
  */
 const ocrpt_paper *ocrpt_paper_first(opencreport *o);
 const ocrpt_paper *ocrpt_paper_next(opencreport *o);
+
+/******************************************
+ * Datasource and query related functions *
+ ******************************************/
+
+/*
+ * Add a custom datasource not covered by
+ * the currently implemented sources.
+ */
+ocrpt_datasource *ocrpt_add_datasource(opencreport *o, const char *source_name, const ocrpt_input *input);
+/*
+ * Find the datasource using its name
+ */
+ocrpt_datasource *ocrpt_find_datasource(opencreport *o, const char *source_name);
+/*
+ * Validate the datasource pointer against the report structure
+ */
+ocrpt_datasource *ocrpt_validate_datasource(opencreport *o, void *source);
+/*
+ * Add an array datasource
+ *
+ * Calling this is optional, as an array datasource called
+ * "array" is automatically added to an opencreport structure.
+ */
+ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o, const char *input_name);
+/*
+ * Add an array query using the datasource pointer
+ */
+ocrpt_query *ocrpt_add_array_query(opencreport *o, ocrpt_datasource *source, const char *name, void *array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types);
+/*
+ * Add an array query using the datasource name
+ */
+ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name, const char *name, void *array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types);
+/*
+ * Return the query result array and the number of columns in it
+ */
+ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_t *cols);
+/*
+ * Add follower query with a match function
+ */
+bool ocrpt_add_query_follower_n_to_1(opencreport *o, ocrpt_query *leader, ocrpt_query *follower, ocrpt_expr *match);
+/*
+ * Add follower query (runs side-by-side with "leader")
+ */
+bool ocrpt_add_query_follower(opencreport *o, ocrpt_query *leader, ocrpt_query *follower);
+/*
+ * Free a query and remove it from follower references
+ */
+void ocrpt_free_query(opencreport *o, ocrpt_query *q);
+/*
+ * Start query navigation from the beginning of the resultset
+ */
+void ocrpt_navigate_start(opencreport *o, ocrpt_query *q);
+/*
+ * Move to next row in the query resultset
+ */
+bool ocrpt_navigate_next(opencreport *o, ocrpt_query *q);
 
 #if 0
 /*
@@ -162,4 +297,4 @@ int ocrpt_parse2(opencreport *o, int allow_bad_xml);
  */
 int ocrpt_execute(opencreport *o);
 
-#endif
+#endif /* _OPENCREPORT_H_ */

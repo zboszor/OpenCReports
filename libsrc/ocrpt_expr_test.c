@@ -1,0 +1,75 @@
+/*
+ * OpenCReports test
+ * Copyright (C) 2019 Zoltán Böszörményi <zboszor@gmail.com>
+ * See COPYING.LGPLv3 in the toplevel directory.
+ */
+
+#include <stdio.h>
+
+#include "opencreport.h"
+
+int main(void) {
+	opencreport *o = ocrpt_init();
+	ocrpt_expr *e;
+
+	char *str[] = {
+		"|1|",
+		"-1",
+
+		/* Left-associative operator sequence */
+		"1 + 2 + 3",
+		"1 * 2 * 3",
+		"1 * 2 / 3",
+		"1 / 2 * 3",
+
+		/* Operator precedence without parenthesis */
+		"1 + 2 * 3",
+		"1 - 2 * 3",
+		"-1 + -2 * -3",
+		"-1 - -2 * -3",
+
+		/* Operator precedence with parenthesis */
+		"(1 + 2) * 3",
+		"(1 - 2) * 3",
+		"(-1 + -2) * -3",
+		"(-1 - -2) * -3",
+
+		/* Facebook challange with implicit multiplication */
+		"1/(1+1)(2+2)",
+
+		/* Misc. expressions */
+		"(2+2).2",
+		"1/2x",
+		"1/2e",
+		"2e",
+		"add(1, 2, 3, 4, 5, (6))",
+	};
+	int nstr = sizeof(str) / sizeof(char *);
+	int i;
+
+	for (i = 0; i < nstr; i++) {
+		char *err = NULL;
+
+		printf("string: %s\n", str[i]);
+		e = ocrpt_expr_parse(o, str[i], &err);
+		if (e) {
+			printf("expr reprinted: ");
+			ocrpt_expr_print(e);
+			printf("expr nodes: %d\n", ocrpt_expr_nodes(e));
+
+			ocrpt_expr_optimize(o, e);
+			printf("expr optimized: ");
+			ocrpt_expr_print(e);
+			printf("expr nodes: %d\n", ocrpt_expr_nodes(e));
+		} else {
+			printf("%s\n", err);
+			ocrpt_strfree(err);
+		}
+		ocrpt_free_expr(e);
+		printf("\n");
+	}
+
+	ocrpt_free(o);
+
+	return 0;
+}
