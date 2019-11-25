@@ -36,6 +36,7 @@ int main(void) {
 
 		/* Facebook challange with implicit multiplication */
 		"1/(1+1)(2+2)",
+		"1/(1+1)*(2+2)",
 
 		/* Misc. expressions */
 		"(2+2).2",
