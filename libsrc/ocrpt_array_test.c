@@ -31,6 +31,18 @@ static const char *array3[4][4] = {
 	{ "1", "Barney Rubble", "small", "29" },
 };
 
+void print_result_row(const char *name, ocrpt_query_result *qr, int32_t cols) {
+	int i;
+
+	printf("Query: '%s':\n", name);
+	for (i = 0; i < cols; i++) {
+		printf("\tCol #%d: '%s': '%s'", i, qr[i].name, qr[i].result.isnull ? "NULL" : qr[i].result.string);
+		if (!qr[i].result.isnull && qr[i].result.number_initialized)
+			mpfr_printf(" (converted to number: %RF)", qr[i].result.number);
+		printf("\n");
+	}
+}
+
 int main(void) {
 	opencreport *o = ocrpt_init();
 	ocrpt_query *q, *q2;
@@ -71,12 +83,7 @@ int main(void) {
 		ocrpt_result *r;
 
 		printf("Row #%d\n", row++);
-		for (i = 0; i < cols; i++) {
-			printf("\tCol #%d: '%s': '%s'", i, qr[i].name, qr[i].result.string);
-			if (qr[i].result.number_initialized)
-				mpfr_printf(" (converted to number: %RF)", qr[i].result.number);
-			printf("\n");
-		}
+		print_result_row("a", qr, cols);
 
 		printf("\n");
 
@@ -114,18 +121,8 @@ int main(void) {
 		ocrpt_result *r;
 
 		printf("Row #%d\n", row++);
-		for (i = 0; i < cols; i++) {
-			printf("\tCol #%d: '%s': '%s'", i, qr[i].name, qr[i].result.string);
-			if (qr[i].result.number_initialized)
-				mpfr_printf(" (converted to number: %RF)", qr[i].result.number);
-			printf("\n");
-		}
-		for (i = 0; i < cols2; i++) {
-			printf("\tCol #%d: '%s': %s", i, qr2[i].name, qr2[i].result.isnull ? "NULL" : qr2[i].result.string);
-			if (!qr2[i].result.isnull && qr2[i].result.number_initialized)
-				mpfr_printf(" (converted to number: %RF)", qr2[i].result.number);
-			printf("\n");
-		}
+		print_result_row("a", qr, cols);
+		print_result_row("b", qr2, cols2);
 
 		printf("\n");
 
@@ -169,18 +166,8 @@ int main(void) {
 		ocrpt_result *r;
 
 		printf("Row #%d\n", row++);
-		for (i = 0; i < cols; i++) {
-			printf("\tCol #%d: '%s': '%s'", i, qr[i].name, qr[i].result.string);
-			if (qr[i].result.number_initialized)
-				mpfr_printf(" (converted to number: %RF)", qr[i].result.number);
-			printf("\n");
-		}
-		for (i = 0; i < cols2; i++) {
-			printf("\tCol #%d: '%s': %s", i, qr2[i].name, qr2[i].result.isnull ? "NULL" : qr2[i].result.string);
-			if (!qr2[i].result.isnull && qr2[i].result.number_initialized)
-				mpfr_printf(" (converted to number: %RF)", qr2[i].result.number);
-			printf("\n");
-		}
+		print_result_row("a", qr, cols);
+		print_result_row("b", qr2, cols2);
 
 		printf("\n");
 
