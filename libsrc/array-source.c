@@ -85,7 +85,6 @@ static bool ocrpt_array_next(ocrpt_query *query) {
 
 static bool ocrpt_array_isdone(ocrpt_query *query) {
 	struct ocrpt_array_results *result = query->priv;
-	int i;
 
 	if (result == NULL)
 		return true;
