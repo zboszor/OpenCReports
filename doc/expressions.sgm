@@ -1,4 +1,4 @@
-<chapter label="1" id="expressions">
+<chapter label="1" id="expressions" xreflabel="Expressions">
 	<title>Expressions in OpenCReports</title>
 	<sect1>
 		<title>Introduction</title>
@@ -7,9 +7,9 @@
 			that provide a solid and extensible basis for report expressions.
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="constants" xreflabel="Constants">
 		<title>Constants</title>
-		<sect2>
+		<sect2 id="stringliterals" xreflabel="String literals">
 			<title>String literals</title>
 			<para>
 				String literals in OpenCReports can be either single or double quoted.
@@ -68,7 +68,7 @@ applepear
 				</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="numericconstants" xreflabel="Numeric constants">
 			<title>Numeric constants</title>
 			<para>
 				Numeric values in OpenCReports are handled with GNU MPFR with
@@ -108,7 +108,7 @@ applepear
 				</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="boolconstants" xreflabel="Boolean constants">
 			<title>Boolean constants</title>
 			<para>
 				Boolean constants evalutate to numeric constans
@@ -123,7 +123,7 @@ false
 			</para>
 		</sect2>
 	</sect1>
-	<sect1>
+	<sect1 id="identifiers" xreflabel="Identifiers">
 		<title>Identifiers</title>
 		<para>
 			In OpenCReports expressions, identifiers can reference query column
@@ -197,7 +197,7 @@ yes.no
 "and"."or"
 			</programlisting>
 		</para>
-		<sect2>
+		<sect2 id="speciddomains" xreflabel="Special identifier domains">
 			<title>Special identifier domains</title>
 			<para>
 				Unquoted domain <literal>m</literal> indicates the domain
@@ -239,7 +239,7 @@ v.break1
 			</para>
 		</sect2>
 	</sect1>
-	<sect1>
+	<sect1 id="opsandfunc" xreflabel="Operators and functions">
 		<title>Operators and functions</title>
 		<para>
 			OpenCReports expressions can use several operators and functions.

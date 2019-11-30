@@ -1,4 +1,4 @@
-SGMLFILES = OpenCReports.sgm expressions.sgm jadetex.cfg
+SGMLFILES = OpenCReports.sgm expressions.sgm c-api-reference.sgm jadetex.cfg
 
 all: OpenCReports.pdf
 
