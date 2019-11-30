@@ -104,8 +104,8 @@ static const ocrpt_input ocrpt_array_input = {
 	.free = ocrpt_array_free
 };
 
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o, const char *input_name) {
-	return ocrpt_add_datasource(o, input_name, &ocrpt_array_input);
+DLL_EXPORT_SYM ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o, const char *source_name) {
+	return ocrpt_add_datasource(o, source_name, &ocrpt_array_input);
 }
 
 static ocrpt_query *add_array_query(opencreport *o, const ocrpt_datasource *source, const char *name, void *array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {

@@ -64,7 +64,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_find_datasource(opencreport *o, const cha
 	return NULL;
 }
 
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_validate_datasource(opencreport *o, void *source) {
+DLL_EXPORT_SYM ocrpt_datasource *ocrpt_validate_datasource(opencreport *o, ocrpt_datasource *source) {
 	List *ptr;
 
 	for (ptr = o->datasources; ptr; ptr = ptr->next) {

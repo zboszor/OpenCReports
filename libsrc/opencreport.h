@@ -170,7 +170,11 @@ static inline void *ocrpt_mem_strdup(const char *ptr) { return (ptr ? ocrpt_mem_
 
 static inline void *ocrpt_mem_strndup(const char *ptr, size_t sz) { return (ptr ? ocrpt_mem_strndup0(ptr, sz) : NULL); }
 
-void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc, ocrpt_mem_realloc_t rrealloc, ocrpt_mem_free_t rfree, ocrpt_mem_strdup_t rstrdup, ocrpt_mem_strndup_t rstrndup);
+void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc,
+								ocrpt_mem_realloc_t rrealloc,
+								ocrpt_mem_free_t rfree,
+								ocrpt_mem_strdup_t rstrdup,
+								ocrpt_mem_strndup_t rstrndup);
 
 /********************************
  * Paper size related functions *
@@ -222,22 +226,28 @@ ocrpt_datasource *ocrpt_find_datasource(opencreport *o, const char *source_name)
 /*
  * Validate the datasource pointer against the report structure
  */
-ocrpt_datasource *ocrpt_validate_datasource(opencreport *o, void *source);
+ocrpt_datasource *ocrpt_validate_datasource(opencreport *o, ocrpt_datasource *source);
 /*
  * Add an array datasource
  *
  * Calling this is optional, as an array datasource called
  * "array" is automatically added to an opencreport structure.
  */
-ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o, const char *input_name);
+ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o, const char *source_name);
 /*
  * Add an array query using the datasource pointer
  */
-ocrpt_query *ocrpt_add_array_query(opencreport *o, ocrpt_datasource *source, const char *name, void *array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types);
+ocrpt_query *ocrpt_add_array_query(opencreport *o, ocrpt_datasource *source,
+									const char *name, void *array,
+									int32_t rows, int32_t cols,
+									const enum ocrpt_result_type *types);
 /*
  * Add an array query using the datasource name
  */
-ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name, const char *name, void *array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types);
+ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name,
+									const char *name, void *array,
+									int32_t rows, int32_t cols,
+									const enum ocrpt_result_type *types);
 /*
  * Return the query result array and the number of columns in it
  */
@@ -245,11 +255,16 @@ ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_t *cols);
 /*
  * Add follower query with a match function
  */
-bool ocrpt_add_query_follower_n_to_1(opencreport *o, ocrpt_query *leader, ocrpt_query *follower, ocrpt_expr *match);
+bool ocrpt_add_query_follower_n_to_1(opencreport *o,
+									ocrpt_query *leader,
+									ocrpt_query *follower,
+									ocrpt_expr *match);
 /*
  * Add follower query (runs side-by-side with "leader")
  */
-bool ocrpt_add_query_follower(opencreport *o, ocrpt_query *leader, ocrpt_query *follower);
+bool ocrpt_add_query_follower(opencreport *o,
+									ocrpt_query *leader,
+									ocrpt_query *follower);
 /*
  * Free a query and remove it from follower references
  */
