@@ -60,6 +60,7 @@ struct ocrpt_input {
 	void (*describe)(ocrpt_query *, ocrpt_query_result **, int32_t *);
 	void (*rewind)(ocrpt_query *);
 	bool (*next)(ocrpt_query *);
+	bool (*populate_result)(ocrpt_query *);
 	bool (*isdone)(ocrpt_query *);
 	void (*free)(ocrpt_query *);
 };
@@ -127,7 +128,7 @@ ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_expr *e);
 /*
  * Print an expression on stdout. Good for unit testing.
  */
-void ocrpt_expr_print(ocrpt_expr *e);
+void ocrpt_expr_print(opencreport *o, ocrpt_expr *e);
 /*
  * Print the result data. Good for unit testing.
  */
@@ -250,6 +251,9 @@ ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name,
 									const enum ocrpt_result_type *types);
 /*
  * Return the query result array and the number of columns in it
+ *
+ * It must be re-run for every new data source row since
+ * the pointer is invalidated after ocrpt_navigate_next()
  */
 ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_t *cols);
 /*

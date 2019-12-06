@@ -86,6 +86,7 @@ struct ocrpt_input {
     void (*describe)(ocrpt_query *, ocrpt_query_result **, int32_t *);
     void (*rewind)(ocrpt_query *);
     bool (*next)(ocrpt_query *);
+    bool (*populate_result)(ocrpt_query *);
     bool (*isdone)(ocrpt_query *);
     void (*free)(ocrpt_query *);
 };
@@ -186,7 +187,9 @@ ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name,
 			<para>
 				Create and get the <literal>ocrpt_query_result</literal>
 				array from a query. Output parameter <literal>cols</literal>
-				returns the number of columns in the result array.
+				returns the number of columns in the result array. It must
+                be (re-)run after ocrpt_navigate_next() since the previously
+                returned pointer becomes invalid.
 				<programlisting>
 ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_t *cols);
 				</programlisting>
@@ -328,7 +331,7 @@ ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_expr *e);
 				Print an expression tree in its processed form on the
 				standard output. Good for unit testing.
 				<programlisting>
-void ocrpt_expr_print(ocrpt_expr *e);
+void ocrpt_expr_print(opencreport *o, ocrpt_expr *e);
 				</programlisting>
 			</para>
 		</sect2>

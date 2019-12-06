@@ -69,7 +69,9 @@ DLL_EXPORT_SYM void ocrpt_free_expr(ocrpt_expr *e) {
 	case OCRPT_EXPR_ERROR:
 	case OCRPT_EXPR_STRING:
 	case OCRPT_EXPR_DATETIME:
-		ocrpt_free_expr_result(e->result, e->type);
+		for (i = 0; i < 2; i++)
+			if (e->result_owned[i] && e->result[i])
+				ocrpt_free_expr_result(e->result[i], e->type);
 		break;
 	case OCRPT_EXPR_MVAR:
 	case OCRPT_EXPR_RVAR:
@@ -79,19 +81,22 @@ DLL_EXPORT_SYM void ocrpt_free_expr(ocrpt_expr *e) {
 		ocrpt_strfree(e->name);
 		e->query = NULL;
 		e->name = NULL;
-		if (e->result_owned && e->result)
-			ocrpt_free_expr_result(e->result, e->result->type);
+		for (i = 0; i < 2; i++)
+			if (e->result_owned[i] && e->result[i])
+				ocrpt_free_expr_result(e->result[i], e->result[i]->type);
 		break;
 	case OCRPT_EXPR:
-		if (e->result_owned && e->result)
-			ocrpt_free_expr_result(e->result, e->result->type);
+		for (i = 0; i < 2; i++)
+			if (e->result_owned[i] && e->result[i])
+				ocrpt_free_expr_result(e->result[i], e->result[i]->type);
 		for (i = 0; i < e->n_ops; i++)
 			ocrpt_free_expr(e->ops[i]);
 		ocrpt_mem_free(e->ops);
 		break;
 	}
 
-	if (e->result_owned)
-		ocrpt_mem_free(e->result);
+	for (i = 0; i < 2; i++)
+		if (e->result_owned[i])
+			ocrpt_mem_free(e->result[i]);
 	ocrpt_mem_free(e);
 }

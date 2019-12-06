@@ -50,8 +50,8 @@ enum ocrpt_expr_type {
 
 struct ocrpt_expr {
 	enum ocrpt_expr_type type;
-	bool result_owned;
-	struct ocrpt_result *result;
+	bool result_owned[2];
+	struct ocrpt_result *result[2];
 	union {
 		/*
 		 * Identifiers: computed report variables,
@@ -71,6 +71,6 @@ struct ocrpt_expr {
 	};
 };
 
-ocrpt_result *ocrpt_expr_make_error_result(ocrpt_expr *e, const char *error);
+ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *error);
 
 #endif

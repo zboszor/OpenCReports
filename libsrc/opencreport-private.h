@@ -37,6 +37,9 @@ struct opencreport {
 
 	mpfr_prec_t prec;
 	mpfr_rnd_t rndmode;
+
+	/* Alternating datasource row result index  */
+	bool residx:1;
 };
 
 extern char cwdpath[PATH_MAX];

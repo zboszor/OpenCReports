@@ -14,6 +14,9 @@
 #include "opencreport-private.h"
 #include "datasource.h"
 
+static void ocrpt_navigate_start_private(opencreport *o, ocrpt_query *q);
+static bool ocrpt_navigate_next_private(opencreport *o, ocrpt_query *q);
+
 static bool ocrpt_navigate_n_to_1_check_current(opencreport *o, ocrpt_query *q) {
 	List *fw;
 
@@ -85,7 +88,7 @@ static bool ocrpt_navigate_next_n_to_1(opencreport *o, ocrpt_query *q) {
 			ocrpt_query_follower *fo = (ocrpt_query_follower *)fw->data;
 			ocrpt_query *f = fo->follower;
 
-			ocrpt_navigate_next(o, f);
+			ocrpt_navigate_next_private(o, f);
 
 			if (!f->source || !f->source->input || !f->source->input->isdone) {
 				/* TODO: report that the input source is not OK? */
@@ -109,7 +112,7 @@ static bool ocrpt_navigate_next_n_to_1(opencreport *o, ocrpt_query *q) {
 			if (f->n_to_1_empty)
 				continue;
 
-			ocrpt_navigate_next(o, f);
+			ocrpt_navigate_next_private(o, f);
 			break;
 		}
 	}
@@ -141,16 +144,16 @@ static bool ocrpt_navigate_next_n_to_1(opencreport *o, ocrpt_query *q) {
 					ocrpt_query_follower *fo1 = (ocrpt_query_follower *)fw1->data;
 					ocrpt_query *f1 = fo1->follower;
 
-					ocrpt_navigate_start(o, f1);
-					ocrpt_navigate_next(o, f1);
+					ocrpt_navigate_start_private(o, f1);
+					ocrpt_navigate_next_private(o, f1);
 				}
 
-				ocrpt_navigate_start(o, f);
-				ocrpt_navigate_next(o, f);
+				ocrpt_navigate_start_private(o, f);
+				ocrpt_navigate_next_private(o, f);
 				continue;
 			}
 
-			ocrpt_navigate_next(o, f);
+			ocrpt_navigate_next_private(o, f);
 			break;
 		}
 	} while (1);
@@ -158,7 +161,7 @@ static bool ocrpt_navigate_next_n_to_1(opencreport *o, ocrpt_query *q) {
 	return retval;
 }
 
-DLL_EXPORT_SYM bool ocrpt_navigate_next(opencreport *o, ocrpt_query *q) {
+static bool ocrpt_navigate_next_private(opencreport *o, ocrpt_query *q) {
 	List *fw;
 	bool retval, retval11;
 
@@ -167,6 +170,7 @@ DLL_EXPORT_SYM bool ocrpt_navigate_next(opencreport *o, ocrpt_query *q) {
 		return false;
 	}
 
+	q->source->input->populate_result(q);
 
 	if (q->n_to_1_started) {
 		retval = ocrpt_navigate_next_n_to_1(o, q);
@@ -198,7 +202,7 @@ DLL_EXPORT_SYM bool ocrpt_navigate_next(opencreport *o, ocrpt_query *q) {
 	retval11 = false;
 	for (fw = q->followers; fw; fw = fw->next) {
 		ocrpt_query *f = (ocrpt_query *)fw->data;
-		retval = ocrpt_navigate_next(o, f);
+		retval = ocrpt_navigate_next_private(o, f);
 		if (f->followers_n_to_1)
 			retval11 = (retval11 || retval);
 	}
@@ -208,7 +212,7 @@ DLL_EXPORT_SYM bool ocrpt_navigate_next(opencreport *o, ocrpt_query *q) {
 		ocrpt_query_follower *fo = (ocrpt_query_follower *)fw->data;
 		ocrpt_query *f = fo->follower;
 
-		ocrpt_navigate_start(o, f);
+		ocrpt_navigate_start_private(o, f);
 	}
 
 	retval = ocrpt_navigate_next_n_to_1(o, q);
@@ -218,7 +222,7 @@ DLL_EXPORT_SYM bool ocrpt_navigate_next(opencreport *o, ocrpt_query *q) {
 	return true;
 }
 
-DLL_EXPORT_SYM void ocrpt_navigate_start(opencreport *o, ocrpt_query *q) {
+static void ocrpt_navigate_start_private(opencreport *o, ocrpt_query *q) {
 	List *fw;
 	ocrpt_query_result *qr;
 	int32_t cols;
@@ -247,13 +251,23 @@ DLL_EXPORT_SYM void ocrpt_navigate_start(opencreport *o, ocrpt_query *q) {
 	for (fw = q->followers; fw; fw = fw->next) {
 		ocrpt_query *f = (ocrpt_query *)fw->data;
 
-		ocrpt_navigate_start(o, f);
+		ocrpt_navigate_start_private(o, f);
 	}
 
 	for (fw = q->followers_n_to_1; fw; fw = fw->next) {
 		ocrpt_query_follower *fo = (ocrpt_query_follower *)fw->data;
 		ocrpt_query *f = fo->follower;
 
-		ocrpt_navigate_start(o, f);
+		ocrpt_navigate_start_private(o, f);
 	}
+}
+
+DLL_EXPORT_SYM void ocrpt_navigate_start(opencreport *o, ocrpt_query *q) {
+	o->residx = true;
+	ocrpt_navigate_start_private(o, q);
+}
+
+DLL_EXPORT_SYM bool ocrpt_navigate_next(opencreport *o, ocrpt_query *q) {
+	o->residx = !o->residx;
+	return ocrpt_navigate_next_private(o, q);
 }

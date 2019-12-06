@@ -159,11 +159,17 @@ DLL_EXPORT_SYM void ocrpt_free_query(opencreport *o, ocrpt_query *q) {
 }
 
 DLL_EXPORT_SYM ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_t *cols) {
+	if (!q) {
+		if (cols)
+			*cols = 0;
+		return NULL;
+	}
+
 	if (!q->result && q->source && q->source->input && q->source->input->describe)
 		q->source->input->describe(q, &q->result, &q->cols);
 	if (cols)
 		*cols = q->cols;
-	return q->result;
+	return (q->source->o->residx ? &q->result[q->cols] : q->result);
 }
 
 void ocrpt_free_query_result(ocrpt_query *q) {
@@ -171,7 +177,7 @@ void ocrpt_free_query_result(ocrpt_query *q) {
 	int32_t cols = q->cols, i;
 
 	if (result && cols) {
-		for (i = 0; i < cols; i++) {
+		for (i = 0; i < 2 * cols; i++) {
 			if (result[i].name_allocated) {
 				ocrpt_strfree(result[i].name);
 				result[i].name = NULL;

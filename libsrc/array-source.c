@@ -35,10 +35,52 @@ static void ocrpt_array_rewind(ocrpt_query *query) {
 	result->isdone = false;
 }
 
-static bool ocrpt_array_next(ocrpt_query *query) {
+static bool ocrpt_array_populate_result(ocrpt_query *query) {
 	opencreport *o = query->source->o;
 	struct ocrpt_array_results *result = query->priv;
-	int i;
+	int i, base;
+
+	base = (o->residx ? query->cols: 0);
+
+	if (result->isdone) {
+		for (i = 0; i < query->cols; i++)
+			query->result[base + i].result.isnull = true;
+		return false;
+	}
+
+	for (i = 0; i < query->cols; i++) {
+		int32_t dataidx = result->current_row * query->cols + i;
+		ocrpt_result *r = &query->result[base + i].result;
+		const char *str;
+
+		//fprintf(stderr, "%s:%d: cols: %d, rows: %d, current row: %d current col: %d, computed idx: %d\n", __func__, __LINE__, query->cols, result->rows, result->current_row, i, dataidx);
+		str = result->data[dataidx];
+
+		if (str) {
+			r->isnull = false;
+
+			if (r->string_owned)
+				ocrpt_strfree(r->string);
+			r->string = str;
+			r->string_owned = false;
+
+			if (r->type == OCRPT_RESULT_NUMBER) {
+				if (!r->number_initialized)
+					mpfr_init2(r->number, o->prec);
+				mpfr_set_str(r->number, str, 10, o->rndmode);
+			}
+		} else {
+			r->isnull = true;
+			if (r->number_initialized)
+				mpfr_set_ui(r->number, 0, o->rndmode);
+		}
+	}
+
+	return true;
+}
+
+static bool ocrpt_array_next(ocrpt_query *query) {
+	struct ocrpt_array_results *result = query->priv;
 
 	if (result == NULL)
 		return false;
@@ -47,40 +89,7 @@ static bool ocrpt_array_next(ocrpt_query *query) {
 	result->current_row++;
 	result->isdone = (result->current_row > result->rows);
 
-	if (result->isdone) {
-		for (i = 0; i < query->cols; i++)
-			query->result[i].result.isnull = true;
-		return false;
-	}
-
-	for (i = 0; i < query->cols; i++) {
-		int32_t dataidx = result->current_row * query->cols + i;
-		const char *str;
-
-		//fprintf(stderr, "%s:%d: cols: %d, rows: %d, current row: %d current col: %d, computed idx: %d\n", __func__, __LINE__, query->cols, result->rows, result->current_row, i, dataidx);
-		str = result->data[dataidx];
-
-		if (str) {
-			query->result[i].result.isnull = false;
-
-			if (query->result[i].result.string_owned)
-				ocrpt_strfree(query->result[i].result.string);
-			query->result[i].result.string = str;
-			query->result[i].result.string_owned = false;
-
-			if (query->result[i].result.type == OCRPT_RESULT_NUMBER) {
-				if (!query->result[i].result.number_initialized)
-					mpfr_init2(query->result[i].result.number, o->prec);
-				mpfr_set_str(query->result[i].result.number, str, 10, o->rndmode);
-			}
-		} else {
-			query->result[i].result.isnull = true;
-			if (query->result[i].result.number_initialized)
-				mpfr_set_ui(query->result[i].result.number, 0, o->rndmode);
-		}
-	}
-
-	return true;
+	return ocrpt_array_populate_result(query);
 }
 
 static bool ocrpt_array_isdone(ocrpt_query *query) {
@@ -100,6 +109,7 @@ static void ocrpt_array_free(ocrpt_query *query) {
 static const ocrpt_input ocrpt_array_input = {
 	.rewind = ocrpt_array_rewind,
 	.next = ocrpt_array_next,
+	.populate_result = ocrpt_array_populate_result,
 	.isdone = ocrpt_array_isdone,
 	.free = ocrpt_array_free
 };
@@ -136,23 +146,29 @@ static ocrpt_query *add_array_query(opencreport *o, const ocrpt_datasource *sour
 	priv->isdone = false;
 	query->priv = priv;
 
-	result = ocrpt_mem_malloc(cols * sizeof(ocrpt_query_result));
+	result = ocrpt_mem_malloc(2 * cols * sizeof(ocrpt_query_result));
 	if (!result) {
 		ocrpt_free_query(o, query);
 		return NULL;
 	}
 
-	memset(result, 0, cols * sizeof(ocrpt_query_result));
+	memset(result, 0, 2 * cols * sizeof(ocrpt_query_result));
 	for (i = 0; i < cols; i++) {
 		result[i].name = priv->data[i];
-		if (types)
+		result[cols + i].name = priv->data[i];
+		if (types) {
 			result[i].result.type = types[i];
-		else
+			result[cols + i].result.type = types[i];
+		} else {
 			result[i].result.type = OCRPT_RESULT_STRING;
+			result[cols + i].result.type = OCRPT_RESULT_STRING;
+		}
 
 		if (result[i].result.type == OCRPT_RESULT_NUMBER) {
 			mpfr_init2(result[i].result.number, o->prec);
 			result[i].result.number_initialized = true;
+			mpfr_init2(result[cols + i].result.number, o->prec);
+			result[cols + i].result.number_initialized = true;
 		}
 	}
 

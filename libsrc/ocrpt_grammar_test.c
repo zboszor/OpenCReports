@@ -456,7 +456,7 @@ int main(void) {
 		e = ocrpt_expr_parse(o, str[i], &err);
 		if (e) {
 			printf("expr reprinted: ");
-			ocrpt_expr_print(e);
+			ocrpt_expr_print(o, e);
 			printf("expr nodes: %d\n", ocrpt_expr_nodes(e));
 		} else {
 			printf("%s\n", err);

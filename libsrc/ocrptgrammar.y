@@ -467,12 +467,15 @@ static ocrpt_expr *newblankexpr(yyscan_t yyscanner, int type, uint32_t n_ops) {
 
 static ocrpt_expr *newstring(yyscan_t yyscanner, const char *s) {
 	ocrpt_expr *e = newblankexpr(yyscanner, OCRPT_EXPR_STRING, 0);
+	ocrpt_result *result;
 
-	e->result = ocrpt_mem_malloc(sizeof(ocrpt_result));
-	memset(e->result, 0, sizeof(ocrpt_result));
-	e->result_owned = true;
-	e->result->string = s;
-	e->result->string_owned = true;
+	result = ocrpt_mem_malloc(sizeof(ocrpt_result));
+	memset(result, 0, sizeof(ocrpt_result));
+	result->string = s;
+	result->string_owned = true;
+	e->result[0] = result;
+	e->result_owned[0] = true;
+	e->result[1] = result;
 	parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, s);
 
 	return e;
@@ -480,14 +483,17 @@ static ocrpt_expr *newstring(yyscan_t yyscanner, const char *s) {
 
 static ocrpt_expr *newnumber(yyscan_t yyscanner, const char *n) {
 	ocrpt_expr *e = newblankexpr(yyscanner, OCRPT_EXPR_NUMBER, 0);
+	ocrpt_result *result;
 
-	e->result = ocrpt_mem_malloc(sizeof(ocrpt_result));
-	memset(e->result, 0, sizeof(ocrpt_result));
-	e->result_owned = true;
+	result = ocrpt_mem_malloc(sizeof(ocrpt_result));
+	memset(result, 0, sizeof(ocrpt_result));
+	e->result[0] = result;
+	e->result_owned[0] = true;
+	e->result[1] = result;
 	parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, n);
-	mpfr_init2(e->result->number, parser_yyget_extra(yyscanner)->o->prec);
-	mpfr_set_str(e->result->number, n, 10, parser_yyget_extra(yyscanner)->o->rndmode);
-	e->result->number_initialized = true;
+	mpfr_init2(result->number, parser_yyget_extra(yyscanner)->o->prec);
+	mpfr_set_str(result->number, n, 10, parser_yyget_extra(yyscanner)->o->rndmode);
+	result->number_initialized = true;
 	ocrpt_strfree(n);
 
 	return e;

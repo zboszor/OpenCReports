@@ -16,24 +16,25 @@
 #include "listutil.h"
 #include "functions.h"
 
-static void ocrpt_expr_print_worker(ocrpt_expr *e, int depth) {
+static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth) {
+	ocrpt_result *result = e->result[o->residx];
 	int i;
 
 	switch (e->type) {
 	case OCRPT_EXPR_ERROR:
-		printf("(ERROR)%s", e->result->string);
+		printf("(ERROR)%s", result->string);
 		break;
 	case OCRPT_EXPR_STRING:
-		printf("(string)%s", e->result->isnull ? "NULL" : e->result->string);
+		printf("(string)%s", result->isnull ? "NULL" : result->string);
 		break;
 	case OCRPT_EXPR_DATETIME:
-		printf("(datetime)%s", e->result->isnull ? "NULL" : e->result->string);
+		printf("(datetime)%s", result->isnull ? "NULL" : result->string);
 		break;
 	case OCRPT_EXPR_NUMBER:
-		if (e->result->isnull)
+		if (result->isnull)
 			printf("NULL");
 		else
-			mpfr_printf("%RF", e->result->number);
+			mpfr_printf("%RF", result->number);
 		break;
 	case OCRPT_EXPR_MVAR:
 		printf("m.'%s'", e->name);
@@ -55,7 +56,7 @@ static void ocrpt_expr_print_worker(ocrpt_expr *e, int depth) {
 		for (i = 0; i < e->n_ops; i++) {
 			if (i > 0)
 				printf(",");
-			ocrpt_expr_print_worker(e->ops[i], depth + 1);
+			ocrpt_expr_print_worker(o, e->ops[i], depth + 1);
 		}
 		printf(")");
 		break;
@@ -65,8 +66,8 @@ static void ocrpt_expr_print_worker(ocrpt_expr *e, int depth) {
 		printf("\n");
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_print(ocrpt_expr *e) {
-	ocrpt_expr_print_worker(e, 0);
+DLL_EXPORT_SYM void ocrpt_expr_print(opencreport *o, ocrpt_expr *e) {
+	ocrpt_expr_print_worker(o, e, 0);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_result_print(ocrpt_result *r) {
@@ -149,7 +150,7 @@ static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_expr *e) {
 				ocrpt_mem_free(e->ops);
 				e->n_ops = 0;
 				e->ops = NULL;
-				e->type = e->result->type;
+				e->type = e->result[o->residx]->type;
 			} else {
 				//fprintf(stderr, "%s: funccall is unset\n", __func__);
 			}
@@ -179,21 +180,28 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e) {
 		break;
 	case OCRPT_EXPR_IDENT:
 		/* Resolve the identifier ocrpt_query_result from the queries */
-		if (e->result && e->result->type != OCRPT_RESULT_ERROR)
+		if (e->result[o->residx] && e->result[o->residx]->type != OCRPT_RESULT_ERROR)
 			break;
 		for (ptr = o->queries; ptr; ptr = ptr->next) {
 			ocrpt_query *q = (ocrpt_query *)ptr->data;
-			ocrpt_query_result *qr;
+			ocrpt_query_result *qr = NULL;
 			int32_t cols;
 
 			/* Identifier is domain-qualified and it doesn't match the query name */
 			if (e->query && strcmp(e->query, q->name))
 				continue;
 
-			qr = ocrpt_query_get_result(q, &cols);
+			/* ocrpt_query_get_result() cannot be used here, we need the whole array */
+			if (q->result) {
+				qr = q->result;
+				cols = q->cols;
+			} else if (q->source && q->source->input && q->source->input->describe)
+				q->source->input->describe(q, &qr, &cols);
+
 			for (i = 0; i < cols; i++) {
 				if (!strcmp(e->name, qr[i].name)) {
-					e->result = &qr[i].result;
+					e->result[0] = &qr[i].result;
+					e->result[1] = &qr[cols + i].result;
 					found = true;
 					break;
 				}
@@ -208,7 +216,7 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e) {
 			len = snprintf(NULL, 0, "invalid identifier '%s%s%s'", (e->query ? e->query : ""), (e->dotprefixed ? "." : ""), e->name);
 			error = alloca(len + 1);
 			snprintf(error, len + 1, "invalid identifier '%s%s%s'", (e->query ? e->query : ""), (e->dotprefixed ? "." : ""), e->name);
-			ocrpt_expr_make_error_result(e, error);
+			ocrpt_expr_make_error_result(o, e, error);
 		}
 		break;
 	case OCRPT_EXPR:
@@ -255,26 +263,29 @@ static void ocrpt_expr_eval_worker(opencreport *o, ocrpt_expr *e) {
 
 DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_expr *e) {
 	ocrpt_expr_eval_worker(o, e);
-	return e->result;
+	return e->result[o->residx];
 }
 
-ocrpt_result *ocrpt_expr_make_error_result(ocrpt_expr *e, const char *error) {
-	if (!e->result) {
-		e->result = ocrpt_mem_malloc(sizeof(ocrpt_result));
-		if (!e->result)
+ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *error) {
+	ocrpt_result *result = e->result[o->residx];
+
+	if (!result) {
+		result = ocrpt_mem_malloc(sizeof(ocrpt_result));
+		if (!result)
 			return NULL;
 
-		memset(e->result, 0, sizeof(ocrpt_result));
-		e->result_owned = true;
+		memset(result, 0, sizeof(ocrpt_result));
+		e->result[o->residx] = result;
+		e->result_owned[o->residx] = true;
 	}
 
-	e->result->type = OCRPT_RESULT_ERROR;
-	if (e->result->string_owned)
-		ocrpt_strfree(e->result->string);
-	e->result->string = ocrpt_mem_strdup(error);
-	e->result->string_owned = true;
+	result->type = OCRPT_RESULT_ERROR;
+	if (result->string_owned)
+		ocrpt_strfree(result->string);
+	result->string = ocrpt_mem_strdup(error);
+	result->string_owned = true;
 
-	e->result->isnull = false;
+	result->isnull = false;
 
-	return e->result;
+	return result;
 }
