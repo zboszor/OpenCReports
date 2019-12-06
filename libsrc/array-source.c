@@ -18,11 +18,59 @@ struct ocrpt_array_results {
 	char *name;
 	const char **data;
 	const enum ocrpt_result_type *types;
+	ocrpt_query_result *result;
 	int32_t rows;
+	int32_t cols;
 	int32_t current_row;
 	bool atstart;
 	bool isdone;
 };
+
+static void ocrpt_array_describe(ocrpt_query *query, ocrpt_query_result **qresult, int32_t *cols) {
+	struct ocrpt_array_results *result = query->priv;
+	int32_t i;
+
+	if (!result->result) {
+		ocrpt_query_result *qr = ocrpt_mem_malloc(2 * result->cols * sizeof(ocrpt_query_result));
+
+		if (!qr) {
+			if (qresult)
+				*qresult = NULL;
+			if (cols)
+				*cols = 0;
+			return;
+		}
+
+		memset(qr, 0, 2 * result->cols * sizeof(ocrpt_query_result));
+
+		for (i = 0; i < result->cols; i++) {
+			qr[i].name = result->data[i];
+			qr[result->cols + i].name = result->data[i];
+
+			if (result->types) {
+				qr[i].result.type = result->types[i];
+				qr[result->cols + i].result.type = result->types[i];
+			} else {
+				qr[i].result.type = OCRPT_RESULT_STRING;
+				qr[result->cols + i].result.type = OCRPT_RESULT_STRING;
+			}
+
+			if (qr[i].result.type == OCRPT_RESULT_NUMBER) {
+				mpfr_init2(qr[i].result.number, query->source->o->prec);
+				qr[i].result.number_initialized = true;
+				mpfr_init2(qr[result->cols + i].result.number, query->source->o->prec);
+				qr[result->cols + i].result.number_initialized = true;
+			}
+		}
+
+		result->result = qr;
+	}
+
+	if (qresult)
+		*qresult = result->result;
+	if (cols)
+		*cols = result->cols;
+}
 
 static void ocrpt_array_rewind(ocrpt_query *query) {
 	struct ocrpt_array_results *result = query->priv;
@@ -107,6 +155,7 @@ static void ocrpt_array_free(ocrpt_query *query) {
 }
 
 static const ocrpt_input ocrpt_array_input = {
+	.describe = ocrpt_array_describe,
 	.rewind = ocrpt_array_rewind,
 	.next = ocrpt_array_next,
 	.populate_result = ocrpt_array_populate_result,
@@ -121,8 +170,6 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o, cons
 static ocrpt_query *add_array_query(opencreport *o, const ocrpt_datasource *source, const char *name, void *array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
 	ocrpt_query *query;
 	struct ocrpt_array_results *priv;
-	ocrpt_query_result *result;
-	int i;
 
 	query = ocrpt_alloc_query(o, source, name);
 	if (!query)
@@ -139,40 +186,13 @@ static ocrpt_query *add_array_query(opencreport *o, const ocrpt_datasource *sour
 
 	memset(priv, 0, sizeof(struct ocrpt_array_results));
 	priv->rows = rows;
+	priv->cols = cols;
 	priv->data = array;
 	priv->types = types;
 	priv->current_row = 0;
 	priv->atstart = true;
 	priv->isdone = false;
 	query->priv = priv;
-
-	result = ocrpt_mem_malloc(2 * cols * sizeof(ocrpt_query_result));
-	if (!result) {
-		ocrpt_free_query(o, query);
-		return NULL;
-	}
-
-	memset(result, 0, 2 * cols * sizeof(ocrpt_query_result));
-	for (i = 0; i < cols; i++) {
-		result[i].name = priv->data[i];
-		result[cols + i].name = priv->data[i];
-		if (types) {
-			result[i].result.type = types[i];
-			result[cols + i].result.type = types[i];
-		} else {
-			result[i].result.type = OCRPT_RESULT_STRING;
-			result[cols + i].result.type = OCRPT_RESULT_STRING;
-		}
-
-		if (result[i].result.type == OCRPT_RESULT_NUMBER) {
-			mpfr_init2(result[i].result.number, o->prec);
-			result[i].result.number_initialized = true;
-			mpfr_init2(result[cols + i].result.number, o->prec);
-			result[cols + i].result.number_initialized = true;
-		}
-	}
-
-	query->result = result;
 
 	return query;
 }

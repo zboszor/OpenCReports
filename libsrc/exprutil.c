@@ -195,7 +195,7 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e) {
 			if (q->result) {
 				qr = q->result;
 				cols = q->cols;
-			} else if (q->source && q->source->input && q->source->input->describe)
+			} else
 				q->source->input->describe(q, &qr, &cols);
 
 			for (i = 0; i < cols; i++) {

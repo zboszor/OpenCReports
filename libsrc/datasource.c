@@ -165,7 +165,7 @@ DLL_EXPORT_SYM ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_
 		return NULL;
 	}
 
-	if (!q->result && q->source && q->source->input && q->source->input->describe)
+	if (!q->result)
 		q->source->input->describe(q, &q->result, &q->cols);
 	if (cols)
 		*cols = q->cols;

@@ -21,12 +21,6 @@ static const enum ocrpt_result_type coltypes[4] = {
 
 static const char *array2[4][4] = {
 	{ "id", "name", "property", "age" },
-	{ "1", "Barney Rubble", "small", "29" },
-	{ "2", "Betty Rubble", "beautiful", "27" },
-};
-
-static const char *array3[4][4] = {
-	{ "id", "name", "property", "age" },
 	{ "2", "Betty Rubble", "beautiful", "27" },
 	{ "1", "Barney Rubble", "small", "29" },
 };
@@ -155,7 +149,7 @@ int main(void) {
 
 	printf("--- TESTING FOLLOWER N:1 ---\n\n");
 
-	q2 = ocrpt_add_array_query_as(o, "array", "b", array3, 2, 4, coltypes);
+	q2 = ocrpt_add_array_query_as(o, "array", "b", array2, 2, 4, coltypes);
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	err = NULL;
 	match = ocrpt_expr_parse(o, "a.id = b.id", &err);
