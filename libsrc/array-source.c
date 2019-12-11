@@ -107,9 +107,8 @@ static bool ocrpt_array_populate_result(ocrpt_query *query) {
 		if (str) {
 			r->isnull = false;
 
-			if (r->string_owned)
-				ocrpt_strfree(r->string);
-			r->string = str;
+			ocrpt_mem_string_free(r->string, r->string_owned);
+			r->string = ocrpt_mem_string_new(str, false);
 			r->string_owned = false;
 
 			if (r->type == OCRPT_RESULT_NUMBER) {

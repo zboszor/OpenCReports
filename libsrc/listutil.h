@@ -8,7 +8,7 @@
 #define _LISTUTIL_H_
 
 #include <stddef.h>
-#include "memutil.h"
+#include "opencreport.h"
 
 struct List {
 	struct List *next;

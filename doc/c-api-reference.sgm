@@ -64,9 +64,16 @@ enum ocrpt_result_type {
     OCRPT_RESULT_DATETIME
 };
 
+struct ocrpt_string {
+    char *str;
+    size_t allocated_len;
+    size_t len;
+};
+typedef struct ocrpt_string ocrpt_string;
+
 struct ocrpt_result {
     enum ocrpt_result_type type;
-    const char *string;
+    ocrpt_string *string;
     mpfr_t number;
     bool number_initialized;
     bool string_owned;

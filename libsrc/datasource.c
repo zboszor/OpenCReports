@@ -182,12 +182,12 @@ void ocrpt_free_query_result(ocrpt_query *q) {
 				ocrpt_strfree(result[i].name);
 				result[i].name = NULL;
 			}
-			if (result[i].result.string_owned) {
-				ocrpt_strfree(result[i].result.string);
-				result[i].result.string = NULL;
-			}
-			if (result[i].result.number_initialized)
+			ocrpt_mem_string_free(result[i].result.string, result[i].result.string_owned);
+			result[i].result.string = NULL;
+			if (result[i].result.number_initialized) {
 				mpfr_clear(result[i].result.number);
+				result[i].result.number_initialized = false;
+			}
 		}
 	}
 

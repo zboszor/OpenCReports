@@ -7,7 +7,6 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#include "memutil.h"
 #include "scanner.h"
 #include "free.h"
 #include "opencreport-private.h"
@@ -40,7 +39,7 @@ static void yynoreturn yy_fatal_error ( const char* msg , yyscan_t yyscanner ) _
 #define startlit()  ( yyextra->literallen = 0 )
 static void addlit(char *ytext, int yleng, yyscan_t yyscanner);
 static void addlitchar(unsigned char ychar, yyscan_t yyscanner);
-static char *litbufdup(yyscan_t yyscanner);
+static ocrpt_string *litbufdup(yyscan_t yyscanner);
 
 %}
 
@@ -93,12 +92,14 @@ xdinside		[^"]*
  /* Bitshift ops */
 "<<"	{
 			SET_YYLLOC();
-			yylval->s = "shl";
+			yylval->s = ocrpt_mem_string_new_with_len("shl", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return BSHIFT;
 		}
 ">>"	{
 			SET_YYLLOC();
-			yylval->s = "shr";
+			yylval->s = ocrpt_mem_string_new_with_len("shr", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return BSHIFT;
 		}
 
@@ -106,33 +107,39 @@ xdinside		[^"]*
 "==" |
 "="		{
 			SET_YYLLOC();
-			yylval->s = "eq";
+			yylval->s = ocrpt_mem_string_new_with_len("eq", 2);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return CMPEQ;
 		}
 "!=" |
 "<>"	{
 			SET_YYLLOC();
-			yylval->s = "ne";
+			yylval->s = ocrpt_mem_string_new_with_len("ne", 2);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return CMPEQ;
 		}
 ">"		{
 			SET_YYLLOC();
-			yylval->s = "gt";
+			yylval->s = ocrpt_mem_string_new_with_len("gt", 2);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return CMP;
 		}
 ">="	{
 			SET_YYLLOC();
-			yylval->s = "ge";
+			yylval->s = ocrpt_mem_string_new_with_len("ge", 2);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return CMP;
 		}
 "<"		{
 			SET_YYLLOC();
-			yylval->s = "lt";
+			yylval->s = ocrpt_mem_string_new_with_len("lt", 2);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return CMP;
 		}
 "<="	{
 			SET_YYLLOC();
-			yylval->s = "le";
+			yylval->s = ocrpt_mem_string_new_with_len("le", 2);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return CMP;
 		}
 
@@ -140,81 +147,104 @@ xdinside		[^"]*
 "||" |
 "or"	{
 			SET_YYLLOC();
-			yylval->s = "lor";
+			yylval->s = ocrpt_mem_string_new_with_len("lor", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return L_OR;
 		}
 
 "&&" |
 "and"	{
 			SET_YYLLOC();
-			yylval->s = "land";
+			yylval->s = ocrpt_mem_string_new_with_len("land", 4);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return L_AND;
 		}
 
 "!"		{
 			SET_YYLLOC();
-			yylval->s = "lnot";
+			yylval->s = ocrpt_mem_string_new_with_len("lnot", 4);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 
  /* Arithmetic ops that are also unary ops */
-"+"	|
-"-"		{ SET_YYLLOC(); return yytext[0]; }
+"+"		{
+			SET_YYLLOC();
+			yylval->s = ocrpt_mem_string_new_with_len("add", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			return yytext[0];
+		}
+"-"		{
+			SET_YYLLOC();
+			yylval->s = ocrpt_mem_string_new_with_len("sub", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			return yytext[0];
+		}
 
 "++"	{
 			SET_YYLLOC();
-			yylval->s = "inc";
+			yylval->s = ocrpt_mem_string_new_with_len("inc", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return INCDEC;
 		}
 
 "--"	{
 			SET_YYLLOC();
-			yylval->s = "dec";
+			yylval->s = ocrpt_mem_string_new_with_len("dec", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return INCDEC;
 		}
 
 "*"		{
 			SET_YYLLOC();
-			yylval->s = "mul";
+			yylval->s = ocrpt_mem_string_new_with_len("mul", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 "/"		{
 			SET_YYLLOC();
-			yylval->s = "div";
+			yylval->s = ocrpt_mem_string_new_with_len("div", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 "%"		{
 			SET_YYLLOC();
-			yylval->s = "mod";
+			yylval->s = ocrpt_mem_string_new_with_len("mod", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 
  /* Binary ops */
 "^"		{
 			SET_YYLLOC();
-			yylval->s = "xor";
+			yylval->s = ocrpt_mem_string_new_with_len("xor", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 "|"		{
 			SET_YYLLOC();
-			yylval->s = "or";
+			yylval->s = ocrpt_mem_string_new_with_len("or", 2);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 "&"		{
 			SET_YYLLOC();
-			yylval->s = "and";
+			yylval->s = ocrpt_mem_string_new_with_len("and", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 "~"		{
 			SET_YYLLOC();
-			yylval->s = "not";
+			yylval->s = ocrpt_mem_string_new_with_len("not", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 
  /* Trinary op */
 "?"		{
 			SET_YYLLOC();
-			yylval->s = "iif";
+			yylval->s = ocrpt_mem_string_new_with_len("iif", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 
@@ -229,7 +259,8 @@ xdinside		[^"]*
 <xi>.	{
 			yyless(0);
 			BEGIN(INITIAL);
-			yylval->s = "mul";
+			yylval->s = ocrpt_mem_string_new_with_len("mul", 3);
+			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return IMPLMUL;
 		}
 
@@ -267,14 +298,14 @@ xdinside		[^"]*
 			yyless(yyleng - 1);
 			BEGIN(xi);
 			SET_YYLLOC();
-			yylval->s = ocrpt_mem_strdup(yytext);
+			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
 			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return IDENT;
 		}
  /* Identifier as is */
 {ident_start}{ident_cont}*	{
 			SET_YYLLOC();
-			yylval->s = ocrpt_mem_strdup(yytext);
+			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
 			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return IDENT;
 		}
@@ -283,7 +314,7 @@ xdinside		[^"]*
 			yyless(yyleng - 1);
 			BEGIN(xi);
 			SET_YYLLOC();
-			yylval->s = ocrpt_mem_strdup(yytext);
+			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
 			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return DCONST;
 		}
@@ -292,14 +323,14 @@ xdinside		[^"]*
 			yyless(yyleng - 1);
 			BEGIN(xi);
 			SET_YYLLOC();
-			yylval->s = ocrpt_mem_strdup(yytext);
+			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
 			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return DCONST;
 		}
  /* Number as is */
 {digits}{exponent}{0,1}	{
 			SET_YYLLOC();
-			yylval->s = ocrpt_mem_strdup(yytext);
+			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
 			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return DCONST;
 		}
@@ -308,7 +339,7 @@ xdinside		[^"]*
 			yyless(yyleng - 1);
 			BEGIN(xi);
 			SET_YYLLOC();
-			yylval->s = ocrpt_mem_strdup(yytext);
+			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
 			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return DCONST;
 		}
@@ -317,14 +348,14 @@ xdinside		[^"]*
 			yyless(yyleng - 1);
 			BEGIN(xi);
 			SET_YYLLOC();
-			yylval->s = ocrpt_mem_strdup(yytext);
+			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
 			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return DCONST;
 		}
  /* Fractional number as is */
 {digits}{0,1}{fraction}{exponent}{0,1}	{
 			SET_YYLLOC();
-			yylval->s = ocrpt_mem_strdup(yytext);
+			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
 			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return DCONST;
 		}
@@ -407,13 +438,9 @@ static void addlitchar(unsigned char ychar, yyscan_t yyscanner) {
 /*
  * Create an ocrpt_mem_malloc'd copy of literalbuf, adding a trailing null.
  */
-static char *litbufdup(yyscan_t yyscanner) {
+static ocrpt_string *litbufdup(yyscan_t yyscanner) {
 	int llen = yyextra->literallen;
-	char *new;
-
-	new = ocrpt_mem_malloc(llen + 1);
-	memcpy(new, yyextra->literalbuf, llen);
-	new[llen] = '\0';
+	ocrpt_string *new = ocrpt_mem_string_new_with_len(yyextra->literalbuf, llen + 1);
 	return new;
 }
 

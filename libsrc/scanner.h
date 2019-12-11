@@ -17,9 +17,9 @@
 typedef void* yyscan_t;
 
 typedef union core_YYSTYPE {
-	char	*s;
-	ocrpt_expr	*exp;
-	List	*l;
+	ocrpt_string	*s;
+	ocrpt_expr		*exp;
+	List			*l;
 } core_YYSTYPE;
 
 #define YYSTYPE core_YYSTYPE

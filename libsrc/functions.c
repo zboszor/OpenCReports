@@ -13,7 +13,6 @@
 
 #include "opencreport-private.h"
 #include "datasource.h"
-#include "memutil.h"
 #include "exprutil.h"
 #include "functions.h"
 
@@ -173,9 +172,9 @@ static void ocrpt_eq(opencreport *o, ocrpt_expr *e) {
 
 	if (e->ops[0]->result[o->residx]->type != e->ops[1]->result[o->residx]->type) {
 		if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR)
-			ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string);
+			ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
 		else if (e->ops[1]->result[o->residx]->type == OCRPT_RESULT_ERROR)
-			ocrpt_expr_make_error_result(o, e, e->ops[1]->result[o->residx]->string);
+			ocrpt_expr_make_error_result(o, e, e->ops[1]->result[o->residx]->string->str);
 		else
 			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 		return;
@@ -186,7 +185,7 @@ static void ocrpt_eq(opencreport *o, ocrpt_expr *e) {
 		ret = (mpfr_cmp(e->ops[0]->result[o->residx]->number, e->ops[1]->result[o->residx]->number) == 0);
 		break;
 	case OCRPT_RESULT_STRING:
-		ret = (strcmp(e->ops[0]->result[o->residx]->string, e->ops[1]->result[o->residx]->string) == 0);
+		ret = (strcmp(e->ops[0]->result[o->residx]->string->str, e->ops[1]->result[o->residx]->string->str) == 0);
 		break;
 	case OCRPT_RESULT_DATETIME:
 		/* TODO */

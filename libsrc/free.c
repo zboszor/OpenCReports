@@ -9,7 +9,6 @@
 #include <stdio.h>
 
 #include "exprutil.h"
-#include "memutil.h"
 #include "scanner.h"
 
 static const char *ocrpt_type_name(enum ocrpt_expr_type type) __attribute__((unused));
@@ -48,8 +47,7 @@ static void ocrpt_free_expr_result(ocrpt_result *r, enum ocrpt_expr_type type) {
 	case OCRPT_EXPR_STRING:
 	case OCRPT_EXPR_DATETIME:
 		if (r) {
-			if (r->string_owned)
-				ocrpt_strfree(r->string);
+			ocrpt_mem_string_free(r->string, r->string_owned);
 			r->string = NULL;
 		}
 		break;
@@ -77,8 +75,8 @@ DLL_EXPORT_SYM void ocrpt_free_expr(ocrpt_expr *e) {
 	case OCRPT_EXPR_RVAR:
 	case OCRPT_EXPR_VVAR:
 	case OCRPT_EXPR_IDENT:
-		ocrpt_strfree(e->query);
-		ocrpt_strfree(e->name);
+		ocrpt_mem_string_free(e->query, true);
+		ocrpt_mem_string_free(e->name, true);
 		e->query = NULL;
 		e->name = NULL;
 		for (i = 0; i < 2; i++)

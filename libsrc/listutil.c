@@ -7,7 +7,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#include "memutil.h"
+
 #include "listutil.h"
 
 List *makelist1(const void *data) {

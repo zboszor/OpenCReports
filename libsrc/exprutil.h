@@ -58,8 +58,8 @@ struct ocrpt_expr {
 		 * environment variables, query fields
 		 */
 		struct {
-			const char *query;
-			const char *name;
+			ocrpt_string *query;
+			ocrpt_string *name;
 			bool dotprefixed;
 		};
 

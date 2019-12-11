@@ -22,13 +22,13 @@ static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth) {
 
 	switch (e->type) {
 	case OCRPT_EXPR_ERROR:
-		printf("(ERROR)%s", result->string);
+		printf("(ERROR)%s", result->string->str);
 		break;
 	case OCRPT_EXPR_STRING:
-		printf("(string)%s", result->isnull ? "NULL" : result->string);
+		printf("(string)%s", result->isnull ? "NULL" : result->string->str);
 		break;
 	case OCRPT_EXPR_DATETIME:
-		printf("(datetime)%s", result->isnull ? "NULL" : result->string);
+		printf("(datetime)%s", result->isnull ? "NULL" : result->string->str);
 		break;
 	case OCRPT_EXPR_NUMBER:
 		if (result->isnull)
@@ -37,19 +37,19 @@ static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth) {
 			mpfr_printf("%RF", result->number);
 		break;
 	case OCRPT_EXPR_MVAR:
-		printf("m.'%s'", e->name);
+		printf("m.'%s'", e->name->str);
 		break;
 	case OCRPT_EXPR_RVAR:
-		printf("r.'%s'", e->name);
+		printf("r.'%s'", e->name->str);
 		break;
 	case OCRPT_EXPR_VVAR:
-		printf("v.'%s'", e->name);
+		printf("v.'%s'", e->name->str);
 		break;
 	case OCRPT_EXPR_IDENT:
 		if (e->query)
-			printf("'%s'.'%s'", e->query, e->name);
+			printf("'%s'.'%s'", e->query->str, e->name->str);
 		else
-			printf(".'%s'", e->name);
+			printf(".'%s'", e->name->str);
 		break;
 	case OCRPT_EXPR:
 		printf("%s(", e->func->fname);
@@ -73,13 +73,13 @@ DLL_EXPORT_SYM void ocrpt_expr_print(opencreport *o, ocrpt_expr *e) {
 DLL_EXPORT_SYM void ocrpt_expr_result_print(ocrpt_result *r) {
 	switch (r->type) {
 	case OCRPT_RESULT_ERROR:
-		printf("(ERROR)%s\n", r->string);
+		printf("(ERROR)%s\n", r->string->str);
 		break;
 	case OCRPT_RESULT_STRING:
-		printf("(string)%s\n", r->string);
+		printf("(string)%s\n", r->string->str);
 		break;
 	case OCRPT_RESULT_DATETIME:
-		printf("(datetime)%s\n", r->string);
+		printf("(datetime)%s\n", r->string->str);
 		break;
 	case OCRPT_RESULT_NUMBER:
 		mpfr_printf("%RF\n", r->number);
@@ -188,7 +188,7 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e) {
 			int32_t cols;
 
 			/* Identifier is domain-qualified and it doesn't match the query name */
-			if (e->query && strcmp(e->query, q->name))
+			if (e->query && strcmp(e->query->str, q->name))
 				continue;
 
 			/* ocrpt_query_get_result() cannot be used here, we need the whole array */
@@ -199,7 +199,7 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e) {
 				q->source->input->describe(q, &qr, &cols);
 
 			for (i = 0; i < cols; i++) {
-				if (!strcmp(e->name, qr[i].name)) {
+				if (!strcmp(e->name->str, qr[i].name)) {
 					e->result[0] = &qr[i].result;
 					e->result[1] = &qr[cols + i].result;
 					found = true;
@@ -213,9 +213,9 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e) {
 			char *error;
 			int len;
 
-			len = snprintf(NULL, 0, "invalid identifier '%s%s%s'", (e->query ? e->query : ""), (e->dotprefixed ? "." : ""), e->name);
+			len = snprintf(NULL, 0, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), (e->dotprefixed ? "." : ""), e->name->str);
 			error = alloca(len + 1);
-			snprintf(error, len + 1, "invalid identifier '%s%s%s'", (e->query ? e->query : ""), (e->dotprefixed ? "." : ""), e->name);
+			snprintf(error, len + 1, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), (e->dotprefixed ? "." : ""), e->name->str);
 			ocrpt_expr_make_error_result(o, e, error);
 		}
 		break;
@@ -280,9 +280,8 @@ ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const 
 	}
 
 	result->type = OCRPT_RESULT_ERROR;
-	if (result->string_owned)
-		ocrpt_strfree(result->string);
-	result->string = ocrpt_mem_strdup(error);
+	ocrpt_mem_string_free(result->string, result->string_owned);
+	result->string = ocrpt_mem_string_new(error, true);
 	result->string_owned = true;
 
 	result->isnull = false;

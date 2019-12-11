@@ -32,10 +32,17 @@ enum ocrpt_result_type {
 	OCRPT_RESULT_DATETIME
 };
 
+struct ocrpt_string {
+	char *str;
+	size_t allocated_len;
+	size_t len;
+};
+typedef struct ocrpt_string ocrpt_string;
+
 struct ocrpt_result {
 	enum ocrpt_result_type type;
 	/* Original lexer token or (computed) string value for expression */
-	const char *string;
+	ocrpt_string *string;
 	/* Converted numeric constant or computed numeric value for expression */
 	mpfr_t number;
 	bool number_initialized;
@@ -176,6 +183,16 @@ void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc,
 								ocrpt_mem_free_t rfree,
 								ocrpt_mem_strdup_t rstrdup,
 								ocrpt_mem_strndup_t rstrndup);
+
+/*
+ * String related functions
+ */
+ocrpt_string *ocrpt_mem_string_new(const char *str, bool copy);
+ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, const size_t len);
+char *ocrpt_mem_string_free(ocrpt_string *string, bool free_str);
+void ocrpt_mem_string_append_len(ocrpt_string *string, const char *str, const size_t len);
+void ocrpt_mem_string_append(ocrpt_string *string, const char *str);
+void ocrpt_mem_string_append_c(ocrpt_string *string, const char c);
 
 /********************************
  * Paper size related functions *

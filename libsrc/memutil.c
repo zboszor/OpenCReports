@@ -11,7 +11,6 @@
 #include <string.h>
 
 #include "opencreport.h"
-#include "memutil.h"
 
 DLL_EXPORT_SYM ocrpt_mem_malloc_t ocrpt_mem_malloc0 = malloc;
 DLL_EXPORT_SYM ocrpt_mem_realloc_t ocrpt_mem_realloc0 = realloc;
@@ -27,7 +26,7 @@ DLL_EXPORT_SYM void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc, ocrpt_
 	ocrpt_mem_strndup0 = rstrndup;
 }
 
-DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new(const char *str) {
+DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new(const char *str, bool copy) {
 	ocrpt_string *string = ocrpt_mem_malloc(sizeof(ocrpt_string));
 
 	if (!string)
@@ -38,7 +37,7 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new(const char *str) {
 		string->allocated_len = 0;
 		string->len = 0;
 	} else {
-		string->str = ocrpt_mem_strdup(str);
+		string->str = (copy ? ocrpt_mem_strdup(str) : (char *)str);
 
 		if (!string->str) {
 			ocrpt_mem_free(string);
@@ -52,25 +51,26 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new(const char *str) {
 	return string;
 }
 
+/* Allocate len + 1 bytes and zero-terminate the string */
 DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, const size_t len) {
 	ocrpt_string *string = ocrpt_mem_malloc(sizeof(ocrpt_string));
 
 	if (!string)
 		return NULL;
 
-	string->str = ocrpt_mem_malloc(len);
+	string->str = ocrpt_mem_malloc(len + 1);
 	if (!string->str) {
 		ocrpt_mem_free(string);
 		return NULL;
 	}
 
-	string->allocated_len = len;
+	string->allocated_len = len + 1;
 
 	if (!str) {
 		string->str[0] = 0;
 		string->len = 0;
 	} else {
-		char *end = stpncpy(string->str, str, len - 1);
+		char *end = stpncpy(string->str, str, len);
 
 		*end = 0;
 		string->len = end - string->str;

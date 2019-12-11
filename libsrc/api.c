@@ -13,7 +13,6 @@
 
 #include <paper.h>
 
-#include "memutil.h"
 #include "scanner.h"
 #include "opencreport-private.h"
 #include "datasource.h"

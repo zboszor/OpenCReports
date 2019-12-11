@@ -10,7 +10,6 @@
 #include <unistd.h>
 #include <libgen.h>
 
-#include "memutil.h"
 #include "opencreport-private.h"
 
 #ifndef O_BINARY

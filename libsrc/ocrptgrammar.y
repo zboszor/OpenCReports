@@ -14,7 +14,6 @@
 #include <string.h>
 #include <setjmp.h>
 
-#include "memutil.h"
 #include "listutil.h"
 #include "scanner.h"
 #include "free.h"
@@ -46,10 +45,10 @@ static void yyerror(YYLTYPE *yylloc, yyscan_t yyscanner, const char *msg);
 #define parser_yyerror(msg)  scanner_yyerror(msg, yyscanner)
 
 static ocrpt_expr *newblankexpr(yyscan_t yyscanner, int type, uint32_t n_ops);
-static ocrpt_expr *newstring(yyscan_t yyscanner, const char *s);
-static ocrpt_expr *newnumber(yyscan_t yyscanner, const char *n);
-static ocrpt_expr *newident(yyscan_t yyscanner, int ident_type, const char *query, const char *name, bool dotprefixed);
-static ocrpt_expr *newexpr(yyscan_t yyscanner, const char *fname, int alloc, List *l);
+static ocrpt_expr *newstring(yyscan_t yyscanner, ocrpt_string *s);
+static ocrpt_expr *newnumber(yyscan_t yyscanner, ocrpt_string *n);
+static ocrpt_expr *newident(yyscan_t yyscanner, int ident_type, ocrpt_string *query, ocrpt_string *name, bool dotprefixed);
+static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, List *l);
 
 %}
 
@@ -61,13 +60,13 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, const char *fname, int alloc, Lis
 %lex-param   {yyscan_t yyscanner}
 
 %union {
-	char		*s;
-	ocrpt_expr	*exp;
-	List		*l;
+	ocrpt_string	*s;
+	ocrpt_expr		*exp;
+	List			*l;
 }
 
-%token <s> IDENT SCONST DCONST L_AND L_OR INCDEC CMPEQ CMP BSHIFT
-%token <s> '*' '/' '%' '^' '|' '&' '~' '!' '?' IMPLMUL
+%token <s>   IDENT SCONST DCONST L_AND L_OR INCDEC CMPEQ CMP BSHIFT
+%token <s>   '+' '-' '*' '/' '%' '^' '|' '&' '~' '!' '?' IMPLMUL
 
 %type <exp> ANYIDENT
 %type <exp> exp
@@ -100,7 +99,7 @@ exp:
 							}
 	| ANYIDENT				{	$$ = $1; }
 	| ANYIDENT '(' arglist ')' {
-								const char *fname = $1->name;
+								ocrpt_string *fname = $1->name;
 
 								yyset_lloc(&@1, yyscanner);
 
@@ -118,7 +117,7 @@ exp:
 								$1->name = NULL;
 								parser_yyget_extra(yyscanner)->parsed_exprs = list_remove(parser_yyget_extra(yyscanner)->parsed_exprs, $1);
 								ocrpt_free_expr($1);
-								$$ = newexpr(yyscanner, fname, 0, $3);
+								$$ = newexpr(yyscanner, fname, $3);
 							}
 	| '(' exp ')'			{
 								yyset_lloc(&@1, yyscanner);
@@ -126,79 +125,79 @@ exp:
 							}
 	| exp '?' exp ':' exp	{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist($1, $3, $5, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, $5, NULL));
 							}
 	| exp L_OR exp			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist($1, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
 	| exp L_AND exp			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist($1, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
 	| '!' exp				{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $1, 1, makelist($2, NULL));
+								$$ = newexpr(yyscanner, $1, makelist($2, NULL));
 							}
 	| exp '|' exp			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist($1, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
 	| exp '^' exp			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist($1, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
 	| exp '&' exp			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist($1, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
 	| '~' exp				{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $1, 1, makelist($2, NULL));
+								$$ = newexpr(yyscanner, $1, makelist($2, NULL));
 							}
 	| exp CMPEQ exp			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist($1, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
 	| exp CMP exp			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist($1, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
 	| exp BSHIFT exp		{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist($1, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
 	| exp '+' exp			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, "add", 1, makelist($1, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
 	| exp '-' exp			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, "sub", 1, makelist($1, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
 	| exp '*' exp			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist($1, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
 	| exp '/' exp			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist($1, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
 	| exp '%' exp			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist($1, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
 	| DCONST IMPLMUL ANYIDENT
 							{
 								ocrpt_expr *number = newnumber(yyscanner, $1);
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist(number, $3, NULL));
+								$$ = newexpr(yyscanner, $2, makelist(number, $3, NULL));
 							}
 	| DCONST IMPLMUL '(' exp ')'
 							{
 								ocrpt_expr *number = newnumber(yyscanner, $1);
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist(number, $4, NULL));
+								$$ = newexpr(yyscanner, $2, makelist(number, $4, NULL));
 							}
 	| ANYIDENT IMPLMUL '(' arglist ')'
 							{
@@ -219,62 +218,62 @@ exp:
 										list = list_prepend(list, $1);
 										parser_yyget_extra(yyscanner)->parsed_arglist = list;
 
-										$$ = newexpr(yyscanner, $2, 1, list);
+										$$ = newexpr(yyscanner, $2, list);
 									} else {
 										/*
 										 * Only one argument is in arglist, we need to check
 										 * if the ident is a supported function name.
 										 */
-										ocrpt_function *f = ocrpt_find_function($1->name);
+										ocrpt_function *f = ocrpt_find_function($1->name->str);
 										if (f) {
-											const char *fname = $1->name;
+											ocrpt_string *fname = $1->name;
 
 											$1->name = NULL;
 											ocrpt_free_expr($1);
-											$$ = newexpr(yyscanner, fname, 0, $4);
+											$$ = newexpr(yyscanner, fname, $4);
 										} else {
 											List *list = $4;
 
 											list = list_prepend(list, $1);
 											parser_yyget_extra(yyscanner)->parsed_arglist = list;
 
-											$$ = newexpr(yyscanner, $2, 1, list);
+											$$ = newexpr(yyscanner, $2, list);
 										}
 									}
 								} else if ($1->query || $1->dotprefixed) {
 									parser_yyerror("invalid function name");
 								} else {
-									const char *fname = $1->name;
+									ocrpt_string *fname = $1->name;
 
 									$1->name = NULL;
 									parser_yyget_extra(yyscanner)->parsed_exprs = list_remove(parser_yyget_extra(yyscanner)->parsed_exprs, $1);
 									ocrpt_free_expr($1);
-									$$ = newexpr(yyscanner, fname, 0, $4);
+									$$ = newexpr(yyscanner, fname, $4);
 								}
 							}
 	| '(' exp ')' IMPLMUL DCONST
 							{
 								ocrpt_expr *number = newnumber(yyscanner, $5);
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $4, 1, makelist($2, number, NULL));
+								$$ = newexpr(yyscanner, $4, makelist($2, number, NULL));
 							}
 	| '(' exp ')' IMPLMUL ANYIDENT
 							{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $4, 1, makelist($2, $5, NULL));
+								$$ = newexpr(yyscanner, $4, makelist($2, $5, NULL));
 							}
 	| '(' exp ')' IMPLMUL '(' exp ')'
 							{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $4, 1, makelist($2, $6, NULL));
+								$$ = newexpr(yyscanner, $4, makelist($2, $6, NULL));
 							}
 	| '|' exp '|'			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, "abs", 1, makelist($2, NULL));
+								$$ = newexpr(yyscanner, ocrpt_mem_string_new_with_len("abs", 3), makelist($2, NULL));
 							}
 	| '-' exp %prec UMINUS	{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, "uminus", 1, makelist($2, NULL));
+								$$ = newexpr(yyscanner, ocrpt_mem_string_new_with_len("uminus", 6), makelist($2, NULL));
 							}
 	| '+' exp %prec UMINUS	{
 								yyset_lloc(&@1, yyscanner);
@@ -282,21 +281,21 @@ exp:
 							}
 	| INCDEC exp			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $1, 1, makelist($2, NULL));
+								$$ = newexpr(yyscanner, $1, makelist($2, NULL));
 							}
 	| exp INCDEC			{
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, 1, makelist($1, NULL));
+								$$ = newexpr(yyscanner, $2, makelist($1, NULL));
 							}
 	;
 
 ANYIDENT:
 	IDENT					{
 								yyset_lloc(&@1, yyscanner);
-								if (strcmp($1, "yes") == 0 || strcmp($1, "true") == 0) {
-									$$ = newnumber(yyscanner, ocrpt_mem_strdup("1"));
-								} else if (strcmp($1, "no") == 0 || strcmp($1, "false") == 0) {
-									$$ = newnumber(yyscanner, ocrpt_mem_strdup("0"));
+								if (strcmp($1->str, "yes") == 0 || strcmp($1->str, "true") == 0) {
+									$$ = newnumber(yyscanner, ocrpt_mem_string_new_with_len("1", 1));
+								} else if (strcmp($1->str, "no") == 0 || strcmp($1->str, "false") == 0) {
+									$$ = newnumber(yyscanner, ocrpt_mem_string_new_with_len("0", 1));
 								} else
 									$$ = newident(yyscanner, OCRPT_EXPR_IDENT, NULL, $1, false); }
 	| '.' IDENT				{
@@ -309,22 +308,22 @@ ANYIDENT:
 							}
 	| IDENT '.' IDENT		{
 								yyset_lloc(&@1, yyscanner);
-								if (strcmp($1, "m") == 0)
+								if (strcmp($1->str, "m") == 0)
 									$$ = newident(yyscanner, OCRPT_EXPR_MVAR, $1, $3, false);
-								else if (strcmp($1, "r") == 0)
+								else if (strcmp($1->str, "r") == 0)
 									$$ = newident(yyscanner, OCRPT_EXPR_RVAR, $1, $3, false);
-								else if (strcmp($1, "v") == 0)
+								else if (strcmp($1->str, "v") == 0)
 									$$ = newident(yyscanner, OCRPT_EXPR_VVAR, $1, $3, false);
 								else
 									$$ = newident(yyscanner, OCRPT_EXPR_IDENT, $1, $3, false);
 							}
 	| IDENT '.' SCONST	{
 								yyset_lloc(&@1, yyscanner);
-								if (strcmp($1, "m") == 0)
+								if (strcmp($1->str, "m") == 0)
 									$$ = newident(yyscanner, OCRPT_EXPR_MVAR, $1, $3, false);
-								else if (strcmp($1, "r") == 0)
+								else if (strcmp($1->str, "r") == 0)
 									$$ = newident(yyscanner, OCRPT_EXPR_RVAR, $1, $3, false);
-								else if (strcmp($1, "v") == 0)
+								else if (strcmp($1->str, "v") == 0)
 									$$ = newident(yyscanner, OCRPT_EXPR_VVAR, $1, $3, false);
 								else
 									$$ = newident(yyscanner, OCRPT_EXPR_IDENT, $1, $3, false);
@@ -373,6 +372,10 @@ void parser_init(base_yy_extra_type *yyext, opencreport *o) {
 	yyext->err = NULL;
 }
 
+static void ocrpt_grammar_free_token(ocrpt_string *token) {
+	ocrpt_mem_string_free(token, true);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, char **err) {
 	yyscan_t yyscanner;
 	base_yy_extra_type yyextra;
@@ -407,7 +410,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, cha
 	scanner_finish(yyscanner);
 
 	if (yyresult) {
-		list_free_deep(yyextra.tokens, (ocrpt_mem_free_t)ocrpt_mem_free);
+		list_free_deep(yyextra.tokens, (ocrpt_mem_free_t)ocrpt_grammar_free_token);
 		list_free(yyextra.parsed_arglist);
 		list_free_deep(yyextra.parsed_exprs, (ocrpt_mem_free_t)ocrpt_free_expr);
 
@@ -418,7 +421,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, cha
 		return NULL;
 	}
 
-	list_free_deep(yyextra.tokens, (ocrpt_mem_free_t)ocrpt_mem_free);
+	list_free_deep(yyextra.tokens, (ocrpt_mem_free_t)ocrpt_grammar_free_token);
 	list_free(yyextra.parsed_arglist);
 	list_free(yyextra.parsed_exprs);
 	return yyextra.last_expr;
@@ -438,7 +441,7 @@ static void print_token_value (FILE *file, int type, YYSTYPE value) {
 	case SCONST:
 	case DCONST:
 	case IDENT:
-		fprintf(file, "%s", value.s);
+		fprintf(file, "%s", value.s->str);
 		break;
 	default:
 		fprintf(file, "%d", type);
@@ -465,7 +468,7 @@ static ocrpt_expr *newblankexpr(yyscan_t yyscanner, int type, uint32_t n_ops) {
 	return e;
 }
 
-static ocrpt_expr *newstring(yyscan_t yyscanner, const char *s) {
+static ocrpt_expr *newstring(yyscan_t yyscanner, ocrpt_string *s) {
 	ocrpt_expr *e = newblankexpr(yyscanner, OCRPT_EXPR_STRING, 0);
 	ocrpt_result *result;
 
@@ -481,7 +484,7 @@ static ocrpt_expr *newstring(yyscan_t yyscanner, const char *s) {
 	return e;
 }
 
-static ocrpt_expr *newnumber(yyscan_t yyscanner, const char *n) {
+static ocrpt_expr *newnumber(yyscan_t yyscanner, ocrpt_string *n) {
 	ocrpt_expr *e = newblankexpr(yyscanner, OCRPT_EXPR_NUMBER, 0);
 	ocrpt_result *result;
 
@@ -492,17 +495,17 @@ static ocrpt_expr *newnumber(yyscan_t yyscanner, const char *n) {
 	e->result[1] = result;
 	parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, n);
 	mpfr_init2(result->number, parser_yyget_extra(yyscanner)->o->prec);
-	mpfr_set_str(result->number, n, 10, parser_yyget_extra(yyscanner)->o->rndmode);
+	mpfr_set_str(result->number, n->str, 10, parser_yyget_extra(yyscanner)->o->rndmode);
 	result->number_initialized = true;
-	ocrpt_strfree(n);
+	ocrpt_mem_string_free(n, true);
 
 	return e;
 }
 
-static ocrpt_expr *newident(yyscan_t yyscanner, int ident_type, const char *query, const char *name, bool dotprefixed) {
+static ocrpt_expr *newident(yyscan_t yyscanner, int ident_type, ocrpt_string *query, ocrpt_string *name, bool dotprefixed) {
 	ocrpt_expr *e;
 
-	if ((query && query[0] == '\0') || (name && name[0] == '\0'))
+	if ((query && query->str[0] == '\0') || (name && name->str[0] == '\0'))
 		parser_yyerror("syntax error: quoted identifier cannot be empty");
 
 	e = newblankexpr(yyscanner, ident_type, 0);
@@ -517,16 +520,15 @@ static ocrpt_expr *newident(yyscan_t yyscanner, int ident_type, const char *quer
 	return e;
 }
 
-static ocrpt_expr *newexpr(yyscan_t yyscanner, const char *fname, int alloc, List *l) {
+static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, List *l) {
 	ocrpt_expr *e;
 	List *ptr;
 	int idx;
 	ocrpt_function *f;
 
-	f = ocrpt_find_function(fname);
+	f = ocrpt_find_function(fname->str);
 	if (!f) {
-		if (!alloc)
-			ocrpt_strfree(fname);
+		ocrpt_mem_string_free(fname, true);
 		parser_yyerror("invalid function name");
 	}
 
@@ -534,19 +536,18 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, const char *fname, int alloc, Lis
 		char *msg;
 		int len;
 
-		if (!alloc)
-			ocrpt_strfree(fname);
-
-		len = snprintf(NULL, 0, "invalid number of operands for %s", f->fname);
+		len = fname->len + sizeof("invalid number of operands for %s");
 		msg = alloca(len + 1);
-		sprintf(msg, "invalid number of operands for %s", f->fname);
+		sprintf(msg, "invalid number of operands for %s", fname->str);
+
+		ocrpt_mem_string_free(fname, true);
+
 		parser_yyerror(msg);
 	}
 
 	e = newblankexpr(yyscanner, OCRPT_EXPR, list_length(l));
 	parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, fname);
-	if (!alloc)
-		ocrpt_strfree(fname);
+	ocrpt_mem_string_free(fname, true);
 	e->func = f;
 
 	for (ptr = l, idx = 0; ptr; ptr = ptr->next, idx++) {
