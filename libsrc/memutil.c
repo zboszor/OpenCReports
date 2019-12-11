@@ -7,6 +7,7 @@
 
 #include <config.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -52,11 +53,14 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new(const char *str, bool copy) {
 }
 
 /* Allocate len + 1 bytes and zero-terminate the string */
-DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, const size_t len) {
+DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, size_t len) {
 	ocrpt_string *string = ocrpt_mem_malloc(sizeof(ocrpt_string));
 
 	if (!string)
 		return NULL;
+
+	if (!str)
+		len = 0;
 
 	string->str = ocrpt_mem_malloc(len + 1);
 	if (!string->str) {
@@ -64,18 +68,12 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, cons
 		return NULL;
 	}
 
+	if (str)
+		strncpy(string->str, str, len);
+
+	string->str[len] = 0;
+	string->len = len;
 	string->allocated_len = len + 1;
-
-	if (!str) {
-		string->str[0] = 0;
-		string->len = 0;
-	} else {
-		char *end = stpncpy(string->str, str, len);
-
-		*end = 0;
-		string->len = end - string->str;
-	}
-
 	return string;
 }
 
