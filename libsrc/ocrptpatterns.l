@@ -440,7 +440,7 @@ static void addlitchar(unsigned char ychar, yyscan_t yyscanner) {
  */
 static ocrpt_string *litbufdup(yyscan_t yyscanner) {
 	int llen = yyextra->literallen;
-	ocrpt_string *new = ocrpt_mem_string_new_with_len(yyextra->literalbuf, llen + 1);
+	ocrpt_string *new = ocrpt_mem_string_new_with_len(yyextra->literalbuf, llen);
 	return new;
 }
 
