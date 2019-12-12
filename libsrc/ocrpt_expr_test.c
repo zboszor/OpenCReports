@@ -44,6 +44,20 @@ int main(void) {
 		"1/2e",
 		"2e",
 		"add(1, 2, 3, 4, 5, (6))",
+
+		/* String expressions */
+		"'a' = 'a'",
+		"'a' = 'b'",
+		"'a' <> 'a'",
+		"'a' <> 'b'",
+		"'a' < 'a'",
+		"'a' < 'b'",
+		"'a' <= 'a'",
+		"'a' <= 'b'",
+		"'a' > 'a'",
+		"'a' > 'b'",
+		"'a' >= 'a'",
+		"'a' >= 'b'",
 	};
 	int nstr = sizeof(str) / sizeof(char *);
 	int i;
@@ -54,6 +68,8 @@ int main(void) {
 		printf("string: %s\n", str[i]);
 		e = ocrpt_expr_parse(o, str[i], &err);
 		if (e) {
+			ocrpt_result *r;
+
 			printf("expr reprinted: ");
 			ocrpt_expr_print(o, e);
 			printf("expr nodes: %d\n", ocrpt_expr_nodes(e));
@@ -62,6 +78,9 @@ int main(void) {
 			printf("expr optimized: ");
 			ocrpt_expr_print(o, e);
 			printf("expr nodes: %d\n", ocrpt_expr_nodes(e));
+
+			r = ocrpt_expr_eval(o, e);
+			ocrpt_expr_result_print(r);
 		} else {
 			printf("%s\n", err);
 			ocrpt_strfree(err);

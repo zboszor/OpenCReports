@@ -10,7 +10,6 @@
 #include <stdint.h>
 
 #include <opencreport.h>
-#include "functions.h"
 
 /*
  * Used as both main type of an expression and subtype
@@ -70,6 +69,7 @@ struct ocrpt_expr {
 		};
 	};
 };
+typedef struct ocrpt_expr ocrpt_expr;
 
 ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *error);
 

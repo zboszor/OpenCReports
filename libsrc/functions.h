@@ -8,21 +8,31 @@
 
 #include <stdbool.h>
 
-#include "opencreport.h"
 #include "exprutil.h"
-
-typedef void (*ocrpt_function_call)(opencreport *, ocrpt_expr *);
-
-struct ocrpt_function {
-	const char *fname;
-	const int n_ops;
-	const bool commutative;
-	const bool associative;
-	ocrpt_function_call func;
-};
-
-typedef struct ocrpt_function ocrpt_function;
+#include "opencreport-private.h"
 
 extern ocrpt_function *ocrpt_find_function(const char *fname);
+
+static inline bool ocrpt_init_func_result(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type) {
+	ocrpt_result *result = e->result[o->residx];
+
+	if (!result) {
+		result = ocrpt_mem_malloc(sizeof(ocrpt_result));
+		if (result) {
+			memset(result, 0, sizeof(ocrpt_result));
+			e->result[o->residx] = result;
+			e->result_owned[o->residx] = true;
+		}
+	}
+	if (result) {
+		if (type == OCRPT_RESULT_NUMBER && !result->number_initialized) {
+			mpfr_init2(result->number, o->prec);
+			result->number_initialized = true;
+		}
+		result->type = type;
+	}
+
+	return !!result;
+}
 
 #endif

@@ -53,6 +53,17 @@ struct ocrpt_result {
 };
 typedef struct ocrpt_result ocrpt_result;
 
+typedef void (*ocrpt_function_call)(opencreport *, ocrpt_expr *);
+
+struct ocrpt_function {
+	const char *fname;
+	const int n_ops;
+	const bool commutative;
+	const bool associative;
+	ocrpt_function_call func;
+};
+typedef struct ocrpt_function ocrpt_function;
+
 struct ocrpt_query;
 typedef struct ocrpt_query ocrpt_query;
 
