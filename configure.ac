@@ -15,7 +15,7 @@ dnl Versioning uses the Xorg convention
 AC_INIT([OpenCReports],[0.1],[https://github.com/zboszor/OpenCReports])
 
 AC_CANONICAL_TARGET
-AC_CONFIG_SRCDIR(libsrc/memutil.h)
+AC_CONFIG_SRCDIR(libsrc/opencreport.h)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR(.)
 
