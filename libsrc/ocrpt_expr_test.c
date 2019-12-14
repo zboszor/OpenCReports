@@ -34,6 +34,14 @@ int main(void) {
 		"(-1 + -2) * -3",
 		"(-1 - -2) * -3",
 
+		/* Identical operators (optimizer test) */
+		"6 / 3 / 2 ",	/* 1 */
+		"(6 / 3) / 2",	/* 1 */
+		"6 / (3 / 2)",	/* 4 */
+		"a / b / c",	/* can be same level of a single div() call */
+		"(a / b) / c",	/* can be same level of a single div() call */
+		"a / (b / c)",	/* b/c must stay as one subexpression */
+
 		/* Facebook challange with implicit multiplication */
 		"1/(1+1)(2+2)",
 		"1/(1+1)*(2+2)",
@@ -44,6 +52,8 @@ int main(void) {
 		"1/2e",
 		"2e",
 		"add(1, 2, 3, 4, 5, (6))",
+		"add(a, 1, b, 2)",
+		"a + 1 + b + 2",
 
 		/* String expressions */
 		"'a' = 'a'",

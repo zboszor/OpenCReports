@@ -16,6 +16,28 @@
 #include "exprutil.h"
 #include "functions.h"
 
+bool ocrpt_init_func_result(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type) {
+	ocrpt_result *result = e->result[o->residx];
+
+	if (!result) {
+		result = ocrpt_mem_malloc(sizeof(ocrpt_result));
+		if (result) {
+			memset(result, 0, sizeof(ocrpt_result));
+			e->result[o->residx] = result;
+			ocrpt_expr_set_result_owned(o, e, true);
+		}
+	}
+	if (result) {
+		if (type == OCRPT_RESULT_NUMBER && !result->number_initialized) {
+			mpfr_init2(result->number, o->prec);
+			result->number_initialized = true;
+		}
+		result->type = type;
+	}
+
+	return !!result;
+}
+
 static void ocrpt_abs(opencreport *o, ocrpt_expr *e) {
 	if (e->n_ops == 1 && e->ops[0]->result[o->residx] && e->ops[0]->result[o->residx]->type == OCRPT_RESULT_NUMBER) {
 		ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
@@ -366,33 +388,33 @@ static void ocrpt_ge(opencreport *o, ocrpt_expr *e) {
  * used via bsearch()
  */
 static ocrpt_function ocrpt_functions[] = {
-	{ "abs",		1,	false,	false,	ocrpt_abs },
-	{ "add",		-1,	true,	true,	ocrpt_add },
-	{ "and",		-1,	true,	true,	NULL },
-	{ "concat",		-1,	false,	false,	NULL },
-	{ "dec",		1,	false,	false,	NULL },
-	{ "div",		-1,	false,	false,	ocrpt_div },
-	{ "eq",			2,	true,	false,	ocrpt_eq },
-	{ "factorial",	1,	false,	false,	NULL },
-	{ "ge",			2,	false,	false,	ocrpt_ge },
-	{ "gt",			2,	false,	false,	ocrpt_gt },
-	{ "iif",		3,	false,	false,	NULL },
-	{ "inc",		1,	false,	false,	NULL },
-	{ "land",		-1,	true,	true,	NULL },
-	{ "le",			2,	false,	false,	ocrpt_le },
-	{ "lnot",		1,	false,	false,	NULL },
-	{ "lor",		-1,	true,	true,	NULL },
-	{ "lt",			2,	false,	false,	ocrpt_lt },
-	{ "mod",		2,	false,	false,	NULL },
-	{ "mul",		-1,	true,	true,	ocrpt_mul },
-	{ "ne",			2,	true,	false,	ocrpt_ne },
-	{ "not",		1,	false,	false,	NULL },
-	{ "or",			-1,	true,	true,	NULL },
-	{ "shl",		2,	false,	false,	NULL },
-	{ "shr",		2,	false,	false,	NULL },
-	{ "sub",		-1,	false,	false,	ocrpt_sub },
-	{ "uminus",		1,	false,	false,	ocrpt_uminus },
-	{ "xor",		-1,	true,	true,	NULL },
+	{ "abs",		1,	false,	false,	false,	ocrpt_abs },
+	{ "add",		-1,	true,	true,	false,	ocrpt_add },
+	{ "and",		-1,	true,	true,	false,	NULL },
+	{ "concat",		-1,	false,	false,	false,	NULL },
+	{ "dec",		1,	false,	false,	false,	NULL },
+	{ "div",		-1,	false,	false,	true,	ocrpt_div },
+	{ "eq",			2,	true,	false,	false,	ocrpt_eq },
+	{ "factorial",	1,	false,	false,	false,	NULL },
+	{ "ge",			2,	false,	false,	false,	ocrpt_ge },
+	{ "gt",			2,	false,	false,	false,	ocrpt_gt },
+	{ "iif",		3,	false,	false,	false,	NULL },
+	{ "inc",		1,	false,	false,	false,	NULL },
+	{ "land",		-1,	true,	true,	false,	NULL },
+	{ "le",			2,	false,	false,	false,	ocrpt_le },
+	{ "lnot",		1,	false,	false,	false,	NULL },
+	{ "lor",		-1,	true,	true,	false,	NULL },
+	{ "lt",			2,	false,	false,	false,	ocrpt_lt },
+	{ "mod",		2,	false,	false,	false,	NULL },
+	{ "mul",		-1,	true,	true,	false,	ocrpt_mul },
+	{ "ne",			2,	true,	false,	false,	ocrpt_ne },
+	{ "not",		1,	false,	false,	false,	NULL },
+	{ "or",			-1,	true,	true,	false,	NULL },
+	{ "shl",		2,	false,	false,	false,	NULL },
+	{ "shr",		2,	false,	false,	false,	NULL },
+	{ "sub",		-1,	false,	false,	false,	ocrpt_sub },
+	{ "uminus",		1,	false,	false,	false,	ocrpt_uminus },
+	{ "xor",		-1,	true,	true,	true,	NULL },
 //	{ "val",		1,	false,	false,	ocrpt_val },
 };
 

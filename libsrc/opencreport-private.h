@@ -47,4 +47,18 @@ extern char cwdpath[PATH_MAX];
 void ocrpt_free_part(const struct opencreport_part *part);
 void ocrpt_free_parts(opencreport *o);
 
+static inline void ocrpt_expr_set_result_owned(opencreport *o, ocrpt_expr *e, bool owned) {
+	if (o->residx)
+		e->result_owned1 = owned;
+	else
+		e->result_owned0 = owned;
+}
+
+static inline bool ocrpt_expr_get_result_owned(opencreport *o, ocrpt_expr *e) {
+	if (o->residx)
+		return e->result_owned1;
+	else
+		return e->result_owned0;
+}
+
 #endif

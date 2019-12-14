@@ -44,7 +44,7 @@ static void print_token_value (FILE *, int, YYSTYPE) __attribute__((unused));
 static void yyerror(YYLTYPE *yylloc, yyscan_t yyscanner, const char *msg);
 #define parser_yyerror(msg)  scanner_yyerror(msg, yyscanner)
 
-static ocrpt_expr *newblankexpr(yyscan_t yyscanner, int type, uint32_t n_ops);
+static ocrpt_expr *newblankexpr1(yyscan_t yyscanner, enum ocrpt_expr_type type, uint32_t n_ops);
 static ocrpt_expr *newstring(yyscan_t yyscanner, ocrpt_string *s);
 static ocrpt_expr *newnumber(yyscan_t yyscanner, ocrpt_string *n);
 static ocrpt_expr *newident(yyscan_t yyscanner, int ident_type, ocrpt_string *query, ocrpt_string *name, bool dotprefixed);
@@ -121,6 +121,7 @@ exp:
 							}
 	| '(' exp ')'			{
 								yyset_lloc(&@1, yyscanner);
+								$2->parenthesized = true;
 								$$ = $2;
 							}
 	| exp '?' exp ':' exp	{
@@ -196,8 +197,10 @@ exp:
 	| DCONST IMPLMUL '(' exp ')'
 							{
 								ocrpt_expr *number = newnumber(yyscanner, $1);
+								ocrpt_expr *paren = newexpr(yyscanner, $2, makelist(number, $4, NULL));
 								yyset_lloc(&@1, yyscanner);
-								$$ = newexpr(yyscanner, $2, makelist(number, $4, NULL));
+								paren->parenthesized = true;
+								$$ = paren;
 							}
 	| ANYIDENT IMPLMUL '(' arglist ')'
 							{
@@ -214,6 +217,9 @@ exp:
 										 * identifier is valid.
 										 */
 										List *list = $4;
+										ocrpt_expr *paren = (ocrpt_expr *)list->data;
+
+										paren->parenthesized = true;
 
 										list = list_prepend(list, $1);
 										parser_yyget_extra(yyscanner)->parsed_arglist = list;
@@ -233,6 +239,9 @@ exp:
 											$$ = newexpr(yyscanner, fname, $4);
 										} else {
 											List *list = $4;
+											ocrpt_expr *paren = (ocrpt_expr *)list->data;
+
+											paren->parenthesized = true;
 
 											list = list_prepend(list, $1);
 											parser_yyget_extra(yyscanner)->parsed_arglist = list;
@@ -255,16 +264,20 @@ exp:
 							{
 								ocrpt_expr *number = newnumber(yyscanner, $5);
 								yyset_lloc(&@1, yyscanner);
+								$2->parenthesized = true;
 								$$ = newexpr(yyscanner, $4, makelist($2, number, NULL));
 							}
 	| '(' exp ')' IMPLMUL ANYIDENT
 							{
 								yyset_lloc(&@1, yyscanner);
+								$2->parenthesized = true;
 								$$ = newexpr(yyscanner, $4, makelist($2, $5, NULL));
 							}
 	| '(' exp ')' IMPLMUL '(' exp ')'
 							{
 								yyset_lloc(&@1, yyscanner);
+								$2->parenthesized = true;
+								$6->parenthesized = true;
 								$$ = newexpr(yyscanner, $4, makelist($2, $6, NULL));
 							}
 	| '|' exp '|'			{
@@ -449,27 +462,20 @@ static void print_token_value (FILE *file, int type, YYSTYPE value) {
 	}
 }
 
-static ocrpt_expr *newblankexpr(yyscan_t yyscanner, int type, uint32_t n_ops) {
-	ocrpt_expr *e;
+static ocrpt_expr *newblankexpr1(yyscan_t yyscanner, enum ocrpt_expr_type type, uint32_t n_ops) {
+	ocrpt_expr *e = newblankexpr(type, n_ops);
 
-	e = ocrpt_mem_malloc(sizeof(ocrpt_expr));
 	if (!e)
 		parser_yyerror("out of memory");
 
-	memset(e, 0, sizeof(ocrpt_expr));
-
 	parser_yyget_extra(yyscanner)->last_expr = e;
 	parser_yyget_extra(yyscanner)->parsed_exprs = list_prepend(parser_yyget_extra(yyscanner)->parsed_exprs, e);
-
-	e->type = type;
-	e->n_ops = n_ops;
-	e->ops = (n_ops > 0 ? ocrpt_mem_malloc(n_ops * sizeof(ocrpt_expr *)) : NULL);
 
 	return e;
 }
 
 static ocrpt_expr *newstring(yyscan_t yyscanner, ocrpt_string *s) {
-	ocrpt_expr *e = newblankexpr(yyscanner, OCRPT_EXPR_STRING, 0);
+	ocrpt_expr *e = newblankexpr1(yyscanner, OCRPT_EXPR_STRING, 0);
 	opencreport *o = parser_yyget_extra(yyscanner)->o;
 
 	parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, s);
@@ -482,7 +488,7 @@ static ocrpt_expr *newstring(yyscan_t yyscanner, ocrpt_string *s) {
 }
 
 static ocrpt_expr *newnumber(yyscan_t yyscanner, ocrpt_string *n) {
-	ocrpt_expr *e = newblankexpr(yyscanner, OCRPT_EXPR_NUMBER, 0);
+	ocrpt_expr *e = newblankexpr1(yyscanner, OCRPT_EXPR_NUMBER, 0);
 	opencreport *o = parser_yyget_extra(yyscanner)->o;
 
 	parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, n);
@@ -500,7 +506,7 @@ static ocrpt_expr *newident(yyscan_t yyscanner, int ident_type, ocrpt_string *qu
 	if ((query && query->str[0] == '\0') || (name && name->str[0] == '\0'))
 		parser_yyerror("syntax error: quoted identifier cannot be empty");
 
-	e = newblankexpr(yyscanner, ident_type, 0);
+	e = newblankexpr1(yyscanner, ident_type, 0);
 	if (query)
 		parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, query);
 	e->query = query;
@@ -537,7 +543,7 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, List *l) {
 		parser_yyerror(msg);
 	}
 
-	e = newblankexpr(yyscanner, OCRPT_EXPR, list_length(l));
+	e = newblankexpr1(yyscanner, OCRPT_EXPR, list_length(l));
 	parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, fname);
 	ocrpt_mem_string_free(fname, true);
 	e->func = f;

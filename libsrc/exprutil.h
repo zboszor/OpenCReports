@@ -46,10 +46,11 @@ enum ocrpt_expr_type {
 };
 
 #define ocrpt_expr_is_const(x) ((x)->type == OCRPT_EXPR_STRING || (x)->type == OCRPT_EXPR_NUMBER || (x)->type == OCRPT_EXPR_DATETIME)
+#define ocrpt_expr_is_dconst(x) ((x)->type == OCRPT_EXPR_NUMBER)
+#define ocrpt_expr_is_sconst(x) ((x)->type == OCRPT_EXPR_STRING)
+#define ocrpt_expr_is_dtconst(x) ((x)->type == OCRPT_EXPR_DATETIME)
 
 struct ocrpt_expr {
-	enum ocrpt_expr_type type;
-	bool result_owned[2];
 	struct ocrpt_result *result[2];
 	union {
 		/*
@@ -68,9 +69,14 @@ struct ocrpt_expr {
 			uint32_t n_ops;
 		};
 	};
+	enum ocrpt_expr_type type:4;
+	bool result_owned0:1;
+	bool result_owned1:1;
+	bool parenthesized:1;
 };
 typedef struct ocrpt_expr ocrpt_expr;
 
+ocrpt_expr *newblankexpr(enum ocrpt_expr_type type, uint32_t n_ops);
 ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *error);
 
 #endif

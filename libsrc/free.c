@@ -37,6 +37,9 @@ static const char *ocrpt_type_name(enum ocrpt_expr_type type) {
 }
 
 static void ocrpt_free_expr_result(ocrpt_result *r, enum ocrpt_expr_type type) {
+	if (!r)
+		return;
+
 	switch (type) {
 	case OCRPT_EXPR_NUMBER:
 		if (r && r->number_initialized)
@@ -67,9 +70,10 @@ DLL_EXPORT_SYM void ocrpt_free_expr(ocrpt_expr *e) {
 	case OCRPT_EXPR_ERROR:
 	case OCRPT_EXPR_STRING:
 	case OCRPT_EXPR_DATETIME:
-		for (i = 0; i < 2; i++)
-			if (e->result_owned[i] && e->result[i])
-				ocrpt_free_expr_result(e->result[i], e->type);
+		if (e->result_owned0)
+			ocrpt_free_expr_result(e->result[0], e->type);
+		if (e->result_owned1)
+			ocrpt_free_expr_result(e->result[1], e->type);
 		break;
 	case OCRPT_EXPR_MVAR:
 	case OCRPT_EXPR_RVAR:
@@ -79,22 +83,25 @@ DLL_EXPORT_SYM void ocrpt_free_expr(ocrpt_expr *e) {
 		ocrpt_mem_string_free(e->name, true);
 		e->query = NULL;
 		e->name = NULL;
-		for (i = 0; i < 2; i++)
-			if (e->result_owned[i] && e->result[i])
-				ocrpt_free_expr_result(e->result[i], e->result[i]->type);
+		if (e->result_owned0)
+			ocrpt_free_expr_result(e->result[0], e->result[0]->type);
+		if (e->result_owned1)
+			ocrpt_free_expr_result(e->result[1], e->result[1]->type);
 		break;
 	case OCRPT_EXPR:
-		for (i = 0; i < 2; i++)
-			if (e->result_owned[i] && e->result[i])
-				ocrpt_free_expr_result(e->result[i], e->result[i]->type);
+		if (e->result_owned0)
+			ocrpt_free_expr_result(e->result[0], e->result[0]->type);
+		if (e->result_owned1)
+			ocrpt_free_expr_result(e->result[1], e->result[1]->type);
 		for (i = 0; i < e->n_ops; i++)
 			ocrpt_free_expr(e->ops[i]);
 		ocrpt_mem_free(e->ops);
 		break;
 	}
 
-	for (i = 0; i < 2; i++)
-		if (e->result_owned[i])
-			ocrpt_mem_free(e->result[i]);
+	if (e->result_owned0)
+		ocrpt_mem_free(e->result[0]);
+	if (e->result_owned1)
+		ocrpt_mem_free(e->result[1]);
 	ocrpt_mem_free(e);
 }

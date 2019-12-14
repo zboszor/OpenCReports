@@ -40,16 +40,17 @@ struct ocrpt_string {
 typedef struct ocrpt_string ocrpt_string;
 
 struct ocrpt_result {
-	enum ocrpt_result_type type;
 	/* Original lexer token or (computed) string value for expression */
 	ocrpt_string *string;
 	/* Converted numeric constant or computed numeric value for expression */
 	mpfr_t number;
-	bool number_initialized;
-	bool string_owned;
-	bool isnull;
 	/* Datetime value */
 	struct tm datetime;
+	/* Group indicators together as bitfields for space saving */
+	enum ocrpt_result_type type:2;
+	bool number_initialized:1;
+	bool string_owned:1;
+	bool isnull:1;
 };
 typedef struct ocrpt_result ocrpt_result;
 
@@ -58,8 +59,9 @@ typedef void (*ocrpt_function_call)(opencreport *, ocrpt_expr *);
 struct ocrpt_function {
 	const char *fname;
 	const int n_ops;
-	const bool commutative;
-	const bool associative;
+	const bool commutative:1;
+	const bool associative:1;
+	const bool left_associative:1;
 	ocrpt_function_call func;
 };
 typedef struct ocrpt_function ocrpt_function;
