@@ -165,7 +165,7 @@ static void ocrpt_div(opencreport *o, ocrpt_expr *e) {
 	}
 
 	if (nnum == e->n_ops) {
-		ocrpt_init_func_result(o, e, OCRPT_EXPR_NUMBER);
+		ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
 		mpfr_set(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
 		for (i = 1; i < e->n_ops; i++)
 			mpfr_div(e->result[o->residx]->number, e->result[o->residx]->number, e->ops[i]->result[o->residx]->number, o->rndmode);
@@ -174,7 +174,7 @@ static void ocrpt_div(opencreport *o, ocrpt_expr *e) {
 }
 
 static void ocrpt_eq(opencreport *o, ocrpt_expr *e) {
-	int32_t ret;
+	unsigned long ret;
 
 	if (e->n_ops != 2 || !e->ops[0]->result[o->residx] || !e->ops[1]->result[o->residx]) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
@@ -208,12 +208,12 @@ static void ocrpt_eq(opencreport *o, ocrpt_expr *e) {
 		break;
 	}
 
-	ocrpt_init_func_result(o, e, OCRPT_EXPR_NUMBER);
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
 	mpfr_set_ui(e->result[o->residx]->number, ret, o->rndmode);
 }
 
 static void ocrpt_ne(opencreport *o, ocrpt_expr *e) {
-	int32_t ret;
+	unsigned long ret;
 
 	if (e->n_ops != 2 || !e->ops[0]->result[o->residx] || !e->ops[1]->result[o->residx]) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
@@ -246,12 +246,12 @@ static void ocrpt_ne(opencreport *o, ocrpt_expr *e) {
 		break;
 	}
 
-	ocrpt_init_func_result(o, e, OCRPT_EXPR_NUMBER);
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
 	mpfr_set_ui(e->result[o->residx]->number, ret, o->rndmode);
 }
 
 static void ocrpt_lt(opencreport *o, ocrpt_expr *e) {
-	int32_t ret;
+	unsigned long ret;
 
 	if (e->n_ops != 2 || !e->ops[0]->result[o->residx] || !e->ops[1]->result[o->residx]) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
@@ -284,12 +284,12 @@ static void ocrpt_lt(opencreport *o, ocrpt_expr *e) {
 		break;
 	}
 
-	ocrpt_init_func_result(o, e, OCRPT_EXPR_NUMBER);
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
 	mpfr_set_ui(e->result[o->residx]->number, ret, o->rndmode);
 }
 
 static void ocrpt_le(opencreport *o, ocrpt_expr *e) {
-	int32_t ret;
+	unsigned long ret;
 
 	if (e->n_ops != 2 || !e->ops[0]->result[o->residx] || !e->ops[1]->result[o->residx]) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
@@ -322,12 +322,12 @@ static void ocrpt_le(opencreport *o, ocrpt_expr *e) {
 		break;
 	}
 
-	ocrpt_init_func_result(o, e, OCRPT_EXPR_NUMBER);
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
 	mpfr_set_ui(e->result[o->residx]->number, ret, o->rndmode);
 }
 
 static void ocrpt_gt(opencreport *o, ocrpt_expr *e) {
-	int32_t ret;
+	unsigned long ret;
 
 	if (e->n_ops != 2 || !e->ops[0]->result[o->residx] || !e->ops[1]->result[o->residx]) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
@@ -360,12 +360,12 @@ static void ocrpt_gt(opencreport *o, ocrpt_expr *e) {
 		break;
 	}
 
-	ocrpt_init_func_result(o, e, OCRPT_EXPR_NUMBER);
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
 	mpfr_set_ui(e->result[o->residx]->number, ret, o->rndmode);
 }
 
 static void ocrpt_ge(opencreport *o, ocrpt_expr *e) {
-	int32_t ret;
+	unsigned long ret;
 
 	if (e->n_ops != 2 || !e->ops[0]->result[o->residx] || !e->ops[1]->result[o->residx]) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
@@ -398,7 +398,7 @@ static void ocrpt_ge(opencreport *o, ocrpt_expr *e) {
 		break;
 	}
 
-	ocrpt_init_func_result(o, e, OCRPT_EXPR_NUMBER);
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
 	mpfr_set_ui(e->result[o->residx]->number, ret, o->rndmode);
 }
 
@@ -412,7 +412,7 @@ static void ocrpt_val(opencreport *o, ocrpt_expr *e) {
 
 	switch (e->ops[0]->result[o->residx]->type) {
 	case OCRPT_RESULT_NUMBER:
-		ocrpt_init_func_result(o, e, OCRPT_EXPR_NUMBER);
+		ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
 		mpfr_set(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
 		break;
 	case OCRPT_RESULT_STRING:
@@ -421,7 +421,7 @@ static void ocrpt_val(opencreport *o, ocrpt_expr *e) {
 			str = "1";
 		else if (!strcmp(str, "no") || !strcmp(str, "false") || !strcmp(str, "f"))
 			str = "0";
-		ocrpt_init_func_result(o, e, OCRPT_EXPR_NUMBER);
+		ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
 		mpfr_set_str(e->result[o->residx]->number, str, 10, o->rndmode);
 		break;
 	case OCRPT_RESULT_DATETIME:
@@ -446,8 +446,105 @@ static void ocrpt_isnull(opencreport *o, ocrpt_expr *e) {
 		return;
 	}
 
-	ocrpt_init_func_result(o, e, OCRPT_EXPR_NUMBER);
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
 	mpfr_set_ui(e->result[o->residx]->number, e->ops[0]->result[o->residx]->isnull, o->rndmode);
+}
+
+static void ocrpt_null(opencreport *o, ocrpt_expr *e) {
+	if (e->n_ops != 1 || !e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	ocrpt_init_func_result(o, e, e->ops[0]->result[o->residx]->type);
+	e->result[o->residx]->isnull = true;
+}
+
+static void ocrpt_nulldt(opencreport *o, ocrpt_expr *e) {
+	if (e->n_ops != 0) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_DATETIME);
+	e->result[o->residx]->isnull = true;
+}
+
+static void ocrpt_nulln(opencreport *o, ocrpt_expr *e) {
+	if (e->n_ops != 0) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
+	e->result[o->residx]->isnull = true;
+}
+
+static void ocrpt_nulls(opencreport *o, ocrpt_expr *e) {
+	if (e->n_ops != 0) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_STRING);
+	e->result[o->residx]->isnull = true;
+}
+
+static void ocrpt_iif(opencreport *o, ocrpt_expr *e) {
+	int32_t i, opidx;
+	long cond;
+	ocrpt_string *string, *sstring;
+
+	if (e->n_ops != 3) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	for (i = 0; i < 3; i++) {
+		if (!e->ops[i]->result[o->residx]) {
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+			return;
+		}
+		if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+			ocrpt_expr_make_error_result(o, e, e->ops[i]->result[o->residx]->string->str);
+			return;
+		}
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	cond = mpfr_get_si(e->ops[0]->result[o->residx]->number, o->rndmode);
+	opidx = (cond ? 1 : 2);
+
+	ocrpt_init_func_result(o, e, e->ops[opidx]->result[o->residx]->type);
+	switch (e->ops[opidx]->result[o->residx]->type) {
+	case OCRPT_RESULT_NUMBER:
+		mpfr_set(e->result[o->residx]->number, e->ops[opidx]->result[o->residx]->number, o->rndmode);
+		break;
+	case OCRPT_RESULT_STRING:
+		sstring = e->ops[opidx]->result[o->residx]->string;
+		string = ocrpt_mem_string_resize(e->result[o->residx]->string, sstring->len);
+		if (!e->result[o->residx]->string) {
+			e->result[o->residx]->string = string;
+			e->result[o->residx]->string_owned = true;
+		}
+		e->result[o->residx]->string->len = 0;
+		ocrpt_mem_string_append_len(e->result[o->residx]->string, sstring->str, sstring->len);
+		break;
+	case OCRPT_RESULT_DATETIME:
+		/* TODO */
+		break;
+	default:
+		break;
+	}
 }
 
 /*
@@ -465,7 +562,7 @@ static ocrpt_function ocrpt_functions[] = {
 	{ "factorial",	1,	false,	false,	false,	NULL },
 	{ "ge",			2,	false,	false,	false,	ocrpt_ge },
 	{ "gt",			2,	false,	false,	false,	ocrpt_gt },
-	{ "iif",		3,	false,	false,	false,	NULL },
+	{ "iif",		3,	false,	false,	false,	ocrpt_iif },
 	{ "inc",		1,	false,	false,	false,	NULL },
 	{ "isnull",		1,	false,	false,	false,	ocrpt_isnull },
 	{ "land",		-1,	true,	true,	false,	NULL },
@@ -477,6 +574,10 @@ static ocrpt_function ocrpt_functions[] = {
 	{ "mul",		-1,	true,	true,	false,	ocrpt_mul },
 	{ "ne",			2,	true,	false,	false,	ocrpt_ne },
 	{ "not",		1,	false,	false,	false,	NULL },
+	{ "null",		1,	false,	false,	false,	ocrpt_null },
+	{ "nulldt",		0,	false,	false,	false,	ocrpt_nulldt },
+	{ "nulln",		0,	false,	false,	false,	ocrpt_nulln },
+	{ "nulls",		0,	false,	false,	false,	ocrpt_nulls },
 	{ "or",			-1,	true,	true,	false,	NULL },
 	{ "shl",		2,	false,	false,	false,	NULL },
 	{ "shr",		2,	false,	false,	false,	NULL },

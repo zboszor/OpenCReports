@@ -78,6 +78,13 @@ int main(void) {
 		"val(1.5)",
 		"val('yes')",
 		"val(yes)",
+
+		/* NULL tests */
+		"null(1)",
+		"null('a')",
+		"nulldt()",
+		"nulln()",
+		"nulls()",
 	};
 	int nstr = sizeof(str) / sizeof(char *);
 	int i;
