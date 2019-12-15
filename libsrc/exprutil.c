@@ -96,16 +96,19 @@ DLL_EXPORT_SYM void ocrpt_expr_print(opencreport *o, ocrpt_expr *e) {
 DLL_EXPORT_SYM void ocrpt_expr_result_print(ocrpt_result *r) {
 	switch (r->type) {
 	case OCRPT_RESULT_ERROR:
-		printf("(ERROR)%s\n", r->string->str);
+		printf("(ERROR)%s\n", r->isnull ? "NULL" : r->string->str);
 		break;
 	case OCRPT_RESULT_STRING:
-		printf("(string)%s\n", r->string->str);
+		printf("(string)%s\n", r->isnull ? "NULL" : r->string->str);
 		break;
 	case OCRPT_RESULT_DATETIME:
-		printf("(datetime)%s\n", r->string->str);
+		printf("(datetime)%s\n", r->isnull ? "NULL" : r->string->str);
 		break;
 	case OCRPT_RESULT_NUMBER:
-		mpfr_printf("%RF\n", r->number);
+		if (r->isnull)
+			printf("(number)NULL\n");
+		else
+			mpfr_printf("(number)%RF\n", r->number);
 		break;
 	}
 }
@@ -395,10 +398,6 @@ static void ocrpt_expr_eval_worker(opencreport *o, ocrpt_expr *e) {
 		return;
 
 	if (e->type != OCRPT_EXPR)
-		return;
-
-	//fprintf(stderr, "%s:%d\n", __func__, __LINE__);
-	if (!e->ops)
 		return;
 
 	//fprintf(stderr, "%s:%d\n", __func__, __LINE__);
