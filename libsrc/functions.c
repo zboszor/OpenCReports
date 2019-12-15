@@ -435,6 +435,21 @@ static void ocrpt_val(opencreport *o, ocrpt_expr *e) {
 	}
 }
 
+static void ocrpt_isnull(opencreport *o, ocrpt_expr *e) {
+	if (e->n_ops != 1 || !e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	ocrpt_init_func_result(o, e, OCRPT_EXPR_NUMBER);
+	mpfr_set_ui(e->result[o->residx]->number, e->ops[0]->result[o->residx]->isnull, o->rndmode);
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -452,6 +467,7 @@ static ocrpt_function ocrpt_functions[] = {
 	{ "gt",			2,	false,	false,	false,	ocrpt_gt },
 	{ "iif",		3,	false,	false,	false,	NULL },
 	{ "inc",		1,	false,	false,	false,	NULL },
+	{ "isnull",		1,	false,	false,	false,	ocrpt_isnull },
 	{ "land",		-1,	true,	true,	false,	NULL },
 	{ "le",			2,	false,	false,	false,	ocrpt_le },
 	{ "lnot",		1,	false,	false,	false,	NULL },
