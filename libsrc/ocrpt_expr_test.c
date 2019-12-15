@@ -55,7 +55,7 @@ int main(void) {
 		"add(a, 1, b, 2)",
 		"a + 1 + b + 2",
 
-		/* String expressions */
+		/* String comparison expressions */
 		"'a' = 'a'",
 		"'a' = 'b'",
 		"'a' <> 'a'",
@@ -68,6 +68,16 @@ int main(void) {
 		"'a' > 'b'",
 		"'a' >= 'a'",
 		"'a' >= 'b'",
+
+		/* String arithmetics */
+		"'a' + 'b'", /* should be 'ab' */
+		"'a' - 'b'", /* should be an error */
+
+		/* val() conversions */
+		"val('1.5')",
+		"val(1.5)",
+		"val('yes')",
+		"val(yes)",
 	};
 	int nstr = sizeof(str) / sizeof(char *);
 	int i;

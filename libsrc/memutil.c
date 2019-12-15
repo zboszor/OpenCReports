@@ -55,6 +55,7 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new(const char *str, bool copy) {
 /* Allocate len + 1 bytes and zero-terminate the string */
 DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, size_t len) {
 	ocrpt_string *string = ocrpt_mem_malloc(sizeof(ocrpt_string));
+	uint32_t strl;
 
 	if (!string)
 		return NULL;
@@ -68,13 +69,34 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, size
 		return NULL;
 	}
 
-	if (str)
-		strncpy(string->str, str, len);
+	if (str) {
+		char *end = stpncpy(string->str, str, len);
+		strl = end - string->str;
+	} else
+		strl = 0;
 
-	string->str[len] = 0;
-	string->len = len;
+	string->str[strl] = 0;
+	string->len = strl;
 	string->allocated_len = len + 1;
 	return string;
+}
+
+DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_resize(ocrpt_string *string, size_t len) {
+	char *str;
+
+	if (!string)
+		return ocrpt_mem_string_new_with_len(NULL, len);
+
+	if (string->allocated_len > len)
+		return string;
+
+	str = ocrpt_mem_realloc(string->str, len + 1);
+	if (str) {
+		string->str = str;
+		return string;
+	}
+
+	return NULL;
 }
 
 DLL_EXPORT_SYM char *ocrpt_mem_string_free(ocrpt_string *string, bool free_str) {
