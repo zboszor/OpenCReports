@@ -183,7 +183,7 @@ static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_expr *e) {
 		if (ocrpt_expr_is_dtconst(e->ops[i]))
 			dtconst++, nconst++;
 	}
-	if (nconst > 1 && nconst == e->n_ops) {
+	if (nconst == e->n_ops) {
 		/*
 		 * Fully constant expression, precompute it.
 		 */
