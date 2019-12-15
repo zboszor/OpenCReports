@@ -6,6 +6,7 @@
 
 #include <config.h>
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <mpfr.h>
@@ -442,4 +443,40 @@ ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const 
 	result->isnull = false;
 
 	return result;
+}
+
+/*
+ * Returns true if the two subsequent row data
+ * in the expression are the same
+ */
+DLL_EXPORT_SYM bool ocrpt_expr_cmp_results(opencreport *o, ocrpt_expr *e) {
+	if (!e->result[o->residx] || !e->result[!o->residx])
+		return false;
+
+	/* (SQL) NULLs compare as non-equal */
+	if (e->result[o->residx]->isnull || e->result[!o->residx]->isnull)
+		return false;
+
+	/* Different types are obviously non-equal */
+	if (e->result[o->residx]->type != e->result[!o->residx]->type)
+		return false;
+
+	/* Two subsequent errors compare as non-equal */
+	switch (e->result[o->residx]->type) {
+	case OCRPT_RESULT_ERROR:
+		return false;
+	case OCRPT_RESULT_STRING:
+		return !strcmp(e->result[o->residx]->string->str, e->result[!o->residx]->string->str);
+	case OCRPT_RESULT_NUMBER: {
+		mpfr_printf("prev: %Rf (isnull %d) current: %Rf (isnull %d)\n",
+					e->result[!o->residx]->number, e->result[!o->residx]->isnull,
+					e->result[o->residx]->number, e->result[o->residx]->isnull);
+		return !mpfr_cmp(e->result[o->residx]->number, e->result[!o->residx]->number);
+	}
+	case OCRPT_RESULT_DATETIME:
+		return false; // TODO: implement
+	default:
+		fprintf(stderr, "%s:%d: unknown expression type %d\n", __func__, __LINE__, e->result[o->residx]->type);
+		return false;
+	}
 }

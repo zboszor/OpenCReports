@@ -146,6 +146,12 @@ void ocrpt_expr_resolve(opencreport *o, ocrpt_expr *e);
  */
 ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_expr *e);
 /*
+ * Compare two subsequent row data in the expression,
+ * return true if they are identical.
+ * It can be used to implement report breaks.
+ */
+bool ocrpt_expr_cmp_results(opencreport *o, ocrpt_expr *e);
+/*
  * Print an expression on stdout. Good for unit testing.
  */
 void ocrpt_expr_print(opencreport *o, ocrpt_expr *e);
@@ -267,16 +273,26 @@ ocrpt_datasource *ocrpt_validate_datasource(opencreport *o, ocrpt_datasource *so
 ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o, const char *source_name);
 /*
  * Add an array query using the datasource pointer
+ *
+ * The array's first row contains the header names
+ * and the number of rows is the number of data rows,
+ * i.e. it's one less than the actual number of rows
+ * in array.
  */
 ocrpt_query *ocrpt_add_array_query(opencreport *o, ocrpt_datasource *source,
-									const char *name, void *array,
+									const char *name, const char **array,
 									int32_t rows, int32_t cols,
 									const enum ocrpt_result_type *types);
 /*
  * Add an array query using the datasource name
+ *
+ * The array's first row contains the header names
+ * and the number of rows is the number of data rows,
+ * i.e. it's one less than the actual number of rows
+ * in array.
  */
 ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name,
-									const char *name, void *array,
+									const char *name, const char **array,
 									int32_t rows, int32_t cols,
 									const enum ocrpt_result_type *types);
 /*

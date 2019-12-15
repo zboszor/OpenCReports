@@ -8,21 +8,21 @@
 
 #include <opencreport.h>
 
-static const char *array[4][4] = {
-	{ "id", "name", "property", "age" },
-	{ "1", "Fred Flintstone", "strong", "31" },
-	{ "2", "Wilma Flintstone", "charming", "28" },
-	{ "3", "Pebbles Flintstone", "young", "5e-1" }
+static const char *array[4][5] = {
+	{ "id", "name", "property", "age", "adult" },
+	{ "1", "Fred Flintstone", "strong", "31", "yes" },
+	{ "2", "Wilma Flintstone", "charming", "28", "yes" },
+	{ "3", "Pebbles Flintstone", "young", "5e-1", "no" }
 };
 
-static const enum ocrpt_result_type coltypes[4] = {
-	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER
+static const enum ocrpt_result_type coltypes[5] = {
+	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 
-static const char *array2[4][4] = {
-	{ "id", "name", "property", "age" },
-	{ "2", "Betty Rubble", "beautiful", "27" },
-	{ "1", "Barney Rubble", "small", "29" },
+static const char *array2[3][5] = {
+	{ "id", "name", "property", "age", "adult" },
+	{ "2", "Betty Rubble", "beautiful", "27", "yes" },
+	{ "1", "Barney Rubble", "small", "29", "yes" },
 };
 
 void print_result_row(const char *name, ocrpt_query_result *qr, int32_t cols) {
@@ -41,7 +41,7 @@ int main(void) {
 	opencreport *o = ocrpt_init();
 	ocrpt_query *q, *q2;
 	ocrpt_query_result *qr, *qr2;
-	ocrpt_expr *id, *name, *age, *match;
+	ocrpt_expr *id, *name, *age, *adult, *match;
 	char *err;
 	int32_t cols, cols2, row, i;
 
@@ -60,7 +60,10 @@ int main(void) {
 	ocrpt_strfree(err);
 	ocrpt_expr_print(o, age);
 
-	q = ocrpt_add_array_query_as(o, "array", "a", array, 3, 4, coltypes);
+	err = NULL;
+	adult = ocrpt_expr_parse(o, "a.adult", &err);
+
+	q = ocrpt_add_array_query_as(o, "array", "a", (const char **)array, 3, 5, coltypes);
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)
@@ -69,6 +72,7 @@ int main(void) {
 	ocrpt_expr_resolve(o, id);
 	ocrpt_expr_resolve(o, name);
 	ocrpt_expr_resolve(o, age);
+	ocrpt_expr_resolve(o, adult);
 
 	row = 0;
 	ocrpt_navigate_start(o, q);
@@ -101,12 +105,19 @@ int main(void) {
 		printf("Evaluated: ");
 		ocrpt_expr_result_print(r);
 
+		printf("Expression: ");
+		ocrpt_expr_print(o, adult);
+		r = ocrpt_expr_eval(o, adult);
+		printf("Evaluated: ");
+		ocrpt_expr_result_print(r);
+		printf("Expression is %s previous row\n", ocrpt_expr_cmp_results(o, adult) ? "identical to" : "different from");
+
 		printf("\n");
 	}
 
 	printf("--- TESTING FOLLOWER ---\n\n");
 
-	q2 = ocrpt_add_array_query_as(o, "array", "b", array2, 2, 4, coltypes);
+	q2 = ocrpt_add_array_query_as(o, "array", "b", (const char **)array2, 2, 5, coltypes);
 	ocrpt_add_query_follower(o, q, q2);
 
 	row = 0;
@@ -149,7 +160,7 @@ int main(void) {
 
 	printf("--- TESTING FOLLOWER N:1 ---\n\n");
 
-	q2 = ocrpt_add_array_query_as(o, "array", "b", array2, 2, 4, coltypes);
+	q2 = ocrpt_add_array_query_as(o, "array", "b", (const char **)array2, 2, 4, coltypes);
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	err = NULL;
 	match = ocrpt_expr_parse(o, "a.id = b.id", &err);
@@ -201,6 +212,7 @@ int main(void) {
 	ocrpt_free_expr(id);
 	ocrpt_free_expr(name);
 	ocrpt_free_expr(age);
+	ocrpt_free_expr(adult);
 
 	/* ocrpt_free() will free it */
 	//ocrpt_free_query(o, q);

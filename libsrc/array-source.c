@@ -61,6 +61,9 @@ static void ocrpt_array_describe(ocrpt_query *query, ocrpt_query_result **qresul
 				mpfr_init2(qr[result->cols + i].result.number, query->source->o->prec);
 				qr[result->cols + i].result.number_initialized = true;
 			}
+
+			qr[i].result.isnull = true;
+			qr[result->cols + i].result.isnull = true;
 		}
 
 		result->result = qr;
@@ -114,6 +117,10 @@ static bool ocrpt_array_populate_result(ocrpt_query *query) {
 			if (r->type == OCRPT_RESULT_NUMBER) {
 				if (!r->number_initialized)
 					mpfr_init2(r->number, o->prec);
+				if (!strcmp(str, "yes") || !strcmp(str, "true") || !strcmp(str, "t"))
+					str = "1";
+				if (!strcmp(str, "no") || !strcmp(str, "false") || !strcmp(str, "f"))
+					str = "0";
 				mpfr_set_str(r->number, str, 10, o->rndmode);
 			}
 		} else {
@@ -166,7 +173,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o, cons
 	return ocrpt_add_datasource(o, source_name, &ocrpt_array_input);
 }
 
-static ocrpt_query *add_array_query(opencreport *o, const ocrpt_datasource *source, const char *name, void *array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
+static ocrpt_query *add_array_query(opencreport *o, const ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
 	ocrpt_query *query;
 	struct ocrpt_array_results *priv;
 
@@ -196,14 +203,14 @@ static ocrpt_query *add_array_query(opencreport *o, const ocrpt_datasource *sour
 	return query;
 }
 
-DLL_EXPORT_SYM ocrpt_query *ocrpt_add_array_query(opencreport *o, ocrpt_datasource *source, const char *name, void *array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
+DLL_EXPORT_SYM ocrpt_query *ocrpt_add_array_query(opencreport *o, ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
 	if (!ocrpt_validate_datasource(o, source))
 		return NULL;
 
 	return add_array_query(o, source, name, array, rows, cols, types);
 }
 
-DLL_EXPORT_SYM ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name, const char *name, void *array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
+DLL_EXPORT_SYM ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
 	ocrpt_datasource *source = ocrpt_find_datasource(o, source_name);
 
 	if (!source)
