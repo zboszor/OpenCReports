@@ -34,6 +34,12 @@ int main(void) {
 		"(-1 + -2) * -3",
 		"(-1 - -2) * -3",
 
+		/* Increment/decrement */
+		"1++",
+		"++1",
+		"1--",
+		"--1",
+
 		/* Identical operators (optimizer test) */
 		"6 / 3 / 2 ",	/* 1 */
 		"(6 / 3) / 2",	/* 1 */
@@ -85,6 +91,9 @@ int main(void) {
 		"nulldt()",
 		"nulln()",
 		"nulls()",
+
+		/* Error tests */
+		"error('custom error')",
 	};
 	int nstr = sizeof(str) / sizeof(char *);
 	int i;
