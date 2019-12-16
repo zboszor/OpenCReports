@@ -524,6 +524,8 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, List *l) {
 	int idx;
 	ocrpt_function *f;
 
+	parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, fname);
+
 	f = ocrpt_find_function(fname->str);
 	if (!f) {
 		ocrpt_mem_string_free(fname, true);
@@ -544,7 +546,6 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, List *l) {
 	}
 
 	e = newblankexpr1(yyscanner, OCRPT_EXPR, list_length(l));
-	parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, fname);
 	ocrpt_mem_string_free(fname, true);
 	e->func = f;
 
