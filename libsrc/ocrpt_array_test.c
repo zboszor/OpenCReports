@@ -160,7 +160,7 @@ int main(void) {
 
 	printf("--- TESTING FOLLOWER N:1 ---\n\n");
 
-	q2 = ocrpt_add_array_query_as(o, "array", "b", (const char **)array2, 2, 4, coltypes);
+	q2 = ocrpt_add_array_query_as(o, "array", "b", (const char **)array2, 2, 5, coltypes);
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	err = NULL;
 	match = ocrpt_expr_parse(o, "a.id = b.id", &err);
