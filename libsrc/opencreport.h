@@ -160,6 +160,10 @@ void ocrpt_expr_print(opencreport *o, ocrpt_expr *e);
  */
 void ocrpt_expr_result_print(ocrpt_result *r);
 /*
+ * Print the result data for every subexpression in the expression. Good for unit testing.
+ */
+void ocrpt_expr_result_deep_print(opencreport *o, ocrpt_expr *e);
+/*
  * Count the number of expression nodes
  */
 int ocrpt_expr_nodes(ocrpt_expr *e);

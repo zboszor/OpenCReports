@@ -39,7 +39,7 @@ ocrpt_expr *newblankexpr(enum ocrpt_expr_type type, uint32_t n_ops) {
 	return e;
 }
 
-static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth) {
+static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth, const char *delimiter) {
 	ocrpt_result *result = e->result[o->residx];
 	int i;
 
@@ -79,18 +79,34 @@ static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth) {
 		for (i = 0; i < e->n_ops; i++) {
 			if (i > 0)
 				printf(",");
-			ocrpt_expr_print_worker(o, e->ops[i], depth + 1);
+			ocrpt_expr_print_worker(o, e->ops[i], depth + 1, delimiter);
 		}
 		printf(")");
 		break;
 	}
 
 	if (depth == 0)
-		printf("\n");
+		printf("%s", delimiter);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_print(opencreport *o, ocrpt_expr *e) {
-	ocrpt_expr_print_worker(o, e, 0);
+	ocrpt_expr_print_worker(o, e, 0, "\n");
+}
+
+static void ocrpt_expr_result_deep_print_worker(opencreport *o, ocrpt_expr *e) {
+	if (e->type == OCRPT_EXPR) {
+		int i;
+
+		for (i = 0; i < e->n_ops; i++)
+			ocrpt_expr_result_deep_print(o, e->ops[i]);
+	}
+
+	ocrpt_expr_print_worker(o, e, 0, " - ");
+	ocrpt_expr_result_print(e->result[o->residx]);
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_result_deep_print(opencreport *o, ocrpt_expr *e) {
+	ocrpt_expr_result_deep_print_worker(o, e);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_result_print(ocrpt_result *r) {
