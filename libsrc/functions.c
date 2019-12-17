@@ -94,9 +94,10 @@ static void ocrpt_add(opencreport *o, ocrpt_expr *e) {
 				e->result[o->residx]->string = string;
 				e->result[o->residx]->string_owned = true;
 			}
+			string->len = 0;
 			for (i = 0; i < e->n_ops; i++) {
 				ocrpt_string *sstring = e->ops[i]->result[o->residx]->string;
-				ocrpt_mem_string_append_len(e->result[o->residx]->string, sstring->str, sstring->len);
+				ocrpt_mem_string_append_len(string, sstring->str, sstring->len);
 			}
 		} else
 			ocrpt_expr_make_error_result(o, e, "out of memory");
@@ -611,6 +612,43 @@ static void ocrpt_error(opencreport *o, ocrpt_expr *e) {
 	}
 }
 
+static void ocrpt_concat(opencreport *o, ocrpt_expr *e) {
+	ocrpt_string *string;
+	int32_t len, i;
+
+	if (e->n_ops < 2) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	for (i = 0; i < e->n_ops; i++) {
+		if (!e->ops[i]->result[o->residx] || e->ops[i]->result[o->residx]->type != OCRPT_RESULT_STRING) {
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+			return;
+		}
+	}
+
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_STRING);
+
+	for (len = 0, i = 0; i < e->n_ops; i++)
+		len += e->ops[i]->result[o->residx]->string->len;
+
+	string = ocrpt_mem_string_resize(e->result[o->residx]->string, len);
+	if (string) {
+		if (!e->result[o->residx]->string) {
+			e->result[o->residx]->string = string;
+			e->result[o->residx]->string_owned = true;
+		}
+
+		string->len = 0;
+		for (i = 0; i < e->n_ops; i++) {
+			ocrpt_string *sstring = e->ops[i]->result[o->residx]->string;
+			ocrpt_mem_string_append_len(string, sstring->str, sstring->len);
+		}
+	} else
+		ocrpt_expr_make_error_result(o, e, "out of memory");
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -619,7 +657,7 @@ static ocrpt_function ocrpt_functions[] = {
 	{ "abs",		1,	false,	false,	false,	ocrpt_abs },
 	{ "add",		-1,	true,	true,	false,	ocrpt_add },
 	{ "and",		-1,	true,	true,	false,	NULL },
-	{ "concat",		-1,	false,	false,	false,	NULL },
+	{ "concat",		-1,	false,	false,	false,	ocrpt_concat },
 	{ "dec",		1,	false,	false,	false,	ocrpt_dec },
 	{ "div",		-1,	false,	false,	true,	ocrpt_div },
 	{ "eq",			2,	true,	false,	false,	ocrpt_eq },
