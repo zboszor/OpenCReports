@@ -76,8 +76,9 @@ int main(void) {
 		"'a' >= 'b'",
 
 		/* String arithmetics */
-		"'a' + 'b'", /* should be 'ab' */
-		"'a' - 'b'", /* should be an error */
+		"'a' + 'b'",			/* should be 'ab' */
+		"concat('a', 'b')",		/* same */
+		"'a' - 'b'",			/* should be an error */
 
 		/* val() conversions */
 		"val('1.5')",
