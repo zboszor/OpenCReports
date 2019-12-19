@@ -183,10 +183,6 @@ static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_expr *e) {
 	if (e->type != OCRPT_EXPR)
 		return;
 
-	//fprintf(stderr, "%s:%d\n", __func__, __LINE__);
-	if (!e->ops)
-		return;
-
 	again:
 
 	//fprintf(stderr, "%s:%d\n", __func__, __LINE__);
@@ -207,7 +203,7 @@ static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_expr *e) {
 		 * Fully constant expression, precompute it.
 		 */
 		if (e->func) {
-			if (e->func->func) {
+			if (e->func->func && !e->func->dont_optimize) {
 				//fprintf(stderr, "%s:%d: calling func() ptr\n", __func__, __LINE__);
 				e->func->func(o, e);
 				//fprintf(stderr, "%s:%d: returned from func()\n", __func__, __LINE__);

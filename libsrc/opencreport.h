@@ -62,6 +62,7 @@ struct ocrpt_function {
 	const bool commutative:1;
 	const bool associative:1;
 	const bool left_associative:1;
+	const bool dont_optimize:1;
 	ocrpt_function_call func;
 };
 typedef struct ocrpt_function ocrpt_function;
