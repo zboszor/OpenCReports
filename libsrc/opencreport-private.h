@@ -37,6 +37,7 @@ struct opencreport {
 
 	mpfr_prec_t prec;
 	mpfr_rnd_t rndmode;
+	gmp_randstate_t randstate;
 
 	/* Alternating datasource row result index  */
 	bool residx:1;

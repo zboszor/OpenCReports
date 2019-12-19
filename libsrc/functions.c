@@ -947,6 +947,16 @@ static void ocrpt_mid(opencreport *o, ocrpt_expr *e) {
 		ocrpt_expr_make_error_result(o, e, "out of memory");
 }
 
+static void ocrpt_random(opencreport *o, ocrpt_expr *e) {
+	if (e->n_ops != 0) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
+	mpfr_urandomb(e->result[o->residx]->number, o->randstate);
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -982,6 +992,7 @@ static ocrpt_function ocrpt_functions[] = {
 	{ "nulln",		0,	false,	false,	false,	ocrpt_nulln },
 	{ "nulls",		0,	false,	false,	false,	ocrpt_nulls },
 	{ "or",			-1,	true,	true,	false,	NULL },
+	{ "random",		0,	false,	false,	false,	ocrpt_random },
 	{ "right",		2,	false,	false,	false,	ocrpt_right },
 	{ "shl",		2,	false,	false,	false,	NULL },
 	{ "shr",		2,	false,	false,	false,	NULL },

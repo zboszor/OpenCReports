@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/random.h>
 
 #include <paper.h>
 
@@ -24,15 +25,26 @@ int n_papersizes;
 
 DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	opencreport *o = (opencreport *)ocrpt_mem_malloc(sizeof(struct opencreport));
+	unsigned long seed;
 
 	if (!o)
 		return NULL;
+
+	/*
+	 * If getrandom() fails, fill the random seed from
+	 * the garbage data in the allocated area before
+	 * zeroing it out.
+	 */
+	if (getrandom(&seed, sizeof(seed), GRND_NONBLOCK) < 0)
+		memcpy(&seed, o, sizeof(seed));
 
 	memset(o, 0, sizeof(struct opencreport));
 
 	o->paper = system_paper;
 	o->prec = OCRPT_MPFR_PRECISION_BITS;
 	o->rndmode = MPFR_RNDN;
+	gmp_randinit_default(o->randstate);
+	gmp_randseed_ui(o->randstate, seed);
 
 	ocrpt_add_array_datasource(o, "array");
 
@@ -62,6 +74,8 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	list_free_deep(o->datasources, ocrpt_free_datasource);
 
 	ocrpt_free_parts(o);
+
+	gmp_randclear(o->randstate);
 
 	ocrpt_mem_free(o);
 }

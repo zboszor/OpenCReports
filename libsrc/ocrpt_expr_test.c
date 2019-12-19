@@ -14,7 +14,9 @@ int main(void) {
 
 	char *str[] = {
 		"|1|",
+		"|nulln()|",
 		"-1",
+		"-nulln()",
 
 		/* Left-associative operator sequence */
 		"1 + 2 + 3",
@@ -107,6 +109,11 @@ int main(void) {
 		"nulldt()",
 		"nulln()",
 		"nulls()",
+
+		/* Random */
+		"random()",
+		"random()",
+		"random()",
 
 		/* Error tests */
 		"error('custom error')",
