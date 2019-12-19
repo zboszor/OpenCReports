@@ -75,10 +75,25 @@ int main(void) {
 		"'a' >= 'a'",
 		"'a' >= 'b'",
 
-		/* String arithmetics */
+		/* String arithmetics tests */
 		"'a' + 'b'",			/* should be 'ab' */
+		//"'a' + nulls()",		/* should be NULL */
 		"concat('a', 'b')",		/* same */
 		"'a' - 'b'",			/* should be an error */
+		"left('árvíztűrő tükörfúrógép', 9)",
+		"mid('árvíztűrő tükörfúrógép', 0, 9)",	/* start index 0 and 1 are the same */
+		"mid('árvíztűrő tükörfúrógép', 1, 9)",
+		"mid('árvíztűrő tükörfúrógép', 6, 10)",
+		"mid('árvíztűrő tükörfúrógép', -12, 9)",
+		"right('árvíztűrő tükörfúrógép', 7)",
+
+		/* String arithmetics NULL tests */
+		"left('a', nulln())",
+		"left(nulls(), 1)",
+		"left(nulls(), nulln())",
+		"right('a', nulln())",
+		"right(nulls(), 1)",
+		"right(nulls(), nulln())",
 
 		/* val() conversions */
 		"val('1.5')",

@@ -33,6 +33,7 @@ bool ocrpt_init_func_result(opencreport *o, ocrpt_expr *e, enum ocrpt_result_typ
 			result->number_initialized = true;
 		}
 		result->type = type;
+		result->isnull = false;
 	}
 
 	return !!result;
@@ -649,6 +650,161 @@ static void ocrpt_concat(opencreport *o, ocrpt_expr *e) {
 		ocrpt_expr_make_error_result(o, e, "out of memory");
 }
 
+static void utf8forward(const char *s, int l, int blen, int *blen2) {
+	int i = 0, j = 0;
+
+	while (j < l && i < blen) {
+		if ((s[i] & 0xf8) == 0xf0)
+			i+= 4, j++;
+		else if ((s[i] & 0xf0) == 0xe0)
+			i += 3, j++;
+		else if ((s[i] & 0xe0) == 0xc0)
+			i += 2, j++;
+		else
+			i++, j++;
+	}
+
+	if (i > blen)
+		i = blen;
+
+	*blen2 = i;
+}
+
+static void utf8backward(const char *s, int l, int blen, int *blen2) {
+	int i = blen, j = 0;
+
+	while (j < l && i > 0) {
+		i--;
+		if (((s[i] & 0xf8) == 0xf0) || ((s[i] & 0xf0) == 0xe0) || ((s[i] & 0xe0) == 0xc0) || ((s[i] & 0x80) == 0x00))
+			j++;
+	}
+
+	*blen2 = i;
+}
+
+static void ocrpt_left(opencreport *o, ocrpt_expr *e) {
+	ocrpt_string *string;
+	ocrpt_string *sstring;
+	int32_t l, len;
+
+	if (e->n_ops != 2 || e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING || e->ops[1]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_STRING);
+
+	if (e->ops[0]->result[o->residx]->isnull || e->ops[1]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	l = mpfr_get_si(e->ops[1]->result[o->residx]->number, o->rndmode);
+	if (l < 0)
+		l = 0;
+
+	sstring = e->ops[0]->result[o->residx]->string;
+
+	utf8forward(sstring->str, l, sstring->len, &len);
+
+	string = ocrpt_mem_string_resize(e->result[o->residx]->string, len);
+	if (string) {
+		if (!e->result[o->residx]->string) {
+			e->result[o->residx]->string = string;
+			e->result[o->residx]->string_owned = true;
+		}
+
+		string->len = 0;
+		ocrpt_mem_string_append_len(string, sstring->str, len);
+	} else
+		ocrpt_expr_make_error_result(o, e, "out of memory");
+}
+
+static void ocrpt_right(opencreport *o, ocrpt_expr *e) {
+	ocrpt_string *string;
+	ocrpt_string *sstring;
+	int32_t l, start;
+
+	if (e->n_ops != 2 || e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING || e->ops[1]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_STRING);
+
+	if (e->ops[0]->result[o->residx]->isnull || e->ops[1]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	l = mpfr_get_si(e->ops[1]->result[o->residx]->number, o->rndmode);
+	if (l < 0)
+		l = 0;
+
+	sstring = e->ops[0]->result[o->residx]->string;
+
+	utf8backward(sstring->str, l, sstring->len, &start);
+
+	string = ocrpt_mem_string_resize(e->result[o->residx]->string, sstring->len - start);
+	if (string) {
+		if (!e->result[o->residx]->string) {
+			e->result[o->residx]->string = string;
+			e->result[o->residx]->string_owned = true;
+		}
+
+		string->len = 0;
+		ocrpt_mem_string_append_len(string, sstring->str + start, sstring->len - start);
+	} else
+		ocrpt_expr_make_error_result(o, e, "out of memory");
+}
+
+static void ocrpt_mid(opencreport *o, ocrpt_expr *e) {
+	ocrpt_string *string;
+	ocrpt_string *sstring;
+	int32_t ofs, l, start, len;
+
+	if (e->n_ops != 3 || e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING ||
+			e->ops[1]->result[o->residx]->type != OCRPT_RESULT_NUMBER ||
+			e->ops[2]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_STRING);
+
+	if (e->ops[0]->result[o->residx]->isnull || e->ops[1]->result[o->residx]->isnull || e->ops[2]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	ofs = mpfr_get_si(e->ops[1]->result[o->residx]->number, o->rndmode);
+	l = mpfr_get_si(e->ops[2]->result[o->residx]->number, o->rndmode);
+	if (l < 0)
+		l = 0;
+
+	sstring = e->ops[0]->result[o->residx]->string;
+
+	if (ofs < 0)
+		utf8backward(sstring->str, -ofs, sstring->len, &start);
+	else if (ofs > 0)
+		utf8forward(sstring->str, ofs - 1, sstring->len, &start);
+	else
+		start = 0;
+	utf8forward(sstring->str + start, l, sstring->len - start, &len);
+
+	string = ocrpt_mem_string_resize(e->result[o->residx]->string, len);
+	if (string) {
+		if (!e->result[o->residx]->string) {
+			e->result[o->residx]->string = string;
+			e->result[o->residx]->string_owned = true;
+		}
+
+		string->len = 0;
+		ocrpt_mem_string_append_len(string, sstring->str + start, len);
+	} else
+		ocrpt_expr_make_error_result(o, e, "out of memory");
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -670,9 +826,11 @@ static ocrpt_function ocrpt_functions[] = {
 	{ "isnull",		1,	false,	false,	false,	ocrpt_isnull },
 	{ "land",		-1,	true,	true,	false,	NULL },
 	{ "le",			2,	false,	false,	false,	ocrpt_le },
+	{ "left",		2,	false,	false,	false,	ocrpt_left },
 	{ "lnot",		1,	false,	false,	false,	NULL },
 	{ "lor",		-1,	true,	true,	false,	NULL },
 	{ "lt",			2,	false,	false,	false,	ocrpt_lt },
+	{ "mid",		3,	false,	false,	false,	ocrpt_mid },
 	{ "mod",		2,	false,	false,	false,	NULL },
 	{ "mul",		-1,	true,	true,	false,	ocrpt_mul },
 	{ "ne",			2,	true,	false,	false,	ocrpt_ne },
@@ -682,6 +840,7 @@ static ocrpt_function ocrpt_functions[] = {
 	{ "nulln",		0,	false,	false,	false,	ocrpt_nulln },
 	{ "nulls",		0,	false,	false,	false,	ocrpt_nulls },
 	{ "or",			-1,	true,	true,	false,	NULL },
+	{ "right",		2,	false,	false,	false,	ocrpt_right },
 	{ "shl",		2,	false,	false,	false,	NULL },
 	{ "shr",		2,	false,	false,	false,	NULL },
 	{ "sub",		-1,	false,	false,	false,	ocrpt_sub },
