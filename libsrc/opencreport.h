@@ -58,7 +58,7 @@ typedef void (*ocrpt_function_call)(opencreport *, ocrpt_expr *);
 
 struct ocrpt_function {
 	const char *fname;
-	const int n_ops;
+	const int32_t n_ops;
 	const bool commutative:1;
 	const bool associative:1;
 	const bool left_associative:1;
@@ -166,7 +166,7 @@ void ocrpt_expr_result_deep_print(opencreport *o, ocrpt_expr *e);
 /*
  * Count the number of expression nodes
  */
-int ocrpt_expr_nodes(ocrpt_expr *e);
+int32_t ocrpt_expr_nodes(ocrpt_expr *e);
 /*
  * Free an expression parse tree
  */
@@ -346,25 +346,25 @@ ocrpt_report_part_set_report_header(ocrpt_report_part *part, ...);
 /*
  * Add XML report description from a file
  */
-int ocrpt_add_report(opencreport *o, const char *filename);
+int32_t ocrpt_add_report(opencreport *o, const char *filename);
 /*
  * Add XML report description using a memory buffer (zero-terminated string)
  */
-int ocrpt_add_report_from_buffer(opencreport *o, const char *buffer);
+int32_t ocrpt_add_report_from_buffer(opencreport *o, const char *buffer);
 /*
  * Parse the reports added up to this point.
  * Allow no deviation from the OpenCReports DTD.
  */
-int ocrpt_parse(opencreport *o);
+int32_t ocrpt_parse(opencreport *o);
 /*
  * Parse the reports added up to this point.
  * Optionally allow deviation from the DTD.
  */
-int ocrpt_parse2(opencreport *o, int allow_bad_xml);
+int32_t ocrpt_parse2(opencreport *o, bool allow_bad_xml);
 /*
  * Execute the reports added up to this point.
  * Parse any unparsed report XMLs with non-strict checks.
  */
-int ocrpt_execute(opencreport *o);
+int32_t ocrpt_execute(opencreport *o);
 
 #endif /* _OPENCREPORT_H_ */

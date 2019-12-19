@@ -44,8 +44,8 @@ typedef struct core_yy_extra_type {
 	 * null at offset literallen.  We store a null only when we need it.
 	 */
 	char *literalbuf;
-	int literallen;
-	int literalalloc;
+	int32_t literallen;
+	int32_t literalalloc;
 } core_yy_extra_type;
 
 typedef struct base_yy_extra_type {

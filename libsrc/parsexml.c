@@ -5,6 +5,8 @@
  */
 
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -23,7 +25,7 @@ void ocrpt_free_part(const struct opencreport_part *part) {
 	ocrpt_mem_free(part);
 }
 
-int ocrpt_add_report_from_buffer_internal(opencreport *o, const char *buffer, int allocated, const char *report_path) {
+int32_t ocrpt_add_report_from_buffer_internal(opencreport *o, const char *buffer, bool allocated, const char *report_path) {
 	struct opencreport_part *part = ocrpt_mem_malloc(sizeof(struct opencreport_part));
 	int partsold;
 
@@ -49,11 +51,11 @@ int ocrpt_add_report_from_buffer_internal(opencreport *o, const char *buffer, in
 	return 0;
 }
 
-int ocrpt_add_report_from_buffer(opencreport *o, const char *buffer) {
+int32_t ocrpt_add_report_from_buffer(opencreport *o, const char *buffer) {
 	return ocrpt_add_report_from_buffer_internal(o, buffer, 0, cwdpath);
 }
 
-int ocrpt_add_report(opencreport *o, const char *filename) {
+int32_t ocrpt_add_report(opencreport *o, const char *filename) {
 	struct stat st;
 	char *str, *fnamecopy, *dir;
 	int fd;
@@ -102,10 +104,10 @@ void ocrpt_free_parts(opencreport *o) {
 	o->parts = NULL;
 }
 
-int ocrpt_parse(opencreport *o) {
-	return ocrpt_parse2(o, 0);
+int32_t ocrpt_parse(opencreport *o) {
+	return ocrpt_parse2(o, false);
 }
 
-int ocrpt_parse2(opencreport *o, int allow_bad_xml) {
+int32_t ocrpt_parse2(opencreport *o, bool allow_bad_xml) {
 	return -1;
 }

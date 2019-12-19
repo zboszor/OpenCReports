@@ -15,16 +15,16 @@
 
 struct opencreport_part {
 	const char *xmlbuf;
-	int allocated;
-	int parsed;
 	const char *path;
+	bool allocated:1;
+	bool parsed:1;
 };
 
 struct opencreport {
 	/* Paper name and size */
 	const ocrpt_paper *paper;
 	ocrpt_paper paper0;
-	int paper_iterator_idx;
+	int32_t paper_iterator_idx;
 
 	/* List and array of struct ocrpt_datasource */
 	List *datasources;
