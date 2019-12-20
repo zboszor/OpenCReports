@@ -13,10 +13,16 @@ int main(void) {
 	ocrpt_expr *e;
 
 	char *str[] = {
+		/* Various numeric functions */
 		"|1|",
 		"|nulln()|",
 		"-1",
 		"-nulln()",
+		"factorial(nulln())",
+		"factorial(-1)",
+		"factorial(0)",
+		"factorial(1)",
+		"factorial(3)",
 
 		/* Left-associative operator sequence */
 		"1 + 2 + 3",

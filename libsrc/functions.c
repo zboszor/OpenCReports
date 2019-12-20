@@ -957,6 +957,42 @@ static void ocrpt_random(opencreport *o, ocrpt_expr *e) {
 	mpfr_urandomb(e->result[o->residx]->number, o->randstate);
 }
 
+static void ocrpt_factorial(opencreport *o, ocrpt_expr *e) {
+	intmax_t n;
+
+	if (e->n_ops != 1 || !e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	switch (e->ops[0]->result[o->residx]->type) {
+	case OCRPT_RESULT_NUMBER:
+		if (e->ops[0]->result[o->residx]->isnull) {
+			ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
+			e->result[o->residx]->isnull = true;
+			return;
+		}
+
+		n = mpfr_get_sj(e->ops[0]->result[o->residx]->number, o->rndmode);
+		if (n < 0LL || n > LONG_MAX) {
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+			return;
+		}
+
+		ocrpt_init_func_result(o, e, OCRPT_RESULT_NUMBER);
+		mpfr_fac_ui(e->result[o->residx]->number, (unsigned long)n, o->rndmode);
+		break;
+	case OCRPT_RESULT_ERROR:
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		break;
+	case OCRPT_RESULT_STRING:
+	case OCRPT_RESULT_DATETIME:
+	default:
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		break;
+	}
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -970,7 +1006,7 @@ static ocrpt_function ocrpt_functions[] = {
 	{ "div",		-1,	false,	false,	true,	false,	ocrpt_div },
 	{ "eq",			2,	true,	false,	false,	false,	ocrpt_eq },
 	{ "error",		1,	false,	false,	false,	false,	ocrpt_error },
-	{ "factorial",	1,	false,	false,	false,	false,	NULL },
+	{ "factorial",	1,	false,	false,	false,	false,	ocrpt_factorial },
 	{ "ge",			2,	false,	false,	false,	false,	ocrpt_ge },
 	{ "gt",			2,	false,	false,	false,	false,	ocrpt_gt },
 	{ "iif",		3,	false,	false,	false,	false,	ocrpt_iif },
