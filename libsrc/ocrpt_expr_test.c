@@ -23,6 +23,15 @@ int main(void) {
 		"factorial(0)",
 		"factorial(1)",
 		"factorial(3)",
+		"5 % 3",
+		"4.9 % 2.9",
+		"4.9 % 3.1",
+		"fmod(5, 3)",
+		"fmod(4.9, 2.9)",
+		"fmod(4.9, 3.1)",
+		"remainder(5, 3)",
+		"remainder(4.9, 2.9)",
+		"remainder(4.9, 3.1)",
 
 		/* Left-associative operator sequence */
 		"1 + 2 + 3",
@@ -105,6 +114,17 @@ int main(void) {
 		"!0",
 		"!1",
 		"!0.4",
+
+		/* Binary operators */
+		"1 | 2",
+		"1 & 2",
+		"3 & 2",
+		"1 ^ 2",
+		"3 ^ 2",
+		"~0",
+		"~1",
+		"1 << 2",
+		"12 >> 2",
 
 		/* String arithmetics tests */
 		"'a' + 'b'",			/* should be 'ab' */
