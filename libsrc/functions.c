@@ -259,7 +259,6 @@ static void ocrpt_eq(opencreport *o, ocrpt_expr *e) {
 		ret = (mpfr_cmp(e->ops[0]->result[o->residx]->number, e->ops[1]->result[o->residx]->number) == 0);
 		break;
 	case OCRPT_RESULT_STRING:
-		printf("%s:%d: called with '%s' and '%s'\n", __func__, __LINE__, e->ops[0]->result[o->residx]->string->str, e->ops[1]->result[o->residx]->string->str);
 		ret = (strcmp(e->ops[0]->result[o->residx]->string->str, e->ops[1]->result[o->residx]->string->str) == 0);
 		break;
 	case OCRPT_RESULT_DATETIME:
