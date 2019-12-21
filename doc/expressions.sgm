@@ -79,7 +79,8 @@ applepear
 			</para>
 			<para>
 				Numeric constants can be integer or fractional numbers with or
-				without the so called <emphasis>e-notation</emphasis>. Some examples:
+				without the so called <emphasis>e-notation</emphasis> or
+				scientific nottion. Some examples:
 				<programlisting>
 1
 1.234
@@ -87,7 +88,7 @@ applepear
 1e-4
 1.234e-5
 				</programlisting>
-				E notation means that that number preceding the letter "e" or
+				E-notation means that that number preceding the letter "e" or
 				"E" is multiplied by ten to the power of the number after the
 				letter "e" or "E", the latter being an integer value. The
 				values of the above examples are:
@@ -255,11 +256,14 @@ v.break1
 				<programlisting>
 expression1 ? expression2 : expression3
 				</programlisting>
-				It's evaluated as follows: if <literal>expression1</literal>
-				is <literal>true</literal> (i.e. non-zero), then the
-				result is the <literal>expression2</literal>, otherwise it's
-				<literal>expression3</literal>. It is the same as the
-				<literal>iif</literal> function below.
+				It's evaluated as follows: if the value of numeric
+				<literal>expression1</literal> is <literal>true</literal>
+				(i.e. non-zero), then the result is the <literal>expression2</literal>,
+				otherwise it's <literal>expression3</literal>.
+				Type of <literal>expression2</literal> and
+				<literal>expression3</literal> may differ, i.e. the
+				result type will be the type of the underlying expression
+				but it can result in runtime errors.
 			</para>
 		</sect2>
 		<sect2>
@@ -279,9 +283,9 @@ expression1 ? expression2 : expression3
 			<para>
 			The bitwise operators in this precedence class and in their
 			increasing order of precedence are:
-			binary OR (<literal>|</literal>),
-			binary XOR (<literal>^</literal>) and
-			binary AND (<literal>&</literal>).
+			bitwise OR (<literal>|</literal>),
+			bitwise XOR (<literal>^</literal>) and
+			bitwise AND (<literal>&</literal>).
 			</para>
 		</sect2>
 		<sect2>
@@ -325,12 +329,18 @@ expression1 ? expression2 : expression3
 			</para>
 		</sect2>
 		<sect2>
+			<title>Factorial operator</title>
+			<para>
+				<literal>a!</literal>, the '!' sign used as postfix operator.
+			</para>
+		</sect2>
+		<sect2>
 			<title>Unary plus and minus, logical and bitwise NOT, prefix increment and decrement</title>
 			<para>
 				Unary plus (<literal>+a</literal>), unary minus (<literal>-a</literal>),
-				logical NOT (<literal>!a</literal>), bitwise NOT (<literal>~a</literal>),
-				prefix increment (<literal>++a</literal>) and prefix
-				decrement (<literal>--a</literal>).
+				logical NOT (<literal>!a</literal>, '!' used as prefix operator),
+				bitwise NOT (<literal>~a</literal>), prefix increment (<literal>++a</literal>)
+				and prefix decrement (<literal>--a</literal>).
 			</para>
 		</sect2>
 		<sect2>
@@ -351,10 +361,12 @@ expression1 ? expression2 : expression3
 				domain-qualified identifier.
 			</para>
 			<para>
-				Implicit multiplication is when e.g. a numeric constant and
-				an identifier are in juxtaposition, in other words they are
-				written side by side without any whitespace delimiters.
-				Implicit multiplication is applicable in these situations:
+				Implicit multiplication is when two distinct operands are in
+				juxtaposition, in other words they are written side by side
+				without any whitespace. In this case, there is an implied
+				multiplication between them that acts with higher precedence
+				than regular multiplication or division. Implicit multiplication
+				is applicable in these situations:
 				<itemizedlist>
 					<listitem>
 						<para>
@@ -365,25 +377,34 @@ expression1 ? expression2 : expression3
 					<listitem>
 						<para>
 							A numeric constant juxtaposed with an expression inside
-							parentheses.
+							parentheses. The constant can be on either side of the
+							expression.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							An identifier juxtaposed with an expression inside
-							parentheses. This is only valid if there is a single expression
-							inside the parentheses. A comma delimited series of expressions
-							are treated as a function call.
+							parentheses, the identifier is on the left side of the
+							expression. This is only treated as implicit
+							multiplication if the identifier name is not known as
+							a function name at the time of parsing and there is
+							a single expression inside the parentheses.
+							No expressions, a single expression with a known function
+							name as the identifier, or a series of comma delimited
+							series of expressions are treated as a function call and
+							the function call validity is checked against the number
+							of operands, with a potential parser error. If there's
+							an ambiguity between function names and identifiers
+							provided by data sources, it can be avoided by using
+							dot-prefixed or dot-prefixed and quoted identifiers,
+							or fully qualified identifiers in the form of
+							<literal>query.identifier</literal>.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							An expression inside parentheses juxtaposed with a numeric constant.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							An expression inside parentheses juxtaposed with an identifier.
+							An expression inside parentheses juxtaposed with an identifier
+							on the right side.
 						</para>
 					</listitem>
 					<listitem>
@@ -394,23 +415,26 @@ expression1 ? expression2 : expression3
 				</itemizedlist>
 			</para>
 			<para>
-				Implicit multiplication is NOT applicable in these situations:
+				Implicit multiplication is NOT applicable in these situations,
+				besides the exceptions already explained above:
 				<itemizedlist>
 					<listitem>
 						<para>
 							An identifier juxtaposed with a numeric constant,
 							the numeric constant is the on the right side.
-							An identifier name can include digits as the
-							second and subsequent characters, so the numeric
-							constant, at least the integer part simply
-							becomes part of the identifier.
+							Since an identifier name can include digits as the
+							second and subsequent characters, the numeric
+							constant, or at least its integer part is simply
+							recognized as part of the identifier name itself
+							according to the token matching. This can also result
+							in syntax errors when not handled with care.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							An identifier juxtaposed with another identifier.
-							The reason is the same as above: in this case,
-							there are only a single identifier according to
+							The reason is the same as in the preceding case:
+							there is only a single identifier according to
 							token matching.
 						</para>
 					</listitem>
@@ -469,6 +493,434 @@ a++b
 				is longer than <literal>+</literal>, so the former is matched
 				first as an operator token. This is a syntax error and
 				expression parsing throws an error for it.
+			</para>
+		</sect2>
+	</sect1>
+	<sect1>
+		<title>Alphabetical list of functions</title>
+		<para>
+			Most functions below operate in this way, unless noted otherwise:
+			<itemizedlist>
+				<listitem>
+					<para>
+						numeric and bitwise functions with more than 2 operands
+						take their first operand and perform the same operation
+						using the second, third, etc. operands repeatedly.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						if any of the operands is an error (resulting from
+						runtime processing of a subexpression), then the
+						result will use the exact error of the first operand
+						that is an error.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						if any of the operands is NULL (e.g. the data source
+						is SQL and the field value is SQL NULL) then the
+						result will also be NULL.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Boolean logic functions treat their operands with
+						0 being false and anything else (even fractions less
+						than 0.5) as true.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Bitwise functions treat their operands as 64-bit
+						numeric values, with rounding if they are fractions.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						String arithmetics operate on UTF-8 encoded strings
+						and count in number of UTF-8 characters instead of
+						byte length.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+		<sect2>
+			<title>abs()</title>
+			<para>
+				Absolute value. Operator <literal>|...|</literal>
+				is a shortcut for this function. It takes a single
+				numeric operand.
+			</para>
+		</sect2>
+		<sect2>
+			<title>add()</title>
+			<para>
+				Addition. Operator <literal>+</literal> is a shortcut for
+				this function. It accepts 2 or more operands of the same
+				type, with all of them being either numeric or string.
+				For string operands, it is equivalent with concatenation,
+				i.e. <literal>concat()</literal> below.
+			</para>
+		</sect2>
+		<sect2>
+			<title>and()</title>
+			<para>
+				Bitwise AND. Operator <literal>&</literal> is a shortcut for
+				this function. It accepts 2 or more numeric operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>ceil()</title>
+			<para>
+				Rounds its operand to the next higher or equal integer.
+				It accepts 1 numeric operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>concat()</title>
+			<para>
+				String concatenation. Accepts 2 or more string operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>dec()</title>
+			<para>
+				Decrement by one. Accepts 1 numeric operand.
+				The operator <literal>++</literal> is the shortcut for it,
+				either in prefix or postfix uses.
+			</para>
+		</sect2>
+		<sect2>
+			<title>div()</title>
+			<para>
+				Division. Operator <literal>/</literal> is a shortcut for
+				this function. It accepts 2 or more numeric operands.
+				The way it works is: take the first operand and divide
+				it by the second and subsequent operands in sequence.
+			</para>
+		</sect2>
+		<sect2>
+			<title>eq()</title>
+			<para>
+				Equivalence. Operator <literal>=</literal> and <literal>==</literal>
+				are a shortcuts for this function. It accepts 2 numeric or
+				string operands. The result is numeric value 1 or 0,
+				if the two operands are equal or non-equal, respectively.
+			</para>
+		</sect2>
+		<sect2>
+			<title>error()</title>
+			<para>
+				Returns an artificially generated error. Accepts 1
+				string operand. The result will use the string operand's
+				value as error message. Good for unit testing OpenCReports
+				as done in the <literal>ocrpt_expr_test</literal> example.
+			</para>
+		</sect2>
+		<sect2>
+			<title>factorial()</title>
+			<para>
+				Factorial function. Accepts 1 numeric operand.
+				The postfix operator <literal>!</literal> is the alias for
+				this function.
+			</para>
+		</sect2>
+		<sect2>
+			<title>floor()</title>
+			<para>
+				Rounds its operand to the next lower or equal integer.
+				It accepts 1 numeric operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>fmod()</title>
+			<para>
+				The result to the value of <literal>x - ny</literal>
+				(<literal>x</literal> and <literal>y</literal> being
+				its two numeric operands), rounded according to the
+				report rounding mode set via <literal>ocrpt_set_rounding_mode()</literal>,
+				where <literal>n</literal> is the integer quotient of
+				<literal>x</literal> divided by <literal>y</literal>,
+				<literal>n</literal> is rounded toward zero.
+				It accepts 2 numeric operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>ge()</title>
+			<para>
+				Greater-or-equal. Accepts 2 operands of the same type,
+				which can be either numeric, string or datetime operands.
+				The operator <literal>&gt;=</literal> is the shortcut for it.
+			</para>
+		</sect2>
+		<sect2>
+			<title>gt()</title>
+			<para>
+				Greater-than. Accepts 2 operands of the same type,
+				which can be either numeric, string or datetime operands.
+				The operator <literal>&gt;</literal> is the shortcut for it.
+			</para>
+		</sect2>
+		<sect2>
+			<title>iif()</title>
+			<para>
+				Trinary function. Accepts 3 operands of which the first one
+				is numeric, the second and third operands can be of any type.
+				If the first operand is non-zero (i.e.: "true") then
+				the result will be the value of the second operand,
+				else it will be the third operand.
+				The trinary operator <literal>exp1 ? exp2 : exp3</literal>
+				is the shortcut for it.
+			</para>
+		</sect2>
+		<sect2>
+			<title>inc()</title>
+			<para>
+				Increment by one. Accepts 1 numeric operand.
+				The operator <literal>--</literal> is the shortcut for it,
+				either in prefix or postfix uses.
+			</para>
+		</sect2>
+		<sect2>
+			<title>isnull()</title>
+			<para>
+				Returns numeric 1 if the operand is NULL, 0 otherwise.
+				Accepts 1 operand of any type.
+			</para>
+		</sect2>
+		<sect2>
+			<title>land()</title>
+			<para>
+				Boolean logic AND. Operator <literal>&&</literal> is a shortcut for
+				this function. It accepts 2 or more numeric operands that
+				are treated as boolean logic values. The function is executed
+				until the result is fully determined, i.e. it stops at
+				the first false value.
+			</para>
+		</sect2>
+		<sect2>
+			<title>le()</title>
+			<para>
+				Less-or-equal. Accepts 2 operands of the same type,
+				which can be either numeric, string or datetime operands.
+				The operator <literal>&lt;=</literal> is the shortcut for it.
+			</para>
+		</sect2>
+		<sect2>
+			<title>left()</title>
+			<para>
+				Returns the leftmost N characters of a string.
+				It accepts 2 operands, the first operand is the string,
+				the second is the numeric that is handled as an integer
+				and used to determine the returned string length.
+			</para>
+		</sect2>
+		<sect2>
+			<title>lnot()</title>
+			<para>
+				Boolean logic NOT. Prefix operator <literal>!</literal> is
+				the shortcut for this function. It returns the negated
+				boolean value of its operand. Accepts 1 numeric operand.
+			</para>
+		</sect2>
+		<sect2>
+			<title>lor()</title>
+			<para>
+				Boolean logic OR. Operator <literal>||</literal> is a shortcut for
+				this function. It accepts 2 or more numeric operands that
+				are treated as boolean logic values, with 0 being false and
+				true for anything else. The function is executed until the result is
+				determined fully, i.e. it stops at the first true value.
+			</para>
+		</sect2>
+		<sect2>
+			<title>lt()</title>
+			<para>
+				Less-than. Accepts 2 operands of the same type,
+				which can be either numeric, string or datetime operands.
+				The operator <literal>&lt;</literal> is the shortcut for it.
+			</para>
+		</sect2>
+		<sect2>
+			<title>mid()</title>
+			<para>
+				Return characters from the middle of the string.
+				It accepts 3 operands, the first operand is the string,
+				the second and third are numeric values that are handled
+				as an integers. The second operand is the offset to start
+				from and the third operand is the length of the result
+				string in UTF-8 characters. The offset is 1-based just like
+				in BASIC, with offset value 0 being identical to 1.
+				Negative offsets count from the right end of the string,
+				i.e. <literal>mid(s,-n,n)</literal> is equivalent to
+				<literal>right(s,n)</literal>.
+			</para>
+		</sect2>
+		<sect2>
+			<title>mod()</title>
+			<para>
+				An alias of <literal>remainder()</literal>.
+				It accepts 2 numeric operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>mul()</title>
+			<para>
+				Multiplication. Operator <literal>*</literal> is a shortcut for
+				this function. It accepts 2 or more numeric operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>ne()</title>
+			<para>
+				Not equal. Accepts 2 operands of the same type,
+				which can be either numeric, string or datetime operands.
+				The operator <literal>!=</literal> and <literal>&lt;&gt;</literal>
+				are shortcuts for it.
+			</para>
+		</sect2>
+		<sect2>
+			<title>not()</title>
+			<para>
+				Bitwise NOT. Prefix operator <literal>~</literal> is
+				the shortcut for this function. It returns the bit-by-bit
+				negated value of its operand. Accepts 1 numeric operand.
+			</para>
+		</sect2>
+		<sect2>
+			<title>null()</title>
+			<para>
+				Generate NULL value using the type of its operand.
+				Accepts 1 operand of any type.
+			</para>
+		</sect2>
+		<sect2>
+			<title>nulldt()</title>
+			<para>
+				Generate NULL of the datetime type. Accepts 0 operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>nulln()</title>
+			<para>
+				Generate NULL of the numeric type. Accepts 0 operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>nulls()</title>
+			<para>
+				Generate NULL of the string type. Accepts 0 operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>or()</title>
+			<para>
+				Bitwise OR. Operator <literal>|</literal> is a shortcut for
+				this function. It accepts 2 or more numeric operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>random()</title>
+			<para>
+				Generate a pseudo-random numeric value between 0 and 1.
+				Accepts 0 operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>remainder()</title>
+			<para>
+				The result to the value of <literal>x - ny</literal>
+				(<literal>x</literal> and <literal>y</literal> being
+				its two numeric operands), rounded according to the
+				report rounding mode set via <literal>ocrpt_set_rounding_mode()</literal>,
+				where <literal>n</literal> is the integer quotient of
+				<literal>x</literal> divided by <literal>y</literal>,
+				<literal>n</literal> is rounded toward to the nearest integer.
+				It accepts 2 numeric operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>right()</title>
+			<para>
+				Returns the rightmost N characters of a string.
+				It accepts 2 operands, the first operand is the string,
+				the second is the numeric that is handled as an integer
+				and used to determine the returned string length.
+			</para>
+		</sect2>
+		<sect2>
+			<title>rint()</title>
+			<para>
+				Rounds its operand using the rounding mode set via
+				<literal>ocrpt_set_rounding_mode()</literal>.
+				It accepts 1 numeric operand.
+			</para>
+		</sect2>
+		<sect2>
+			<title>round()</title>
+			<para>
+				Rounds its operand to the nearest representable integer,
+				rounding halfway cases away from zero.
+				It accepts 1 numeric operand.
+			</para>
+		</sect2>
+		<sect2>
+			<title>shl()</title>
+			<para>
+				Bitwise shift left. Shifts the first operand left with the
+				number of bits set indicated the second operand. The operand
+				<literal>&lt;&lt;</literal> is the shortcut for this
+				function. It accepts 2 numeric operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>shr()</title>
+			<para>
+				Bitwise shift right. Shifts the first operand right with the
+				number of bits indicated by the second operand. The operand
+				<literal>&gt;&gt;</literal> is the shortcut for this
+				function. It accepts 2 numeric operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>sub()</title>
+			<para>
+				Subtraction. Operator <literal>-</literal> is a shortcut for
+				this function. It accepts 2 or more numeric operands.
+			</para>
+		</sect2>
+		<sect2>
+			<title>trunc()</title>
+			<para>
+				Rounds its operand to the next representable integer toward
+				zero. It accepts 1 numeric operand.
+			</para>
+		</sect2>
+		<sect2>
+			<title>uminus()</title>
+			<para>
+				Unary minus. Changes the sign of its numeric operand
+				from positive to negative, or vice versa. Operator unary
+				<literal>-</literal> is the shortcut of this function.
+				It accepts 1 numeric operand.
+			</para>
+		</sect2>
+		<sect2>
+			<title>val()</title>
+			<para>
+				Numeric value. If a string operand is given, it returns
+				the converted numeric value. The value of a numeric operand
+				is passed through as is.
+				It accepts 1 numeric or string operand.
+			</para>
+		</sect2>
+		<sect2>
+			<title>xor()</title>
+			<para>
+				Bitwise exclusive OR. Operator <literal>^</literal> is
+				the shortcut for this function.
+				It accepts 2 or more numeric operands.
 			</para>
 		</sect2>
 	</sect1>
