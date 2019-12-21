@@ -23,6 +23,7 @@ int main(void) {
 		"factorial(0)",
 		"factorial(1)",
 		"factorial(3)",
+		"3!",
 		"5 % 3",
 		"4.9 % 2.9",
 		"4.9 % 3.1",

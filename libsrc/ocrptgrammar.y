@@ -83,7 +83,8 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, List *l);
 %left		BSHIFT
 %left		'+' '-'
 %left		'*' '/' '%'
-%precedence	'!' '~' UMINUS
+%precedence	'!'
+%precedence	'~' UMINUS
 %right		INCDEC
 
 %%
@@ -136,9 +137,17 @@ exp:
 								yyset_lloc(&@1, yyscanner);
 								$$ = newexpr(yyscanner, $2, makelist($1, $3, NULL));
 							}
-	| '!' exp				{
+	| '!' exp %prec UMINUS	{
 								yyset_lloc(&@1, yyscanner);
 								$$ = newexpr(yyscanner, $1, makelist($2, NULL));
+							}
+	| exp '!'				{
+								ocrpt_string *fact;
+								yyset_lloc(&@1, yyscanner);
+								parser_yyget_extra(yyscanner)->tokens = list_remove(parser_yyget_extra(yyscanner)->tokens, $2);
+								ocrpt_mem_string_free($2, true);
+								fact = ocrpt_mem_string_new_with_len("factorial", 9);
+								$$ = newexpr(yyscanner, fact, makelist($1, NULL));
 							}
 	| exp '|' exp			{
 								yyset_lloc(&@1, yyscanner);
