@@ -141,6 +141,8 @@ int main(void) {
 		"right('árvíztűrő tükörfúrógép', 7)",
 		"lower('ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP')",
 		"upper('árvíztűrő tükörfúrógép')",
+		"proper('ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP')",
+		"proper('árvíztűrő tükörfúrógép')",
 
 		/* String arithmetics NULL tests */
 		"left('a', nulln())",

@@ -1690,6 +1690,60 @@ static void ocrpt_upper(opencreport *o, ocrpt_expr *e) {
 		ocrpt_expr_make_error_result(o, e, "out of memory");
 }
 
+static void ocrpt_proper(opencreport *o, ocrpt_expr *e) {
+	ocrpt_string *string;
+	ocrpt_string *sstring;
+
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_STRING);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	sstring = e->ops[0]->result[o->residx]->string;
+	string = ocrpt_mem_string_resize(e->result[o->residx]->string, sstring->len);
+	if (string) {
+		utf8proc_int32_t c;
+		utf8proc_ssize_t bytes_read, bytes_total, bytes_written;
+		bool first = true;
+		char cc[8];
+
+		if (!e->result[o->residx]->string) {
+			e->result[o->residx]->string = string;
+			e->result[o->residx]->string_owned = true;
+		}
+
+		string->len = 0;
+		bytes_total = 0;
+
+		while (bytes_total < sstring->len) {
+			bytes_read = utf8proc_iterate((utf8proc_uint8_t *)(sstring->str + bytes_total), sstring->len - bytes_total, &c);
+			c = (first ? utf8proc_toupper(c) : utf8proc_tolower(c));
+			bytes_written = utf8proc_encode_char(c, (utf8proc_uint8_t *)cc);
+			ocrpt_mem_string_append_len(string, cc, bytes_written);
+			bytes_total += bytes_read;
+			first = false;
+		}
+	} else
+		ocrpt_expr_make_error_result(o, e, "out of memory");
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -1729,6 +1783,7 @@ static ocrpt_function ocrpt_functions[] = {
 	{ "nulln",		ocrpt_nulln,	0,	false,	false,	false,	false },
 	{ "nulls",		ocrpt_nulls,	0,	false,	false,	false,	false },
 	{ "or",			ocrpt_or,	-1,	true,	true,	false,	false },
+	{ "proper",		ocrpt_proper,	1,	false,	false,	false,	false },
 	{ "random",		ocrpt_random,	0,	false,	false,	false,	true },
 	{ "remainder",	ocrpt_remainder,	2,	false,	false,	false,	false },
 	{ "right",		ocrpt_right,	2,	false,	false,	false,	false },
