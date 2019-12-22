@@ -50,6 +50,9 @@ struct ocrpt_result {
 	enum ocrpt_result_type type:2;
 	bool number_initialized:1;
 	bool string_owned:1;
+	bool date_valid:1;
+	bool time_valid:1;
+	bool interval:1;
 	bool isnull:1;
 };
 typedef struct ocrpt_result ocrpt_result;
@@ -58,12 +61,12 @@ typedef void (*ocrpt_function_call)(opencreport *, ocrpt_expr *);
 
 struct ocrpt_function {
 	const char *fname;
+	ocrpt_function_call func;
 	const int32_t n_ops;
 	const bool commutative:1;
 	const bool associative:1;
 	const bool left_associative:1;
 	const bool dont_optimize:1;
-	ocrpt_function_call func;
 };
 typedef struct ocrpt_function ocrpt_function;
 
