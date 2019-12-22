@@ -57,6 +57,10 @@ PKG_CHECK_MODULES(LIBXML, libxml-2.0 >= 2.5.0)
 AC_SUBST(LIBXML_LIBS)
 AC_SUBST(LIBXML_CFLAGS)
 
+PKG_CHECK_MODULES(UTF8PROC, libutf8proc)
+AC_SUBST(UTF8PROC_LIBS)
+AC_SUBST(UTF8PROC_CFLAGS)
+
 dnl GNU MP/MPFR detection
 AC_CHECK_HEADERS(gmp.h mpfr.h mpf2mpfr.h,,[AC_MSG_ERROR([GNU MP and MPFR headers not found!])])
 AC_CHECK_LIB(mpfr, mpfr_init2,[MPFR_LIBS="-lmpfr"],[AC_MSG_ERROR([GNU MPFR library not found!])])

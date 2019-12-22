@@ -139,6 +139,8 @@ int main(void) {
 		"mid('árvíztűrő tükörfúrógép', 6, 10)",
 		"mid('árvíztűrő tükörfúrógép', -12, 9)",
 		"right('árvíztűrő tükörfúrógép', 7)",
+		"lower('ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP')",
+		"upper('árvíztűrő tükörfúrógép')",
 
 		/* String arithmetics NULL tests */
 		"left('a', nulln())",

@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utf8proc.h>
 
 #include "opencreport-private.h"
 #include "datasource.h"
@@ -1585,6 +1586,110 @@ static void ocrpt_trunc(opencreport *o, ocrpt_expr *e) {
 	mpfr_trunc(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number);
 }
 
+static void ocrpt_lower(opencreport *o, ocrpt_expr *e) {
+	ocrpt_string *string;
+	ocrpt_string *sstring;
+
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_STRING);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	sstring = e->ops[0]->result[o->residx]->string;
+	string = ocrpt_mem_string_resize(e->result[o->residx]->string, sstring->len);
+	if (string) {
+		utf8proc_int32_t c;
+		utf8proc_ssize_t bytes_read, bytes_total, bytes_written;
+		char cc[8];
+
+		if (!e->result[o->residx]->string) {
+			e->result[o->residx]->string = string;
+			e->result[o->residx]->string_owned = true;
+		}
+
+		string->len = 0;
+		bytes_total = 0;
+
+		while (bytes_total < sstring->len) {
+			bytes_read = utf8proc_iterate((utf8proc_uint8_t *)(sstring->str + bytes_total), sstring->len - bytes_total, &c);
+			c = utf8proc_tolower(c);
+			bytes_written = utf8proc_encode_char(c, (utf8proc_uint8_t *)cc);
+			ocrpt_mem_string_append_len(string, cc, bytes_written);
+			bytes_total += bytes_read;
+		}
+	} else
+		ocrpt_expr_make_error_result(o, e, "out of memory");
+}
+
+static void ocrpt_upper(opencreport *o, ocrpt_expr *e) {
+	ocrpt_string *string;
+	ocrpt_string *sstring;
+
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_init_func_result(o, e, OCRPT_RESULT_STRING);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	sstring = e->ops[0]->result[o->residx]->string;
+	string = ocrpt_mem_string_resize(e->result[o->residx]->string, sstring->len);
+	if (string) {
+		utf8proc_int32_t c;
+		utf8proc_ssize_t bytes_read, bytes_total, bytes_written;
+		char cc[8];
+
+		if (!e->result[o->residx]->string) {
+			e->result[o->residx]->string = string;
+			e->result[o->residx]->string_owned = true;
+		}
+
+		string->len = 0;
+		bytes_total = 0;
+
+		while (bytes_total < sstring->len) {
+			bytes_read = utf8proc_iterate((utf8proc_uint8_t *)(sstring->str + bytes_total), sstring->len - bytes_total, &c);
+			c = utf8proc_toupper(c);
+			bytes_written = utf8proc_encode_char(c, (utf8proc_uint8_t *)cc);
+			ocrpt_mem_string_append_len(string, cc, bytes_written);
+			bytes_total += bytes_read;
+		}
+	} else
+		ocrpt_expr_make_error_result(o, e, "out of memory");
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -1612,6 +1717,7 @@ static ocrpt_function ocrpt_functions[] = {
 	{ "left",		ocrpt_left,	2,	false,	false,	false,	false },
 	{ "lnot",		ocrpt_lnot,	1,	false,	false,	false,	false },
 	{ "lor",		ocrpt_lor,	-1,	true,	true,	false,	false },
+	{ "lower",		ocrpt_lower,	1,	false,	false,	false,	false },
 	{ "lt",			ocrpt_lt,	2,	false,	false,	false,	false },
 	{ "mid",		ocrpt_mid,	3,	false,	false,	false,	false },
 	{ "mod",		ocrpt_remainder,	2,	false,	false,	false,	false },
@@ -1633,6 +1739,7 @@ static ocrpt_function ocrpt_functions[] = {
 	{ "sub",		ocrpt_sub,	-1,	false,	false,	false,	false },
 	{ "trunc",		ocrpt_trunc,	1,	false,	false,	false,	false },
 	{ "uminus",		ocrpt_uminus,	1,	false,	false,	false,	false },
+	{ "upper",		ocrpt_upper,	1,	false,	false,	false,	false },
 	{ "val",		ocrpt_val,	1,	false,	false,	false,	false },
 	{ "xor",		ocrpt_xor,	-1,	true,	true,	true,	false },
 };

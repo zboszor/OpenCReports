@@ -18,7 +18,8 @@ ocrptgrammar.tab.h: ocrptgrammar.tab.c
 lex.yy.c: ocrptpatterns.l ocrptgrammar.tab.h
 	$(LEX) $<
 
-libopencrpt_la_CFLAGS = $(CFLAG_VISIBILITY)
+libopencrpt_la_CFLAGS = \
+	$(CFLAG_VISIBILITY) $(MPFR_CFLAGS) $(PAPER_CFLAGS) $(UTF8PROC_CFLAGS)
 
 libopencrpt_la_SOURCES = \
 	memutil.c listutil.c exprutil.c functions.c \
@@ -26,7 +27,8 @@ libopencrpt_la_SOURCES = \
 	api.c free.c parsexml.c datasource.c \
 	array-source.c navigation.c
 
-libopencrpt_la_LIBADD = $(MPFR_LIBS) $(PAPER_LIBS)
+libopencrpt_la_LIBADD = \
+	$(MPFR_LIBS) $(PAPER_LIBS) $(UTF8PROC_LIBS)
 
 libopencrpt_la_LDFLAGS = \
 	-version-info $(OCRPT_LT_CURRENT):$(OCRPT_LT_REVISION):$(OCRPT_LT_AGE) \
