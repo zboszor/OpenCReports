@@ -32,6 +32,13 @@ enum ocrpt_result_type {
 	OCRPT_RESULT_DATETIME
 };
 
+struct ocrpt_list {
+	struct ocrpt_list *next;
+	const void *data;
+	size_t len;
+};
+typedef struct ocrpt_list ocrpt_list;
+
 struct ocrpt_string {
 	char *str;
 	size_t allocated_len;
@@ -210,6 +217,20 @@ void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc,
 								ocrpt_mem_free_t rfree,
 								ocrpt_mem_strdup_t rstrdup,
 								ocrpt_mem_strndup_t rstrndup);
+
+/*
+ * List related functions
+ */
+#define ocrpt_list_length(l) ((l) ? (l)->len : 0)
+ocrpt_list *ocrpt_makelist1(const void *data);
+ocrpt_list *ocrpt_makelist(const void *data1, ...);
+ocrpt_list *ocrpt_list_last(ocrpt_list *l);
+ocrpt_list *ocrpt_list_end_append(ocrpt_list *l, ocrpt_list *e, const void *data);
+ocrpt_list *ocrpt_list_append(ocrpt_list *l, const void *data);
+ocrpt_list *ocrpt_list_prepend(ocrpt_list *l, const void *data);
+ocrpt_list *ocrpt_list_remove(ocrpt_list *l, const void *data);
+void ocrpt_list_free(ocrpt_list *l);
+void ocrpt_list_free_deep(ocrpt_list *l, ocrpt_mem_free_t freefunc);
 
 /*
  * String related functions

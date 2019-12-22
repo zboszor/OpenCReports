@@ -41,9 +41,9 @@ int32_t ocrpt_add_report_from_buffer_internal(opencreport *o, const char *buffer
 		return -1;
 	}
 
-	partsold = list_length(o->parts);
-	o->parts = list_append(o->parts, part);
-	if (list_length(o->parts) != partsold + 1) {
+	partsold = ocrpt_list_length(o->parts);
+	o->parts = ocrpt_list_append(o->parts, part);
+	if (ocrpt_list_length(o->parts) != partsold + 1) {
 		ocrpt_free_part(part);
 		return -1;
 	}
@@ -100,7 +100,7 @@ int32_t ocrpt_add_report(opencreport *o, const char *filename) {
 }
 
 void ocrpt_free_parts(opencreport *o) {
-	list_free_deep(o->parts, (ocrpt_mem_free_t)ocrpt_free_part);
+	ocrpt_list_free_deep(o->parts, (ocrpt_mem_free_t)ocrpt_free_part);
 	o->parts = NULL;
 }
 

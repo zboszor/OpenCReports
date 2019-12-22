@@ -39,8 +39,8 @@ struct ocrpt_query {
 	int32_t fcount;
 	int32_t fcount_n1;
 	struct ocrpt_query *leader;
-	List *followers;		/* list of ocrpt_query structures */
-	List *followers_n_to_1;	/* list of ocrpt_query_follower structures */
+	ocrpt_list *followers;		/* list of ocrpt_query structures */
+	ocrpt_list *followers_n_to_1;	/* list of ocrpt_query_follower structures */
 
 	bool next_failed;
 	bool navigation_failed;

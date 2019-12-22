@@ -18,7 +18,7 @@
 #include "datasource.h"
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_add_datasource(opencreport *o, const char *source_name, const ocrpt_input *input) {
-	List *l;
+	ocrpt_list *l;
 	ocrpt_datasource *s = NULL;
 
 	if (!o || !source_name || !*source_name || !input)
@@ -47,13 +47,13 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_add_datasource(opencreport *o, const char
 	s->input = input;
 	s->encoder = iconv_open("UTF-8", "UTF-8");
 
-	o->datasources = list_append(o->datasources, s);
+	o->datasources = ocrpt_list_append(o->datasources, s);
 
 	return s;
 }
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_find_datasource(opencreport *o, const char *source_name) {
-	List *ptr;
+	ocrpt_list *ptr;
 
 	for (ptr = o->datasources; ptr; ptr = ptr->next) {
 		ocrpt_datasource *s = (ocrpt_datasource *)ptr->data;
@@ -65,7 +65,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_find_datasource(opencreport *o, const cha
 }
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_validate_datasource(opencreport *o, ocrpt_datasource *source) {
-	List *ptr;
+	ocrpt_list *ptr;
 
 	for (ptr = o->datasources; ptr; ptr = ptr->next) {
 		if (ptr->data == source)
@@ -98,10 +98,10 @@ ocrpt_query *ocrpt_alloc_query(opencreport *o, const ocrpt_datasource *source, c
 	}
 
 	q->source = source;
-	llen = list_length(o->queries);
-	o->queries = list_append(o->queries, q);
+	llen = ocrpt_list_length(o->queries);
+	o->queries = ocrpt_list_append(o->queries, q);
 
-	if (list_length(o->queries) == llen) {
+	if (ocrpt_list_length(o->queries) == llen) {
 		ocrpt_strfree(q->name);
 		ocrpt_mem_free(q);
 		return NULL;
@@ -112,7 +112,7 @@ ocrpt_query *ocrpt_alloc_query(opencreport *o, const ocrpt_datasource *source, c
 
 void ocrpt_free_query0(ocrpt_query *q) {
 	opencreport *o = q->source->o;
-	List *ptr, *ptr1;
+	ocrpt_list *ptr, *ptr1;
 
 	for (ptr = o->queries; ptr; ptr = ptr->next) {
 		ocrpt_query *q1 = (ocrpt_query *)ptr->data;
@@ -121,7 +121,7 @@ void ocrpt_free_query0(ocrpt_query *q) {
 		if (q1 == q)
 			continue;
 
-		q1->followers = list_remove(q1->followers, q);
+		q1->followers = ocrpt_list_remove(q1->followers, q);
 
 		for (ptr1 = q1->followers_n_to_1; ptr1; ptr1 = ptr1->next) {
 			ocrpt_query_follower *f0 = (ocrpt_query_follower *)ptr1->data;
@@ -133,7 +133,7 @@ void ocrpt_free_query0(ocrpt_query *q) {
 			}
 		}
 		if (f) {
-			q1->followers_n_to_1 = list_remove(q1->followers_n_to_1, f);
+			q1->followers_n_to_1 = ocrpt_list_remove(q1->followers_n_to_1, f);
 			ocrpt_mem_free(f);
 		}
 	}
@@ -144,18 +144,18 @@ void ocrpt_free_query0(ocrpt_query *q) {
 	ocrpt_free_query_result(q);
 	ocrpt_strfree(q->name);
 	q->name = NULL;
-	list_free(q->followers);
+	ocrpt_list_free(q->followers);
 	for (ptr = q->followers_n_to_1; ptr; ptr = ptr->next) {
 		ocrpt_query_follower *f = (ocrpt_query_follower *)ptr->data;
 		ocrpt_free_expr(f->expr);
 	}
-	list_free_deep(q->followers_n_to_1, ocrpt_mem_free);
+	ocrpt_list_free_deep(q->followers_n_to_1, ocrpt_mem_free);
 	ocrpt_mem_free(q);
 }
 
 DLL_EXPORT_SYM void ocrpt_free_query(opencreport *o, ocrpt_query *q) {
 	ocrpt_free_query0(q);
-	o->queries = list_remove(o->queries, q);
+	o->queries = ocrpt_list_remove(o->queries, q);
 }
 
 DLL_EXPORT_SYM ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_t *cols) {
@@ -221,9 +221,9 @@ DLL_EXPORT_SYM bool ocrpt_add_query_follower_n_to_1(opencreport *o, ocrpt_query 
 	fo->follower = follower;
 	fo->expr = match;
 
-	len = list_length(leader->followers_n_to_1);
-	leader->followers_n_to_1 = list_append(leader->followers_n_to_1, fo);
-	ret = (len < list_length(leader->followers_n_to_1));
+	len = ocrpt_list_length(leader->followers_n_to_1);
+	leader->followers_n_to_1 = ocrpt_list_append(leader->followers_n_to_1, fo);
+	ret = (len < ocrpt_list_length(leader->followers_n_to_1));
 
 	if (!ret)
 		ocrpt_mem_free(fo);
@@ -244,7 +244,7 @@ DLL_EXPORT_SYM bool ocrpt_add_query_follower(opencreport *o, ocrpt_query *leader
 		return false;
 	}
 
-	len = list_length(leader->followers);
-	leader->followers = list_append(leader->followers, follower);
-	return (len < list_length(leader->followers));
+	len = ocrpt_list_length(leader->followers);
+	leader->followers = ocrpt_list_append(leader->followers, follower);
+	return (len < ocrpt_list_length(leader->followers));
 }

@@ -18,7 +18,7 @@ static void ocrpt_navigate_start_private(opencreport *o, ocrpt_query *q);
 static bool ocrpt_navigate_next_private(opencreport *o, ocrpt_query *q);
 
 static bool ocrpt_navigate_n_to_1_check_current(opencreport *o, ocrpt_query *q) {
-	List *fw;
+	ocrpt_list *fw;
 
 	if (!q || !q->source || !q->source->input || !q->source->input->isdone)
 		return false;
@@ -55,7 +55,7 @@ static bool ocrpt_navigate_n_to_1_check_current(opencreport *o, ocrpt_query *q) 
 }
 
 static bool ocrpt_navigate_n_to_1_check_ended(opencreport *o, ocrpt_query *q) {
-	List *fw;
+	ocrpt_list *fw;
 	bool ended = true;
 
 	for (fw = q->followers_n_to_1; fw; fw = fw->next) {
@@ -79,11 +79,11 @@ static bool ocrpt_navigate_n_to_1_check_ended(opencreport *o, ocrpt_query *q) {
 static bool ocrpt_navigate_next_n_to_1(opencreport *o, ocrpt_query *q) {
 	bool retval = false;
 
-	if (list_length(q->followers_n_to_1) == 0)
+	if (ocrpt_list_length(q->followers_n_to_1) == 0)
 		return retval;
 
 	if (!q->n_to_1_started) {
-		List *fw;
+		ocrpt_list *fw;
 
 		/*
 		 * If the n_to_1 followers were not started yet,
@@ -105,7 +105,7 @@ static bool ocrpt_navigate_next_n_to_1(opencreport *o, ocrpt_query *q) {
 				f->n_to_1_empty = true;
 		}
 	} else {
-		List *fw;
+		ocrpt_list *fw;
 
 		/*
 		 * If the n_to_1 followers were started in a previous round,
@@ -124,7 +124,7 @@ static bool ocrpt_navigate_next_n_to_1(opencreport *o, ocrpt_query *q) {
 	}
 
 	do {
-		List *fw, *fw1;
+		ocrpt_list *fw, *fw1;
 
 		if (ocrpt_navigate_n_to_1_check_ended(o, q))
 			break;
@@ -168,7 +168,7 @@ static bool ocrpt_navigate_next_n_to_1(opencreport *o, ocrpt_query *q) {
 }
 
 static bool ocrpt_navigate_next_private(opencreport *o, ocrpt_query *q) {
-	List *fw;
+	ocrpt_list *fw;
 	bool retval, retval11;
 
 	if (!o || !q || !q->source || !q->source->o || o != q->source->o) {
@@ -229,7 +229,7 @@ static bool ocrpt_navigate_next_private(opencreport *o, ocrpt_query *q) {
 }
 
 static void ocrpt_navigate_start_private(opencreport *o, ocrpt_query *q) {
-	List *fw;
+	ocrpt_list *fw;
 	ocrpt_query_result *qr;
 	int32_t cols;
 

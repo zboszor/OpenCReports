@@ -8,7 +8,6 @@
 
 #include <stdlib.h>
 #include <opencreport.h>
-#include "listutil.h"
 #include "exprutil.h"
 
 #define UNUSED __attribute__((unused))
@@ -27,13 +26,13 @@ struct opencreport {
 	int32_t paper_iterator_idx;
 
 	/* List and array of struct ocrpt_datasource */
-	List *datasources;
+	ocrpt_list *datasources;
 
 	/* List and array of struct ocrpt_query */
-	List *queries;
+	ocrpt_list *queries;
 
 	/* List of struct opencreports_part */
-	List *parts;
+	ocrpt_list *parts;
 
 	mpfr_prec_t prec;
 	mpfr_rnd_t rndmode;

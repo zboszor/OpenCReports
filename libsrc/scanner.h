@@ -19,7 +19,7 @@ typedef void* yyscan_t;
 typedef union core_YYSTYPE {
 	ocrpt_string	*s;
 	ocrpt_expr		*exp;
-	List			*l;
+	ocrpt_list		*l;
 } core_YYSTYPE;
 
 #define YYSTYPE core_YYSTYPE
@@ -57,9 +57,9 @@ typedef struct base_yy_extra_type {
 	jmp_buf env;
 	opencreport *o;
 	ocrpt_expr *last_expr;
-	List *tokens;
-	List *parsed_exprs;
-	List *parsed_arglist;
+	ocrpt_list *tokens;
+	ocrpt_list *parsed_exprs;
+	ocrpt_list *parsed_arglist;
 	char *err;
 } base_yy_extra_type;
 

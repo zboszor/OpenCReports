@@ -93,13 +93,13 @@ xdinside		[^"]*
 "<<"	{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("shl", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return BSHIFT;
 		}
 ">>"	{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("shr", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return BSHIFT;
 		}
 
@@ -108,38 +108,38 @@ xdinside		[^"]*
 "="		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("eq", 2);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return CMPEQ;
 		}
 "!=" |
 "<>"	{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("ne", 2);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return CMPEQ;
 		}
 ">"		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("gt", 2);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return CMP;
 		}
 ">="	{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("ge", 2);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return CMP;
 		}
 "<"		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("lt", 2);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return CMP;
 		}
 "<="	{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("le", 2);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return CMP;
 		}
 
@@ -148,7 +148,7 @@ xdinside		[^"]*
 "or"	{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("lor", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return L_OR;
 		}
 
@@ -156,14 +156,14 @@ xdinside		[^"]*
 "and"	{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("land", 4);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return L_AND;
 		}
 
 "!"		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("lnot", 4);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 
@@ -171,46 +171,46 @@ xdinside		[^"]*
 "+"		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("add", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 "-"		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("sub", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 
 "++"	{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("inc", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return INCDEC;
 		}
 
 "--"	{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("dec", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return INCDEC;
 		}
 
 "*"		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("mul", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 "/"		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("div", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 "%"		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("mod", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 
@@ -218,25 +218,25 @@ xdinside		[^"]*
 "^"		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("xor", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 "|"		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("or", 2);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 "&"		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("and", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 "~"		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("not", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 
@@ -244,7 +244,7 @@ xdinside		[^"]*
 "?"		{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len("iif", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}
 
@@ -260,7 +260,7 @@ xdinside		[^"]*
 			yyless(0);
 			BEGIN(INITIAL);
 			yylval->s = ocrpt_mem_string_new_with_len("mul", 3);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return IMPLMUL;
 		}
 
@@ -299,14 +299,14 @@ xdinside		[^"]*
 			BEGIN(xi);
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return IDENT;
 		}
  /* Identifier as is */
 {ident_start}{ident_cont}*	{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return IDENT;
 		}
  /* Number juxtaposed with "(" */
@@ -315,7 +315,7 @@ xdinside		[^"]*
 			BEGIN(xi);
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return DCONST;
 		}
  /* Number juxtaposed with an ident */
@@ -324,14 +324,14 @@ xdinside		[^"]*
 			BEGIN(xi);
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return DCONST;
 		}
  /* Number as is */
 {digits}{exponent}{0,1}	{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return DCONST;
 		}
  /* Fractional number juxtaposed with "(" */
@@ -340,7 +340,7 @@ xdinside		[^"]*
 			BEGIN(xi);
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return DCONST;
 		}
  /* Fractional number juxtaposed with an ident */
@@ -349,14 +349,14 @@ xdinside		[^"]*
 			BEGIN(xi);
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return DCONST;
 		}
  /* Fractional number as is */
 {digits}{0,1}{fraction}{exponent}{0,1}	{
 			SET_YYLLOC();
 			yylval->s = ocrpt_mem_string_new_with_len(yytext, yyleng);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return DCONST;
 		}
 
@@ -373,7 +373,7 @@ xdinside		[^"]*
 			yyless(1);
 			BEGIN(INITIAL);
 			yylval->s = litbufdup(yyscanner);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return SCONST;
 		}
 
@@ -386,7 +386,7 @@ xdinside		[^"]*
 			yyless(1);
 			BEGIN(INITIAL);
 			yylval->s = litbufdup(yyscanner);
-			parser_yyget_extra(yyscanner)->tokens = list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
+			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return SCONST;
 		}
 

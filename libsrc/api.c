@@ -71,7 +71,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 		ocrpt_free_query(o, q);
 	}
 
-	list_free_deep(o->datasources, ocrpt_free_datasource);
+	ocrpt_list_free_deep(o->datasources, ocrpt_free_datasource);
 
 	ocrpt_free_parts(o);
 

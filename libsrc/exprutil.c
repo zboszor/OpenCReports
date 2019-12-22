@@ -14,7 +14,6 @@
 #include "opencreport-private.h"
 #include "exprutil.h"
 #include "datasource.h"
-#include "listutil.h"
 #include "functions.h"
 
 ocrpt_expr *newblankexpr(enum ocrpt_expr_type type, uint32_t n_ops) {
@@ -340,7 +339,7 @@ DLL_EXPORT_SYM void ocrpt_expr_optimize(opencreport *o, ocrpt_expr *e) {
 }
 
 static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e) {
-	List *ptr;
+	ocrpt_list *ptr;
 	int32_t i;
 	bool found = false;
 

@@ -5,13 +5,15 @@
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
+#include <config.h>
+
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "listutil.h"
+#include "opencreport.h"
 
-List *makelist1(const void *data) {
-	List *l = ocrpt_mem_malloc(sizeof(List));
+DLL_EXPORT_SYM ocrpt_list *ocrpt_makelist1(const void *data) {
+	ocrpt_list *l = ocrpt_mem_malloc(sizeof(ocrpt_list));
 
 	if (!l)
 		return NULL;
@@ -23,19 +25,19 @@ List *makelist1(const void *data) {
 	return l;
 }
 
-List *makelist(const void *data, ...) {
-	List *l, *e;
+DLL_EXPORT_SYM ocrpt_list *ocrpt_makelist(const void *data, ...) {
+	ocrpt_list *l, *e;
 	void *arg;
 	va_list ap;
 
-	l = makelist1(data);
+	l = ocrpt_makelist1(data);
 	if (!l)
 		return NULL;
 	e = l;
 
 	va_start(ap, data);
 	while ((arg = va_arg(ap, void *))) {
-		l = list_end_append(l, e, arg);
+		l = ocrpt_list_end_append(l, e, arg);
 		if (e->next)
 			e = e->next;
 		else
@@ -45,8 +47,8 @@ List *makelist(const void *data, ...) {
 	return l;
 }
 
-List *list_last(List *l) {
-	List *ptr;
+DLL_EXPORT_SYM ocrpt_list *ocrpt_list_last(ocrpt_list *l) {
+	ocrpt_list *ptr;
 
 	if (!l)
 		return NULL;
@@ -58,34 +60,34 @@ List *list_last(List *l) {
 	return ptr;
 }
 
-List *list_end_append(List *l, List *e, const void *data) {
+DLL_EXPORT_SYM ocrpt_list *ocrpt_list_end_append(ocrpt_list *l, ocrpt_list *e, const void *data) {
 	if (!l)
-		return makelist1(data);
+		return ocrpt_makelist1(data);
 	if (!e)
-		e = list_last(l);
+		e = ocrpt_list_last(l);
 	if (e->next)
-		e = list_last(e);
-	e->next = makelist1(data);
+		e = ocrpt_list_last(e);
+	e->next = ocrpt_makelist1(data);
 	if (e->next)
 		l->len++;
 	return l;
 }
 
-List *list_append(List *l, const void *data) {
-	List *e;
+DLL_EXPORT_SYM ocrpt_list *ocrpt_list_append(ocrpt_list *l, const void *data) {
+	ocrpt_list *e;
 
 	if (!l)
-		return makelist1(data);
-	e = list_last(l);
-	return list_end_append(l, e, data);
+		return ocrpt_makelist1(data);
+	e = ocrpt_list_last(l);
+	return ocrpt_list_end_append(l, e, data);
 }
 
-List *list_prepend(List *l, const void *data) {
-	List *e;
+DLL_EXPORT_SYM ocrpt_list *ocrpt_list_prepend(ocrpt_list *l, const void *data) {
+	ocrpt_list *e;
 
 	if (!l)
-		return makelist1(data);
-	e = ocrpt_mem_malloc(sizeof(List));
+		return ocrpt_makelist1(data);
+	e = ocrpt_mem_malloc(sizeof(ocrpt_list));
 	if (!e)
 		return l;
 	e->next = l;
@@ -94,8 +96,8 @@ List *list_prepend(List *l, const void *data) {
 	return e;
 }
 
-List *list_remove(List *l, const void *data) {
-	List *e, *prev = NULL;
+DLL_EXPORT_SYM ocrpt_list *ocrpt_list_remove(ocrpt_list *l, const void *data) {
+	ocrpt_list *e, *prev = NULL;
 
 	if (!l)
 		return NULL;
@@ -120,17 +122,17 @@ List *list_remove(List *l, const void *data) {
 	return l;
 }
 
-void list_free(List *l) {
+DLL_EXPORT_SYM void ocrpt_list_free(ocrpt_list *l) {
 	while (l) {
-		List *prev = l;
+		ocrpt_list *prev = l;
 		l = l->next;
 		ocrpt_mem_free(prev);
 	}
 }
 
-void list_free_deep(List *l, ocrpt_mem_free_t freefunc) {
+DLL_EXPORT_SYM void ocrpt_list_free_deep(ocrpt_list *l, ocrpt_mem_free_t freefunc) {
 	while (l) {
-		List *prev = l;
+		ocrpt_list *prev = l;
 		l = l->next;
 		freefunc(prev->data);
 		ocrpt_mem_free(prev);
