@@ -11,7 +11,6 @@ dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
 dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 dnl GNU Lesser General Public License for more details.
 
-dnl Versioning uses the Xorg convention
 AC_INIT([OpenCReports],[0.1],[https://github.com/zboszor/OpenCReports])
 
 AC_CANONICAL_TARGET
