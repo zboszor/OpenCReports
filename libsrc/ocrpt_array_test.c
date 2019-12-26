@@ -39,7 +39,7 @@ void print_result_row(const char *name, ocrpt_query_result *qr, int32_t cols) {
 
 int main(void) {
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_find(o, "array");
+	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "array");
 	ocrpt_query *q, *q2;
 	ocrpt_query_result *qr, *qr2;
 	ocrpt_expr *id, *name, *age, *adult, *match;

@@ -46,8 +46,6 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	gmp_randinit_default(o->randstate);
 	gmp_randseed_ui(o->randstate, seed);
 
-	ocrpt_datasource_add_array(o, "array");
-
 	return o;
 }
 
