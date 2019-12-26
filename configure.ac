@@ -14,7 +14,7 @@ dnl GNU Lesser General Public License for more details.
 AC_INIT([OpenCReports],[0.1],[https://github.com/zboszor/OpenCReports])
 
 AC_CANONICAL_TARGET
-AC_CONFIG_SRCDIR(libsrc/opencreport.h)
+AC_CONFIG_SRCDIR(include/opencreport.h)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR(.)
 
@@ -77,6 +77,8 @@ AC_CONFIG_FILES([
 	Makefile
 	opencreports.pc
 	doc/Makefile
+	include/Makefile
 	libsrc/Makefile
+	tests/Makefile
 ])
 AC_OUTPUT

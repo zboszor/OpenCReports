@@ -47,12 +47,12 @@ libsrc/lex.yy.*
 doc/*.pdf
 
 # Test binaries
-libsrc/ocrpt_grammar_test
-libsrc/ocrpt_expr_test
-libsrc/ocrpt_array_test
-libsrc/ocrpt_array_resolve_test
-libsrc/ocrpt_break_test
-libsrc/ocrpt_paper_test
+tests/ocrpt_grammar_test
+tests/ocrpt_expr_test
+tests/ocrpt_array_test
+tests/ocrpt_array_resolve_test
+tests/ocrpt_break_test
+tests/ocrpt_paper_test
 
 # Misc
 README.md.new
