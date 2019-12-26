@@ -51,6 +51,8 @@ AS_IF([test x$gl_cv_cc_visibility = xyes],
 	[AC_DEFINE(DLL_EXPORT_SYM,[],[Explicitly export global symbols])]
 )
 
+PKG_INSTALLDIR()
+
 dnl LibXML2 2.5.0 introduced the XmlTextReader API
 PKG_CHECK_MODULES(LIBXML, libxml-2.0 >= 2.5.0)
 AC_SUBST(LIBXML_LIBS)
@@ -73,6 +75,7 @@ AC_SUBST(PAPER_LIBS)
 
 AC_CONFIG_FILES([
 	Makefile
+	opencreports.pc
 	doc/Makefile
 	libsrc/Makefile
 ])

@@ -39,6 +39,7 @@ m4/lt~obsolete.m4
 *.o
 
 # Generated files
+opencreports.pc
 libsrc/ocrptgrammar.tab.*
 libsrc/lex.yy.*
 
