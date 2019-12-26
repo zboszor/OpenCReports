@@ -169,15 +169,15 @@ static const ocrpt_input ocrpt_array_input = {
 	.free = ocrpt_array_free
 };
 
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o, const char *source_name) {
-	return ocrpt_add_datasource(o, source_name, &ocrpt_array_input);
+DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, const char *source_name) {
+	return ocrpt_datasource_add(o, source_name, &ocrpt_array_input);
 }
 
-static ocrpt_query *add_array_query(opencreport *o, const ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
+static ocrpt_query *array_query_add(opencreport *o, const ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
 	ocrpt_query *query;
 	struct ocrpt_array_results *priv;
 
-	query = ocrpt_alloc_query(o, source, name);
+	query = ocrpt_query_alloc(o, source, name);
 	if (!query)
 		return NULL;
 
@@ -186,7 +186,7 @@ static ocrpt_query *add_array_query(opencreport *o, const ocrpt_datasource *sour
 
 	priv = ocrpt_mem_malloc(sizeof(struct ocrpt_array_results));
 	if (!priv) {
-		ocrpt_free_query(o, query);
+		ocrpt_query_free(o, query);
 		return NULL;
 	}
 
@@ -203,18 +203,18 @@ static ocrpt_query *add_array_query(opencreport *o, const ocrpt_datasource *sour
 	return query;
 }
 
-DLL_EXPORT_SYM ocrpt_query *ocrpt_add_array_query(opencreport *o, ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
-	if (!ocrpt_validate_datasource(o, source))
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(opencreport *o, ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
+	if (!ocrpt_datasource_validate(o, source))
 		return NULL;
 
-	return add_array_query(o, source, name, array, rows, cols, types);
+	return array_query_add(o, source, name, array, rows, cols, types);
 }
 
-DLL_EXPORT_SYM ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
-	ocrpt_datasource *source = ocrpt_find_datasource(o, source_name);
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array_as(opencreport *o, const char *source_name, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
+	ocrpt_datasource *source = ocrpt_datasource_find(o, source_name);
 
 	if (!source)
 		return NULL;
 
-	return add_array_query(o, source, name, array, rows, cols, types);
+	return array_query_add(o, source, name, array, rows, cols, types);
 }

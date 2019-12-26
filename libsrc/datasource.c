@@ -17,7 +17,7 @@
 #include "opencreport-private.h"
 #include "datasource.h"
 
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_add_datasource(opencreport *o, const char *source_name, const ocrpt_input *input) {
+DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const ocrpt_input *input) {
 	ocrpt_list *l;
 	ocrpt_datasource *s = NULL;
 
@@ -52,7 +52,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_add_datasource(opencreport *o, const char
 	return s;
 }
 
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_find_datasource(opencreport *o, const char *source_name) {
+DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_find(opencreport *o, const char *source_name) {
 	ocrpt_list *ptr;
 
 	for (ptr = o->datasources; ptr; ptr = ptr->next) {
@@ -64,7 +64,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_find_datasource(opencreport *o, const cha
 	return NULL;
 }
 
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_validate_datasource(opencreport *o, ocrpt_datasource *source) {
+DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_validate(opencreport *o, ocrpt_datasource *source) {
 	ocrpt_list *ptr;
 
 	for (ptr = o->datasources; ptr; ptr = ptr->next) {
@@ -82,7 +82,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_validate_datasource(opencreport *o, ocrpt
  * - a valid pointer if the query space was successfully
  *   allocated and added to o->queries
  */
-ocrpt_query *ocrpt_alloc_query(opencreport *o, const ocrpt_datasource *source, const char *name) {
+ocrpt_query *ocrpt_query_alloc(opencreport *o, const ocrpt_datasource *source, const char *name) {
 	ocrpt_query *q = ocrpt_mem_malloc(sizeof(ocrpt_query));
 	int32_t llen;
 
@@ -110,7 +110,7 @@ ocrpt_query *ocrpt_alloc_query(opencreport *o, const ocrpt_datasource *source, c
 	return q;
 }
 
-void ocrpt_free_query0(ocrpt_query *q) {
+void ocrpt_query_free0(ocrpt_query *q) {
 	opencreport *o = q->source->o;
 	ocrpt_list *ptr, *ptr1;
 
@@ -141,7 +141,7 @@ void ocrpt_free_query0(ocrpt_query *q) {
 	if (q->source && q->source->input && q->source->input->free)
 		q->source->input->free(q);
 
-	ocrpt_free_query_result(q);
+	ocrpt_query_result_free(q);
 	ocrpt_strfree(q->name);
 	q->name = NULL;
 	ocrpt_list_free(q->followers);
@@ -153,8 +153,8 @@ void ocrpt_free_query0(ocrpt_query *q) {
 	ocrpt_mem_free(q);
 }
 
-DLL_EXPORT_SYM void ocrpt_free_query(opencreport *o, ocrpt_query *q) {
-	ocrpt_free_query0(q);
+DLL_EXPORT_SYM void ocrpt_query_free(opencreport *o, ocrpt_query *q) {
+	ocrpt_query_free0(q);
 	o->queries = ocrpt_list_remove(o->queries, q);
 }
 
@@ -172,7 +172,7 @@ DLL_EXPORT_SYM ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_
 	return (q->source->o->residx ? &q->result[q->cols] : q->result);
 }
 
-void ocrpt_free_query_result(ocrpt_query *q) {
+void ocrpt_query_result_free(ocrpt_query *q) {
 	ocrpt_query_result *result = q->result;
 	int32_t cols = q->cols, i;
 
@@ -196,7 +196,7 @@ void ocrpt_free_query_result(ocrpt_query *q) {
 	q->cols = 0;
 }
 
-DLL_EXPORT_SYM bool ocrpt_add_query_follower_n_to_1(opencreport *o, ocrpt_query *leader, ocrpt_query *follower, ocrpt_expr *match) {
+DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(opencreport *o, ocrpt_query *leader, ocrpt_query *follower, ocrpt_expr *match) {
 	ocrpt_query_follower *fo;
 	int32_t len;
 	bool ret;
@@ -231,7 +231,7 @@ DLL_EXPORT_SYM bool ocrpt_add_query_follower_n_to_1(opencreport *o, ocrpt_query 
 	return ret;
 }
 
-DLL_EXPORT_SYM bool ocrpt_add_query_follower(opencreport *o, ocrpt_query *leader, ocrpt_query *follower) {
+DLL_EXPORT_SYM bool ocrpt_query_add_follower(opencreport *o, ocrpt_query *leader, ocrpt_query *follower) {
 	int32_t len;
 
 	if (!o || !leader || !leader->source || !leader->source->o || o != leader->source->o) {

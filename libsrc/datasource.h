@@ -55,10 +55,10 @@ struct ocrpt_query_follower {
 
 typedef struct ocrpt_query_follower ocrpt_query_follower;
 
-ocrpt_query *ocrpt_alloc_query(opencreport *o, const ocrpt_datasource *source, const char *name);
+ocrpt_query *ocrpt_query_alloc(opencreport *o, const ocrpt_datasource *source, const char *name);
 
-void ocrpt_free_query0(ocrpt_query *q);
+void ocrpt_query_free0(ocrpt_query *q);
 
-void ocrpt_free_query_result(ocrpt_query *q);
+void ocrpt_query_result_free(ocrpt_query *q);
 
 #endif /* _DATASOURCE_H_ */

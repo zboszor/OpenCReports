@@ -46,7 +46,7 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	gmp_randinit_default(o->randstate);
 	gmp_randseed_ui(o->randstate, seed);
 
-	ocrpt_add_array_datasource(o, "array");
+	ocrpt_datasource_add_array(o, "array");
 
 	return o;
 }
@@ -68,7 +68,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	 */
 	while (o->queries) {
 		ocrpt_query *q = (ocrpt_query *)o->queries->data;
-		ocrpt_free_query(o, q);
+		ocrpt_query_free(o, q);
 	}
 
 	ocrpt_list_free_deep(o->datasources, ocrpt_free_datasource);

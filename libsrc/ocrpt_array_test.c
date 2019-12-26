@@ -39,6 +39,7 @@ void print_result_row(const char *name, ocrpt_query_result *qr, int32_t cols) {
 
 int main(void) {
 	opencreport *o = ocrpt_init();
+	ocrpt_datasource *ds = ocrpt_datasource_find(o, "array");
 	ocrpt_query *q, *q2;
 	ocrpt_query_result *qr, *qr2;
 	ocrpt_expr *id, *name, *age, *adult, *match;
@@ -63,7 +64,7 @@ int main(void) {
 	err = NULL;
 	adult = ocrpt_expr_parse(o, "a.adult", &err);
 
-	q = ocrpt_add_array_query_as(o, "array", "a", (const char **)array, 3, 5, coltypes);
+	q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 3, 5, coltypes);
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)
@@ -75,9 +76,9 @@ int main(void) {
 	ocrpt_expr_resolve(o, adult);
 
 	row = 0;
-	ocrpt_navigate_start(o, q);
+	ocrpt_query_navigate_start(o, q);
 
-	while (ocrpt_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(o, q)) {
 		ocrpt_result *r;
 
 		qr = ocrpt_query_get_result(q, &cols);
@@ -117,13 +118,13 @@ int main(void) {
 
 	printf("--- TESTING FOLLOWER ---\n\n");
 
-	q2 = ocrpt_add_array_query_as(o, "array", "b", (const char **)array2, 2, 5, coltypes);
-	ocrpt_add_query_follower(o, q, q2);
+	q2 = ocrpt_query_add_array(o, ds, "b", (const char **)array2, 2, 5, coltypes);
+	ocrpt_query_add_follower(o, q, q2);
 
 	row = 0;
-	ocrpt_navigate_start(o, q);
+	ocrpt_query_navigate_start(o, q);
 
-	while (ocrpt_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(o, q)) {
 		ocrpt_result *r;
 
 		qr = ocrpt_query_get_result(q, &cols);
@@ -156,22 +157,22 @@ int main(void) {
 		printf("\n");
 	}
 
-	ocrpt_free_query(o, q2);
+	ocrpt_query_free(o, q2);
 
 	printf("--- TESTING FOLLOWER N:1 ---\n\n");
 
-	q2 = ocrpt_add_array_query_as(o, "array", "b", (const char **)array2, 2, 5, coltypes);
+	q2 = ocrpt_query_add_array(o, ds, "b", (const char **)array2, 2, 5, coltypes);
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	err = NULL;
 	match = ocrpt_expr_parse(o, "a.id = b.id", &err);
 	ocrpt_strfree(err);
 
-	ocrpt_add_query_follower_n_to_1(o, q, q2, match);
+	ocrpt_query_add_follower_n_to_1(o, q, q2, match);
 
 	row = 0;
-	ocrpt_navigate_start(o, q);
+	ocrpt_query_navigate_start(o, q);
 
-	while (ocrpt_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(o, q)) {
 		ocrpt_result *r;
 
 		qr = ocrpt_query_get_result(q, &cols);

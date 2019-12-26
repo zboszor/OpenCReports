@@ -156,7 +156,7 @@ void ocrpt_expr_optimize(opencreport *o, ocrpt_expr *e);
 void ocrpt_expr_resolve(opencreport *o, ocrpt_expr *e);
 /*
  * Evaluate the expression, i.e. compute its ocrpt_result
- * It must be called after ocrpt_navigate_next(), see below.
+ * It must be called after ocrpt_query_navigate_next(), see below.
  */
 ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_expr *e);
 /*
@@ -308,22 +308,22 @@ const ocrpt_paper *ocrpt_paper_next(opencreport *o);
  * Add a custom datasource not covered by
  * the currently implemented sources.
  */
-ocrpt_datasource *ocrpt_add_datasource(opencreport *o, const char *source_name, const ocrpt_input *input);
+ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const ocrpt_input *input);
 /*
  * Find the datasource using its name
  */
-ocrpt_datasource *ocrpt_find_datasource(opencreport *o, const char *source_name);
+ocrpt_datasource *ocrpt_datasource_find(opencreport *o, const char *source_name);
 /*
  * Validate the datasource pointer against the report structure
  */
-ocrpt_datasource *ocrpt_validate_datasource(opencreport *o, ocrpt_datasource *source);
+ocrpt_datasource *ocrpt_datasource_validate(opencreport *o, ocrpt_datasource *source);
 /*
  * Add an array datasource
  *
  * Calling this is optional, as an array datasource called
  * "array" is automatically added to an opencreport structure.
  */
-ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o, const char *source_name);
+ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, const char *source_name);
 /*
  * Add an array query using the datasource pointer
  *
@@ -332,7 +332,7 @@ ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o, const char *source_
  * i.e. it's one less than the actual number of rows
  * in array.
  */
-ocrpt_query *ocrpt_add_array_query(opencreport *o, ocrpt_datasource *source,
+ocrpt_query *ocrpt_query_add_array(opencreport *o, ocrpt_datasource *source,
 									const char *name, const char **array,
 									int32_t rows, int32_t cols,
 									const enum ocrpt_result_type *types);
@@ -344,7 +344,7 @@ ocrpt_query *ocrpt_add_array_query(opencreport *o, ocrpt_datasource *source,
  * i.e. it's one less than the actual number of rows
  * in array.
  */
-ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name,
+ocrpt_query *ocrpt_query_add_array_as(opencreport *o, const char *source_name,
 									const char *name, const char **array,
 									int32_t rows, int32_t cols,
 									const enum ocrpt_result_type *types);
@@ -352,34 +352,34 @@ ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name,
  * Return the query result array and the number of columns in it
  *
  * It must be re-run for every new data source row since
- * the pointer is invalidated after ocrpt_navigate_next()
+ * the pointer is invalidated after ocrpt_query_navigate_next()
  */
 ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_t *cols);
 /*
  * Add follower query with a match function
  */
-bool ocrpt_add_query_follower_n_to_1(opencreport *o,
+bool ocrpt_query_add_follower_n_to_1(opencreport *o,
 									ocrpt_query *leader,
 									ocrpt_query *follower,
 									ocrpt_expr *match);
 /*
  * Add follower query (runs side-by-side with "leader")
  */
-bool ocrpt_add_query_follower(opencreport *o,
+bool ocrpt_query_add_follower(opencreport *o,
 									ocrpt_query *leader,
 									ocrpt_query *follower);
 /*
  * Free a query and remove it from follower references
  */
-void ocrpt_free_query(opencreport *o, ocrpt_query *q);
+void ocrpt_query_free(opencreport *o, ocrpt_query *q);
 /*
  * Start query navigation from the beginning of the resultset
  */
-void ocrpt_navigate_start(opencreport *o, ocrpt_query *q);
+void ocrpt_query_navigate_start(opencreport *o, ocrpt_query *q);
 /*
  * Move to next row in the query resultset
  */
-bool ocrpt_navigate_next(opencreport *o, ocrpt_query *q);
+bool ocrpt_query_navigate_next(opencreport *o, ocrpt_query *q);
 
 #if 0
 /*
