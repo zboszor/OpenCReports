@@ -325,6 +325,19 @@ ocrpt_datasource *ocrpt_datasource_validate(opencreport *o, ocrpt_datasource *so
  */
 ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, const char *source_name);
 /*
+ * Set the global function pointer to resolve array and type array
+ */
+typedef void (*ocrpt_query_discover_func)(const char *, void **, const char *, void **);
+void ocrpt_query_set_discover_func(ocrpt_query_discover_func func);
+/*
+ * Default discovery function for data and type arrays
+ */
+extern ocrpt_query_discover_func ocrpt_query_discover_array;
+/*
+ * Discovery function for data and type arrays
+ */
+void ocrpt_query_discover_array_c(const char *arrayname, void **array, const char *typesname, void **types);
+/*
  * Add an array query using the datasource pointer
  *
  * The array's first row contains the header names

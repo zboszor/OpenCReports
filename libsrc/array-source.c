@@ -10,8 +10,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <dlfcn.h>
 
-#include <opencreport-private.h>
+#include "opencreport-private.h"
 #include "datasource.h"
 
 struct ocrpt_array_results {
@@ -208,4 +209,33 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(opencreport *o, ocrpt_datasour
 		return NULL;
 
 	return array_query_add(o, source, name, array, rows, cols, types);
+}
+
+DLL_EXPORT_SYM ocrpt_query_discover_func ocrpt_query_discover_array = ocrpt_query_discover_array_c;
+
+DLL_EXPORT_SYM void ocrpt_query_set_discover_func(ocrpt_query_discover_func func) {
+	ocrpt_query_discover_array = func;
+}
+
+DLL_EXPORT_SYM void ocrpt_query_discover_array_c(const char *arrayname, void **array, const char *typesname, void **types) {
+	void *handle = dlopen(NULL, RTLD_NOW);
+
+	if (array) {
+		if (arrayname && *arrayname) {
+			dlerror();
+			*array = dlsym(handle, arrayname);
+			dlerror();
+		} else
+			*array = NULL;
+	}
+	if (types) {
+		if (typesname && *typesname) {
+			dlerror();
+			*types = dlsym(handle, typesname);
+			dlerror();
+		} else
+			*types = NULL;
+	}
+
+	dlclose(handle);
 }
