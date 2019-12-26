@@ -209,12 +209,3 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(opencreport *o, ocrpt_datasour
 
 	return array_query_add(o, source, name, array, rows, cols, types);
 }
-
-DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array_as(opencreport *o, const char *source_name, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
-	ocrpt_datasource *source = ocrpt_datasource_find(o, source_name);
-
-	if (!source)
-		return NULL;
-
-	return array_query_add(o, source, name, array, rows, cols, types);
-}

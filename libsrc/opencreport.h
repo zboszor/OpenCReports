@@ -337,18 +337,6 @@ ocrpt_query *ocrpt_query_add_array(opencreport *o, ocrpt_datasource *source,
 									int32_t rows, int32_t cols,
 									const enum ocrpt_result_type *types);
 /*
- * Add an array query using the datasource name
- *
- * The array's first row contains the header names
- * and the number of rows is the number of data rows,
- * i.e. it's one less than the actual number of rows
- * in array.
- */
-ocrpt_query *ocrpt_query_add_array_as(opencreport *o, const char *source_name,
-									const char *name, const char **array,
-									int32_t rows, int32_t cols,
-									const enum ocrpt_result_type *types);
-/*
  * Return the query result array and the number of columns in it
  *
  * It must be re-run for every new data source row since
