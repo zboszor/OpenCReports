@@ -6,7 +6,7 @@ lib_LTLIBRARIES = libopencrpt.la
 
 noinst_PROGRAMS = \
 	ocrpt_grammar_test ocrpt_expr_test \
-	ocrpt_array_test \
+	ocrpt_array_test ocrpt_break_test \
 	ocrpt_paper_test
 
 ocrptgrammar.tab.c: ocrptgrammar.y
@@ -25,7 +25,7 @@ libopencrpt_la_SOURCES = \
 	memutil.c listutil.c exprutil.c functions.c \
 	lex.yy.c ocrptgrammar.tab.h ocrptgrammar.tab.c \
 	api.c free.c parsexml.c datasource.c \
-	array-source.c navigation.c
+	array-source.c navigation.c breaks.c
 
 libopencrpt_la_LIBADD = \
 	$(MPFR_LIBS) $(PAPER_LIBS) $(UTF8PROC_LIBS)
@@ -42,6 +42,9 @@ ocrpt_expr_test_LDADD = libopencrpt.la
 
 ocrpt_array_test_SOURCES = ocrpt_array_test.c
 ocrpt_array_test_LDADD = libopencrpt.la
+
+ocrpt_break_test_SOURCES = ocrpt_break_test.c
+ocrpt_break_test_LDADD = libopencrpt.la
 
 ocrpt_paper_test_SOURCES = ocrpt_paper_test.c
 ocrpt_paper_test_LDADD = libopencrpt.la

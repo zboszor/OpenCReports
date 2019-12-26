@@ -12,6 +12,18 @@
 
 #define UNUSED __attribute__((unused))
 
+struct ocrpt_break {
+	const char *name;
+	ocrpt_expr *e_newpage;
+	ocrpt_expr *e_headernewpage;
+	ocrpt_expr *e_suppressblank;
+	/* TODO: add details for header and footer */
+	ocrpt_list *breakfields;	/* list of ocrpt_expr pointers */
+	bool newpage:1;
+	bool headernewpage:1;
+	bool suppressblank:1;
+};
+
 struct opencreport_part {
 	const char *xmlbuf;
 	const char *path;

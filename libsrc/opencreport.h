@@ -108,6 +108,9 @@ struct ocrpt_paper {
 };
 typedef struct ocrpt_paper ocrpt_paper;
 
+struct ocrpt_break;
+typedef struct ocrpt_break ocrpt_break;
+
 #if 0
 struct report_line;
 typedef struct report_line report_line;
@@ -182,6 +185,26 @@ int32_t ocrpt_expr_nodes(ocrpt_expr *e);
  * Free an expression parse tree
  */
 void ocrpt_free_expr(ocrpt_expr *e);
+
+/***************************
+ * Break related functions *
+ ***************************/
+
+/*
+ * Add a report break
+ */
+ocrpt_break *ocrpt_break_new(opencreport *o, const char *name,
+							ocrpt_expr *newpage,
+							ocrpt_expr *headernewpage,
+							ocrpt_expr *suppressblank);
+/*
+ * Find a report break using its name
+ */
+ocrpt_break *ocrpt_break_get(opencreport *o, const char *name);
+/*
+ * Add a break field to a break
+ */
+bool ocrpt_break_add_breakfield(opencreport *o, ocrpt_break *b, ocrpt_expr *bf);
 
 /****************************
  * Memory handling wrappers *
