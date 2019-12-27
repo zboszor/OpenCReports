@@ -11,7 +11,8 @@ lex.yy.c: ocrptpatterns.l ocrptgrammar.tab.h
 
 libopencreport_la_CFLAGS = \
 	-Wall -O2 -g -I$(top_srcdir)/include $(CFLAG_VISIBILITY) \
-	$(MPFR_CFLAGS) $(PAPER_CFLAGS) $(UTF8PROC_CFLAGS)
+	$(MPFR_CFLAGS) $(PAPER_CFLAGS) $(UTF8PROC_CFLAGS) \
+	$(LIBXML_CFLAGS)
 
 libopencreport_la_SOURCES = \
 	memutil.c listutil.c exprutil.c functions.c \
@@ -20,7 +21,7 @@ libopencreport_la_SOURCES = \
 	array-source.c navigation.c breaks.c
 
 libopencreport_la_LIBADD = \
-	$(MPFR_LIBS) $(PAPER_LIBS) $(UTF8PROC_LIBS)
+	$(MPFR_LIBS) $(PAPER_LIBS) $(UTF8PROC_LIBS) $(LIBXML_LIBS)
 
 libopencreport_la_LDFLAGS = \
 	-version-info $(OCRPT_LT_CURRENT):$(OCRPT_LT_REVISION):$(OCRPT_LT_AGE) \

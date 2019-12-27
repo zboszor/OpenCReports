@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <sys/random.h>
 
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 #include <paper.h>
 
 #include "scanner.h"
@@ -180,6 +182,9 @@ static void initialize_ocrpt(void) {
 	free((void *)system_paper_name);
 
 	paperdone();
+
+	LIBXML_TEST_VERSION;
+	xmlInitParser();
 }
 
 __attribute__((destructor))
@@ -189,4 +194,6 @@ static void uninitialize_ocrpt(void) {
 	for (i = 0; i < n_papersizes; i++)
 		free((void *)papersizes[i].name);
 	free(papersizes);
+
+	xmlCleanupParser();
 }
