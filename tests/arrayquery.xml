@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="array" type="array" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="array" value="array" coltypes="coltypes" rows="3" cols="5" />
+	</Queries>
+</OpenCReport>

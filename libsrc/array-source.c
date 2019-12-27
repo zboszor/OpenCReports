@@ -161,7 +161,7 @@ static void ocrpt_array_free(ocrpt_query *query) {
 	query->priv = NULL;
 }
 
-static const ocrpt_input ocrpt_array_input = {
+const ocrpt_input ocrpt_array_input = {
 	.describe = ocrpt_array_describe,
 	.rewind = ocrpt_array_rewind,
 	.next = ocrpt_array_next,

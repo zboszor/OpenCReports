@@ -51,6 +51,7 @@ tests/ocrpt_grammar_test
 tests/ocrpt_expr_test
 tests/ocrpt_array_test
 tests/ocrpt_array_resolve_test
+tests/ocrpt_array_xml_test
 tests/ocrpt_break_test
 tests/ocrpt_paper_test
 

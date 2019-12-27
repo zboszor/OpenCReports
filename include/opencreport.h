@@ -350,6 +350,10 @@ ocrpt_query *ocrpt_query_add_array(opencreport *o, ocrpt_datasource *source,
 									int32_t rows, int32_t cols,
 									const enum ocrpt_result_type *types);
 /*
+ * Find a query using its name
+ */
+ocrpt_query *ocrpt_query_find(opencreport *o, const char *name);
+/*
  * Return the query result array and the number of columns in it
  *
  * It must be re-run for every new data source row since
@@ -382,37 +386,17 @@ void ocrpt_query_navigate_start(opencreport *o, ocrpt_query *q);
  */
 bool ocrpt_query_navigate_next(opencreport *o, ocrpt_query *q);
 
-#if 0
+/********************************************
+ * Functions related to report XML handling *
+ ********************************************/
+
 /*
- * Create a report part
+ * Add details to the report from the parsed XML file
  */
-ocrpt_report_part *ocrpt_create_report_part(void);
-/*
- * Add report header to report part
- */
-ocrpt_report_part_set_report_header(ocrpt_report_part *part, ...);
-#endif
-/*
- * Add XML report description from a file
- */
-int32_t ocrpt_add_report(opencreport *o, const char *filename);
-/*
- * Add XML report description using a memory buffer (zero-terminated string)
- */
-int32_t ocrpt_add_report_from_buffer(opencreport *o, const char *buffer);
-/*
- * Parse the reports added up to this point.
- * Allow no deviation from the OpenCReports DTD.
- */
-int32_t ocrpt_parse(opencreport *o);
-/*
- * Parse the reports added up to this point.
- * Optionally allow deviation from the DTD.
- */
-int32_t ocrpt_parse2(opencreport *o, bool allow_bad_xml);
+bool ocrpt_parse_xml(opencreport *o, const char *filename);
+
 /*
  * Execute the reports added up to this point.
- * Parse any unparsed report XMLs with non-strict checks.
  */
 int32_t ocrpt_execute(opencreport *o);
 

@@ -1,0 +1,145 @@
+<!ELEMENT OpenCReport (Datasources?,Queries?,(Part|Report)*)>
+<!ELEMENT Datasources (Datasource+)>
+<!ELEMENT Datasource EMPTY>
+<!ATTLIST Datasource
+	name CDATA #REQUIRED
+	type CDATA #REQUIRED
+	port CDATA #IMPLIED
+	dbname CDATA #IMPLIED
+	username CDATA #IMPLIED
+	password CDATA #IMPLIED
+	connstr CDATA #IMPLIED >
+<!ELEMENT Queries (Query)+>
+<!ELEMENT Query (#PCDATA)>
+<!ATTLIST Query
+	name CDATA #REQUIRED
+	datasource CDATA #REQUIRED
+	value CDATA #IMPLIED
+	rows CDATA #IMPLIED
+	cols CDATA #IMPLIED
+	coltypes CDATA #IMPLIED >
+<!ELEMENT Part (PageHeader|PageFooter|ReportHeader|ReportFooter|pr)*>
+<!ATTLIST Part
+	pagesAcross CDATA #IMPLIED
+	pages_across CDATA #IMPLIED
+	fontSize CDATA #IMPLIED
+	font_size CDATA #IMPLIED
+	orientation CDATA #IMPLIED
+	topMargin CDATA #IMPLIED
+	top_margin CDATA #IMPLIED
+	leftMargin CDATA #IMPLIED
+	left_margin CDATA #IMPLIED
+	bottomMargin CDATA #IMPLIED
+	bottom_margin CDATA #IMPLIED
+	paperType CDATA #IMPLIED
+	paper_type CDATA #IMPLIED
+	iterations CDATA #IMPLIED
+	suppressPageHeaderFirstPage CDATA #IMPLIED >
+<!ELEMENT pr (pd)+>
+<!ATTLIST pr
+	layout CDATA #IMPLIED
+	newpage CDATA #IMPLIED >
+<!ELEMENT pd (Report)>
+<!ATTLIST pd
+	width CDATA #IMPLIED
+	height CDATA #IMPLIED
+	border_width CDATA #IMPLIED
+	border_color CDATA #IMPLIED >
+<!ELEMENT Report (Breaks?,Variables?,((Alternate|NoData)|PageHeader|PageFooter|ReportHeader|ReportFooter|(Detail|Graph|Chart)*|xi:include)*) >
+<!ATTLIST Report
+	pagesAcross CDATA #IMPLIED
+	pages_across CDATA #IMPLIED
+	fontSize CDATA #IMPLIED
+	font_size CDATA #IMPLIED
+	orientation CDATA #IMPLIED
+	topMargin CDATA #IMPLIED
+	top_margin CDATA #IMPLIED
+	leftMargin CDATA #IMPLIED
+	left_margin CDATA #IMPLIED
+	bottomMargin CDATA #IMPLIED
+	bottom_margin CDATA #IMPLIED
+	paperType CDATA #IMPLIED
+	paper_type CDATA #IMPLIED
+	iterations CDATA #IMPLIED
+	suppressPageHeaderFirstPage CDATA #IMPLIED
+
+	query CDATA #IMPLIED
+	xmlns:xi CDATA #IMPLIED
+	suppress CDATA #IMPLIED
+	uniquerow CDATA #IMPLIED
+	detail_columns CDATA #IMPLIED
+	column_pad CDATA #IMPLIED >
+<!ELEMENT xi:include EMPTY>
+<!ATTLIST xi:include
+	href CDATA #REQUIRED >
+<!ELEMENT Alternate (NoData) >
+<!ELEMENT NoData (Output) >
+<!ELEMENT ReportHeader (Output)* >
+<!ELEMENT PageHeader (Output)* >
+<!ELEMENT ReportFooter (Output)* >
+<!ELEMENT PageFooter (Output)* >
+<!ELEMENT Output (Line | HorizontalLine | Image)* >
+<!ELEMENT Line (field | literal)* >
+<!ATTLIST Line
+	fontSize CDATA #IMPLIED
+	bold CDATA #IMPLIED
+	suppress CDATA #IMPLIED
+	color CDATA #IMPLIED
+	bgcolor CDATA #IMPLIED >
+<!ELEMENT HorizontalLine EMPTY>
+<!ATTLIST HorizontalLine
+	size CDATA #IMPLIED
+	indent CDATA #IMPLIED
+	length CDATA #IMPLIED
+	fontSize CDATA #IMPLIED
+	suppress CDATA #IMPLIED
+	bgcolor CDATA #IMPLIED >
+<!ELEMENT Image EMPTY >
+<!ATTLIST Image
+	value CDATA #REQUIRED
+	type CDATA #REQUIRED
+	width CDATA #REQUIRED
+	height CDATA #REQUIRED >
+<!ELEMENT field EMPTY>
+<!ATTLIST field
+	value CDATA #REQUIRED
+	delayed CDATA #IMPLIED
+	width CDATA #IMPLIED
+	align CDATA #IMPLIED
+	format CDATA #IMPLIED
+	bgcolor CDATA #IMPLIED
+	color CDATA #IMPLIED
+	link CDATA #IMPLIED
+	maxlines CDATA #IMPLIED
+	col CDATA #IMPLIED >
+<!ELEMENT literal (#PCDATA) >
+<!ATTLIST literal
+	width CDATA #IMPLIED
+	align CDATA #IMPLIED
+	bgcolor CDATA #IMPLIED
+	color CDATA #IMPLIED
+	col CDATA #IMPLIED >
+<!ELEMENT Detail (FieldHeaders?, FieldDetails?) >
+<!ELEMENT FieldHeaders (Output)* >
+<!ELEMENT FieldDetails (Output)* >
+<!ELEMENT Breaks (Break)* >
+<!ELEMENT Break (BreakHeader | BreakFooter | BreakFields)* >
+<!ATTLIST Break
+	name CDATA #REQUIRED
+	headernewpage CDATA #IMPLIED
+	suppressblank CDATA #IMPLIED
+	newpage CDATA #IMPLIED >
+<!ELEMENT BreakHeader (Output)* >
+<!ELEMENT BreakFooter (Output)* >
+<!ELEMENT BreakFields (BreakField)* >
+<!ELEMENT BreakField EMPTY>
+<!ATTLIST BreakField
+	value CDATA #REQUIRED >
+<!ELEMENT Variables (Variable)* >
+<!ELEMENT Variable EMPTY >
+<!ATTLIST Variable
+	name CDATA #REQUIRED
+	value CDATA #REQUIRED
+	type (expression|count|sum|average|lowest|highest) "sum"
+	resetonbreak CDATA #IMPLIED
+	precalculate CDATA #IMPLIED >

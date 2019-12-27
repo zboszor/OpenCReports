@@ -110,6 +110,21 @@ ocrpt_query *ocrpt_query_alloc(opencreport *o, const ocrpt_datasource *source, c
 	return q;
 }
 
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_find(opencreport *o, const char *name) {
+	ocrpt_list *ptr;
+
+	if (!o)
+		return NULL;
+
+	for (ptr = o->queries; ptr; ptr = ptr->next) {
+		ocrpt_query *q = (ocrpt_query *)ptr->data;
+		if (!strcmp(q->name, name))
+			return q;
+	}
+
+	return NULL;
+}
+
 void ocrpt_query_free0(ocrpt_query *q) {
 	opencreport *o = q->source->o;
 	ocrpt_list *ptr, *ptr1;

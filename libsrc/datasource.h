@@ -14,6 +14,8 @@
 #include <opencreport.h>
 #include "opencreport-private.h"
 
+extern const ocrpt_input ocrpt_array_input;
+
 struct ocrpt_datasource {
 	opencreport *o;
 	const ocrpt_input *input;
@@ -52,7 +54,6 @@ struct ocrpt_query_follower {
 	ocrpt_query *follower;
 	ocrpt_expr *expr;
 };
-
 typedef struct ocrpt_query_follower ocrpt_query_follower;
 
 ocrpt_query *ocrpt_query_alloc(opencreport *o, const ocrpt_datasource *source, const char *name);
