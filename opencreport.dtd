@@ -20,6 +20,7 @@
 	coltypes CDATA #IMPLIED >
 <!ELEMENT Part (PageHeader|PageFooter|ReportHeader|ReportFooter|pr)*>
 <!ATTLIST Part
+	layout CDATA #IMPLIED
 	pagesAcross CDATA #IMPLIED
 	pages_across CDATA #IMPLIED
 	fontSize CDATA #IMPLIED
@@ -39,13 +40,13 @@
 <!ATTLIST pr
 	layout CDATA #IMPLIED
 	newpage CDATA #IMPLIED >
-<!ELEMENT pd (Report)>
+<!ELEMENT pd (Report*)>
 <!ATTLIST pd
 	width CDATA #IMPLIED
 	height CDATA #IMPLIED
 	border_width CDATA #IMPLIED
 	border_color CDATA #IMPLIED >
-<!ELEMENT Report (Breaks?,Variables?,((Alternate|NoData)|PageHeader|PageFooter|ReportHeader|ReportFooter|(Detail|Graph|Chart)*|xi:include)*) >
+<!ELEMENT Report ((Alternate|NoData)|(Breaks?,Variables?)|PageHeader|PageFooter|ReportHeader|ReportFooter|(Detail|Graph|Chart)*|xi:include)* >
 <!ATTLIST Report
 	pagesAcross CDATA #IMPLIED
 	pages_across CDATA #IMPLIED
@@ -114,14 +115,46 @@
 	col CDATA #IMPLIED >
 <!ELEMENT literal (#PCDATA) >
 <!ATTLIST literal
-	width CDATA #IMPLIED
 	align CDATA #IMPLIED
 	bgcolor CDATA #IMPLIED
 	color CDATA #IMPLIED
+	width CDATA #IMPLIED
+	bold CDATA #IMPLIED
+	italics CDATA #IMPLIED
+	link CDATA #IMPLIED
+	translate CDATA #IMPLIED
 	col CDATA #IMPLIED >
 <!ELEMENT Detail (FieldHeaders?, FieldDetails?) >
 <!ELEMENT FieldHeaders (Output)* >
 <!ELEMENT FieldDetails (Output)* >
+<!ELEMENT Graph (Plot+) >
+<!ATTLIST Graph
+	name CDATA #IMPLIED
+	type CDATA #REQUIRED
+	subtype CDATA #REQUIRED
+	width CDATA #IMPLIED
+	height CDATA #IMPLIED
+	bold_titles CDATA #IMPLIED
+	title CDATA #IMPLIED
+	legend_bg_color CDATA #IMPLIED
+	legend_orientation CDATA #IMPLIED
+	draw_x_line CDATA #IMPLIED
+	draw_y_line CDATA #IMPLIED
+	grid_color CDATA #IMPLIED
+	x_axis_title CDATA #IMPLIED
+	y_axis_title CDATA #IMPLIED
+	y_axis_mod CDATA #IMPLIED
+	y_axis_title_right CDATA #IMPLIED
+	y_axis_decimals CDATA #IMPLIED
+	y_axis_decimals_right CDATA #IMPLIED >
+<!ELEMENT Plot EMPTY>
+<!ATTLIST Plot
+	axis CDATA #IMPLIED
+	field CDATA #IMPLIED
+	label CDATA #IMPLIED
+	side CDATA #IMPLIED
+	disabled CDATA #IMPLIED
+	color CDATA #IMPLIED >
 <!ELEMENT Breaks (Break)* >
 <!ELEMENT Break (BreakHeader | BreakFooter | BreakFields)* >
 <!ATTLIST Break
