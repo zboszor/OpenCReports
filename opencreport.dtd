@@ -17,7 +17,9 @@
 	value CDATA #IMPLIED
 	rows CDATA #IMPLIED
 	cols CDATA #IMPLIED
-	coltypes CDATA #IMPLIED >
+	coltypes CDATA #IMPLIED
+	follower_for CDATA #IMPLIED
+	follower_expr CDATA #IMPLIED >
 <!ELEMENT Part (PageHeader|PageFooter|ReportHeader|ReportFooter|pr)*>
 <!ATTLIST Part
 	layout CDATA #IMPLIED

@@ -137,7 +137,10 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 	xmlChar *name = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
 	xmlChar *datasource = xmlTextReaderGetAttribute(reader, (const xmlChar *)"datasource");
 	xmlChar *value = xmlTextReaderReadString(reader);
+	xmlChar *follower_for = xmlTextReaderGetAttribute(reader, (const xmlChar *)"follower_for");
+	xmlChar *follower_expr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"follower_expr");
 	ocrpt_datasource *ds;
+	ocrpt_query *q = NULL, *lq = NULL;
 	int ret, depth, nodetype;
 
 	/*
@@ -163,23 +166,50 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 
 		ocrpt_query_discover_array((char *)value, &arrayptr, (char *)coltypes, &coltypesptr);
 		if (arrayptr)
-			ocrpt_query_add_array(o, ds, (char *)name, (const char **)arrayptr, rows1, cols1, coltypesptr);
+			q = ocrpt_query_add_array(o, ds, (char *)name, (const char **)arrayptr, rows1, cols1, coltypesptr);
 		else
 			fprintf(stderr, "Cannot determine array pointer for array query\n");
 
 		xmlFree(rows);
 		xmlFree(cols);
 		xmlFree(coltypes);
+	} else if (ds->input == &ocrpt_csv_input) {
+		/* CSV datasource */
+		xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
+		void *coltypesptr;
+
+		ocrpt_query_discover_array(NULL, NULL, (char *)coltypes, &coltypesptr);
+		q = ocrpt_query_add_csv(o, ds, (char *)name, (const char *)value, coltypesptr);
+
+		xmlFree(coltypes);
 	}
 
 	/*
-	 * TODO: implement adding XML, JSON, CVS, PostgreSQL,
+	 * TODO: implement adding XML, JSON, PostgreSQL,
 	 * MariaDB and ODBC queries
 	 */
+
+	if (follower_for)
+		lq = ocrpt_query_find(o, (char *)follower_for);
+
+	if (lq && q) {
+		if (follower_expr) {
+			char *err = NULL;
+
+			ocrpt_expr *e = ocrpt_expr_parse(o, (char *)follower_expr, &err);
+			if (e) {
+				ocrpt_query_add_follower_n_to_1(o, lq, q, e);
+			} else
+				fprintf(stderr, "Cannot parse matching expression between queries \"%s\" and \"%s\": \"%s\"\n", follower_for, name, follower_expr);
+		} else
+			ocrpt_query_add_follower(o, lq, q);
+	}
 
 	xmlFree(name);
 	xmlFree(datasource);
 	xmlFree(value);
+	xmlFree(follower_for);
+	xmlFree(follower_expr);
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
@@ -247,6 +277,8 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	 */
 	if (!strcmp((char *)type, "array"))
 		ocrpt_datasource_add_array(o, (char *)name);
+	else if (!strcmp((char *)type, "csv"))
+		ocrpt_datasource_add_csv(o, (char *)name);
 
 	xmlFree(name);
 	xmlFree(type);

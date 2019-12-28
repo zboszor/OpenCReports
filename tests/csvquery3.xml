@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="csv" type="csv" />
+		<Datasource name="array" type="array" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="csv" value="csvquery.csv" coltypes="coltypes" />
+	</Queries>
+	<Queries>
+		<Query name="b" datasource="array" value="array2" coltypes="coltypes" rows="2" cols="5" follower_for="a" follower_expr="a.id = b.id" />
+	</Queries>
+</OpenCReport>
