@@ -56,6 +56,7 @@ tests/ocrpt_csv_test
 tests/ocrpt_csv_array_test
 tests/ocrpt_csv_xml_test
 tests/ocrpt_csv_array_xml_test
+tests/ocrpt_csv_array_xml2_test
 tests/ocrpt_break_test
 tests/ocrpt_paper_test
 

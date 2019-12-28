@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="csv" type="csv" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="csv" value="csvquery.csv" />
+	</Queries>
+</OpenCReport>
