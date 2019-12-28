@@ -87,7 +87,18 @@ struct ocrpt_query_result {
 };
 typedef struct ocrpt_query_result ocrpt_query_result;
 
+enum ocrpt_input_type {
+	OCRPT_INPUT_ARRAY,
+	OCRPT_INPUT_CSV,
+	OCRPT_INPUT_JSON,
+	OCRPT_INPUT_XML,
+	OCRPT_INPUT_POSTGRESQL,
+	OCRPT_INPUT_MARIADB,
+};
+typedef enum ocrpt_input_type ocrpt_input_type;
+
 struct ocrpt_input {
+	ocrpt_input_type type;
 	void (*describe)(ocrpt_query *, ocrpt_query_result **, int32_t *);
 	void (*rewind)(ocrpt_query *);
 	bool (*next)(ocrpt_query *);

@@ -14,9 +14,6 @@
 #include <opencreport.h>
 #include "opencreport-private.h"
 
-extern const ocrpt_input ocrpt_array_input;
-extern const ocrpt_input ocrpt_csv_input;
-
 struct ocrpt_datasource {
 	opencreport *o;
 	const ocrpt_input *input;

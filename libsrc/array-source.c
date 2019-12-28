@@ -167,7 +167,8 @@ static void ocrpt_array_free(ocrpt_query *query) {
 	query->priv = NULL;
 }
 
-const ocrpt_input ocrpt_array_input = {
+static const ocrpt_input ocrpt_array_input = {
+	.type = OCRPT_INPUT_ARRAY,
 	.describe = ocrpt_array_describe,
 	.rewind = ocrpt_array_rewind,
 	.next = ocrpt_array_next,
@@ -253,7 +254,7 @@ DLL_EXPORT_SYM void ocrpt_query_discover_array_c(const char *arrayname, void **a
 	dlclose(handle);
 }
 
-static void ocrpt_csv_free(ocrpt_query *query) {
+static void ocrpt_file_free(ocrpt_query *query) {
 	struct ocrpt_array_results *result = query->priv;
 	int32_t i;
 	int32_t max = (result->rows + 1) * result->cols;
@@ -266,13 +267,14 @@ static void ocrpt_csv_free(ocrpt_query *query) {
 	query->priv = NULL;
 }
 
-const ocrpt_input ocrpt_csv_input = {
+static const ocrpt_input ocrpt_csv_input = {
+	.type = OCRPT_INPUT_CSV,
 	.describe = ocrpt_array_describe,
 	.rewind = ocrpt_array_rewind,
 	.next = ocrpt_array_next,
 	.populate_result = ocrpt_array_populate_result,
 	.isdone = ocrpt_array_isdone,
-	.free = ocrpt_csv_free
+	.free = ocrpt_file_free
 };
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_csv(opencreport *o, const char *source_name) {

@@ -153,35 +153,44 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 		value = xmlTextReaderGetAttribute(reader, (const xmlChar *)"value");
 
 	ds = ocrpt_datasource_find(o, (char *)datasource);
-	if (ds->input == &ocrpt_array_input) {
-		/* Array datasource */
-		xmlChar *cols = xmlTextReaderGetAttribute(reader, (const xmlChar *)"cols");
-		xmlChar *rows = xmlTextReaderGetAttribute(reader, (const xmlChar *)"rows");
-		xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
-		void *arrayptr, *coltypesptr;
-		int32_t cols1, rows1;
+	switch (ds->input->type) {
+	case OCRPT_INPUT_ARRAY: {
+			xmlChar *cols = xmlTextReaderGetAttribute(reader, (const xmlChar *)"cols");
+			xmlChar *rows = xmlTextReaderGetAttribute(reader, (const xmlChar *)"rows");
+			xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
+			void *arrayptr, *coltypesptr;
+			int32_t cols1, rows1;
 
-		cols1 = atoi((char *)cols);
-		rows1 = atoi((char *)rows);
+			cols1 = atoi((char *)cols);
+			rows1 = atoi((char *)rows);
 
-		ocrpt_query_discover_array((char *)value, &arrayptr, (char *)coltypes, &coltypesptr);
-		if (arrayptr)
-			q = ocrpt_query_add_array(o, ds, (char *)name, (const char **)arrayptr, rows1, cols1, coltypesptr);
-		else
-			fprintf(stderr, "Cannot determine array pointer for array query\n");
+			ocrpt_query_discover_array((char *)value, &arrayptr, (char *)coltypes, &coltypesptr);
+			if (arrayptr)
+				q = ocrpt_query_add_array(o, ds, (char *)name, (const char **)arrayptr, rows1, cols1, coltypesptr);
+			else
+				fprintf(stderr, "Cannot determine array pointer for array query\n");
 
-		xmlFree(rows);
-		xmlFree(cols);
-		xmlFree(coltypes);
-	} else if (ds->input == &ocrpt_csv_input) {
-		/* CSV datasource */
-		xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
-		void *coltypesptr;
+			xmlFree(rows);
+			xmlFree(cols);
+			xmlFree(coltypes);
 
-		ocrpt_query_discover_array(NULL, NULL, (char *)coltypes, &coltypesptr);
-		q = ocrpt_query_add_csv(o, ds, (char *)name, (const char *)value, coltypesptr);
+			break;
+		}
 
-		xmlFree(coltypes);
+	case OCRPT_INPUT_CSV: {
+			xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
+			void *coltypesptr;
+
+			ocrpt_query_discover_array(NULL, NULL, (char *)coltypes, &coltypesptr);
+			q = ocrpt_query_add_csv(o, ds, (char *)name, (const char *)value, coltypesptr);
+
+			xmlFree(coltypes);
+			break;
+		}
+
+	default:
+		abort();
+		break;
 	}
 
 	/*
