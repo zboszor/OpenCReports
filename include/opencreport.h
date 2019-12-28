@@ -248,7 +248,7 @@ void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc,
 ocrpt_list *ocrpt_makelist1(const void *data);
 ocrpt_list *ocrpt_makelist(const void *data1, ...);
 ocrpt_list *ocrpt_list_last(ocrpt_list *l);
-ocrpt_list *ocrpt_list_end_append(ocrpt_list *l, ocrpt_list *e, const void *data);
+ocrpt_list *ocrpt_list_end_append(ocrpt_list *l, ocrpt_list **e, const void *data);
 ocrpt_list *ocrpt_list_append(ocrpt_list *l, const void *data);
 ocrpt_list *ocrpt_list_prepend(ocrpt_list *l, const void *data);
 ocrpt_list *ocrpt_list_remove(ocrpt_list *l, const void *data);
@@ -348,6 +348,16 @@ void ocrpt_query_discover_array_c(const char *arrayname, void **array, const cha
 ocrpt_query *ocrpt_query_add_array(opencreport *o, ocrpt_datasource *source,
 									const char *name, const char **array,
 									int32_t rows, int32_t cols,
+									const enum ocrpt_result_type *types);
+/*
+ * Add a CSV datasource
+ */
+ocrpt_datasource *ocrpt_datasource_add_csv(opencreport *o, const char *source_name);
+/*
+ * Add a CSV query
+ */
+ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource *source,
+									const char *name, const char *filename,
 									const enum ocrpt_result_type *types);
 /*
  * Find a query using its name

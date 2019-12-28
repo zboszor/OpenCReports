@@ -21,7 +21,8 @@ libopencreport_la_SOURCES = \
 	array-source.c navigation.c breaks.c
 
 libopencreport_la_LIBADD = \
-	$(MPFR_LIBS) $(PAPER_LIBS) $(UTF8PROC_LIBS) $(LIBXML_LIBS)
+	$(MPFR_LIBS) $(PAPER_LIBS) $(UTF8PROC_LIBS) $(LIBXML_LIBS) \
+	$(CSV_LIBS)
 
 libopencreport_la_LDFLAGS = \
 	-version-info $(OCRPT_LT_CURRENT):$(OCRPT_LT_REVISION):$(OCRPT_LT_AGE) \

@@ -18,18 +18,12 @@
 #include "datasource.h"
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const ocrpt_input *input) {
-	ocrpt_list *l;
 	ocrpt_datasource *s = NULL;
 
 	if (!o || !source_name || !*source_name || !input)
 		return NULL;
 
-	for (l = o->datasources; l; l = l->next) {
-		s = (ocrpt_datasource *)l->data;
-		if (strcmp(s->name, source_name) == 0)
-			break;
-	}
-
+	s = ocrpt_datasource_find(o, source_name);
 	if (s) {
 		if (s->input == input)
 			return s;
@@ -55,6 +49,9 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_find(opencreport *o, const char *source_name) {
 	ocrpt_list *ptr;
 
+	if (!o || !source_name)
+		return NULL;
+
 	for (ptr = o->datasources; ptr; ptr = ptr->next) {
 		ocrpt_datasource *s = (ocrpt_datasource *)ptr->data;
 		if (!strcmp(s->name, source_name))
@@ -66,6 +63,9 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_find(opencreport *o, const cha
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_validate(opencreport *o, ocrpt_datasource *source) {
 	ocrpt_list *ptr;
+
+	if (!o || !source)
+		return NULL;
 
 	for (ptr = o->datasources; ptr; ptr = ptr->next) {
 		if (ptr->data == source)

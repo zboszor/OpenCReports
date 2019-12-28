@@ -73,6 +73,14 @@ AC_CHECK_HEADERS(paper.h,,[AC_MSG_ERROR([libpaper header is not found])])
 AC_CHECK_LIB(paper, paperinit,[PAPER_LIBS="-lpaper"],[AC_MSG_ERROR([libpaper library is not found])])
 AC_SUBST(PAPER_LIBS)
 
+AC_CHECK_HEADERS(csv.h,,[AC_MSG_ERROR([libcsv headers not found!])])
+AC_CHECK_LIB(csv, csv_init,[CSV_LIBS=-lcsv],[AC_MSG_ERROR([libcsv library not found!])])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+	[[#include <csv.h>]],
+	[[int i = CSV_APPEND_NULL]])],,
+	[AC_MSG_ERROR([libcsv 3.0.0 or newer is required!])])
+AC_SUBST(CSV_LIBS)
+
 AC_CONFIG_FILES([
 	Makefile
 	opencreports.pc
