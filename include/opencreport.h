@@ -371,6 +371,16 @@ ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource *source,
 									const char *name, const char *filename,
 									const enum ocrpt_result_type *types);
 /*
+ * Add a JSON datasource
+ */
+ocrpt_datasource *ocrpt_datasource_add_json(opencreport *o, const char *source_name);
+/*
+ * Add a JSON query
+ */
+ocrpt_query *ocrpt_query_add_json(opencreport *o, ocrpt_datasource *source,
+									const char *name, const char *filename,
+									const enum ocrpt_result_type *types);
+/*
  * Find a query using its name
  */
 ocrpt_query *ocrpt_query_find(opencreport *o, const char *name);

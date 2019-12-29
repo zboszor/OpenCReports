@@ -57,6 +57,13 @@ tests/ocrpt_csv_array_test
 tests/ocrpt_csv_xml_test
 tests/ocrpt_csv_array_xml_test
 tests/ocrpt_csv_array_xml2_test
+tests/ocrpt_json_test
+tests/ocrpt_json2_test
+tests/ocrpt_json3_test
+tests/ocrpt_json4_test
+tests/ocrpt_json5_test
+tests/ocrpt_json_xml_test
+tests/ocrpt_json_xml2_test
 tests/ocrpt_break_test
 tests/ocrpt_paper_test
 

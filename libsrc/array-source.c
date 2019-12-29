@@ -17,6 +17,8 @@
 #include <unistd.h>
 
 #include <csv.h>
+#include <yajl/yajl_parse.h>
+#include <yajl/yajl_gen.h>
 
 #include "opencreport-private.h"
 #include "datasource.h"
@@ -29,8 +31,9 @@ struct ocrpt_array_results {
 	int32_t rows;
 	int32_t cols;
 	int32_t current_row;
-	bool atstart;
-	bool isdone;
+	bool atstart:1;
+	bool isdone:1;
+	bool free_types:1;
 };
 
 static void ocrpt_array_describe(ocrpt_query *query, ocrpt_query_result **qresult, int32_t *cols) {
@@ -181,7 +184,9 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, cons
 	return ocrpt_datasource_add(o, source_name, &ocrpt_array_input);
 }
 
-static ocrpt_query *array_query_add(opencreport *o, const ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
+static ocrpt_query *array_query_add(opencreport *o, const ocrpt_datasource *source, const char *name,
+									const char **array, int32_t rows, int32_t cols,
+									const enum ocrpt_result_type *types, bool free_types) {
 	ocrpt_query *query;
 	struct ocrpt_array_results *priv;
 
@@ -206,6 +211,7 @@ static ocrpt_query *array_query_add(opencreport *o, const ocrpt_datasource *sour
 	priv->current_row = 0;
 	priv->atstart = true;
 	priv->isdone = false;
+	priv->free_types = free_types;
 	query->priv = priv;
 
 	return query;
@@ -217,12 +223,12 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(opencreport *o, ocrpt_datasour
 		return NULL;
 	}
 
-	if (source->input != &ocrpt_array_input) {
+	if (source->input->type != OCRPT_INPUT_ARRAY) {
 		fprintf(stderr, "%s:%d: datasource is not array\n", __func__, __LINE__);
 		return NULL;
 	}
 
-	return array_query_add(o, source, name, array, rows, cols, types);
+	return array_query_add(o, source, name, array, rows, cols, types, false);
 }
 
 DLL_EXPORT_SYM ocrpt_query_discover_func ocrpt_query_discover_array = ocrpt_query_discover_array_c;
@@ -262,6 +268,8 @@ static void ocrpt_file_free(ocrpt_query *query) {
 	for (i = 0; i < max; i++)
 		ocrpt_mem_free(result->data[i]);
 
+	if (result->free_types)
+		ocrpt_mem_free(result->types);
 	ocrpt_mem_free(result->data);
 	ocrpt_mem_free(query->priv);
 	query->priv = NULL;
@@ -281,16 +289,30 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_csv(opencreport *o, const 
 	return ocrpt_datasource_add(o, source_name, &ocrpt_csv_input);
 }
 
+/*
+ * Common structure for all file based query types'
+ * internal processing
+ */
 struct ocrpt_file_query {
 	ocrpt_list *rowlist;
 	ocrpt_list *row_last;
 	ocrpt_list *collist;
 	ocrpt_list *col_last;
+	const char **names;
+	const char **fields;
 	enum ocrpt_result_type *types;
 	int32_t rows;
 	int32_t cols;
+	int32_t depth;
+	int32_t current_col;
 	bool firstrow:1;
 	bool firstcol:1;
+	bool inheader:1;
+	bool incoltypes:1;
+	bool coltypesset:1;
+	bool inrows:1;
+	bool inrow:1;
+	bool inrowvalue:1;
 };
 typedef struct ocrpt_file_query ocrpt_file_query;
 
@@ -323,7 +345,8 @@ static void csv_parser_eol_cb(int eolchar UNUSED, void *user_data) {
 	struct ocrpt_file_query *fq = user_data;
 
 	fq->rows++;
-	fq->firstrow = false;
+	if (fq->firstrow)
+		fq->firstrow = false;
 	fq->firstcol = true;
 	fq->collist = NULL;
 	fq->col_last = NULL;
@@ -331,6 +354,17 @@ static void csv_parser_eol_cb(int eolchar UNUSED, void *user_data) {
 
 static void ocrpt_file_query_free_rows(const void *ptr) {
 	ocrpt_list_free_deep((ocrpt_list *)ptr, ocrpt_mem_free);
+}
+
+static void ocrpt_file_query_free(ocrpt_file_query *fq, bool in_error) {
+	ocrpt_mem_free(fq->names);
+	ocrpt_mem_free(fq->fields);
+
+	if (in_error) {
+		ocrpt_mem_free(fq->types);
+		ocrpt_list_free_deep(fq->rowlist, ocrpt_file_query_free_rows);
+	} else
+		ocrpt_list_free_deep(fq->rowlist, (ocrpt_mem_free_t)ocrpt_list_free);
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource *source,
@@ -341,7 +375,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource
 	char *buf;
 	const char **array;
 	ocrpt_query *retval;
-	ocrpt_file_query *fq;
+	ocrpt_file_query fq = {};
 	ocrpt_list *rowptr;
 	size_t parser_retval;
 	int32_t fd, row;
@@ -351,7 +385,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource
 		return NULL;
 	}
 
-	if (source->input != &ocrpt_csv_input) {
+	if (source->input->type != OCRPT_INPUT_CSV) {
 		fprintf(stderr, "%s:%d: datasource is not csv\n", __func__, __LINE__);
 		return NULL;
 	}
@@ -389,24 +423,15 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource
 		return NULL;
 	}
 
-	fq = ocrpt_mem_malloc(sizeof(ocrpt_file_query));
-	if (!fq) {
-		ocrpt_mem_free(buf);
-		csv_free(&csv);
-		fprintf(stderr, "%s: out of memory\n", __func__);
-		return NULL;
-	}
+	memset(&fq, 0, sizeof(ocrpt_file_query));
+	fq.firstrow = true;
+	fq.firstcol = true;
 
-	memset(fq, 0, sizeof(ocrpt_file_query));
-	fq->firstrow = true;
-	fq->firstcol = true;
-
-	parser_retval = csv_parse(&csv, buf, st.st_size, csv_parser_field_cb, csv_parser_eol_cb, fq);
+	parser_retval = csv_parse(&csv, buf, st.st_size, csv_parser_field_cb, csv_parser_eol_cb, &fq);
 	if (parser_retval != st.st_size) {
 		ocrpt_mem_free(buf);
 		csv_free(&csv);
-		ocrpt_list_free_deep(fq->rowlist, ocrpt_file_query_free_rows);
-		ocrpt_mem_free(fq);
+		ocrpt_file_query_free(&fq, true);
 		fprintf(stderr, "%s: parsing CSV file \"%s\" failed\n", __func__, filename);
 		return NULL;
 	}
@@ -415,29 +440,350 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource
 
 	ocrpt_mem_free(buf);
 
-	array = ocrpt_mem_malloc(fq->rows * fq->cols * sizeof(char *));
+	array = ocrpt_mem_malloc(fq.rows * fq.cols * sizeof(char *));
 	if (!array) {
-		ocrpt_list_free_deep(fq->rowlist, ocrpt_file_query_free_rows);
-		ocrpt_mem_free(fq);
+		ocrpt_file_query_free(&fq, true);
 		fprintf(stderr, "%s: out of memory\n", __func__);
 		return NULL;
 	}
 
-	for (rowptr = fq->rowlist, row = 0; rowptr; rowptr = rowptr->next, row++) {
+	for (rowptr = fq.rowlist, row = 0; rowptr; rowptr = rowptr->next, row++) {
 		const ocrpt_list *colptr;
 		int32_t col;
 
 		for (colptr = rowptr->data, col = 0; colptr; colptr = colptr->next, col++)
-			array[row * fq->cols + col] = colptr->data;
+			array[row * fq.cols + col] = colptr->data;
 
-		for (; col < fq->cols; col++)
-			array[row * fq->cols + col] = NULL;
+		for (; col < fq.cols; col++)
+			array[row * fq.cols + col] = NULL;
 	}
 
-	retval = array_query_add(o, source, name, array, fq->rows - 1, fq->cols, types);
+	retval = array_query_add(o, source, name, array, fq.rows - 1, fq.cols, types, false);
 
-	ocrpt_list_free_deep(fq->rowlist, (ocrpt_mem_free_t)ocrpt_list_free);
-	ocrpt_mem_free(fq);
+	ocrpt_file_query_free(&fq, false);
+
+	return retval;
+}
+
+static const ocrpt_input ocrpt_json_input = {
+	.type = OCRPT_INPUT_JSON,
+	.describe = ocrpt_array_describe,
+	.rewind = ocrpt_array_rewind,
+	.next = ocrpt_array_next,
+	.populate_result = ocrpt_array_populate_result,
+	.isdone = ocrpt_array_isdone,
+	.free = ocrpt_file_free
+};
+
+DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_json(opencreport *o, const char *source_name) {
+	return ocrpt_datasource_add(o, source_name, &ocrpt_json_input);
+}
+
+static int ocrpt_yajl_null(void *ctx) {
+	return false;
+}
+
+static int ocrpt_yajl_set_field(ocrpt_file_query *fq, const char *str, size_t len) {
+	char *field;
+
+	if (fq->depth == 3 && fq->inrows && fq->inrowvalue) {
+		/* Ignore unknown elements */
+		if (fq->current_col < 0)
+			return true;
+		field = ocrpt_mem_malloc(len + 1);
+		if (field) {
+			char *end = stpncpy(field, (char *)str, len);
+			*end = 0;
+		}
+		ocrpt_mem_free(fq->fields[fq->current_col]);
+		fq->fields[fq->current_col] = field;
+		fq->inrowvalue = false;
+		return true;
+	}
+	return false;
+}
+
+static int ocrpt_yajl_number(void *ctx, const char *str, size_t len) {
+	ocrpt_file_query *fq = ctx;
+
+	return ocrpt_yajl_set_field(fq, str, len);
+}
+
+static int ocrpt_yajl_string(void *ctx, const unsigned char *str, size_t len) {
+	ocrpt_file_query *fq = ctx;
+	char *field;
+
+	if (fq->depth == 2 && fq->inheader) {
+		field = ocrpt_mem_malloc(len + 1);
+
+		if (field) {
+			char *end = stpncpy(field, (char *)str, len);
+			*end = 0;
+		}
+
+		fq->collist = ocrpt_list_end_append(fq->collist, &fq->col_last, field);
+		fq->cols++;
+		return true;
+	} else if (fq->depth == 2 && fq->incoltypes) {
+		/* Ignore excess elements in "coltypes" */
+		if (fq->current_col >= fq->cols)
+			return true;
+		if (!strncmp((char *)str, "string", len)) {
+			fq->types[fq->current_col++] = OCRPT_RESULT_STRING;
+			fq->coltypesset = true;
+			return true;
+		}
+		if (!strncmp((char *)str, "number", len)) {
+			fq->types[fq->current_col++] = OCRPT_RESULT_NUMBER;
+			fq->coltypesset = true;
+			return true;
+		}
+		if (!strncmp((char *)str, "datetime", len)) {
+			fq->types[fq->current_col++] = OCRPT_RESULT_DATETIME;
+			fq->coltypesset = true;
+			return true;
+		}
+	} else if (ocrpt_yajl_set_field(fq, (char *)str, len))
+		return true;
+
+	return false;
+}
+
+static int ocrpt_yajl_map_key(void *ctx, const unsigned char *str, size_t len) {
+	ocrpt_file_query *fq = ctx;
+
+	if (fq->depth == 1 && !strncmp((char *)str, "columns", len)) {
+		fq->inheader = true;
+		return true;
+	} else if (fq->depth == 1 && !strncmp((char *)str, "coltypes", len)) {
+		fq->incoltypes = true;
+		return true;
+	} else if (fq->depth == 1 && !strncmp((char *)str, "rows", len)) {
+		fq->inrows = true;
+		return true;
+	} else if (fq->depth == 3 && fq->inrows) {
+		int32_t i;
+
+		fq->current_col = -1;
+		fq->inrowvalue = true;
+		for (i = 0; i < fq->cols; i++) {
+			if (!strncmp(fq->names[i], (char *)str, len)) {
+				fq->current_col = i;
+				break;
+			}
+		}
+		return true;
+	}
+
+	return false;
+}
+
+static int ocrpt_yajl_start_map(void *ctx) {
+	ocrpt_file_query *fq = ctx;
+	fq->depth++;
+
+	if (fq->depth == 1 && !fq->inheader && !fq->incoltypes && !fq->inrows && !fq->inrow)
+		return true;
+	if (fq->depth == 3 && fq->inrows && !fq->inrow) {
+		fq->inrow = true;
+		return true;
+	}
+
+	return false;
+}
+
+static int ocrpt_yajl_end_map(void *ctx) {
+	ocrpt_file_query *fq = ctx;
+
+	fq->depth--;
+
+	if (fq->depth == 0 && !fq->inheader && !fq->incoltypes && !fq->inrows && !fq->inrow)
+		return true;
+	if (fq->depth == 1) {
+		if (fq->inrows)
+			fq->inrows = false;
+	} if (fq->depth == 2 && fq->inrows && fq->inrow) {
+		int32_t i;
+
+		for (i = 0; i < fq->cols; i++) {
+			fq->collist = ocrpt_list_end_append(fq->collist, &fq->col_last, fq->fields[i]);
+			fq->fields[i] = NULL;
+		}
+
+		fq->rowlist = ocrpt_list_end_append(fq->rowlist, &fq->row_last, fq->collist);
+		fq->collist = NULL;
+		fq->col_last = NULL;
+		fq->rows++;
+		fq->inrow = false;
+		return true;
+	}
+
+	return false;
+}
+
+static int ocrpt_yajl_start_array(void *ctx) {
+	ocrpt_file_query *fq = ctx;
+	fq->depth++;
+
+	if (fq->depth == 2) {
+		if (fq->inheader && !fq->incoltypes && !fq->inrows)
+			return true;
+		if (!fq->inheader && fq->incoltypes && !fq->inrows)
+			return true;
+		if (!fq->inheader && !fq->incoltypes && fq->inrows)
+			return true;
+	}
+
+	return false;
+}
+
+static int ocrpt_yajl_end_array(void *ctx) {
+	ocrpt_file_query *fq = ctx;
+	int32_t i;
+
+	fq->depth--;
+
+	if (fq->depth == 1) {
+		if (fq->inheader) {
+			const ocrpt_list *ptr;
+
+			fq->names = ocrpt_mem_malloc(fq->cols * sizeof(char *));
+			fq->fields = ocrpt_mem_malloc(fq->cols * sizeof(char *));
+			for (ptr = fq->collist, i = 0; ptr; ptr = ptr->next, i++) {
+				fq->names[i] = ptr->data;
+				fq->fields[i] = NULL;
+			}
+
+			fq->types = ocrpt_mem_malloc(fq->cols * sizeof(enum ocrpt_result_type));
+			for (i = 0; i < fq->cols; i++)
+				fq->types[i] = OCRPT_RESULT_STRING;
+
+			fq->rowlist = ocrpt_list_end_append(fq->rowlist, &fq->row_last, fq->collist);
+			fq->collist = NULL;
+			fq->col_last = NULL;
+			fq->rows++;
+
+			fq->inheader = false;
+			return true;
+		}
+		if (fq->incoltypes) {
+			fq->incoltypes = false;
+			return true;
+		}
+		if (fq->inrows) {
+			fq->inrows = false;
+			return true;
+		}
+		
+	}
+
+	return false;
+}
+
+static yajl_callbacks ocrpt_yajl_cb = {
+	ocrpt_yajl_null,
+	NULL, /* boolean */
+	NULL, /* integer */
+	NULL, /* double */
+	ocrpt_yajl_number,
+	ocrpt_yajl_string,
+	ocrpt_yajl_start_map,
+	ocrpt_yajl_map_key,
+	ocrpt_yajl_end_map,
+	ocrpt_yajl_start_array,
+	ocrpt_yajl_end_array
+};
+
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(opencreport *o, ocrpt_datasource *source,
+												const char *name, const char *filename,
+												const enum ocrpt_result_type *types) {
+	struct stat st;
+	char *buf;
+	const char **array;
+	ocrpt_query *retval;
+	ocrpt_file_query fq;
+	yajl_status yajl_stat;
+	yajl_handle yhandler;
+	ocrpt_list *rowptr;
+	int32_t fd, row;
+
+	if (!ocrpt_datasource_validate(o, source)) {
+		fprintf(stderr, "%s:%d: datasource is not for this opencreport structure\n", __func__, __LINE__);
+		return NULL;
+	}
+
+	if (source->input->type != OCRPT_INPUT_JSON) {
+		fprintf(stderr, "%s:%d: datasource is not json\n", __func__, __LINE__);
+		return NULL;
+	}
+
+	if (stat(filename, &st) != 0) {
+		fprintf(stderr, "%s: error opening file\n", __func__);
+		return NULL;
+	}
+
+	fd = open(filename, O_RDONLY);
+	if (fd < 0) {
+		fprintf(stderr, "%s: error opening file\n", __func__);
+		return NULL;
+	}
+
+	buf = ocrpt_mem_malloc(st.st_size);
+	if (!buf) {
+		close(fd);
+		fprintf(stderr, "%s: out of memory\n", __func__);
+		return NULL;
+	}
+
+	if (read(fd, buf, st.st_size) != st.st_size) {
+		close(fd);
+		ocrpt_mem_free(buf);
+		fprintf(stderr, "%s: error reading file\n", __func__);
+		return NULL;
+	}
+
+	close(fd);
+
+	memset(&fq, 0, sizeof(ocrpt_file_query));
+
+	yhandler = yajl_alloc(&ocrpt_yajl_cb, NULL, (void *) &fq);
+	yajl_config(yhandler, yajl_allow_comments, 1);
+
+	yajl_stat = yajl_parse(yhandler, (unsigned char *)buf, st.st_size);
+	if (yajl_stat != yajl_status_ok) {
+		ocrpt_file_query_free(&fq, true);
+		yajl_free(yhandler);
+		ocrpt_mem_free(buf);
+		return NULL;
+	}
+
+	ocrpt_mem_free(buf);
+
+	yajl_free(yhandler);
+
+	array = ocrpt_mem_malloc(fq.rows * fq.cols * sizeof(char *));
+	if (!array) {
+		ocrpt_file_query_free(&fq, true);
+		fprintf(stderr, "%s: out of memory\n", __func__);
+		return NULL;
+	}
+
+	for (rowptr = fq.rowlist, row = 0; rowptr; rowptr = rowptr->next, row++) {
+		const ocrpt_list *colptr;
+		int32_t col;
+
+		for (colptr = rowptr->data, col = 0; colptr; colptr = colptr->next, col++)
+			array[row * fq.cols + col] = colptr->data;
+
+		for (; col < fq.cols; col++)
+			array[row * fq.cols + col] = NULL;
+	}
+
+	retval = array_query_add(o, source, name, array, fq.rows - 1, fq.cols, (fq.coltypesset ? fq.types : types), fq.coltypesset);
+
+	ocrpt_file_query_free(&fq, false);
+	if (fq.types && !fq.coltypesset)
+		ocrpt_mem_free(fq.types);
 
 	return retval;
 }

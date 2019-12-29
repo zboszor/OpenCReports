@@ -1,0 +1,9 @@
+{
+	"columns": ["id", "name", "property", "age", "adult"],
+	"coltypes": ["number", "string", "string", "number" ],
+	"rows": [
+		{ "id": 1, "name": "Fred Flintstone", "property": "strong", "age": 31, "adult": "yes" },
+		{ "id": 2, "name": "Wilma Flintstone", "property": "charming", "age": 28, "adult": "yes" },
+		{ "id": 2, "name": "Pebbles Flintstone", "property": "young", "age": "5e-1", "adult": "no" }
+	]
+}

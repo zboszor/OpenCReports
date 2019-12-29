@@ -81,6 +81,10 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
 	[AC_MSG_ERROR([libcsv 3.0.0 or newer is required!])])
 AC_SUBST(CSV_LIBS)
 
+PKG_CHECK_MODULES(YAJL, yajl)
+AC_SUBST(YAJL_CFLAGS)
+AC_SUBST(YAJL_LIBS)
+
 AC_CONFIG_FILES([
 	Makefile
 	opencreports.pc

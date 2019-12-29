@@ -188,31 +188,45 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 			break;
 		}
 
+	case OCRPT_INPUT_JSON: {
+			xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
+			void *coltypesptr;
+
+			ocrpt_query_discover_array(NULL, NULL, (char *)coltypes, &coltypesptr);
+			q = ocrpt_query_add_json(o, ds, (char *)name, (const char *)value, coltypesptr);
+
+			xmlFree(coltypes);
+			break;
+		}
+
 	default:
 		abort();
 		break;
 	}
 
 	/*
-	 * TODO: implement adding XML, JSON, PostgreSQL,
+	 * TODO: implement adding XML, PostgreSQL,
 	 * MariaDB and ODBC queries
 	 */
 
-	if (follower_for)
-		lq = ocrpt_query_find(o, (char *)follower_for);
+	if (q) {
+		if (follower_for)
+			lq = ocrpt_query_find(o, (char *)follower_for);
 
-	if (lq && q) {
-		if (follower_expr) {
-			char *err = NULL;
+		if (lq) {
+			if (follower_expr) {
+				char *err = NULL;
 
-			ocrpt_expr *e = ocrpt_expr_parse(o, (char *)follower_expr, &err);
-			if (e) {
-				ocrpt_query_add_follower_n_to_1(o, lq, q, e);
+				ocrpt_expr *e = ocrpt_expr_parse(o, (char *)follower_expr, &err);
+				if (e) {
+					ocrpt_query_add_follower_n_to_1(o, lq, q, e);
+				} else
+					fprintf(stderr, "Cannot parse matching expression between queries \"%s\" and \"%s\": \"%s\"\n", follower_for, name, follower_expr);
 			} else
-				fprintf(stderr, "Cannot parse matching expression between queries \"%s\" and \"%s\": \"%s\"\n", follower_for, name, follower_expr);
-		} else
-			ocrpt_query_add_follower(o, lq, q);
-	}
+				ocrpt_query_add_follower(o, lq, q);
+		}
+	} else
+		fprintf(stderr, "cannot add query \"%s\"\n", name);
 
 	xmlFree(name);
 	xmlFree(datasource);
@@ -288,6 +302,8 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 		ocrpt_datasource_add_array(o, (char *)name);
 	else if (!strcmp((char *)type, "csv"))
 		ocrpt_datasource_add_csv(o, (char *)name);
+	else if (!strcmp((char *)type, "json"))
+		ocrpt_datasource_add_json(o, (char *)name);
 
 	xmlFree(name);
 	xmlFree(type);
