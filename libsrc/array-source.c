@@ -308,6 +308,7 @@ struct ocrpt_file_query {
 	bool firstrow:1;
 	bool firstcol:1;
 	bool inheader:1;
+	bool headerset:1;
 	bool incoltypes:1;
 	bool coltypesset:1;
 	bool inrows:1;
@@ -532,17 +533,14 @@ static int ocrpt_yajl_string(void *ctx, const unsigned char *str, size_t len) {
 			return true;
 		if (!strncmp((char *)str, "string", len)) {
 			fq->types[fq->current_col++] = OCRPT_RESULT_STRING;
-			fq->coltypesset = true;
 			return true;
 		}
 		if (!strncmp((char *)str, "number", len)) {
 			fq->types[fq->current_col++] = OCRPT_RESULT_NUMBER;
-			fq->coltypesset = true;
 			return true;
 		}
 		if (!strncmp((char *)str, "datetime", len)) {
 			fq->types[fq->current_col++] = OCRPT_RESULT_DATETIME;
-			fq->coltypesset = true;
 			return true;
 		}
 	} else if (ocrpt_yajl_set_field(fq, (char *)str, len))
@@ -554,13 +552,13 @@ static int ocrpt_yajl_string(void *ctx, const unsigned char *str, size_t len) {
 static int ocrpt_yajl_map_key(void *ctx, const unsigned char *str, size_t len) {
 	ocrpt_file_query *fq = ctx;
 
-	if (fq->depth == 1 && !strncmp((char *)str, "columns", len)) {
+	if (fq->depth == 1 && (!strncmp((char *)str, "columns", len) || !strncmp((char *)str, "fields", len)) && !fq->headerset) {
 		fq->inheader = true;
 		return true;
-	} else if (fq->depth == 1 && !strncmp((char *)str, "coltypes", len)) {
+	} else if (fq->depth == 1 && !strncmp((char *)str, "coltypes", len) && fq->headerset && !fq->coltypesset) {
 		fq->incoltypes = true;
 		return true;
-	} else if (fq->depth == 1 && !strncmp((char *)str, "rows", len)) {
+	} else if (fq->depth == 1 && !strncmp((char *)str, "rows", len) && fq->headerset) {
 		fq->inrows = true;
 		return true;
 	} else if (fq->depth == 3 && fq->inrows) {
@@ -666,10 +664,12 @@ static int ocrpt_yajl_end_array(void *ctx) {
 			fq->rows++;
 
 			fq->inheader = false;
+			fq->headerset = true;
 			return true;
 		}
 		if (fq->incoltypes) {
 			fq->incoltypes = false;
+			fq->coltypesset = true;
 			return true;
 		}
 		if (fq->inrows) {

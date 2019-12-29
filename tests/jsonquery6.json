@@ -1,0 +1,10 @@
+{
+	"columns": ["id", "name", "property", "age", "adult"],
+	"coltypes": ["number", "string", "string", "number", "number", "datetime" ],
+	"fields": ["id", "name", "property", "age", "adult"],
+	"rows": [
+		{ "id": 1, "name": "Fred Flintstone", "property": "strong", "age": 31, "adult": "yes", "ignored": "ignored" },
+		{ "id": 2, "name": "Wilma Flintstone", "age": 28, "adult": "yes" },
+		{ "id": 2, "name": "Pebbles Flintstone", "property": "young", "age": "5e-1", "adult": "no", "age": "3" }
+	]
+}

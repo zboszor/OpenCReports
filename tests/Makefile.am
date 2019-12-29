@@ -9,6 +9,7 @@ noinst_PROGRAMS = \
 	ocrpt_csv_test ocrpt_csv2_test ocrpt_csv_array_test \
 	ocrpt_csv_xml_test ocrpt_csv_array_xml_test ocrpt_csv_array_xml2_test \
 	ocrpt_json_test ocrpt_json2_test ocrpt_json3_test ocrpt_json4_test ocrpt_json5_test \
+	ocrpt_json6_test ocrpt_json7_test ocrpt_json8_test \
 	ocrpt_json_xml_test ocrpt_json_xml2_test \
 	ocrpt_break_test ocrpt_paper_test
 
@@ -85,6 +86,21 @@ ocrpt_json5_test_SOURCES = ocrpt_json5_test.c
 ocrpt_json5_test_CFLAGS = -rdynamic
 ocrpt_json5_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_json5_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_json6_test_SOURCES = ocrpt_json6_test.c
+ocrpt_json6_test_CFLAGS = -rdynamic
+ocrpt_json6_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_json6_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_json7_test_SOURCES = ocrpt_json7_test.c
+ocrpt_json7_test_CFLAGS = -rdynamic
+ocrpt_json7_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_json7_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_json8_test_SOURCES = ocrpt_json8_test.c
+ocrpt_json8_test_CFLAGS = -rdynamic
+ocrpt_json8_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_json8_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_json_xml_test_SOURCES = ocrpt_json_xml_test.c
 ocrpt_json_xml_test_CFLAGS = -rdynamic
