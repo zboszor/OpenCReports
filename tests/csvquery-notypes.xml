@@ -2,9 +2,9 @@
 <!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
 <OpenCReport>
 	<Datasources>
-		<Datasource name="csv" type="csv" />
+		<Datasource name="mycsv" type="csv" />
 	</Datasources>
 	<Queries>
-		<Query name="a" datasource="csv" value="csvquery.csv" />
+		<Query name="a" datasource="mycsv" value="csvquery.csv" />
 	</Queries>
 </OpenCReport>
