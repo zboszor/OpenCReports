@@ -6,5 +6,5 @@ includedir=@sicom_includedir@
 Name: opencreports
 Description: OpenCReports library
 Version: @VERSION@
-Libs: -rdynamic -L${libdir} -lopencreport
-Cflags: -I${includedir}
+Libs: -L${libdir} -lopencreport
+Cflags: -I${includedir} -rdynamic
