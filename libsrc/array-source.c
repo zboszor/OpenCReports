@@ -318,15 +318,17 @@ typedef struct ocrpt_file_query ocrpt_file_query;
 
 static void csv_parser_field_cb(void *field_ptr, size_t field_sz, void *user_data) {
 	struct ocrpt_file_query *fq = user_data;
-	char *field;
+	char *field = NULL;
 
 	if (!fq->firstrow && (ocrpt_list_length(fq->collist) >= fq->cols))
 		return;
 
-	field = ocrpt_mem_malloc(field_sz + 1);
-	if (field) {
-		char *end = stpncpy(field, field_ptr, field_sz);
-		*end = 0;
+	if (field_ptr) {
+		field = ocrpt_mem_malloc(field_sz + 1);
+		if (field) {
+			char *end = stpncpy(field, field_ptr, field_sz);
+			*end = 0;
+		}
 	}
 
 	if (fq->firstcol) {
@@ -417,7 +419,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource
 
 	close(fd);
 
-	if (csv_init(&csv, CSV_STRICT | CSV_REPALL_NL | CSV_STRICT_FINI | CSV_APPEND_NULL) != 0) {
+	if (csv_init(&csv, CSV_STRICT | CSV_REPALL_NL | CSV_STRICT_FINI | CSV_APPEND_NULL | CSV_EMPTY_IS_NULL) != 0) {
 		ocrpt_mem_free(buf);
 		fprintf(stderr, "%s: error initializing CSV parser\n", __func__);
 		return NULL;

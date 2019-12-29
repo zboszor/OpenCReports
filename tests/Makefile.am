@@ -6,7 +6,7 @@ $(top_builddir)/libsrc/libopencreport.la:
 noinst_PROGRAMS = \
 	ocrpt_grammar_test ocrpt_expr_test \
 	ocrpt_array_test ocrpt_array_resolve_test ocrpt_array_xml_test \
-	ocrpt_csv_test ocrpt_csv_array_test \
+	ocrpt_csv_test ocrpt_csv2_test ocrpt_csv_array_test \
 	ocrpt_csv_xml_test ocrpt_csv_array_xml_test ocrpt_csv_array_xml2_test \
 	ocrpt_json_test ocrpt_json2_test ocrpt_json3_test ocrpt_json4_test ocrpt_json5_test \
 	ocrpt_json_xml_test ocrpt_json_xml2_test \
@@ -37,6 +37,10 @@ ocrpt_array_xml_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_csv_test_SOURCES = ocrpt_csv_test.c
 ocrpt_csv_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_csv_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_csv2_test_SOURCES = ocrpt_csv2_test.c
+ocrpt_csv2_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_csv2_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_csv_array_test_SOURCES = ocrpt_csv_array_test.c
 ocrpt_csv_array_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
