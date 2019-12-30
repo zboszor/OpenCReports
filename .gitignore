@@ -75,6 +75,10 @@ tests/ocrpt_xml4_test
 tests/ocrpt_xml5_test
 tests/ocrpt_xml_xml_test
 tests/ocrpt_xml_xml2_test
+tests/ocrpt_pgsql_test
+tests/ocrpt_pgsql2_test
+tests/ocrpt_pgsql_xml_test
+tests/ocrpt_pgsql_xml2_test
 tests/ocrpt_break_test
 tests/ocrpt_paper_test
 

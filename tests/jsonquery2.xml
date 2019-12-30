@@ -2,9 +2,9 @@
 <!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
 <OpenCReport>
 	<Datasources>
-		<Datasource name="myjson" type="json" />
+		<Datasource name="myjson" type="'json'" />
 	</Datasources>
 	<Queries>
-		<Query name="a" datasource="myjson" value="jsonquery2.json" />
+		<Query name="a" datasource="myjson" value="'jsonquery2.json'" />
 	</Queries>
 </OpenCReport>

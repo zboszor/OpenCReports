@@ -110,10 +110,10 @@ int main(void) {
 
 	printf("--- END ---\n");
 
-	ocrpt_free_expr(id);
-	ocrpt_free_expr(name);
-	ocrpt_free_expr(age);
-	ocrpt_free_expr(adult);
+	ocrpt_expr_free(id);
+	ocrpt_expr_free(name);
+	ocrpt_expr_free(age);
+	ocrpt_expr_free(adult);
 
 	/* ocrpt_free() will free it */
 	//ocrpt_free_query(o, q);

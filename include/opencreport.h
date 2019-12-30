@@ -32,6 +32,13 @@ enum ocrpt_result_type {
 	OCRPT_RESULT_DATETIME
 };
 
+enum ocrpt_varref_type {
+	OCRPT_VARREF_MVAR  = (1 << 0),
+	OCRPT_VARREF_RVAR  = (1 << 1),
+	OCRPT_VARREF_IDENT = (1 << 2),
+	OCRPT_VARREF_VVAR  = (1 << 3)
+};
+
 struct ocrpt_list {
 	struct ocrpt_list *next;
 	const void *data;
@@ -167,6 +174,11 @@ void ocrpt_expr_optimize(opencreport *o, ocrpt_expr *e);
  */
 void ocrpt_expr_resolve(opencreport *o, ocrpt_expr *e);
 /*
+ * Resolve variable references in the expression
+ * with excluding certain variable reference types
+ */
+void ocrpt_expr_resolve_exclude(opencreport *o, ocrpt_expr *e, int32_t varref_exclude_mask);
+/*
  * Evaluate the expression, i.e. compute its ocrpt_result
  * It must be called after ocrpt_query_navigate_next(), see below.
  */
@@ -196,7 +208,7 @@ int32_t ocrpt_expr_nodes(ocrpt_expr *e);
 /*
  * Free an expression parse tree
  */
-void ocrpt_free_expr(ocrpt_expr *e);
+void ocrpt_expr_free(ocrpt_expr *e);
 
 /***************************
  * Break related functions *
@@ -391,6 +403,16 @@ ocrpt_datasource *ocrpt_datasource_add_xml(opencreport *o, const char *source_na
 ocrpt_query *ocrpt_query_add_xml(opencreport *o, ocrpt_datasource *source,
 									const char *name, const char *filename,
 									const enum ocrpt_result_type *types);
+/*
+ * Add a PostgreSQL datasource using separate connection parameters
+ */
+ocrpt_datasource *ocrpt_datasource_add_postgresql(opencreport *o, const char *source_name,
+												const char *host, const char *port, const char *dbname,
+												const char *user, const char *password);
+/*
+ * Add a PostgreSQL datasource using a connection info string
+ */
+ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o, const char *source_name, const char *conninfo);
 /*
  * Find a query using its name
  */

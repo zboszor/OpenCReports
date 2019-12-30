@@ -2,11 +2,11 @@
 <!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
 <OpenCReport>
 	<Datasources>
-		<Datasource name="mycsv" type="csv" />
-		<Datasource name="myarray" type="array" />
+		<Datasource name="mycsv" type="'csv'" />
+		<Datasource name="myarray" type="'array'" />
 	</Datasources>
 	<Queries>
-		<Query name="a" datasource="mycsv" value="csvquery.csv" coltypes="coltypes" />
-		<Query name="b" datasource="myarray" value="array2" coltypes="coltypes" rows="2" cols="5" follower_for="a" follower_expr="a.id = b.id" />
+		<Query name="a" datasource="mycsv" value="'csvquery.csv'" coltypes="'coltypes'" />
+		<Query name="b" datasource="myarray" value="'array2'" coltypes="'coltypes'" rows="2" cols="5" follower_for="a" follower_expr="a.id = b.id" />
 	</Queries>
 </OpenCReport>

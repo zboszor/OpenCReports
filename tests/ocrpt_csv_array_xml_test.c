@@ -60,10 +60,10 @@ void create_exprs(opencreport *o) {
 }
 
 void free_exprs(void) {
-	ocrpt_free_expr(id);
-	ocrpt_free_expr(name);
-	ocrpt_free_expr(age);
-	ocrpt_free_expr(adult);
+	ocrpt_expr_free(id);
+	ocrpt_expr_free(name);
+	ocrpt_expr_free(age);
+	ocrpt_expr_free(adult);
 }
 
 int main(void) {

@@ -2,9 +2,9 @@
 <!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
 <OpenCReport>
 	<Datasources>
-		<Datasource name="myxml" type="xml" />
+		<Datasource name="myxml" type="'xml'" />
 	</Datasources>
 	<Queries>
-		<Query name="a" datasource="myxml" value="xmldata2.xml" />
+		<Query name="a" datasource="myxml" value="'xmldata2.xml'" />
 	</Queries>
 </OpenCReport>

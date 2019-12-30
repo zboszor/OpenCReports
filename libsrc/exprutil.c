@@ -6,6 +6,7 @@
 
 #include <config.h>
 
+#include <alloca.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -28,7 +29,7 @@ ocrpt_expr *newblankexpr(enum ocrpt_expr_type type, uint32_t n_ops) {
 	e->ops = (n_ops > 0 ? ocrpt_mem_malloc(n_ops * sizeof(ocrpt_expr *)) : NULL);
 
 	if ((n_ops > 0) && !e->ops) {
-		ocrpt_free_expr(e);
+		ocrpt_expr_free(e);
 		return NULL;
 	}
 
@@ -209,7 +210,7 @@ static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_expr *e) {
 				//fprintf(stderr, "subexpr: \n");
 				//ocrpt_expr_print(e);
 				for (i = 0; i < e->n_ops; i++)
-					ocrpt_free_expr(e->ops[i]);
+					ocrpt_expr_free(e->ops[i]);
 				ocrpt_mem_free(e->ops);
 				e->n_ops = 0;
 				e->ops = NULL;
@@ -241,8 +242,8 @@ static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_expr *e) {
 		int32_t nsplit1, nsplit2;
 
 		if (!split1 || !split2) {
-			ocrpt_free_expr(split1);
-			ocrpt_free_expr(split2);
+			ocrpt_expr_free(split1);
+			ocrpt_expr_free(split2);
 			return;
 		}
 
@@ -316,7 +317,7 @@ static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_expr *e) {
 						e->n_ops += x->n_ops - 1;
 
 						x->n_ops = 0;
-						ocrpt_free_expr(x);
+						ocrpt_expr_free(x);
 
 						expr_pulled_up = true;
 					}
@@ -338,60 +339,70 @@ DLL_EXPORT_SYM void ocrpt_expr_optimize(opencreport *o, ocrpt_expr *e) {
 	ocrpt_expr_optimize_worker(o, e);
 }
 
-static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e) {
+static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e, int32_t varref_exclude_mask) {
 	ocrpt_list *ptr;
 	int32_t i;
 	bool found = false;
 
 	switch (e->type) {
 	case OCRPT_EXPR_MVAR: /* TODO */
+		if ((varref_exclude_mask & OCRPT_VARREF_MVAR) == 0) {
+		}
+		break;
 	case OCRPT_EXPR_RVAR: /* TODO */
+		if ((varref_exclude_mask & OCRPT_VARREF_RVAR) == 0) {
+		}
+		break;
 	case OCRPT_EXPR_VVAR: /* TODO */
+		if ((varref_exclude_mask & OCRPT_VARREF_VVAR) == 0) {
+		}
 		break;
 	case OCRPT_EXPR_IDENT:
-		/* Resolve the identifier ocrpt_query_result from the queries */
-		if (e->result[o->residx] && e->result[o->residx]->type != OCRPT_RESULT_ERROR)
-			break;
-		for (ptr = o->queries; ptr; ptr = ptr->next) {
-			ocrpt_query *q = (ocrpt_query *)ptr->data;
-			ocrpt_query_result *qr = NULL;
-			int32_t cols;
-
-			/* Identifier is domain-qualified and it doesn't match the query name */
-			if (e->query && strcmp(e->query->str, q->name))
-				continue;
-
-			/* ocrpt_query_get_result() cannot be used here, we need the whole array */
-			if (q->result) {
-				qr = q->result;
-				cols = q->cols;
-			} else
-				q->source->input->describe(q, &qr, &cols);
-
-			for (i = 0; i < cols; i++) {
-				if (!strcmp(e->name->str, qr[i].name)) {
-					e->result[0] = &qr[i].result;
-					e->result[1] = &qr[cols + i].result;
-					found = true;
-					break;
-				}
-			}
-			if (found)
+		if ((varref_exclude_mask & OCRPT_VARREF_IDENT) == 0) {
+			/* Resolve the identifier ocrpt_query_result from the queries */
+			if (e->result[o->residx] && e->result[o->residx]->type != OCRPT_RESULT_ERROR)
 				break;
-		}
-		if (!found) {
-			char *error;
-			int len;
+			for (ptr = o->queries; ptr; ptr = ptr->next) {
+				ocrpt_query *q = (ocrpt_query *)ptr->data;
+				ocrpt_query_result *qr = NULL;
+				int32_t cols;
 
-			len = snprintf(NULL, 0, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
-			error = alloca(len + 1);
-			snprintf(error, len + 1, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
-			ocrpt_expr_make_error_result(o, e, error);
+				/* Identifier is domain-qualified and it doesn't match the query name */
+				if (e->query && strcmp(e->query->str, q->name))
+					continue;
+
+				/* ocrpt_query_get_result() cannot be used here, we need the whole array */
+				if (q->result) {
+					qr = q->result;
+					cols = q->cols;
+				} else
+					q->source->input->describe(q, &qr, &cols);
+
+				for (i = 0; i < cols; i++) {
+					if (!strcmp(e->name->str, qr[i].name)) {
+						e->result[0] = &qr[i].result;
+						e->result[1] = &qr[cols + i].result;
+						found = true;
+						break;
+					}
+				}
+				if (found)
+					break;
+			}
+			if (!found) {
+				char *error;
+				int len;
+
+				len = snprintf(NULL, 0, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
+				error = alloca(len + 1);
+				snprintf(error, len + 1, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
+				ocrpt_expr_make_error_result(o, e, error);
+			}
 		}
 		break;
 	case OCRPT_EXPR:
 		for (i = 0; i < e->n_ops; i++)
-			ocrpt_expr_resolve_worker(o, e->ops[i]);
+			ocrpt_expr_resolve_worker(o, e->ops[i], varref_exclude_mask);
 		break;
 	default:
 		break;
@@ -399,7 +410,11 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e) {
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_resolve(opencreport *o, ocrpt_expr *e) {
-	ocrpt_expr_resolve_worker(o, e);
+	ocrpt_expr_resolve_worker(o, e, 0);
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(opencreport *o, ocrpt_expr *e, int32_t varref_exclude_mask) {
+	ocrpt_expr_resolve_worker(o, e, varref_exclude_mask);
 }
 
 static void ocrpt_expr_eval_worker(opencreport *o, ocrpt_expr *e) {

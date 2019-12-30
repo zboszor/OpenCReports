@@ -40,8 +40,8 @@ enum ocrpt_expr_type {
 	 * basis from the recordset.
 	 */
 	OCRPT_EXPR_RVAR,
-	OCRPT_EXPR_VVAR,
 	OCRPT_EXPR_IDENT,
+	OCRPT_EXPR_VVAR,
 	OCRPT_EXPR,
 };
 

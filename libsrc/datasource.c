@@ -142,7 +142,7 @@ void ocrpt_query_free0(ocrpt_query *q) {
 			ocrpt_query_follower *f0 = (ocrpt_query_follower *)ptr1->data;
 
 			if (f0->follower == q) {
-				ocrpt_free_expr(f0->expr);
+				ocrpt_expr_free(f0->expr);
 				f = f0;
 				break;
 			}
@@ -162,7 +162,7 @@ void ocrpt_query_free0(ocrpt_query *q) {
 	ocrpt_list_free(q->followers);
 	for (ptr = q->followers_n_to_1; ptr; ptr = ptr->next) {
 		ocrpt_query_follower *f = (ocrpt_query_follower *)ptr->data;
-		ocrpt_free_expr(f->expr);
+		ocrpt_expr_free(f->expr);
 	}
 	ocrpt_list_free_deep(q->followers_n_to_1, ocrpt_mem_free);
 	ocrpt_mem_free(q);

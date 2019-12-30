@@ -2,9 +2,6 @@
 <!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
 <OpenCReport>
 	<Datasources>
-		<Datasource name="mycsv" type="'csv'" />
+		<Datasource name="pgsql" type="'postgresql'" user="'ocrpt'" dbname="'ocrpttest'" />
 	</Datasources>
-	<Queries>
-		<Query name="a" datasource="mycsv" value="'csvquery.csv'" />
-	</Queries>
 </OpenCReport>

@@ -116,7 +116,7 @@ exp:
 
 								$1->name = NULL;
 								parser_yyget_extra(yyscanner)->parsed_exprs = ocrpt_list_remove(parser_yyget_extra(yyscanner)->parsed_exprs, $1);
-								ocrpt_free_expr($1);
+								ocrpt_expr_free($1);
 								$$ = newexpr(yyscanner, fname, $3);
 							}
 	| '(' exp ')'			{
@@ -243,7 +243,7 @@ exp:
 											ocrpt_string *fname = $1->name;
 
 											$1->name = NULL;
-											ocrpt_free_expr($1);
+											ocrpt_expr_free($1);
 											$$ = newexpr(yyscanner, fname, $4);
 										} else {
 											ocrpt_list *list = $4;
@@ -264,7 +264,7 @@ exp:
 
 									$1->name = NULL;
 									parser_yyget_extra(yyscanner)->parsed_exprs = ocrpt_list_remove(parser_yyget_extra(yyscanner)->parsed_exprs, $1);
-									ocrpt_free_expr($1);
+									ocrpt_expr_free($1);
 									$$ = newexpr(yyscanner, fname, $4);
 								}
 							}
@@ -433,7 +433,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, cha
 	if (yyresult) {
 		ocrpt_list_free_deep(yyextra.tokens, (ocrpt_mem_free_t)ocrpt_grammar_free_token);
 		ocrpt_list_free(yyextra.parsed_arglist);
-		ocrpt_list_free_deep(yyextra.parsed_exprs, (ocrpt_mem_free_t)ocrpt_free_expr);
+		ocrpt_list_free_deep(yyextra.parsed_exprs, (ocrpt_mem_free_t)ocrpt_expr_free);
 
 		if (err)
 			*err = yyextra.err;

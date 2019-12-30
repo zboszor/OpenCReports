@@ -6,6 +6,7 @@
 
 #include <config.h>
 
+#include <alloca.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -133,12 +134,52 @@ static void processNode(xmlTextReaderPtr reader) {
 	}
 }
 
+static void ocrpt_xml_expr_get_value(opencreport *o, ocrpt_expr *e, char **s, int32_t *i) {
+	ocrpt_result *r;
+
+	if (s)
+		*s = NULL;
+	if (i)
+		*i = 0;
+	if (!e)
+		return;
+
+	r = ocrpt_expr_eval(o, e);
+	if (r) {
+		if (s && r->type == OCRPT_RESULT_STRING)
+			*s = r->string->str;
+		if (i && OCRPT_RESULT_NUMBER)
+			*i = mpfr_get_si(r->number, o->rndmode);
+	}
+}
+
+static ocrpt_expr *ocrpt_xml_expr_parse(opencreport *o, xmlChar *expr) {
+	ocrpt_expr *e;
+	char *err;
+
+	if (!expr)
+		return NULL;
+
+	e = ocrpt_expr_parse(o, (char *)expr, &err);
+	if (e) {
+		ocrpt_expr_resolve_exclude(o, e, OCRPT_VARREF_RVAR | OCRPT_VARREF_IDENT | OCRPT_VARREF_VVAR);
+		ocrpt_expr_optimize(o, e);
+	} else {
+		fprintf(stderr, "Cannot parse: %s\n", expr);
+		ocrpt_strfree(err);
+	}
+
+	return e;
+}
+
 static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 	xmlChar *name = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
 	xmlChar *datasource = xmlTextReaderGetAttribute(reader, (const xmlChar *)"datasource");
-	xmlChar *value = xmlTextReaderReadString(reader);
 	xmlChar *follower_for = xmlTextReaderGetAttribute(reader, (const xmlChar *)"follower_for");
 	xmlChar *follower_expr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"follower_expr");
+	xmlChar *value = xmlTextReaderReadString(reader);
+	ocrpt_expr *value_e;
+	char *value_s;
 	ocrpt_datasource *ds;
 	ocrpt_query *q = NULL, *lq = NULL;
 	int ret, depth, nodetype;
@@ -148,71 +189,103 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 	 * to be in the text element but it's accepted as a value="..."
 	 * attribute, too.
 	 */
-
 	if (!value)
 		value = xmlTextReaderGetAttribute(reader, (const xmlChar *)"value");
 
+	value_e = ocrpt_xml_expr_parse(o, value);
+	ocrpt_xml_expr_get_value(o, value_e, &value_s, NULL);
+
 	ds = ocrpt_datasource_find(o, (char *)datasource);
-	switch (ds->input->type) {
-	case OCRPT_INPUT_ARRAY: {
-			xmlChar *cols = xmlTextReaderGetAttribute(reader, (const xmlChar *)"cols");
-			xmlChar *rows = xmlTextReaderGetAttribute(reader, (const xmlChar *)"rows");
-			xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
-			void *arrayptr, *coltypesptr;
-			int32_t cols1, rows1;
+	if (ds) {
+		switch (ds->input->type) {
+			case OCRPT_INPUT_ARRAY: {
+				xmlChar *cols = xmlTextReaderGetAttribute(reader, (const xmlChar *)"cols");
+				xmlChar *rows = xmlTextReaderGetAttribute(reader, (const xmlChar *)"rows");
+				xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
+				ocrpt_expr *cols_e, *rows_e, *coltypes_e;
+				char *cols_s, *rows_s, *coltypes_s;
+				void *arrayptr, *coltypesptr;
+				int32_t cols_i, rows_i;
 
-			cols1 = atoi((char *)cols);
-			rows1 = atoi((char *)rows);
+				cols_e = ocrpt_xml_expr_parse(o, cols);
+				ocrpt_xml_expr_get_value(o, cols_e, &cols_s, &cols_i);
+				if (cols_s && !cols_i)
+					cols_i = atoi(cols_s);
+				rows_e = ocrpt_xml_expr_parse(o, rows);
+				ocrpt_xml_expr_get_value(o, rows_e, &rows_s, &rows_i);
+				if (rows_s && !cols_i)
+					rows_i = atoi(rows_s);
+				coltypes_e = ocrpt_xml_expr_parse(o, coltypes);
+				ocrpt_xml_expr_get_value(o, coltypes_e, &coltypes_s, NULL);
 
-			ocrpt_query_discover_array((char *)value, &arrayptr, (char *)coltypes, &coltypesptr);
-			if (arrayptr)
-				q = ocrpt_query_add_array(o, ds, (char *)name, (const char **)arrayptr, rows1, cols1, coltypesptr);
-			else
-				fprintf(stderr, "Cannot determine array pointer for array query\n");
+				ocrpt_query_discover_array((char *)value, &arrayptr, (char *)coltypes_s, &coltypesptr);
+				if (arrayptr)
+					q = ocrpt_query_add_array(o, ds, (char *)name, (const char **)arrayptr, rows_i, cols_i, coltypesptr);
+				else
+					fprintf(stderr, "Cannot determine array pointer for array query\n");
 
-			xmlFree(rows);
-			xmlFree(cols);
-			xmlFree(coltypes);
+				xmlFree(rows);
+				xmlFree(cols);
+				xmlFree(coltypes);
+				ocrpt_expr_free(cols_e);
+				ocrpt_expr_free(rows_e);
+				ocrpt_expr_free(coltypes_e);
 
-			break;
+				break;
+			}
+			case OCRPT_INPUT_CSV: {
+				xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
+				ocrpt_expr *coltypes_e;
+				char *coltypes_s;
+				void *coltypesptr;
+
+				coltypes_e = ocrpt_xml_expr_parse(o, coltypes);
+				ocrpt_xml_expr_get_value(o, coltypes_e, &coltypes_s, NULL);
+
+				ocrpt_query_discover_array(NULL, NULL, (char *)coltypes_s, &coltypesptr);
+				q = ocrpt_query_add_csv(o, ds, (char *)name, (const char *)value, coltypesptr);
+
+				xmlFree(coltypes);
+				ocrpt_expr_free(coltypes_e);
+				break;
+			}
+			case OCRPT_INPUT_JSON: {
+				xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
+				ocrpt_expr *coltypes_e;
+				char *coltypes_s;
+				void *coltypesptr;
+
+				coltypes_e = ocrpt_xml_expr_parse(o, coltypes);
+				ocrpt_xml_expr_get_value(o, coltypes_e, &coltypes_s, NULL);
+
+				ocrpt_query_discover_array(NULL, NULL, (char *)coltypes, &coltypesptr);
+				q = ocrpt_query_add_json(o, ds, (char *)name, (const char *)value, coltypesptr);
+
+				xmlFree(coltypes);
+				ocrpt_expr_free(coltypes_e);
+				break;
+			}
+			case OCRPT_INPUT_XML: {
+				xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
+				ocrpt_expr *coltypes_e;
+				char *coltypes_s;
+				void *coltypesptr;
+
+				coltypes_e = ocrpt_xml_expr_parse(o, coltypes);
+				ocrpt_xml_expr_get_value(o, coltypes_e, &coltypes_s, NULL);
+				ocrpt_query_discover_array(NULL, NULL, (char *)coltypes, &coltypesptr);
+				q = ocrpt_query_add_xml(o, ds, (char *)name, (const char *)value, coltypesptr);
+
+				xmlFree(coltypes);
+				break;
+			}
+			case OCRPT_INPUT_POSTGRESQL: {
+				break;
+			}
+			default:
+				abort();
+				break;
 		}
-
-	case OCRPT_INPUT_CSV: {
-			xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
-			void *coltypesptr;
-
-			ocrpt_query_discover_array(NULL, NULL, (char *)coltypes, &coltypesptr);
-			q = ocrpt_query_add_csv(o, ds, (char *)name, (const char *)value, coltypesptr);
-
-			xmlFree(coltypes);
-			break;
-		}
-
-	case OCRPT_INPUT_JSON: {
-			xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
-			void *coltypesptr;
-
-			ocrpt_query_discover_array(NULL, NULL, (char *)coltypes, &coltypesptr);
-			q = ocrpt_query_add_json(o, ds, (char *)name, (const char *)value, coltypesptr);
-
-			xmlFree(coltypes);
-			break;
-		}
-
-	case OCRPT_INPUT_XML: {
-			xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
-			void *coltypesptr;
-
-			ocrpt_query_discover_array(NULL, NULL, (char *)coltypes, &coltypesptr);
-			q = ocrpt_query_add_xml(o, ds, (char *)name, (const char *)value, coltypesptr);
-
-			xmlFree(coltypes);
-			break;
-		}
-
-	default:
-		abort();
-		break;
 	}
 
 	/*
@@ -302,22 +375,75 @@ static void ocrpt_parse_queries_node(opencreport *o, xmlTextReaderPtr reader) {
 static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader) {
 	xmlChar *name = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
 	xmlChar *type = xmlTextReaderGetAttribute(reader, (const xmlChar *)"type");
+	ocrpt_expr *type_e;
+	char *type_s = NULL;
 	int ret, depth, nodetype;
+
+	type_e = ocrpt_xml_expr_parse(o, type);
+	ocrpt_xml_expr_get_value(o, type_e, &type_s, NULL);
 
 	/*
 	 * TODO: implement:
-	 * - adding XML, JSON and CVS datasources, and
 	 * - connecting to PostgreSQL, MariaDB and ODBC datasources
 	 */
-	if (!strcmp((char *)type, "array"))
-		ocrpt_datasource_add_array(o, (char *)name);
-	else if (!strcmp((char *)type, "csv"))
-		ocrpt_datasource_add_csv(o, (char *)name);
-	else if (!strcmp((char *)type, "json"))
-		ocrpt_datasource_add_json(o, (char *)name);
-	else if (!strcmp((char *)type, "xml"))
-		ocrpt_datasource_add_xml(o, (char *)name);
+	if (name && type_s) {
+		if (!strcmp((char *)type_s, "array"))
+			ocrpt_datasource_add_array(o, (char *)name);
+		else if (!strcmp((char *)type_s, "csv"))
+			ocrpt_datasource_add_csv(o, (char *)name);
+		else if (!strcmp((char *)type_s, "json"))
+			ocrpt_datasource_add_json(o, (char *)name);
+		else if (!strcmp((char *)type_s, "xml"))
+			ocrpt_datasource_add_xml(o, (char *)name);
+		else if (!strcmp((char *)type_s, "postgresql")) {
+			xmlChar *host = xmlTextReaderGetAttribute(reader, (const xmlChar *)"host");
+			xmlChar *port = xmlTextReaderGetAttribute(reader, (const xmlChar *)"port");
+			xmlChar *dbname = xmlTextReaderGetAttribute(reader, (const xmlChar *)"dbname");
+			xmlChar *user = xmlTextReaderGetAttribute(reader, (const xmlChar *)"user");
+			xmlChar	*password = xmlTextReaderGetAttribute(reader, (const xmlChar *)"password");
+			xmlChar *connstr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"connstr");
+			ocrpt_expr *host_e, *port_e, *dbname_e, *user_e, *password_e, *connstr_e;
+			char *host_s, *port_s, *dbname_s, *user_s, *password_s, *connstr_s;
+			int32_t port_i;
 
+			host_e = ocrpt_xml_expr_parse(o, host);
+			ocrpt_xml_expr_get_value(o, host_e, &host_s, NULL);
+			port_e = ocrpt_xml_expr_parse(o, port);
+			ocrpt_xml_expr_get_value(o, port_e, &port_s, &port_i);
+			if (!port_s && port_i > 0) {
+				port_s = alloca(32);
+				sprintf(port_s, "%d", port_i);
+			}
+			dbname_e = ocrpt_xml_expr_parse(o, dbname);
+			ocrpt_xml_expr_get_value(o, dbname_e, &dbname_s, NULL);
+			user_e = ocrpt_xml_expr_parse(o, user);
+			ocrpt_xml_expr_get_value(o, user_e, &user_s, NULL);
+			password_e = ocrpt_xml_expr_parse(o, password);
+			ocrpt_xml_expr_get_value(o, password_e, &password_s, NULL);
+			connstr_e = ocrpt_xml_expr_parse(o, connstr);
+			ocrpt_xml_expr_get_value(o, connstr_e, &connstr_s, NULL);
+
+			if (connstr_s)
+				ocrpt_datasource_add_postgresql2(o, (char *)name, connstr_s);
+			else
+				ocrpt_datasource_add_postgresql(o, (char *)name, host_s, port_s, dbname_s, user_s, password_s);
+
+			xmlFree(host);
+			xmlFree(port);
+			xmlFree(dbname);
+			xmlFree(user);
+			xmlFree(password);
+			xmlFree(connstr);
+			ocrpt_expr_free(host_e);
+			ocrpt_expr_free(port_e);
+			ocrpt_expr_free(dbname_e);
+			ocrpt_expr_free(user_e);
+			ocrpt_expr_free(password_e);
+			ocrpt_expr_free(connstr_e);
+		}
+	}
+
+	ocrpt_expr_free(type_e);
 	xmlFree(name);
 	xmlFree(type);
 
