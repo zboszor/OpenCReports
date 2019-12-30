@@ -2,6 +2,6 @@
 <!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
 <OpenCReport>
 	<Datasources>
-		<Datasource name="pgsql" type="'postgresql'" user="'ocrpt'" dbname="'ocrpttest'" />
+		<Datasource name="pgsql" type="'postgresql'" connstr="'dbname=ocrpttest user=ocrpt'" />
 	</Datasources>
 </OpenCReport>
