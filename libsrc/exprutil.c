@@ -383,9 +383,9 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e) {
 			char *error;
 			int len;
 
-			len = snprintf(NULL, 0, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), (e->dotprefixed ? "." : ""), e->name->str);
+			len = snprintf(NULL, 0, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
 			error = alloca(len + 1);
-			snprintf(error, len + 1, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), (e->dotprefixed ? "." : ""), e->name->str);
+			snprintf(error, len + 1, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
 			ocrpt_expr_make_error_result(o, e, error);
 		}
 		break;

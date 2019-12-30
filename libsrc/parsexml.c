@@ -199,6 +199,17 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 			break;
 		}
 
+	case OCRPT_INPUT_XML: {
+			xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
+			void *coltypesptr;
+
+			ocrpt_query_discover_array(NULL, NULL, (char *)coltypes, &coltypesptr);
+			q = ocrpt_query_add_xml(o, ds, (char *)name, (const char *)value, coltypesptr);
+
+			xmlFree(coltypes);
+			break;
+		}
+
 	default:
 		abort();
 		break;
@@ -304,6 +315,8 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 		ocrpt_datasource_add_csv(o, (char *)name);
 	else if (!strcmp((char *)type, "json"))
 		ocrpt_datasource_add_json(o, (char *)name);
+	else if (!strcmp((char *)type, "xml"))
+		ocrpt_datasource_add_xml(o, (char *)name);
 
 	xmlFree(name);
 	xmlFree(type);

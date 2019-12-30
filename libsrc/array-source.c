@@ -19,6 +19,9 @@
 #include <csv.h>
 #include <yajl/yajl_parse.h>
 #include <yajl/yajl_gen.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+#include <libxml/xmlreader.h>
 
 #include "opencreport-private.h"
 #include "datasource.h"
@@ -296,6 +299,10 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_csv(opencreport *o, const 
 struct ocrpt_file_query {
 	ocrpt_list *rowlist;
 	ocrpt_list *row_last;
+	ocrpt_list *headerlist;
+	ocrpt_list *header_last;
+	ocrpt_list *coltypeslist;
+	ocrpt_list *coltypes_last;
 	ocrpt_list *collist;
 	ocrpt_list *col_last;
 	const char **names;
@@ -365,6 +372,8 @@ static void ocrpt_file_query_free(ocrpt_file_query *fq, bool in_error) {
 
 	if (in_error) {
 		ocrpt_mem_free(fq->types);
+		ocrpt_list_free_deep(fq->headerlist, ocrpt_mem_free);
+		ocrpt_list_free(fq->coltypeslist);
 		ocrpt_list_free_deep(fq->rowlist, ocrpt_file_query_free_rows);
 	} else
 		ocrpt_list_free_deep(fq->rowlist, (ocrpt_mem_free_t)ocrpt_list_free);
@@ -676,7 +685,6 @@ static int ocrpt_yajl_end_array(void *ctx) {
 			fq->inrows = false;
 			return true;
 		}
-		
 	}
 
 	return false;
@@ -782,6 +790,411 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(opencreport *o, ocrpt_datasourc
 	}
 
 	retval = array_query_add(o, source, name, array, fq.rows - 1, fq.cols, (fq.coltypesset ? fq.types : types), fq.coltypesset);
+
+	ocrpt_file_query_free(&fq, false);
+	if (fq.types && !fq.coltypesset)
+		ocrpt_mem_free(fq.types);
+
+	return retval;
+}
+
+static const ocrpt_input ocrpt_xml_input = {
+	.type = OCRPT_INPUT_XML,
+	.describe = ocrpt_array_describe,
+	.rewind = ocrpt_array_rewind,
+	.next = ocrpt_array_next,
+	.populate_result = ocrpt_array_populate_result,
+	.isdone = ocrpt_array_isdone,
+	.free = ocrpt_file_free
+};
+
+DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_xml(opencreport *o, const char *source_name) {
+	return ocrpt_datasource_add(o, source_name, &ocrpt_xml_input);
+}
+
+static int32_t ocrpt_parse_col_node(opencreport *o, xmlTextReaderPtr reader, ocrpt_file_query *fq) {
+	int32_t ret, depth, nodetype;
+	xmlChar *value = NULL;
+	int32_t len = 0;
+
+	if (!xmlTextReaderIsEmptyElement(reader)) {
+		value = xmlTextReaderReadString(reader);
+		len = (value ? strlen((char *)value) : 0);
+	}
+
+	if (fq->inheader || fq->inrows) {
+		char *field = NULL;
+
+		if (fq->inheader && !value) {
+			xmlFree(value);
+			return 0;
+		}
+		if (value) {
+			field = ocrpt_mem_malloc(len + 1);
+			if (field) {
+				char *end = stpncpy(field, (char *)value, len);
+				*end = 0;
+			}
+		}
+
+		if (fq->inheader) {
+			fq->headerlist = ocrpt_list_end_append(fq->headerlist, &fq->header_last, field);
+			fq->cols++;
+		} else if (fq->inrows) {
+			fq->collist = ocrpt_list_end_append(fq->collist, &fq->col_last, field);
+		}
+	} else if (fq->incoltypes) {
+		enum ocrpt_result_type type;
+		if (!strcmp((char *)value, "string"))
+			type = OCRPT_RESULT_STRING;
+		else if (!strcmp((char *)value, "number"))
+			type = OCRPT_RESULT_NUMBER;
+		else if (!strcmp((char *)value, "datetime"))
+			type = OCRPT_RESULT_DATETIME;
+		else {
+			xmlFree(value);
+			return 0;
+		}
+		fq->coltypeslist = ocrpt_list_end_append(fq->coltypeslist, &fq->coltypes_last, (void *)type);
+	}
+
+	fq->firstcol = false;
+
+	depth = xmlTextReaderDepth(reader);
+	ret = xmlTextReaderRead(reader);
+	while (ret == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && (!strcmp((char *)name, "field") || !strcmp((char *)name, "col"))) {
+			xmlFree(name);
+			break;
+		}
+
+		xmlFree(name);
+
+		ret = xmlTextReaderRead(reader);
+	}
+
+	xmlFree(value);
+
+	return 1;
+}
+
+static int32_t ocrpt_parse_row_node(opencreport *o, xmlTextReaderPtr reader, ocrpt_file_query *fq) {
+	int32_t ret, depth, nodetype, err;
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return 0;
+
+	depth = xmlTextReaderDepth(reader);
+	err = 0;
+	ret = xmlTextReaderRead(reader);
+	while (ret == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "row")) {
+			xmlFree(name);
+			fq->rowlist = ocrpt_list_end_append(fq->rowlist, &fq->row_last, fq->collist);
+			fq->collist = NULL;
+			fq->col_last = NULL;
+			fq->rows++;
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if (!strcmp((char *)name, "col"))
+				ret = ocrpt_parse_col_node(o, reader, fq);
+			else {
+				err = 1;
+				ret = 0;
+			}
+		}
+
+		xmlFree(name);
+
+		if (!ret)
+			err = 1;
+		if (ret == 1)
+			ret = xmlTextReaderRead(reader);
+	}
+
+	return !err;
+}
+
+static int32_t ocrpt_parse_rows_node(opencreport *o, xmlTextReaderPtr reader, ocrpt_file_query *fq) {
+	int32_t ret, depth, nodetype, err;
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return 0;
+
+	depth = xmlTextReaderDepth(reader);
+	err = 0;
+	ret = xmlTextReaderRead(reader);
+	while (ret == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "rows")) {
+			xmlFree(name);
+			fq->inrows = false;
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if (!strcmp((char *)name, "row"))
+				ret = ocrpt_parse_row_node(o, reader, fq);
+			else {
+				err = 1;
+				ret = 0;
+			}
+		}
+
+		xmlFree(name);
+
+		if (!ret)
+			err = 1;
+		if (ret == 1)
+			ret = xmlTextReaderRead(reader);
+	}
+
+	return !err;
+}
+
+static int32_t ocrpt_parse_coltypes_node(opencreport *o, xmlTextReaderPtr reader, ocrpt_file_query *fq) {
+	int32_t ret, depth, nodetype, err;
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return 0;
+
+	depth = xmlTextReaderDepth(reader);
+	err = 0;
+	ret = xmlTextReaderRead(reader);
+	while (ret == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "coltypes")) {
+			xmlFree(name);
+			fq->incoltypes = false;
+			fq->coltypesset = (ocrpt_list_length(fq->coltypeslist) > 0);
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if (!strcmp((char *)name, "field") || !strcmp((char *)name, "col"))
+				ret = ocrpt_parse_col_node(o, reader, fq);
+			else {
+				err = 1;
+				ret = 0;
+			}
+		}
+
+		xmlFree(name);
+
+		if (!ret)
+			err = 1;
+		if (ret == 1)
+			ret = xmlTextReaderRead(reader);
+	}
+
+	return !err;
+}
+
+static int32_t ocrpt_parse_columns_node(opencreport *o, xmlTextReaderPtr reader, ocrpt_file_query *fq) {
+	int32_t ret, depth, nodetype, err;
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return 0;
+
+	depth = xmlTextReaderDepth(reader);
+	err = 0;
+	ret = xmlTextReaderRead(reader);
+	while (ret == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && (!strcmp((char *)name, "columns") || !strcmp((char *)name, "fields"))) {
+			xmlFree(name);
+			fq->rowlist = ocrpt_list_prepend(fq->rowlist, fq->headerlist);
+			fq->headerlist = NULL;
+			fq->header_last = NULL;
+			fq->inheader = false;
+			fq->headerset = true;
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if (!strcmp((char *)name, "field") || !strcmp((char *)name, "col"))
+				ret = ocrpt_parse_col_node(o, reader, fq);
+			else {
+				err = 1;
+				ret = 0;
+			}
+		}
+
+		xmlFree(name);
+
+		if (!ret)
+			err = 1;
+		if (ret == 1)
+			ret = xmlTextReaderRead(reader);
+	}
+
+	return !err;
+}
+
+static int32_t ocrpt_parse_data_node(opencreport *o, xmlTextReaderPtr reader, ocrpt_file_query *fq) {
+	int32_t ret, depth, nodetype, err;
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return 0;
+
+	depth = xmlTextReaderDepth(reader);
+	err = 0;
+	ret = xmlTextReaderRead(reader);
+	while (ret == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "data")) {
+			xmlFree(name);
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if ((!strcmp((char *)name, "fields") || !strcmp((char *)name, "columns")) && !fq->headerset) {
+				fq->inheader = true;
+				fq->firstcol = true;
+				ret = ocrpt_parse_columns_node(o, reader, fq);
+			} else if (!strcmp((char *)name, "coltypes")) {
+				fq->incoltypes = true;
+				fq->firstcol = true;
+				ret = ocrpt_parse_coltypes_node(o, reader, fq);
+			} else if (!strcmp((char *)name, "rows")) {
+				fq->inrows = true;
+				fq->firstcol = true;
+				ret = ocrpt_parse_rows_node(o, reader, fq);
+			} else {
+				err = 1;
+				ret = 0;
+			}
+		}
+
+		xmlFree(name);
+
+		if (!ret)
+			err = 1;
+		if (ret == 1)
+			ret = xmlTextReaderRead(reader);
+	}
+
+	return !err;
+}
+
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(opencreport *o, ocrpt_datasource *source,
+												const char *name, const char *filename,
+												const enum ocrpt_result_type *types) {
+	const char **array;
+	ocrpt_query *retval;
+	ocrpt_file_query fq;
+	xmlTextReaderPtr reader;
+	ocrpt_list *rowptr;
+	int32_t ret, err, row;
+
+	if (!ocrpt_datasource_validate(o, source)) {
+		fprintf(stderr, "%s:%d: datasource is not for this opencreport structure\n", __func__, __LINE__);
+		return NULL;
+	}
+
+	if (source->input->type != OCRPT_INPUT_XML) {
+		fprintf(stderr, "%s:%d: datasource is not json\n", __func__, __LINE__);
+		return NULL;
+	}
+
+	reader = xmlReaderForFile(filename, NULL, XML_PARSE_RECOVER |
+								XML_PARSE_NOENT | XML_PARSE_NOBLANKS |
+								XML_PARSE_XINCLUDE | XML_PARSE_NOXINCNODE);
+
+	if (!reader) {
+		return NULL;
+	}
+
+	memset(&fq, 0, sizeof(ocrpt_file_query));
+
+	ret = xmlTextReaderRead(reader);
+	err = 0;
+	while (ret == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+		int nodetype = xmlTextReaderNodeType(reader);
+		int depth = xmlTextReaderDepth(reader);
+
+		if (nodetype == XML_READER_TYPE_DOCUMENT_TYPE) {
+			/* ignore - xmllint validation is enough */
+		} else if (nodetype == XML_READER_TYPE_ELEMENT && depth == 0) {
+			if (!strcmp((char *)name, "data"))
+				ret = ocrpt_parse_data_node(o, reader, &fq);
+			else {
+				err = 1;
+				ret = 0;
+			}
+		}
+
+		xmlFree(name);
+
+		if (!ret)
+			err = 1;
+		if (ret == 1)
+			ret = xmlTextReaderRead(reader);
+	}
+
+	xmlFreeTextReader(reader);
+
+	if (err) {
+		ocrpt_file_query_free(&fq, true);
+		return NULL;
+	}
+
+	array = ocrpt_mem_malloc((fq.rows + 1) * fq.cols * sizeof(char *));
+	if (!array) {
+		ocrpt_file_query_free(&fq, true);
+		fprintf(stderr, "%s: out of memory\n", __func__);
+		return NULL;
+	}
+
+	if (fq.coltypesset) {
+		ocrpt_list *colptr;
+		int32_t col;
+
+		fq.types = ocrpt_mem_malloc(fq.cols * sizeof(enum ocrpt_result_type));
+
+		for (colptr = fq.coltypeslist, col = 0; colptr && col < fq.cols; colptr = colptr->next, col++)
+			fq.types[col] = (enum ocrpt_result_type)colptr->data;
+
+		for (; col < fq.cols; col++)
+			fq.types[col] = OCRPT_RESULT_STRING;
+
+		ocrpt_list_free(fq.coltypeslist);
+	}
+
+	for (rowptr = fq.rowlist, row = 0; rowptr; rowptr = rowptr->next, row++) {
+		ocrpt_list *colptr;
+		int32_t col;
+
+		for (colptr = (ocrpt_list *)rowptr->data, col = 0; colptr && col < fq.cols; colptr = colptr->next, col++)
+			array[row * fq.cols + col] = colptr->data;
+
+		for (; col < fq.cols; col++)
+			array[row * fq.cols + col] = NULL;
+
+		for (; colptr; colptr = colptr->next) {
+			ocrpt_mem_free(colptr->data);
+			colptr->data = NULL;
+		}
+	}
+
+	retval = array_query_add(o, source, name, array, fq.rows, fq.cols, (fq.coltypesset ? fq.types : types), fq.coltypesset);
 
 	ocrpt_file_query_free(&fq, false);
 	if (fq.types && !fq.coltypesset)

@@ -1,0 +1,8 @@
+<!ELEMENT data ((columns|fields)|coltypes?|rows?)*>
+<!ELEMENT columns ((col|field)+)>
+<!ELEMENT fields ((col|field)+)>
+<!ELEMENT coltypes ((col|field)+)>
+<!ELEMENT rows (row*)>
+<!ELEMENT row ((col|field)+)>
+<!ELEMENT col (#PCDATA)>
+<!ELEMENT field (#PCDATA)>

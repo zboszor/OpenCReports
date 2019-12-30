@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<data>
+	<rows>
+		<row>
+			<col>1</col>
+			<col>Fred Flintstone</col>
+			<col>strong</col>
+			<col>31</col>
+			<col>yes</col>
+			<col>ignored</col>
+		</row>
+		<row>
+			<col>2</col>
+			<col>Wilma Flintstone</col>
+			<col/>
+			<col>28</col>
+			<col>yes</col>
+		</row>
+		<row>
+			<col>3</col>
+			<col>Pebbles Flintstone</col>
+			<col><!----></col>
+			<col>5e-1</col>
+			<col>no</col>
+		</row>
+	</rows>
+	<fields>
+		<field>id</field>
+		<field>name</field>
+		<field>property</field>
+		<field>age</field>
+		<field>adult</field>
+	</fields>
+	<coltypes>
+		<col>number</col>
+		<col>string</col>
+		<col>string</col>
+		<col>number</col>
+		<col>number</col>
+	</coltypes>
+</data>

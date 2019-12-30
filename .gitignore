@@ -68,6 +68,13 @@ tests/ocrpt_json7_test
 tests/ocrpt_json8_test
 tests/ocrpt_json_xml_test
 tests/ocrpt_json_xml2_test
+tests/ocrpt_xml_test
+tests/ocrpt_xml2_test
+tests/ocrpt_xml3_test
+tests/ocrpt_xml4_test
+tests/ocrpt_xml5_test
+tests/ocrpt_xml_xml_test
+tests/ocrpt_xml_xml2_test
 tests/ocrpt_break_test
 tests/ocrpt_paper_test
 
