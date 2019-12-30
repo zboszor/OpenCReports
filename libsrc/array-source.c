@@ -27,7 +27,6 @@
 #include "datasource.h"
 
 struct ocrpt_array_results {
-	char *name;
 	const char **data;
 	const enum ocrpt_result_type *types;
 	ocrpt_query_result *result;
