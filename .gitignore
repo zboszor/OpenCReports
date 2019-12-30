@@ -79,6 +79,8 @@ tests/ocrpt_pgsql_test
 tests/ocrpt_pgsql2_test
 tests/ocrpt_pgsql_xml_test
 tests/ocrpt_pgsql_xml2_test
+tests/ocrpt_pgsql_xml3_test
+tests/ocrpt_pgsql_xml4_test
 tests/ocrpt_break_test
 tests/ocrpt_paper_test
 

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="pgsql" type="postgresql" connstr="dbname=ocrpttest user=ocrpt" />
+	</Datasources>
+</OpenCReport>

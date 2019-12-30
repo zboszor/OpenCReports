@@ -45,7 +45,7 @@ int main(void) {
 		return 0;
 	}
 
-	printf("datasource: array=%p\n", ocrpt_datasource_find(o, "array"));
+	printf("datasource: array=%p\n", ocrpt_datasource_find(o, "myarray"));
 	printf("query: a=%p\n", ocrpt_query_find(o, "a"));
 
 	err = NULL;

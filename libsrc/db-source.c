@@ -89,3 +89,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o
 	ds->priv = conn;
 	return ds;
 }
+
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_postgresql(opencreport *o, ocrpt_datasource *source, const char *name, const char *query) {
+	return NULL;
+}
