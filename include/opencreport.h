@@ -77,6 +77,9 @@ struct ocrpt_function {
 };
 typedef struct ocrpt_function ocrpt_function;
 
+struct ocrpt_datasource;
+typedef struct ocrpt_datasource ocrpt_datasource;
+
 struct ocrpt_query;
 typedef struct ocrpt_query ocrpt_query;
 
@@ -105,12 +108,10 @@ struct ocrpt_input {
 	bool (*populate_result)(ocrpt_query *);
 	bool (*isdone)(ocrpt_query *);
 	void (*free)(ocrpt_query *);
+	void (*close)(const ocrpt_datasource *);
 };
 
 typedef struct ocrpt_input ocrpt_input;
-
-struct ocrpt_datasource;
-typedef struct ocrpt_datasource ocrpt_datasource;
 
 struct ocrpt_paper {
 	const char *name;

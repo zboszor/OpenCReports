@@ -54,6 +54,11 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 static void ocrpt_free_datasource(const void *sptr) {
 	const ocrpt_datasource *s = sptr;
 
+	if (!s)
+		return;
+
+	if (s->input && s->input->close)
+		s->input->close(s);
 	ocrpt_strfree(s->name);
 	iconv_close(s->encoder);
 	ocrpt_mem_free(s);
