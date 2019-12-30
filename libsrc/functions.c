@@ -1806,5 +1806,5 @@ static int funccmp(const void *key, const void *f) {
 }
 
 ocrpt_function *ocrpt_find_function(const char *fname) {
-	return bsearch(fname, ocrpt_functions, n_ocrpt_functions, sizeof(ocrpt_function), funccmp);			
+	return bsearch(fname, ocrpt_functions, n_ocrpt_functions, sizeof(ocrpt_function), funccmp);
 }
