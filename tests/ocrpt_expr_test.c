@@ -194,7 +194,7 @@ int main(void) {
 			printf("expr nodes: %d\n", ocrpt_expr_nodes(e));
 
 			r = ocrpt_expr_eval(o, e);
-			ocrpt_expr_result_print(r);
+			ocrpt_result_print(r);
 		} else {
 			printf("%s\n", err);
 			ocrpt_strfree(err);

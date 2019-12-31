@@ -59,6 +59,11 @@ static void ocrpt_expr_result_free(ocrpt_result *r, enum ocrpt_expr_type type) {
 	}
 }
 
+DLL_EXPORT_SYM void ocrpt_result_free(ocrpt_result *r) {
+	ocrpt_expr_result_free(r, r->type);
+	ocrpt_mem_free(r);
+}
+
 DLL_EXPORT_SYM void ocrpt_expr_free(ocrpt_expr *e) {
 	int i;
 

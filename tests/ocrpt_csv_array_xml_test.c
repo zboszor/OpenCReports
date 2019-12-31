@@ -103,25 +103,25 @@ int main(void) {
 		ocrpt_expr_print(o, id);
 		r = ocrpt_expr_eval(o, id);
 		printf("Evaluated: ");
-		ocrpt_expr_result_print(r);
+		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, name);
 		r = ocrpt_expr_eval(o, name);
 		printf("Evaluated: ");
-		ocrpt_expr_result_print(r);
+		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, age);
 		r = ocrpt_expr_eval(o, age);
 		printf("Evaluated: ");
-		ocrpt_expr_result_print(r);
+		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, adult);
 		r = ocrpt_expr_eval(o, adult);
 		printf("Evaluated: ");
-		ocrpt_expr_result_print(r);
+		ocrpt_result_print(r);
 		printf("Expression is %s previous row\n", ocrpt_expr_cmp_results(o, adult) ? "identical to" : "different from");
 
 		printf("\n");
@@ -167,19 +167,19 @@ int main(void) {
 		ocrpt_expr_print(o, id);
 		r = ocrpt_expr_eval(o, id);
 		printf("Evaluated: ");
-		ocrpt_expr_result_print(r);
+		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, name);
 		r = ocrpt_expr_eval(o, name);
 		printf("Evaluated: ");
-		ocrpt_expr_result_print(r);
+		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, age);
 		r = ocrpt_expr_eval(o, age);
 		printf("Evaluated: ");
-		ocrpt_expr_result_print(r);
+		ocrpt_result_print(r);
 
 		printf("\n");
 	}
@@ -221,19 +221,19 @@ int main(void) {
 		ocrpt_expr_print(o, id);
 		r = ocrpt_expr_eval(o, id);
 		printf("Evaluated: ");
-		ocrpt_expr_result_print(r);
+		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, name);
 		r = ocrpt_expr_eval(o, name);
 		printf("Evaluated: ");
-		ocrpt_expr_result_print(r);
+		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, age);
 		r = ocrpt_expr_eval(o, age);
 		printf("Evaluated: ");
-		ocrpt_expr_result_print(r);
+		ocrpt_result_print(r);
 
 		printf("\n");
 	}

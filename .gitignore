@@ -49,6 +49,8 @@ doc/*.pdf
 # Test binaries
 tests/ocrpt_grammar_test
 tests/ocrpt_expr_test
+tests/ocrpt_environment_test
+tests/ocrpt_environment2_test
 tests/ocrpt_array_test
 tests/ocrpt_array_resolve_test
 tests/ocrpt_array_xml_test
@@ -81,6 +83,8 @@ tests/ocrpt_pgsql_xml_test
 tests/ocrpt_pgsql_xml2_test
 tests/ocrpt_pgsql_xml3_test
 tests/ocrpt_pgsql_xml4_test
+tests/ocrpt_pgsql_xml5_test
+tests/ocrpt_pgsql_xml6_test
 tests/ocrpt_break_test
 tests/ocrpt_paper_test
 

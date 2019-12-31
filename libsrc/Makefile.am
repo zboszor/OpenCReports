@@ -17,7 +17,7 @@ libopencreport_la_CFLAGS = \
 libopencreport_la_SOURCES = \
 	memutil.c listutil.c exprutil.c functions.c \
 	lex.yy.c ocrptgrammar.tab.h ocrptgrammar.tab.c \
-	api.c free.c parsexml.c datasource.c \
+	api.c free.c parsexml.c datasource.c environment.c \
 	array-source.c db-source.c navigation.c breaks.c
 
 libopencreport_la_LIBADD = \

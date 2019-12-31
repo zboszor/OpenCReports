@@ -5,13 +5,26 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <opencreport.h>
 
 int main(void) {
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+	ocrpt_datasource *ds;
 
+	setenv("dsname", "pgsql", 1);
+	setenv("dstype", "postgresql", 1);
+	setenv("dbname", "ocrpttest", 1);
+	setenv("dbuser", "ocrpt", 1);
+
+	if (!ocrpt_parse_xml(o, "pgsqlquery5.xml")) {
+		printf("XML parse error\n");
+		ocrpt_free(o);
+		return 0;
+	}
+
+	ds = ocrpt_datasource_find(o, "pgsql");
 	printf("Connecting to PostgreSQ database was %ssuccessful\n", (ds ? "" : "NOT "));
 
 	ocrpt_free(o);

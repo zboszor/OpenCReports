@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="m.dsname" type="m.dstype" connstr="m.dbconnstr" />
+	</Datasources>
+</OpenCReport>

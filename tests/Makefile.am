@@ -4,7 +4,7 @@ $(top_builddir)/libsrc/libopencreport.la:
 	$(MAKE) -C $(top_builddir)/libsrc libopencreport.la
 
 noinst_PROGRAMS = \
-	ocrpt_grammar_test ocrpt_expr_test \
+	ocrpt_grammar_test ocrpt_expr_test ocrpt_environment_test ocrpt_environment2_test \
 	ocrpt_array_test ocrpt_array_resolve_test ocrpt_array_xml_test \
 	ocrpt_csv_test ocrpt_csv2_test ocrpt_csv_array_test \
 	ocrpt_csv_xml_test ocrpt_csv_array_xml_test ocrpt_csv_array_xml2_test \
@@ -15,6 +15,7 @@ noinst_PROGRAMS = \
 	ocrpt_xml_xml_test ocrpt_xml_xml2_test \
 	ocrpt_pgsql_test ocrpt_pgsql2_test \
 	ocrpt_pgsql_xml_test ocrpt_pgsql_xml2_test ocrpt_pgsql_xml3_test ocrpt_pgsql_xml4_test \
+	ocrpt_pgsql_xml5_test ocrpt_pgsql_xml6_test \
 	ocrpt_break_test ocrpt_paper_test
 
 ocrpt_grammar_test_SOURCES = ocrpt_grammar_test.c
@@ -24,6 +25,14 @@ ocrpt_grammar_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_expr_test_SOURCES = ocrpt_expr_test.c
 ocrpt_expr_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_expr_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_environment_test_SOURCES = ocrpt_environment_test.c
+ocrpt_environment_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_environment_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_environment2_test_SOURCES = ocrpt_environment2_test.c
+ocrpt_environment2_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_environment2_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_array_test_SOURCES = ocrpt_array_test.c
 ocrpt_array_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
@@ -174,6 +183,14 @@ ocrpt_pgsql_xml3_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_pgsql_xml4_test_SOURCES = ocrpt_pgsql_xml4_test.c
 ocrpt_pgsql_xml4_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_pgsql_xml4_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_pgsql_xml5_test_SOURCES = ocrpt_pgsql_xml5_test.c
+ocrpt_pgsql_xml5_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_pgsql_xml5_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_pgsql_xml6_test_SOURCES = ocrpt_pgsql_xml6_test.c
+ocrpt_pgsql_xml6_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_pgsql_xml6_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_break_test_SOURCES = ocrpt_break_test.c
 ocrpt_break_test_LDADD = $(top_builddir)/libsrc/libopencreport.la

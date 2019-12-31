@@ -102,14 +102,14 @@ static void ocrpt_expr_result_deep_print_worker(opencreport *o, ocrpt_expr *e) {
 	}
 
 	ocrpt_expr_print_worker(o, e, 0, " - ");
-	ocrpt_expr_result_print(e->result[o->residx]);
+	ocrpt_result_print(e->result[o->residx]);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_result_deep_print(opencreport *o, ocrpt_expr *e) {
 	ocrpt_expr_result_deep_print_worker(o, e);
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_result_print(ocrpt_result *r) {
+DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
 	switch (r->type) {
 	case OCRPT_RESULT_ERROR:
 		printf("(ERROR)%s\n", r->isnull ? "NULL" : r->string->str);
@@ -345,8 +345,20 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e, int32_t var
 	bool found = false;
 
 	switch (e->type) {
-	case OCRPT_EXPR_MVAR: /* TODO */
+	case OCRPT_EXPR_MVAR:
 		if ((varref_exclude_mask & OCRPT_VARREF_MVAR) == 0) {
+			ocrpt_result *result = ocrpt_environment_get_c(e->name->str);
+
+			ocrpt_mem_string_free(e->query, true);
+			e->query = NULL;
+			ocrpt_mem_string_free(e->name, true);
+			e->name = NULL;
+			e->dotprefixed = false;
+
+			e->type = OCRPT_EXPR_STRING;
+			e->result[0] = result;
+			e->result_owned0 = true;
+			e->result[1] = result;
 		}
 		break;
 	case OCRPT_EXPR_RVAR: /* TODO */

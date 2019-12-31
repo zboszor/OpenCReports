@@ -181,6 +181,8 @@ void ocrpt_expr_resolve_exclude(opencreport *o, ocrpt_expr *e, int32_t varref_ex
 /*
  * Evaluate the expression, i.e. compute its ocrpt_result
  * It must be called after ocrpt_query_navigate_next(), see below.
+ *
+ * The returned ocrpt_result MUST NOT be freed with ocrpt_result_free().
  */
 ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_expr *e);
 /*
@@ -194,10 +196,6 @@ bool ocrpt_expr_cmp_results(opencreport *o, ocrpt_expr *e);
  */
 void ocrpt_expr_print(opencreport *o, ocrpt_expr *e);
 /*
- * Print the result data. Good for unit testing.
- */
-void ocrpt_expr_result_print(ocrpt_result *r);
-/*
  * Print the result data for every subexpression in the expression. Good for unit testing.
  */
 void ocrpt_expr_result_deep_print(opencreport *o, ocrpt_expr *e);
@@ -209,6 +207,32 @@ int32_t ocrpt_expr_nodes(ocrpt_expr *e);
  * Free an expression parse tree
  */
 void ocrpt_expr_free(ocrpt_expr *e);
+/*
+ * Print the result data. Good for unit testing.
+ */
+void ocrpt_result_print(ocrpt_result *r);
+/*
+ * Free an ocrpt_result structure
+ */
+void ocrpt_result_free(ocrpt_result *r);
+
+/*********************************
+ * Environment related functions *
+ *********************************/
+
+typedef ocrpt_result *(*ocrpt_environment_query_func)(const char *);
+extern ocrpt_environment_query_func ocrpt_environment_get;
+
+/*
+ * Set the global environment getter function
+ */
+void ocrpt_environment_set_query_func(ocrpt_environment_query_func func);
+
+/*
+ * Returns the value of an environment variable
+ * The returned ocrpt_result pointer must be freed with ocrpt_result_free()
+ */
+ocrpt_result *ocrpt_environment_get_c(const char *env);
 
 /***************************
  * Break related functions *
