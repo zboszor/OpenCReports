@@ -16,7 +16,7 @@ noinst_PROGRAMS = \
 	ocrpt_pgsql_test ocrpt_pgsql2_test \
 	ocrpt_pgsql_xml_test ocrpt_pgsql_xml2_test ocrpt_pgsql_xml3_test ocrpt_pgsql_xml4_test \
 	ocrpt_pgsql_xml5_test ocrpt_pgsql_xml6_test ocrpt_pgsql_xml7_test ocrpt_pgsql_xml8_test \
-	ocrpt_pgsql_xml9_test \
+	ocrpt_pgsql_xml9_test ocrpt_pgsql_xml10_test \
 	ocrpt_break_test ocrpt_paper_test
 
 ocrpt_grammar_test_SOURCES = ocrpt_grammar_test.c
@@ -204,6 +204,11 @@ ocrpt_pgsql_xml8_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_pgsql_xml9_test_SOURCES = ocrpt_pgsql_xml9_test.c
 ocrpt_pgsql_xml9_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_pgsql_xml9_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_pgsql_xml10_test_SOURCES = ocrpt_pgsql_xml10_test.c
+ocrpt_pgsql_xml10_test_CFLAGS = -rdynamic
+ocrpt_pgsql_xml10_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_pgsql_xml10_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_break_test_SOURCES = ocrpt_break_test.c
 ocrpt_break_test_LDADD = $(top_builddir)/libsrc/libopencreport.la

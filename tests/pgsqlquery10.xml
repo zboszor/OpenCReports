@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="pgsql" type="postgresql" connstr="dbname=ocrpttest user=ocrpt" />
+		<Datasource name="csv" type="csv" />
+	</Datasources>
+	<Queries>
+		<Query datasource="pgsql" name="a">SELECT * FROM flintstones;</Query>
+		<Query datasource="csv" name="b" value="csvquery3.csv" coltypes="coltypes" follower_for="a" follower_expr="a.id = b.id" />
+	</Queries>
+</OpenCReport>

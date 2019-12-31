@@ -285,8 +285,8 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 		if (lq) {
 			if (follower_expr) {
 				char *err = NULL;
-
 				ocrpt_expr *e = ocrpt_expr_parse(o, follower_expr_s, &err);
+
 				if (e) {
 					ocrpt_query_add_follower_n_to_1(o, lq, q, e);
 				} else
