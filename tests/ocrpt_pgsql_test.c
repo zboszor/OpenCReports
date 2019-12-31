@@ -12,7 +12,7 @@ int main(void) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
 
-	printf("Connecting to PostgreSQ database was %ssuccessful\n", (ds ? "" : "NOT "));
+	printf("Connecting to PostgreSQL database was %ssuccessful\n", (ds ? "" : "NOT "));
 
 	ocrpt_free(o);
 

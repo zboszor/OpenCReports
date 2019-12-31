@@ -41,7 +41,7 @@ int main(void) {
 	}
 
 	ds = ocrpt_datasource_find(o, "pgsql");
-	printf("Connecting to PostgreSQ database was %ssuccessful\n", (ds ? "" : "NOT "));
+	printf("Connecting to PostgreSQL database was %ssuccessful\n", (ds ? "" : "NOT "));
 
 	q = ocrpt_query_find(o, "pgquery");
 	printf("Adding query was %ssuccessful\n", (q ? "" : "NOT "));
