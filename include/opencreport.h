@@ -440,7 +440,7 @@ ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o, const char *s
 /*
  * Add a PostgreSQL query
  */
-ocrpt_query *ocrpt_query_add_postgresql(opencreport *o, ocrpt_datasource *source, const char *name, const char *query);
+ocrpt_query *ocrpt_query_add_postgresql(opencreport *o, ocrpt_datasource *source, const char *name, const char *querystr);
 /*
  * Find a query using its name
  */

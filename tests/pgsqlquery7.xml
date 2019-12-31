@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="m.dsname" type="m.dstype" connstr="m.dbconnstr" />
+	</Datasources>
+	<Queries>
+		<Query datasource="m.dsname" name="m.qname" value="m.query" />
+	</Queries>
+</OpenCReport>
