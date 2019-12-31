@@ -196,7 +196,6 @@ static ocrpt_query *array_query_add(opencreport *o, const ocrpt_datasource *sour
 	if (!query)
 		return NULL;
 
-	query->source = source;
 	query->cols = cols;
 
 	priv = ocrpt_mem_malloc(sizeof(struct ocrpt_array_results));
