@@ -1,5 +1,5 @@
-create user "ocrpt"
-create database "ocrpttest" owner "ocrpt";
+create user ocrpt;
+create database ocrpttest owner ocrpt;
 \c ocrpttest ocrpt
 
 create table flintstones (id serial, name text, property text, age int, adult bool);
