@@ -99,47 +99,19 @@ static void ocrpt_array_rewind(ocrpt_query *query) {
 }
 
 static bool ocrpt_array_populate_result(ocrpt_query *query) {
-	opencreport *o = query->source->o;
 	struct ocrpt_array_results *result = query->priv;
-	int i, base;
-
-	base = (o->residx ? query->cols: 0);
+	int32_t i;
 
 	if (result->isdone) {
-		for (i = 0; i < query->cols; i++)
-			query->result[base + i].result.isnull = true;
+		ocrpt_query_result_set_values_null(query);
 		return false;
 	}
 
 	for (i = 0; i < query->cols; i++) {
 		int32_t dataidx = result->current_row * query->cols + i;
-		ocrpt_result *r = &query->result[base + i].result;
-		const char *str;
+		const char *str = result->data[dataidx];
 
-		//fprintf(stderr, "%s:%d: cols: %d, rows: %d, current row: %d current col: %d, computed idx: %d\n", __func__, __LINE__, query->cols, result->rows, result->current_row, i, dataidx);
-		str = result->data[dataidx];
-
-		if (str) {
-			r->isnull = false;
-
-			ocrpt_mem_string_free(r->string, r->string_owned);
-			r->string = ocrpt_mem_string_new(str, false);
-			r->string_owned = false;
-
-			if (r->type == OCRPT_RESULT_NUMBER) {
-				if (!r->number_initialized)
-					mpfr_init2(r->number, o->prec);
-				if (!strcmp(str, "yes") || !strcmp(str, "true") || !strcmp(str, "t"))
-					str = "1";
-				if (!strcmp(str, "no") || !strcmp(str, "false") || !strcmp(str, "f"))
-					str = "0";
-				mpfr_set_str(r->number, str, 10, o->rndmode);
-			}
-		} else {
-			r->isnull = true;
-			if (r->number_initialized)
-				mpfr_set_ui(r->number, 0, o->rndmode);
-		}
+		ocrpt_query_result_set_value(query, i, (str == NULL), str, -1);
 	}
 
 	return true;

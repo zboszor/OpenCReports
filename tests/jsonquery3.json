@@ -1,0 +1,8 @@
+{
+	"columns": ["id", "name", "property", "age", "adult"],
+	"coltypes": ["number", "string", "string", "number", "number"],
+	"rows": [
+		{ "id": 2, "name": "Betty Rubble", "property": "beautiful", "age": 27, "adult": "yes" },
+		{ "id": 1, "name": "Barney Rubble", "property": "small", "age": 29, "adult": "yes" }
+	]
+}

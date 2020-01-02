@@ -56,6 +56,9 @@ typedef struct ocrpt_query_follower ocrpt_query_follower;
 
 ocrpt_query *ocrpt_query_alloc(opencreport *o, const ocrpt_datasource *source, const char *name);
 
+void ocrpt_query_result_set_values_null(ocrpt_query *q);
+void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, const char *str, size_t len);
+
 void ocrpt_query_free0(ocrpt_query *q);
 
 void ocrpt_query_result_free(ocrpt_query *q);

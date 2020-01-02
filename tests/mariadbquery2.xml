@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="mariadb" type="'mariadb'" optionfile="./mariadb/ocrpt.cnf" group="ocrpt" />
+	</Datasources>
+</OpenCReport>

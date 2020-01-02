@@ -442,6 +442,21 @@ ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o, const char *s
  */
 ocrpt_query *ocrpt_query_add_postgresql(opencreport *o, ocrpt_datasource *source, const char *name, const char *querystr);
 /*
+ * Add a MariaDB/MySQL datasource using separate connection parameters
+ */
+ocrpt_datasource *ocrpt_datasource_add_mariadb(opencreport *o, const char *source_name,
+												const char *host, const char *port, const char *dbname,
+												const char *user, const char *password, const char *unix_socket);
+/*
+ * Add a MariaDB/MySQL datasource using an option file and group settings
+ * If the option file is NULL, the default option files are used.
+ */
+ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, const char *source_name, const char *optionfile, const char *group);
+/*
+ * Add a MariaDB/MySQL query
+ */
+ocrpt_query *ocrpt_query_add_mariadb(opencreport *o, ocrpt_datasource *source, const char *name, const char *querystr);
+/*
  * Find a query using its name
  */
 ocrpt_query *ocrpt_query_find(opencreport *o, const char *name);

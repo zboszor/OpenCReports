@@ -1,0 +1,8 @@
+[ocrpt]
+!include /etc/my.cnf
+database=ocrpttest
+user=ocrpt
+#password=
+#host=
+#port=
+#unix_socket=

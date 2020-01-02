@@ -268,6 +268,9 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 		case OCRPT_INPUT_POSTGRESQL:
 			q = ocrpt_query_add_postgresql(o, ds, name_s, value_s);
 			break;
+		case OCRPT_INPUT_MARIADB:
+			q = ocrpt_query_add_mariadb(o, ds, name_s, value_s);
+			break;
 		default:
 			abort();
 			break;
@@ -369,13 +372,16 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	xmlChar *name = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
 	xmlChar *type = xmlTextReaderGetAttribute(reader, (const xmlChar *)"type");
 	xmlChar *host = xmlTextReaderGetAttribute(reader, (const xmlChar *)"host");
+	xmlChar *unix_socket = xmlTextReaderGetAttribute(reader, (const xmlChar *)"unix_socket");
 	xmlChar *port = xmlTextReaderGetAttribute(reader, (const xmlChar *)"port");
 	xmlChar *dbname = xmlTextReaderGetAttribute(reader, (const xmlChar *)"dbname");
 	xmlChar *user = xmlTextReaderGetAttribute(reader, (const xmlChar *)"user");
 	xmlChar	*password = xmlTextReaderGetAttribute(reader, (const xmlChar *)"password");
 	xmlChar *connstr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"connstr");
-	ocrpt_expr *name_e, *type_e, *host_e, *port_e, *dbname_e, *user_e, *password_e, *connstr_e;
-	char *name_s, *type_s, *host_s, *port_s, *dbname_s, *user_s, *password_s, *connstr_s;
+	xmlChar *optionfile = xmlTextReaderGetAttribute(reader, (const xmlChar *)"optionfile");
+	xmlChar *group = xmlTextReaderGetAttribute(reader, (const xmlChar *)"group");
+	ocrpt_expr *name_e, *type_e, *host_e, *unix_socket_e, *port_e, *dbname_e, *user_e, *password_e, *connstr_e, *optionfile_e, *group_e;
+	char *name_s, *type_s, *host_s, *unix_socket_s, *port_s, *dbname_s, *user_s, *password_s, *connstr_s, *optionfile_s, *group_s;
 	int32_t port_i;
 	int ret, depth, nodetype;
 
@@ -383,6 +389,7 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	ocrpt_xml_expr_parse_get_value_with_fallback(o, type);
 
 	ocrpt_xml_expr_parse_get_value_with_fallback(o, host);
+	ocrpt_xml_expr_parse_get_value_with_fallback(o, unix_socket);
 
 	port_e = ocrpt_xml_expr_parse(o, port, true);
 	ocrpt_xml_expr_get_value(o, port_e, &port_s, &port_i);
@@ -399,6 +406,8 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	ocrpt_xml_expr_parse_get_value_with_fallback_noreport(o, user);
 	ocrpt_xml_expr_parse_get_value_with_fallback_noreport(o, password);
 	ocrpt_xml_expr_parse_get_value_with_fallback_noreport(o, connstr);
+	ocrpt_xml_expr_parse_get_value_with_fallback_noreport(o, optionfile);
+	ocrpt_xml_expr_parse_get_value_with_fallback_noreport(o, group);
 
 	/*
 	 * TODO: implement:
@@ -417,26 +426,37 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 			if (connstr_s)
 				ocrpt_datasource_add_postgresql2(o, name_s, connstr_s);
 			else
-				ocrpt_datasource_add_postgresql(o, name_s, host_s, port_s, dbname_s, user_s, password_s);
+				ocrpt_datasource_add_postgresql(o, name_s, unix_socket_s ? unix_socket_s : host_s, port_s, dbname_s, user_s, password_s);
+		} else if (!strcmp(type_s, "mariadb") || !strcmp(type_s, "mysql")) {
+			if (group_s)
+				ocrpt_datasource_add_mariadb2(o, name_s, optionfile_s, group_s);
+			else
+				ocrpt_datasource_add_mariadb(o, name_s, host_s, port_s, dbname_s, user_s, password_s, unix_socket_s);
 		}
 	}
 
 	xmlFree(name);
 	xmlFree(type);
 	xmlFree(host);
+	xmlFree(unix_socket);
 	xmlFree(port);
 	xmlFree(dbname);
 	xmlFree(user);
 	xmlFree(password);
 	xmlFree(connstr);
+	xmlFree(optionfile);
+	xmlFree(group);
 	ocrpt_expr_free(name_e);
 	ocrpt_expr_free(type_e);
 	ocrpt_expr_free(host_e);
+	ocrpt_expr_free(unix_socket_e);
 	ocrpt_expr_free(port_e);
 	ocrpt_expr_free(dbname_e);
 	ocrpt_expr_free(user_e);
 	ocrpt_expr_free(password_e);
 	ocrpt_expr_free(connstr_e);
+	ocrpt_expr_free(optionfile_e);
+	ocrpt_expr_free(group_e);
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;

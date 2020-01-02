@@ -4,11 +4,15 @@
 <!ATTLIST Datasource
 	name CDATA #REQUIRED
 	type CDATA #REQUIRED
+	host CDATA #IMPLIED
+	unix_socket CDATA #IMPLIED
 	port CDATA #IMPLIED
 	dbname CDATA #IMPLIED
-	username CDATA #IMPLIED
+	user CDATA #IMPLIED
 	password CDATA #IMPLIED
-	connstr CDATA #IMPLIED >
+	connstr CDATA #IMPLIED
+	optionfile CDATA #IMPLIED
+	group CDATA #IMPLIED >
 <!ELEMENT Queries (Query)+>
 <!ELEMENT Query (#PCDATA)>
 <!ATTLIST Query

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="mariadb" type="mariadb" dbname="ocrpttest" user="ocrpt" />
+	</Datasources>
+	<Queries>
+		<Query datasource="mariadb" name="a">SELECT * FROM flintstones</Query>
+		<Query datasource="mariadb" name="b" follower_for="a" follower_expr="a.id = b.id" >SELECT adult, id, name, property, age FROM rubbles ORDER BY id DESC</Query>
+	</Queries>
+</OpenCReport>

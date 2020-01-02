@@ -187,6 +187,52 @@ DLL_EXPORT_SYM ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_
 	return (q->source->o->residx ? &q->result[q->cols] : q->result);
 }
 
+void ocrpt_query_result_set_values_null(ocrpt_query *q) {
+	opencreport *o = q->source->o;
+	int32_t base = (o->residx ? q->cols: 0);
+	int32_t i;
+
+	for (i = 0; i < q->cols; i++)
+		q->result[base + i].result.isnull = true;
+}
+
+void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, const char *str, size_t len) {
+	opencreport *o = q->source->o;
+	int32_t base = (o->residx ? q->cols: 0);
+	ocrpt_result *r = &q->result[base + i].result;
+	ocrpt_string *string;
+
+	r->isnull = isnull;
+	if (isnull)
+		return;
+
+	switch (r->type) {
+	case OCRPT_RESULT_NUMBER:
+		if (!r->number_initialized)
+			mpfr_init2(r->number, o->prec);
+		if (!strcmp(str, "yes") || !strcmp(str, "true") || !strcmp(str, "t"))
+			str = "1";
+		if (!strcmp(str, "no") || !strcmp(str, "false") || !strcmp(str, "f"))
+			str = "0";
+		mpfr_set_str(r->number, str, 10, o->rndmode);
+		/* fall through */
+	case OCRPT_RESULT_STRING:
+	default:
+		if (len < 0)
+			len = (str ? strlen(str) : 0);
+		string = ocrpt_mem_string_resize(r->string, len);
+		if (string) {
+			if (!r->string) {
+				r->string = string;
+				r->string_owned = true;
+			}
+		}
+		string->len = 0;
+		ocrpt_mem_string_append_len(string, str, len);
+		break;
+	}
+}
+
 void ocrpt_query_result_free(ocrpt_query *q) {
 	ocrpt_query_result *result = q->result;
 	int32_t cols = q->cols, i;
