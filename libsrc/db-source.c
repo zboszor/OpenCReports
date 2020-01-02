@@ -162,7 +162,7 @@ static void ocrpt_postgresql_rewind(ocrpt_query *query) {
 
 			result->rewindquery = ocrpt_mem_malloc(len + 1);
 			if (result->rewindquery) {
-				len = snprintf(result->rewindquery, len, "MOVE ABSOLUTE 0 IN \"%s\"", query->name);
+				len = snprintf(result->rewindquery, len + 1, "MOVE ABSOLUTE 0 IN \"%s\"", query->name);
 				result->rewindquery[len] = 0;
 			}
 		}
@@ -238,7 +238,7 @@ static void ocrpt_postgresql_free(ocrpt_query *query) {
 
 	len = snprintf(NULL, 0, "CLOSE \"%s\"", query->name);
 	cursor = alloca(len + 1);
-	len = snprintf(cursor, len, "CLOSE \"%s\"", query->name);
+	len = snprintf(cursor, len + 1, "CLOSE \"%s\"", query->name);
 	cursor[len] = 0;
 
 	res = PQexec(query->source->priv, cursor);
@@ -276,7 +276,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql(opencreport *o,
 
 	len = snprintf(NULL, 0, PACKAGE_STRING " datasource %s", source_name);
 	appname = alloca(len + 1);
-	snprintf(appname, len, PACKAGE_STRING " datasource %s", source_name);
+	snprintf(appname, len + 1, PACKAGE_STRING " datasource %s", source_name);
 	values[6] = appname;
 
 	PGconn *conn = PQconnectdbParams(keywords, values, 1);
@@ -299,7 +299,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o
 
 	len = snprintf(NULL, 0, PACKAGE_STRING " datasource %s", source_name);
 	appname = alloca(len + 1);
-	snprintf(appname, len, PACKAGE_STRING " datasource %s", source_name);
+	snprintf(appname, len + 1, PACKAGE_STRING " datasource %s", source_name);
 	values[2] = appname;
 
 	PGconn *conn = PQconnectdbParams(keywords, values, 1);
@@ -332,7 +332,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_postgresql(opencreport *o, ocrpt_dat
 
 	len = snprintf(NULL, 0, "DECLARE \"%s\" SCROLL CURSOR WITH HOLD FOR %s", name, querystr);
 	cursor = alloca(len + 1);
-	snprintf(cursor, len, "DECLARE \"%s\" SCROLL CURSOR WITH HOLD FOR %s", name, querystr);
+	snprintf(cursor, len + 1, "DECLARE \"%s\" SCROLL CURSOR WITH HOLD FOR %s", name, querystr);
 	cursor[len] = 0;
 
 	res = PQexec(source->priv, cursor);
@@ -354,7 +354,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_postgresql(opencreport *o, ocrpt_dat
 
 	memset(result, 0, sizeof(ocrpt_postgresql_results));
 
-	snprintf(cursor, len, "FETCH %d FROM \"%s\"", PGFETCHSIZE, name);
+	snprintf(cursor, len + 1, "FETCH %d FROM \"%s\"", PGFETCHSIZE, name);
 	result->fetchquery = ocrpt_mem_strdup(cursor);
 	result->chunk = -1;
 	result->row = -1;
@@ -364,7 +364,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_postgresql(opencreport *o, ocrpt_dat
 
 	out_error:
 
-	snprintf(cursor, len, "CLOSE \"%s\"", name);
+	snprintf(cursor, len + 1, "CLOSE \"%s\"", name);
 	res = PQexec(source->priv, cursor);
 	PQclear(res);
 	return NULL;

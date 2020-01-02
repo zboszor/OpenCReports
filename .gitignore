@@ -89,6 +89,7 @@ tests/ocrpt_pgsql_xml7_test
 tests/ocrpt_pgsql_xml8_test
 tests/ocrpt_pgsql_xml9_test
 tests/ocrpt_pgsql_xml10_test
+tests/ocrpt_pgsql_xml11_test
 tests/ocrpt_mariadb_test
 tests/ocrpt_mariadb2_test
 tests/ocrpt_mariadb_xml_test
