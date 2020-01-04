@@ -141,29 +141,15 @@ void ocrpt_mem_string_append_len(ocrpt_string *string, const char *str, const si
 }
 
 void ocrpt_mem_string_append(ocrpt_string *string, const char *str) {
-	size_t newlen;
-	char *end;
+	size_t len;
 
 	if (!string)
 		return;
 	if (!str)
 		return;
 
-	newlen = strlen(str);
-
-	if (string->allocated_len < string->len + newlen + 1) {
-		char *strnew = ocrpt_mem_realloc(string->str, string->len + newlen + 1);
-
-		if (!strnew)
-			return;
-
-		string->allocated_len = string->len + newlen + 1;
-		string->str = strnew;
-	}
-
-	end = stpncpy(&string->str[string->len], str, newlen + 1);
-	*end = 0;
-	string->len = end - string->str;
+	len = strlen(str);
+	ocrpt_mem_string_append(string, str, len);
 }
 
 void ocrpt_mem_string_append_c(ocrpt_string *string, const char c) {
