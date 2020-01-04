@@ -149,7 +149,7 @@ void ocrpt_mem_string_append(ocrpt_string *string, const char *str) {
 		return;
 
 	len = strlen(str);
-	ocrpt_mem_string_append(string, str, len);
+	ocrpt_mem_string_append_len(string, str, len);
 }
 
 void ocrpt_mem_string_append_c(ocrpt_string *string, const char c) {
