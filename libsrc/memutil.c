@@ -93,6 +93,7 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_resize(ocrpt_string *string, size_
 	str = ocrpt_mem_realloc(string->str, len + 1);
 	if (str) {
 		string->str = str;
+		string->allocated_len = len + 1;
 		return string;
 	}
 
