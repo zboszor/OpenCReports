@@ -20,6 +20,10 @@ noinst_PROGRAMS = \
 	ocrpt_mariadb_test ocrpt_mariadb2_test \
 	ocrpt_mariadb_xml_test ocrpt_mariadb_xml2_test ocrpt_mariadb_xml3_test \
 	ocrpt_mariadb_xml4_test \
+	ocrpt_odbc_test ocrpt_odbc2_test ocrpt_odbc3_test ocrpt_odbc4_test \
+	ocrpt_odbc5_test ocrpt_odbc6_test ocrpt_odbc7_test \
+	ocrpt_odbc_xml_test ocrpt_odbc_xml2_test ocrpt_odbc_xml3_test \
+	ocrpt_odbc_xml4_test \
 	ocrpt_break_test ocrpt_paper_test
 
 ocrpt_grammar_test_SOURCES = ocrpt_grammar_test.c
@@ -241,6 +245,50 @@ ocrpt_mariadb_xml3_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_mariadb_xml4_test_SOURCES = ocrpt_mariadb_xml4_test.c
 ocrpt_mariadb_xml4_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_mariadb_xml4_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_odbc_test_SOURCES = ocrpt_odbc_test.c
+ocrpt_odbc_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_odbc_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_odbc2_test_SOURCES = ocrpt_odbc2_test.c
+ocrpt_odbc2_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_odbc2_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_odbc3_test_SOURCES = ocrpt_odbc3_test.c
+ocrpt_odbc3_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_odbc3_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_odbc4_test_SOURCES = ocrpt_odbc4_test.c
+ocrpt_odbc4_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_odbc4_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_odbc5_test_SOURCES = ocrpt_odbc5_test.c
+ocrpt_odbc5_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_odbc5_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_odbc6_test_SOURCES = ocrpt_odbc6_test.c
+ocrpt_odbc6_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_odbc6_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_odbc7_test_SOURCES = ocrpt_odbc7_test.c
+ocrpt_odbc7_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_odbc7_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_odbc_xml_test_SOURCES = ocrpt_odbc_xml_test.c
+ocrpt_odbc_xml_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_odbc_xml_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_odbc_xml2_test_SOURCES = ocrpt_odbc_xml2_test.c
+ocrpt_odbc_xml2_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_odbc_xml2_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_odbc_xml3_test_SOURCES = ocrpt_odbc_xml3_test.c
+ocrpt_odbc_xml3_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_odbc_xml3_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_odbc_xml4_test_SOURCES = ocrpt_odbc_xml4_test.c
+ocrpt_odbc_xml4_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_odbc_xml4_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_break_test_SOURCES = ocrpt_break_test.c
 ocrpt_break_test_LDADD = $(top_builddir)/libsrc/libopencreport.la

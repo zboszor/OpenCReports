@@ -96,6 +96,17 @@ tests/ocrpt_mariadb_xml_test
 tests/ocrpt_mariadb_xml2_test
 tests/ocrpt_mariadb_xml3_test
 tests/ocrpt_mariadb_xml4_test
+tests/ocrpt_odbc_test
+tests/ocrpt_odbc2_test
+tests/ocrpt_odbc3_test
+tests/ocrpt_odbc4_test
+tests/ocrpt_odbc5_test
+tests/ocrpt_odbc6_test
+tests/ocrpt_odbc7_test
+tests/ocrpt_odbc_xml_test
+tests/ocrpt_odbc_xml2_test
+tests/ocrpt_odbc_xml3_test
+tests/ocrpt_odbc_xml4_test
 tests/ocrpt_break_test
 tests/ocrpt_paper_test
 

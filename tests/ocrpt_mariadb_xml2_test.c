@@ -1,6 +1,6 @@
 /*
  * OpenCReports test
- * Copyright (C) 2019 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -12,7 +12,7 @@ int main(void) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds;
 
-	if (!ocrpt_parse_xml(o, "mariadbquery.xml")) {
+	if (!ocrpt_parse_xml(o, "mariadbquery2.xml")) {
 		printf("XML parse error\n");
 		ocrpt_free(o);
 		return 0;

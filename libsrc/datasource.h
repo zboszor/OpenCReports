@@ -1,7 +1,7 @@
 /*
  * OpenCReports data source methods
  *
- * Copyright (C) 2019 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 #ifndef _DATASOURCE_H_
@@ -19,8 +19,6 @@ struct ocrpt_datasource {
 	const ocrpt_input *input;
 	const char *name;
 	void *priv;
-	char charset[64];
-	iconv_t encoder;
 };
 
 struct ocrpt_query {
@@ -57,7 +55,7 @@ typedef struct ocrpt_query_follower ocrpt_query_follower;
 ocrpt_query *ocrpt_query_alloc(opencreport *o, const ocrpt_datasource *source, const char *name);
 
 void ocrpt_query_result_set_values_null(ocrpt_query *q);
-void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, const char *str, size_t len);
+void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_t conv, const char *str, size_t len);
 
 void ocrpt_query_free0(ocrpt_query *q);
 

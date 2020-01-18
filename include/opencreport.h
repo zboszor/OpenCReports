@@ -104,6 +104,7 @@ enum ocrpt_input_type {
 	OCRPT_INPUT_XML,
 	OCRPT_INPUT_POSTGRESQL,
 	OCRPT_INPUT_MARIADB,
+	OCRPT_INPUT_ODBC
 };
 typedef enum ocrpt_input_type ocrpt_input_type;
 
@@ -115,6 +116,7 @@ struct ocrpt_input {
 	bool (*populate_result)(ocrpt_query *);
 	bool (*isdone)(ocrpt_query *);
 	void (*free)(ocrpt_query *);
+	bool (*set_encoding)(ocrpt_datasource *, const char *);
 	void (*close)(const ocrpt_datasource *);
 };
 
@@ -366,6 +368,10 @@ ocrpt_datasource *ocrpt_datasource_find(opencreport *o, const char *source_name)
  */
 ocrpt_datasource *ocrpt_datasource_validate(opencreport *o, ocrpt_datasource *source);
 /*
+ * Set the input encoding for a datasource
+ */
+void ocrpt_datasource_set_encoding(opencreport *o, ocrpt_datasource *source, const char *encoding);
+/*
  * Add an array datasource
  *
  * Calling this is optional, as an array datasource called
@@ -456,6 +462,19 @@ ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, const char *sour
  * Add a MariaDB/MySQL query
  */
 ocrpt_query *ocrpt_query_add_mariadb(opencreport *o, ocrpt_datasource *source, const char *name, const char *querystr);
+/*
+ * Add an ODBC datasource using separate connection parameters
+ */
+ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const char *source_name,
+											const char *dbname, const char *user, const char *password);
+/*
+ * Add an ODBC datasource using a connection info string
+ */
+ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, const char *source_name, const char *conninfo);
+/*
+ * Add an ODBC query
+ */
+ocrpt_query *ocrpt_query_add_odbc(opencreport *o, ocrpt_datasource *source, const char *name, const char *querystr);
 /*
  * Find a query using its name
  */

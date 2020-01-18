@@ -1,17 +1,19 @@
 /*
  * OpenCReports array data source
  *
- * Copyright (C) 2019 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
 #include <config.h>
 
+#include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include <iconv.h>
 
 #include <opencreport.h>
 #include "opencreport-private.h"
@@ -39,7 +41,6 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char
 	s->name = ocrpt_mem_strdup(source_name);
 	s->o = o;
 	s->input = input;
-	s->encoder = iconv_open("UTF-8", "UTF-8");
 
 	o->datasources = ocrpt_list_append(o->datasources, s);
 
@@ -73,6 +74,14 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_validate(opencreport *o, ocrpt
 	}
 
 	return NULL;
+}
+
+DLL_EXPORT_SYM void ocrpt_datasource_set_encoding(opencreport *o, ocrpt_datasource *source, const char *encoding) {
+	if (!ocrpt_datasource_validate(o, source))
+		return;
+
+	if (source->input->set_encoding)
+		source->input->set_encoding(source, encoding);
 }
 
 /*
@@ -196,7 +205,7 @@ void ocrpt_query_result_set_values_null(ocrpt_query *q) {
 		q->result[base + i].result.isnull = true;
 }
 
-void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, const char *str, size_t len) {
+void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_t conv, const char *str, size_t len) {
 	opencreport *o = q->source->o;
 	int32_t base = (o->residx ? q->cols: 0);
 	ocrpt_result *r = &q->result[base + i].result;
@@ -205,6 +214,57 @@ void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, const 
 	r->isnull = isnull;
 	if (isnull)
 		return;
+
+	if (conv != (iconv_t)-1) {
+		int32_t converted_len = (o->converted ? o->converted->allocated_len - 1 : len);
+		ocrpt_string *string = NULL;
+		bool firstrun = true, restart = false;
+
+		while (firstrun || restart) {
+			string = ocrpt_mem_string_resize(o->converted, converted_len);
+			char *inbuf;
+			char *outbuf;
+			size_t inbytesleft, outbytesleft;
+			bool exit_loop = false;
+
+			firstrun = false;
+			restart = false;
+
+			if (string) {
+				if (!o->converted)
+					o->converted = string;
+			} else
+				break;
+
+			inbuf = (char *)str;
+			inbytesleft = len;
+			outbuf = string->str;
+			outbytesleft = string->allocated_len - 1;
+
+			while (!exit_loop && (iconv(conv, &inbuf, &inbytesleft, &outbuf, &outbytesleft) == (size_t)-1)) {
+				switch (errno) {
+				case E2BIG:
+					converted_len <<= 1;
+					restart = true;
+					exit_loop = true;
+					break;
+				case EILSEQ:
+				case EINVAL:
+					inbuf++;
+					inbytesleft--;
+					break;
+				default:
+					exit_loop = true;
+					break;
+				}
+			}
+		}
+
+		if (string) {
+			str = string->str;
+			len = string->len;
+		}
+	}
 
 	switch (r->type) {
 	case OCRPT_RESULT_NUMBER:

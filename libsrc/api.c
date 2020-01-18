@@ -1,6 +1,6 @@
 /*
  * OpenCReports main module
- * Copyright (C) 2019 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -60,11 +60,13 @@ static void ocrpt_free_datasource(const void *sptr) {
 	if (s->input && s->input->close)
 		s->input->close(s);
 	ocrpt_strfree(s->name);
-	iconv_close(s->encoder);
 	ocrpt_mem_free(s);
 }
 
 DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
+	if (!o)
+		return;
+
 	/*
 	 * ocrpt_free_query() or ocrpt_free_query0()
 	 * must not be called from a List iterator on
@@ -77,11 +79,9 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	}
 
 	ocrpt_list_free_deep(o->datasources, ocrpt_free_datasource);
-
 	ocrpt_free_parts(o);
-
 	gmp_randclear(o->randstate);
-
+	ocrpt_mem_string_free(o->converted, true);
 	ocrpt_mem_free(o);
 }
 

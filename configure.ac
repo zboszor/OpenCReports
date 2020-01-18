@@ -1,6 +1,6 @@
 dnl Configure template for OpenCReports
 
-dnl Copyright (c) 2019 Zoltán Böszörményi (zboszor@gmail.com)
+dnl Copyright (c) 2019-2020 Zoltán Böszörményi (zboszor@gmail.com)
 dnl OpenCReports is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU Lesser General Public License as published by
 dnl the Free Software Foundation; either version 3, or (at your option)
@@ -90,6 +90,10 @@ AC_SUBST(POSTGRESQL_CFLAGS)
 AC_SUBST(POSTGRESQL_LIBS)
 
 MYSQL_CLIENT([5.0.3],[thread-safe])
+
+PKG_CHECK_MODULES(ODBC, odbc)
+AC_SUBST(ODBC_CFLAGS)
+AC_SUBST(ODBC_LIBS)
 
 AC_CONFIG_FILES([
 	Makefile

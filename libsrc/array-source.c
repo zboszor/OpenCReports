@@ -1,7 +1,7 @@
 /*
  * OpenCReports array data source
  *
- * Copyright (C) 2019 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -30,6 +30,7 @@ struct ocrpt_array_results {
 	const char **data;
 	const enum ocrpt_result_type *types;
 	ocrpt_query_result *result;
+	ocrpt_string *converted;
 	int32_t rows;
 	int32_t cols;
 	int32_t current_row;
@@ -99,6 +100,7 @@ static void ocrpt_array_rewind(ocrpt_query *query) {
 }
 
 static bool ocrpt_array_populate_result(ocrpt_query *query) {
+	const struct ocrpt_datasource *source = query->source;
 	struct ocrpt_array_results *result = query->priv;
 	int32_t i;
 
@@ -110,8 +112,9 @@ static bool ocrpt_array_populate_result(ocrpt_query *query) {
 	for (i = 0; i < query->cols; i++) {
 		int32_t dataidx = result->current_row * query->cols + i;
 		const char *str = result->data[dataidx];
+		int32_t len = strlen(str);
 
-		ocrpt_query_result_set_value(query, i, (str == NULL), str, -1);
+		ocrpt_query_result_set_value(query, i, (str == NULL), source->priv, str, len);
 	}
 
 	return true;
@@ -140,8 +143,26 @@ static bool ocrpt_array_isdone(ocrpt_query *query) {
 }
 
 static void ocrpt_array_free(ocrpt_query *query) {
-	ocrpt_mem_free(query->priv);
+	struct ocrpt_array_results *result = query->priv;
+
+	ocrpt_mem_free(result);
 	query->priv = NULL;
+}
+
+static bool ocrpt_array_set_encoding(ocrpt_datasource *ds, const char *encoding) {
+	iconv_t c = ds->priv;
+
+	if (c != (iconv_t)-1)
+		iconv_close(c);
+	ds->priv = iconv_open("UTF-8", encoding);
+	return (ds->priv != (iconv_t) -1);
+}
+
+void ocrpt_array_close(const ocrpt_datasource *ds) {
+	iconv_t c =	ds->priv;
+
+	if (c != (iconv_t)-1)
+		iconv_close(c);
 }
 
 static const ocrpt_input ocrpt_array_input = {
@@ -151,11 +172,17 @@ static const ocrpt_input ocrpt_array_input = {
 	.next = ocrpt_array_next,
 	.populate_result = ocrpt_array_populate_result,
 	.isdone = ocrpt_array_isdone,
-	.free = ocrpt_array_free
+	.free = ocrpt_array_free,
+	.set_encoding = ocrpt_array_set_encoding,
+	.close = ocrpt_array_close
 };
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, const char *source_name) {
-	return ocrpt_datasource_add(o, source_name, &ocrpt_array_input);
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_array_input);
+
+	if (ds)
+		ds->priv = (iconv_t)-1;
+	return ds;
 }
 
 static ocrpt_query *array_query_add(opencreport *o, const ocrpt_datasource *source, const char *name,
@@ -255,11 +282,18 @@ static const ocrpt_input ocrpt_csv_input = {
 	.next = ocrpt_array_next,
 	.populate_result = ocrpt_array_populate_result,
 	.isdone = ocrpt_array_isdone,
-	.free = ocrpt_file_free
+	.free = ocrpt_file_free,
+	.set_encoding = ocrpt_array_set_encoding,
+	.close = ocrpt_array_close
 };
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_csv(opencreport *o, const char *source_name) {
-	return ocrpt_datasource_add(o, source_name, &ocrpt_csv_input);
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_csv_input);
+
+	if (ds)
+		ds->priv = (iconv_t)-1;
+
+	return ds;
 }
 
 /*
@@ -454,11 +488,18 @@ static const ocrpt_input ocrpt_json_input = {
 	.next = ocrpt_array_next,
 	.populate_result = ocrpt_array_populate_result,
 	.isdone = ocrpt_array_isdone,
-	.free = ocrpt_file_free
+	.free = ocrpt_file_free,
+	.set_encoding = ocrpt_array_set_encoding,
+	.close = ocrpt_array_close
 };
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_json(opencreport *o, const char *source_name) {
-	return ocrpt_datasource_add(o, source_name, &ocrpt_json_input);
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_json_input);
+
+	if (ds)
+		ds->priv = (iconv_t)-1;
+
+	return ds;
 }
 
 static int ocrpt_yajl_null(void *ctx) {
@@ -775,11 +816,18 @@ static const ocrpt_input ocrpt_xml_input = {
 	.next = ocrpt_array_next,
 	.populate_result = ocrpt_array_populate_result,
 	.isdone = ocrpt_array_isdone,
-	.free = ocrpt_file_free
+	.free = ocrpt_file_free,
+	.set_encoding = ocrpt_array_set_encoding,
+	.close = ocrpt_array_close
 };
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_xml(opencreport *o, const char *source_name) {
-	return ocrpt_datasource_add(o, source_name, &ocrpt_xml_input);
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_xml_input);
+
+	if (ds)
+		ds->priv = (iconv_t)-1;
+
+	return ds;
 }
 
 static int32_t ocrpt_parse_col_node(opencreport *o, xmlTextReaderPtr reader, ocrpt_file_query *fq) {

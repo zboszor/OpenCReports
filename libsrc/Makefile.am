@@ -13,7 +13,7 @@ libopencreport_la_CFLAGS = \
 	-Wall -O2 -g -I$(top_srcdir)/include $(CFLAG_VISIBILITY) \
 	$(MPFR_CFLAGS) $(PAPER_CFLAGS) $(UTF8PROC_CFLAGS) \
 	$(LIBXML_CFLAGS) $(YAJL_CFLAGS) $(POSTGRESQL_CFLAGS) \
-	$(MYSQL_CLIENT_CFLAGS)
+	$(MYSQL_CLIENT_CFLAGS) $(ODBC_CFLAGS)
 
 libopencreport_la_SOURCES = \
 	memutil.c listutil.c exprutil.c functions.c \
@@ -23,7 +23,8 @@ libopencreport_la_SOURCES = \
 
 libopencreport_la_LIBADD = \
 	$(MPFR_LIBS) $(PAPER_LIBS) $(UTF8PROC_LIBS) $(LIBXML_LIBS) \
-	$(CSV_LIBS) $(YAJL_LIBS) $(POSTGRESQL_LIBS) $(MYSQL_CLIENT_LIBS)
+	$(CSV_LIBS) $(YAJL_LIBS) $(POSTGRESQL_LIBS) $(MYSQL_CLIENT_LIBS) \
+	$(ODBC_LIBS)
 
 libopencreport_la_LDFLAGS = \
 	-version-info $(OCRPT_LT_CURRENT):$(OCRPT_LT_REVISION):$(OCRPT_LT_AGE) \

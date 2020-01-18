@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="odbc" type="odbc" dbname="ocrpttest1" user="ocrpt" />
+		<Datasource name="json" type="json" />
+	</Datasources>
+	<Queries>
+		<Query datasource="odbc" name="a">SELECT * FROM flintstones</Query>
+		<Query datasource="json" name="b" value="jsonquery3.json" follower_for="a" follower_expr="a.id = b.id" />
+	</Queries>
+</OpenCReport>

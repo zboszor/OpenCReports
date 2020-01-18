@@ -1,7 +1,7 @@
 /*
  * OpenCReports array data source
  *
- * Copyright (C) 2019 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -22,6 +22,28 @@
 
 #include <libpq-fe.h>
 #include <mysql.h>
+#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+
+#ifndef SQL_ATTR_APP_WCHAR_TYPE
+#define SQL_ATTR_APP_WCHAR_TYPE 1061
+#endif
+#ifndef SQL_ATTR_APP_UNICODE_TYPE
+#define SQL_ATTR_APP_UNICODE_TYPE 1064
+#endif
+#ifndef SQL_DD_CP_ANSI
+#define SQL_DD_CP_ANSI 0
+#endif
+#ifndef SQL_DD_CP_UCS2
+#define SQL_DD_CP_UCS2 1
+#endif
+#ifndef SQL_DD_CP_UTF8
+#define SQL_DD_CP_UTF8 2
+#endif
+#ifndef SQL_DD_CP_UTF16
+#define SQL_DD_CP_UTF16 SQL_DD_CP_UCS2
+#endif
 
 #include "opencreport.h"
 #include "datasource.h"
@@ -198,7 +220,7 @@ static bool ocrpt_postgresql_populate_result(ocrpt_query *query) {
 		const char *str = PQgetvalue(result->res, result->row, i);
 		int32_t len = PQgetlength(result->res, result->row, i);
 
-		ocrpt_query_result_set_value(query, i, isnull, str, len);
+		ocrpt_query_result_set_value(query, i, isnull, (iconv_t)-1, str, len);
 	}
 
 	return true;
@@ -286,6 +308,11 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql(opencreport *o,
 	}
 
 	ds = ocrpt_datasource_add(o, source_name, &ocrpt_postgresql_input);
+	if (!ds) {
+		PQfinish(conn);
+		return NULL;
+	}
+
 	ds->priv = conn;
 	return ds;
 }
@@ -309,6 +336,11 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o
 	}
 
 	ds = ocrpt_datasource_add(o, source_name, &ocrpt_postgresql_input);
+	if (!ds) {
+		PQfinish(conn);
+		return NULL;
+	}
+
 	ds->priv = conn;
 	return ds;
 }
@@ -478,7 +510,7 @@ static bool ocrpt_mariadb_populate_result(ocrpt_query *query) {
 	len = mysql_fetch_lengths(result->res);
 
 	for (i = 0; i < query->cols; i++)
-		ocrpt_query_result_set_value(query, i, (row[i] == NULL), row[i], len[i]);
+		ocrpt_query_result_set_value(query, i, (row[i] == NULL), (iconv_t)-1, row[i], len[i]);
 
 	return true;
 }
@@ -549,6 +581,11 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_mariadb(opencreport *o, co
 	}
 
 	ds = ocrpt_datasource_add(o, source_name, &ocrpt_mariadb_input);
+	if (!ds) {
+		mysql_close(mysql);
+		return NULL;
+	}
+
 	ds->priv = mysql;
 	return ds;
 }
@@ -574,6 +611,11 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, c
 	}
 
 	ds = ocrpt_datasource_add(o, source_name, &ocrpt_mariadb_input);
+	if (!ds) {
+		mysql_close(mysql);
+		return NULL;
+	}
+
 	ds->priv = mysql;
 	return ds;
 }
@@ -623,6 +665,487 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_mariadb(opencreport *o, ocrpt_dataso
 	if (!result->result) {
 		mysql_free_result(res);
 		ocrpt_query_free(o, query);
+		return NULL;
+	}
+
+	return query;
+}
+
+struct ocrpt_odbc_private {
+	SQLHENV env;
+	SQLHDBC dbc;
+	iconv_t encoder;
+};
+typedef struct ocrpt_odbc_private ocrpt_odbc_private;
+
+struct ocrpt_odbc_results {
+	ocrpt_query_result *result;
+	SQLHSTMT stmt;
+	ocrpt_list *rows;
+	ocrpt_list *cur_row;
+	ocrpt_string *coldata;
+	int32_t cols;
+	bool atstart:1;
+	bool isdone:1;
+};
+typedef struct ocrpt_odbc_results ocrpt_odbc_results;
+
+static void ocrpt_odbc_print_diag(ocrpt_query *query, const char *stmt, SQLRETURN ret) __attribute__((unused));
+static void ocrpt_odbc_print_diag(ocrpt_query *query, const char *stmt, SQLRETURN ret) {
+	ocrpt_odbc_private *priv = query->source->priv;
+	SQLINTEGER err;
+	SQLSMALLINT mlen;
+	char state[6];
+	unsigned char buffer[256];
+	SQLCHAR	stat[10];
+	SQLCHAR	msg[200];
+
+	fprintf(stderr, "%s:%d: query \"%s\" %s ret %d\n", __func__, __LINE__, query->name, stmt, ret);
+
+	SQLError(priv->env, priv->dbc, NULL, (SQLCHAR *)state, NULL, buffer, 256, NULL);
+	SQLGetDiagRec(SQL_HANDLE_DBC, priv->dbc, 1, stat, &err, msg, 100, &mlen);
+
+	fprintf(stderr, "%s:%d: %s result %d: %6.6s \"%s\", %s \"%s\"\n", __func__, __LINE__, stmt, ret, state, msg, stat, msg);
+}
+
+static ocrpt_query_result *ocrpt_odbc_describe_early(ocrpt_query *query) {
+	ocrpt_odbc_results *result = query->priv;
+	ocrpt_query_result *qr;
+	ocrpt_list *last_row;
+	int32_t i;
+	SQLSMALLINT cols;
+	SQLRETURN ret;
+
+	result->atstart = true;
+	result->isdone = false;
+
+	SQLNumResultCols(result->stmt, &cols);
+	result->cols = cols;
+
+	qr = ocrpt_mem_malloc(2 * result->cols * sizeof(ocrpt_query_result));
+	if (!qr)
+		return NULL;
+
+	memset(qr, 0, 2 * result->cols * sizeof(ocrpt_query_result));
+
+	for (i = 0; i < result->cols; i++) {
+		enum ocrpt_result_type type;
+		SQLRETURN ret;
+		SQLSMALLINT colname_len;
+		SQLSMALLINT col_type;
+		SQLULEN col_size;
+		ocrpt_string *string;
+
+		ret = SQLDescribeCol(result->stmt, i + 1, NULL, 0, &colname_len, NULL, NULL, NULL, NULL);
+		if (!SQL_SUCCEEDED(ret))
+			continue;
+
+		qr[i].name = ocrpt_mem_malloc(colname_len + 1);
+		qr[i].name_allocated = true;
+		qr[result->cols + i].name = qr[i].name;
+
+		ret = SQLDescribeCol(result->stmt, i + 1, (SQLCHAR *)qr[i].name, colname_len + 1, NULL, &col_type, &col_size, NULL, NULL);
+		string = ocrpt_mem_string_resize(result->coldata, col_size);
+		if (string) {
+			if (!result->coldata)
+				result->coldata = string;
+		}
+
+		/* TODO: Handle date/time/interval types */
+		switch (col_type) {
+		case SQL_TINYINT:
+		case SQL_SMALLINT:
+		case SQL_INTEGER:
+		case SQL_BIGINT:
+		case SQL_REAL:
+		case SQL_FLOAT:
+		case SQL_DOUBLE:
+		case SQL_DECIMAL:
+		case SQL_NUMERIC:
+			type = OCRPT_RESULT_NUMBER;
+			break;
+		case SQL_BIT:
+		case SQL_BINARY:
+		case SQL_VARBINARY:
+		case SQL_LONGVARBINARY:
+		case SQL_CHAR:
+		case SQL_VARCHAR:
+		case SQL_LONGVARCHAR:
+		case SQL_WCHAR:
+		case SQL_WVARCHAR:
+		case SQL_WLONGVARCHAR:
+		case SQL_GUID:
+			type = OCRPT_RESULT_STRING;
+			break;
+#if 0
+		case SQL_DATE:
+		case SQL_TYPE_DATE:
+			type = OCRPT_RESULT_DATE;
+			break;
+		case SQL_TIME:
+		case SQL_TYPE_TIME:
+		case SQL_TYPE_UTCTIME:
+			type = OCRPT_RESULT_TIME;
+			break;
+		case SQL_TIMESTAMP:
+		case SQL_TYPE_TIMESTAMP:
+		case SQL_TYPE_UTCDATETIME:
+			type = OCRPT_RESULT_DATETIME;
+			break;
+		case SQL_INTERVAL_MONTH:
+		case SQL_INTERVAL_YEAR:
+		case SQL_INTERVAL_YEAR_TO_MONTH:
+		case SQL_INTERVAL_DAY:
+		case SQL_INTERVAL_HOUR:
+		case SQL_INTERVAL_MINUTE:
+		case SQL_INTERVAL_SECOND:
+		case SQL_INTERVAL_DAY_TO_HOUR:
+		case SQL_INTERVAL_DAY_TO_MINUTE:
+		case SQL_INTERVAL_DAY_TO_SECOND:
+		case SQL_INTERVAL_HOUR_TO_MINUTE:
+		case SQL_INTERVAL_HOUR_TO_SECOND:
+		case SQL_INTERVAL_MINUTE_TO_SECOND:
+			type = OCRPT_RESULT_INTERVAL;
+			break;
+#endif
+		default:
+			fprintf(stderr, "%s:%d: type %d\n", __func__, __LINE__, col_type);
+			type = OCRPT_RESULT_STRING;
+			break;
+		}
+
+		qr[i].result.type = type;
+		qr[result->cols + i].result.type = type;
+
+		if (qr[i].result.type == OCRPT_RESULT_NUMBER) {
+			mpfr_init2(qr[i].result.number, query->source->o->prec);
+			qr[i].result.number_initialized = true;
+			mpfr_init2(qr[result->cols + i].result.number, query->source->o->prec);
+			qr[result->cols + i].result.number_initialized = true;
+		}
+
+		qr[i].result.isnull = true;
+		qr[result->cols + i].result.isnull = true;
+	}
+
+	result->result = qr;
+
+	while ((ret = SQLFetchScroll(result->stmt, SQL_FETCH_NEXT, 0)) == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) {
+		ocrpt_list *col = NULL, *last_col;
+
+		for (i = 0; i < result->cols; i++) {
+			SQLLEN len_or_null;
+
+			ret = SQLGetData(result->stmt, i + 1, SQL_C_CHAR, result->coldata->str, result->coldata->allocated_len, &len_or_null);
+			if (ret == SQL_SUCCESS_WITH_INFO || ret == SQL_SUCCESS) {
+				ocrpt_string *coldata;
+
+				if (len_or_null == SQL_NULL_DATA)
+					coldata = NULL;
+				else
+					coldata = ocrpt_mem_string_new_with_len(result->coldata->str, len_or_null);
+				col = ocrpt_list_end_append(col, &last_col, coldata);
+			} else
+				ocrpt_odbc_print_diag(query, "SQLGetData", ret);
+		}
+
+		result->rows = ocrpt_list_end_append(result->rows, &last_row, col);
+	}
+
+	SQLFreeHandle(SQL_HANDLE_STMT, result->stmt);
+
+	return qr;
+}
+
+static void ocrpt_odbc_describe(ocrpt_query *query, ocrpt_query_result **qresult, int32_t *cols) {
+	ocrpt_odbc_results *result = query->priv;
+
+	if (qresult)
+		*qresult = result->result;
+	if (cols)
+		*cols = (result->result ? result->cols : 0);
+}
+
+static void ocrpt_odbc_rewind(ocrpt_query *query) {
+	ocrpt_odbc_results *result = query->priv;
+
+	result->atstart = true;
+	result->isdone = false;
+	result->cur_row = NULL;
+}
+
+static bool ocrpt_odbc_populate_result(ocrpt_query *query) {
+	ocrpt_odbc_results *result = query->priv;
+	ocrpt_odbc_private *priv = query->source->priv;
+	int32_t i;
+
+	if (result->atstart || result->isdone) {
+		ocrpt_query_result_set_values_null(query);
+		return !result->isdone;
+	}
+
+	for (i = 0; i < query->cols; i++) {
+		ocrpt_list *cur_col = (ocrpt_list *)result->cur_row->data;
+		ocrpt_string *str = (ocrpt_string *)cur_col->data;
+
+		ocrpt_query_result_set_value(query, i, (str == NULL), priv->encoder, str->str, str->len);
+	}
+
+	return true;
+}
+
+static bool ocrpt_odbc_next(ocrpt_query *query) {
+	ocrpt_odbc_results *result = query->priv;
+
+	if (result->isdone)
+		return false;
+
+	if (result->atstart) {
+		result->atstart = false;
+		result->cur_row = result->rows;
+	} else if (result->cur_row)
+		result->cur_row = result->cur_row->next;
+	result->isdone = (result->cur_row == NULL);
+	return ocrpt_odbc_populate_result(query);
+}
+
+static bool ocrpt_odbc_isdone(ocrpt_query *query) {
+	ocrpt_odbc_results *result = query->priv;
+
+	return result->isdone;
+}
+
+static void ocrpt_odbc_free(ocrpt_query *query) {
+	ocrpt_odbc_results *result = query->priv;
+	ocrpt_list *row;
+
+	for (row = (ocrpt_list *)result->rows; row; row = row->next) {
+		ocrpt_list *col;
+
+		for (col = (ocrpt_list *)row->data; col; col = col->next) {
+			ocrpt_string *data = (ocrpt_string *)col->data;
+
+			if (data)
+				ocrpt_mem_string_free(data, true);
+		}
+
+		ocrpt_list_free((ocrpt_list *)row->data);
+	}
+
+	ocrpt_list_free((ocrpt_list *)result->rows);
+
+	ocrpt_mem_string_free(result->coldata, true);
+	ocrpt_mem_free(result);
+}
+
+static bool ocrpt_odbc_set_encoding(ocrpt_datasource *ds, const char *encoding) {
+	ocrpt_odbc_private *priv = ds->priv;
+
+	if (priv->encoder != (iconv_t)-1)
+		iconv_close(priv->encoder);
+	priv->encoder = iconv_open("UTF-8", encoding);
+	return (priv->encoder != (iconv_t)-1);
+}
+
+static void ocrpt_odbc_close(const ocrpt_datasource *ds) {
+	ocrpt_odbc_private *priv = ds->priv;
+
+	SQLDisconnect(priv->dbc);
+	SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
+	SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
+	if (priv->encoder != (iconv_t)-1)
+		iconv_close(priv->encoder);
+	ocrpt_mem_free(priv);
+}
+
+static const ocrpt_input ocrpt_odbc_input = {
+	.type = OCRPT_INPUT_ODBC,
+	.describe = ocrpt_odbc_describe,
+	.rewind = ocrpt_odbc_rewind,
+	.next = ocrpt_odbc_next,
+	.populate_result = ocrpt_odbc_populate_result,
+	.isdone = ocrpt_odbc_isdone,
+	.free = ocrpt_odbc_free,
+	.set_encoding = ocrpt_odbc_set_encoding,
+	.close = ocrpt_odbc_close
+};
+
+static ocrpt_odbc_private *ocrpt_odbc_setup(void) {
+	ocrpt_odbc_private *priv = ocrpt_mem_malloc(sizeof(ocrpt_odbc_private));
+	SQLRETURN ret;
+
+	if (!priv)
+		return NULL;
+
+	memset(priv, 0, sizeof(ocrpt_odbc_private));
+	priv->encoder = (iconv_t)-1;
+
+	ret = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &priv->env);
+	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
+		ocrpt_mem_free(priv);
+		return NULL;
+	}
+
+	ret = SQLSetEnvAttr(priv->env, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
+		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
+		ocrpt_mem_free(priv);
+		return NULL;
+	}
+
+#if 0
+	/*
+	 * We expect UTF-8 strings from the database.
+	 * Some database drivers do that implicitly and ignore this call,
+	 * some of them comply with this call.
+	 * But unfortunately, some of the do not comply and ignore it.
+	 * For them, there's ocrpt_datasource_set_encoding().
+	 */
+	ret = SQLSetEnvAttr(priv->env, SQL_ATTR_APP_UNICODE_TYPE, (void *)SQL_DD_CP_UTF8, SQL_IS_INTEGER);
+	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
+		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
+		return NULL;
+	}
+
+	ret = SQLSetEnvAttr(priv->env, SQL_ATTR_APP_WCHAR_TYPE, (void *)SQL_DD_CP_UTF8, SQL_IS_INTEGER);
+	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
+		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
+		return NULL;
+	}
+#endif
+
+	ret = SQLAllocHandle(SQL_HANDLE_DBC, priv->env, &priv->dbc);
+	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
+		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
+		ocrpt_mem_free(priv);
+		return NULL;
+	}
+
+	SQLSetConnectAttr(priv->dbc, SQL_LOGIN_TIMEOUT, (SQLPOINTER *)5, 0);
+
+	return priv;
+}
+
+DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const char *source_name,
+															const char *dbname, const char *user, const char *password) {
+	ocrpt_datasource *ds;
+	ocrpt_odbc_private *priv = ocrpt_odbc_setup();
+	SQLRETURN ret;
+
+	if (!priv) {
+		fprintf(stderr, "%s:%d: ODBC private data setup failed\n", __func__, __LINE__);
+		return NULL;
+	}
+
+	ret = SQLConnect(priv->dbc, (SQLCHAR *)dbname, SQL_NTS, (SQLCHAR *)user, SQL_NTS, (SQLCHAR *)password, SQL_NTS);
+	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
+		fprintf(stderr, "%s:%d: SQLConnect failed\n", __func__, __LINE__);
+		SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
+		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
+		ocrpt_mem_free(priv);
+		return NULL;
+	}
+
+	ds = ocrpt_datasource_add(o, source_name, &ocrpt_odbc_input);
+	if (!ds) {
+		fprintf(stderr, "%s:%d: ocrpt_datasource_add failed\n", __func__, __LINE__);
+		SQLDisconnect(priv->dbc);
+		SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
+		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
+		ocrpt_mem_free(priv);
+	}
+
+	ds->priv = priv;
+	return ds;
+}
+
+DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, const char *source_name, const char *conninfo) {
+	ocrpt_datasource *ds;
+	ocrpt_odbc_private *priv = ocrpt_odbc_setup();
+	SQLRETURN ret;
+
+	if (!priv) {
+		fprintf(stderr, "%s:%d: ODBC private data setup failed\n", __func__, __LINE__);
+		return NULL;
+	}
+
+	ret = SQLDriverConnect(priv->dbc, NULL, (SQLCHAR *)conninfo, SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
+		fprintf(stderr, "%s:%d: SQLDriverConnect failed\n", __func__, __LINE__);
+		SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
+		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
+		ocrpt_mem_free(priv);
+		return NULL;
+	}
+
+	ds = ocrpt_datasource_add(o, source_name, &ocrpt_odbc_input);
+	if (!ds) {
+		fprintf(stderr, "%s:%d: ocrpt_datasource_add failed\n", __func__, __LINE__);
+		SQLDisconnect(priv->dbc);
+		SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
+		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
+		ocrpt_mem_free(priv);
+	}
+
+	ds->priv = priv;
+	return ds;
+}
+
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_odbc(opencreport *o, ocrpt_datasource *source, const char *name, const char *querystr) {
+	ocrpt_query *query;
+	ocrpt_odbc_private *priv;
+	ocrpt_odbc_results *result;
+	SQLHSTMT stmt;
+	SQLRETURN ret;
+
+	if (!ocrpt_datasource_validate(o, source)) {
+		fprintf(stderr, "%s:%d: datasource is not for this opencreport structure\n", __func__, __LINE__);
+		return NULL;
+	}
+
+	if (source->input->type != OCRPT_INPUT_ODBC) {
+		fprintf(stderr, "%s:%d: datasource is not an ODBC source\n", __func__, __LINE__);
+		return NULL;
+	}
+
+	priv = source->priv;
+
+	ret = SQLAllocHandle(SQL_HANDLE_STMT, priv->dbc, &stmt);
+	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
+		fprintf(stderr, "%s:%d: allocation statement handle failed\n", __func__, __LINE__);
+		return NULL;
+	}
+
+	ret = SQLExecDirect(stmt, (SQLCHAR *)querystr, SQL_NTS);
+	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
+		fprintf(stderr, "%s:%d: executing query failed: %s\n", __func__, __LINE__, querystr);
+		SQLFreeHandle(SQL_HANDLE_STMT, stmt);
+		return NULL;
+	}
+
+	query = ocrpt_query_alloc(o, source, name);
+	if (!query) {
+		SQLFreeHandle(SQL_HANDLE_STMT, stmt);
+		return NULL;
+	}
+
+	result = ocrpt_mem_malloc(sizeof(struct ocrpt_odbc_results));
+	if (!result) {
+		ocrpt_query_free(o, query);
+		SQLFreeHandle(SQL_HANDLE_STMT, stmt);
+		return NULL;
+	}
+
+	memset(result, 0, sizeof(ocrpt_odbc_results));
+
+	result->stmt = stmt;
+	result->atstart = true;
+	query->priv = result;
+	result->result = ocrpt_odbc_describe_early(query);
+
+	if (!result->result) {
+		ocrpt_query_free(o, query);
+		SQLFreeHandle(SQL_HANDLE_STMT, stmt);
 		return NULL;
 	}
 

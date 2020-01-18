@@ -1,6 +1,6 @@
 /*
  * OpenCReports main header
- * Copyright (C) 2019 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -271,15 +271,13 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 		case OCRPT_INPUT_MARIADB:
 			q = ocrpt_query_add_mariadb(o, ds, name_s, value_s);
 			break;
+		case OCRPT_INPUT_ODBC:
+			q = ocrpt_query_add_odbc(o, ds, name_s, value_s);
+			break;
 		default:
-			abort();
 			break;
 		}
 	}
-
-	/*
-	 * TODO: implement adding MariaDB and ODBC queries
-	 */
 
 	if (q) {
 		if (follower_for)
@@ -432,6 +430,11 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 				ocrpt_datasource_add_mariadb2(o, name_s, optionfile_s, group_s);
 			else
 				ocrpt_datasource_add_mariadb(o, name_s, host_s, port_s, dbname_s, user_s, password_s, unix_socket_s);
+		} else if (!strcmp(type_s, "odbc")) {
+			if (connstr_s)
+				ocrpt_datasource_add_odbc2(o, name_s, connstr_s);
+			else
+				ocrpt_datasource_add_odbc(o, name_s, dbname_s, user_s, password_s);
 		}
 	}
 
