@@ -91,7 +91,16 @@ AC_SUBST(POSTGRESQL_LIBS)
 
 MYSQL_CLIENT([5.0.3],[thread-safe])
 
-PKG_CHECK_MODULES(ODBC, odbc)
+AC_ARG_WITH([odbcmanager],
+	[AS_HELP_STRING([--with-odbcmanager={unixodbc|iodbc}],
+		[specify ODBC manager library @<:@default=unixodbc@:>@])],
+		[odbcmanager=$with_odbcmanager],
+	[odbcmanager=unixodbc])
+AS_IF(
+	[test x$odbcmanager = xunixodbc],[PKG_CHECK_MODULES(ODBC, odbc)],
+	[test x$odbcmanager = xiodbc],[PKG_CHECK_MODULES(ODBC, libiodbc)],
+	[AC_MSG_ERROR([Invalid ODBC manager type])])
+AC_MSG_NOTICE([ODBC manager is $odbcmanager])
 AC_SUBST(ODBC_CFLAGS)
 AC_SUBST(ODBC_LIBS)
 
