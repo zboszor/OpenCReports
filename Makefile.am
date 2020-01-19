@@ -4,4 +4,8 @@ ACLOCAL_AMFLAGS = -I m4
 
 pkgconfig_DATA = opencreports.pc
 
-SUBDIRS = doc include libsrc tests
+if ENABLE_TESTS
+TESTS = tests
+endif
+
+SUBDIRS = doc include libsrc $(TESTS)

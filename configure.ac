@@ -94,7 +94,7 @@ MYSQL_CLIENT([5.0.3],[thread-safe])
 AC_ARG_WITH([odbcmanager],
 	[AS_HELP_STRING([--with-odbcmanager={unixodbc|iodbc}],
 		[specify ODBC manager library @<:@default=unixodbc@:>@])],
-		[odbcmanager=$with_odbcmanager],
+	[odbcmanager=$with_odbcmanager],
 	[odbcmanager=unixodbc])
 AS_IF(
 	[test x$odbcmanager = xunixodbc],[PKG_CHECK_MODULES(ODBC, odbc)],
@@ -103,6 +103,13 @@ AS_IF(
 AC_MSG_NOTICE([ODBC manager is $odbcmanager])
 AC_SUBST(ODBC_CFLAGS)
 AC_SUBST(ODBC_LIBS)
+
+AC_MSG_CHECKING([whether tests are enabled])
+AC_ARG_ENABLE([tests],
+	[AS_HELP_STRING([--enable-tests],[enable unit tests])],
+	[],[enable_tests=no])
+AC_MSG_RESULT([$enable_tests])
+AM_CONDITIONAL(ENABLE_TESTS, [test x$enable_tests = xyes])
 
 AC_CONFIG_FILES([
 	Makefile
