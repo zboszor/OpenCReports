@@ -316,24 +316,6 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 	ocrpt_expr_free(cols_e);
 	ocrpt_expr_free(rows_e);
 	ocrpt_expr_free(coltypes_e);
-
-	ret = xmlTextReaderRead(reader);
-	while (ret == 1) {
-		xmlChar *name = xmlTextReaderName(reader);
-
-		//processNode(reader);
-
-		nodetype = xmlTextReaderNodeType(reader);
-
-		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "Query")) {
-			xmlFree(name);
-			break;
-		}
-
-		xmlFree(name);
-
-		ret = xmlTextReaderRead(reader);
-	}
 }
 
 static void ocrpt_parse_queries_node(opencreport *o, xmlTextReaderPtr reader) {
@@ -344,8 +326,7 @@ static void ocrpt_parse_queries_node(opencreport *o, xmlTextReaderPtr reader) {
 
 	depth = xmlTextReaderDepth(reader);
 
-	ret = xmlTextReaderRead(reader);
-	while (ret == 1) {
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		nodetype = xmlTextReaderNodeType(reader);
@@ -361,8 +342,6 @@ static void ocrpt_parse_queries_node(opencreport *o, xmlTextReaderPtr reader) {
 		}
 
 		xmlFree(name);
-
-		ret = xmlTextReaderRead(reader);
 	}
 }
 
@@ -407,10 +386,6 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	ocrpt_xml_expr_parse_get_value_with_fallback_noreport(o, optionfile);
 	ocrpt_xml_expr_parse_get_value_with_fallback_noreport(o, group);
 
-	/*
-	 * TODO: implement:
-	 * - connecting to PostgreSQL, MariaDB and ODBC datasources
-	 */
 	if (name_s && type_s) {
 		if (!strcmp(type_s, "array"))
 			ocrpt_datasource_add_array(o, name_s);
@@ -466,8 +441,7 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 
 	depth = xmlTextReaderDepth(reader);
 
-	ret = xmlTextReaderRead(reader);
-	while (ret == 1) {
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		nodetype = xmlTextReaderNodeType(reader);
@@ -478,8 +452,6 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 		}
 
 		xmlFree(name);
-
-		ret = xmlTextReaderRead(reader);
 	}
 }
 
@@ -491,8 +463,7 @@ static void ocrpt_parse_datasources_node(opencreport *o, xmlTextReaderPtr reader
 
 	depth = xmlTextReaderDepth(reader);
 
-	ret = xmlTextReaderRead(reader);
-	while (ret == 1) {
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		nodetype = xmlTextReaderNodeType(reader);
@@ -508,8 +479,6 @@ static void ocrpt_parse_datasources_node(opencreport *o, xmlTextReaderPtr reader
 		}
 
 		xmlFree(name);
-
-		ret = xmlTextReaderRead(reader);
 	}
 }
 
@@ -521,8 +490,7 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 
 	depth = xmlTextReaderDepth(reader);
 
-	ret = xmlTextReaderRead(reader);
-	while (ret == 1) {
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		//processNode(reader);
@@ -548,8 +516,6 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 		}
 
 		xmlFree(name);
-
-		ret = xmlTextReaderRead(reader);
 	}
 }
 
@@ -565,8 +531,7 @@ DLL_EXPORT_SYM bool ocrpt_parse_xml(opencreport *o, const char *filename) {
 	if (!reader)
 		return false;
 
-	ret = xmlTextReaderRead(reader);
-	while (ret == 1) {
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 		int nodeType = xmlTextReaderNodeType(reader);
 		int depth = xmlTextReaderDepth(reader);
@@ -595,9 +560,6 @@ DLL_EXPORT_SYM bool ocrpt_parse_xml(opencreport *o, const char *filename) {
 		}
 
 		xmlFree(name);
-
-		if (ret == 1)
-			ret = xmlTextReaderRead(reader);
 	}
 
 	xmlFreeTextReader(reader);
