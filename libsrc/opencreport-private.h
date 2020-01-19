@@ -31,32 +31,6 @@ struct opencreport_part {
 	bool parsed:1;
 };
 
-struct opencreport {
-	/* Paper name and size */
-	const ocrpt_paper *paper;
-	ocrpt_paper paper0;
-	int32_t paper_iterator_idx;
-
-	/* List and array of struct ocrpt_datasource */
-	ocrpt_list *datasources;
-
-	/* List and array of struct ocrpt_query */
-	ocrpt_list *queries;
-
-	/* Internal area for encoding conversion */
-	ocrpt_string *converted;
-
-	/* List of struct opencreports_part */
-	ocrpt_list *parts;
-
-	mpfr_prec_t prec;
-	mpfr_rnd_t rndmode;
-	gmp_randstate_t randstate;
-
-	/* Alternating datasource row result index  */
-	bool residx:1;
-};
-
 extern char cwdpath[PATH_MAX];
 
 void ocrpt_free_part(const struct opencreport_part *part);

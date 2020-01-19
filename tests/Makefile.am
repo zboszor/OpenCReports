@@ -6,7 +6,8 @@ $(top_builddir)/libsrc/libopencreport.la:
 	$(MAKE) -C $(top_builddir)/libsrc libopencreport.la
 
 TESTS = \
-	ocrpt_grammar_test ocrpt_expr_test ocrpt_environment_test ocrpt_environment2_test \
+	ocrpt_grammar_test ocrpt_expr_test ocrpt_function_test \
+	ocrpt_environment_test ocrpt_environment2_test \
 	ocrpt_array_test ocrpt_array2_test ocrpt_array_resolve_test ocrpt_array_xml_test \
 	ocrpt_csv_test ocrpt_csv2_test ocrpt_csv_array_test \
 	ocrpt_csv_xml_test ocrpt_csv_array_xml_test ocrpt_csv_array_xml2_test \
@@ -34,7 +35,7 @@ noinst_PROGRAMS = \
 	ocrpt_paper_test
 
 test: $(TESTS) execute_test.sh
-	$(foreach TEST,$(TESTS),./execute_test.sh $(TEST) && ) true
+	$(foreach TEST,$(TESTS),./execute_test.sh $(TEST) &&) true
 
 ocrpt_grammar_test_SOURCES = ocrpt_grammar_test.c
 ocrpt_grammar_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
@@ -283,6 +284,10 @@ ocrpt_odbc_xml3_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_odbc_xml4_test_SOURCES = ocrpt_odbc_xml4_test.c
 ocrpt_odbc_xml4_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_odbc_xml4_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_function_test_SOURCES = ocrpt_function_test.c
+ocrpt_function_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_function_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_break_test_SOURCES = ocrpt_break_test.c
 ocrpt_break_test_LDADD = $(top_builddir)/libsrc/libopencreport.la

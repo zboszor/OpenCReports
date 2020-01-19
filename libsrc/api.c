@@ -64,8 +64,18 @@ DLL_EXPORT_SYM void ocrpt_datasource_free(opencreport *o, ocrpt_datasource *sour
 }
 
 DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
+	int32_t i;
+
 	if (!o)
 		return;
+
+	for (i = 0; i < o->n_functions; i++) {
+		const ocrpt_function *f = o->functions[i];
+
+		ocrpt_strfree(f->fname);
+		ocrpt_mem_free(f);
+	}
+	ocrpt_mem_free(o->functions);
 
 	/*
 	 * ocrpt_free_query() or ocrpt_free_query0()

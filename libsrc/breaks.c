@@ -14,7 +14,6 @@
 #include "opencreport-private.h"
 #include "exprutil.h"
 #include "datasource.h"
-#include "functions.h"
 
 DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(opencreport *o, const char *name,
 											ocrpt_expr *newpage,

@@ -15,7 +15,6 @@
 #include "opencreport-private.h"
 #include "exprutil.h"
 #include "datasource.h"
-#include "functions.h"
 
 ocrpt_expr *newblankexpr(enum ocrpt_expr_type type, uint32_t n_ops) {
 	ocrpt_expr *e;
@@ -459,7 +458,7 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_expr *e) {
 	return e->result[o->residx];
 }
 
-ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *error) {
+DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *error) {
 	ocrpt_result *result = e->result[o->residx];
 
 	if (!result) {

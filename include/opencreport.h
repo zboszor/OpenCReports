@@ -18,6 +18,9 @@ typedef struct opencreport opencreport;
 struct ocrpt_expr;
 typedef struct ocrpt_expr ocrpt_expr;
 
+struct ocrpt_function;
+typedef struct ocrpt_function ocrpt_function;
+
 enum ocrpt_result_type {
 	/*
 	 * Error in parsing or evaluation
@@ -30,6 +33,38 @@ enum ocrpt_result_type {
 	OCRPT_RESULT_STRING,
 	OCRPT_RESULT_NUMBER,
 	OCRPT_RESULT_DATETIME
+};
+
+/*
+ * The first part of the definitions are the same as enum ocrpt_result_type
+ */
+enum ocrpt_expr_type {
+	/*
+	 * Error in parsing or evaluation
+	 */
+	OCRPT_EXPR_ERROR,
+
+	/*
+	 * Constants
+	 */
+	OCRPT_EXPR_STRING,
+	OCRPT_EXPR_NUMBER,
+	OCRPT_EXPR_DATETIME,
+
+	/*
+	 * Pre-set variable that can be evaluated early
+	 */
+	OCRPT_EXPR_MVAR,
+
+	/*
+	 * Internal variables, identifiers resolved from queries and
+	 * general expressions. These are evaluated on a row-by-row
+	 * basis from the recordset.
+	 */
+	OCRPT_EXPR_RVAR,
+	OCRPT_EXPR_IDENT,
+	OCRPT_EXPR_VVAR,
+	OCRPT_EXPR,
 };
 
 enum ocrpt_varref_type {
@@ -76,13 +111,37 @@ typedef void (*ocrpt_function_call)(opencreport *, ocrpt_expr *);
 struct ocrpt_function {
 	const char *fname;
 	ocrpt_function_call func;
-	const int32_t n_ops;
-	const bool commutative:1;
-	const bool associative:1;
-	const bool left_associative:1;
-	const bool dont_optimize:1;
+	int32_t n_ops;
+	bool commutative:1;
+	bool associative:1;
+	bool left_associative:1;
+	bool dont_optimize:1;
 };
-typedef struct ocrpt_function ocrpt_function;
+
+struct ocrpt_expr {
+	struct ocrpt_result *result[2];
+	union {
+		/*
+		 * Identifiers: computed report variables,
+		 * environment variables, query fields
+		 */
+		struct {
+			ocrpt_string *query;
+			ocrpt_string *name;
+			bool dotprefixed;
+		};
+
+		struct {
+			const ocrpt_function *func;
+			ocrpt_expr **ops;
+			uint32_t n_ops;
+		};
+	};
+	enum ocrpt_expr_type type:4;
+	bool result_owned0:1;
+	bool result_owned1:1;
+	bool parenthesized:1;
+};
 
 struct ocrpt_datasource;
 typedef struct ocrpt_datasource ocrpt_datasource;
@@ -142,6 +201,36 @@ typedef struct ocrpt_report_part ocrpt_report_part;
 
 #define OCRPT_MPFR_PRECISION_BITS	(256)
 
+/* Main report structure type, expanded */
+struct opencreport {
+	/* Paper name and size */
+	const ocrpt_paper *paper;
+	ocrpt_paper paper0;
+	int32_t paper_iterator_idx;
+
+	ocrpt_function **functions;
+	int32_t n_functions;
+
+	/* List and array of struct ocrpt_datasource */
+	ocrpt_list *datasources;
+
+	/* List and array of struct ocrpt_query */
+	ocrpt_list *queries;
+
+	/* Internal area for encoding conversion */
+	ocrpt_string *converted;
+
+	/* List of struct opencreports_part */
+	ocrpt_list *parts;
+
+	mpfr_prec_t prec;
+	mpfr_rnd_t rndmode;
+	gmp_randstate_t randstate;
+
+	/* Alternating datasource row result index  */
+	bool residx:1;
+};
+
 /*
  * Create a new empty OpenCReports structure
  */
@@ -167,6 +256,15 @@ void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode);
  * Create an expression parse tree from an expression string
  */
 ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, char **err);
+/*
+ * Initialize expression result to the specified type
+ * Mainly used in functions
+ */
+bool ocrpt_expr_init_result(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type);
+/*
+ * Set or initialize the result of the expression as an error with the specified message
+ */
+ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *error);
 /*
  * Optimize expression after parsing
  */
@@ -217,6 +315,21 @@ void ocrpt_result_print(ocrpt_result *r);
  * Free an ocrpt_result structure
  */
 void ocrpt_result_free(ocrpt_result *r);
+
+/******************************
+ * Function related functions *
+ ******************************/
+
+/*
+ * Add a new custom function to the opencreport structure
+ */
+bool ocrpt_function_add(opencreport *o, const char *fname, ocrpt_function_call func,
+						int32_t n_ops, bool commutative, bool associative,
+						bool left_associative, bool dont_optimize);
+/*
+ * Find a named function
+ */
+ocrpt_function const * const ocrpt_function_find(opencreport *o, const char *fname);
 
 /*********************************
  * Environment related functions *

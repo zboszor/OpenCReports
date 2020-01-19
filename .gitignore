@@ -54,6 +54,7 @@ tests/results/*.stdout
 # Test binaries
 tests/ocrpt_grammar_test
 tests/ocrpt_expr_test
+tests/ocrpt_function_test
 tests/ocrpt_random_test
 tests/ocrpt_environment_test
 tests/ocrpt_environment2_test

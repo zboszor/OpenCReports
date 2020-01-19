@@ -11,72 +11,11 @@
 
 #include <opencreport.h>
 
-/*
- * Used as both main type of an expression and subtype
- * The first part of the definitions are the same as
- * enum ocrpt_result_type in the public opencreport.h
- */
-enum ocrpt_expr_type {
-	/*
-	 * Error in parsing or evaluation
-	 */
-	OCRPT_EXPR_ERROR,
-
-	/*
-	 * Constants
-	 */
-	OCRPT_EXPR_STRING,
-	OCRPT_EXPR_NUMBER,
-	OCRPT_EXPR_DATETIME,
-
-	/*
-	 * Pre-set variable that can be evaluated early
-	 */
-	OCRPT_EXPR_MVAR,
-
-	/*
-	 * Internal variables, identifiers resolved from queries and
-	 * general expressions. These are evaluated on a row-by-row
-	 * basis from the recordset.
-	 */
-	OCRPT_EXPR_RVAR,
-	OCRPT_EXPR_IDENT,
-	OCRPT_EXPR_VVAR,
-	OCRPT_EXPR,
-};
-
 #define ocrpt_expr_is_const(x) ((x)->type == OCRPT_EXPR_STRING || (x)->type == OCRPT_EXPR_NUMBER || (x)->type == OCRPT_EXPR_DATETIME)
 #define ocrpt_expr_is_dconst(x) ((x)->type == OCRPT_EXPR_NUMBER)
 #define ocrpt_expr_is_sconst(x) ((x)->type == OCRPT_EXPR_STRING)
 #define ocrpt_expr_is_dtconst(x) ((x)->type == OCRPT_EXPR_DATETIME)
 
-struct ocrpt_expr {
-	struct ocrpt_result *result[2];
-	union {
-		/*
-		 * Identifiers: computed report variables,
-		 * environment variables, query fields
-		 */
-		struct {
-			ocrpt_string *query;
-			ocrpt_string *name;
-			bool dotprefixed;
-		};
-
-		struct {
-			const ocrpt_function *func;
-			ocrpt_expr **ops;
-			uint32_t n_ops;
-		};
-	};
-	enum ocrpt_expr_type type:4;
-	bool result_owned0:1;
-	bool result_owned1:1;
-	bool parenthesized:1;
-};
-typedef struct ocrpt_expr ocrpt_expr;
-
 ocrpt_expr *newblankexpr(enum ocrpt_expr_type type, uint32_t n_ops);
-ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *error);
 
 #endif
