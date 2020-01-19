@@ -878,17 +878,17 @@ static bool ocrpt_odbc_populate_result(ocrpt_query *query) {
 	ocrpt_odbc_results *result = query->priv;
 	ocrpt_odbc_private *priv = query->source->priv;
 	int32_t i;
+	ocrpt_list *cur_col;
 
 	if (result->atstart || result->isdone) {
 		ocrpt_query_result_set_values_null(query);
 		return !result->isdone;
 	}
 
-	for (i = 0; i < query->cols; i++) {
-		ocrpt_list *cur_col = (ocrpt_list *)result->cur_row->data;
+	for (i = 0, cur_col = (ocrpt_list *)result->cur_row->data; i < query->cols; i++, cur_col = cur_col->next) {
 		ocrpt_string *str = (ocrpt_string *)cur_col->data;
 
-		ocrpt_query_result_set_value(query, i, (str == NULL), priv->encoder, str->str, str->len);
+		ocrpt_query_result_set_value(query, i, (str == NULL), priv->encoder, str ? str->str : NULL, str ? str->len : 0);
 	}
 
 	return true;
