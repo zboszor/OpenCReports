@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include <opencreport.h>
+#include "ocrpt_test_common.c"
 
 const char *array[4][5] = {
 	{ "id", "name", "property", "age", "adult" },
@@ -18,18 +19,6 @@ const char *array[4][5] = {
 const enum ocrpt_result_type coltypes[5] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
-
-void print_result_row(const char *name, ocrpt_query_result *qr, int32_t cols) {
-	int i;
-
-	printf("Query: '%s':\n", name);
-	for (i = 0; i < cols; i++) {
-		printf("\tCol #%d: '%s': '%s'", i, qr[i].name, qr[i].result.isnull ? "NULL" : qr[i].result.string->str);
-		if (!qr[i].result.isnull && qr[i].result.number_initialized)
-			mpfr_printf(" (converted to number: %RF)", qr[i].result.number);
-		printf("\n");
-	}
-}
 
 int main(void) {
 	opencreport *o = ocrpt_init();
