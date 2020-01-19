@@ -31,8 +31,8 @@ int main(void) {
 	int32_t cols, row, i;
 
 	ocrpt_query_discover_array("array", &arrayptr, "coltypes", &coltypesptr);
-	printf("Discovered array pointer: %p - should be %p\n", arrayptr, array);
-	printf("Discovered coltypes pointer: %p - should be %p\n", coltypesptr, coltypes);
+	printf("Discovered array pointer: %sidentical\n", arrayptr == array ? "" : "NOT ");
+	printf("Discovered coltypes pointer: %sidentical\n", coltypesptr == coltypes ? "" : "NOT ");
 
 	if (!arrayptr) {
 		printf("Cannot find array pointer\n");

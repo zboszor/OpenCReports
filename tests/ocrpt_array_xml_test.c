@@ -22,6 +22,7 @@ const enum ocrpt_result_type coltypes[5] = {
 
 int main(void) {
 	opencreport *o = ocrpt_init();
+	ocrpt_datasource *ds;
 	ocrpt_query *q;
 	ocrpt_query_result *qr;
 	ocrpt_expr *id, *name, *age, *adult;
@@ -34,8 +35,11 @@ int main(void) {
 		return 0;
 	}
 
-	printf("datasource: array=%p\n", ocrpt_datasource_find(o, "myarray"));
-	printf("query: a=%p\n", ocrpt_query_find(o, "a"));
+	ds = ocrpt_datasource_find(o, "myarray");
+	printf("datasource: array %sfound\n", ds == NULL ? "NOT " : "");
+
+	q = ocrpt_query_find(o, "a");
+	printf("query: \"a\" %sfound\n", q == NULL ? "NOT " : "");
 
 	err = NULL;
 	id = ocrpt_expr_parse(o, "id", &err);
@@ -55,7 +59,6 @@ int main(void) {
 	err = NULL;
 	adult = ocrpt_expr_parse(o, "a.adult", &err);
 
-	q = ocrpt_query_find(o, "a");
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)
