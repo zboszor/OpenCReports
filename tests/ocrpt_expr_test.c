@@ -165,11 +165,6 @@ int main(void) {
 		"nulln()",
 		"nulls()",
 
-		/* Random */
-		"random()",
-		"random()",
-		"random()",
-
 		/* Error tests */
 		"error('custom error')",
 	};

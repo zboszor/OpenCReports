@@ -1,11 +1,13 @@
 AM_CPPFLAGS = -Wall -O2 -g -I$(top_srcdir)/include
 
+AM_CFLAGS = -rdynamic
+
 $(top_builddir)/libsrc/libopencreport.la:
 	$(MAKE) -C $(top_builddir)/libsrc libopencreport.la
 
-noinst_PROGRAMS = \
+TESTS = \
 	ocrpt_grammar_test ocrpt_expr_test ocrpt_environment_test ocrpt_environment2_test \
-	ocrpt_array_test ocrpt_array_resolve_test ocrpt_array_xml_test \
+	ocrpt_array_test ocrpt_array2_test ocrpt_array_resolve_test ocrpt_array_xml_test \
 	ocrpt_csv_test ocrpt_csv2_test ocrpt_csv_array_test \
 	ocrpt_csv_xml_test ocrpt_csv_array_xml_test ocrpt_csv_array_xml2_test \
 	ocrpt_json_test ocrpt_json2_test ocrpt_json3_test ocrpt_json4_test ocrpt_json5_test \
@@ -24,7 +26,15 @@ noinst_PROGRAMS = \
 	ocrpt_odbc5_test ocrpt_odbc6_test ocrpt_odbc7_test \
 	ocrpt_odbc_xml_test ocrpt_odbc_xml2_test ocrpt_odbc_xml3_test \
 	ocrpt_odbc_xml4_test \
-	ocrpt_break_test ocrpt_paper_test
+	ocrpt_break_test
+
+noinst_PROGRAMS = \
+	$(TESTS) \
+	ocrpt_random_test \
+	ocrpt_paper_test
+
+test: $(TESTS) execute_test.sh
+	$(foreach TEST,$(TESTS),./execute_test.sh $(TEST) && ) true
 
 ocrpt_grammar_test_SOURCES = ocrpt_grammar_test.c
 ocrpt_grammar_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
@@ -33,6 +43,10 @@ ocrpt_grammar_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_expr_test_SOURCES = ocrpt_expr_test.c
 ocrpt_expr_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_expr_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_random_test_SOURCES = ocrpt_random_test.c
+ocrpt_random_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_random_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_environment_test_SOURCES = ocrpt_environment_test.c
 ocrpt_environment_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
@@ -46,13 +60,15 @@ ocrpt_array_test_SOURCES = ocrpt_array_test.c
 ocrpt_array_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_array_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
+ocrpt_array2_test_SOURCES = ocrpt_array2_test.c
+ocrpt_array2_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_array2_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
 ocrpt_array_resolve_test_SOURCES = ocrpt_array_resolve_test.c
-ocrpt_array_resolve_test_CFLAGS = -rdynamic
 ocrpt_array_resolve_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_array_resolve_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_array_xml_test_SOURCES = ocrpt_array_xml_test.c
-ocrpt_array_xml_test_CFLAGS = -rdynamic
 ocrpt_array_xml_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_array_xml_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
@@ -69,102 +85,82 @@ ocrpt_csv_array_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_csv_array_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_csv_xml_test_SOURCES = ocrpt_csv_xml_test.c
-ocrpt_csv_xml_test_CFLAGS = -rdynamic
 ocrpt_csv_xml_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_csv_xml_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_csv_array_xml_test_SOURCES = ocrpt_csv_array_xml_test.c
-ocrpt_csv_array_xml_test_CFLAGS = -rdynamic
 ocrpt_csv_array_xml_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_csv_array_xml_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_csv_array_xml2_test_SOURCES = ocrpt_csv_array_xml2_test.c
-ocrpt_csv_array_xml2_test_CFLAGS = -rdynamic
 ocrpt_csv_array_xml2_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_csv_array_xml2_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_json_test_SOURCES = ocrpt_json_test.c
-ocrpt_json_test_CFLAGS = -rdynamic
 ocrpt_json_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_json_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_json2_test_SOURCES = ocrpt_json2_test.c
-ocrpt_json2_test_CFLAGS = -rdynamic
 ocrpt_json2_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_json2_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_json3_test_SOURCES = ocrpt_json3_test.c
-ocrpt_json3_test_CFLAGS = -rdynamic
 ocrpt_json3_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_json3_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_json4_test_SOURCES = ocrpt_json4_test.c
-ocrpt_json4_test_CFLAGS = -rdynamic
 ocrpt_json4_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_json4_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_json5_test_SOURCES = ocrpt_json5_test.c
-ocrpt_json5_test_CFLAGS = -rdynamic
 ocrpt_json5_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_json5_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_json6_test_SOURCES = ocrpt_json6_test.c
-ocrpt_json6_test_CFLAGS = -rdynamic
 ocrpt_json6_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_json6_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_json7_test_SOURCES = ocrpt_json7_test.c
-ocrpt_json7_test_CFLAGS = -rdynamic
 ocrpt_json7_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_json7_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_json8_test_SOURCES = ocrpt_json8_test.c
-ocrpt_json8_test_CFLAGS = -rdynamic
 ocrpt_json8_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_json8_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_json_xml_test_SOURCES = ocrpt_json_xml_test.c
-ocrpt_json_xml_test_CFLAGS = -rdynamic
 ocrpt_json_xml_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_json_xml_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_json_xml2_test_SOURCES = ocrpt_json_xml2_test.c
-ocrpt_json_xml2_test_CFLAGS = -rdynamic
 ocrpt_json_xml2_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_json_xml2_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_xml_test_SOURCES = ocrpt_xml_test.c
-ocrpt_xml_test_CFLAGS = -rdynamic
 ocrpt_xml_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_xml_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_xml2_test_SOURCES = ocrpt_xml2_test.c
-ocrpt_xml2_test_CFLAGS = -rdynamic
 ocrpt_xml2_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_xml2_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_xml3_test_SOURCES = ocrpt_xml3_test.c
-ocrpt_xml3_test_CFLAGS = -rdynamic
 ocrpt_xml3_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_xml3_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_xml4_test_SOURCES = ocrpt_xml4_test.c
-ocrpt_xml4_test_CFLAGS = -rdynamic
 ocrpt_xml4_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_xml4_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_xml5_test_SOURCES = ocrpt_xml5_test.c
-ocrpt_xml5_test_CFLAGS = -rdynamic
 ocrpt_xml5_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_xml5_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_xml_xml_test_SOURCES = ocrpt_xml_xml_test.c
-ocrpt_xml_xml_test_CFLAGS = -rdynamic
 ocrpt_xml_xml_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_xml_xml_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_xml_xml2_test_SOURCES = ocrpt_xml_xml2_test.c
-ocrpt_xml_xml2_test_CFLAGS = -rdynamic
 ocrpt_xml_xml2_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_xml_xml2_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
@@ -213,12 +209,10 @@ ocrpt_pgsql_xml9_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_pgsql_xml9_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_pgsql_xml10_test_SOURCES = ocrpt_pgsql_xml10_test.c
-ocrpt_pgsql_xml10_test_CFLAGS = -rdynamic
 ocrpt_pgsql_xml10_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_pgsql_xml10_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_pgsql_xml11_test_SOURCES = ocrpt_pgsql_xml11_test.c
-ocrpt_pgsql_xml11_test_CFLAGS = -rdynamic
 ocrpt_pgsql_xml11_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_pgsql_xml11_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 

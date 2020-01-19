@@ -1,0 +1,204 @@
+Query columns:
+0: 'id'
+1: 'name'
+2: 'property'
+3: 'age'
+4: 'adult'
+.'id'
+.'name'
+mul(val(.'age'),2.000000)
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: 1
+	Col #1: 'name': string value: Fred Flintstone
+	Col #2: 'property': string value: strong
+	Col #3: 'age': string value: 31
+	Col #4: 'adult': string value: yes
+
+Expression: .'id'
+Evaluated: (string)1
+Expression: .'name'
+Evaluated: (string)Fred Flintstone
+Expression: mul(val(.'age'),2.000000)
+Evaluated: (number)62.000000
+Expression: val('a'.'adult')
+Evaluated: (number)1.000000
+Expression is different from previous row
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: 2
+	Col #1: 'name': string value: Wilma Flintstone
+	Col #2: 'property': string value: charming
+	Col #3: 'age': string value: 28
+	Col #4: 'adult': string value: yes
+
+Expression: .'id'
+Evaluated: (string)2
+Expression: .'name'
+Evaluated: (string)Wilma Flintstone
+Expression: mul(val(.'age'),2.000000)
+Evaluated: (number)56.000000
+Expression: val('a'.'adult')
+Evaluated: (number)1.000000
+prev: 1.000000 (isnull 0) current: 1.000000 (isnull 0)
+Expression is identical to previous row
+
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: 3
+	Col #1: 'name': string value: Pebbles Flintstone
+	Col #2: 'property': string value: young
+	Col #3: 'age': string value: 5e-1
+	Col #4: 'adult': string value: no
+
+Expression: .'id'
+Evaluated: (string)3
+Expression: .'name'
+Evaluated: (string)Pebbles Flintstone
+Expression: mul(val(.'age'),2.000000)
+Evaluated: (number)1.000000
+Expression: val('a'.'adult')
+Evaluated: (number)0
+prev: 1.000000 (isnull 0) current: 0 (isnull 0)
+Expression is different from previous row
+
+--- TESTING FOLLOWER ---
+
+q cols 5
+q2 cols 5
+.'id'
+.'name'
+mul(val(.'age'),2.000000)
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: 1
+	Col #1: 'name': string value: Fred Flintstone
+	Col #2: 'property': string value: strong
+	Col #3: 'age': string value: 31
+	Col #4: 'adult': string value: yes
+Query: 'b':
+	Col #0: 'id': string value: 2
+	Col #1: 'name': string value: Betty Rubble
+	Col #2: 'property': string value: beautiful
+	Col #3: 'age': string value: 27
+	Col #4: 'adult': string value: yes
+
+Expression: .'id'
+Evaluated: (string)1
+Expression: .'name'
+Evaluated: (string)Fred Flintstone
+Expression: mul(val(.'age'),2.000000)
+Evaluated: (number)62.000000
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: 2
+	Col #1: 'name': string value: Wilma Flintstone
+	Col #2: 'property': string value: charming
+	Col #3: 'age': string value: 28
+	Col #4: 'adult': string value: yes
+Query: 'b':
+	Col #0: 'id': string value: 1
+	Col #1: 'name': string value: Barney Rubble
+	Col #2: 'property': string value: small
+	Col #3: 'age': string value: 29
+	Col #4: 'adult': string value: yes
+
+Expression: .'id'
+Evaluated: (string)2
+Expression: .'name'
+Evaluated: (string)Wilma Flintstone
+Expression: mul(val(.'age'),2.000000)
+Evaluated: (number)56.000000
+
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: 3
+	Col #1: 'name': string value: Pebbles Flintstone
+	Col #2: 'property': string value: young
+	Col #3: 'age': string value: 5e-1
+	Col #4: 'adult': string value: no
+Query: 'b':
+	Col #0: 'id': string value: NULL
+	Col #1: 'name': string value: NULL
+	Col #2: 'property': string value: NULL
+	Col #3: 'age': string value: NULL
+	Col #4: 'adult': string value: NULL
+
+Expression: .'id'
+Evaluated: (string)3
+Expression: .'name'
+Evaluated: (string)Pebbles Flintstone
+Expression: mul(val(.'age'),2.000000)
+Evaluated: (number)1.000000
+
+--- TESTING FOLLOWER N:1 ---
+
+.'id'
+.'name'
+mul(val(.'age'),2.000000)
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: 1
+	Col #1: 'name': string value: Fred Flintstone
+	Col #2: 'property': string value: strong
+	Col #3: 'age': string value: 31
+	Col #4: 'adult': string value: yes
+Query: 'b':
+	Col #0: 'id': string value: 1
+	Col #1: 'name': string value: Barney Rubble
+	Col #2: 'property': string value: small
+	Col #3: 'age': string value: 29
+	Col #4: 'adult': string value: yes
+
+Expression: .'id'
+Evaluated: (string)1
+Expression: .'name'
+Evaluated: (string)Fred Flintstone
+Expression: mul(val(.'age'),2.000000)
+Evaluated: (number)62.000000
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: 2
+	Col #1: 'name': string value: Wilma Flintstone
+	Col #2: 'property': string value: charming
+	Col #3: 'age': string value: 28
+	Col #4: 'adult': string value: yes
+Query: 'b':
+	Col #0: 'id': string value: 2
+	Col #1: 'name': string value: Betty Rubble
+	Col #2: 'property': string value: beautiful
+	Col #3: 'age': string value: 27
+	Col #4: 'adult': string value: yes
+
+Expression: .'id'
+Evaluated: (string)2
+Expression: .'name'
+Evaluated: (string)Wilma Flintstone
+Expression: mul(val(.'age'),2.000000)
+Evaluated: (number)56.000000
+
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: 3
+	Col #1: 'name': string value: Pebbles Flintstone
+	Col #2: 'property': string value: young
+	Col #3: 'age': string value: 5e-1
+	Col #4: 'adult': string value: no
+Query: 'b':
+	Col #0: 'id': string value: NULL
+	Col #1: 'name': string value: NULL
+	Col #2: 'property': string value: NULL
+	Col #3: 'age': string value: NULL
+	Col #4: 'adult': string value: NULL
+
+Expression: .'id'
+Evaluated: (string)3
+Expression: .'name'
+Evaluated: (string)Pebbles Flintstone
+Expression: mul(val(.'age'),2.000000)
+Evaluated: (number)1.000000
+
+--- END ---

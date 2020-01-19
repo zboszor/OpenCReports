@@ -115,7 +115,7 @@ DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
 		printf("(ERROR)%s\n", r->isnull ? "NULL" : r->string->str);
 		break;
 	case OCRPT_RESULT_STRING:
-		printf("(string)%s\n", r->isnull ? "NULL" : r->string->str);
+		printf("(string)%s\n", (r->isnull || !r->string) ? "NULL" : r->string->str);
 		break;
 	case OCRPT_RESULT_DATETIME:
 		printf("(datetime)%s\n", r->isnull ? "NULL" : r->string->str);

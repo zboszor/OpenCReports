@@ -1,0 +1,57 @@
+Connecting to MariaDB database was successful
+Adding query 'a' was successful
+Adding query 'b' was successful
+Query columns (a):
+0: 'id'
+1: 'name'
+2: 'property'
+3: 'age'
+4: 'adult'
+Query columns (b):
+0: 'adult'
+1: 'id'
+2: 'name'
+3: 'property'
+4: 'age'
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 1.000000)
+	Col #1: 'name': string value: Fred Flintstone
+	Col #2: 'property': string value: strong
+	Col #3: 'age': string value: NULL (converted to number: 31.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+Query: 'b':
+	Col #0: 'adult': string value: NULL (converted to number: 1.000000)
+	Col #1: 'id': string value: NULL (converted to number: 1.000000)
+	Col #2: 'name': string value: Barney Rubble
+	Col #3: 'property': string value: small
+	Col #4: 'age': string value: NULL (converted to number: 28.000000)
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 2.000000)
+	Col #1: 'name': string value: Wilma Flintstone
+	Col #2: 'property': string value: charming
+	Col #3: 'age': string value: NULL (converted to number: 28.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+Query: 'b':
+	Col #0: 'adult': string value: NULL (converted to number: 1.000000)
+	Col #1: 'id': string value: NULL (converted to number: 2.000000)
+	Col #2: 'name': string value: Betty Rubble
+	Col #3: 'property': string value: beautiful
+	Col #4: 'age': string value: NULL (converted to number: 27.000000)
+
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 3.000000)
+	Col #1: 'name': string value: Pebbles Flintstone
+	Col #2: 'property': string value: young
+	Col #3: 'age': string value: NULL (converted to number: 1.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 0)
+Query: 'b':
+	Col #0: 'adult': string value: NULL
+	Col #1: 'id': string value: NULL
+	Col #2: 'name': string value: NULL
+	Col #3: 'property': string value: NULL
+	Col #4: 'age': string value: NULL
+

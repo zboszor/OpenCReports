@@ -26,6 +26,7 @@ libtool
 ltmain.sh
 missing
 stamp-h1
+test-driver
 
 m4/libtool.m4
 m4/ltoptions.m4
@@ -46,12 +47,18 @@ libsrc/lex.yy.*
 # Documentation
 doc/*.pdf
 
+# Test results
+tests/results/*.stderr
+tests/results/*.stdout
+
 # Test binaries
 tests/ocrpt_grammar_test
 tests/ocrpt_expr_test
+tests/ocrpt_random_test
 tests/ocrpt_environment_test
 tests/ocrpt_environment2_test
 tests/ocrpt_array_test
+tests/ocrpt_array2_test
 tests/ocrpt_array_resolve_test
 tests/ocrpt_array_xml_test
 tests/ocrpt_csv_test

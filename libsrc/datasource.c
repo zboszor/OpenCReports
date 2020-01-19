@@ -135,9 +135,13 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_find(opencreport *o, const char *name) {
 }
 
 void ocrpt_query_free0(ocrpt_query *q) {
-	opencreport *o = q->source->o;
+	opencreport *o;
 	ocrpt_list *ptr, *ptr1;
 
+	if (!q)
+		return;
+
+	o = q->source->o;
 	for (ptr = o->queries; ptr; ptr = ptr->next) {
 		ocrpt_query *q1 = (ocrpt_query *)ptr->data;
 		ocrpt_query_follower *f = NULL;
@@ -209,7 +213,7 @@ void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_
 	opencreport *o = q->source->o;
 	int32_t base = (o->residx ? q->cols: 0);
 	ocrpt_result *r = &q->result[base + i].result;
-	ocrpt_string *string;
+	ocrpt_string *rstring;
 
 	r->isnull = isnull;
 	if (isnull)
@@ -258,6 +262,8 @@ void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_
 					break;
 				}
 			}
+			string->len = string->allocated_len - 1 - outbytesleft;
+			string->str[string->len] = 0;
 		}
 
 		if (string) {
@@ -275,20 +281,20 @@ void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_
 		if (!strcmp(str, "no") || !strcmp(str, "false") || !strcmp(str, "f"))
 			str = "0";
 		mpfr_set_str(r->number, str, 10, o->rndmode);
-		/* fall through */
+		break;
 	case OCRPT_RESULT_STRING:
 	default:
 		if (len < 0)
 			len = (str ? strlen(str) : 0);
-		string = ocrpt_mem_string_resize(r->string, len);
-		if (string) {
+		rstring = ocrpt_mem_string_resize(r->string, len);
+		if (rstring) {
 			if (!r->string) {
-				r->string = string;
+				r->string = rstring;
 				r->string_owned = true;
 			}
 		}
-		string->len = 0;
-		ocrpt_mem_string_append_len(string, str, len);
+		rstring->len = 0;
+		ocrpt_mem_string_append_len(rstring, str, len);
 		break;
 	}
 }

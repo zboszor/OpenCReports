@@ -57,6 +57,7 @@ void free_exprs(void) {
 
 int main(void) {
 	opencreport *o = ocrpt_init();
+	ocrpt_datasource *ds, *ds2;
 	ocrpt_query *q, *q2;
 	ocrpt_query_result *qr, *qr2;
 	int32_t cols, cols2, row, i;
@@ -67,6 +68,7 @@ int main(void) {
 		return 0;
 	}
 
+	ds = ocrpt_datasource_find(o, "mycsv");
 	q = ocrpt_query_find(o, "a");
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
@@ -119,6 +121,7 @@ int main(void) {
 	free_exprs();
 
 	ocrpt_query_free(o, q);
+	ocrpt_datasource_free(o, ds);
 
 	printf("--- TESTING FOLLOWER ---\n\n");
 
@@ -128,10 +131,33 @@ int main(void) {
 		return 0;
 	}
 
+	ds = ocrpt_datasource_find(o, "mycsv");
+	if (!ds) {
+		printf("datasource 'mycsv' not found\n");
+		ocrpt_free(o);
+		return 1;
+	}
 	q = ocrpt_query_find(o, "a");
+	if (!q) {
+		printf("query 'a' not found\n");
+		ocrpt_free(o);
+		return 1;
+	}
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("q cols %d\n", cols);
+
+	ds2 = ocrpt_datasource_find(o, "myarray");
+	if (!ds2) {
+		printf("datasource 'myarray' not found\n");
+		ocrpt_free(o);
+		return 1;
+	}
 	q2 = ocrpt_query_find(o, "b");
+	if (!q2) {
+		printf("query 'b' not found\n");
+		ocrpt_free(o);
+		return 1;
+	}
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	printf("q2 cols %d\n", cols2);
 

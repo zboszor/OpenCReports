@@ -104,15 +104,15 @@ static bool ocrpt_array_populate_result(ocrpt_query *query) {
 	struct ocrpt_array_results *result = query->priv;
 	int32_t i;
 
-	if (result->isdone) {
+	if (result->atstart || result->isdone) {
 		ocrpt_query_result_set_values_null(query);
-		return false;
+		return !result->isdone;
 	}
 
 	for (i = 0; i < query->cols; i++) {
 		int32_t dataidx = result->current_row * query->cols + i;
 		const char *str = result->data[dataidx];
-		int32_t len = strlen(str);
+		int32_t len = str ? strlen(str) : 0;
 
 		ocrpt_query_result_set_value(query, i, (str == NULL), source->priv, str, len);
 	}
