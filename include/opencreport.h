@@ -360,6 +360,10 @@ const ocrpt_paper *ocrpt_paper_next(opencreport *o);
  */
 ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const ocrpt_input *input);
 /*
+ * Free a datasource from the opencreport structure it was added to
+ */
+void ocrpt_datasource_free(opencreport *o, ocrpt_datasource *source);
+/*
  * Find the datasource using its name
  */
 ocrpt_datasource *ocrpt_datasource_find(opencreport *o, const char *source_name);

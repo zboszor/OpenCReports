@@ -51,16 +51,16 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	return o;
 }
 
-static void ocrpt_free_datasource(const void *sptr) {
-	const ocrpt_datasource *s = sptr;
-
-	if (!s)
+DLL_EXPORT_SYM void ocrpt_datasource_free(opencreport *o, ocrpt_datasource *source) {
+	if (!ocrpt_datasource_validate(o, source))
 		return;
 
-	if (s->input && s->input->close)
-		s->input->close(s);
-	ocrpt_strfree(s->name);
-	ocrpt_mem_free(s);
+	if (source->input && source->input->close)
+		source->input->close(source);
+	ocrpt_strfree(source->name);
+	ocrpt_mem_free(source);
+
+	o->datasources = ocrpt_list_remove(o->datasources, source);
 }
 
 DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
@@ -78,7 +78,11 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 		ocrpt_query_free(o, q);
 	}
 
-	ocrpt_list_free_deep(o->datasources, ocrpt_free_datasource);
+	while (o->datasources) {
+		ocrpt_datasource *ds = (ocrpt_datasource *)o->datasources->data;
+		ocrpt_datasource_free(o, ds);
+	}
+
 	ocrpt_free_parts(o);
 	gmp_randclear(o->randstate);
 	ocrpt_mem_string_free(o->converted, true);
