@@ -323,20 +323,32 @@ void ocrpt_query_result_free(ocrpt_query *q) {
 	q->cols = 0;
 }
 
+static bool ocrpt_query_follower_validity(opencreport *o, ocrpt_query *leader, ocrpt_query *follower) {
+	if (!o) {
+		fprintf(stderr, "%s:%d: invalid opencreport pointer\n", __func__, __LINE__);
+		return false;
+	}
+
+	if (!leader || !leader->source || !leader->source->o || o != leader->source->o) {
+		fprintf(stderr, "%s:%d: opencreport and leader query structures do not match\n", __func__, __LINE__);
+		return false;
+	}
+
+	if (!follower || !follower->source || !follower->source->o || o != follower->source->o) {
+		fprintf(stderr, "%s:%d: opencreport and follower query structures do not match\n", __func__, __LINE__);
+		return false;
+	}
+
+	return true;
+}
+
 DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(opencreport *o, ocrpt_query *leader, ocrpt_query *follower, ocrpt_expr *match) {
 	ocrpt_query_follower *fo;
 	int32_t len;
 	bool ret;
 
-	if (!o || !leader || !leader->source || !leader->source->o || o != leader->source->o) {
-		fprintf(stderr, "%s:%d: opencreport and ocrpt_query structures do not match\n", __func__, __LINE__);
+	if (!ocrpt_query_follower_validity(o, leader, follower))
 		return false;
-	}
-
-	if (!o || !follower || !follower->source || !follower->source->o || o != follower->source->o) {
-		fprintf(stderr, "%s:%d: opencreport and ocrpt_query structures do not match\n", __func__, __LINE__);
-		return false;
-	}
 
 	ocrpt_expr_optimize(o, match);
 	ocrpt_expr_resolve(o, match);
@@ -361,15 +373,8 @@ DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(opencreport *o, ocrpt_query 
 DLL_EXPORT_SYM bool ocrpt_query_add_follower(opencreport *o, ocrpt_query *leader, ocrpt_query *follower) {
 	int32_t len;
 
-	if (!o || !leader || !leader->source || !leader->source->o || o != leader->source->o) {
-		fprintf(stderr, "%s:%d: opencreport and ocrpt_query structures do not match\n", __func__, __LINE__);
+	if (!ocrpt_query_follower_validity(o, leader, follower))
 		return false;
-	}
-
-	if (!o || !follower || !follower->source || !follower->source->o || o != follower->source->o) {
-		fprintf(stderr, "%s:%d: opencreport and ocrpt_query structures do not match\n", __func__, __LINE__);
-		return false;
-	}
 
 	len = ocrpt_list_length(leader->followers);
 	leader->followers = ocrpt_list_append(leader->followers, follower);
