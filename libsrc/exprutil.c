@@ -386,7 +386,7 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e, int32_t var
 				if (!q->result)
 					q->source->input->describe(q, &q->result, &q->cols);
 				qr = q->result;
-				cols = q->cols;
+				cols = (q->result ? q->cols : 0);
 
 				for (i = 0; i < cols; i++) {
 					if (!strcmp(e->name->str, qr[i].name)) {

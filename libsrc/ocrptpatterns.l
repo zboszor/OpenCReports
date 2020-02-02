@@ -498,10 +498,13 @@ yyscan_t scanner_init(const char *str, core_yy_extra_type *yyext) {
 	 * Make a scan buffer with special termination needed by flex.
 	 */
 	yyext->scanbuf = (char *) ocrpt_mem_malloc(slen + 2);
-	yyext->scanbuflen = slen;
-	memcpy(yyext->scanbuf, str, slen);
-	yyext->scanbuf[slen] = yyext->scanbuf[slen + 1] = YY_END_OF_BUFFER_CHAR;
-	yy_scan_buffer(yyext->scanbuf, slen + 2, scanner);
+	if (yyext->scanbuf) {
+		yyext->scanbuflen = slen;
+		if (str)
+			memcpy(yyext->scanbuf, str, slen);
+		yyext->scanbuf[slen] = yyext->scanbuf[slen + 1] = YY_END_OF_BUFFER_CHAR;
+		yy_scan_buffer(yyext->scanbuf, slen + 2, scanner);
+	}
 
 	/* initialize literal buffer to a reasonable but expansible size */
 	yyext->literalalloc = 1024;

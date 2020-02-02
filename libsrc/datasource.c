@@ -193,11 +193,14 @@ DLL_EXPORT_SYM ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_
 		return NULL;
 	}
 
-	if (!q->result)
+	if (!q->result) {
 		q->source->input->describe(q, &q->result, &q->cols);
+		if (!q->result)
+			q->cols = 0;
+	}
 	if (cols)
 		*cols = q->cols;
-	return (q->source->o->residx ? &q->result[q->cols] : q->result);
+	return (q->result ? (q->source->o->residx ? &q->result[q->cols] : q->result) : NULL);
 }
 
 void ocrpt_query_result_set_values_null(ocrpt_query *q) {
@@ -292,8 +295,8 @@ void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_
 				r->string = rstring;
 				r->string_owned = true;
 			}
+			rstring->len = 0;
 		}
-		rstring->len = 0;
 		ocrpt_mem_string_append_len(rstring, str, len);
 		break;
 	}

@@ -863,6 +863,12 @@ static int32_t ocrpt_parse_col_node(opencreport *o, xmlTextReaderPtr reader, ocr
 		}
 	} else if (fq->incoltypes) {
 		enum ocrpt_result_type type;
+
+		if (!value) {
+			xmlFree(value);
+			return 0;
+		}
+
 		if (!strcmp((char *)value, "string"))
 			type = OCRPT_RESULT_STRING;
 		else if (!strcmp((char *)value, "number"))

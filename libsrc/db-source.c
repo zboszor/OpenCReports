@@ -429,7 +429,7 @@ static ocrpt_query_result *ocrpt_mariadb_describe_early(ocrpt_query *query) {
 
 	memset(qr, 0, 2 * result->cols * sizeof(ocrpt_query_result));
 
-	for (i = 0, field = mysql_fetch_field(result->res), i = 0; i < result->cols && field; field = mysql_fetch_field(result->res), i++) {
+	for (i = 0, field = mysql_fetch_field(result->res); i < result->cols && field; field = mysql_fetch_field(result->res), i++) {
 		enum ocrpt_result_type type;
 
 		qr[i].name = ocrpt_mem_strdup(field->name);
@@ -745,6 +745,8 @@ static ocrpt_query_result *ocrpt_odbc_describe_early(ocrpt_query *query) {
 		qr[result->cols + i].name = qr[i].name;
 
 		ret = SQLDescribeCol(result->stmt, i + 1, (SQLCHAR *)qr[i].name, colname_len + 1, NULL, &col_type, &col_size, NULL, NULL);
+		if (!SQL_SUCCEEDED(ret))
+			continue;
 		string = ocrpt_mem_string_resize(result->coldata, col_size);
 		if (string) {
 			if (!result->coldata)
@@ -1053,6 +1055,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const
 		SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
 		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
 		ocrpt_mem_free(priv);
+		return NULL;
 	}
 
 	ds->priv = priv;
@@ -1085,6 +1088,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, cons
 		SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
 		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
 		ocrpt_mem_free(priv);
+		return NULL;
 	}
 
 	ds->priv = priv;
