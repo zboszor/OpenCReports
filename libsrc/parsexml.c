@@ -289,7 +289,9 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 				ocrpt_expr *e = ocrpt_expr_parse(o, follower_expr_s, &err);
 
 				if (e) {
-					ocrpt_query_add_follower_n_to_1(o, lq, q, e);
+					bool added = ocrpt_query_add_follower_n_to_1(o, lq, q, e);
+					if (!added)
+						ocrpt_expr_free(e);
 				} else
 					fprintf(stderr, "Cannot parse matching expression between queries \"%s\" and \"%s\": \"%s\"\n", follower_for_s, name_s, follower_expr);
 			} else
