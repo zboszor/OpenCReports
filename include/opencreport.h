@@ -641,6 +641,6 @@ bool ocrpt_parse_xml(opencreport *o, const char *filename);
 /*
  * Execute the reports added up to this point.
  */
-int32_t ocrpt_execute(opencreport *o);
+bool ocrpt_execute(opencreport *o);
 
 #endif /* _OPENCREPORT_H_ */

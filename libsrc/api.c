@@ -100,15 +100,24 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 }
 
 DLL_EXPORT_SYM void ocrpt_set_numeric_precision_bits(opencreport *o, mpfr_prec_t prec) {
+	if (!o)
+		return;
+
 	o->prec = prec;
 }
 
 DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode) {
+	if (!o)
+		return;
+
 	o->rndmode = rndmode;
 }
 
-int ocrpt_execute(opencreport *o) {
-	return -1;
+DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
+	if (!o)
+		return false;
+
+	return false;
 }
 
 static int papersortcmp(const void *a, const void *b) {
@@ -128,16 +137,24 @@ DLL_EXPORT_SYM const ocrpt_paper *ocrpt_get_system_paper(void) {
 }
 
 DLL_EXPORT_SYM const ocrpt_paper *ocrpt_get_paper(opencreport *o) {
+	if (!o)
+		return ocrpt_get_system_paper();
+
 	return o->paper;
 }
 
 DLL_EXPORT_SYM void ocrpt_set_paper(opencreport *o, const ocrpt_paper *paper) {
+	if (!o)
+		return;
 	o->paper0 = *paper;
 	o->paper = &o->paper0;
 }
 
 DLL_EXPORT_SYM void ocrpt_set_paper_by_name(opencreport *o, const char *papername) {
 	const ocrpt_paper *paper = ocrpt_get_paper_by_name(papername);
+
+	if (!o)
+		return;
 
 	if (!paper)
 		paper = system_paper;
@@ -146,11 +163,16 @@ DLL_EXPORT_SYM void ocrpt_set_paper_by_name(opencreport *o, const char *papernam
 }
 
 DLL_EXPORT_SYM const ocrpt_paper *ocrpt_paper_first(opencreport *o) {
+	if (!o)
+		return NULL;
 	o->paper_iterator_idx = 0;
 	return &papersizes[o->paper_iterator_idx];
 }
 
 DLL_EXPORT_SYM const ocrpt_paper *ocrpt_paper_next(opencreport *o) {
+	if (!o)
+		return NULL;
+
 	if (o->paper_iterator_idx >= n_papersizes)
 		return NULL;
 
