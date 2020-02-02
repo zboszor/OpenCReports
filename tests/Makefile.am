@@ -27,6 +27,7 @@ TESTS = \
 	ocrpt_odbc5_test ocrpt_odbc6_test ocrpt_odbc7_test \
 	ocrpt_odbc_xml_test ocrpt_odbc_xml2_test ocrpt_odbc_xml3_test \
 	ocrpt_odbc_xml4_test \
+	ocrpt_circular_follower_test \
 	ocrpt_break_test
 
 noinst_PROGRAMS = \
@@ -288,6 +289,10 @@ ocrpt_odbc_xml4_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_function_test_SOURCES = ocrpt_function_test.c
 ocrpt_function_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
 ocrpt_function_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
+
+ocrpt_circular_follower_test_SOURCES = ocrpt_circular_follower_test.c
+ocrpt_circular_follower_test_LDADD = $(top_builddir)/libsrc/libopencreport.la
+ocrpt_circular_follower_test_DEPENDENCIES = $(top_builddir)/libsrc/libopencreport.la
 
 ocrpt_break_test_SOURCES = ocrpt_break_test.c
 ocrpt_break_test_LDADD = $(top_builddir)/libsrc/libopencreport.la

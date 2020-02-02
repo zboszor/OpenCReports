@@ -115,6 +115,7 @@ tests/ocrpt_odbc_xml_test
 tests/ocrpt_odbc_xml2_test
 tests/ocrpt_odbc_xml3_test
 tests/ocrpt_odbc_xml4_test
+tests/ocrpt_circular_follower_test
 tests/ocrpt_break_test
 tests/ocrpt_paper_test
 

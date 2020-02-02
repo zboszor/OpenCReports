@@ -7,7 +7,7 @@ if [[ ! -x ${TEST} ]]; then
 	exit 0
 fi
 
-./${TEST} >results/${TEST}.stdout 2>results/${TEST}.stderr
+./${TEST} 2>results/${TEST}.stderr >results/${TEST}.stdout
 
 OUTDIFF=$(diff -durpN expected/${TEST}.stdout results/${TEST}.stdout 2>/dev/null)
 OUTRET=$?

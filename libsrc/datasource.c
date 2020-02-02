@@ -323,6 +323,44 @@ void ocrpt_query_result_free(ocrpt_query *q) {
 	q->cols = 0;
 }
 
+static bool ocrpt_query_follower_circular(opencreport *o, ocrpt_query *leader, ocrpt_query *follower) {
+	ocrpt_list *ptr;
+
+	for (ptr = leader->followers; ptr; ptr = ptr->next) {
+		ocrpt_query *fptr = (ocrpt_query *)ptr->data;
+		if (fptr == follower)
+			return false;
+		if (!ocrpt_query_follower_circular(o, fptr, follower))
+			return false;
+	}
+
+	for (ptr = leader->followers_n_to_1; ptr; ptr = ptr->next) {
+		ocrpt_query_follower *fptr = (ocrpt_query_follower *)ptr->data;
+		if (fptr->follower == follower)
+			return false;
+		if (!ocrpt_query_follower_circular(o, fptr->follower, follower))
+			return false;
+	}
+
+	for (ptr = follower->followers; ptr; ptr = ptr->next) {
+		ocrpt_query *fptr = (ocrpt_query *)ptr->data;
+		if (fptr == leader)
+			return false;
+		if (!ocrpt_query_follower_circular(o, fptr, leader))
+			return false;
+	}
+
+	for (ptr = follower->followers_n_to_1; ptr; ptr = ptr->next) {
+		ocrpt_query_follower *fptr = (ocrpt_query_follower *)ptr->data;
+		if (fptr->follower == leader)
+			return false;
+		if (!ocrpt_query_follower_circular(o, fptr->follower, leader))
+			return false;
+	}
+
+	return true;
+}
+
 static bool ocrpt_query_follower_validity(opencreport *o, ocrpt_query *leader, ocrpt_query *follower) {
 	if (!o) {
 		fprintf(stderr, "%s:%d: invalid opencreport pointer\n", __func__, __LINE__);
@@ -339,6 +377,16 @@ static bool ocrpt_query_follower_validity(opencreport *o, ocrpt_query *leader, o
 		return false;
 	}
 
+	if (leader == follower) {
+		fprintf(stderr, "%s:%d: leader and follower queries cannot be identical\n", __func__, __LINE__);
+		return false;
+	}
+
+	if (!ocrpt_query_follower_circular(o, leader, follower)) {
+		fprintf(stderr, "%s:%d: follower would create a circular query tree\n", __func__, __LINE__);
+		return false;
+	}
+
 	return true;
 }
 
@@ -349,9 +397,6 @@ DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(opencreport *o, ocrpt_query 
 
 	if (!ocrpt_query_follower_validity(o, leader, follower))
 		return false;
-
-	ocrpt_expr_optimize(o, match);
-	ocrpt_expr_resolve(o, match);
 
 	fo = ocrpt_mem_malloc(sizeof(ocrpt_query_follower));
 	if (!fo)
@@ -366,6 +411,9 @@ DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(opencreport *o, ocrpt_query 
 
 	if (!ret)
 		ocrpt_mem_free(fo);
+
+	ocrpt_expr_optimize(o, match);
+	ocrpt_expr_resolve(o, match);
 
 	return ret;
 }
