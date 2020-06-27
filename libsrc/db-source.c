@@ -598,10 +598,10 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, c
 	if (mysql0 == NULL)
 		return NULL;
 
-	mysql_optionsv(mysql0, MYSQL_READ_DEFAULT_GROUP);
 	mysql_optionsv(mysql0, MYSQL_READ_DEFAULT_FILE, "/etc/my.cnf");
 	if (optionfile)
 		mysql_optionsv(mysql0, MYSQL_READ_DEFAULT_FILE, optionfile);
+	mysql_optionsv(mysql0, MYSQL_READ_DEFAULT_GROUP, group);
 	mysql_optionsv(mysql0, MYSQL_SET_CHARSET_NAME, "utf8");
 
 	mysql = mysql_real_connect(mysql0, NULL, NULL, NULL, NULL, -1, NULL, 0);
