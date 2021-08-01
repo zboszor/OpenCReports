@@ -1,7 +1,7 @@
 /*
  * OpenCReports array data source
  *
- * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -15,8 +15,7 @@
 #include <pthread.h>
 #include <iconv.h>
 
-#include <opencreport.h>
-#include "opencreport-private.h"
+#include "opencreport.h"
 #include "datasource.h"
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const ocrpt_input *input) {
@@ -366,27 +365,47 @@ static bool ocrpt_query_follower_circular(opencreport *o, ocrpt_query *leader, o
 
 static bool ocrpt_query_follower_validity(opencreport *o, ocrpt_query *leader, ocrpt_query *follower) {
 	if (!o) {
-		fprintf(stderr, "%s:%d: invalid opencreport pointer\n", __func__, __LINE__);
+		fprintf(stderr, "invalid opencreport pointer\n");
 		return false;
 	}
 
-	if (!leader || !leader->source || !leader->source->o || o != leader->source->o) {
-		fprintf(stderr, "%s:%d: opencreport and leader query structures do not match\n", __func__, __LINE__);
+	if (!leader) {
+		fprintf(stderr, "leader query unset\n");
 		return false;
 	}
 
-	if (!follower || !follower->source || !follower->source->o || o != follower->source->o) {
-		fprintf(stderr, "%s:%d: opencreport and follower query structures do not match\n", __func__, __LINE__);
+	if (!leader->source) {
+		fprintf(stderr, "%s leader query's source unset\n", leader->name);
+		return false;
+	}
+
+	if (!follower) {
+		fprintf(stderr, "follower query unset\n");
+		return false;
+	}
+
+	if (!follower->source) {
+		fprintf(stderr, "%s follower query's source unset\n", follower->name);
+		return false;
+	}
+
+	if (!leader->source->o || o != leader->source->o) {
+		fprintf(stderr, "opencreport and %s:%s leader query structures do not match\n", leader->source->name, leader->name);
+		return false;
+	}
+
+	if (!follower->source->o || o != follower->source->o) {
+		fprintf(stderr, "opencreport and %s:%s follower query structures do not match\n", follower->source->name, follower->name);
 		return false;
 	}
 
 	if (leader == follower) {
-		fprintf(stderr, "%s:%d: leader and follower queries cannot be identical\n", __func__, __LINE__);
+		fprintf(stderr, "leader and follower queries cannot be identical\n");
 		return false;
 	}
 
 	if (!ocrpt_query_follower_circular(o, leader, follower)) {
-		fprintf(stderr, "%s:%d: follower would create a circular query tree\n", __func__, __LINE__);
+		fprintf(stderr, "%s:%s follower would create a circular graph for %s:%s leader\n", follower->source->name, follower->name, leader->source->name, leader->name);
 		return false;
 	}
 

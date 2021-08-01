@@ -41,7 +41,7 @@ expr nodes: 1
 (ERROR)invalid operand(s)
 
 string: factorial(0)
-expr reprinted: factorial(0)
+expr reprinted: factorial(0.000000)
 expr nodes: 2
 expr optimized: 1.000000
 expr nodes: 1
@@ -239,16 +239,16 @@ expr nodes: 1
 string: 1--
 expr reprinted: dec(1.000000)
 expr nodes: 2
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: --1
 expr reprinted: dec(1.000000)
 expr nodes: 2
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 6 / 3 / 2 
 expr reprinted: div(div(6.000000,3.000000),2.000000)
@@ -365,16 +365,16 @@ expr nodes: 1
 string: 'a' = 'b'
 expr reprinted: eq((string)a,(string)b)
 expr nodes: 3
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 'a' <> 'a'
 expr reprinted: ne((string)a,(string)a)
 expr nodes: 3
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 'a' <> 'b'
 expr reprinted: ne((string)a,(string)b)
@@ -386,9 +386,9 @@ expr nodes: 1
 string: 'a' < 'a'
 expr reprinted: lt((string)a,(string)a)
 expr nodes: 3
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 'a' < 'b'
 expr reprinted: lt((string)a,(string)b)
@@ -414,16 +414,16 @@ expr nodes: 1
 string: 'a' > 'a'
 expr reprinted: gt((string)a,(string)a)
 expr nodes: 3
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 'a' > 'b'
 expr reprinted: gt((string)a,(string)b)
 expr nodes: 3
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 'a' >= 'a'
 expr reprinted: ge((string)a,(string)a)
@@ -435,30 +435,30 @@ expr nodes: 1
 string: 'a' >= 'b'
 expr reprinted: ge((string)a,(string)b)
 expr nodes: 3
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 0 && 0
-expr reprinted: land(0,0)
+expr reprinted: land(0.000000,0.000000)
 expr nodes: 3
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 0 && 1
-expr reprinted: land(0,1.000000)
+expr reprinted: land(0.000000,1.000000)
 expr nodes: 3
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 1 && 0
-expr reprinted: land(1.000000,0)
+expr reprinted: land(1.000000,0.000000)
 expr nodes: 3
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 1 && 1
 expr reprinted: land(1.000000,1.000000)
@@ -468,11 +468,11 @@ expr nodes: 1
 (number)1.000000
 
 string: 0 && 0.5
-expr reprinted: land(0,0.500000)
+expr reprinted: land(0.000000,0.500000)
 expr nodes: 3
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 0.5 && 0.5
 expr reprinted: land(0.500000,0.500000)
@@ -482,11 +482,11 @@ expr nodes: 1
 (number)1.000000
 
 string: 0 && 0.4
-expr reprinted: land(0,0.400000)
+expr reprinted: land(0.000000,0.400000)
 expr nodes: 3
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 0.4 && 0.4
 expr reprinted: land(0.400000,0.400000)
@@ -496,21 +496,21 @@ expr nodes: 1
 (number)1.000000
 
 string: 0 || 0
-expr reprinted: lor(0,0)
+expr reprinted: lor(0.000000,0.000000)
 expr nodes: 3
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 0 || 1
-expr reprinted: lor(0,1.000000)
+expr reprinted: lor(0.000000,1.000000)
 expr nodes: 3
 expr optimized: 1.000000
 expr nodes: 1
 (number)1.000000
 
 string: 1 || 0
-expr reprinted: lor(1.000000,0)
+expr reprinted: lor(1.000000,0.000000)
 expr nodes: 3
 expr optimized: 1.000000
 expr nodes: 1
@@ -524,7 +524,7 @@ expr nodes: 1
 (number)1.000000
 
 string: 0 || 0.5
-expr reprinted: lor(0,0.500000)
+expr reprinted: lor(0.000000,0.500000)
 expr nodes: 3
 expr optimized: 1.000000
 expr nodes: 1
@@ -538,7 +538,7 @@ expr nodes: 1
 (number)1.000000
 
 string: 0 || 0.4
-expr reprinted: lor(0,0.400000)
+expr reprinted: lor(0.000000,0.400000)
 expr nodes: 3
 expr optimized: 1.000000
 expr nodes: 1
@@ -552,7 +552,7 @@ expr nodes: 1
 (number)1.000000
 
 string: !0
-expr reprinted: lnot(0)
+expr reprinted: lnot(0.000000)
 expr nodes: 2
 expr optimized: 1.000000
 expr nodes: 1
@@ -561,16 +561,16 @@ expr nodes: 1
 string: !1
 expr reprinted: lnot(1.000000)
 expr nodes: 2
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: !0.4
 expr reprinted: lnot(0.400000)
 expr nodes: 2
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 1 | 2
 expr reprinted: or(1.000000,2.000000)
@@ -582,9 +582,9 @@ expr nodes: 1
 string: 1 & 2
 expr reprinted: and(1.000000,2.000000)
 expr nodes: 3
-expr optimized: 0
+expr optimized: 0.000000
 expr nodes: 1
-(number)0
+(number)0.000000
 
 string: 3 & 2
 expr reprinted: and(3.000000,2.000000)
@@ -608,7 +608,7 @@ expr nodes: 1
 (number)3.000000
 
 string: ~0
-expr reprinted: not(0)
+expr reprinted: not(0.000000)
 expr nodes: 2
 expr optimized: 18446744073709551615.000000
 expr nodes: 1
@@ -664,7 +664,7 @@ expr nodes: 1
 (string)árvíztűrő
 
 string: mid('árvíztűrő tükörfúrógép', 0, 9)
-expr reprinted: mid((string)árvíztűrő tükörfúrógép,0,9.000000)
+expr reprinted: mid((string)árvíztűrő tükörfúrógép,0.000000,9.000000)
 expr nodes: 4
 expr optimized: (string)árvíztűrő
 expr nodes: 1

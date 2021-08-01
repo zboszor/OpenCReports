@@ -1,6 +1,6 @@
 /*
  * Expression tree utilities
- * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "opencreport-private.h"
+#include "opencreport.h"
 #include "datasource.h"
 
 DLL_EXPORT_SYM ocrpt_environment_query_func ocrpt_environment_get = ocrpt_environment_get_c;

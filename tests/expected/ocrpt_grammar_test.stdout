@@ -224,7 +224,7 @@ expr reprinted: 1.000000
 expr nodes: 1
 
 string: false
-expr reprinted: 0
+expr reprinted: 0.000000
 expr nodes: 1
 
 string: yes
@@ -232,7 +232,7 @@ expr reprinted: 1.000000
 expr nodes: 1
 
 string: no
-expr reprinted: 0
+expr reprinted: 0.000000
 expr nodes: 1
 
 string: a

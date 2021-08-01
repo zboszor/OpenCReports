@@ -1,6 +1,6 @@
 /*
  * OpenCReports main header
- * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -19,40 +19,46 @@
 #include <libxml/tree.h>
 #include <libxml/xmlreader.h>
 
-#include "opencreport-private.h"
+#include "opencreport.h"
 #include "datasource.h"
 
 #ifndef O_BINARY
 #define O_BINARY (0)
 #endif
 
-void ocrpt_free_part(const struct opencreport_part *part) {
+extern char cwdpath[PATH_MAX];
+
+void ocrpt_free_part(opencreport *o, const struct ocrpt_part *part) {
 	ocrpt_mem_free(part->path);
+#if 0
 	if (part->allocated)
 		ocrpt_mem_free(part->xmlbuf);
+#endif
 	ocrpt_mem_free(part);
 }
 
 int32_t ocrpt_add_report_from_buffer_internal(opencreport *o, const char *buffer, bool allocated, const char *report_path) {
-	struct opencreport_part *part = ocrpt_mem_malloc(sizeof(struct opencreport_part));
+	struct ocrpt_part *part = ocrpt_mem_malloc(sizeof(struct ocrpt_part));
 	int partsold;
 
 	if (!part)
 		return -1;
 
+#if 0
 	part->xmlbuf = buffer;
 	part->allocated = allocated;
 	part->parsed = 0;
+#endif
 	part->path = ocrpt_mem_strdup(report_path);
 	if (!part->path) {
-		ocrpt_free_part(part);
+		ocrpt_free_part(o, part);
 		return -1;
 	}
 
 	partsold = ocrpt_list_length(o->parts);
 	o->parts = ocrpt_list_append(o->parts, part);
 	if (ocrpt_list_length(o->parts) != partsold + 1) {
-		ocrpt_free_part(part);
+		ocrpt_free_part(o, part);
 		return -1;
 	}
 

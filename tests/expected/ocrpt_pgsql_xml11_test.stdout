@@ -47,7 +47,7 @@ Query: 'a':
 	Col #1: 'name': string value: Pebbles Flintstone
 	Col #2: 'property': string value: young
 	Col #3: 'age': string value: NULL (converted to number: 1.000000)
-	Col #4: 'adult': string value: NULL (converted to number: 0)
+	Col #4: 'adult': string value: NULL (converted to number: 0.000000)
 Query: 'b':
 	Col #0: 'adult': string value: NULL
 	Col #1: 'id': string value: NULL

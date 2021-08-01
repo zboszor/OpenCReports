@@ -1,6 +1,6 @@
 /*
  * Expression tree utilities
- * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -12,7 +12,7 @@
 #include <string.h>
 #include <mpfr.h>
 
-#include "opencreport-private.h"
+#include "opencreport.h"
 #include "exprutil.h"
 #include "datasource.h"
 
@@ -502,12 +502,8 @@ DLL_EXPORT_SYM bool ocrpt_expr_cmp_results(opencreport *o, ocrpt_expr *e) {
 		return false;
 	case OCRPT_RESULT_STRING:
 		return !strcmp(e->result[o->residx]->string->str, e->result[!o->residx]->string->str);
-	case OCRPT_RESULT_NUMBER: {
-		mpfr_printf("prev: %Rf (isnull %d) current: %Rf (isnull %d)\n",
-					e->result[!o->residx]->number, e->result[!o->residx]->isnull,
-					e->result[o->residx]->number, e->result[o->residx]->isnull);
+	case OCRPT_RESULT_NUMBER:
 		return !mpfr_cmp(e->result[o->residx]->number, e->result[!o->residx]->number);
-	}
 	case OCRPT_RESULT_DATETIME:
 		return false; // TODO: implement
 	default:

@@ -1,6 +1,6 @@
 /*
  * OpenCReports main module
- * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -12,7 +12,7 @@
 #include <string.h>
 #include <utf8proc.h>
 
-#include "opencreport-private.h"
+#include "opencreport.h"
 #include "datasource.h"
 #include "exprutil.h"
 

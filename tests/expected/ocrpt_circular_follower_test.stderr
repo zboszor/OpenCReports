@@ -1,12 +1,12 @@
-ocrpt_query_follower_validity:389: follower would create a circular query tree
-ocrpt_query_follower_validity:389: follower would create a circular query tree
-ocrpt_query_follower_validity:389: follower would create a circular query tree
-ocrpt_query_follower_validity:389: follower would create a circular query tree
-ocrpt_query_follower_validity:379: opencreport and follower query structures do not match
-ocrpt_query_follower_validity:379: opencreport and follower query structures do not match
-ocrpt_query_follower_validity:389: follower would create a circular query tree
-ocrpt_query_follower_validity:389: follower would create a circular query tree
-ocrpt_query_follower_validity:389: follower would create a circular query tree
-ocrpt_query_follower_validity:389: follower would create a circular query tree
-ocrpt_query_follower_validity:389: follower would create a circular query tree
-ocrpt_query_follower_validity:389: follower would create a circular query tree
+array:b follower would create a circular graph for array:a leader
+array:b follower would create a circular graph for array:a leader
+array:a follower would create a circular graph for array:b leader
+array:a follower would create a circular graph for array:b leader
+follower query unset
+follower query unset
+array:c follower would create a circular graph for array:b leader
+array:a follower would create a circular graph for array:c leader
+array:a follower would create a circular graph for array:c leader
+array:c follower would create a circular graph for array:a leader
+array:c follower would create a circular graph for array:a leader
+array:a follower would create a circular graph for array:d leader

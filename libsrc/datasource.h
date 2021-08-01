@@ -1,7 +1,7 @@
 /*
  * OpenCReports data source methods
  *
- * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 #ifndef _DATASOURCE_H_
@@ -11,8 +11,7 @@
 #include <stdint.h>
 #include <iconv.h>
 
-#include <opencreport.h>
-#include "opencreport-private.h"
+#include "opencreport.h"
 
 struct ocrpt_datasource {
 	opencreport *o;

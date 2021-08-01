@@ -49,7 +49,7 @@ Query: 'a':
 	Col #1: 'name': string value: Pebbles Flintstone
 	Col #2: 'property': string value: 
 	Col #3: 'age': string value: NULL (converted to number: 0.500000)
-	Col #4: 'adult': string value: NULL (converted to number: 0)
+	Col #4: 'adult': string value: NULL (converted to number: 0.000000)
 
 Expression: .'id'
 Evaluated: (number)3.000000
@@ -58,7 +58,7 @@ Evaluated: (string)Pebbles Flintstone
 Expression: mul(.'age',2.000000)
 Evaluated: (number)1.000000
 Expression: 'a'.'adult'
-Evaluated: (number)0
+Evaluated: (number)0.000000
 Expression is different from previous row
 
 --- END ---

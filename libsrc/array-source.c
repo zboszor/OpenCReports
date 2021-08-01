@@ -1,7 +1,7 @@
 /*
  * OpenCReports array data source
  *
- * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -23,8 +23,12 @@
 #include <libxml/tree.h>
 #include <libxml/xmlreader.h>
 
-#include "opencreport-private.h"
+#include "opencreport.h"
 #include "datasource.h"
+
+#ifndef UNUSED
+#define UNUSED __attribute__((unused))
+#endif
 
 struct ocrpt_array_results {
 	const char **data;

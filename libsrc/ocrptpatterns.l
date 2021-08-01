@@ -8,8 +8,7 @@
 #include <stdio.h>
 
 #include "scanner.h"
-#include "free.h"
-#include "opencreport-private.h"
+#include "opencreport.h"
 #include "ocrptgrammar.tab.h"
 
 /* Suppress using the built-in yy_fatal_error function */
@@ -475,14 +474,13 @@ void scanner_yyerror(const char *message, yyscan_t yyscanner) {
 	longjmp(parser_yyget_extra(yyscanner)->env, -1);
 }
 
-YYSTYPE ocrpt_lval;
-
 /*
  * Called before any actual parsing is done
  */
 yyscan_t scanner_init(const char *str, core_yy_extra_type *yyext) {
 	size_t slen = str ? strlen(str) : 0;
 	yyscan_t scanner;
+	YYSTYPE ocrpt_lval;
 
 	if (yylex_init(&scanner) != 0) {
 		fprintf(stderr, "yylex_init() failed: %m");

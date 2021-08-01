@@ -188,15 +188,73 @@ struct ocrpt_paper {
 };
 typedef struct ocrpt_paper ocrpt_paper;
 
-struct ocrpt_break;
+struct ocrpt_break {
+	const char *name;
+	ocrpt_expr *e_newpage;
+	ocrpt_expr *e_headernewpage;
+	ocrpt_expr *e_suppressblank;
+	/* TODO: add details for header and footer */
+	ocrpt_list *breakfields;	/* list of ocrpt_expr pointers */
+	/*
+	 * TODO:
+	 * ocrpt_output *breakheader;
+	 * ocrpt_output *breakfooter;
+	 * ...
+	 */
+	bool newpage:1;
+	bool headernewpage:1;
+	bool suppressblank:1;
+};
 typedef struct ocrpt_break ocrpt_break;
+
+struct ocrpt_report {
+	/*
+	 * TODO:
+	 * ocrpt_output *nodata;
+	 * ocrpt_output *pageheader;
+	 * ocrpt_output *pagefooter;
+	 * ocrpt_output *reportheader;
+	 * orcpt_output *reportfooter;
+	 * ocrpt_output *detail;
+	 * ...
+	 */
+
+	/* List of ocrpt_break elements */
+	ocrpt_list *breaks;
+
+	/* List of ocrpt_variable elements */
+	ocrpt_list *variables;
+};
+typedef struct ocrpt_report ocrpt_report;
+
+struct ocrpt_part {
+	/*
+	 * TODO:
+	 * ocrpt_output *pageheader;
+	 * ocrpt_output *pagefooter;
+	 * ocrpt_output *reportheader;
+	 * orcpt_output *reportfooter;
+	 */
+
+	/*
+	 * List of ocrpt_list, each child list is
+	 * the columns for the given row.
+	 */
+	ocrpt_list *rows;
+	ocrpt_list *lastrow;
+	ocrpt_list *lastcol_in_lastrow;
+	const char *path;
+#if 0
+	const char *xmlbuf;
+	bool allocated:1;
+	bool parsed:1;
+#endif
+};
+typedef struct ocrpt_part ocrpt_part;
 
 #if 0
 struct report_line;
 typedef struct report_line report_line;
-
-struct ocrpt_report_part;
-typedef struct ocrpt_report_part ocrpt_report_part;
 #endif
 
 #define OCRPT_MPFR_PRECISION_BITS	(256)
@@ -220,9 +278,10 @@ struct opencreport {
 	/* Internal area for encoding conversion */
 	ocrpt_string *converted;
 
-	/* List of struct opencreports_part */
+	/* List of struct ocrpt_part elements */
 	ocrpt_list *parts;
 
+	/* Internal math defaults and states */
 	mpfr_prec_t prec;
 	mpfr_rnd_t rndmode;
 	gmp_randstate_t randstate;
@@ -261,6 +320,24 @@ ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, char **err);
  * Mainly used in functions
  */
 bool ocrpt_expr_init_result(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type);
+/*
+ * Inline function to set the result owned/disowned by the expression
+ */
+static inline void ocrpt_expr_set_result_owned(opencreport *o, ocrpt_expr *e, bool owned) {
+	if (o->residx)
+		e->result_owned1 = owned;
+	else
+		e->result_owned0 = owned;
+}
+/*
+ * Inline function to query the expression result ownership
+ */
+static inline bool ocrpt_expr_get_result_owned(opencreport *o, ocrpt_expr *e) {
+	if (o->residx)
+		return e->result_owned1;
+	else
+		return e->result_owned0;
+}
 /*
  * Set or initialize the result of the expression as an error with the specified message
  */
@@ -355,19 +432,30 @@ ocrpt_result *ocrpt_environment_get_c(const char *env);
 
 /*
  * Add a report break
+ *
+ * The break will take over the expressions' ownerships.
  */
-ocrpt_break *ocrpt_break_new(opencreport *o, const char *name,
+ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_part *part,
+							const char *name,
 							ocrpt_expr *newpage,
 							ocrpt_expr *headernewpage,
 							ocrpt_expr *suppressblank);
 /*
+ * Free a report break
+ */
+void ocrpt_break_free(opencreport *o, ocrpt_break *br);
+/*
  * Find a report break using its name
  */
-ocrpt_break *ocrpt_break_get(opencreport *o, const char *name);
+ocrpt_break *ocrpt_break_get(opencreport *o, ocrpt_part *part, const char *name);
 /*
  * Add a break field to a break
  */
-bool ocrpt_break_add_breakfield(opencreport *o, ocrpt_break *b, ocrpt_expr *bf);
+bool ocrpt_break_add_breakfield(opencreport *o, ocrpt_part *part, ocrpt_break *b, ocrpt_expr *bf);
+/*
+ * Check whether the report break triggers
+ */
+bool ocrpt_break_check_fields(opencreport *o, ocrpt_break *br);
 
 /****************************
  * Memory handling wrappers *
@@ -628,6 +716,13 @@ void ocrpt_query_navigate_start(opencreport *o, ocrpt_query *q);
  * Move to next row in the query resultset
  */
 bool ocrpt_query_navigate_next(opencreport *o, ocrpt_query *q);
+
+/*********************************************
+ * Functions related to report part handling *
+ *********************************************/
+
+void ocrpt_free_part(opencreport *o, const struct ocrpt_part *part);
+void ocrpt_free_parts(opencreport *o);
 
 /********************************************
  * Functions related to report XML handling *

@@ -1,6 +1,6 @@
 dnl Configure template for OpenCReports
 
-dnl Copyright (c) 2019-2020 Zoltán Böszörményi (zboszor@gmail.com)
+dnl Copyright (c) 2019-2021 Zoltán Böszörményi (zboszor@gmail.com)
 dnl OpenCReports is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU Lesser General Public License as published by
 dnl the Free Software Foundation; either version 3, or (at your option)

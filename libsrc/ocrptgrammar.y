@@ -1,7 +1,7 @@
 %{
 /*
  * OpenCReports expression grammar
- * Copyright (C) 2019-2020 Zoltán Böszörményi
+ * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -14,9 +14,9 @@
 #include <string.h>
 #include <setjmp.h>
 
-#include "opencreport-private.h"
+#include "opencreport.h"
+#include "exprutil.h"
 #include "scanner.h"
-#include "free.h"
 
 /* We can override alloc/free */
 #define YYMALLOC ocrpt_mem_malloc
@@ -378,9 +378,6 @@ arglist:
 	;
 
 %%
-
-/* To suppress "defined but not used" warnings */
-static const yytype_uint16 yytoknum[] __attribute__((unused));
 
 void yyset_debug(int  _bdebug , yyscan_t yyscanner);
 

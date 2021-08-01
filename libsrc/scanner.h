@@ -1,6 +1,6 @@
 /*
  * Common scanner header for lexer and parser
- * Copyright (C) 2019-2020 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 #ifndef _SCANNER_H_
@@ -11,7 +11,7 @@
 #include <setjmp.h>
 #include <mpfr.h>
 
-#include "opencreport-private.h"
+#include "opencreport.h"
 
 #define YY_TYPEDEF_YY_SCANNER_T
 typedef void* yyscan_t;
