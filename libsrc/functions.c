@@ -1743,6 +1743,67 @@ static void ocrpt_proper(opencreport *o, ocrpt_expr *e) {
 		ocrpt_expr_make_error_result(o, e, "out of memory");
 }
 
+static void ocrpt_rownum(opencreport *o, ocrpt_expr *e) {
+	ocrpt_query *q = NULL;
+
+	if (e->n_ops > 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->n_ops == 1) {
+		if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+			ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+			return;
+		}
+
+		if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING) {
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+			return;
+		}
+
+		if (!e->ops[0]->result[o->residx]->isnull) {
+			char *qname = e->ops[0]->result[o->residx]->string->str;
+			ocrpt_list *ptr;
+
+			for (ptr = o->queries; ptr; ptr = ptr->next) {
+				ocrpt_query *tmp = (ocrpt_query *)ptr->data;
+				if (strcmp(tmp->name, qname) == 0) {
+					q = tmp;
+					break;
+				}
+			}
+		}
+	} else {
+		/*
+		 * TODO: use the toplevel query of the report that is
+		 * currently running instead of the first query in the
+		 * list. Someone may be using <Report query="...">
+		 */
+		if (o->queries)
+			q = (ocrpt_query *)o->queries->data;
+	}
+
+	if (!q) {
+		ocrpt_expr_make_error_result(o, e, "rownum(): no such query");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+	/*
+	 * Internal row numbering is 0-based but in SQL it's 1-based.
+	 * It feels more natural to the user to use the SQL row numbers.
+	 * Also handle the case if a follow has run out of rows via ->isdone()
+	 */
+	if (q->source && q->source->input && q->source->input->isdone) {
+		if (q->source->input->isdone(q))
+			e->result[o->residx]->isnull = true;
+		else
+			mpfr_set_si(e->result[o->residx]->number, q->current_row + 1, o->rndmode);
+	} else
+		mpfr_set_si(e->result[o->residx]->number, q->current_row + 1, o->rndmode);
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -1788,6 +1849,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "right",		ocrpt_right,	2,	false,	false,	false,	false },
 	{ "rint",		ocrpt_rint,	1,	false,	false,	false,	false },
 	{ "round",		ocrpt_round,	1,	false,	false,	false,	false },
+	{ "rownum",		ocrpt_rownum,	-1,	false,	false,	false,	true },
 	{ "shl",		ocrpt_shl,	2,	false,	false,	false,	false },
 	{ "shr",		ocrpt_shr,	2,	false,	false,	false,	false },
 	{ "sub",		ocrpt_sub,	-1,	false,	false,	false,	false },
