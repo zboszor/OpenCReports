@@ -4,6 +4,12 @@
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
+#ifndef UNUSED
+#define UNUSED __attribute__((unused))
+#endif
+
+static void print_result_row(const char *name, ocrpt_query_result *qr, int32_t cols) UNUSED;
+
 static void print_result_row(const char *name, ocrpt_query_result *qr, int32_t cols) {
 	int i;
 
