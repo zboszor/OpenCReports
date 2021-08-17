@@ -33,14 +33,23 @@ TESTS = \
 	ocrpt_rownum_test \
 	ocrpt_break_test
 
-noinst_PROGRAMS = \
-	$(TESTS) \
+# Unstable tests by nature:
+# ocrpt_random_test produces a random number which is different every time
+# ocrpt_paper_test prints paper sizes and defaults which depends on language settings
+UNSTABLE_TESTS = \
 	ocrpt_random_test \
 	ocrpt_paper_test
+
+noinst_PROGRAMS = $(TESTS) $(UNSTABLE_TESTS)
 
 $(noinst_PROGRAMS): $(top_builddir)/libsrc/libopencreport.la
 
 all: $(noinst_PROGRAMS)
 
-test: $(top_builddir)/libsrc/libopencreport.la $(TESTS) execute_test.sh
+test: $(TESTS) execute_test.sh
 	$(foreach TEST,$(TESTS),./execute_test.sh $(TEST) &&) true
+
+unstable-test: $(UNSTABLE_TESTS) execute_test.sh
+	$(foreach TEST,$(UNSTABLE_TESTS),./execute_test.sh $(TEST) &&) true
+
+all-test: test unstable-test
