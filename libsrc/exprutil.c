@@ -170,7 +170,7 @@ DLL_EXPORT_SYM int ocrpt_expr_nodes(ocrpt_expr *e) {
  *    operands only if they are not inside parentheses.
  *    Example: (a/b)/c is the same as a/b/c but a/(b/c) is not.
  */
-static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_expr *e) {
+static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
 	int32_t i, nconst, dconst, sconst, dtconst;
 	bool try_pullup = true;
 
@@ -188,7 +188,7 @@ static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_expr *e) {
 	for (i = 0, nconst = 0, dconst = 0, sconst = 0, dtconst = 0; i < e->n_ops; i++) {
 		if (!ocrpt_expr_is_const(e->ops[i])) {
 			//fprintf(stderr, "%s:%d\n", __func__, __LINE__);
-			ocrpt_expr_optimize_worker(o, e->ops[i]);
+			ocrpt_expr_optimize_worker(o, r, e->ops[i]);
 		}
 		if (ocrpt_expr_is_dconst(e->ops[i]))
 			dconst++, nconst++;
@@ -204,7 +204,7 @@ static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_expr *e) {
 		if (e->func) {
 			if (e->func->func && !e->func->dont_optimize) {
 				//fprintf(stderr, "%s:%d: calling func() ptr\n", __func__, __LINE__);
-				e->func->func(o, e);
+				e->func->func(o, r, e);
 				//fprintf(stderr, "%s:%d: returned from func()\n", __func__, __LINE__);
 				//fprintf(stderr, "subexpr: \n");
 				//ocrpt_expr_print(e);
@@ -330,12 +330,12 @@ static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_expr *e) {
 	}
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_optimize(opencreport *o, ocrpt_expr *e) {
+DLL_EXPORT_SYM void ocrpt_expr_optimize(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
 	if (!o || !e)
 		return;
 
 	//fprintf(stderr, "%s:%d\n", __func__, __LINE__);
-	ocrpt_expr_optimize_worker(o, e);
+	ocrpt_expr_optimize_worker(o, r, e);
 }
 
 static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e, int32_t varref_exclude_mask) {
@@ -427,7 +427,63 @@ DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(opencreport *o, ocrpt_expr *e, in
 	ocrpt_expr_resolve_worker(o, e, varref_exclude_mask);
 }
 
-static void ocrpt_expr_eval_worker(opencreport *o, ocrpt_expr *e) {
+static bool ocrpt_expr_reference_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask) {
+	int32_t i;
+	bool found = false;
+
+	switch (e->type) {
+	case OCRPT_EXPR_MVAR:
+		if ((varref_include_mask & OCRPT_VARREF_MVAR))
+			found = true;
+		break;
+	case OCRPT_EXPR_RVAR:
+		if ((varref_include_mask & OCRPT_VARREF_RVAR))
+			found = true;
+		break;
+	case OCRPT_EXPR_VVAR:
+		if ((varref_include_mask & OCRPT_VARREF_VVAR)) {
+			found = true;
+			if (!e->var) {
+				ocrpt_list *l;
+
+				for (l = r->variables; l; l = l->next) {
+					ocrpt_var *v = (ocrpt_var *)l->data;
+
+					if (strcmp(v->name, e->name->str) == 0) {
+						e->var = v;
+						break;
+					}
+				}
+			}
+			if (e->var && varref_vartype_mask)
+				*varref_vartype_mask |= (1 << e->var->type);
+		}
+		break;
+	case OCRPT_EXPR_IDENT:
+		if ((varref_include_mask & OCRPT_VARREF_IDENT))
+			found = true;
+		break;
+	case OCRPT_EXPR:
+		for (i = 0; i < e->n_ops; i++) {
+			found = found || ocrpt_expr_reference_worker(o, r, e->ops[i], varref_include_mask, varref_vartype_mask);
+			if (found)
+				break;
+		}
+		break;
+	default:
+		break;
+	}
+
+	return found;
+}
+
+DLL_EXPORT_SYM bool ocrpt_expr_references(opencreport *o, ocrpt_report *r, ocrpt_expr *e, int32_t varref_include_mask, uint32_t *varref_vartype_mask) {
+	if (varref_vartype_mask)
+		*varref_vartype_mask = 0;
+	return ocrpt_expr_reference_worker(o, r, e, varref_include_mask, varref_vartype_mask);
+}
+
+static void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
 	int i;
 
 	if (!o || !e)
@@ -438,12 +494,12 @@ static void ocrpt_expr_eval_worker(opencreport *o, ocrpt_expr *e) {
 
 	//fprintf(stderr, "%s:%d\n", __func__, __LINE__);
 	for (i = 0; i < e->n_ops; i++)
-		ocrpt_expr_eval_worker(o, e->ops[i]);
+		ocrpt_expr_eval_worker(o, r, e->ops[i]);
 
 	if (e->func && e->func->func) {
 		if (e->func->func) {
 			//fprintf(stderr, "%s:%d: calling func() ptr\n", __func__, __LINE__);
-			e->func->func(o, e);
+			e->func->func(o, r, e);
 		} else {
 			fprintf(stderr, "%s: funccall is unset\n", __func__);
 		}
@@ -452,8 +508,8 @@ static void ocrpt_expr_eval_worker(opencreport *o, ocrpt_expr *e) {
 	}
 }
 
-DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_expr *e) {
-	ocrpt_expr_eval_worker(o, e);
+DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
+	ocrpt_expr_eval_worker(o, r, e);
 	return e->result[o->residx];
 }
 

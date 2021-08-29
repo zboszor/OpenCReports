@@ -15,6 +15,9 @@
 struct opencreport;
 typedef struct opencreport opencreport;
 
+struct ocrpt_report;
+typedef struct ocrpt_report ocrpt_report;
+
 struct ocrpt_expr;
 typedef struct ocrpt_expr ocrpt_expr;
 
@@ -106,7 +109,10 @@ struct ocrpt_result {
 };
 typedef struct ocrpt_result ocrpt_result;
 
-typedef void (*ocrpt_function_call)(opencreport *, ocrpt_expr *);
+#define OCRPT_FUNCTION_PARAMS opencreport *o, ocrpt_report *r, ocrpt_expr *e
+#define OCRPT_FUNCTION(name) void name(OCRPT_FUNCTION_PARAMS)
+#define OCRPT_STATIC_FUNCTION(name) static void name(OCRPT_FUNCTION_PARAMS)
+typedef void (*ocrpt_function_call)(OCRPT_FUNCTION_PARAMS);
 
 struct ocrpt_function {
 	const char *fname;
@@ -118,6 +124,44 @@ struct ocrpt_function {
 	bool dont_optimize:1;
 };
 
+enum ocrpt_var_type {
+	OCRPT_VARIABLE_COUNT,
+	OCRPT_VARIABLE_EXPRESSION,
+	OCRPT_VARIABLE_SUM,
+	OCRPT_VARIABLE_AVERAGE,
+	OCRPT_VARIABLE_LOWEST,
+	OCRPT_VARIABLE_HIGHEST
+};
+typedef enum ocrpt_var_type ocrpt_var_type;
+
+enum ocrpt_var_type_bit {
+	OCRPT_VARIABLE_COUNT_BIT = (1 << OCRPT_VARIABLE_COUNT),
+	OCRPT_VARIABLE_EXPRESSION_BIT = (1 << OCRPT_VARIABLE_EXPRESSION),
+	OCRPT_VARIABLE_SUM_BIT = (1 << OCRPT_VARIABLE_SUM),
+	OCRPT_VARIABLE_AVERAGE_BIT = (1 << OCRPT_VARIABLE_AVERAGE),
+	OCRPT_VARIABLE_LOWEST_BIT = (1 << OCRPT_VARIABLE_LOWEST),
+	OCRPT_VARIABLE_HIGHEST_BIT = (1 << OCRPT_VARIABLE_HIGHEST)
+};
+
+struct ocrpt_break;
+typedef struct ocrpt_break ocrpt_break;
+
+struct ocrpt_var {
+	const char *name;
+	union {
+		char *br_name;
+		ocrpt_break *br;
+	};
+	ocrpt_expr *expr;
+	ocrpt_result *rowcount[2];
+	ocrpt_result *intermed[2];
+	ocrpt_result *result[2];
+	enum ocrpt_var_type type:3;
+	bool reset_on_br:1;
+	bool br_resolved:1;
+};
+typedef struct ocrpt_var ocrpt_var;
+
 struct ocrpt_expr {
 	struct ocrpt_result *result[2];
 	union {
@@ -128,7 +172,7 @@ struct ocrpt_expr {
 		struct {
 			ocrpt_string *query;
 			ocrpt_string *name;
-			bool dotprefixed;
+			ocrpt_var *var;
 		};
 
 		struct {
@@ -141,6 +185,7 @@ struct ocrpt_expr {
 	bool result_owned0:1;
 	bool result_owned1:1;
 	bool parenthesized:1;
+	bool dotprefixed:1;
 };
 
 struct ocrpt_datasource;
@@ -188,24 +233,24 @@ struct ocrpt_paper {
 };
 typedef struct ocrpt_paper ocrpt_paper;
 
+enum ocrpt_break_attr_type {
+	OCRPT_BREAK_ATTR_NEWPAGE,
+	OCRPT_BREAK_ATTR_HEADERNEWPAGE,
+	OCRPT_BREAK_ATTR_SUPPRESSBLANK,
+	OCRPT_BREAK_ATTRS_COUNT
+};
+typedef enum ocrpt_break_attr_type ocrpt_break_attr_type;
+
 struct ocrpt_break {
 	const char *name;
-	ocrpt_expr *e_newpage;
-	ocrpt_expr *e_headernewpage;
-	ocrpt_expr *e_suppressblank;
-	/* TODO: add details for header and footer */
+	bool attrs[OCRPT_BREAK_ATTRS_COUNT];
 	ocrpt_list *breakfields;	/* list of ocrpt_expr pointers */
-	/*
-	 * TODO:
-	 * ocrpt_output *breakheader;
-	 * ocrpt_output *breakfooter;
-	 * ...
-	 */
-	bool newpage:1;
-	bool headernewpage:1;
-	bool suppressblank:1;
+	ocrpt_list *reset_vars;		/* list of ocrpt_var pointers */
+	/* TODO: add details for header and footer */
 };
-typedef struct ocrpt_break ocrpt_break;
+
+struct ocrpt_part;
+typedef struct ocrpt_part ocrpt_part;
 
 struct ocrpt_report {
 	/*
@@ -219,13 +264,16 @@ struct ocrpt_report {
 	 * ...
 	 */
 
+	/* Parent part */
+	ocrpt_part *part;
+
+	/* Toplevel query */
+	ocrpt_query *query;
+	/* List of ocrpt_var elements */
+	ocrpt_list *variables;
 	/* List of ocrpt_break elements */
 	ocrpt_list *breaks;
-
-	/* List of ocrpt_variable elements */
-	ocrpt_list *variables;
 };
-typedef struct ocrpt_report ocrpt_report;
 
 struct ocrpt_part {
 	/*
@@ -237,8 +285,8 @@ struct ocrpt_part {
 	 */
 
 	/*
-	 * List of ocrpt_list, each child list is
-	 * the columns for the given row.
+	 * List of ocrpt_list, each child list is the columns for the given row,
+	 * which in turn are ocrpt_report elements.
 	 */
 	ocrpt_list *rows;
 	ocrpt_list *lastrow;
@@ -250,7 +298,6 @@ struct ocrpt_part {
 	bool parsed:1;
 #endif
 };
-typedef struct ocrpt_part ocrpt_part;
 
 #if 0
 struct report_line;
@@ -280,6 +327,7 @@ struct opencreport {
 
 	/* List of struct ocrpt_part elements */
 	ocrpt_list *parts;
+	ocrpt_list *last_part;
 
 	/* Internal math defaults and states */
 	mpfr_prec_t prec;
@@ -345,7 +393,7 @@ ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const 
 /*
  * Optimize expression after parsing
  */
-void ocrpt_expr_optimize(opencreport *o, ocrpt_expr *e);
+void ocrpt_expr_optimize(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
 /*
  * Resolve variable references in the expression
  */
@@ -356,12 +404,16 @@ void ocrpt_expr_resolve(opencreport *o, ocrpt_expr *e);
  */
 void ocrpt_expr_resolve_exclude(opencreport *o, ocrpt_expr *e, int32_t varref_exclude_mask);
 /*
+ * Checks whether the expression references certain variable types
+ */
+bool ocrpt_expr_references(opencreport *o, ocrpt_report *r, ocrpt_expr *e, int32_t varref_include_mask, uint32_t *varref_vartype_mask);
+/*
  * Evaluate the expression, i.e. compute its ocrpt_result
  * It must be called after ocrpt_query_navigate_next(), see below.
  *
  * The returned ocrpt_result MUST NOT be freed with ocrpt_result_free().
  */
-ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_expr *e);
+ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
 /*
  * Compare two subsequent row data in the expression,
  * return true if they are identical.
@@ -384,6 +436,14 @@ int32_t ocrpt_expr_nodes(ocrpt_expr *e);
  * Free an expression parse tree
  */
 void ocrpt_expr_free(ocrpt_expr *e);
+/*
+ * Create a named report variable
+ */
+ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, ocrpt_var_type type, const char *name, ocrpt_expr *e);
+/*
+ * Free a report variable
+ */
+void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_var *var);
 /*
  * Print the result data. Good for unit testing.
  */
@@ -431,27 +491,30 @@ ocrpt_result *ocrpt_environment_get_c(const char *env);
  ***************************/
 
 /*
- * Add a report break
- *
- * The break will take over the expressions' ownerships.
+ * Add a named report break
  */
-ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_part *part,
-							const char *name,
-							ocrpt_expr *newpage,
-							ocrpt_expr *headernewpage,
-							ocrpt_expr *suppressblank);
+ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, const char *name);
+
+/*
+ * Set the break attribute from bool value
+ */
+bool ocrpt_break_set_attribute(ocrpt_break *brk, const ocrpt_break_attr_type attr_type, bool value);
+/*
+ * Set the break attribute from numeric constant expression
+ */
+bool ocrpt_break_set_attribute_from_expr(opencreport *o, ocrpt_report *r, ocrpt_break *brk, const ocrpt_break_attr_type attr_type, ocrpt_expr *expr);
 /*
  * Free a report break
  */
-void ocrpt_break_free(opencreport *o, ocrpt_break *br);
+void ocrpt_break_free(opencreport *o, ocrpt_report *r, ocrpt_break *br, bool remove_from_list);
 /*
  * Find a report break using its name
  */
-ocrpt_break *ocrpt_break_get(opencreport *o, ocrpt_part *part, const char *name);
+ocrpt_break *ocrpt_break_get(opencreport *o, ocrpt_report *r, const char *name);
 /*
  * Add a break field to a break
  */
-bool ocrpt_break_add_breakfield(opencreport *o, ocrpt_part *part, ocrpt_break *b, ocrpt_expr *bf);
+bool ocrpt_break_add_breakfield(opencreport *o, ocrpt_report *r, ocrpt_break *b, ocrpt_expr *bf);
 /*
  * Check whether the report break triggers
  */
@@ -498,7 +561,7 @@ void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc,
 #define ocrpt_list_length(l) ((l) ? (l)->len : 0)
 ocrpt_list *ocrpt_makelist1(const void *data);
 ocrpt_list *ocrpt_makelist(const void *data1, ...);
-ocrpt_list *ocrpt_list_last(ocrpt_list *l);
+ocrpt_list *ocrpt_list_last(const ocrpt_list *l);
 ocrpt_list *ocrpt_list_end_append(ocrpt_list *l, ocrpt_list **e, const void *data);
 ocrpt_list *ocrpt_list_append(ocrpt_list *l, const void *data);
 ocrpt_list *ocrpt_list_prepend(ocrpt_list *l, const void *data);
@@ -717,12 +780,45 @@ void ocrpt_query_navigate_start(opencreport *o, ocrpt_query *q);
  */
 bool ocrpt_query_navigate_next(opencreport *o, ocrpt_query *q);
 
-/*********************************************
- * Functions related to report part handling *
- *********************************************/
+/********************************************************
+ * Functions related to report and report part handling *
+ ********************************************************/
 
-void ocrpt_free_part(opencreport *o, const struct ocrpt_part *part);
-void ocrpt_free_parts(opencreport *o);
+/*
+ * Create new part structure in the main opencreport structure
+ */
+ocrpt_part *ocrpt_part_new(opencreport *o);
+/*
+ * Create a new row in ocrpt_part
+ */
+ocrpt_list *ocrpt_part_new_row(opencreport *o, ocrpt_part *p);
+/*
+ * Append an ocrpt_report to the column list of the last row in ocrpt_part
+ */
+void ocrpt_part_append_report(opencreport *o, ocrpt_part *p, ocrpt_report *r);
+/*
+ * Free a report part and remove it from the parts list
+ */
+void ocrpt_part_free(opencreport *o, struct ocrpt_part *p);
+/*
+ * Free all report parts and remove them from the parts list
+ */
+void ocrpt_parts_free(opencreport *o);
+/*
+ * Create a new ocrpt_report structure
+ * It will have to be appended with ocrpt_part_append_report()
+ * or to be used standalone for unit tests
+ */
+ocrpt_report *ocrpt_report_new(void);
+/*
+ * Free an ocrpt_report structure
+ * and optionally remove it from the parts list
+ */
+void ocrpt_report_free(opencreport *o, ocrpt_report *r, bool remove_from_list);
+/*
+ * Set the main query of an ocrpt_report
+ */
+void ocrpt_report_set_main_query(ocrpt_report *r, const char *query);
 
 /********************************************
  * Functions related to report XML handling *

@@ -28,7 +28,8 @@ libopencreport_la_CFLAGS = \
 libopencreport_la_SOURCES = \
 	memutil.c listutil.c exprutil.c functions.c \
 	api.c free.c parsexml.c datasource.c environment.c \
-	array-source.c db-source.c navigation.c breaks.c
+	array-source.c db-source.c navigation.c breaks.c \
+	parts.c variables.c
 
 libopencreport_la_LIBADD = \
 	libopencreport_grammar.la \

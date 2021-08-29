@@ -8,7 +8,7 @@
 
 #include <opencreport.h>
 
-static void my_inc(opencreport *o, ocrpt_expr *e) {
+OCRPT_STATIC_FUNCTION(my_inc) {
 	if (e->n_ops != 1 || !e->ops[0]->result[o->residx]) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 		return;
@@ -31,7 +31,7 @@ static void my_inc(opencreport *o, ocrpt_expr *e) {
 	}
 }
 
-static void my_dec(opencreport *o, ocrpt_expr *e) {
+OCRPT_STATIC_FUNCTION(my_dec) {
 	if (e->n_ops != 1 || !e->ops[0]->result[o->residx]) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 		return;
@@ -68,7 +68,7 @@ int main(void) {
 	if (e1) {
 		ocrpt_expr_print(o, e1);
 		printf("e1 nodes: %d\n", ocrpt_expr_nodes(e1));
-		ocrpt_expr_optimize(o, e1);
+		ocrpt_expr_optimize(o, NULL, e1);
 		ocrpt_expr_print(o, e1);
 		printf("e1 nodes: %d\n", ocrpt_expr_nodes(e1));
 	} else {
@@ -81,7 +81,7 @@ int main(void) {
 	if (e2) {
 		ocrpt_expr_print(o, e2);
 		printf("e2 nodes: %d\n", ocrpt_expr_nodes(e2));
-		ocrpt_expr_optimize(o, e2);
+		ocrpt_expr_optimize(o, NULL, e2);
 		ocrpt_expr_print(o, e2);
 		printf("e2 nodes: %d\n", ocrpt_expr_nodes(e2));
 	} else {

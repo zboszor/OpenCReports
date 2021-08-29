@@ -183,12 +183,12 @@ int main(void) {
 			ocrpt_expr_print(o, e);
 			printf("expr nodes: %d\n", ocrpt_expr_nodes(e));
 
-			ocrpt_expr_optimize(o, e);
+			ocrpt_expr_optimize(o, NULL, e);
 			printf("expr optimized: ");
 			ocrpt_expr_print(o, e);
 			printf("expr nodes: %d\n", ocrpt_expr_nodes(e));
 
-			r = ocrpt_expr_eval(o, e);
+			r = ocrpt_expr_eval(o, NULL, e);
 			ocrpt_result_print(r);
 		} else {
 			printf("%s\n", err);

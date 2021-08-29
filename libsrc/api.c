@@ -93,7 +93,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 		ocrpt_datasource_free(o, ds);
 	}
 
-	ocrpt_free_parts(o);
+	ocrpt_parts_free(o);
 	gmp_randclear(o->randstate);
 	ocrpt_mem_string_free(o->converted, true);
 	ocrpt_mem_free(o);

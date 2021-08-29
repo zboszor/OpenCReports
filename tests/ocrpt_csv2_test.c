@@ -66,25 +66,25 @@ int main(void) {
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, id);
-		r = ocrpt_expr_eval(o, id);
+		r = ocrpt_expr_eval(o, NULL, id);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, name);
-		r = ocrpt_expr_eval(o, name);
+		r = ocrpt_expr_eval(o, NULL, name);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, age);
-		r = ocrpt_expr_eval(o, age);
+		r = ocrpt_expr_eval(o, NULL, age);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, adult);
-		r = ocrpt_expr_eval(o, adult);
+		r = ocrpt_expr_eval(o, NULL, adult);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 		printf("Expression is %s previous row\n", ocrpt_expr_cmp_results(o, adult) ? "identical to" : "different from");

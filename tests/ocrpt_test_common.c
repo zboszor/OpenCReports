@@ -21,3 +21,20 @@ static void print_result_row(const char *name, ocrpt_query_result *qr, int32_t c
 		printf("\n");
 	}
 }
+
+static void print_part_reports(char *name, ocrpt_part *p) UNUSED;
+static void print_part_reports(char *name, ocrpt_part *p) {
+	ocrpt_list *row, *col;
+	int i, j;
+
+	printf("part %s:\n", name);
+	for (row = p->rows, i = 0; row; row = row->next, i++) {
+		printf("row %d reports:", i);
+		for (col = (ocrpt_list *)row->data, j = 0; col; col = col->next, j++) {
+			ocrpt_report *r = (ocrpt_report *) col->data;
+			if (r)
+				printf(" %d", j);
+		}
+		printf("\n");
+	}
+}

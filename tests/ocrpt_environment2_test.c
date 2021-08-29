@@ -23,7 +23,7 @@ int main(void) {
 		printf("Before resolving: ");
 		ocrpt_expr_print(o, e);
 		ocrpt_expr_resolve(o, e);
-		ocrpt_expr_optimize(o, e);
+		ocrpt_expr_optimize(o, NULL, e);
 		printf("After resolving: ");
 		ocrpt_expr_print(o, e);
 		ocrpt_expr_free(e);
@@ -41,7 +41,7 @@ int main(void) {
 		printf("Before resolving: ");
 		ocrpt_expr_print(o, e);
 		ocrpt_expr_resolve(o, e);
-		ocrpt_expr_optimize(o, e);
+		ocrpt_expr_optimize(o, NULL, e);
 		printf("After resolving: ");
 		ocrpt_expr_print(o, e);
 		ocrpt_expr_free(e);

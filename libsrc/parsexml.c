@@ -28,15 +28,6 @@
 
 extern char cwdpath[PATH_MAX];
 
-void ocrpt_free_part(opencreport *o, const struct ocrpt_part *part) {
-	ocrpt_mem_free(part->path);
-#if 0
-	if (part->allocated)
-		ocrpt_mem_free(part->xmlbuf);
-#endif
-	ocrpt_mem_free(part);
-}
-
 int32_t ocrpt_add_report_from_buffer_internal(opencreport *o, const char *buffer, bool allocated, const char *report_path) {
 	struct ocrpt_part *part = ocrpt_mem_malloc(sizeof(struct ocrpt_part));
 	int partsold;
@@ -51,14 +42,14 @@ int32_t ocrpt_add_report_from_buffer_internal(opencreport *o, const char *buffer
 #endif
 	part->path = ocrpt_mem_strdup(report_path);
 	if (!part->path) {
-		ocrpt_free_part(o, part);
+		ocrpt_part_free(o, part);
 		return -1;
 	}
 
 	partsold = ocrpt_list_length(o->parts);
 	o->parts = ocrpt_list_append(o->parts, part);
 	if (ocrpt_list_length(o->parts) != partsold + 1) {
-		ocrpt_free_part(o, part);
+		ocrpt_part_free(o, part);
 		return -1;
 	}
 
@@ -113,11 +104,6 @@ int32_t ocrpt_add_report(opencreport *o, const char *filename) {
 	return ocrpt_add_report_from_buffer_internal(o, str, 1, dir);
 }
 
-void ocrpt_free_parts(opencreport *o) {
-	ocrpt_list_free_deep(o->parts, (ocrpt_mem_free_t)ocrpt_free_part);
-	o->parts = NULL;
-}
-
 static void processNode(xmlTextReaderPtr reader) __attribute__((unused));
 static void processNode(xmlTextReaderPtr reader) {
 	xmlChar *name, *value;
@@ -151,7 +137,7 @@ static void ocrpt_xml_expr_get_value(opencreport *o, ocrpt_expr *e, char **s, in
 	if (!e)
 		return;
 
-	r = ocrpt_expr_eval(o, e);
+	r = ocrpt_expr_eval(o, NULL, e);
 	if (r) {
 		if (s && r->type == OCRPT_RESULT_STRING)
 			*s = r->string->str;
@@ -170,7 +156,7 @@ static ocrpt_expr *ocrpt_xml_expr_parse(opencreport *o, xmlChar *expr, bool repo
 	e = ocrpt_expr_parse(o, (char *)expr, &err);
 	if (e) {
 		ocrpt_expr_resolve_exclude(o, e, OCRPT_VARREF_RVAR | OCRPT_VARREF_IDENT | OCRPT_VARREF_VVAR);
-		ocrpt_expr_optimize(o, e);
+		ocrpt_expr_optimize(o, NULL, e);
 	} else {
 		if (report)
 			fprintf(stderr, "Cannot parse: %s\n", expr);
@@ -490,6 +476,160 @@ static void ocrpt_parse_datasources_node(opencreport *o, xmlTextReaderPtr reader
 	}
 }
 
+static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, xmlTextReaderPtr reader) {
+	/* TODO: parse and process Report node attributes; make it possible for multiple pd nodes to exist in the same pr node */
+	ocrpt_report *r = ocrpt_report_new();
+	int ret, depth, nodetype;
+
+	ocrpt_part_append_report(o, p, r);
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return;
+
+	depth = xmlTextReaderDepth(reader);
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+
+		//processNode(reader);
+
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "Report")) {
+			xmlFree(name);
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+#if 0
+			if (!strcmp((char *)name, "Alternate"))
+				ocrpt_parse_alternate_node(o, r, reader);
+			else if (!strcmp((char *)name, "NoData"))
+				ocrpt_parse_nodata_node(o, r, reader);
+			else if (!strcmp((char *)name, "Breaks"))
+				ocrpt_parse_breaks_node(o, r, reader);
+			else if (!strcmp((char *)name, "Variables"))
+				ocrpt_parse_variables_node(o, r, reader);
+			else if (!strcmp((char *)name, "PageHeader"))
+				ocrpt_parse_pageheader_node(o, p, r, reader);
+			else if (!strcmp((char *)name, "PageFooter"))
+				ocrpt_parse_pagefooter_node(o, p, r, reader);
+			else if (!strcmp((char *)name, "ReportHeader"))
+				ocrpt_parse_reportheader_node(o, p, r, reader);
+			else if (!strcmp((char *)name, "ReportFooter"))
+				ocrpt_parse_reportfooter_node(o, p, r, reader);
+			else if (!strcmp((char *)name, "Detail"))
+				ocrpt_parse_detail_node(o, r, reader);
+			else if (!strcmp((char *)name, "Graph"))
+				ocrpt_parse_graph_node(o, r, reader);
+			else if (!strcmp((char *)name, "Chart"))
+				ocrpt_parse_chart_node(o, r, reader);
+#endif
+		}
+
+		xmlFree(name);
+	}
+}
+
+static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, xmlTextReaderPtr reader) {
+	/* TODO: parse and process pd node attributes */
+	int ret, depth, nodetype;
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return;
+
+	depth = xmlTextReaderDepth(reader);
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+
+		//processNode(reader);
+
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "pd")) {
+			xmlFree(name);
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if (!strcmp((char *)name, "Report"))
+				ocrpt_parse_report_node(o, p, reader);
+		}
+
+		xmlFree(name);
+	}
+}
+
+static void ocrpt_parse_partrow_node(opencreport *o, ocrpt_part *p, xmlTextReaderPtr reader) {
+	/* TODO: parse and process pr node attributes */
+	int ret, depth, nodetype;
+
+	ocrpt_part_new_row(o, p);
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return;
+
+	depth = xmlTextReaderDepth(reader);
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+
+		//processNode(reader);
+
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "pr")) {
+			xmlFree(name);
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if (!strcmp((char *)name, "pd"))
+				ocrpt_parse_pd_node(o, p, reader);
+		}
+
+		xmlFree(name);
+	}
+}
+
+static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
+	/* TODO: parse and process Part node attributes */
+	ocrpt_part *p = ocrpt_part_new(o);
+	int ret, depth, nodetype;
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return;
+
+	depth = xmlTextReaderDepth(reader);
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+
+		//processNode(reader);
+
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "Part")) {
+			xmlFree(name);
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if (!strcmp((char *)name, "pr"))
+				ocrpt_parse_partrow_node(o, p, reader);
+#if 0
+			else if (!strcmp((char *)name, "PageHeader"))
+				ocrpt_parse_pageheader_node(o, p, NULL, reader);
+			else if (!strcmp((char *)name, "PageFooter"))
+				ocrpt_parse_pagefooter_node(o, p, NULL, reader);
+			else if (!strcmp((char *)name, "ReportHeader"))
+				ocrpt_parse_reportheader_node(o, p, NULL, reader);
+			else if (!strcmp((char *)name, "ReportFooter"))
+				ocrpt_parse_reportfooter_node(o, p, NULL, reader);
+#endif
+		}
+
+		xmlFree(name);
+	}
+}
+
 static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader) {
 	int ret, depth, nodetype;
 
@@ -515,12 +655,10 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 				ocrpt_parse_datasources_node(o, reader);
 			else if (!strcmp((char *)name, "Queries"))
 				ocrpt_parse_queries_node(o, reader);
-#if 0
 			else if (!strcmp((char *)name, "Report"))
-				ocrpt_parse_report_node(o, reader);
+				ocrpt_parse_report_node(o, NULL, reader);
 			else if (!strcmp((char *)name, "Part"))
 				ocrpt_parse_part_node(o, reader);
-#endif
 		}
 
 		xmlFree(name);
@@ -559,12 +697,10 @@ DLL_EXPORT_SYM bool ocrpt_parse_xml(opencreport *o, const char *filename) {
 				ocrpt_parse_queries_node(o, reader);
 			else if (!strcmp((char *)name, "Query"))
 				ocrpt_parse_query_node(o, reader);
-#if 0
 			else if (!strcmp((char *)name, "Report"))
-				ocrpt_parse_report_node(o, reader);
+				ocrpt_parse_report_node(o, NULL, reader);
 			else if (!strcmp((char *)name, "Part"))
 				ocrpt_parse_part_node(o, reader);
-#endif
 		}
 
 		xmlFree(name);

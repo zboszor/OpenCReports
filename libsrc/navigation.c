@@ -37,7 +37,7 @@ static bool ocrpt_navigate_n_to_1_check_current(opencreport *o, ocrpt_query *q) 
 		if (f->source->input->isdone(f))
 			return false;
 
-		r = ocrpt_expr_eval(o, fo->expr);
+		r = ocrpt_expr_eval(o, NULL, fo->expr);
 #if 0
 		printf("%s:%d: after ocrpt_expr_eval:\n", __func__, __LINE__);
 		ocrpt_expr_result_deep_print(o, fo->expr);

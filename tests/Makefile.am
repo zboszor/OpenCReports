@@ -31,6 +31,7 @@ TESTS = \
 	ocrpt_odbc_xml4_test \
 	ocrpt_circular_follower_test \
 	ocrpt_rownum_test \
+	ocrpt_part_test ocrpt_part_xml_test \
 	ocrpt_break_test
 
 # Unstable tests by nature:

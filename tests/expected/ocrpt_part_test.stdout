@@ -1,0 +1,13 @@
+Allocated two parts for report structure
+Freed report structure
+Allocated two parts and one report for each part
+part p1:
+row 0 reports: 0
+part p2:
+row 0 reports: 0
+Freed report structure
+Allocated two parts and two reports for the second part
+part p1:
+part p2:
+row 0 reports: 0 1
+Freed report structure

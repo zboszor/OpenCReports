@@ -38,22 +38,18 @@ DLL_EXPORT_SYM ocrpt_list *ocrpt_makelist(const void *data, ...) {
 	va_start(ap, data);
 	while ((arg = va_arg(ap, void *))) {
 		l = ocrpt_list_end_append(l, &e, arg);
-		if (e->next)
-			e = e->next;
-		else
-			break;
 	}
 	va_end(ap);
 	return l;
 }
 
-DLL_EXPORT_SYM ocrpt_list *ocrpt_list_last(ocrpt_list *l) {
+DLL_EXPORT_SYM ocrpt_list *ocrpt_list_last(const ocrpt_list *l) {
 	ocrpt_list *ptr;
 
 	if (!l)
 		return NULL;
 
-	ptr = l;
+	ptr = (ocrpt_list *)l;
 	while (ptr->next)
 		ptr = ptr->next;
 
@@ -72,8 +68,11 @@ DLL_EXPORT_SYM ocrpt_list *ocrpt_list_end_append(ocrpt_list *l, ocrpt_list **end
 	if (e->next)
 		e = ocrpt_list_last(e);
 	e->next = ocrpt_makelist1(data);
-	if (e->next)
-		l->len++;
+	if (!e->next)
+		return l;
+
+	l->len++;
+	e = e->next;
 
 	out:
 	if (endptr)

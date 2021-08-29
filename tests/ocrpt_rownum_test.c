@@ -83,25 +83,25 @@ int main(void) {
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, id);
-		r = ocrpt_expr_eval(o, id);
+		r = ocrpt_expr_eval(o, NULL, id);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, rownum1);
-		r = ocrpt_expr_eval(o, rownum1);
+		r = ocrpt_expr_eval(o, NULL, rownum1);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, rownum2);
-		r = ocrpt_expr_eval(o, rownum2);
+		r = ocrpt_expr_eval(o, NULL, rownum2);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, rownum3);
-		r = ocrpt_expr_eval(o, rownum3);
+		r = ocrpt_expr_eval(o, NULL, rownum3);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
@@ -137,25 +137,25 @@ int main(void) {
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, id);
-		r = ocrpt_expr_eval(o, id);
+		r = ocrpt_expr_eval(o, NULL, id);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, rownum1);
-		r = ocrpt_expr_eval(o, rownum1);
+		r = ocrpt_expr_eval(o, NULL, rownum1);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, rownum2);
-		r = ocrpt_expr_eval(o, rownum2);
+		r = ocrpt_expr_eval(o, NULL, rownum2);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, rownum3);
-		r = ocrpt_expr_eval(o, rownum3);
+		r = ocrpt_expr_eval(o, NULL, rownum3);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
