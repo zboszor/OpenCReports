@@ -526,12 +526,16 @@ bool ocrpt_break_check_fields(opencreport *o, ocrpt_break *br);
 
 typedef void *(*ocrpt_mem_malloc_t)(size_t);
 typedef void *(*ocrpt_mem_realloc_t)(void *, size_t);
+typedef void *(*ocrpt_mem_reallocarray_t)(void *, size_t, size_t);
 typedef void (*ocrpt_mem_free_t)(const void *);
 typedef char *(*ocrpt_mem_strdup_t)(const char *);
 typedef char *(*ocrpt_mem_strndup_t)(const char *, size_t);
+/* Dummy type, only used for casting ocrpt_mem_free_t for mp_set_memory_functions() */
+typedef void (*ocrpt_mem_free_size_t)(void *, size_t);
 
 extern ocrpt_mem_malloc_t ocrpt_mem_malloc0;
 extern ocrpt_mem_realloc_t ocrpt_mem_realloc0;
+extern ocrpt_mem_reallocarray_t ocrpt_mem_reallocarray0;
 extern ocrpt_mem_free_t ocrpt_mem_free0;
 extern ocrpt_mem_strdup_t ocrpt_mem_strdup0;
 extern ocrpt_mem_strndup_t ocrpt_mem_strndup0;
@@ -542,6 +546,9 @@ static inline void *ocrpt_mem_malloc(size_t sz) { return ocrpt_mem_malloc0(sz); 
 static inline void *ocrpt_mem_realloc(void *ptr, size_t sz) __attribute__((alloc_size(2)));
 static inline void *ocrpt_mem_realloc(void *ptr, size_t sz) { return ocrpt_mem_realloc0(ptr, sz); }
 
+static inline void *ocrpt_mem_reallocarray(void *ptr, size_t sz, size_t) __attribute__((alloc_size(2)));
+static inline void *ocrpt_mem_reallocarray(void *ptr, size_t nmemb, size_t sz) { return ocrpt_mem_reallocarray0(ptr, nmemb, sz); }
+
 static inline void ocrpt_mem_free(const void *ptr) { ocrpt_mem_free0(ptr); }
 static inline void ocrpt_strfree(const char *s) { ocrpt_mem_free0((const void *)s); }
 
@@ -551,6 +558,7 @@ static inline void *ocrpt_mem_strndup(const char *ptr, size_t sz) { return (ptr 
 
 void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc,
 								ocrpt_mem_realloc_t rrealloc,
+								ocrpt_mem_reallocarray_t rreallocarray,
 								ocrpt_mem_free_t rfree,
 								ocrpt_mem_strdup_t rstrdup,
 								ocrpt_mem_strndup_t rstrndup);

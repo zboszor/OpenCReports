@@ -187,6 +187,10 @@ static void initialize_ocrpt(void) {
 	const struct paper *paper_info;
 	int i;
 
+	/* Use the OpenCReport allocator functions in GMP/MPFR */
+	mpfr_mp_memory_cleanup();
+	mp_set_memory_functions(ocrpt_mem_malloc0, ocrpt_mem_reallocarray0, (ocrpt_mem_free_size_t)ocrpt_mem_free0);
+
 	/*
 	 * When we add a toplevel report part from buffer,
 	 * we can't rely on file path, we can only rely
