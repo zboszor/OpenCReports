@@ -6,6 +6,7 @@
 #ifndef _OPENCREPORT_H_
 #define _OPENCREPORT_H_
 
+#include <locale.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <time.h>
@@ -330,40 +331,7 @@ struct opencreport {
 	ocrpt_list *last_part;
 
 	/* Locale specific data */
-	char *current_locale;
-	char *currency_symbol;
-	char *int_curr_symbol;
-	char *decimal_point;
-	char *thousands_sep;
-	char *negative_sign;
-	char *positive_sign;
-	char *mon_grouping;
-	char *mon_decimal_point;
-	char *mon_thousands_sep;
-	char *amstr;
-	char *pmstr;
-	char *ampm_fmt;
-	char *d_t_fmt;
-	char *d_fmt;
-	char *t_fmt;
-	char int_n_cs_precedes;
-	char int_n_sep_by_space;
-	char int_n_sign_posn;
-	char int_p_cs_precedes;
-	char int_p_sep_by_space;
-	char int_p_sign_posn;
-	char n_cs_precedes;
-	char n_sep_by_space;
-	char n_sign_posn;
-	char p_cs_precedes;
-	char p_sep_by_space;
-	char p_sign_posn;
-	int int_frac_digits;
-	int frac_digits;
-	char *dayname[7];
-	char *abdayname[7];
-	char *monthname[12];
-	char *abmonthname[12];
+	locale_t locale;
 
 	/* Internal math defaults and states */
 	mpfr_prec_t prec;
@@ -400,12 +368,6 @@ void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode);
  * It does not affect the main program.
  */
 void ocrpt_set_locale(opencreport *o, const char *locale);
-
-/*
- * Lock and unlock the global locale mutex
- */
-void ocrpt_lock_global_locale_mutex(void);
-void ocrpt_unlock_global_locale_mutex(void);
 
 /*
  * Print monetary value in the report's locale

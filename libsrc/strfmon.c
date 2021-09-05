@@ -46,7 +46,7 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/strfmon.c,v 1.14 2003/03/20 08:18:55 ach
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
-#include <locale.h>
+#include <langinfo.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -95,7 +95,9 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/strfmon.c,v 1.14 2003/03/20 08:18:55 ach
 } while (0)
 
 #define GRPSEP do {						\
-	*--bufend = thousands_sep;				\
+	int i;	\
+	for (i = thousands_sep_len; i; i--)	\
+		*--bufend = thousands_sep[i - 1];	\
 	groups++;						\
 } while (0)
 
@@ -118,7 +120,7 @@ DLL_EXPORT_SYM ssize_t ocrpt_mpfr_strfmon(opencreport *o, char * __restrict s, s
 	mpfr_t	val;		/* local value */
 	mpfr_srcptr	val_ptr;/* passed-in value */
 	char	space_char = ' '; /* space after currency */
-	char	cs_precedes,	/* values gathered from struct lconv */
+	char	cs_precedes,	/* values gathered from nl_langinfo_l() */
 			sep_by_space,
 			sign_posn,
 			*signstr,
@@ -230,13 +232,13 @@ DLL_EXPORT_SYM ssize_t ocrpt_mpfr_strfmon(opencreport *o, char * __restrict s, s
 		}
 
 		if (flags & USE_INTL_CURRENCY) {
-			currency_symbol = o->int_curr_symbol;
+			currency_symbol = ocrpt_mem_strdup(nl_langinfo_l(__INT_CURR_SYMBOL, o->locale));
 			if (currency_symbol != NULL) {
 				space_char = *(currency_symbol + 3);
 				*(currency_symbol + 3) = '\0';
 			}
 		} else
-			currency_symbol = o->currency_symbol;
+			currency_symbol = ocrpt_mem_strdup(nl_langinfo_l(__CURRENCY_SYMBOL, o->locale));
 
 		if (currency_symbol == NULL)
 			goto end_error;			/* ENOMEM. */
@@ -382,6 +384,7 @@ DLL_EXPORT_SYM ssize_t ocrpt_mpfr_strfmon(opencreport *o, char * __restrict s, s
 	PRINT('\0');
 	va_end(ap);
 	mpfr_clear(val);
+	ocrpt_mem_free(currency_symbol);
 	ocrpt_mem_free(asciivalue);
 	return (dst - s - 1);	/* return size of put data except trailing '\0' */
 
@@ -394,6 +397,7 @@ format_error:
 
 end_error:
 	sverrno = errno;
+	ocrpt_mem_free(currency_symbol);
 	ocrpt_mem_free(asciivalue);
 	errno = sverrno;
 	va_end(ap);
@@ -406,27 +410,27 @@ __setup_vars(opencreport *o, int flags, char *cs_precedes, char *sep_by_space,
 		char *sign_posn, char **signstr) {
 
 	if ((flags & IS_NEGATIVE) && (flags & USE_INTL_CURRENCY)) {
-		*cs_precedes = o->int_n_cs_precedes;
-		*sep_by_space = o->int_n_sep_by_space;
-		*sign_posn = (flags & PARENTH_POSN) ? 0 : o->int_n_sign_posn;
-		*signstr = (*o->negative_sign == '\0') ? "-"
-		    : o->negative_sign;
+		*cs_precedes = *nl_langinfo_l(__INT_N_CS_PRECEDES, o->locale);
+		*sep_by_space = *nl_langinfo_l(__INT_N_SEP_BY_SPACE, o->locale);
+		*sign_posn = (flags & PARENTH_POSN) ? 0 : *nl_langinfo_l(__INT_N_SIGN_POSN, o->locale);
+		*signstr = (*nl_langinfo_l(__NEGATIVE_SIGN, o->locale) == '\0') ? "-"
+		    : nl_langinfo_l(__NEGATIVE_SIGN, o->locale);
 	} else if (flags & USE_INTL_CURRENCY) {
-		*cs_precedes = o->int_p_cs_precedes;
-		*sep_by_space = o->int_p_sep_by_space;
-		*sign_posn = (flags & PARENTH_POSN) ? 0 : o->int_p_sign_posn;
-		*signstr = o->positive_sign;
+		*cs_precedes = *nl_langinfo_l(__INT_P_CS_PRECEDES, o->locale);
+		*sep_by_space = *nl_langinfo_l(__INT_P_SEP_BY_SPACE, o->locale);
+		*sign_posn = (flags & PARENTH_POSN) ? 0 : *nl_langinfo_l(__INT_P_SIGN_POSN, o->locale);
+		*signstr = nl_langinfo_l(__POSITIVE_SIGN, o->locale);
 	} else if (flags & IS_NEGATIVE) {
-		*cs_precedes = o->n_cs_precedes;
-		*sep_by_space = o->n_sep_by_space;
-		*sign_posn = (flags & PARENTH_POSN) ? 0 : o->n_sign_posn;
-		*signstr = (*o->negative_sign == '\0') ? "-"
-		    : o->negative_sign;
+		*cs_precedes = *nl_langinfo_l(__N_CS_PRECEDES, o->locale);
+		*sep_by_space = *nl_langinfo_l(__N_SEP_BY_SPACE, o->locale);
+		*sign_posn = (flags & PARENTH_POSN) ? 0 : *nl_langinfo_l(__N_SIGN_POSN, o->locale);
+		*signstr = (*nl_langinfo_l(__NEGATIVE_SIGN, o->locale) == '\0') ? "-"
+		    : nl_langinfo_l(__NEGATIVE_SIGN, o->locale);
 	} else {
-		*cs_precedes = o->p_cs_precedes;
-		*sep_by_space = o->p_sep_by_space;
-		*sign_posn = (flags & PARENTH_POSN) ? 0 : o->p_sign_posn;
-		*signstr = o->positive_sign;
+		*cs_precedes = *nl_langinfo_l(__P_CS_PRECEDES, o->locale);
+		*sep_by_space = *nl_langinfo_l(__P_SEP_BY_SPACE, o->locale);
+		*sign_posn = (flags & PARENTH_POSN) ? 0 : *nl_langinfo_l(__P_SIGN_POSN, o->locale);
+		*signstr = nl_langinfo_l(__POSITIVE_SIGN, o->locale);
 	}
 
 	/* Set defult values for unspecified information. */
@@ -476,7 +480,7 @@ get_groups(int size, char *grouping) {
 		chars++;
 		size -= (int)*grouping++;
 		/* no more grouping ? */
-		if (*grouping == CHAR_MAX)
+		if (*grouping == CHAR_MAX || *grouping <= 0)
 			break;
 		/* rest grouping with same value ? */
 		if (*grouping == 0) {
@@ -497,21 +501,23 @@ static char *__format_grouped_mpfr(opencreport *o, mpfr_t value, int *flags, int
 	size_t		bufsize;
 	char		*bufend;
 
-	int		padded;
+	int		padded, decimal_point_len, thousands_sep_len;
 
 	char		*grouping;
-	char		decimal_point;
-	char		thousands_sep;
+	char		*decimal_point;
+	char		*thousands_sep;
 
 	int groups = 0;
 
-	grouping = o->mon_grouping;
-	decimal_point = *o->mon_decimal_point;
-	if (decimal_point == '\0')
-		decimal_point = *o->decimal_point;
-	thousands_sep = *o->mon_thousands_sep;
-	if (thousands_sep == '\0')
-		thousands_sep = *o->thousands_sep;
+	grouping = nl_langinfo_l(__MON_GROUPING, o->locale);
+	decimal_point = nl_langinfo_l(__MON_DECIMAL_POINT, o->locale);
+	if (*decimal_point == '\0')
+		decimal_point = nl_langinfo_l(__DECIMAL_POINT, o->locale);
+	decimal_point_len = strlen(decimal_point);
+	thousands_sep = nl_langinfo_l(__MON_THOUSANDS_SEP, o->locale);
+	if (*thousands_sep == '\0')
+		thousands_sep = nl_langinfo_l(__THOUSANDS_SEP, o->locale);
+	thousands_sep_len = strlen(thousands_sep);
 
 	/* fill left_prec with default value */
 	if (left_prec == -1)
@@ -520,11 +526,12 @@ static char *__format_grouped_mpfr(opencreport *o, mpfr_t value, int *flags, int
 	/* fill right_prec with default value */
 	if (right_prec == -1) {
 		if (*flags & USE_INTL_CURRENCY)
-			right_prec = o->int_frac_digits;
+			right_prec = *nl_langinfo_l(__INT_FRAC_DIGITS, o->locale);
 		else
-			right_prec = o->frac_digits;
+			right_prec = *nl_langinfo_l(__FRAC_DIGITS, o->locale);
 
-		if (right_prec == CHAR_MAX)	/* POSIX locale ? */
+		/* Sometimes it's (char)-1, i.e. UCHAR_MAX sign-extended to int */
+		if (right_prec >= CHAR_MAX || right_prec < 0)	/* POSIX locale ? */
 			right_prec = 2;
 	}
 
@@ -539,7 +546,7 @@ static char *__format_grouped_mpfr(opencreport *o, mpfr_t value, int *flags, int
 
 	/* make sure that we've enough space for result string */
 	bufsize = strlen(avalue) * 2 + 1;
-	rslt = malloc(bufsize);
+	rslt = ocrpt_mem_malloc(bufsize);
 	if (rslt == NULL) {
 		mpfr_free_str(avalue);
 		return (NULL);
@@ -555,14 +562,16 @@ static char *__format_grouped_mpfr(opencreport *o, mpfr_t value, int *flags, int
 	}
 
 	if (right_prec > 0) {
+		int i;
 		bufend -= right_prec;
 		memcpy(bufend, avalue + avalue_size + padded - right_prec, right_prec);
-		*--bufend = decimal_point;
+		for (i = decimal_point_len; i; i--)
+			*--bufend = decimal_point[i - 1];
 		avalue_size -= (right_prec + 1);
 	}
 
 	if ((*flags & NEED_GROUPING) &&
-	    thousands_sep != '\0' &&	/* XXX: need investigation */
+	    *thousands_sep != '\0' &&	/* XXX: need investigation */
 	    *grouping != CHAR_MAX &&
 	    *grouping > 0) {
 		while (avalue_size > (int)*grouping) {
@@ -571,7 +580,7 @@ static char *__format_grouped_mpfr(opencreport *o, mpfr_t value, int *flags, int
 			grouping++;
 
 			/* no more grouping ? */
-			if (*grouping == CHAR_MAX)
+			if (*grouping == CHAR_MAX || *grouping <= 0)
 				break;
 
 			/* rest grouping with same value ? */

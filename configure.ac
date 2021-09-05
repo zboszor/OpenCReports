@@ -53,10 +53,6 @@ AS_IF([test x$gl_cv_cc_visibility = xyes],
 
 PKG_INSTALLDIR()
 
-AX_PTHREAD()
-AC_SUBST(PTHREAD_CFLAGS)
-AC_SUBST(PTHREAD_LIBS)
-
 dnl LibXML2 2.5.0 introduced the XmlTextReader API
 PKG_CHECK_MODULES(LIBXML, libxml-2.0 >= 2.5.0)
 AC_SUBST(LIBXML_LIBS)

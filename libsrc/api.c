@@ -23,8 +23,6 @@
 #include "opencreport.h"
 #include "datasource.h"
 
-static pthread_mutex_t ocrpt_locale_mtx = PTHREAD_MUTEX_INITIALIZER;
-
 char cwdpath[PATH_MAX];
 static ocrpt_paper *papersizes;
 static const ocrpt_paper *system_paper;
@@ -69,37 +67,6 @@ DLL_EXPORT_SYM void ocrpt_datasource_free(opencreport *o, ocrpt_datasource *sour
 	o->datasources = ocrpt_list_remove(o->datasources, source);
 }
 
-static void ocrpt_free_locale(opencreport *o) {
-	int32_t i;
-
-	ocrpt_mem_free(o->current_locale);
-
-	ocrpt_mem_free(o->currency_symbol);
-	ocrpt_mem_free(o->int_curr_symbol);
-	ocrpt_mem_free(o->decimal_point);
-	ocrpt_mem_free(o->thousands_sep);
-	ocrpt_mem_free(o->negative_sign);
-	ocrpt_mem_free(o->positive_sign);
-	ocrpt_mem_free(o->mon_grouping);
-	ocrpt_mem_free(o->mon_decimal_point);
-	ocrpt_mem_free(o->mon_thousands_sep);
-	ocrpt_mem_free(o->amstr);
-	ocrpt_mem_free(o->pmstr);
-	ocrpt_mem_free(o->ampm_fmt);
-	ocrpt_mem_free(o->d_t_fmt);
-	ocrpt_mem_free(o->d_fmt);
-	ocrpt_mem_free(o->t_fmt);
-
-	for (i = 0; i < 7; i++) {
-		ocrpt_mem_free(o->dayname[i]);
-		ocrpt_mem_free(o->abdayname[i]);
-	}
-	for (i = 0; i < 12; i++) {
-		ocrpt_mem_free(o->monthname[i]);
-		ocrpt_mem_free(o->abmonthname[i]);
-	}
-}
-
 DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	int32_t i;
 
@@ -131,7 +98,8 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	}
 
 	ocrpt_parts_free(o);
-	ocrpt_free_locale(o);
+	if (o->locale)
+		freelocale(o->locale);
 
 	gmp_randclear(o->randstate);
 	ocrpt_mem_string_free(o->converted, true);
@@ -220,99 +188,11 @@ DLL_EXPORT_SYM const ocrpt_paper *ocrpt_paper_next(opencreport *o) {
 	return (o->paper_iterator_idx >= n_papersizes ? NULL : &papersizes[o->paper_iterator_idx]);
 }
 
-DLL_EXPORT_SYM void ocrpt_lock_global_locale_mutex(void) {
-	pthread_mutex_lock(&ocrpt_locale_mtx);
-}
-
-DLL_EXPORT_SYM void ocrpt_unlock_global_locale_mutex(void) {
-	pthread_mutex_unlock(&ocrpt_locale_mtx);
-}
-
 DLL_EXPORT_SYM void ocrpt_set_locale(opencreport *o, const char *locale) {
-	char *oldlocale;
-	struct lconv *lc;
-	int32_t i;
-	static struct { int dn; int adn; } dayname[7] = {
-		{ DAY_1, ABDAY_1 },
-		{ DAY_2, ABDAY_2 },
-		{ DAY_3, ABDAY_3 },
-		{ DAY_4, ABDAY_4 },
-		{ DAY_5, ABDAY_5 },
-		{ DAY_6, ABDAY_6 },
-		{ DAY_7, ABDAY_7 },
-	};
-	static struct {int mn; int amn; } monname[12] = {
-		{ MON_1, ABMON_1 },
-		{ MON_2, ABMON_2 },
-		{ MON_3, ABMON_3 },
-		{ MON_4, ABMON_4 },
-		{ MON_5, ABMON_5 },
-		{ MON_6, ABMON_6 },
-		{ MON_7, ABMON_7 },
-		{ MON_8, ABMON_8 },
-		{ MON_9, ABMON_9 },
-		{ MON_10, ABMON_10 },
-		{ MON_11, ABMON_11 },
-		{ MON_12, ABMON_12 },
-	};
+	if (o->locale)
+		freelocale(o->locale);
 
-	if (o->current_locale && strcmp(locale, o->current_locale) == 0)
-		return;
-
-	ocrpt_lock_global_locale_mutex();
-	oldlocale = ocrpt_mem_strdup(setlocale(LC_ALL, NULL));
-
-	ocrpt_free_locale(o);
-
-	o->current_locale = ocrpt_mem_strdup(locale);
-
-	setlocale(LC_ALL, locale);
-
-	lc = localeconv();
-
-	o->currency_symbol = ocrpt_mem_strdup(lc->currency_symbol);
-	o->int_curr_symbol = ocrpt_mem_strdup(lc->int_curr_symbol);
-	o->decimal_point = ocrpt_mem_strdup(lc->decimal_point);
-	o->thousands_sep = ocrpt_mem_strdup(lc->thousands_sep);
-	o->negative_sign = ocrpt_mem_strdup(lc->negative_sign);
-	o->positive_sign = ocrpt_mem_strdup(lc->positive_sign);
-	o->mon_grouping = ocrpt_mem_strdup(lc->mon_grouping);
-	o->mon_decimal_point = ocrpt_mem_strdup(lc->mon_decimal_point);
-	o->mon_thousands_sep = ocrpt_mem_strdup(lc->mon_thousands_sep);
-	o->amstr = ocrpt_mem_strdup(nl_langinfo(AM_STR));
-	o->pmstr = ocrpt_mem_strdup(nl_langinfo(PM_STR));
-	o->ampm_fmt = ocrpt_mem_strdup(nl_langinfo(T_FMT_AMPM));
-	o->d_t_fmt = ocrpt_mem_strdup(nl_langinfo(D_T_FMT));
-	o->d_fmt = ocrpt_mem_strdup(nl_langinfo(D_FMT));
-	o->t_fmt = ocrpt_mem_strdup(nl_langinfo(T_FMT));
-
-	o->int_n_cs_precedes = lc->int_n_cs_precedes;
-	o->int_n_sep_by_space = lc->int_n_sep_by_space;
-	o->int_n_sign_posn = lc->int_n_sign_posn;
-	o->int_p_cs_precedes = lc->int_p_cs_precedes;
-	o->int_p_sep_by_space = lc->int_p_sep_by_space;
-	o->int_p_sign_posn = lc->int_p_sign_posn;
-	o->n_cs_precedes = lc->n_cs_precedes;
-	o->n_sep_by_space = lc->n_sep_by_space;
-	o->n_sign_posn = lc->n_sign_posn;
-	o->p_cs_precedes = lc->p_cs_precedes;
-	o->p_sep_by_space = lc->p_sep_by_space;
-	o->p_sign_posn = lc->p_sign_posn;
-	o->int_frac_digits = lc->int_frac_digits;
-	o->frac_digits = lc->frac_digits;
-
-	for (i = 0; i < 7; i++) {
-		o->dayname[i] = ocrpt_mem_strdup(nl_langinfo(dayname[i].dn));
-		o->abdayname[i] = ocrpt_mem_strdup(nl_langinfo(dayname[i].adn));
-	}
-	for (i = 0; i < 12; i++) {
-		o->monthname[i] = ocrpt_mem_strdup(nl_langinfo(monname[i].mn));
-		o->abmonthname[i] = ocrpt_mem_strdup(nl_langinfo(monname[i].amn));
-	}
-
-	setlocale(LC_ALL, oldlocale);
-	ocrpt_mem_free(oldlocale);
-	ocrpt_unlock_global_locale_mutex();
+	o->locale = newlocale(LC_ALL_MASK, locale, (locale_t)0);
 }
 
 __attribute__((constructor))
