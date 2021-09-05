@@ -109,6 +109,11 @@ DLL_EXPORT_SYM void ocrpt_expr_result_deep_print(opencreport *o, ocrpt_expr *e) 
 }
 
 DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
+	if (!r) {
+		printf("ERROR: ocrpt_result is NULL\n");
+		return;
+	}
+
 	switch (r->type) {
 	case OCRPT_RESULT_ERROR:
 		printf("(ERROR)%s\n", r->isnull ? "NULL" : r->string->str);
@@ -338,7 +343,7 @@ DLL_EXPORT_SYM void ocrpt_expr_optimize(opencreport *o, ocrpt_report *r, ocrpt_e
 	ocrpt_expr_optimize_worker(o, r, e);
 }
 
-static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e, int32_t varref_exclude_mask) {
+static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, int32_t varref_exclude_mask) {
 	ocrpt_list *ptr;
 	int32_t i;
 	bool found = false;
@@ -364,8 +369,28 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e, int32_t var
 		if ((varref_exclude_mask & OCRPT_VARREF_RVAR) == 0) {
 		}
 		break;
-	case OCRPT_EXPR_VVAR: /* TODO */
+	case OCRPT_EXPR_VVAR:
 		if ((varref_exclude_mask & OCRPT_VARREF_VVAR) == 0) {
+			ocrpt_list *ptr;
+
+			for (ptr = r->variables; ptr; ptr = ptr->next) {
+				ocrpt_var *v = (ocrpt_var *)ptr->data;
+				if (strcasecmp(e->name->str, v->name) == 0) {
+					e->var = v;
+					ocrpt_expr_resolve_worker(o, r, v->expr, varref_exclude_mask);
+					break;
+				}
+			}
+
+			if (!ptr) {
+				ocrpt_string *msg = ocrpt_mem_string_new_printf("variable v.'%s' cannot be resolved\n", e->name->str);
+
+				if (msg) {
+					ocrpt_expr_make_error_result(o, e, msg->str);
+					ocrpt_mem_string_free(msg, true);
+				} else
+					fprintf(stderr, "variable v.'%s' cannot be resolved\n", e->name->str);
+			}
 		}
 		break;
 	case OCRPT_EXPR_IDENT:
@@ -412,19 +437,19 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_expr *e, int32_t var
 		break;
 	case OCRPT_EXPR:
 		for (i = 0; i < e->n_ops; i++)
-			ocrpt_expr_resolve_worker(o, e->ops[i], varref_exclude_mask);
+			ocrpt_expr_resolve_worker(o, r, e->ops[i], varref_exclude_mask);
 		break;
 	default:
 		break;
 	}
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_resolve(opencreport *o, ocrpt_expr *e) {
-	ocrpt_expr_resolve_worker(o, e, 0);
+DLL_EXPORT_SYM void ocrpt_expr_resolve(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
+	ocrpt_expr_resolve_worker(o, r, e, 0);
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(opencreport *o, ocrpt_expr *e, int32_t varref_exclude_mask) {
-	ocrpt_expr_resolve_worker(o, e, varref_exclude_mask);
+DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(opencreport *o, ocrpt_report *r, ocrpt_expr *e, int32_t varref_exclude_mask) {
+	ocrpt_expr_resolve_worker(o, r, e, varref_exclude_mask);
 }
 
 static bool ocrpt_expr_reference_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask) {
@@ -489,22 +514,38 @@ static void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *
 	if (!o || !e)
 		return;
 
-	if (e->type != OCRPT_EXPR)
-		return;
+	switch (e->type) {
+	case OCRPT_EXPR:
+		//fprintf(stderr, "%s:%d\n", __func__, __LINE__);
+		for (i = 0; i < e->n_ops; i++)
+			ocrpt_expr_eval_worker(o, r, e->ops[i]);
 
-	//fprintf(stderr, "%s:%d\n", __func__, __LINE__);
-	for (i = 0; i < e->n_ops; i++)
-		ocrpt_expr_eval_worker(o, r, e->ops[i]);
-
-	if (e->func && e->func->func) {
-		if (e->func->func) {
-			//fprintf(stderr, "%s:%d: calling func() ptr\n", __func__, __LINE__);
-			e->func->func(o, r, e);
+		if (e->func && e->func->func) {
+			if (e->func->func) {
+				//fprintf(stderr, "%s:%d: calling func() ptr\n", __func__, __LINE__);
+				e->func->func(o, r, e);
+			} else {
+				fprintf(stderr, "%s: funccall is unset\n", __func__);
+			}
 		} else {
-			fprintf(stderr, "%s: funccall is unset\n", __func__);
+			fprintf(stderr, "%s: function is unknown (impossible, it is caught by the parser)\n", __func__);
 		}
-	} else {
-		fprintf(stderr, "%s: function is unknown (impossible, it is caught by the parser)\n", __func__);
+		break;
+	case OCRPT_EXPR_VVAR:
+		if (!e->var)
+			ocrpt_expr_resolve(o, r, e);
+
+		if (!e->var)
+			break;
+
+		ocrpt_expr_eval(o, r, e->var->expr);
+
+		if (!e->result[o->residx])
+			e->result[o->residx] = e->var->expr->result[o->residx];
+		break;
+
+	default:
+		break;
 	}
 }
 

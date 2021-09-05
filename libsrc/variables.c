@@ -65,6 +65,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 	if (!var)
 		return NULL;
 
+	memset(var, 0, sizeof(ocrpt_var));
 	var->name = ocrpt_mem_strdup(name);
 
 	switch (type) {
@@ -105,6 +106,4 @@ DLL_EXPORT_SYM void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_v
 	ocrpt_expr_free(var->expr);
 	ocrpt_mem_free(var->name);
 	ocrpt_mem_free(var);
-
-	ocrpt_list_remove(r->variables, var);
 }

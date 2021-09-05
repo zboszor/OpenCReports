@@ -22,6 +22,7 @@ libopencreport_la_DEPENDENCIES = libopencreport_grammar.la
 
 libopencreport_la_CFLAGS = \
 	-Wall -Werror -O2 -g -I$(top_srcdir)/include \
+	-D_GNU_SOURCE \
 	$(CFLAG_VISIBILITY) \
 	$(MPFR_CFLAGS) $(PAPER_CFLAGS) $(UTF8PROC_CFLAGS) \
 	$(LIBXML_CFLAGS) $(YAJL_CFLAGS) $(POSTGRESQL_CFLAGS) \

@@ -59,10 +59,10 @@ int main(void) {
 	q2 = ocrpt_query_add_array(o, ds, "b", (const char **)array2, 2, 5, coltypes);
 	ocrpt_query_add_follower(o, q, q2);
 
-	ocrpt_expr_resolve(o, id);
-	ocrpt_expr_resolve(o, rownum1);
-	ocrpt_expr_resolve(o, rownum2);
-	ocrpt_expr_resolve(o, rownum3);
+	ocrpt_expr_resolve(o, NULL, id);
+	ocrpt_expr_resolve(o, NULL, rownum1);
+	ocrpt_expr_resolve(o, NULL, rownum2);
+	ocrpt_expr_resolve(o, NULL, rownum3);
 
 	printf("--- TESTING FOLLOWER ---\n\n");
 

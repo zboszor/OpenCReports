@@ -7,6 +7,7 @@
 
 #include <config.h>
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -96,6 +97,34 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, size
 	string->str[strl] = 0;
 	string->len = strl;
 	string->allocated_len = len + 1;
+	return string;
+}
+
+DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_printf(const char *format, ...) {
+	va_list va;
+	ocrpt_string *string = ocrpt_mem_malloc(sizeof(ocrpt_string));
+	int32_t len;
+
+	if (!string)
+		return NULL;
+
+	va_start(va, format);
+
+	len = vsnprintf(NULL, 0, format, va);
+	if (len > 0) {
+		string->str = ocrpt_mem_malloc(len + 1);
+		if (string->str) {
+			vsnprintf(string->str, len + 1, format, va);
+			string->len = len;
+			string->allocated_len = len + 1;
+		} else {
+			ocrpt_mem_free(string);
+			string = NULL;
+		}
+	}
+
+	va_end(va);
+
 	return string;
 }
 

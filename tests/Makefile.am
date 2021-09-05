@@ -34,6 +34,7 @@ TESTS = \
 	ocrpt_rownum_test \
 	ocrpt_part_test ocrpt_part_xml_test \
 	ocrpt_locale_test \
+	ocrpt_variable_test \
 	ocrpt_break_test
 
 # Unstable tests by nature:

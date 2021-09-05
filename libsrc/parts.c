@@ -83,6 +83,12 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_report_new(void) {
 }
 
 DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r, bool remove_from_part) {
+	ocrpt_list *ptr;
+
+	for (ptr = r->variables; ptr; ptr = ptr->next)
+		ocrpt_variable_free(o, r, (ocrpt_var *)r->variables->data);
+	ocrpt_list_free(r->variables);
+
 	if (remove_from_part && r->part) {
 		ocrpt_part *p = r->part;
 		ocrpt_list *row;
@@ -98,6 +104,15 @@ DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r, bool remo
 	ocrpt_mem_free(r);
 }
 
-void ocrpt_report_set_main_query(ocrpt_report *r, const char *query) {
+DLL_EXPORT_SYM void ocrpt_report_set_main_query(ocrpt_report *r, const char *query) {
 	r->query = ocrpt_mem_strdup(query);
+}
+
+DLL_EXPORT_SYM void ocrpt_report_evaluate_variables(opencreport *o, ocrpt_report *r) {
+	ocrpt_list *ptr;
+
+	for (ptr = r->variables; ptr; ptr = ptr->next) {
+		ocrpt_var *v = (ocrpt_var *)ptr->data;
+		ocrpt_expr_eval(o, r, v->expr);
+	}
 }

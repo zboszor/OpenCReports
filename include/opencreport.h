@@ -418,12 +418,12 @@ void ocrpt_expr_optimize(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
 /*
  * Resolve variable references in the expression
  */
-void ocrpt_expr_resolve(opencreport *o, ocrpt_expr *e);
+void ocrpt_expr_resolve(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
 /*
  * Resolve variable references in the expression
  * with excluding certain variable reference types
  */
-void ocrpt_expr_resolve_exclude(opencreport *o, ocrpt_expr *e, int32_t varref_exclude_mask);
+void ocrpt_expr_resolve_exclude(opencreport *o, ocrpt_report *r, ocrpt_expr *e, int32_t varref_exclude_mask);
 /*
  * Checks whether the expression references certain variable types
  */
@@ -603,6 +603,7 @@ void ocrpt_list_free_deep(ocrpt_list *l, ocrpt_mem_free_t freefunc);
  */
 ocrpt_string *ocrpt_mem_string_new(const char *str, bool copy);
 ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, size_t len);
+ocrpt_string *ocrpt_mem_string_new_printf(const char *format, ...);
 ocrpt_string *ocrpt_mem_string_resize(ocrpt_string *string, size_t len);
 char *ocrpt_mem_string_free(ocrpt_string *string, bool free_str);
 void ocrpt_mem_string_append_len(ocrpt_string *string, const char *str, const size_t len);
@@ -848,6 +849,10 @@ void ocrpt_report_free(opencreport *o, ocrpt_report *r, bool remove_from_list);
  * Set the main query of an ocrpt_report
  */
 void ocrpt_report_set_main_query(ocrpt_report *r, const char *query);
+/*
+ * Evaluate report variables
+ */
+void ocrpt_report_evaluate_variables(opencreport *o, ocrpt_report *r);
 
 /********************************************
  * Functions related to report XML handling *

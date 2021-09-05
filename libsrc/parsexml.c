@@ -155,7 +155,7 @@ static ocrpt_expr *ocrpt_xml_expr_parse(opencreport *o, xmlChar *expr, bool repo
 
 	e = ocrpt_expr_parse(o, (char *)expr, &err);
 	if (e) {
-		ocrpt_expr_resolve_exclude(o, e, OCRPT_VARREF_RVAR | OCRPT_VARREF_IDENT | OCRPT_VARREF_VVAR);
+		ocrpt_expr_resolve_exclude(o, NULL, e, OCRPT_VARREF_RVAR | OCRPT_VARREF_IDENT | OCRPT_VARREF_VVAR);
 		ocrpt_expr_optimize(o, NULL, e);
 	} else {
 		if (report)
