@@ -9,6 +9,7 @@
 #include <locale.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <sys/types.h>
 #include <time.h>
 #include <mpfr.h>
 
