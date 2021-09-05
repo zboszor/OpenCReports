@@ -527,7 +527,7 @@ bool ocrpt_break_set_attribute_from_expr(opencreport *o, ocrpt_report *r, ocrpt_
 /*
  * Free a report break
  */
-void ocrpt_break_free(opencreport *o, ocrpt_report *r, ocrpt_break *br, bool remove_from_list);
+void ocrpt_break_free(opencreport *o, ocrpt_report *r, ocrpt_break *br);
 /*
  * Find a report break using its name
  */
@@ -844,7 +844,7 @@ ocrpt_report *ocrpt_report_new(void);
  * Free an ocrpt_report structure
  * and optionally remove it from the parts list
  */
-void ocrpt_report_free(opencreport *o, ocrpt_report *r, bool remove_from_list);
+void ocrpt_report_free(opencreport *o, ocrpt_report *r);
 /*
  * Set the main query of an ocrpt_report
  */

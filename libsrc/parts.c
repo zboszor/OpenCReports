@@ -51,7 +51,7 @@ DLL_EXPORT_SYM void ocrpt_part_free(opencreport *o, ocrpt_part *p) {
 		ocrpt_list *col;
 
 		for (col = (ocrpt_list *)row->data; col; col = col->next)
-			ocrpt_report_free(o, (ocrpt_report *)col->data, false);
+			ocrpt_report_free(o, (ocrpt_report *)col->data);
 
 		ocrpt_list_free((ocrpt_list *)row->data);
 	}
@@ -82,23 +82,12 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_report_new(void) {
 	return r;
 }
 
-DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r, bool remove_from_part) {
+DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_list *ptr;
 
 	for (ptr = r->variables; ptr; ptr = ptr->next)
 		ocrpt_variable_free(o, r, (ocrpt_var *)r->variables->data);
 	ocrpt_list_free(r->variables);
-
-	if (remove_from_part && r->part) {
-		ocrpt_part *p = r->part;
-		ocrpt_list *row;
-
-		for (row = p->rows; row; row = row->next) {
-			row->data = ocrpt_list_remove((ocrpt_list *)row->data, r);
-			if (row == p->lastrow)
-				p->lastcol_in_lastrow = ocrpt_list_last((ocrpt_list *)row->data);
-		}
-	}
 
 	ocrpt_mem_free(r->query);
 	ocrpt_mem_free(r);
