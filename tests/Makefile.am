@@ -8,6 +8,7 @@ $(top_builddir)/libsrc/libopencreport.la:
 	$(MAKE) -C $(top_builddir)/libsrc libopencreport.la
 
 TESTS = \
+	ocrpt_compiler_test \
 	ocrpt_grammar_test ocrpt_expr_test ocrpt_function_test \
 	ocrpt_environment_test ocrpt_environment2_test \
 	ocrpt_array_test ocrpt_array2_test ocrpt_array_resolve_test ocrpt_array_xml_test \
