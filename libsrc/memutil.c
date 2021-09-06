@@ -109,12 +109,15 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_printf(const char *format, ...
 		return NULL;
 
 	va_start(va, format);
-
 	len = vsnprintf(NULL, 0, format, va);
+	va_end(va);
+
 	if (len > 0) {
 		string->str = ocrpt_mem_malloc(len + 1);
 		if (string->str) {
-			vsnprintf(string->str, len + 1, format, va);
+			va_start(va, format);
+			vsnprintf(string->str, len, format, va);
+			va_end(va);
 			string->len = len;
 			string->allocated_len = len + 1;
 		} else {
@@ -122,8 +125,6 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_printf(const char *format, ...
 			string = NULL;
 		}
 	}
-
-	va_end(va);
 
 	return string;
 }
