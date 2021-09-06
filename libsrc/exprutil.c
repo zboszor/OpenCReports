@@ -373,7 +373,7 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_exp
 		if ((varref_exclude_mask & OCRPT_VARREF_VVAR) == 0) {
 			ocrpt_list *ptr;
 
-			for (ptr = r->variables; ptr; ptr = ptr->next) {
+			for (ptr = r ? r->variables : NULL; ptr; ptr = ptr->next) {
 				ocrpt_var *v = (ocrpt_var *)ptr->data;
 				if (strcasecmp(e->name->str, v->name) == 0) {
 					e->var = v;
