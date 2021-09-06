@@ -21,6 +21,7 @@
 
 #include "opencreport.h"
 #include "datasource.h"
+#include "exprutil.h"
 
 #ifndef O_BINARY
 #define O_BINARY (0)
@@ -179,6 +180,28 @@ static ocrpt_expr *ocrpt_xml_expr_parse(opencreport *o, xmlChar *expr, bool repo
 					if (!expr##_s) \
 						expr##_s = (char *)expr; \
 				}
+
+static void ocrpt_ignore_child_nodes(opencreport *o, xmlTextReaderPtr reader, const char *leaf_name) {
+	int ret, depth, nodetype;
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return;
+
+	depth = xmlTextReaderDepth(reader);
+
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, leaf_name)) {
+			xmlFree(name);
+			break;
+		}
+
+		xmlFree(name);
+	}
+}
 
 static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 	xmlChar *name = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
@@ -354,7 +377,6 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	ocrpt_expr *name_e, *type_e, *host_e, *unix_socket_e, *port_e, *dbname_e, *user_e, *password_e, *connstr_e, *optionfile_e, *group_e;
 	char *name_s, *type_s, *host_s, *unix_socket_s, *port_s, *dbname_s, *user_s, *password_s, *connstr_s, *optionfile_s, *group_s;
 	int32_t port_i;
-	int ret, depth, nodetype;
 
 	ocrpt_xml_expr_parse_get_value_with_fallback(o, name);
 	ocrpt_xml_expr_parse_get_value_with_fallback(o, type);
@@ -430,23 +452,7 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	ocrpt_expr_free(optionfile_e);
 	ocrpt_expr_free(group_e);
 
-	if (xmlTextReaderIsEmptyElement(reader))
-		return;
-
-	depth = xmlTextReaderDepth(reader);
-
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
-		xmlChar *name = xmlTextReaderName(reader);
-
-		nodetype = xmlTextReaderNodeType(reader);
-
-		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "Datasource")) {
-			xmlFree(name);
-			break;
-		}
-
-		xmlFree(name);
-	}
+	ocrpt_ignore_child_nodes(o, reader, "Datasource");
 }
 
 static void ocrpt_parse_datasources_node(opencreport *o, xmlTextReaderPtr reader) {
@@ -470,6 +476,91 @@ static void ocrpt_parse_datasources_node(opencreport *o, xmlTextReaderPtr reader
 		if (nodetype == XML_READER_TYPE_ELEMENT) {
 			if (!strcmp((char *)name, "Datasource"))
 				ocrpt_parse_datasource_node(o, reader);
+		}
+
+		xmlFree(name);
+	}
+}
+
+static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr reader) {
+	xmlChar *name = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
+	xmlChar *value = xmlTextReaderGetAttribute(reader, (const xmlChar *)"value");
+	xmlChar *type = xmlTextReaderGetAttribute(reader, (const xmlChar *)"type");
+	xmlChar *resetonbreak = xmlTextReaderGetAttribute(reader, (const xmlChar *)"resetonbreak");
+	xmlChar *precalculate = xmlTextReaderGetAttribute(reader, (const xmlChar *)"precalculate");
+	ocrpt_var_type vtype = OCRPT_VARIABLE_EXPRESSION; /* */
+	ocrpt_expr *e = NULL, *p = NULL;
+	char *p_s;
+	int32_t p_i;
+	bool good = true;
+
+	if (strcasecmp((char *)type, "count") == 0)
+		vtype = OCRPT_VARIABLE_COUNT;
+	else if (strcasecmp((char *)type, "expression") == 0)
+		vtype = OCRPT_VARIABLE_EXPRESSION;
+	else if (strcasecmp((char *)type, "sum") == 0)
+		vtype = OCRPT_VARIABLE_SUM;
+	else if (strcasecmp((char *)type, "average") == 0)
+		vtype = OCRPT_VARIABLE_AVERAGE;
+	else if (strcasecmp((char *)type, "lowest") == 0)
+		vtype = OCRPT_VARIABLE_LOWEST;
+	else if (strcasecmp((char *)type, "highest") == 0)
+		vtype = OCRPT_VARIABLE_HIGHEST;
+	else
+		fprintf(stderr, "unset or invalid type for variable declaration for v.'%s', using \"expression\"\n", name);
+
+	if (value) {
+		e = ocrpt_expr_parse(o, (char *)value, NULL);
+		if (!e) {
+			good = false;
+			ocrpt_expr_free(e);
+		}
+	} else
+		good = false;
+
+	if (precalculate) {
+		p = ocrpt_xml_expr_parse(o, precalculate, true);
+		ocrpt_xml_expr_get_value(o, p, &p_s, &p_i);
+		if (p_s && !p_i)
+			p_i = atoi(p_s);
+	}
+
+	if (good) {
+		ocrpt_var *v = ocrpt_variable_new(o, r, vtype, (char *)name, e);
+		ocrpt_variable_reset_on_break(v, (char *)resetonbreak);
+		ocrpt_variable_set_precalculate(v, !!p_i);
+	}
+
+	xmlFree(name);
+	xmlFree(value);
+	xmlFree(type);
+	xmlFree(resetonbreak);
+	xmlFree(precalculate);
+
+	ocrpt_ignore_child_nodes(o, reader, "Variable");
+}
+
+static void ocrpt_parse_variables_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr reader) {
+	int ret, depth, nodetype;
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return;
+
+	depth = xmlTextReaderDepth(reader);
+
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "Variables")) {
+			xmlFree(name);
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if (!strcmp((char *)name, "Variable"))
+				ocrpt_parse_variable_node(o, r, reader);
 		}
 
 		xmlFree(name);
@@ -500,6 +591,8 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, xmlTextReader
 		}
 
 		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if (!strcmp((char *)name, "Variables"))
+				ocrpt_parse_variables_node(o, r, reader);
 #if 0
 			if (!strcmp((char *)name, "Alternate"))
 				ocrpt_parse_alternate_node(o, r, reader);
@@ -507,8 +600,6 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, xmlTextReader
 				ocrpt_parse_nodata_node(o, r, reader);
 			else if (!strcmp((char *)name, "Breaks"))
 				ocrpt_parse_breaks_node(o, r, reader);
-			else if (!strcmp((char *)name, "Variables"))
-				ocrpt_parse_variables_node(o, r, reader);
 			else if (!strcmp((char *)name, "PageHeader"))
 				ocrpt_parse_pageheader_node(o, p, r, reader);
 			else if (!strcmp((char *)name, "PageFooter"))

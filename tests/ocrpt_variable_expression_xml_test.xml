@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="3" cols="5" />
+	</Queries>
+	<Report>
+		<Variables>
+			<Variable name="var2" value="id + 2" type="expression" />
+			<Variable name="var1" value="id + 1" type="expression" />
+		</Variables>
+	</Report>
+</OpenCReport>
