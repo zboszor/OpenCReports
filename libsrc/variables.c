@@ -107,3 +107,14 @@ DLL_EXPORT_SYM void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_v
 	ocrpt_mem_free(var->name);
 	ocrpt_mem_free(var);
 }
+
+DLL_EXPORT_SYM void ocrpt_variable_reset_on_break(ocrpt_var *var, const char *brname) {
+	var->br_resolved = false;
+	var->reset_on_br = true;
+	ocrpt_mem_free(var->br_name);
+	var->br_name = brname ? ocrpt_mem_strdup(brname) : NULL;
+}
+
+DLL_EXPORT_SYM void ocrpt_variable_set_precalculate(ocrpt_var *var, bool value) {
+	var->precalculate = value;
+}

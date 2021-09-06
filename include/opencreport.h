@@ -161,6 +161,7 @@ struct ocrpt_var {
 	enum ocrpt_var_type type:3;
 	bool reset_on_br:1;
 	bool br_resolved:1;
+	bool precalculate:1;
 };
 typedef struct ocrpt_var ocrpt_var;
 
@@ -465,6 +466,15 @@ ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, ocrpt_var_type ty
  * Free a report variable
  */
 void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_var *var);
+/*
+ * Set the break name for resetting the variable when break data changes
+ */
+void ocrpt_variable_reset_on_break(ocrpt_var *var, const char *brname);
+/*
+ * Set precalculate property
+ * It will imply delayed="yes" for expressions using this variable
+ */
+void ocrpt_variable_set_precalculate(ocrpt_var *var, bool value);
 /*
  * Print the result data. Good for unit testing.
  */
@@ -849,6 +859,10 @@ void ocrpt_report_free(opencreport *o, ocrpt_report *r);
  * Set the main query of an ocrpt_report
  */
 void ocrpt_report_set_main_query(ocrpt_report *r, const char *query);
+/*
+ * Resolve report variables' base expressions
+ */
+void ocrpt_report_resolve_variables(opencreport *o, ocrpt_report *r);
 /*
  * Evaluate report variables
  */

@@ -97,6 +97,15 @@ DLL_EXPORT_SYM void ocrpt_report_set_main_query(ocrpt_report *r, const char *que
 	r->query = ocrpt_mem_strdup(query);
 }
 
+DLL_EXPORT_SYM void ocrpt_report_resolve_variables(opencreport *o, ocrpt_report *r) {
+	ocrpt_list *ptr;
+
+	for (ptr = r->variables; ptr; ptr = ptr->next) {
+		ocrpt_var *v = (ocrpt_var *)ptr->data;
+		ocrpt_expr_resolve(o, r, v->expr);
+	}
+}
+
 DLL_EXPORT_SYM void ocrpt_report_evaluate_variables(opencreport *o, ocrpt_report *r) {
 	ocrpt_list *ptr;
 
