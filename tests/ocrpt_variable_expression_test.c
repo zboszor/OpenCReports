@@ -56,6 +56,7 @@ int main(void) {
 
 	row = 0;
 	ocrpt_query_navigate_start(o, q);
+	ocrpt_report_resolve_variables(o, r);
 
 	while (ocrpt_query_navigate_next(o, q)) {
 		ocrpt_result *rs;
