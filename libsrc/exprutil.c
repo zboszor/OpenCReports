@@ -480,8 +480,13 @@ static bool ocrpt_expr_reference_worker(opencreport *o, ocrpt_report *r, ocrpt_e
 					}
 				}
 			}
-			if (e->var && varref_vartype_mask)
-				*varref_vartype_mask |= (1 << e->var->type);
+			if (e->var) {
+				if (varref_vartype_mask)
+					*varref_vartype_mask |= (1 << e->var->type);
+			} else {
+				if (varref_vartype_mask)
+					*varref_vartype_mask |= OCRPT_VARIABLE_UNKNOWN_BIT;
+			}
 		}
 		break;
 	case OCRPT_EXPR_IDENT:

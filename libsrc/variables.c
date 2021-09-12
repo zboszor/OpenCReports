@@ -18,72 +18,99 @@
 /*
  * Create a named report variable
  *
- * Possible types are: count, expression, sum, average, lowest, highest
- * All types (except count) need a base expression
+ * Takes ownership of the expression pointer.
+ *
+ * Possible types are: expression, count, countall, sum, average, lowest, highest
+ * All types (except count and countall) need a base expression.
+ *
+ * Returns ocrpt_var pointer or NULL in case of an error
+ * When returning NULL, the expression is freed so the caller
+ * doesn't have to distinguish between different types of error.
  */
 DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, ocrpt_var_type type, const char *name, ocrpt_expr *e) {
+	ocrpt_list *ptr;
 	ocrpt_var *var;
+	uint32_t vartypes;
 
-	if (!o || !name)
+	if (!o) {
+		fprintf(stderr, "invalid variable definitition: valid opencreport pointer expected\n");
 		return NULL;
-
-	if (type > OCRPT_VARIABLE_HIGHEST)
+	}
+	if (!r) {
+		fprintf(stderr, "invalid variable definitition: valid ocrpt_report pointer expected\n");
 		return NULL;
-
-	if (type == OCRPT_VARIABLE_COUNT) {
-		if (e)
-			return NULL;
-
-		e = ocrpt_expr_parse(o, "1", NULL);
-		if (!e)
-			return NULL;
-
-		type = OCRPT_VARIABLE_SUM;
-	} else {
-		if (e) {
-			uint32_t vartypes;
-			if (ocrpt_expr_references(o, r, e, OCRPT_VARREF_VVAR, &vartypes)) {
-				switch (type) {
-				case OCRPT_VARIABLE_EXPRESSION:
-					return NULL;
-				case OCRPT_VARIABLE_COUNT:
-				case OCRPT_VARIABLE_SUM:
-				case OCRPT_VARIABLE_AVERAGE:
-				case OCRPT_VARIABLE_LOWEST:
-				case OCRPT_VARIABLE_HIGHEST:
-					if ((vartypes & ~OCRPT_VARIABLE_EXPRESSION_BIT) != 0)
-						return NULL;
-					break;
-				}
-				return NULL;
-			}
-		} else
-			return NULL;
+	}
+	if (!name) {
+		fprintf(stderr, "invalid variable definitition: valid name expected\n");
+		return NULL;
 	}
 
-	var = ocrpt_mem_malloc(sizeof(ocrpt_var));
-	if (!var)
-		return NULL;
-
-	memset(var, 0, sizeof(ocrpt_var));
-	var->name = ocrpt_mem_strdup(name);
+	for (ptr = r->variables; ptr; ptr = ptr->next) {
+		var = (ocrpt_var *)ptr->data;
+		if (strcmp(var->name, name) == 0) {
+			fprintf(stderr, "variable '%s': duplicate variable name\n", name);
+			ocrpt_expr_free(e);
+			return NULL;
+		}
+	}
 
 	switch (type) {
 	case OCRPT_VARIABLE_EXPRESSION:
-		var->expr = e;
-		break;
+	case OCRPT_VARIABLE_COUNT:
+	case OCRPT_VARIABLE_COUNTALL:
 	case OCRPT_VARIABLE_SUM:
-		break;
 	case OCRPT_VARIABLE_AVERAGE:
-		break;
 	case OCRPT_VARIABLE_LOWEST:
-		break;
 	case OCRPT_VARIABLE_HIGHEST:
+		if (type == OCRPT_VARIABLE_COUNT || type == OCRPT_VARIABLE_COUNTALL) {
+			/*
+			 * If no expression is passed, the constant expression 1 will be used.
+			 * For "count", if an expression results in isnull()==true then the
+			 * line is not counted, similarly to SQL's "count(expr)".
+			 * For "countall", all lines (even NULL) is counted, similarly
+			 * to SQL's "count(*)"
+			 */
+			if (!e)
+				e = ocrpt_expr_parse(o, "1", NULL);
+			/* Out of memory */
+			if (!e) {
+				fprintf(stderr, "variable '%s': cannot parse constant expression 1\n", name);
+				return NULL;
+			}
+		} else if (!e) {
+			fprintf(stderr, "variable '%s': expression is NULL\n", name);
+			return NULL;
+		}
+		if (ocrpt_expr_references(o, r, e, OCRPT_VARREF_VVAR, &vartypes)) {
+			if ((vartypes & OCRPT_VARIABLE_UNKNOWN_BIT)) {
+				fprintf(stderr, "variable '%s': references an unknown variable name\n", name);
+				ocrpt_expr_free(e);
+				return NULL;
+			}
+			if ((vartypes & ~OCRPT_VARIABLE_EXPRESSION_BIT) != 0) {
+				fprintf(stderr, "variable '%s': may only reference expression variables\n", name);
+				ocrpt_expr_free(e);
+				return NULL;
+			}
+		}
 		break;
 	default:
-		/* Can't happen */
-		break;
+		fprintf(stderr, "invalid type for variable '%s': %d\n", name, type);
+		ocrpt_expr_free(e);
+		return NULL;
 	}
+
+	var = ocrpt_mem_malloc(sizeof(ocrpt_var));
+	if (!var) {
+		fprintf(stderr, "variable '%s': out of memory\n", name);
+		ocrpt_expr_free(e);
+		return NULL;
+	}
+
+	memset(var, 0, sizeof(ocrpt_var));
+	var->name = ocrpt_mem_strdup(name);
+	var->type = type;
+	var->expr = e;
 
 	r->variables = ocrpt_list_append(r->variables, var);
 
