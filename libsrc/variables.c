@@ -135,6 +135,19 @@ DLL_EXPORT_SYM void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_v
 	ocrpt_mem_free(var);
 }
 
+DLL_EXPORT_SYM void ocrpt_variables_free(opencreport *o, ocrpt_report *r) {
+	ocrpt_list *ptr;
+	bool good = ocrpt_report_validate(o, r);
+
+	for (ptr = good ? r->variables : NULL; ptr; ptr = ptr->next)
+		ocrpt_variable_free(o, r, (ocrpt_var *)ptr->data);
+
+	if (good) {
+		ocrpt_list_free(r->variables);
+		r->variables = NULL;
+	}
+}
+
 DLL_EXPORT_SYM void ocrpt_variable_reset_on_break(ocrpt_var *var, const char *brname) {
 	var->br_resolved = false;
 	var->reset_on_br = true;

@@ -481,6 +481,10 @@ ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, ocrpt_var_type ty
  */
 void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_var *var);
 /*
+ * Free all report variables
+ */
+void ocrpt_variables_free(opencreport *o, ocrpt_report *r);
+/*
  * Set the break name for resetting the variable when break data changes
  */
 void ocrpt_variable_reset_on_break(ocrpt_var *var, const char *brname);
@@ -539,27 +543,35 @@ ocrpt_result *ocrpt_environment_get_c(const char *env);
  * Add a named report break
  */
 ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, const char *name);
-
-/*
- * Set the break attribute from bool value
- */
-bool ocrpt_break_set_attribute(ocrpt_break *brk, const ocrpt_break_attr_type attr_type, bool value);
-/*
- * Set the break attribute from numeric constant expression
- */
-bool ocrpt_break_set_attribute_from_expr(opencreport *o, ocrpt_report *r, ocrpt_break *brk, const ocrpt_break_attr_type attr_type, ocrpt_expr *expr);
 /*
  * Free a report break
  */
 void ocrpt_break_free(opencreport *o, ocrpt_report *r, ocrpt_break *br);
+/*
+ * Free all report breaks
+ */
+void ocrpt_breaks_free(opencreport *o, ocrpt_report *r);
+/*
+ * Validate a break pointer for o and r
+ */
+bool ocrpt_break_validate(opencreport *o, ocrpt_report *r, ocrpt_break *br);
+/*
+ * Set the break attribute from bool value
+ */
+bool ocrpt_break_set_attribute(ocrpt_break *br, const ocrpt_break_attr_type attr_type, bool value);
+/*
+ * Set the break attribute from numeric constant expression
+ */
+bool ocrpt_break_set_attribute_from_expr(opencreport *o, ocrpt_report *r, ocrpt_break *br, const ocrpt_break_attr_type attr_type, ocrpt_expr *expr);
 /*
  * Find a report break using its name
  */
 ocrpt_break *ocrpt_break_get(opencreport *o, ocrpt_report *r, const char *name);
 /*
  * Add a break field to a break
+ * If successful, this function takes over ownership of "bf"
  */
-bool ocrpt_break_add_breakfield(opencreport *o, ocrpt_report *r, ocrpt_break *b, ocrpt_expr *bf);
+bool ocrpt_break_add_breakfield(opencreport *o, ocrpt_report *r, ocrpt_break *br, ocrpt_expr *bf);
 /*
  * Check whether the report break triggers
  */
@@ -869,6 +881,10 @@ ocrpt_report *ocrpt_report_new(void);
  * and optionally remove it from the parts list
  */
 void ocrpt_report_free(opencreport *o, ocrpt_report *r);
+/*
+ * Validate a report against "o"
+ */
+bool ocrpt_report_validate(opencreport *o, ocrpt_report *r);
 /*
  * Set the main query of an ocrpt_report
  */

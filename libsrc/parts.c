@@ -54,6 +54,7 @@ DLL_EXPORT_SYM void ocrpt_part_free(opencreport *o, ocrpt_part *p) {
 			ocrpt_report_free(o, (ocrpt_report *)col->data);
 
 		ocrpt_list_free((ocrpt_list *)row->data);
+		row->data = NULL;
 	}
 	ocrpt_list_free(p->rows);
 	p->rows = NULL;
@@ -83,14 +84,33 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_report_new(void) {
 }
 
 DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
-	ocrpt_list *ptr;
-
-	for (ptr = r->variables; ptr; ptr = ptr->next)
-		ocrpt_variable_free(o, r, (ocrpt_var *)ptr->data);
-	ocrpt_list_free(r->variables);
-
+	ocrpt_variables_free(o, r);
+	ocrpt_breaks_free(o, r);
 	ocrpt_mem_free(r->query);
 	ocrpt_mem_free(r);
+}
+
+DLL_EXPORT_SYM bool ocrpt_report_validate(opencreport *o, ocrpt_report *r) {
+	ocrpt_list *parts_ptr;
+
+	if (!o || !r)
+		return false;
+
+	for (parts_ptr = o->parts; parts_ptr; parts_ptr = parts_ptr->next) {
+		ocrpt_part *p = (ocrpt_part *)parts_ptr->data;
+		ocrpt_list *row;
+
+		for (row = p->rows; row; row = row->next) {
+			ocrpt_list *col;
+
+			for (col = (ocrpt_list *)row->data; col; col = col->next) {
+				if (r == col->data)
+					return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 DLL_EXPORT_SYM void ocrpt_report_set_main_query(ocrpt_report *r, const char *query) {
