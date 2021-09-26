@@ -203,6 +203,9 @@ struct ocrpt_expr {
 	bool result_owned1:1;
 	bool parenthesized:1;
 	bool dotprefixed:1;
+	bool iterative:1;
+	bool iterative_init:1;
+	bool iterative_start_with_init:1;
 };
 
 struct ocrpt_datasource;
@@ -405,10 +408,15 @@ ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, char **err);
  */
 bool ocrpt_expr_init_result(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type);
 /*
+ * Initialize both expression results to the specified type
+ * Mainly used in functions
+ */
+void ocrpt_expr_init_both_results(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type);
+/*
  * Inline function to set the result owned/disowned by the expression
  */
-static inline void ocrpt_expr_set_result_owned(opencreport *o, ocrpt_expr *e, bool owned) {
-	if (o->residx)
+static inline void ocrpt_expr_set_result_owned(opencreport *o, ocrpt_expr *e, bool which, bool owned) {
+	if (which)
 		e->result_owned1 = owned;
 	else
 		e->result_owned0 = owned;
@@ -422,6 +430,11 @@ static inline bool ocrpt_expr_get_result_owned(opencreport *o, ocrpt_expr *e) {
 	else
 		return e->result_owned0;
 }
+/*
+ * Set whether the start value for iterative expressions
+ * is the initial value or computed
+ */
+void ocrpt_expr_set_iterative_start_value(ocrpt_expr *e, bool start_with_init);
 /*
  * Set or initialize the result of the expression as an error with the specified message
  */

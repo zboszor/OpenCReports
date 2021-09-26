@@ -16,15 +16,15 @@
 #include "datasource.h"
 #include "exprutil.h"
 
-DLL_EXPORT_SYM bool ocrpt_expr_init_result(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type) {
-	ocrpt_result *result = e->result[o->residx];
+static bool ocrpt_expr_init_result_internal(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type, bool which) {
+	ocrpt_result *result = e->result[which];
 
 	if (!result) {
 		result = ocrpt_mem_malloc(sizeof(ocrpt_result));
 		if (result) {
 			memset(result, 0, sizeof(ocrpt_result));
-			e->result[o->residx] = result;
-			ocrpt_expr_set_result_owned(o, e, true);
+			e->result[which] = result;
+			ocrpt_expr_set_result_owned(o, e, which, true);
 		}
 	}
 	if (result) {
@@ -37,6 +37,15 @@ DLL_EXPORT_SYM bool ocrpt_expr_init_result(opencreport *o, ocrpt_expr *e, enum o
 	}
 
 	return !!result;
+}
+
+DLL_EXPORT_SYM bool ocrpt_expr_init_result(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type) {
+	return ocrpt_expr_init_result_internal(o, e, type, o->residx);
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_init_both_results(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type) {
+	ocrpt_expr_init_result_internal(o, e, type, false);
+	ocrpt_expr_init_result_internal(o, e, type, true);
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_abs) {

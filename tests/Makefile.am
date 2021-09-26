@@ -37,7 +37,8 @@ TESTS = \
 	ocrpt_variable_expression_test ocrpt_variable_expression_xml_test \
 	ocrpt_variable_check_test \
 	ocrpt_break_test ocrpt_break_xml_test ocrpt_break_xml2_test \
-	ocrpt_break_xml3_test
+	ocrpt_break_xml3_test \
+	ocrpt_iterative_expr_test
 
 # Unstable tests by nature:
 # ocrpt_random_test produces a random number which is different every time

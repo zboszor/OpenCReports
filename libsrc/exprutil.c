@@ -343,7 +343,7 @@ DLL_EXPORT_SYM void ocrpt_expr_optimize(opencreport *o, ocrpt_report *r, ocrpt_e
 	ocrpt_expr_optimize_worker(o, r, e);
 }
 
-static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, int32_t varref_exclude_mask) {
+static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *orig_e, ocrpt_expr *e, int32_t varref_exclude_mask) {
 	ocrpt_list *ptr;
 	int32_t i;
 	bool found = false;
@@ -365,9 +365,29 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_exp
 			e->result[1] = result;
 		}
 		break;
-	case OCRPT_EXPR_RVAR: /* TODO */
+	case OCRPT_EXPR_RVAR:
 		if ((varref_exclude_mask & OCRPT_VARREF_RVAR) == 0) {
+			if (strcmp(e->name->str, "self") == 0) {
+				/*
+				 * Initialize the self-reference of result pointers crossed
+				 * so a call to ocrpt_expr_eval() will use the previous
+				 * result.
+				 *
+				 * ocrpt_expr_init_both_results() must be called on the
+				 * original expression before ocrpt_expr_resolve() because
+				 * only the caller may know the intended type.
+				 *
+				 * The intended use cases are breakrownumber("breakname")
+				 * and iterative variables like sum and others.
+				 */
+				orig_e->iterative = true;
+				e->result[0] = orig_e->result[1];
+				e->result_owned0 = false;
+				e->result[1] = orig_e->result[0];
+				e->result_owned1 = false;
+			}
 		}
+		/* TODO: implement global report variables */
 		break;
 	case OCRPT_EXPR_VVAR:
 		if ((varref_exclude_mask & OCRPT_VARREF_VVAR) == 0) {
@@ -377,7 +397,7 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_exp
 				ocrpt_var *v = (ocrpt_var *)ptr->data;
 				if (strcasecmp(e->name->str, v->name) == 0) {
 					e->var = v;
-					ocrpt_expr_resolve_worker(o, r, v->expr, varref_exclude_mask);
+					ocrpt_expr_resolve_worker(o, r, orig_e, v->expr, varref_exclude_mask);
 					break;
 				}
 			}
@@ -437,7 +457,7 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_exp
 		break;
 	case OCRPT_EXPR:
 		for (i = 0; i < e->n_ops; i++)
-			ocrpt_expr_resolve_worker(o, r, e->ops[i], varref_exclude_mask);
+			ocrpt_expr_resolve_worker(o, r, orig_e, e->ops[i], varref_exclude_mask);
 		break;
 	default:
 		break;
@@ -445,11 +465,11 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_exp
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_resolve(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
-	ocrpt_expr_resolve_worker(o, r, e, 0);
+	ocrpt_expr_resolve_worker(o, r, e, e, 0);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(opencreport *o, ocrpt_report *r, ocrpt_expr *e, int32_t varref_exclude_mask) {
-	ocrpt_expr_resolve_worker(o, r, e, varref_exclude_mask);
+	ocrpt_expr_resolve_worker(o, r, e, e, varref_exclude_mask);
 }
 
 static bool ocrpt_expr_reference_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask) {
@@ -519,6 +539,17 @@ static void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *
 	if (!o || !e)
 		return;
 
+	/* If:
+	 * - the expression has a self-reference,
+	 * - it's the first time it's evaluated, and
+	 * - the expression should return the initial value the first time,
+	 * then indicate that the next time it should be evaluated.
+	 */
+	if (e->iterative && e->iterative_init && e->iterative_start_with_init) {
+		e->iterative_init = false;
+		return;
+	}
+
 	switch (e->type) {
 	case OCRPT_EXPR:
 		//fprintf(stderr, "%s:%d\n", __func__, __LINE__);
@@ -569,7 +600,7 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_
 
 		memset(result, 0, sizeof(ocrpt_result));
 		e->result[o->residx] = result;
-		ocrpt_expr_set_result_owned(o, e, true);
+		ocrpt_expr_set_result_owned(o, e, o->residx, true);
 	}
 
 	result->type = OCRPT_RESULT_ERROR;
@@ -612,4 +643,9 @@ DLL_EXPORT_SYM bool ocrpt_expr_cmp_results(opencreport *o, ocrpt_expr *e) {
 		fprintf(stderr, "%s:%d: unknown expression type %d\n", __func__, __LINE__, e->result[o->residx]->type);
 		return false;
 	}
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_set_iterative_start_value(ocrpt_expr *e, bool start_with_init) {
+	e->iterative_init = true;
+	e->iterative_start_with_init = start_with_init;
 }
