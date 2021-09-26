@@ -567,6 +567,165 @@ static void ocrpt_parse_variables_node(opencreport *o, ocrpt_report *r, xmlTextR
 	}
 }
 
+static bool ocrpt_parse_breakfield_node(opencreport *o, ocrpt_report *r, ocrpt_break *br, xmlTextReaderPtr reader) {
+	xmlChar *value = xmlTextReaderGetAttribute(reader, (const xmlChar *)"value");
+	bool have_breakfield = false;
+
+	if (value) {
+		ocrpt_expr *e = ocrpt_expr_parse(o, (char *)value, NULL);
+		have_breakfield = ocrpt_break_add_breakfield(o, r, br, e);
+	}
+
+	xmlFree(value);
+
+	ocrpt_ignore_child_nodes(o, reader, "BreakField");
+
+	return have_breakfield;
+}
+
+static bool ocrpt_parse_breakfields_node(opencreport *o, ocrpt_report *r, ocrpt_break *br, xmlTextReaderPtr reader) {
+	int ret, depth, nodetype;
+	bool have_breakfield = false;
+
+	/* No BreakField sub-element */
+	if (xmlTextReaderIsEmptyElement(reader))
+		return false;
+
+	depth = xmlTextReaderDepth(reader);
+
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "BreakFields")) {
+			xmlFree(name);
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if (!strcmp((char *)name, "BreakField"))
+				have_breakfield = ocrpt_parse_breakfield_node(o, r, br, reader) || have_breakfield;
+		}
+
+		xmlFree(name);
+	}
+
+	return have_breakfield;
+}
+
+static void ocrpt_break_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr reader) {
+	xmlChar *brname, *newpage, *headernewpage, *suppressblank;
+	ocrpt_break *br;
+	int ret, depth, nodetype;
+	bool have_breakfield = false;
+
+	brname = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
+
+	if (!brname) {
+		fprintf(stderr, "nameless break is useless, not adding to report\n");
+		return;
+	}
+
+	/* There's no BreakFields sub-element, useless break. */
+	if (xmlTextReaderIsEmptyElement(reader)) {
+		fprintf(stderr, "break '%s' is useless, not adding to report\n", (char *)brname);
+		xmlFree(brname);
+		return;
+	}
+
+	br = ocrpt_break_new(o, r, (char *)brname);
+
+	newpage = xmlTextReaderGetAttribute(reader, (const xmlChar *)"newpage");
+	headernewpage = xmlTextReaderGetAttribute(reader, (const xmlChar *)"headernewpage");
+	suppressblank = xmlTextReaderGetAttribute(reader, (const xmlChar *)"suppressblank");
+
+	depth = xmlTextReaderDepth(reader);
+
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "Break")) {
+			xmlFree(name);
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if (!strcmp((char *)name, "BreakFields"))
+				have_breakfield = ocrpt_parse_breakfields_node(o, r, br, reader) || have_breakfield;
+#if 0
+			else if (!strcmp((char *)name, "BreakHeader"))
+				ocrpt_parse_alternate_node(o, r, reader);
+			else if (!strcmp((char *)name, "BreakFooter"))
+				ocrpt_parse_nodata_node(o, r, reader);
+#endif
+		}
+
+		xmlFree(name);
+	}
+
+	if (have_breakfield) {
+		struct {
+			char *name;
+			xmlChar *value;
+			ocrpt_break_attr_type type;
+		} attribs[OCRPT_BREAK_ATTRS_COUNT] = {
+			{ "newpage", newpage, OCRPT_BREAK_ATTR_NEWPAGE },
+			{ "headernewpage", headernewpage, OCRPT_BREAK_ATTR_HEADERNEWPAGE },
+			{ "suppressblank", suppressblank, OCRPT_BREAK_ATTR_SUPPRESSBLANK },
+		};
+		int i;
+
+		for (i = 0; i < OCRPT_BREAK_ATTRS_COUNT; i++) {
+			if (attribs[i].name && attribs[i].value) {
+				ocrpt_expr *e = ocrpt_xml_expr_parse(o, attribs[i].value, true);
+				ocrpt_break_set_attribute_from_expr(o, r, br, attribs[i].type, e);
+			}
+		}
+	}
+
+	/* There's no BreakFields sub-element, useless break. */
+	if (!have_breakfield) {
+		fprintf(stderr, "break '%s' is useless, not adding to report\n", (char *)brname);
+		ocrpt_break_free(o, r, br);
+		r->breaks = ocrpt_list_remove(r->breaks, br);
+	}
+
+	xmlFree(brname);
+	xmlFree(newpage);
+	xmlFree(headernewpage);
+	xmlFree(suppressblank);
+}
+
+static void ocrpt_parse_breaks_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr reader) {
+	int ret, depth, nodetype;
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return;
+
+	depth = xmlTextReaderDepth(reader);
+
+	while ((ret = xmlTextReaderRead(reader)) == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+
+		nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "Breaks")) {
+			xmlFree(name);
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if (!strcmp((char *)name, "Break"))
+				ocrpt_break_node(o, r, reader);
+		}
+
+		xmlFree(name);
+	}
+}
+
 static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, xmlTextReaderPtr reader) {
 	/* TODO: parse and process Report node attributes; make it possible for multiple pd nodes to exist in the same pr node */
 	ocrpt_report *r = ocrpt_report_new();
@@ -593,13 +752,13 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, xmlTextReader
 		if (nodetype == XML_READER_TYPE_ELEMENT) {
 			if (!strcmp((char *)name, "Variables"))
 				ocrpt_parse_variables_node(o, r, reader);
+			else if (!strcmp((char *)name, "Breaks"))
+				ocrpt_parse_breaks_node(o, r, reader);
 #if 0
 			if (!strcmp((char *)name, "Alternate"))
 				ocrpt_parse_alternate_node(o, r, reader);
 			else if (!strcmp((char *)name, "NoData"))
 				ocrpt_parse_nodata_node(o, r, reader);
-			else if (!strcmp((char *)name, "Breaks"))
-				ocrpt_parse_breaks_node(o, r, reader);
 			else if (!strcmp((char *)name, "PageHeader"))
 				ocrpt_parse_pageheader_node(o, p, r, reader);
 			else if (!strcmp((char *)name, "PageFooter"))

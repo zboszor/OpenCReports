@@ -119,6 +119,9 @@ DLL_EXPORT_SYM bool ocrpt_break_add_breakfield(opencreport *o, ocrpt_report *r, 
 	if (!ocrpt_break_validate(o, r, br))
 		return false;
 
+	if (!bf)
+		return false;
+
 	br->breakfields = ocrpt_list_append(br->breakfields, bf);
 	return true;
 }
