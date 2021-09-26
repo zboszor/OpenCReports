@@ -155,6 +155,7 @@ DLL_EXPORT_SYM void ocrpt_break_resolve_fields(opencreport *o, ocrpt_report *r, 
 }
 
 DLL_EXPORT_SYM bool ocrpt_break_check_fields(opencreport *o, ocrpt_report *r, ocrpt_break *br) {
+	ocrpt_query *q = NULL;
 	ocrpt_list *ptr;
 	bool match = true;
 
@@ -165,6 +166,11 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(opencreport *o, ocrpt_report *r, oc
 		match = ocrpt_expr_cmp_results(o, e) && match;
 	}
 
+	if (r && r->query)
+		q = r->query;
+	if (!q && o->queries)
+		q = (ocrpt_query *)o->queries->data;
+
 	/* Return true if any of the breakfield expressions don't match */
-	return !match;
+	return !match || (q && q->current_row == 0);
 }
