@@ -134,3 +134,12 @@ DLL_EXPORT_SYM void ocrpt_report_evaluate_variables(opencreport *o, ocrpt_report
 		ocrpt_expr_eval(o, r, v->expr);
 	}
 }
+
+DLL_EXPORT_SYM void ocrpt_report_resolve_breaks(opencreport *o, ocrpt_report *r) {
+	ocrpt_list *ptr;
+
+	for (ptr = r->breaks; ptr; ptr = ptr->next) {
+		ocrpt_break *br = (ocrpt_break *)ptr->data;
+		ocrpt_break_resolve_fields(o, r, br);
+	}
+}

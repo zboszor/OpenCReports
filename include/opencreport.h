@@ -569,13 +569,17 @@ bool ocrpt_break_set_attribute_from_expr(opencreport *o, ocrpt_report *r, ocrpt_
 ocrpt_break *ocrpt_break_get(opencreport *o, ocrpt_report *r, const char *name);
 /*
  * Add a break field to a break
- * If successful, this function takes over ownership of "bf"
+ * This function takes over ownership of the breakfield expression
  */
 bool ocrpt_break_add_breakfield(opencreport *o, ocrpt_report *r, ocrpt_break *br, ocrpt_expr *bf);
 /*
+ * Resolve and optimize break fields
+ */
+void ocrpt_break_resolve_fields(opencreport *o, ocrpt_report *r, ocrpt_break *br);
+/*
  * Check whether the report break triggers
  */
-bool ocrpt_break_check_fields(opencreport *o, ocrpt_break *br);
+bool ocrpt_break_check_fields(opencreport *o, ocrpt_report *r, ocrpt_break *br);
 
 /****************************
  * Memory handling wrappers *
@@ -897,6 +901,10 @@ void ocrpt_report_resolve_variables(opencreport *o, ocrpt_report *r);
  * Evaluate report variables
  */
 void ocrpt_report_evaluate_variables(opencreport *o, ocrpt_report *r);
+/*
+ * Resolve report breaks' break fields
+ */
+void ocrpt_report_resolve_breaks(opencreport *o, ocrpt_report *r);
 
 /********************************************
  * Functions related to report XML handling *
