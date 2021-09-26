@@ -159,6 +159,9 @@ enum ocrpt_var_type_bit {
 	OCRPT_VARIABLE_HIGHEST_BIT \
 )
 
+struct ocrpt_query;
+typedef struct ocrpt_query ocrpt_query;
+
 struct ocrpt_break;
 typedef struct ocrpt_break ocrpt_break;
 
@@ -194,6 +197,8 @@ struct ocrpt_expr {
 
 		struct {
 			const ocrpt_function *func;
+			ocrpt_query *q; /* set if func is rownum() */
+			ocrpt_break *br; /* set if func is brrownum() */
 			ocrpt_expr **ops;
 			uint32_t n_ops;
 		};
@@ -210,9 +215,6 @@ struct ocrpt_expr {
 
 struct ocrpt_datasource;
 typedef struct ocrpt_datasource ocrpt_datasource;
-
-struct ocrpt_query;
-typedef struct ocrpt_query ocrpt_query;
 
 struct ocrpt_query_result {
 	const char *name;
@@ -266,6 +268,7 @@ struct ocrpt_break {
 	bool attrs[OCRPT_BREAK_ATTRS_COUNT];
 	ocrpt_list *breakfields;	/* list of ocrpt_expr pointers */
 	ocrpt_list *reset_vars;		/* list of ocrpt_var pointers */
+	ocrpt_expr *rownum;			/* row number of the break */
 	/* TODO: add details for header and footer */
 };
 

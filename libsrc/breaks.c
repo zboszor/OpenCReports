@@ -32,6 +32,15 @@ DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, con
 	memset(br, 0, sizeof(ocrpt_break));
 	br->name = ocrpt_mem_strdup(name);
 
+	/* Initialize rownum to 1, start with initial value */
+	br->rownum = ocrpt_expr_parse(o, "r.self + 1", NULL);
+	ocrpt_expr_init_both_results(o, br->rownum, OCRPT_RESULT_NUMBER);
+	mpfr_set_ui(br->rownum->result[0]->number, 1, o->rndmode);
+	mpfr_set_ui(br->rownum->result[1]->number, 1, o->rndmode);
+	ocrpt_expr_set_iterative_start_value(br->rownum, true);
+	ocrpt_expr_resolve(o, r, br->rownum);
+	ocrpt_expr_optimize(o, r, br->rownum);
+
 	r->breaks = ocrpt_list_append(r->breaks, br);
 
 	return br;
@@ -66,6 +75,7 @@ DLL_EXPORT_SYM bool ocrpt_break_set_attribute_from_expr(opencreport *o, ocrpt_re
 
 DLL_EXPORT_SYM void ocrpt_break_free(opencreport *o, ocrpt_report *r, ocrpt_break *br) {
 	ocrpt_list_free_deep(br->breakfields, (ocrpt_mem_free_t)ocrpt_expr_free);
+	ocrpt_expr_free(br->rownum);
 	ocrpt_mem_free(br->name);
 	ocrpt_mem_free(br);
 }
@@ -158,6 +168,7 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(opencreport *o, ocrpt_report *r, oc
 	ocrpt_query *q = NULL;
 	ocrpt_list *ptr;
 	bool match = true;
+	bool retval;
 
 	for (ptr = br->breakfields; ptr; ptr = ptr->next) {
 		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
@@ -172,5 +183,13 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(opencreport *o, ocrpt_report *r, oc
 		q = (ocrpt_query *)o->queries->data;
 
 	/* Return true if any of the breakfield expressions don't match */
-	return !match || (q && q->current_row == 0);
+	retval = !match || (q && q->current_row == 0);
+
+	if (retval) {
+		mpfr_set_ui(br->rownum->result[o->residx]->number, 1, o->rndmode);
+		ocrpt_expr_set_iterative_start_value(br->rownum, true);
+	}
+	ocrpt_expr_eval(o, r, br->rownum);
+
+	return retval;
 }

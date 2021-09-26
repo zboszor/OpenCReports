@@ -108,6 +108,13 @@ int main(void) {
 		printf("\n");
 	}
 
+	/*
+	 * rownum3 referenced query 'b'
+	 * free this expression to avoid use-after-free
+	 * after freeing and re-creating q2 a.k.a. query 'b'
+	 */
+	ocrpt_expr_free(rownum3);
+
 	ocrpt_query_free(o, q2);
 
 	printf("--- TESTING FOLLOWER N:1 ---\n\n");
@@ -116,6 +123,10 @@ int main(void) {
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	err = NULL;
 	match = ocrpt_expr_parse(o, "a.id = b.id", &err);
+	ocrpt_strfree(err);
+
+	err = NULL;
+	rownum3 = ocrpt_expr_parse(o, "rownum('b')", &err);
 	ocrpt_strfree(err);
 
 	ocrpt_query_add_follower_n_to_1(o, q, q2, match);

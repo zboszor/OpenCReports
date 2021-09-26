@@ -1753,8 +1753,6 @@ OCRPT_STATIC_FUNCTION(ocrpt_proper) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_rownum) {
-	ocrpt_query *q = NULL;
-
 	if (e->n_ops > 1) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 		return;
@@ -1771,26 +1769,26 @@ OCRPT_STATIC_FUNCTION(ocrpt_rownum) {
 			return;
 		}
 
-		if (!e->ops[0]->result[o->residx]->isnull) {
+		if (!e->q && !e->ops[0]->result[o->residx]->isnull) {
 			char *qname = e->ops[0]->result[o->residx]->string->str;
 			ocrpt_list *ptr;
 
 			for (ptr = o->queries; ptr; ptr = ptr->next) {
 				ocrpt_query *tmp = (ocrpt_query *)ptr->data;
 				if (strcmp(tmp->name, qname) == 0) {
-					q = tmp;
+					e->q = tmp;
 					break;
 				}
 			}
 		}
 	} else {
 		if (r && r->query)
-			q = r->query;
-		if (!q && o->queries)
-			q = (ocrpt_query *)o->queries->data;
+			e->q = r->query;
+		if (!e->q && o->queries)
+			e->q = (ocrpt_query *)o->queries->data;
 	}
 
-	if (!q) {
+	if (!e->q) {
 		ocrpt_expr_make_error_result(o, e, "rownum(): no such query");
 		return;
 	}
@@ -1801,13 +1799,53 @@ OCRPT_STATIC_FUNCTION(ocrpt_rownum) {
 	 * It feels more natural to the user to use the SQL row numbers.
 	 * Also handle the case if a follow has run out of rows via ->isdone()
 	 */
-	if (q->source && q->source->input && q->source->input->isdone) {
-		if (q->source->input->isdone(q))
+	if (e->q->source && e->q->source->input && e->q->source->input->isdone) {
+		if (e->q->source->input->isdone(e->q))
 			e->result[o->residx]->isnull = true;
 		else
-			mpfr_set_si(e->result[o->residx]->number, q->current_row + 1, o->rndmode);
+			mpfr_set_si(e->result[o->residx]->number, e->q->current_row + 1, o->rndmode);
 	} else
-		mpfr_set_si(e->result[o->residx]->number, q->current_row + 1, o->rndmode);
+		mpfr_set_si(e->result[o->residx]->number, e->q->current_row + 1, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_brrownum) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->br && !e->ops[0]->result[o->residx]->isnull) {
+		char *brname = e->ops[0]->result[o->residx]->string->str;
+		ocrpt_list *ptr;
+
+		for (ptr = r->breaks; ptr; ptr = ptr->next) {
+			ocrpt_break *tmp = (ocrpt_break *)ptr->data;
+			if (strcmp(tmp->name, brname) == 0) {
+				e->br = tmp;
+				break;
+			}
+		}
+	}
+
+	if (!e->br) {
+		ocrpt_expr_make_error_result(o, e, "brrownum(): no such break");
+		return;
+	}
+
+	if (!e->result[o->residx]) {
+		e->result[o->residx] = e->br->rownum->result[o->residx];
+		ocrpt_expr_set_result_owned(o, e, o->residx, false);
+	}
 }
 
 /*
@@ -1818,6 +1856,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "abs",		ocrpt_abs,	1,	false,	false,	false,	false },
 	{ "add",		ocrpt_add,	-1,	true,	true,	false,	false },
 	{ "and",		ocrpt_and,	-1,	true,	true,	false,	false },
+	{ "brrownum",	ocrpt_brrownum,	1,	false,	false,	false,	true },
 	{ "ceil",		ocrpt_ceil,	1,	false,	false,	false,	false },
 	{ "concat",		ocrpt_concat,	-1,	false,	false,	false,	false },
 	{ "dec",		ocrpt_dec,	1,	false,	false,	false,	false },
