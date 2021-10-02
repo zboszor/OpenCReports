@@ -1,0 +1,63 @@
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 1.000000)
+	Col #1: 'name': string value: Fred Flintstone
+	Col #2: 'property': string value: strong
+	Col #3: 'age': string value: NULL (converted to number: 31.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: v.'var_id_count'
+Evaluated: (number)1.000000
+Expression: v.'var_id_countall'
+Evaluated: (number)1.000000
+Expression: v.'var_id_sum'
+Evaluated: (number)1.000000
+Expression: v.'var_id_highest'
+Evaluated: (number)1.000000
+Expression: v.'var_id_lowest'
+Evaluated: (number)1.000000
+Expression: v.'var_age_avg'
+Evaluated: (number)31.000000
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 2.000000)
+	Col #1: 'name': string value: Wilma Flintstone
+	Col #2: 'property': string value: charming
+	Col #3: 'age': string value: NULL (converted to number: 28.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: v.'var_id_count'
+Evaluated: (number)2.000000
+Expression: v.'var_id_countall'
+Evaluated: (number)2.000000
+Expression: v.'var_id_sum'
+Evaluated: (number)3.000000
+Expression: v.'var_id_highest'
+Evaluated: (number)2.000000
+Expression: v.'var_id_lowest'
+Evaluated: (number)1.000000
+Expression: v.'var_age_avg'
+Evaluated: (number)29.500000
+
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 3.000000)
+	Col #1: 'name': string value: Pebbles Flintstone
+	Col #2: 'property': string value: young
+	Col #3: 'age': string value: NULL (converted to number: 0.500000)
+	Col #4: 'adult': string value: NULL (converted to number: 0.000000)
+
+Expression: v.'var_id_count'
+Evaluated: (number)3.000000
+Expression: v.'var_id_countall'
+Evaluated: (number)3.000000
+Expression: v.'var_id_sum'
+Evaluated: (number)6.000000
+Expression: v.'var_id_highest'
+Evaluated: (number)3.000000
+Expression: v.'var_id_lowest'
+Evaluated: (number)1.000000
+Expression: v.'var_age_avg'
+Evaluated: (number)19.833333
+

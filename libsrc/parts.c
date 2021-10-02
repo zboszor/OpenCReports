@@ -122,7 +122,8 @@ DLL_EXPORT_SYM void ocrpt_report_resolve_variables(opencreport *o, ocrpt_report 
 
 	for (ptr = r->variables; ptr; ptr = ptr->next) {
 		ocrpt_var *v = (ocrpt_var *)ptr->data;
-		ocrpt_expr_resolve(o, r, v->expr);
+
+		ocrpt_variable_resolve(o, r, v);
 	}
 }
 
@@ -131,7 +132,8 @@ DLL_EXPORT_SYM void ocrpt_report_evaluate_variables(opencreport *o, ocrpt_report
 
 	for (ptr = r->variables; ptr; ptr = ptr->next) {
 		ocrpt_var *v = (ocrpt_var *)ptr->data;
-		ocrpt_expr_eval(o, r, v->expr);
+
+		ocrpt_variable_evaluate(o, r, v);
 	}
 }
 

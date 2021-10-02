@@ -7,6 +7,7 @@
 
 #include <config.h>
 
+#include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,13 +75,10 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new(const char *str, bool copy) {
 /* Allocate len + 1 bytes and zero-terminate the string */
 DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, size_t len) {
 	ocrpt_string *string = ocrpt_mem_malloc(sizeof(ocrpt_string));
-	uint32_t strl;
+	size_t strl;
 
 	if (!string)
 		return NULL;
-
-	if (!str)
-		len = 0;
 
 	string->str = ocrpt_mem_malloc(len + 1);
 	if (!string->str) {
@@ -100,31 +98,36 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, size
 	return string;
 }
 
-DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_printf(const char *format, ...) {
-	va_list va;
-	ocrpt_string *string = ocrpt_mem_malloc(sizeof(ocrpt_string));
-	int32_t len;
+DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_vnprintf(size_t len, const char *format, va_list va) {
+	ocrpt_string *string;
 
+	if (len <= 0)
+		return NULL;
+
+	string = ocrpt_mem_string_new_with_len(NULL, len + 1);
 	if (!string)
 		return NULL;
 
+	vsnprintf(string->str, len, format, va);
+	string->len = len;
+	return string;
+}
+
+DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_printf(const char *format, ...) {
+	va_list va;
+	ocrpt_string *string;
+	size_t len;
+
 	va_start(va, format);
-	len = vsnprintf(NULL, 0, format, va);
+	len = ocrpt_mem_vnprintf_size_from_string(format, va);
 	va_end(va);
 
-	if (len > 0) {
-		string->str = ocrpt_mem_malloc(len + 1);
-		if (string->str) {
-			va_start(va, format);
-			vsnprintf(string->str, len, format, va);
-			va_end(va);
-			string->len = len;
-			string->allocated_len = len + 1;
-		} else {
-			ocrpt_mem_free(string);
-			string = NULL;
-		}
-	}
+	if (len <= 0)
+		return NULL;
+
+	va_start(va, format);
+	string = ocrpt_mem_string_new_vnprintf(len, format, va);
+	va_end(va);
 
 	return string;
 }

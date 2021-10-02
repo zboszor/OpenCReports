@@ -9,6 +9,7 @@
 #include <locale.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <sys/types.h>
 #include <time.h>
 #include <mpfr.h>
@@ -171,7 +172,9 @@ struct ocrpt_var {
 		char *br_name;
 		ocrpt_break *br;
 	};
-	ocrpt_expr *expr;
+	ocrpt_expr *baseexpr;
+	ocrpt_expr *intermedexpr;
+	ocrpt_expr *resultexpr;
 	ocrpt_result *rowcount[2];
 	ocrpt_result *intermed[2];
 	ocrpt_result *result[2];
@@ -441,7 +444,7 @@ void ocrpt_expr_set_iterative_start_value(ocrpt_expr *e, bool start_with_init);
 /*
  * Set or initialize the result of the expression as an error with the specified message
  */
-ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *error);
+ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *format, ...);
 /*
  * Optimize expression after parsing
  */
@@ -491,7 +494,7 @@ void ocrpt_expr_free(ocrpt_expr *e);
 /*
  * Create a named report variable
  */
-ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, ocrpt_var_type type, const char *name, ocrpt_expr *e);
+ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, ocrpt_var_type type, const char *name, ocrpt_expr *e, const char *reset_on_break_name);
 /*
  * Free a report variable
  */
@@ -501,14 +504,18 @@ void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_var *var);
  */
 void ocrpt_variables_free(opencreport *o, ocrpt_report *r);
 /*
- * Set the break name for resetting the variable when break data changes
- */
-void ocrpt_variable_reset_on_break(ocrpt_var *var, const char *brname);
-/*
  * Set precalculate property
  * It will imply delayed="yes" for expressions using this variable
  */
 void ocrpt_variable_set_precalculate(ocrpt_var *var, bool value);
+/*
+ * Resolve a variable
+ */
+void ocrpt_variable_resolve(opencreport *o, ocrpt_report *r, ocrpt_var *v);
+/*
+ * Evaluate a variable
+ */
+void ocrpt_variable_evaluate(opencreport *o, ocrpt_report *r, ocrpt_var *v);
 /*
  * Print the result data. Good for unit testing.
  */
@@ -659,7 +666,11 @@ void ocrpt_list_free_deep(ocrpt_list *l, ocrpt_mem_free_t freefunc);
  */
 ocrpt_string *ocrpt_mem_string_new(const char *str, bool copy);
 ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, size_t len);
-ocrpt_string *ocrpt_mem_string_new_printf(const char *format, ...);
+static inline size_t ocrpt_mem_vnprintf_size_from_string(const char *format, va_list va) {
+	return vsnprintf(NULL, 0, format, va);
+}
+ocrpt_string *ocrpt_mem_string_new_vnprintf(size_t len, const char *format, va_list va);
+ocrpt_string *ocrpt_mem_string_new_printf(const char *format, ...) __attribute__ ((format(printf, 1, 2)));
 ocrpt_string *ocrpt_mem_string_resize(ocrpt_string *string, size_t len);
 char *ocrpt_mem_string_free(ocrpt_string *string, bool free_str);
 void ocrpt_mem_string_append_len(ocrpt_string *string, const char *str, const size_t len);

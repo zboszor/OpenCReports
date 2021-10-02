@@ -18,4 +18,7 @@
 
 ocrpt_expr *newblankexpr(enum ocrpt_expr_type type, uint32_t n_ops);
 
+void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *orig_e, ocrpt_expr *e, ocrpt_var *var, int32_t varref_exclude_mask);
+void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var);
+
 #endif

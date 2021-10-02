@@ -6,6 +6,7 @@
 
 #include <config.h>
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +24,7 @@ static bool ocrpt_expr_init_result_internal(opencreport *o, ocrpt_expr *e, enum 
 		result = ocrpt_mem_malloc(sizeof(ocrpt_result));
 		if (result) {
 			memset(result, 0, sizeof(ocrpt_result));
+			assert(!e->result[which]);
 			e->result[which] = result;
 			ocrpt_expr_set_result_owned(o, e, which, true);
 		}
@@ -1843,6 +1845,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_brrownum) {
 	}
 
 	if (!e->result[o->residx]) {
+		assert(!e->result[o->residx]);
 		e->result[o->residx] = e->br->rownum->result[o->residx];
 		ocrpt_expr_set_result_owned(o, e, o->residx, false);
 	}

@@ -43,7 +43,7 @@ int main(void) {
 	ocrpt_expr_print(o, be);
 	printf("\n");
 
-	ocrpt_variable_new(o, r, OCRPT_VARIABLE_EXPRESSION, "var1", be);
+	ocrpt_variable_new(o, r, OCRPT_VARIABLE_EXPRESSION, "var1", be, NULL);
 
 	err = NULL;
 	e = ocrpt_expr_parse(o, "v.var1", &err);

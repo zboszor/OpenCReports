@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="3" cols="5" />
+	</Queries>
+	<Report>
+		<Variables>
+			<Variable name="var_id_count" value="id" type="count" />
+			<Variable name="var_id_countall" value="id" type="countall" />
+			<Variable name="var_id_sum" value="id" type="sum" />
+			<Variable name="var_id_highest" value="id" type="highest" />
+			<Variable name="var_id_lowest" value="id" type="lowest" />
+			<Variable name="var_age_avg" value="age" type="average" />
+		</Variables>
+	</Report>
+</OpenCReport>

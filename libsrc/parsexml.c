@@ -496,6 +496,8 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 
 	if (strcasecmp((char *)type, "count") == 0)
 		vtype = OCRPT_VARIABLE_COUNT;
+	else if (strcasecmp((char *)type, "countall") == 0)
+		vtype = OCRPT_VARIABLE_COUNTALL;
 	else if (strcasecmp((char *)type, "expression") == 0)
 		vtype = OCRPT_VARIABLE_EXPRESSION;
 	else if (strcasecmp((char *)type, "sum") == 0)
@@ -526,8 +528,7 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 	}
 
 	if (good) {
-		ocrpt_var *v = ocrpt_variable_new(o, r, vtype, (char *)name, e);
-		ocrpt_variable_reset_on_break(v, (char *)resetonbreak);
+		ocrpt_var *v = ocrpt_variable_new(o, r, vtype, (char *)name, e, (char *)resetonbreak);
 		ocrpt_variable_set_precalculate(v, !!p_i);
 	}
 

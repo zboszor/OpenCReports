@@ -6,7 +6,10 @@
 
 #include <config.h>
 
+#include <assert.h>
 #include <alloca.h>
+#include <inttypes.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -343,31 +346,34 @@ DLL_EXPORT_SYM void ocrpt_expr_optimize(opencreport *o, ocrpt_report *r, ocrpt_e
 	ocrpt_expr_optimize_worker(o, r, e);
 }
 
-static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *orig_e, ocrpt_expr *e, int32_t varref_exclude_mask) {
-	ocrpt_list *ptr;
+void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *orig_e, ocrpt_expr *e, ocrpt_var *var, int32_t varref_exclude_mask) {
 	int32_t i;
 	bool found = false;
 
 	switch (e->type) {
 	case OCRPT_EXPR_MVAR:
 		if ((varref_exclude_mask & OCRPT_VARREF_MVAR) == 0) {
-			ocrpt_result *result = ocrpt_environment_get_c(e->name->str);
+			if (!e->result[0] && !e->result[1]) {
+				ocrpt_result *result = ocrpt_environment_get_c(e->name->str);
 
-			ocrpt_mem_string_free(e->query, true);
-			e->query = NULL;
-			ocrpt_mem_string_free(e->name, true);
-			e->name = NULL;
-			e->dotprefixed = false;
+				ocrpt_mem_string_free(e->query, true);
+				e->query = NULL;
+				ocrpt_mem_string_free(e->name, true);
+				e->name = NULL;
+				e->dotprefixed = false;
 
-			e->type = OCRPT_EXPR_STRING;
-			e->result[0] = result;
-			e->result_owned0 = true;
-			e->result[1] = result;
+				e->type = OCRPT_EXPR_STRING;
+				e->result[0] = result;
+				e->result_owned0 = true;
+				e->result[1] = result;
+			}
 		}
 		break;
 	case OCRPT_EXPR_RVAR:
 		if ((varref_exclude_mask & OCRPT_VARREF_RVAR) == 0) {
 			if (strcmp(e->name->str, "self") == 0) {
+				/* Don't assert(var) here because unit tests use r.self to test basic behaviour. */
+				e->var = var;
 				/*
 				 * Initialize the self-reference of result pointers crossed
 				 * so a call to ocrpt_expr_eval() will use the previous
@@ -381,40 +387,79 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_exp
 				 * and iterative variables like sum and others.
 				 */
 				orig_e->iterative = true;
-				e->result[0] = orig_e->result[1];
-				e->result_owned0 = false;
-				e->result[1] = orig_e->result[0];
-				e->result_owned1 = false;
+				if (!e->result[0]) {
+					assert(orig_e->result[1]);
+					e->result[0] = orig_e->result[1];
+					e->result_owned0 = false;
+				}
+				if (!e->result[1]) {
+					assert(orig_e->result[0]);
+					e->result[1] = orig_e->result[0];
+					e->result_owned1 = false;
+				}
+			} else if (strcmp(e->name->str, "baseexpr") == 0) {
+				assert(var);
+				e->var = var;
+				if (var->baseexpr) {
+					if (!e->result[0]) {
+						assert(var->baseexpr->result[0]);
+						e->result[0] = var->baseexpr->result[0];
+						e->result_owned0 = false;
+					}
+					if (!e->result[1]) {
+					assert(var->baseexpr->result[1]);
+						e->result[1] = var->baseexpr->result[1];
+						e->result_owned1 = false;
+					}
+				}
+			} else if (strcmp(e->name->str, "intermedexpr") == 0) {
+				assert(var);
+				e->var = var;
+				if (var->intermedexpr) {
+					if (!e->result[0]) {
+						assert(var->intermedexpr->result[0]);
+						e->result[0] = var->intermedexpr->result[0];
+						e->result_owned0 = false;
+					}
+					if (!e->result[1]) {
+						assert(var->intermedexpr->result[1]);
+						e->result[1] = var->intermedexpr->result[1];
+						e->result_owned1 = false;
+					}
+				}
 			}
+			/* TODO: implement generally usable global report variables */
 		}
-		/* TODO: implement global report variables */
+
 		break;
 	case OCRPT_EXPR_VVAR:
 		if ((varref_exclude_mask & OCRPT_VARREF_VVAR) == 0) {
-			ocrpt_list *ptr;
+			if (!e->var) {
+				ocrpt_list *ptr;
 
-			for (ptr = r ? r->variables : NULL; ptr; ptr = ptr->next) {
-				ocrpt_var *v = (ocrpt_var *)ptr->data;
-				if (strcasecmp(e->name->str, v->name) == 0) {
-					e->var = v;
-					ocrpt_expr_resolve_worker(o, r, orig_e, v->expr, varref_exclude_mask);
-					break;
+				for (ptr = r ? r->variables : NULL; ptr; ptr = ptr->next) {
+					ocrpt_var *v = (ocrpt_var *)ptr->data;
+					if (strcasecmp(e->name->str, v->name) == 0) {
+						e->var = v;
+						break;
+					}
 				}
-			}
+				if (!ptr) {
+					ocrpt_string *msg = ocrpt_mem_string_new_printf("variable v.'%s' cannot be resolved\n", e->name->str);
 
-			if (!ptr) {
-				ocrpt_string *msg = ocrpt_mem_string_new_printf("variable v.'%s' cannot be resolved\n", e->name->str);
-
-				if (msg) {
-					ocrpt_expr_make_error_result(o, e, msg->str);
-					ocrpt_mem_string_free(msg, true);
-				} else
-					fprintf(stderr, "variable v.'%s' cannot be resolved\n", e->name->str);
+					if (msg) {
+						ocrpt_expr_make_error_result(o, e, msg->str);
+						ocrpt_mem_string_free(msg, true);
+					} else
+						fprintf(stderr, "variable v.'%s' cannot be resolved\n", e->name->str);
+				}
 			}
 		}
 		break;
 	case OCRPT_EXPR_IDENT:
 		if ((varref_exclude_mask & OCRPT_VARREF_IDENT) == 0) {
+			ocrpt_list *ptr;
+
 			/* Resolve the identifier ocrpt_query_result from the queries */
 			if (e->result[o->residx] && e->result[o->residx]->type != OCRPT_RESULT_ERROR)
 				break;
@@ -435,6 +480,8 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_exp
 
 				for (i = 0; i < cols; i++) {
 					if (!strcmp(e->name->str, qr[i].name)) {
+						assert(!e->result[0]);
+						assert(!e->result[1]);
 						e->result[0] = &qr[i].result;
 						e->result[1] = &qr[cols + i].result;
 						found = true;
@@ -457,7 +504,7 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_exp
 		break;
 	case OCRPT_EXPR:
 		for (i = 0; i < e->n_ops; i++)
-			ocrpt_expr_resolve_worker(o, r, orig_e, e->ops[i], varref_exclude_mask);
+			ocrpt_expr_resolve_worker(o, r, orig_e, e->ops[i], var, varref_exclude_mask);
 		break;
 	default:
 		break;
@@ -465,11 +512,11 @@ static void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_exp
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_resolve(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
-	ocrpt_expr_resolve_worker(o, r, e, e, 0);
+	ocrpt_expr_resolve_worker(o, r, e, e, NULL, 0);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(opencreport *o, ocrpt_report *r, ocrpt_expr *e, int32_t varref_exclude_mask) {
-	ocrpt_expr_resolve_worker(o, r, e, e, varref_exclude_mask);
+	ocrpt_expr_resolve_worker(o, r, e, e, NULL, varref_exclude_mask);
 }
 
 static bool ocrpt_expr_reference_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask) {
@@ -533,7 +580,7 @@ DLL_EXPORT_SYM bool ocrpt_expr_references(opencreport *o, ocrpt_report *r, ocrpt
 	return ocrpt_expr_reference_worker(o, r, e, varref_include_mask, varref_vartype_mask);
 }
 
-static void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
+void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 	int i;
 
 	if (!o || !e)
@@ -554,7 +601,7 @@ static void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *
 	case OCRPT_EXPR:
 		//fprintf(stderr, "%s:%d\n", __func__, __LINE__);
 		for (i = 0; i < e->n_ops; i++)
-			ocrpt_expr_eval_worker(o, r, e->ops[i]);
+			ocrpt_expr_eval_worker(o, r, e->ops[i], orig_e, var);
 
 		if (e->func && e->func->func) {
 			if (e->func->func) {
@@ -568,16 +615,18 @@ static void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *
 		}
 		break;
 	case OCRPT_EXPR_VVAR:
-		if (!e->var)
-			ocrpt_expr_resolve(o, r, e);
+		assert(e->var);
 
-		if (!e->var)
-			break;
+		if (e->var->baseexpr)
+			ocrpt_expr_eval_worker(o, r, e->var->baseexpr, e, e->var);
+		if (e->var->intermedexpr)
+			ocrpt_expr_eval_worker(o, r, e->var->intermedexpr, e, e->var);
+		ocrpt_expr_eval_worker(o, r, e->var->resultexpr, e, e->var);
 
-		ocrpt_expr_eval(o, r, e->var->expr);
-
-		if (!e->result[o->residx])
-			e->result[o->residx] = e->var->expr->result[o->residx];
+		if (!e->result[o->residx]) {
+			assert(!e->result[o->residx]);
+			e->result[o->residx] = e->var->resultexpr->result[o->residx];
+		}
 		break;
 
 	default:
@@ -586,12 +635,14 @@ static void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *
 }
 
 DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
-	ocrpt_expr_eval_worker(o, r, e);
+	ocrpt_expr_eval_worker(o, r, e, e, NULL);
 	return e->result[o->residx];
 }
 
-DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *error) {
+DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *format, ...) {
 	ocrpt_result *result = e->result[o->residx];
+	va_list va;
+	size_t len;
 
 	if (!result) {
 		result = ocrpt_mem_malloc(sizeof(ocrpt_result));
@@ -599,13 +650,21 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_
 			return NULL;
 
 		memset(result, 0, sizeof(ocrpt_result));
+		assert(!e->result[o->residx]);
 		e->result[o->residx] = result;
 		ocrpt_expr_set_result_owned(o, e, o->residx, true);
 	}
 
 	result->type = OCRPT_RESULT_ERROR;
+
+	va_start(va, format);
+	len = ocrpt_mem_vnprintf_size_from_string(format, va);
+	va_end(va);
+
 	ocrpt_mem_string_free(result->string, result->string_owned);
-	result->string = ocrpt_mem_string_new(error, true);
+	va_start(va, format);
+	result->string = ocrpt_mem_string_new_vnprintf(len + 1, format, va);
+	va_end(va);
 	result->string_owned = true;
 
 	result->isnull = false;
