@@ -359,7 +359,7 @@ DLL_EXPORT_SYM void ocrpt_expr_optimize(opencreport *o, ocrpt_report *r, ocrpt_e
 	ocrpt_expr_optimize_worker(o, r, e);
 }
 
-void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *orig_e, ocrpt_expr *e, ocrpt_var *var, int32_t varref_exclude_mask) {
+void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask) {
 	int32_t i;
 
 	switch (e->type) {
@@ -527,7 +527,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *orig
 		break;
 	case OCRPT_EXPR:
 		for (i = 0; i < e->n_ops; i++)
-			ocrpt_expr_resolve_worker(o, r, orig_e, e->ops[i], var, varref_exclude_mask);
+			ocrpt_expr_resolve_worker(o, r, e->ops[i], orig_e, var, varref_exclude_mask);
 		break;
 	default:
 		break;
