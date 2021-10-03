@@ -471,18 +471,13 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 					ocrpt_var *v = (ocrpt_var *)ptr->data;
 					if (strcasecmp(e->name->str, v->name) == 0) {
 						e->var = v;
+						if (v->precalculate)
+							orig_e->delayed = true;
 						break;
 					}
 				}
-				if (!ptr) {
-					ocrpt_string *msg = ocrpt_mem_string_new_printf("variable v.'%s' cannot be resolved\n", e->name->str);
-
-					if (msg) {
-						ocrpt_expr_make_error_result(o, e, msg->str);
-						ocrpt_mem_string_free(msg, true);
-					} else
-						fprintf(stderr, "variable v.'%s' cannot be resolved\n", e->name->str);
-				}
+				if (!ptr)
+					ocrpt_expr_make_error_result(o, e, "unknown variable v.'%s'\n", e->name->str);
 			}
 		}
 		break;
