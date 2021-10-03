@@ -42,7 +42,7 @@ int main(void) {
 	}
 
 	err = NULL;
-	e = ocrpt_expr_parse(o, "age > 18", &err);
+	e = ocrpt_expr_parse(o, r, "age > 18", &err);
 	ocrpt_strfree(err);
 
 	if (!ocrpt_break_add_breakfield(o, r, br, e)) {

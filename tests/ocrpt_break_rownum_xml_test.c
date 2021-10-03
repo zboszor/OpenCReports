@@ -46,7 +46,7 @@ int main(void) {
 	/* There is only one break in the report, extract it */
 	br = (ocrpt_break *)r->breaks->data;
 
-	e = ocrpt_expr_parse(o, "brrownum('adult')", NULL);
+	e = ocrpt_expr_parse(o, r, "brrownum('adult')", NULL);
 
 	row = 0;
 	ocrpt_query_navigate_start(o, q);

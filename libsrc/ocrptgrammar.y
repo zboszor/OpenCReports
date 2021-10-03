@@ -396,7 +396,7 @@ static void ocrpt_grammar_free_token(ocrpt_string *token) {
 	ocrpt_mem_string_free(token, true);
 }
 
-DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, char **err) {
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, const char *str, char **err) {
 	yyscan_t yyscanner;
 	base_yy_extra_type yyextra;
 	int yyresult = 1;
@@ -444,6 +444,10 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, cha
 	ocrpt_list_free_deep(yyextra.tokens, (ocrpt_mem_free_t)ocrpt_grammar_free_token);
 	ocrpt_list_free(yyextra.parsed_arglist);
 	ocrpt_list_free(yyextra.parsed_exprs);
+
+	if (r)
+		yyextra.last_expr->result_index = r->num_expressions++;
+
 	return yyextra.last_expr;
 }
 

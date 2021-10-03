@@ -28,7 +28,7 @@ int main(void) {
 	ocrpt_query *q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 5, 5, coltypes);
 	ocrpt_expr *e1, *e2;
 
-	e1 = ocrpt_expr_parse(o, "r.self + 2", NULL);
+	e1 = ocrpt_expr_parse(o, NULL, "r.self + 2", NULL);
 	/* Initialize the value of "e" to 0 */
 	ocrpt_expr_init_both_results(o, e1, OCRPT_RESULT_NUMBER);
 	mpfr_set_ui(e1->result[0]->number, 0, o->rndmode);
@@ -39,7 +39,7 @@ int main(void) {
 	printf("e1 expr (starts with initial value): ");
 	ocrpt_expr_print(o, e1);
 
-	e2 = ocrpt_expr_parse(o, "r.self + 2", NULL);
+	e2 = ocrpt_expr_parse(o, NULL, "r.self + 2", NULL);
 	/* Initialize the value of "e" to 0 */
 	ocrpt_expr_init_both_results(o, e2, OCRPT_RESULT_NUMBER);
 	mpfr_set_ui(e2->result[0]->number, 0, o->rndmode);

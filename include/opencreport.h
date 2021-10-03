@@ -187,6 +187,9 @@ struct ocrpt_var {
 };
 typedef struct ocrpt_var ocrpt_var;
 
+#define OCRPT_MAX_DELAYED_RESULT_BITS (16)
+#define OCRPT_MAX_DELAYED_RESULTS (1 << OCRPT_MAX_DELAYED_RESULT_BITS)
+
 struct ocrpt_expr {
 	struct ocrpt_result *result[2];
 	union {
@@ -208,6 +211,11 @@ struct ocrpt_expr {
 			uint32_t n_ops;
 		};
 	};
+	/*
+	 * Allow up to 2^OCRPT_MAX_DELAYED_RESULT_BITS expressions
+	 * in a report when delayed expressions are used
+	 */
+	unsigned int result_index:OCRPT_MAX_DELAYED_RESULT_BITS;
 	enum ocrpt_expr_type type:4;
 	bool result_owned0:1;
 	bool result_owned1:1;
@@ -304,6 +312,11 @@ struct ocrpt_report {
 	ocrpt_list *variables;
 	/* List of ocrpt_break elements */
 	ocrpt_list *breaks;
+	/*
+	 * Number of expression in the report
+	 * including internal ones created for variables
+	 */
+	uint32_t num_expressions;
 };
 
 struct ocrpt_part {
@@ -412,7 +425,7 @@ ssize_t ocrpt_mpfr_strfmon(opencreport *o, char * __restrict s, size_t maxsize, 
 /*
  * Create an expression parse tree from an expression string
  */
-ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, char **err);
+ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, const char *str, char **err);
 /*
  * Initialize expression result to the specified type
  * Mainly used in functions

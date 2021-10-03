@@ -18,7 +18,7 @@ int main(void) {
 	printf("OCRPTENV is set.\n");
 
 	err = NULL;
-	e = ocrpt_expr_parse(o, "m.OCRPTENV", &err);
+	e = ocrpt_expr_parse(o, NULL, "m.OCRPTENV", &err);
 	if (e) {
 		printf("Before resolving: ");
 		ocrpt_expr_print(o, e);
@@ -36,7 +36,7 @@ int main(void) {
 	printf("OCRPTENV is unset.\n");
 
 	err = NULL;
-	e = ocrpt_expr_parse(o, "m.OCRPTENV", &err);
+	e = ocrpt_expr_parse(o, NULL, "m.OCRPTENV", &err);
 	if (e) {
 		printf("Before resolving: ");
 		ocrpt_expr_print(o, e);

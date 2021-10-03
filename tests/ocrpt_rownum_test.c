@@ -36,22 +36,22 @@ int main(void) {
 	int32_t cols, cols2, row;
 
 	err = NULL;
-	id = ocrpt_expr_parse(o, "id", &err);
+	id = ocrpt_expr_parse(o, NULL, "id", &err);
 	ocrpt_strfree(err);
 	ocrpt_expr_print(o, id);
 
 	err = NULL;
-	rownum1 = ocrpt_expr_parse(o, "rownum()", &err);
+	rownum1 = ocrpt_expr_parse(o, NULL, "rownum()", &err);
 	ocrpt_strfree(err);
 	ocrpt_expr_print(o, rownum1);
 
 	err = NULL;
-	rownum2 = ocrpt_expr_parse(o, "rownum('a')", &err);
+	rownum2 = ocrpt_expr_parse(o, NULL, "rownum('a')", &err);
 	ocrpt_strfree(err);
 	ocrpt_expr_print(o, rownum2);
 
 	err = NULL;
-	rownum3 = ocrpt_expr_parse(o, "rownum('b')", &err);
+	rownum3 = ocrpt_expr_parse(o, NULL, "rownum('b')", &err);
 	ocrpt_strfree(err);
 	ocrpt_expr_print(o, rownum3);
 
@@ -122,11 +122,11 @@ int main(void) {
 	q2 = ocrpt_query_add_array(o, ds, "b", (const char **)array2, 2, 5, coltypes);
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	err = NULL;
-	match = ocrpt_expr_parse(o, "a.id = b.id", &err);
+	match = ocrpt_expr_parse(o, NULL, "a.id = b.id", &err);
 	ocrpt_strfree(err);
 
 	err = NULL;
-	rownum3 = ocrpt_expr_parse(o, "rownum('b')", &err);
+	rownum3 = ocrpt_expr_parse(o, NULL, "rownum('b')", &err);
 	ocrpt_strfree(err);
 
 	ocrpt_query_add_follower_n_to_1(o, q, q2, match);

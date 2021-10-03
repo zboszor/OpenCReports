@@ -154,7 +154,7 @@ static ocrpt_expr *ocrpt_xml_expr_parse(opencreport *o, xmlChar *expr, bool repo
 	if (!expr)
 		return NULL;
 
-	e = ocrpt_expr_parse(o, (char *)expr, &err);
+	e = ocrpt_expr_parse(o, NULL, (char *)expr, &err);
 	if (e) {
 		ocrpt_expr_resolve_exclude(o, NULL, e, OCRPT_VARREF_RVAR | OCRPT_VARREF_IDENT | OCRPT_VARREF_VVAR);
 		ocrpt_expr_optimize(o, NULL, e);
@@ -301,7 +301,7 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 		if (lq) {
 			if (follower_expr) {
 				char *err = NULL;
-				ocrpt_expr *e = ocrpt_expr_parse(o, follower_expr_s, &err);
+				ocrpt_expr *e = ocrpt_expr_parse(o, NULL, follower_expr_s, &err);
 
 				if (e) {
 					bool added = ocrpt_query_add_follower_n_to_1(o, lq, q, e);
@@ -514,7 +514,7 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 		fprintf(stderr, "unset or invalid type for variable declaration for v.'%s', using \"expression\"\n", name);
 
 	if (value) {
-		e = ocrpt_expr_parse(o, (char *)value, NULL);
+		e = ocrpt_expr_parse(o, r, (char *)value, NULL);
 		if (!e) {
 			good = false;
 			ocrpt_expr_free(e);
@@ -575,7 +575,7 @@ static bool ocrpt_parse_breakfield_node(opencreport *o, ocrpt_report *r, ocrpt_b
 	bool have_breakfield = false;
 
 	if (value) {
-		ocrpt_expr *e = ocrpt_expr_parse(o, (char *)value, NULL);
+		ocrpt_expr *e = ocrpt_expr_parse(o, r, (char *)value, NULL);
 		have_breakfield = ocrpt_break_add_breakfield(o, r, br, e);
 	}
 

@@ -39,7 +39,7 @@ int main(void) {
 	b = ocrpt_query_add_array(o, ds, "b", (const char **)array2, 2, 5, coltypes);
 
 	err = NULL;
-	match_ab = ocrpt_expr_parse(o, "a.id = b.id", &err);
+	match_ab = ocrpt_expr_parse(o, NULL, "a.id = b.id", &err);
 	ocrpt_strfree(err);
 
 	printf("adding N:1 follower a -> b, should succeed\n");
@@ -65,7 +65,7 @@ int main(void) {
 	c = NULL;
 
 	err = NULL;
-	match_bc = ocrpt_expr_parse(o, "b.id = c.id", &err);
+	match_bc = ocrpt_expr_parse(o, NULL, "b.id = c.id", &err);
 	ocrpt_strfree(err);
 
 	printf("adding N:1 follower b -> c (query c does not exist), should fail\n");
@@ -88,7 +88,7 @@ int main(void) {
 	printf("added follower b -> c, retval %d\n\n", retval);
 
 	err = NULL;
-	match_ac = ocrpt_expr_parse(o, "a.id = c.id", &err);
+	match_ac = ocrpt_expr_parse(o, NULL, "a.id = c.id", &err);
 	ocrpt_strfree(err);
 
 	printf("adding N:1 follower c -> a (circular followers), should fail\n");
@@ -118,7 +118,7 @@ int main(void) {
 	printf("added query d\n\n");
 
 	err = NULL;
-	match_cd = ocrpt_expr_parse(o, "c.id = d.id", &err);
+	match_cd = ocrpt_expr_parse(o, NULL, "c.id = d.id", &err);
 	ocrpt_strfree(err);
 
 	printf("adding follower c -> d, should succeed\n");

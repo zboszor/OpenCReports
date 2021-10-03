@@ -33,22 +33,22 @@ int main(void) {
 	ocrpt_datasource_set_encoding(o, ds, "ISO-8859-1");
 
 	err = NULL;
-	id = ocrpt_expr_parse(o, "id", &err);
+	id = ocrpt_expr_parse(o, NULL, "id", &err);
 	ocrpt_strfree(err);
 	ocrpt_expr_print(o, id);
 
 	err = NULL;
-	name = ocrpt_expr_parse(o, "name", &err);
+	name = ocrpt_expr_parse(o, NULL, "name", &err);
 	ocrpt_strfree(err);
 	ocrpt_expr_print(o, name);
 
 	err = NULL;
-	age = ocrpt_expr_parse(o, "age * 2", &err);
+	age = ocrpt_expr_parse(o, NULL, "age * 2", &err);
 	ocrpt_strfree(err);
 	ocrpt_expr_print(o, age);
 
 	err = NULL;
-	adult = ocrpt_expr_parse(o, "a.adult", &err);
+	adult = ocrpt_expr_parse(o, NULL, "a.adult", &err);
 
 	q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 3, 5, coltypes);
 	qr = ocrpt_query_get_result(q, &cols);

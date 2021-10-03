@@ -35,39 +35,39 @@ int main(void) {
 	q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 3, 5, coltypes);
 
 	err = NULL;
-	e = ocrpt_expr_parse(o, "id + 1", &err);
+	e = ocrpt_expr_parse(o, r, "id + 1", &err);
 	ocrpt_strfree(err);
 	ocrpt_variable_new(o, r, OCRPT_VARIABLE_EXPRESSION, "var1", e, NULL);
 
 	/* Exercise duplicate variable name */
 	err = NULL;
-	e = ocrpt_expr_parse(o, "id + 1", &err);
+	e = ocrpt_expr_parse(o, r, "id + 1", &err);
 	ocrpt_strfree(err);
 	ocrpt_variable_new(o, r, OCRPT_VARIABLE_EXPRESSION, "var1", e, NULL);
 
 	/* Exercise expression variable containing another (known) expression variable */
 	err = NULL;
-	e = ocrpt_expr_parse(o, "v.var1", &err);
+	e = ocrpt_expr_parse(o, r, "v.var1", &err);
 	ocrpt_strfree(err);
 	v = ocrpt_variable_new(o, r, OCRPT_VARIABLE_EXPRESSION, "var2", e, NULL);
 	printf("adding 'var2' %s\n", v ? "succeeded" : "failed");
 
 	/* Exercise other variable containing expression variable */
 	err = NULL;
-	e = ocrpt_expr_parse(o, "v.var1", &err);
+	e = ocrpt_expr_parse(o, r, "v.var1", &err);
 	ocrpt_strfree(err);
 	v = ocrpt_variable_new(o, r, OCRPT_VARIABLE_SUM, "var3", e, NULL);
 	printf("adding 'var3' %s\n", v ? "succeeded" : "failed");
 
 	/* Exercise another variable type containing non-expression-type variable */
 	err = NULL;
-	e = ocrpt_expr_parse(o, "v.var3", &err);
+	e = ocrpt_expr_parse(o, r, "v.var3", &err);
 	ocrpt_strfree(err);
 	ocrpt_variable_new(o, r, OCRPT_VARIABLE_HIGHEST, "var4", e, NULL);
 
 	/* Exercise another variable type containing unknown variable */
 	err = NULL;
-	e = ocrpt_expr_parse(o, "v.varX", &err);
+	e = ocrpt_expr_parse(o, r, "v.varX", &err);
 	ocrpt_strfree(err);
 	ocrpt_variable_new(o, r, OCRPT_VARIABLE_HIGHEST, "var5", e, NULL);
 

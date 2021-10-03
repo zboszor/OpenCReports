@@ -37,7 +37,7 @@ int main(void) {
 	qr = ocrpt_query_get_result(q, &cols);
 
 	err = NULL;
-	be = ocrpt_expr_parse(o, "id + 1", &err);
+	be = ocrpt_expr_parse(o, r, "id + 1", &err);
 	ocrpt_strfree(err);
 	printf("Base expression for 'var1' reprinted: ");
 	ocrpt_expr_print(o, be);
@@ -46,7 +46,7 @@ int main(void) {
 	ocrpt_variable_new(o, r, OCRPT_VARIABLE_EXPRESSION, "var1", be, NULL);
 
 	err = NULL;
-	e = ocrpt_expr_parse(o, "v.var1", &err);
+	e = ocrpt_expr_parse(o, r, "v.var1", &err);
 	ocrpt_strfree(err);
 	printf("Variable expression reprinted: ");
 	ocrpt_expr_print(o, e);

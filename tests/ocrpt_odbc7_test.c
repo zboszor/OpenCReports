@@ -32,7 +32,7 @@ int main(void) {
 		printf("%d: '%s'\n", i, qr2[i].name);
 
 	err = NULL;
-	match = ocrpt_expr_parse(o, "a.id = b.id", &err);
+	match = ocrpt_expr_parse(o, NULL, "a.id = b.id", &err);
 	ocrpt_strfree(err);
 
 	ocrpt_query_add_follower_n_to_1(o, q, q2, match);

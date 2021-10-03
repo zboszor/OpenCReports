@@ -64,7 +64,7 @@ int main(void) {
 	ocrpt_function_add(o, "dec", my_dec, 1, false, false, false, false);
 
 	err = NULL;
-	e1 = ocrpt_expr_parse(o, "100++", &err);
+	e1 = ocrpt_expr_parse(o, NULL, "100++", &err);
 	if (e1) {
 		ocrpt_expr_print(o, e1);
 		printf("e1 nodes: %d\n", ocrpt_expr_nodes(e1));
@@ -77,7 +77,7 @@ int main(void) {
 	}
 
 	err = NULL;
-	e2 = ocrpt_expr_parse(o, "100--", &err);
+	e2 = ocrpt_expr_parse(o, NULL, "100--", &err);
 	if (e2) {
 		ocrpt_expr_print(o, e2);
 		printf("e2 nodes: %d\n", ocrpt_expr_nodes(e2));

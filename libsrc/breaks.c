@@ -33,7 +33,7 @@ DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, con
 	br->name = ocrpt_mem_strdup(name);
 
 	/* Initialize rownum to 1, start with initial value */
-	br->rownum = ocrpt_expr_parse(o, "r.self + 1", NULL);
+	br->rownum = ocrpt_expr_parse(o, r, "r.self + 1", NULL);
 	ocrpt_expr_init_both_results(o, br->rownum, OCRPT_RESULT_NUMBER);
 	mpfr_set_ui(br->rownum->result[0]->number, 1, o->rndmode);
 	mpfr_set_ui(br->rownum->result[1]->number, 1, o->rndmode);

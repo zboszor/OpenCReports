@@ -175,7 +175,7 @@ int main(void) {
 		char *err = NULL;
 
 		printf("string: %s\n", str[i]);
-		e = ocrpt_expr_parse(o, str[i], &err);
+		e = ocrpt_expr_parse(o, NULL, str[i], &err);
 		if (e) {
 			ocrpt_result *r;
 

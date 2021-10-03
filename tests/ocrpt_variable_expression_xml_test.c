@@ -42,7 +42,7 @@ int main(void) {
 	r = (ocrpt_report *)((ocrpt_list *)(((ocrpt_part *)(o->parts->data))->rows->data))->data;
 
 	err = NULL;
-	e = ocrpt_expr_parse(o, "v.var1", &err);
+	e = ocrpt_expr_parse(o, r, "v.var1", &err);
 	ocrpt_strfree(err);
 	printf("Variable expression reprinted: ");
 	ocrpt_expr_print(o, e);

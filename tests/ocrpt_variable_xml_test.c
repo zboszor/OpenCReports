@@ -62,11 +62,11 @@ int main(void) {
 	q = ocrpt_query_find(o, "a");
 	qr = ocrpt_query_get_result(q, &cols);
 
-	for (i = 0; i < N_TEST_VARS; i++)
-		e[i] = ocrpt_expr_parse(o, test_vars[i], NULL);
-
 	/* There is only one ocrpt_report pointer in o->parts, extract it. */
 	r = (ocrpt_report *)((ocrpt_list *)(((ocrpt_part *)(o->parts->data))->rows->data))->data;
+
+	for (i = 0; i < N_TEST_VARS; i++)
+		e[i] = ocrpt_expr_parse(o, r, test_vars[i], NULL);
 
 	row = 0;
 	ocrpt_query_navigate_start(o, q);
