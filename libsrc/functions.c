@@ -618,24 +618,13 @@ OCRPT_STATIC_FUNCTION(ocrpt_nulls) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_iif) {
-	int32_t i, opidx;
+	int32_t opidx;
 	long cond;
 	ocrpt_string *string, *sstring;
 
 	if (e->n_ops != 3) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 		return;
-	}
-
-	for (i = 0; i < e->n_ops; i++) {
-		if (!e->ops[i]->result[o->residx]) {
-			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
-			return;
-		}
-		if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
-			ocrpt_expr_make_error_result(o, e, e->ops[i]->result[o->residx]->string->str);
-			return;
-		}
 	}
 
 	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER || e->ops[0]->result[o->residx]->isnull) {
@@ -645,6 +634,15 @@ OCRPT_STATIC_FUNCTION(ocrpt_iif) {
 
 	cond = mpfr_get_si(e->ops[0]->result[o->residx]->number, o->rndmode);
 	opidx = (cond ? 1 : 2);
+
+	if (!e->ops[opidx]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+	if (e->ops[opidx]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[opidx]->result[o->residx]->string->str);
+		return;
+	}
 
 	ocrpt_expr_init_result(o, e, e->ops[opidx]->result[o->residx]->type);
 
