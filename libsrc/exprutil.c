@@ -41,61 +41,72 @@ ocrpt_expr *newblankexpr(enum ocrpt_expr_type type, uint32_t n_ops) {
 	return e;
 }
 
-static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth, const char *delimiter) {
+static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth, const char *delimiter, ocrpt_string *str) {
 	ocrpt_result *result = e->result[o->residx];
 	int i;
 
 	switch (e->type) {
 	case OCRPT_EXPR_ERROR:
-		printf("(ERROR)%s", result->string->str);
+		ocrpt_mem_string_append_printf(str, "(ERROR)%s", result->string->str);
 		break;
 	case OCRPT_EXPR_STRING:
-		printf("(string)%s", result->isnull ? "NULL" : result->string->str);
+		ocrpt_mem_string_append_printf(str, "(string)%s", result->isnull ? "NULL" : result->string->str);
 		break;
 	case OCRPT_EXPR_DATETIME:
-		printf("(datetime)%s", result->isnull ? "NULL" : result->string->str);
+		ocrpt_mem_string_append_printf(str, "(datetime)%s", result->isnull ? "NULL" : result->string->str);
 		break;
 	case OCRPT_EXPR_NUMBER:
 		if (result->isnull)
-			printf("NULL");
-		else
-			mpfr_printf("%RF", result->number);
+			ocrpt_mem_string_append_printf(str, "NULL");
+		else {
+			size_t len = mpfr_snprintf(NULL, 0, "%RF", result->number);
+			ocrpt_string *newstr = ocrpt_mem_string_new_with_len(NULL, len);
+			mpfr_snprintf(newstr->str, newstr->allocated_len, "%RF", result->number);
+			newstr->len = len;
+			ocrpt_mem_string_append_len(str, newstr->str, newstr->len);
+			ocrpt_mem_string_free(newstr, true);
+		}
 		break;
 	case OCRPT_EXPR_MVAR:
-		printf("m.'%s'", e->name->str);
+		ocrpt_mem_string_append_printf(str, "m.'%s'", e->name->str);
 		break;
 	case OCRPT_EXPR_RVAR:
-		printf("r.'%s'", e->name->str);
+		ocrpt_mem_string_append_printf(str, "r.'%s'", e->name->str);
 		break;
 	case OCRPT_EXPR_VVAR:
-		printf("v.'%s'", e->name->str);
+		ocrpt_mem_string_append_printf(str, "v.'%s'", e->name->str);
 		break;
 	case OCRPT_EXPR_IDENT:
 		if (e->query)
-			printf("'%s'.'%s'", e->query->str, e->name->str);
+			ocrpt_mem_string_append_printf(str, "'%s'.'%s'", e->query->str, e->name->str);
 		else
-			printf(".'%s'", e->name->str);
+			ocrpt_mem_string_append_printf(str, ".'%s'", e->name->str);
 		break;
 	case OCRPT_EXPR:
-		printf("%s(", e->func->fname);
+		ocrpt_mem_string_append_printf(str, "%s(", e->func->fname);
 		for (i = 0; i < e->n_ops; i++) {
 			if (i > 0)
-				printf(",");
-			ocrpt_expr_print_worker(o, e->ops[i], depth + 1, delimiter);
+				ocrpt_mem_string_append_printf(str, ",");
+			ocrpt_expr_print_worker(o, e->ops[i], depth + 1, delimiter, str);
 		}
-		printf(")");
+		ocrpt_mem_string_append_printf(str, ")");
 		break;
 	}
 
 	if (depth == 0)
-		printf("%s", delimiter);
+		ocrpt_mem_string_append_printf(str, "%s", delimiter);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_print(opencreport *o, ocrpt_expr *e) {
-	ocrpt_expr_print_worker(o, e, 0, "\n");
+	ocrpt_string *str = ocrpt_mem_string_new_with_len(NULL, 256);
+	ocrpt_expr_print_worker(o, e, 0, "\n", str);
+	printf("%s", str->str);
+	ocrpt_mem_string_free(str, true);
 }
 
 static void ocrpt_expr_result_deep_print_worker(opencreport *o, ocrpt_expr *e) {
+	ocrpt_string *str = ocrpt_mem_string_new_with_len(NULL, 256);;
+
 	if (e->type == OCRPT_EXPR) {
 		int i;
 
@@ -103,7 +114,9 @@ static void ocrpt_expr_result_deep_print_worker(opencreport *o, ocrpt_expr *e) {
 			ocrpt_expr_result_deep_print(o, e->ops[i]);
 	}
 
-	ocrpt_expr_print_worker(o, e, 0, " - ");
+	ocrpt_expr_print_worker(o, e, 0, " - ", str);
+	printf("%s", str->str);
+	ocrpt_mem_string_free(str, true);
 	ocrpt_result_print(e->result[o->residx]);
 }
 
@@ -348,7 +361,6 @@ DLL_EXPORT_SYM void ocrpt_expr_optimize(opencreport *o, ocrpt_report *r, ocrpt_e
 
 void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *orig_e, ocrpt_expr *e, ocrpt_var *var, int32_t varref_exclude_mask) {
 	int32_t i;
-	bool found = false;
 
 	switch (e->type) {
 	case OCRPT_EXPR_MVAR:
@@ -401,6 +413,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *orig
 				assert(var);
 				e->var = var;
 				if (var->baseexpr) {
+					ocrpt_expr_resolve_worker(o, r, e->var->baseexpr, e->var->baseexpr, var, varref_exclude_mask);
 					if (!e->result[0]) {
 						assert(var->baseexpr->result[0]);
 						e->result[0] = var->baseexpr->result[0];
@@ -416,6 +429,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *orig
 				assert(var);
 				e->var = var;
 				if (var->intermedexpr) {
+					ocrpt_expr_resolve_worker(o, r, e->var->intermedexpr, e->var->intermedexpr, var, varref_exclude_mask);
 					if (!e->result[0]) {
 						assert(var->intermedexpr->result[0]);
 						e->result[0] = var->intermedexpr->result[0];
@@ -424,6 +438,22 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *orig
 					if (!e->result[1]) {
 						assert(var->intermedexpr->result[1]);
 						e->result[1] = var->intermedexpr->result[1];
+						e->result_owned1 = false;
+					}
+				}
+			} else if (strcmp(e->name->str, "intermed2expr") == 0) {
+				assert(var);
+				e->var = var;
+				if (var->intermed2expr) {
+					ocrpt_expr_resolve_worker(o, r, e->var->intermed2expr, e->var->intermed2expr, var, varref_exclude_mask);
+					if (!e->result[0]) {
+						assert(var->intermed2expr->result[0]);
+						e->result[0] = var->intermed2expr->result[0];
+						e->result_owned0 = false;
+					}
+					if (!e->result[1]) {
+						assert(var->intermed2expr->result[1]);
+						e->result[1] = var->intermed2expr->result[1];
 						e->result_owned1 = false;
 					}
 				}
@@ -459,6 +489,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *orig
 	case OCRPT_EXPR_IDENT:
 		if ((varref_exclude_mask & OCRPT_VARREF_IDENT) == 0) {
 			ocrpt_list *ptr;
+			bool found = false;
 
 			/* Resolve the identifier ocrpt_query_result from the queries */
 			if (e->result[o->residx] && e->result[o->residx]->type != OCRPT_RESULT_ERROR)
@@ -480,25 +511,17 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *orig
 
 				for (i = 0; i < cols; i++) {
 					if (!strcmp(e->name->str, qr[i].name)) {
-						assert(!e->result[0]);
-						assert(!e->result[1]);
-						e->result[0] = &qr[i].result;
-						e->result[1] = &qr[cols + i].result;
+						if (!e->result[0])
+							e->result[0] = &qr[i].result;
+						if (!e->result[1])
+							e->result[1] = &qr[cols + i].result;
 						found = true;
 						break;
 					}
 				}
-				if (found)
-					break;
-			}
-			if (!found) {
-				char *error;
-				int len;
 
-				len = snprintf(NULL, 0, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
-				error = alloca(len + 1);
-				snprintf(error, len + 1, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
-				ocrpt_expr_make_error_result(o, e, error);
+				if (!found)
+					ocrpt_expr_make_error_result(o, e, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
 			}
 		}
 		break;
@@ -614,23 +637,63 @@ void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrp
 			fprintf(stderr, "%s: function is unknown (impossible, it is caught by the parser)\n", __func__);
 		}
 		break;
+
 	case OCRPT_EXPR_VVAR:
 		assert(e->var);
 
-		if (e->var->baseexpr)
-			ocrpt_expr_eval_worker(o, r, e->var->baseexpr, e, e->var);
-		if (e->var->intermedexpr)
-			ocrpt_expr_eval_worker(o, r, e->var->intermedexpr, e, e->var);
-		ocrpt_expr_eval_worker(o, r, e->var->resultexpr, e, e->var);
+		if (!ocrpt_expr_get_result_evaluated(o, e->var->resultexpr))
+			ocrpt_expr_eval_worker(o, r, e->var->resultexpr, e->var->resultexpr, e->var);
 
 		if (!e->result[o->residx]) {
-			assert(!e->result[o->residx]);
+			assert(e->var->resultexpr->result[o->residx]);
 			e->result[o->residx] = e->var->resultexpr->result[o->residx];
 		}
 		break;
 
+	case OCRPT_EXPR_RVAR:
+		if (strcmp(e->name->str, "self") == 0) {
+			/* Do nothing - r.self references the VVAR's previous value */
+		} else if (strcmp(e->name->str, "baseexpr") == 0) {
+			assert(e->var);
+			if (e->var->baseexpr) {
+				ocrpt_expr_eval_worker(o, r, e->var->baseexpr, e->var->baseexpr, e->var);
+
+				if (!e->result[o->residx]) {
+					assert(e->var->baseexpr->result[o->residx]);
+					e->result[o->residx] = e->var->baseexpr->result[o->residx];
+				}
+			}
+		} else if (strcmp(e->name->str, "intermedexpr") == 0) {
+			assert(e->var);
+			if (e->var->intermedexpr) {
+				ocrpt_expr_eval_worker(o, r, e->var->intermedexpr, e->var->intermedexpr, e->var);
+
+				if (!e->result[o->residx]) {
+					assert(e->var->intermedexpr->result[o->residx]);
+					e->result[o->residx] = e->var->intermedexpr->result[o->residx];
+				}
+			}
+		} else if (strcmp(e->name->str, "intermed2expr") == 0) {
+			assert(e->var);
+			if (e->var->intermed2expr) {
+				ocrpt_expr_eval_worker(o, r, e->var->intermed2expr, e->var->intermed2expr, e->var);
+
+				if (!e->result[o->residx]) {
+					assert(e->var->intermed2expr->result[o->residx]);
+					e->result[o->residx] = e->var->intermed2expr->result[o->residx];
+				}
+			}
+		}
+		/* TODO: implement generally usable global report variables */
+		break;
+
 	default:
 		break;
+	}
+
+	if (e == orig_e) {
+		ocrpt_expr_set_result_evaluated(o, e, o->residx, true);
+		ocrpt_expr_set_result_evaluated(o, e, !o->residx, false);
 	}
 }
 

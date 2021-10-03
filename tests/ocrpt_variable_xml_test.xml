@@ -5,7 +5,7 @@
 		<Datasource name="myarray" type="'array'" />
 	</Datasources>
 	<Queries>
-		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="3" cols="5" />
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="3" cols="6" />
 	</Queries>
 	<Report>
 		<Variables>
@@ -14,7 +14,15 @@
 			<Variable name="var_id_sum" value="id" type="sum" />
 			<Variable name="var_id_highest" value="id" type="highest" />
 			<Variable name="var_id_lowest" value="id" type="lowest" />
-			<Variable name="var_age_avg" value="age" type="average" />
+			<Variable name="var_id_avg" value="id" type="average" />
+			<Variable name="var_id_avgall" value="id" type="averageall" />
+			<Variable name="var_id2_count" value="id2" type="count" />
+			<Variable name="var_id2_countall" value="id2" type="countall" />
+			<Variable name="var_id2_sum" value="id2" type="sum" />
+			<Variable name="var_id2_highest" value="id2" type="highest" />
+			<Variable name="var_id2_lowest" value="id2" type="lowest" />
+			<Variable name="var_id2_avg" value="id2" type="average" />
+			<Variable name="var_id2_avgall" value="id2" type="averageall" />
 		</Variables>
 	</Report>
 </OpenCReport>

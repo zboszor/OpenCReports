@@ -9,15 +9,15 @@
 #include <opencreport.h>
 #include "ocrpt_test_common.c"
 
-/* NOT static */ const char *array[4][5] = {
-	{ "id", "name", "property", "age", "adult" },
-	{ "1", "Fred Flintstone", "strong", "31", "yes" },
-	{ "2", "Wilma Flintstone", "charming", "28", "yes" },
-	{ "3", "Pebbles Flintstone", "young", "5e-1", "no" }
+/* NOT static */ const char *array[4][6] = {
+	{ "id", "id2", "name", "property", "age", "adult" },
+	{ "1", "1", "Fred Flintstone", "strong", "31", "yes" },
+	{ "2", NULL, "Wilma Flintstone", "charming", "28", "yes" },
+	{ "3", "3", "Pebbles Flintstone", "young", "5e-1", "no" }
 };
 
-/* NOT static */ const enum ocrpt_result_type coltypes[5] = {
-	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
+/* NOT static */ const enum ocrpt_result_type coltypes[6] = {
+	OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 
 struct test_expr_types {
@@ -26,12 +26,21 @@ struct test_expr_types {
 };
 
 static char *test_vars[] = {
+	"id2",
 	"v.var_id_count",
 	"v.var_id_countall",
 	"v.var_id_sum",
 	"v.var_id_highest",
 	"v.var_id_lowest",
-	"v.var_age_avg"
+	"v.var_id_avg",
+	"v.var_id_avgall",
+	"v.var_id2_count",
+	"v.var_id2_countall",
+	"v.var_id2_sum",
+	"v.var_id2_highest",
+	"v.var_id2_lowest",
+	"v.var_id2_avg",
+	"v.var_id2_avgall"
 };
 
 #define N_TEST_VARS (sizeof(test_vars) / sizeof(char *))

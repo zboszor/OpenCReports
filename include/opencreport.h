@@ -134,6 +134,7 @@ enum ocrpt_var_type {
 	OCRPT_VARIABLE_COUNTALL,
 	OCRPT_VARIABLE_SUM,
 	OCRPT_VARIABLE_AVERAGE,
+	OCRPT_VARIABLE_AVERAGEALL,
 	OCRPT_VARIABLE_LOWEST,
 	OCRPT_VARIABLE_HIGHEST
 };
@@ -174,11 +175,12 @@ struct ocrpt_var {
 	};
 	ocrpt_expr *baseexpr;
 	ocrpt_expr *intermedexpr;
+	ocrpt_expr *intermed2expr;
 	ocrpt_expr *resultexpr;
 	ocrpt_result *rowcount[2];
 	ocrpt_result *intermed[2];
 	ocrpt_result *result[2];
-	enum ocrpt_var_type type:3;
+	enum ocrpt_var_type type:4;
 	bool reset_on_br:1;
 	bool br_resolved:1;
 	bool precalculate:1;
@@ -209,6 +211,8 @@ struct ocrpt_expr {
 	enum ocrpt_expr_type type:4;
 	bool result_owned0:1;
 	bool result_owned1:1;
+	bool result_evaluated0:1;
+	bool result_evaluated1:1;
 	bool parenthesized:1;
 	bool dotprefixed:1;
 	bool iterative:1;
@@ -435,6 +439,24 @@ static inline bool ocrpt_expr_get_result_owned(opencreport *o, ocrpt_expr *e) {
 		return e->result_owned1;
 	else
 		return e->result_owned0;
+}
+/*
+ * Inline function to set the result owned/disowned by the expression
+ */
+static inline void ocrpt_expr_set_result_evaluated(opencreport *o, ocrpt_expr *e, bool which, bool evaluated) {
+	if (which)
+		e->result_evaluated1 = evaluated;
+	else
+		e->result_evaluated0 = evaluated;
+}
+/*
+ * Inline function to query the expression result ownership
+ */
+static inline bool ocrpt_expr_get_result_evaluated(opencreport *o, ocrpt_expr *e) {
+	if (o->residx)
+		return e->result_evaluated1;
+	else
+		return e->result_evaluated0;
 }
 /*
  * Set whether the start value for iterative expressions

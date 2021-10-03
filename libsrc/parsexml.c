@@ -504,6 +504,8 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 		vtype = OCRPT_VARIABLE_SUM;
 	else if (strcasecmp((char *)type, "average") == 0)
 		vtype = OCRPT_VARIABLE_AVERAGE;
+	else if (strcasecmp((char *)type, "averageall") == 0)
+		vtype = OCRPT_VARIABLE_AVERAGEALL;
 	else if (strcasecmp((char *)type, "lowest") == 0)
 		vtype = OCRPT_VARIABLE_LOWEST;
 	else if (strcasecmp((char *)type, "highest") == 0)
