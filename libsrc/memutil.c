@@ -108,7 +108,7 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_vnprintf(size_t len, const cha
 	if (!string)
 		return NULL;
 
-	vsnprintf(string->str, len, format, va);
+	vsnprintf(string->str, len + 1, format, va);
 	string->len = len;
 	return string;
 }

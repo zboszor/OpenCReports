@@ -663,7 +663,7 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_
 
 	ocrpt_mem_string_free(result->string, result->string_owned);
 	va_start(va, format);
-	result->string = ocrpt_mem_string_new_vnprintf(len + 1, format, va);
+	result->string = ocrpt_mem_string_new_vnprintf(len, format, va);
 	va_end(va);
 	result->string_owned = true;
 
