@@ -1,6 +1,6 @@
 /*
  * OpenCReports test
- * Copyright (C) 2021-2021 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
