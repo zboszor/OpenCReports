@@ -1,0 +1,205 @@
+First run of the query
+
+Break triggers
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 1.000000)
+	Col #1: 'id2': string value: NULL (converted to number: 1.000000)
+	Col #2: 'name': string value: Fred Flintstone
+	Col #3: 'property': string value: strong
+	Col #4: 'age': string value: NULL (converted to number: 31.000000)
+	Col #5: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: .'id2'
+Evaluated: (number)1.000000
+Expression: v.'var_id_count'
+Evaluated: (number)1.000000
+Expression: v.'var_id_countall'
+Evaluated: (number)1.000000
+Expression: v.'var_id_sum'
+Evaluated: (number)1.000000
+Expression: v.'var_id_highest'
+Evaluated: (number)1.000000
+Expression: v.'var_id_lowest'
+Evaluated: (number)1.000000
+Expression: v.'var_id_avg'
+Evaluated: (number)1.000000
+Expression: v.'var_id_avgall'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_count'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_countall'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_sum'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_highest'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_lowest'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_avg'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_avgall'
+Evaluated: (number)1.000000
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 2.000000)
+	Col #1: 'id2': string value: NULL
+	Col #2: 'name': string value: Wilma Flintstone
+	Col #3: 'property': string value: charming
+	Col #4: 'age': string value: NULL (converted to number: 28.000000)
+	Col #5: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: .'id2'
+Evaluated: (number)NULL
+Expression: v.'var_id_count'
+Evaluated: (number)2.000000
+Expression: v.'var_id_countall'
+Evaluated: (number)2.000000
+Expression: v.'var_id_sum'
+Evaluated: (number)3.000000
+Expression: v.'var_id_highest'
+Evaluated: (number)2.000000
+Expression: v.'var_id_lowest'
+Evaluated: (number)1.000000
+Expression: v.'var_id_avg'
+Evaluated: (number)1.500000
+Expression: v.'var_id_avgall'
+Evaluated: (number)1.500000
+Expression: v.'var_id2_count'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_countall'
+Evaluated: (number)2.000000
+Expression: v.'var_id2_sum'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_highest'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_lowest'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_avg'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_avgall'
+Evaluated: (number)0.500000
+
+Break triggers
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 3.000000)
+	Col #1: 'id2': string value: NULL (converted to number: 3.000000)
+	Col #2: 'name': string value: Pebbles Flintstone
+	Col #3: 'property': string value: young
+	Col #4: 'age': string value: NULL (converted to number: 0.500000)
+	Col #5: 'adult': string value: NULL (converted to number: 0.000000)
+
+Expression: .'id2'
+Evaluated: (number)3.000000
+Expression: v.'var_id_count'
+Evaluated: (number)1.000000
+Expression: v.'var_id_countall'
+Evaluated: (number)1.000000
+Expression: v.'var_id_sum'
+Evaluated: (number)3.000000
+Expression: v.'var_id_highest'
+Evaluated: (number)3.000000
+Expression: v.'var_id_lowest'
+Evaluated: (number)3.000000
+Expression: v.'var_id_avg'
+Evaluated: (number)3.000000
+Expression: v.'var_id_avgall'
+Evaluated: (number)3.000000
+Expression: v.'var_id2_count'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_countall'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_sum'
+Evaluated: (number)3.000000
+Expression: v.'var_id2_highest'
+Evaluated: (number)3.000000
+Expression: v.'var_id2_lowest'
+Evaluated: (number)3.000000
+Expression: v.'var_id2_avg'
+Evaluated: (number)3.000000
+Expression: v.'var_id2_avgall'
+Evaluated: (number)3.000000
+
+Break triggers
+Row #3
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 4.000000)
+	Col #1: 'id2': string value: NULL
+	Col #2: 'name': string value: Betty Rubble
+	Col #3: 'property': string value: beautiful
+	Col #4: 'age': string value: NULL (converted to number: 27.000000)
+	Col #5: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: .'id2'
+Evaluated: (number)NULL
+Expression: v.'var_id_count'
+Evaluated: (number)1.000000
+Expression: v.'var_id_countall'
+Evaluated: (number)1.000000
+Expression: v.'var_id_sum'
+Evaluated: (number)4.000000
+Expression: v.'var_id_highest'
+Evaluated: (number)4.000000
+Expression: v.'var_id_lowest'
+Evaluated: (number)4.000000
+Expression: v.'var_id_avg'
+Evaluated: (number)4.000000
+Expression: v.'var_id_avgall'
+Evaluated: (number)4.000000
+Expression: v.'var_id2_count'
+Evaluated: (number)0.000000
+Expression: v.'var_id2_countall'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_sum'
+Evaluated: (number)0.000000
+Expression: v.'var_id2_highest'
+Evaluated: (number)NULL
+Expression: v.'var_id2_lowest'
+Evaluated: (number)NULL
+Expression: v.'var_id2_avg'
+Evaluated: (number)NAN
+Expression: v.'var_id2_avgall'
+Evaluated: (number)0.000000
+
+Row #4
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 5.000000)
+	Col #1: 'id2': string value: NULL (converted to number: 5.000000)
+	Col #2: 'name': string value: Barney Rubble
+	Col #3: 'property': string value: small
+	Col #4: 'age': string value: NULL (converted to number: 29.000000)
+	Col #5: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: .'id2'
+Evaluated: (number)5.000000
+Expression: v.'var_id_count'
+Evaluated: (number)2.000000
+Expression: v.'var_id_countall'
+Evaluated: (number)2.000000
+Expression: v.'var_id_sum'
+Evaluated: (number)9.000000
+Expression: v.'var_id_highest'
+Evaluated: (number)5.000000
+Expression: v.'var_id_lowest'
+Evaluated: (number)4.000000
+Expression: v.'var_id_avg'
+Evaluated: (number)4.500000
+Expression: v.'var_id_avgall'
+Evaluated: (number)4.500000
+Expression: v.'var_id2_count'
+Evaluated: (number)1.000000
+Expression: v.'var_id2_countall'
+Evaluated: (number)2.000000
+Expression: v.'var_id2_sum'
+Evaluated: (number)5.000000
+Expression: v.'var_id2_highest'
+Evaluated: (number)5.000000
+Expression: v.'var_id2_lowest'
+Evaluated: (number)5.000000
+Expression: v.'var_id2_avg'
+Evaluated: (number)5.000000
+Expression: v.'var_id2_avgall'
+Evaluated: (number)2.500000
+

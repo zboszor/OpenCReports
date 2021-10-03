@@ -14,6 +14,7 @@
 #include "opencreport.h"
 #include "exprutil.h"
 #include "datasource.h"
+#include "variables.h"
 
 DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, const char *name) {
 	ocrpt_break *br;
@@ -170,6 +171,9 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(opencreport *o, ocrpt_report *r, oc
 	bool match = true;
 	bool retval;
 
+	if (!o || !r || !br)
+		return false;
+
 	for (ptr = br->breakfields; ptr; ptr = ptr->next) {
 		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 
@@ -192,4 +196,27 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(opencreport *o, ocrpt_report *r, oc
 	ocrpt_expr_eval(o, r, br->rownum);
 
 	return retval;
+}
+
+DLL_EXPORT_SYM void ocrpt_break_reset_vars(opencreport *o, ocrpt_report *r, ocrpt_break *br) {
+	ocrpt_list *ptr;
+
+	if (!o || !r || !br)
+		return;
+
+	for (ptr = r->variables; ptr; ptr = ptr->next) {
+		ocrpt_var *v = (ocrpt_var *)ptr->data;
+		bool match = false;
+
+		if (v->br) {
+			if (v->br == br)
+				match = true;
+		} else if (v->br_name) {
+			if (strcmp(v->br_name, br->name) == 0)
+				match = true;
+		}
+
+		if (match)
+			ocrpt_variable_reset(o, v);
+	}
 }

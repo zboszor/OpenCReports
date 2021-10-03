@@ -77,15 +77,18 @@ DLL_EXPORT_SYM void ocrpt_parts_free(opencreport *o) {
 	}
 }
 
-DLL_EXPORT_SYM ocrpt_report *ocrpt_report_new(void) {
+DLL_EXPORT_SYM ocrpt_report *ocrpt_report_new(opencreport *o) {
 	ocrpt_report *r = ocrpt_mem_malloc(sizeof(ocrpt_report));
 	memset(r, 0, sizeof(ocrpt_report));
+	r->query_rownum = ocrpt_expr_parse(o, r, "rownum()", NULL);
+	ocrpt_expr_resolve(o, r, r->query_rownum);
 	return r;
 }
 
 DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_variables_free(o, r);
 	ocrpt_breaks_free(o, r);
+	ocrpt_expr_free(r->query_rownum);
 	ocrpt_mem_free(r->query);
 	ocrpt_mem_free(r);
 }

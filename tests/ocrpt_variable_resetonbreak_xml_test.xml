@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="5" cols="6" />
+	</Queries>
+	<Report>
+		<Variables>
+			<Variable name="var_id_count" value="id" type="count" resetonbreak="adult" />
+			<Variable name="var_id_countall" value="id" type="countall" resetonbreak="adult" />
+			<Variable name="var_id_sum" value="id" type="sum" resetonbreak="adult" />
+			<Variable name="var_id_highest" value="id" type="highest" resetonbreak="adult" />
+			<Variable name="var_id_lowest" value="id" type="lowest" resetonbreak="adult" />
+			<Variable name="var_id_avg" value="id" type="average" resetonbreak="adult" />
+			<Variable name="var_id_avgall" value="id" type="averageall" resetonbreak="adult" />
+			<Variable name="var_id2_count" value="id2" type="count" resetonbreak="adult" />
+			<Variable name="var_id2_countall" value="id2" type="countall" resetonbreak="adult" />
+			<Variable name="var_id2_sum" value="id2" type="sum" resetonbreak="adult" />
+			<Variable name="var_id2_highest" value="id2" type="highest" resetonbreak="adult" />
+			<Variable name="var_id2_lowest" value="id2" type="lowest" resetonbreak="adult" />
+			<Variable name="var_id2_avg" value="id2" type="average" resetonbreak="adult" />
+			<Variable name="var_id2_avgall" value="id2" type="averageall" resetonbreak="adult" />
+		</Variables>
+		<Breaks>
+			<Break name="adult">
+				<BreakFields>
+					<BreakField value="age > 18" />
+				</BreakFields>
+			</Break>
+		</Breaks>
+	</Report>
+</OpenCReport>

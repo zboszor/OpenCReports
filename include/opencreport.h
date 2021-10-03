@@ -169,10 +169,8 @@ typedef struct ocrpt_break ocrpt_break;
 
 struct ocrpt_var {
 	const char *name;
-	union {
-		char *br_name;
-		ocrpt_break *br;
-	};
+	char *br_name;
+	ocrpt_break *br;
 	ocrpt_expr *baseexpr;
 	ocrpt_expr *intermedexpr;
 	ocrpt_expr *intermed2expr;
@@ -181,8 +179,6 @@ struct ocrpt_var {
 	ocrpt_result *intermed[2];
 	ocrpt_result *result[2];
 	enum ocrpt_var_type type:4;
-	bool reset_on_br:1;
-	bool br_resolved:1;
 	bool precalculate:1;
 };
 typedef struct ocrpt_var ocrpt_var;
@@ -283,7 +279,6 @@ struct ocrpt_break {
 	const char *name;
 	bool attrs[OCRPT_BREAK_ATTRS_COUNT];
 	ocrpt_list *breakfields;	/* list of ocrpt_expr pointers */
-	ocrpt_list *reset_vars;		/* list of ocrpt_var pointers */
 	ocrpt_expr *rownum;			/* row number of the break */
 	/* TODO: add details for header and footer */
 };
@@ -305,9 +300,10 @@ struct ocrpt_report {
 
 	/* Parent part */
 	ocrpt_part *part;
-
 	/* Toplevel query */
 	ocrpt_query *query;
+	/* rownum() expression for the toplevel query */
+	ocrpt_expr *query_rownum;
 	/* List of ocrpt_var elements */
 	ocrpt_list *variables;
 	/* List of ocrpt_break elements */
@@ -448,8 +444,8 @@ static inline void ocrpt_expr_set_result_owned(opencreport *o, ocrpt_expr *e, bo
 /*
  * Inline function to query the expression result ownership
  */
-static inline bool ocrpt_expr_get_result_owned(opencreport *o, ocrpt_expr *e) {
-	if (o->residx)
+static inline bool ocrpt_expr_get_result_owned(opencreport *o, ocrpt_expr *e, bool which) {
+	if (which)
 		return e->result_owned1;
 	else
 		return e->result_owned0;
@@ -505,6 +501,10 @@ bool ocrpt_expr_references(opencreport *o, ocrpt_report *r, ocrpt_expr *e, int32
  * The returned ocrpt_result MUST NOT be freed with ocrpt_result_free().
  */
 ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
+/*
+ * Get the value
+ */
+void ocrpt_expr_get_value(opencreport *o, ocrpt_expr *e, char **s, int32_t *i);
 /*
  * Compare two subsequent row data in the expression,
  * return true if they are identical.
@@ -639,6 +639,10 @@ void ocrpt_break_resolve_fields(opencreport *o, ocrpt_report *r, ocrpt_break *br
  * Check whether the report break triggers
  */
 bool ocrpt_break_check_fields(opencreport *o, ocrpt_report *r, ocrpt_break *br);
+/*
+ * Reset variables for the break
+ */
+void ocrpt_break_reset_vars(opencreport *o, ocrpt_report *r, ocrpt_break *br);
 
 /****************************
  * Memory handling wrappers *
@@ -943,7 +947,7 @@ void ocrpt_parts_free(opencreport *o);
  * It will have to be appended with ocrpt_part_append_report()
  * or to be used standalone for unit tests
  */
-ocrpt_report *ocrpt_report_new(void);
+ocrpt_report *ocrpt_report_new(opencreport *o);
 /*
  * Free an ocrpt_report structure
  * and optionally remove it from the parts list

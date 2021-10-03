@@ -128,25 +128,6 @@ static void processNode(xmlTextReaderPtr reader) {
 	}
 }
 
-static void ocrpt_xml_expr_get_value(opencreport *o, ocrpt_expr *e, char **s, int32_t *i) {
-	ocrpt_result *r;
-
-	if (s)
-		*s = NULL;
-	if (i)
-		*i = 0;
-	if (!e)
-		return;
-
-	r = ocrpt_expr_eval(o, NULL, e);
-	if (r) {
-		if (s && r->type == OCRPT_RESULT_STRING)
-			*s = r->string->str;
-		if (i && OCRPT_RESULT_NUMBER)
-			*i = mpfr_get_si(r->number, o->rndmode);
-	}
-}
-
 static ocrpt_expr *ocrpt_xml_expr_parse(opencreport *o, xmlChar *expr, bool report) {
 	ocrpt_expr *e;
 	char *err;
@@ -169,14 +150,14 @@ static ocrpt_expr *ocrpt_xml_expr_parse(opencreport *o, xmlChar *expr, bool repo
 
 #define ocrpt_xml_expr_parse_get_value_with_fallback(o, expr) { \
 					expr##_e = ocrpt_xml_expr_parse(o, expr, true); \
-					ocrpt_xml_expr_get_value(o, expr##_e, &expr##_s, NULL); \
+					ocrpt_expr_get_value(o, expr##_e, &expr##_s, NULL); \
 					if (!expr##_s) \
 						expr##_s = (char *)expr; \
 				}
 
 #define ocrpt_xml_expr_parse_get_value_with_fallback_noreport(o, expr) { \
 					expr##_e = ocrpt_xml_expr_parse(o, expr, false); \
-					ocrpt_xml_expr_get_value(o, expr##_e, &expr##_s, NULL); \
+					ocrpt_expr_get_value(o, expr##_e, &expr##_s, NULL); \
 					if (!expr##_s) \
 						expr##_s = (char *)expr; \
 				}
@@ -247,12 +228,12 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 	ocrpt_xml_expr_parse_get_value_with_fallback(o, follower_expr);
 
 	cols_e = ocrpt_xml_expr_parse(o, cols, true);
-	ocrpt_xml_expr_get_value(o, cols_e, &cols_s, &cols_i);
+	ocrpt_expr_get_value(o, cols_e, &cols_s, &cols_i);
 	if (cols_s && !cols_i)
 		cols_i = atoi(cols_s);
 
 	rows_e = ocrpt_xml_expr_parse(o, rows, true);
-	ocrpt_xml_expr_get_value(o, rows_e, &rows_s, &rows_i);
+	ocrpt_expr_get_value(o, rows_e, &rows_s, &rows_i);
 	if (rows_s && !cols_i)
 		rows_i = atoi(rows_s);
 
@@ -385,7 +366,7 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	ocrpt_xml_expr_parse_get_value_with_fallback(o, unix_socket);
 
 	port_e = ocrpt_xml_expr_parse(o, port, true);
-	ocrpt_xml_expr_get_value(o, port_e, &port_s, &port_i);
+	ocrpt_expr_get_value(o, port_e, &port_s, &port_i);
 	if (!port_s && port_i > 0) {
 		port_s = alloca(32);
 		sprintf(port_s, "%d", port_i);
@@ -524,7 +505,7 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 
 	if (precalculate) {
 		p = ocrpt_xml_expr_parse(o, precalculate, true);
-		ocrpt_xml_expr_get_value(o, p, &p_s, &p_i);
+		ocrpt_expr_get_value(o, p, &p_s, &p_i);
 		if (p_s && !p_i)
 			p_i = atoi(p_s);
 	}
@@ -731,7 +712,7 @@ static void ocrpt_parse_breaks_node(opencreport *o, ocrpt_report *r, xmlTextRead
 
 static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, xmlTextReaderPtr reader) {
 	/* TODO: parse and process Report node attributes; make it possible for multiple pd nodes to exist in the same pr node */
-	ocrpt_report *r = ocrpt_report_new();
+	ocrpt_report *r = ocrpt_report_new(o);
 	int ret, depth, nodetype;
 
 	ocrpt_part_append_report(o, p, r);

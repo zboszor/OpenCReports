@@ -105,13 +105,26 @@ DLL_EXPORT_SYM void ocrpt_expr_print(opencreport *o, ocrpt_expr *e) {
 }
 
 static void ocrpt_expr_result_deep_print_worker(opencreport *o, ocrpt_expr *e) {
-	ocrpt_string *str = ocrpt_mem_string_new_with_len(NULL, 256);;
+	ocrpt_string *str = ocrpt_mem_string_new_with_len(NULL, 256);
+	int i;
 
-	if (e->type == OCRPT_EXPR) {
-		int i;
-
+	switch (e->type) {
+	case OCRPT_EXPR:
 		for (i = 0; i < e->n_ops; i++)
 			ocrpt_expr_result_deep_print(o, e->ops[i]);
+		break;
+	case OCRPT_EXPR_VVAR:
+		assert(e->var);
+		if (e->var->baseexpr)
+			ocrpt_expr_result_deep_print(o, e->var->baseexpr);
+		if (e->var->intermedexpr)
+			ocrpt_expr_result_deep_print(o, e->var->intermedexpr);
+		if (e->var->intermed2expr)
+			ocrpt_expr_result_deep_print(o, e->var->intermed2expr);
+		ocrpt_expr_result_deep_print(o, e->var->resultexpr);
+		break;
+	default:
+		break;
 	}
 
 	ocrpt_expr_print_worker(o, e, 0, " - ", str);
@@ -420,7 +433,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 						e->result_owned0 = false;
 					}
 					if (!e->result[1]) {
-					assert(var->baseexpr->result[1]);
+						assert(var->baseexpr->result[1]);
 						e->result[1] = var->baseexpr->result[1];
 						e->result_owned1 = false;
 					}
@@ -765,4 +778,23 @@ DLL_EXPORT_SYM bool ocrpt_expr_cmp_results(opencreport *o, ocrpt_expr *e) {
 DLL_EXPORT_SYM void ocrpt_expr_set_iterative_start_value(ocrpt_expr *e, bool start_with_init) {
 	e->iterative_init = true;
 	e->iterative_start_with_init = start_with_init;
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_get_value(opencreport *o, ocrpt_expr *e, char **s, int32_t *i) {
+	ocrpt_result *r;
+
+	if (s)
+		*s = NULL;
+	if (i)
+		*i = 0;
+	if (!e)
+		return;
+
+	r = ocrpt_expr_eval(o, NULL, e);
+	if (r) {
+		if (s && r->type == OCRPT_RESULT_STRING)
+			*s = r->string->str;
+		if (i && OCRPT_RESULT_NUMBER)
+			*i = mpfr_get_si(r->number, o->rndmode);
+	}
 }

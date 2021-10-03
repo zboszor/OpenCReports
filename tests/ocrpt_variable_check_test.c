@@ -29,7 +29,7 @@ int main(void) {
 	ocrpt_var *v;
 	char *err;
 
-	r = ocrpt_report_new();
+	r = ocrpt_report_new(o);
 	ocrpt_part_append_report(o, NULL, r);
 
 	q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 3, 5, coltypes);

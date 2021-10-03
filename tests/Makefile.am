@@ -40,7 +40,8 @@ TESTS = \
 	ocrpt_break_xml3_test \
 	ocrpt_iterative_expr_test \
 	ocrpt_break_rownum_xml_test \
-	ocrpt_variable_xml_test
+	ocrpt_variable_xml_test \
+	ocrpt_variable_resetonbreak_xml_test
 
 # Unstable tests by nature:
 # ocrpt_random_test produces a random number which is different every time

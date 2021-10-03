@@ -30,11 +30,11 @@ int main(void) {
 	o = ocrpt_init();
 
 	p1 = ocrpt_part_new(o);
-	r1 = ocrpt_report_new();
+	r1 = ocrpt_report_new(o);
 	ocrpt_part_append_report(o, p1, r1);
 
 	p2 = ocrpt_part_new(o);
-	r2 = ocrpt_report_new();
+	r2 = ocrpt_report_new(o);
 	ocrpt_part_append_report(o, p2, r2);
 
 	printf("Allocated two parts and one report for each part\n");
@@ -51,10 +51,10 @@ int main(void) {
 	p1 = ocrpt_part_new(o);
 
 	p2 = ocrpt_part_new(o);
-	r1 = ocrpt_report_new();
+	r1 = ocrpt_report_new(o);
 	ocrpt_part_append_report(o, p2, r1);
 
-	r2 = ocrpt_report_new();
+	r2 = ocrpt_report_new(o);
 	ocrpt_part_append_report(o, p2, r2);
 
 	printf("Allocated two parts and two reports for the second part\n");
