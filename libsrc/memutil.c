@@ -168,7 +168,7 @@ DLL_EXPORT_SYM char *ocrpt_mem_string_free(ocrpt_string *string, bool free_str) 
 	return str;
 }
 
-void ocrpt_mem_string_append_len(ocrpt_string *string, const char *str, const size_t len) {
+DLL_EXPORT_SYM void ocrpt_mem_string_append_len(ocrpt_string *string, const char *str, const size_t len) {
 	char *end;
 
 	if (!string)
@@ -191,7 +191,7 @@ void ocrpt_mem_string_append_len(ocrpt_string *string, const char *str, const si
 	string->len = end - string->str;
 }
 
-void ocrpt_mem_string_append(ocrpt_string *string, const char *str) {
+DLL_EXPORT_SYM void ocrpt_mem_string_append(ocrpt_string *string, const char *str) {
 	size_t len;
 
 	if (!string)
@@ -203,7 +203,7 @@ void ocrpt_mem_string_append(ocrpt_string *string, const char *str) {
 	ocrpt_mem_string_append_len(string, str, len);
 }
 
-void ocrpt_mem_string_append_c(ocrpt_string *string, const char c) {
+DLL_EXPORT_SYM void ocrpt_mem_string_append_c(ocrpt_string *string, const char c) {
 	if (!string)
 		return;
 
@@ -219,4 +219,25 @@ void ocrpt_mem_string_append_c(ocrpt_string *string, const char c) {
 
 	string->str[string->len++] = c;
 	string->str[string->len] = 0;
+}
+
+DLL_EXPORT_SYM void ocrpt_mem_string_append_printf(ocrpt_string *string, const char *format, ...) {
+	va_list va;
+	ocrpt_string *newstr;
+	size_t len;
+
+	va_start(va, format);
+	len = ocrpt_mem_vnprintf_size_from_string(format, va);
+	va_end(va);
+
+	if (len <= 0)
+		return;
+
+	va_start(va, format);
+	newstr = ocrpt_mem_string_new_vnprintf(len, format, va);
+	va_end(va);
+
+	ocrpt_mem_string_append_len(string, newstr->str, newstr->len);
+
+	ocrpt_mem_string_free(newstr, true);
 }

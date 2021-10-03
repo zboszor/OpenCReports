@@ -676,6 +676,7 @@ char *ocrpt_mem_string_free(ocrpt_string *string, bool free_str);
 void ocrpt_mem_string_append_len(ocrpt_string *string, const char *str, const size_t len);
 void ocrpt_mem_string_append(ocrpt_string *string, const char *str);
 void ocrpt_mem_string_append_c(ocrpt_string *string, const char c);
+void ocrpt_mem_string_append_printf(ocrpt_string *string, const char *format, ...);
 
 /********************************
  * Paper size related functions *
