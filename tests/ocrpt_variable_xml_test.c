@@ -89,8 +89,6 @@ int main(void) {
 
 		printf("\n");
 
-		ocrpt_report_evaluate_variables(o, r);
-
 		for (i = 0; i < N_TEST_VARS; i++) {
 			printf("Expression: ");
 			ocrpt_expr_print(o, e[i]);
