@@ -30,7 +30,8 @@ TESTS = \
 	ocrpt_odbc5_test ocrpt_odbc6_test ocrpt_odbc7_test \
 	ocrpt_odbc_xml_test ocrpt_odbc_xml2_test ocrpt_odbc_xml3_test \
 	ocrpt_odbc_xml4_test \
-	ocrpt_circular_follower_test \
+	ocrpt_follower_circular_test \
+	ocrpt_follower_invalidref_test \
 	ocrpt_rownum_test \
 	ocrpt_part_test ocrpt_part_xml_test \
 	ocrpt_locale_test \

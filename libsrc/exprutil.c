@@ -566,7 +566,7 @@ static bool ocrpt_expr_reference_worker(opencreport *o, ocrpt_report *r, ocrpt_e
 	case OCRPT_EXPR_VVAR:
 		if ((varref_include_mask & OCRPT_VARREF_VVAR)) {
 			found = true;
-			if (!e->var) {
+			if (r && !e->var) {
 				ocrpt_list *l;
 
 				for (l = r->variables; l; l = l->next) {
@@ -588,14 +588,52 @@ static bool ocrpt_expr_reference_worker(opencreport *o, ocrpt_report *r, ocrpt_e
 		}
 		break;
 	case OCRPT_EXPR_IDENT:
-		if ((varref_include_mask & OCRPT_VARREF_IDENT))
+		if ((varref_include_mask & OCRPT_VARREF_IDENT)) {
+			ocrpt_list *ptr;
+			bool domain_found = false;
+			bool ident_found = false;
+
 			found = true;
+
+			for (ptr = o->queries; ptr; ptr = ptr->next) {
+				ocrpt_query *q = (ocrpt_query *)ptr->data;
+				ocrpt_query_result *qr = NULL;
+				int32_t cols;
+
+				/* Identifier is domain-qualified and it doesn't match the query name */
+				if (e->query) {
+					if (strcmp(e->query->str, q->name))
+						continue;
+					domain_found = true;
+				}
+
+				/* ocrpt_query_get_result() cannot be used here, we need the whole array */
+				if (!q->result)
+					q->source->input->describe(q, &q->result, &q->cols);
+				qr = q->result;
+				cols = (q->result ? q->cols : 0);
+
+				for (i = 0; i < cols; i++) {
+					if (!strcmp(e->name->str, qr[i].name)) {
+						if (!e->result[0])
+							e->result[0] = &qr[i].result;
+						if (!e->result[1])
+							e->result[1] = &qr[cols + i].result;
+						ident_found = true;
+						break;
+					}
+				}
+			}
+			if (!ident_found || (e->query && e->query->len > 0 && !domain_found)) {
+				if (varref_vartype_mask)
+					*varref_vartype_mask |= OCRPT_IDENT_UNKNOWN_BIT;
+			}
+		}
 		break;
 	case OCRPT_EXPR:
 		for (i = 0; i < e->n_ops; i++) {
-			found = found || ocrpt_expr_reference_worker(o, r, e->ops[i], varref_include_mask, varref_vartype_mask);
-			if (found)
-				break;
+			bool found1 = ocrpt_expr_reference_worker(o, r, e->ops[i], varref_include_mask, varref_vartype_mask);
+			found = found || found1;
 		}
 		break;
 	default:

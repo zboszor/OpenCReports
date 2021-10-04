@@ -415,14 +415,34 @@ static bool ocrpt_query_follower_validity(opencreport *o, ocrpt_query *leader, o
 DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(opencreport *o, ocrpt_query *leader, ocrpt_query *follower, ocrpt_expr *match) {
 	ocrpt_query_follower *fo;
 	int32_t len;
+	uint32_t mask;
 	bool ret;
 
-	if (!ocrpt_query_follower_validity(o, leader, follower))
+	if (!ocrpt_query_follower_validity(o, leader, follower)) {
+		ocrpt_expr_free(match);
 		return false;
+	}
+
+	if (ocrpt_expr_references(o, NULL, match, OCRPT_VARREF_MVAR | OCRPT_VARREF_RVAR | OCRPT_VARREF_VVAR, NULL)) {
+		fprintf(stderr, "invalid expression for follower query\n");
+		ocrpt_expr_free(match);
+		return false;
+	}
+
+	mask = 0;
+	if (ocrpt_expr_references(o, NULL, match, OCRPT_VARREF_IDENT, &mask)) {
+		if ((mask & OCRPT_IDENT_UNKNOWN_BIT) == OCRPT_IDENT_UNKNOWN_BIT) {
+			fprintf(stderr, "invalid expression for follower query\n");
+			ocrpt_expr_free(match);
+			return false;
+		}
+	}
 
 	fo = ocrpt_mem_malloc(sizeof(ocrpt_query_follower));
-	if (!fo)
+	if (!fo) {
+		ocrpt_expr_free(match);
 		return false;
+	}
 
 	fo->follower = follower;
 	fo->expr = match;
@@ -431,8 +451,10 @@ DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(opencreport *o, ocrpt_query 
 	leader->followers_n_to_1 = ocrpt_list_append(leader->followers_n_to_1, fo);
 	ret = (len < ocrpt_list_length(leader->followers_n_to_1));
 
-	if (!ret)
+	if (!ret) {
+		ocrpt_expr_free(match);
 		ocrpt_mem_free(fo);
+	}
 
 	ocrpt_expr_optimize(o, NULL, match);
 	ocrpt_expr_resolve(o, NULL, match);
