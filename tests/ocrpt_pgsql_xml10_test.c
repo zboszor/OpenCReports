@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 #include <opencreport.h>
-#include "ocrpt_test_common.c"
+#include "ocrpt_test_common.h"
 
 const enum ocrpt_result_type coltypes[5] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER

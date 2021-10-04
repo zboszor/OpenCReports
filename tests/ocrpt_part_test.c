@@ -8,7 +8,7 @@
 
 #include "opencreport.h"
 
-#include "ocrpt_test_common.c"
+#include "ocrpt_test_common.h"
 
 int main(void) {
 	opencreport *o = ocrpt_init();

@@ -4,6 +4,9 @@
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
+#ifndef _OCRPT_TEST_COMMON_H_
+#define _OCRPT_TEST_COMMON_H_
+
 #ifndef UNUSED
 #define UNUSED __attribute__((unused))
 #endif
@@ -38,3 +41,5 @@ static void print_part_reports(char *name, ocrpt_part *p) {
 		printf("\n");
 	}
 }
+
+#endif

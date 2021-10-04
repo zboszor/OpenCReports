@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #include <opencreport.h>
-#include "ocrpt_test_common.c"
+#include "ocrpt_test_common.h"
 
 static ocrpt_expr *id, *name, *age, *adult;
 
