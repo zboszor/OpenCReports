@@ -309,6 +309,8 @@ struct ocrpt_report {
 	ocrpt_list *variables;
 	/* List of ocrpt_break elements */
 	ocrpt_list *breaks;
+	/* List of ocrpt_result arrays */
+	ocrpt_list *delayed_results;
 	/*
 	 * Number of expression in the report
 	 * including internal ones created for variables
@@ -554,9 +556,17 @@ void ocrpt_variable_resolve(opencreport *o, ocrpt_report *r, ocrpt_var *v);
  */
 void ocrpt_variable_evaluate(opencreport *o, ocrpt_report *r, ocrpt_var *v);
 /*
+ * Copy result value
+ */
+void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_result *src);
+/*
  * Print the result data. Good for unit testing.
  */
 void ocrpt_result_print(ocrpt_result *r);
+/*
+ * Free data inside ocrpt_result but not the struct itself
+ */
+void ocrpt_result_free_data(ocrpt_result *r);
 /*
  * Free an ocrpt_result structure
  */

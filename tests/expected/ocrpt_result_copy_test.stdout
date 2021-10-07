@@ -1,0 +1,57 @@
+.'id'
+.'name'
+error((string)Error)
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 1.000000)
+	Col #1: 'name': string value: Fred Flintstone
+	Col #2: 'property': string value: strong
+	Col #3: 'age': string value: NULL (converted to number: 31.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: .'id'
+Evaluated: (number)1.000000
+Copied: (number)1.000000
+Expression: .'name'
+Evaluated: (string)Fred Flintstone
+Copied: (string)Fred Flintstone
+Expression: error((string)Error)
+Evaluated: (ERROR)Error
+Copied: (ERROR)Error
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: NULL
+	Col #1: 'name': string value: Wilma Flintstone
+	Col #2: 'property': string value: charming
+	Col #3: 'age': string value: NULL (converted to number: 28.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: .'id'
+Evaluated: (number)NULL
+Copied: (number)NULL
+Expression: .'name'
+Evaluated: (string)Wilma Flintstone
+Copied: (string)Wilma Flintstone
+Expression: error((string)Error)
+Evaluated: (ERROR)Error
+Copied: (ERROR)Error
+
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 3.000000)
+	Col #1: 'name': string value: Pebbles Flintstone
+	Col #2: 'property': string value: young
+	Col #3: 'age': string value: NULL (converted to number: 0.500000)
+	Col #4: 'adult': string value: NULL (converted to number: 0.000000)
+
+Expression: .'id'
+Evaluated: (number)3.000000
+Copied: (number)3.000000
+Expression: .'name'
+Evaluated: (string)Pebbles Flintstone
+Copied: (string)Pebbles Flintstone
+Expression: error((string)Error)
+Evaluated: (ERROR)Error
+Copied: (ERROR)Error
+

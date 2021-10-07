@@ -137,6 +137,47 @@ DLL_EXPORT_SYM void ocrpt_expr_result_deep_print(opencreport *o, ocrpt_expr *e) 
 	ocrpt_expr_result_deep_print_worker(o, e);
 }
 
+DLL_EXPORT_SYM void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_result *src) {
+	if (!src || !dst)
+		return;
+
+	dst->type = src->type;
+	dst->isnull = src->isnull;
+
+	if (!src->isnull) {
+		switch (src->type) {
+		case OCRPT_RESULT_ERROR:
+		case OCRPT_RESULT_STRING:
+			if (!src->string) {
+				dst->isnull = true;
+				break;
+			}
+			if (!dst->string) {
+				dst->string = ocrpt_mem_string_new_with_len(src->string->str, src->string->len);
+				dst->string_owned = true;
+			} else {
+				/* Probably a new ocrpt_mem_string_copy() is needed */
+				ocrpt_mem_string_resize(dst->string, src->string->len);
+				memcpy(dst->string->str, src->string->str, src->string->len);
+				dst->string->len = src->string->len;
+				dst->string->str[dst->string->len] = 0;
+			}
+			break;
+		case OCRPT_RESULT_NUMBER:
+			if (!dst->number_initialized) {
+				mpfr_init2(dst->number, o->prec);
+				dst->number_initialized = true;
+			}
+			mpfr_set(dst->number, src->number, o->rndmode);
+			break;
+		case OCRPT_RESULT_DATETIME:
+			/* TODO */
+			break;
+		}
+	}
+
+}
+
 DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
 	if (!r) {
 		printf("ERROR: ocrpt_result is NULL\n");
@@ -145,7 +186,7 @@ DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
 
 	switch (r->type) {
 	case OCRPT_RESULT_ERROR:
-		printf("(ERROR)%s\n", r->isnull ? "NULL" : r->string->str);
+		printf("(ERROR)%s\n", (r->isnull || !r->string) ? "NULL" : r->string->str);
 		break;
 	case OCRPT_RESULT_STRING:
 		printf("(string)%s\n", (r->isnull || !r->string) ? "NULL" : r->string->str);
