@@ -163,14 +163,14 @@ static ocrpt_expr *ocrpt_xml_expr_parse(opencreport *o, xmlChar *expr, bool repo
 				}
 
 static void ocrpt_ignore_child_nodes(opencreport *o, xmlTextReaderPtr reader, const char *leaf_name) {
-	int ret, depth, nodetype;
+	int depth, nodetype;
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
 	depth = xmlTextReaderDepth(reader);
 
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
+	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		nodetype = xmlTextReaderNodeType(reader);
@@ -315,14 +315,14 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 }
 
 static void ocrpt_parse_queries_node(opencreport *o, xmlTextReaderPtr reader) {
-	int ret, depth, nodetype;
+	int depth, nodetype;
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
 	depth = xmlTextReaderDepth(reader);
 
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
+	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		nodetype = xmlTextReaderNodeType(reader);
@@ -435,14 +435,14 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 }
 
 static void ocrpt_parse_datasources_node(opencreport *o, xmlTextReaderPtr reader) {
-	int ret, depth, nodetype;
+	int depth, nodetype;
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
 	depth = xmlTextReaderDepth(reader);
 
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
+	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		nodetype = xmlTextReaderNodeType(reader);
@@ -470,7 +470,7 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 	ocrpt_var_type vtype = OCRPT_VARIABLE_EXPRESSION; /* default if left out */
 	ocrpt_expr *e = NULL, *p = NULL;
 	char *p_s;
-	int32_t p_i;
+	int32_t p_i = 0;
 	bool good = true;
 
 	if (strcasecmp((char *)type, "count") == 0)
@@ -523,14 +523,14 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 }
 
 static void ocrpt_parse_variables_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr reader) {
-	int ret, depth, nodetype;
+	int depth, nodetype;
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
 	depth = xmlTextReaderDepth(reader);
 
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
+	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		nodetype = xmlTextReaderNodeType(reader);
@@ -566,7 +566,7 @@ static bool ocrpt_parse_breakfield_node(opencreport *o, ocrpt_report *r, ocrpt_b
 }
 
 static bool ocrpt_parse_breakfields_node(opencreport *o, ocrpt_report *r, ocrpt_break *br, xmlTextReaderPtr reader) {
-	int ret, depth, nodetype;
+	int depth, nodetype;
 	bool have_breakfield = false;
 
 	/* No BreakField sub-element */
@@ -575,7 +575,7 @@ static bool ocrpt_parse_breakfields_node(opencreport *o, ocrpt_report *r, ocrpt_
 
 	depth = xmlTextReaderDepth(reader);
 
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
+	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		nodetype = xmlTextReaderNodeType(reader);
@@ -599,7 +599,7 @@ static bool ocrpt_parse_breakfields_node(opencreport *o, ocrpt_report *r, ocrpt_
 static void ocrpt_break_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr reader) {
 	xmlChar *brname, *newpage, *headernewpage, *suppressblank;
 	ocrpt_break *br;
-	int ret, depth, nodetype;
+	int depth, nodetype;
 	bool have_breakfield = false;
 
 	brname = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
@@ -624,7 +624,7 @@ static void ocrpt_break_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr r
 
 	depth = xmlTextReaderDepth(reader);
 
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
+	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		nodetype = xmlTextReaderNodeType(reader);
@@ -682,14 +682,14 @@ static void ocrpt_break_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr r
 }
 
 static void ocrpt_parse_breaks_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr reader) {
-	int ret, depth, nodetype;
+	int depth, nodetype;
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
 	depth = xmlTextReaderDepth(reader);
 
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
+	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		nodetype = xmlTextReaderNodeType(reader);
@@ -711,7 +711,7 @@ static void ocrpt_parse_breaks_node(opencreport *o, ocrpt_report *r, xmlTextRead
 static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, xmlTextReaderPtr reader) {
 	/* TODO: parse and process Report node attributes; make it possible for multiple pd nodes to exist in the same pr node */
 	ocrpt_report *r = ocrpt_report_new(o);
-	int ret, depth, nodetype;
+	int depth, nodetype;
 
 	ocrpt_part_append_report(o, p, r);
 
@@ -719,7 +719,7 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, xmlTextReader
 		return;
 
 	depth = xmlTextReaderDepth(reader);
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
+	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		//processNode(reader);
@@ -764,13 +764,13 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, xmlTextReader
 
 static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, xmlTextReaderPtr reader) {
 	/* TODO: parse and process pd node attributes */
-	int ret, depth, nodetype;
+	int depth, nodetype;
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
 	depth = xmlTextReaderDepth(reader);
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
+	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		//processNode(reader);
@@ -793,7 +793,7 @@ static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, xmlTextReaderPtr 
 
 static void ocrpt_parse_partrow_node(opencreport *o, ocrpt_part *p, xmlTextReaderPtr reader) {
 	/* TODO: parse and process pr node attributes */
-	int ret, depth, nodetype;
+	int depth, nodetype;
 
 	ocrpt_part_new_row(o, p);
 
@@ -801,7 +801,7 @@ static void ocrpt_parse_partrow_node(opencreport *o, ocrpt_part *p, xmlTextReade
 		return;
 
 	depth = xmlTextReaderDepth(reader);
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
+	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		//processNode(reader);
@@ -825,13 +825,13 @@ static void ocrpt_parse_partrow_node(opencreport *o, ocrpt_part *p, xmlTextReade
 static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 	/* TODO: parse and process Part node attributes */
 	ocrpt_part *p = ocrpt_part_new(o);
-	int ret, depth, nodetype;
+	int depth, nodetype;
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
 	depth = xmlTextReaderDepth(reader);
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
+	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		//processNode(reader);
@@ -863,14 +863,14 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 }
 
 static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader) {
-	int ret, depth, nodetype;
+	int depth, nodetype;
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
 	depth = xmlTextReaderDepth(reader);
 
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
+	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 
 		//processNode(reader);
@@ -900,7 +900,6 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 DLL_EXPORT_SYM bool ocrpt_parse_xml(opencreport *o, const char *filename) {
 	xmlTextReaderPtr reader;
 	bool retval = true;
-	int ret;
 
 	reader = xmlReaderForFile(filename, NULL, XML_PARSE_RECOVER |
 								XML_PARSE_NOENT | XML_PARSE_NOBLANKS |
@@ -909,7 +908,7 @@ DLL_EXPORT_SYM bool ocrpt_parse_xml(opencreport *o, const char *filename) {
 	if (!reader)
 		return false;
 
-	while ((ret = xmlTextReaderRead(reader)) == 1) {
+	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
 		int nodeType = xmlTextReaderNodeType(reader);
 		int depth = xmlTextReaderDepth(reader);
