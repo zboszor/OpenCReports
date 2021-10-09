@@ -389,6 +389,9 @@ struct opencreport {
 
 	/* Alternating datasource row result index  */
 	bool residx:1;
+
+	/* Debugging bits */
+	bool debug_report_ptr:1;
 };
 
 /*

@@ -50,7 +50,8 @@ TESTS = \
 # ocrpt_paper_test prints paper sizes and defaults which depends on language settings
 UNSTABLE_TESTS = \
 	ocrpt_random_test \
-	ocrpt_paper_test
+	ocrpt_paper_test \
+	ocrpt_execute_test
 
 noinst_PROGRAMS = $(TESTS) $(UNSTABLE_TESTS)
 

@@ -1,0 +1,24 @@
+ocrpt_part_append_report: appending ocrpt_report 0x607000000100
+ocrpt_part_append_report: appending ocrpt_report 0x607000000170
+ocrpt_part_append_report: appending ocrpt_report 0x6070000001e0
+ocrpt_part_append_report: appending ocrpt_report 0x607000000250
+ocrpt_part_append_report: appending ocrpt_report 0x6070000002c0
+ocrpt_part_append_report: appending ocrpt_report 0x607000000330
+ocrpt_part_append_report: appending ocrpt_report 0x6070000003a0
+ocrpt_part_append_report: appending ocrpt_report 0x607000000410
+ocrpt_part_append_report: appending ocrpt_report 0x607000000480
+ocrpt_part_append_report: appending ocrpt_report 0x6070000004f0
+ocrpt_part_append_report: appending ocrpt_report 0x607000000560
+ocrpt_part_append_report: appending ocrpt_report 0x6070000005d0
+ocrpt_execute: report 0x607000000100 is executing
+ocrpt_execute: report 0x607000000170 is executing
+ocrpt_execute: report 0x6070000001e0 is executing
+ocrpt_execute: report 0x607000000250 is executing
+ocrpt_execute: report 0x6070000002c0 is executing
+ocrpt_execute: report 0x607000000330 is executing
+ocrpt_execute: report 0x6070000003a0 is executing
+ocrpt_execute: report 0x607000000410 is executing
+ocrpt_execute: report 0x607000000480 is executing
+ocrpt_execute: report 0x6070000004f0 is executing
+ocrpt_execute: report 0x607000000560 is executing
+ocrpt_execute: report 0x6070000005d0 is executing

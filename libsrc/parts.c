@@ -34,6 +34,9 @@ DLL_EXPORT_SYM ocrpt_list *ocrpt_part_new_row(opencreport *o, ocrpt_part *p) {
 DLL_EXPORT_SYM void ocrpt_part_append_report(opencreport *o, ocrpt_part *p, ocrpt_report *r) {
 	ocrpt_list *lr;
 
+	if (o->debug_report_ptr)
+		fprintf(stderr, "%s: appending ocrpt_report %p\n", __func__, r);
+
 	if (!p)
 		p = ocrpt_part_new(o);
 

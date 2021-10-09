@@ -125,7 +125,25 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	if (!o)
 		return false;
 
-	return false;
+	for (ocrpt_list *pl = o->parts; pl; pl = pl->next) {
+		ocrpt_part *p = (ocrpt_part *)pl->data;
+
+		for (ocrpt_list *row = p->rows; row; row = row->next) {
+			for (ocrpt_list *pdl = (ocrpt_list *)row->data; pdl; pdl = pdl->next) {
+				ocrpt_report *r = (ocrpt_report *)pdl->data;
+
+				r->executing = true;
+
+				/* TODO: execute report */
+				if (o->debug_report_ptr)
+					fprintf(stderr, "%s: report %p is executing\n", __func__, r);
+
+				r->executing = false;
+			}
+		}
+	}
+
+	return true;
 }
 
 static int papersortcmp(const void *a, const void *b) {
