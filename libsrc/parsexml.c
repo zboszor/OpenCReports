@@ -467,7 +467,7 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 	xmlChar *type = xmlTextReaderGetAttribute(reader, (const xmlChar *)"type");
 	xmlChar *resetonbreak = xmlTextReaderGetAttribute(reader, (const xmlChar *)"resetonbreak");
 	xmlChar *precalculate = xmlTextReaderGetAttribute(reader, (const xmlChar *)"precalculate");
-	ocrpt_var_type vtype = OCRPT_VARIABLE_EXPRESSION; /* */
+	ocrpt_var_type vtype = OCRPT_VARIABLE_EXPRESSION; /* default if left out */
 	ocrpt_expr *e = NULL, *p = NULL;
 	char *p_s;
 	int32_t p_i;
