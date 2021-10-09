@@ -116,7 +116,7 @@ exp:
 
 								$1->name = NULL;
 								extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, $1);
-								ocrpt_expr_free($1);
+								ocrpt_expr_free(extra->o, extra->r, $1);
 								$$ = newexpr(yyscanner, fname, $3);
 							}
 	| '(' exp ')'			{
@@ -245,7 +245,7 @@ exp:
 											ocrpt_string *fname = $1->name;
 
 											$1->name = NULL;
-											ocrpt_expr_free($1);
+											ocrpt_expr_free(extra->o, extra->r, $1);
 											$$ = newexpr(yyscanner, fname, $4);
 										} else {
 											ocrpt_list *list = $4;
@@ -266,7 +266,7 @@ exp:
 
 									$1->name = NULL;
 									extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, $1);
-									ocrpt_expr_free($1);
+									ocrpt_expr_free(extra->o, extra->r, $1);
 									$$ = newexpr(yyscanner, fname, $4);
 								}
 							}
@@ -384,11 +384,12 @@ void yyset_debug(int  _bdebug , yyscan_t yyscanner);
 /* parser_init()
  * Initialize to parse one query string
  */
-void parser_init(base_yy_extra_type *yyext, opencreport *o) {
+void parser_init(base_yy_extra_type *yyext, opencreport *o, ocrpt_report *r) {
 	yyext->tokens = NULL;
 	yyext->parsed_exprs = NULL;
 	yyext->parsed_arglist = NULL;
 	yyext->o = o;
+	yyext->r = r;
 	yyext->err = NULL;
 }
 
@@ -420,7 +421,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, con
 #endif
 
 		/* initialize the bison parser */
-		parser_init(&yyextra, o);
+		parser_init(&yyextra, o, r);
 
 		/* Parse! */
 		yyresult = yyparse(yyscanner);
@@ -430,9 +431,16 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, con
 	scanner_finish(yyscanner);
 
 	if (yyresult) {
+		ocrpt_list *ptr;
+
 		ocrpt_list_free_deep(yyextra.tokens, (ocrpt_mem_free_t)ocrpt_grammar_free_token);
 		ocrpt_list_free(yyextra.parsed_arglist);
-		ocrpt_list_free_deep(yyextra.parsed_exprs, (ocrpt_mem_free_t)ocrpt_expr_free);
+
+		for (ptr = yyextra.parsed_exprs; ptr; ptr = ptr->next) {
+			ocrpt_expr *e = (ocrpt_expr *)ptr->data;
+			ocrpt_expr_free(o, r, e);
+		}
+		ocrpt_list_free(yyextra.parsed_exprs);
 
 		if (err)
 			*err = yyextra.err;
@@ -445,8 +453,11 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, con
 	ocrpt_list_free(yyextra.parsed_arglist);
 	ocrpt_list_free(yyextra.parsed_exprs);
 
-	if (r)
+	if (r && !r->executing) {
+		r->exprs = ocrpt_list_end_append(r->exprs, &r->exprs_last, yyextra.last_expr);
 		yyextra.last_expr->result_index = r->num_expressions++;
+		yyextra.last_expr->result_index_set = true;
+	}
 
 	return yyextra.last_expr;
 }
@@ -474,8 +485,8 @@ static void print_token_value (FILE *file, int type, YYSTYPE value) {
 }
 
 static ocrpt_expr *newblankexpr1(yyscan_t yyscanner, enum ocrpt_expr_type type, uint32_t n_ops) {
-	ocrpt_expr *e = newblankexpr(type, n_ops);
 	base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
+	ocrpt_expr *e = newblankexpr(extra->o, extra->r, type, n_ops);
 
 	if (!e)
 		parser_yyerror("out of memory");

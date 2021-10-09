@@ -88,7 +88,9 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_report_new(opencreport *o) {
 DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_variables_free(o, r);
 	ocrpt_breaks_free(o, r);
-	ocrpt_expr_free(r->query_rownum);
+	ocrpt_list_free(r->exprs);
+	r->exprs = r->exprs_last = NULL;
+	ocrpt_expr_free(o, r, r->query_rownum);
 	ocrpt_mem_free(r->query);
 	ocrpt_mem_free(r);
 }

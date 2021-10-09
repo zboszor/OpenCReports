@@ -56,6 +56,7 @@ typedef struct base_yy_extra_type {
 
 	jmp_buf env;
 	opencreport *o;
+	ocrpt_report *r;
 	ocrpt_expr *last_expr;
 	ocrpt_list *tokens;
 	ocrpt_list *parsed_exprs;
@@ -74,7 +75,6 @@ YYSTYPE *yyget_lval(yyscan_t yyscanner);
 
 extern void scanner_yyerror(const char *message, yyscan_t yyscanner) __attribute__((noreturn));
 
-void parser_init(base_yy_extra_type *yyext, opencreport *o);
 int  yyparse(yyscan_t yyscanner);
 
 #endif /* _SCANNER_H_ */

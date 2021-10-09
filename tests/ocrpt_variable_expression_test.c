@@ -79,7 +79,7 @@ int main(void) {
 		printf("\n");
 	}
 
-	ocrpt_expr_free(e);
+	ocrpt_expr_free(o, r, e);
 
 	ocrpt_free(o);
 

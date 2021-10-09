@@ -90,9 +90,9 @@ int main(void) {
 		printf("\n");
 	}
 
-	ocrpt_expr_free(id);
-	ocrpt_expr_free(name);
-	ocrpt_expr_free(err);
+	ocrpt_expr_free(o, NULL, id);
+	ocrpt_expr_free(o, NULL, name);
+	ocrpt_expr_free(o, NULL, err);
 	ocrpt_result_free_data(&rs);
 
 	/* ocrpt_free() will free it */

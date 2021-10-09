@@ -113,7 +113,7 @@ int main(void) {
 	 * free this expression to avoid use-after-free
 	 * after freeing and re-creating q2 a.k.a. query 'b'
 	 */
-	ocrpt_expr_free(rownum3);
+	ocrpt_expr_free(o, NULL, rownum3);
 
 	ocrpt_query_free(o, q2);
 
@@ -178,10 +178,10 @@ int main(void) {
 
 	printf("--- END ---\n");
 
-	ocrpt_expr_free(id);
-	ocrpt_expr_free(rownum1);
-	ocrpt_expr_free(rownum2);
-	ocrpt_expr_free(rownum3);
+	ocrpt_expr_free(o, NULL, id);
+	ocrpt_expr_free(o, NULL, rownum1);
+	ocrpt_expr_free(o, NULL, rownum2);
+	ocrpt_expr_free(o, NULL, rownum3);
 
 	/* ocrpt_free() will free it */
 	//ocrpt_free_query(o, q);

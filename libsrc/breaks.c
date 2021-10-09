@@ -75,8 +75,14 @@ DLL_EXPORT_SYM bool ocrpt_break_set_attribute_from_expr(opencreport *o, ocrpt_re
 }
 
 DLL_EXPORT_SYM void ocrpt_break_free(opencreport *o, ocrpt_report *r, ocrpt_break *br) {
-	ocrpt_list_free_deep(br->breakfields, (ocrpt_mem_free_t)ocrpt_expr_free);
-	ocrpt_expr_free(br->rownum);
+	ocrpt_list *ptr;
+
+	for (ptr = br->breakfields; ptr; ptr = ptr->next) {
+		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
+		ocrpt_expr_free(o, r, e);
+	}
+	ocrpt_list_free(br->breakfields);
+	ocrpt_expr_free(o, r, br->rownum);
 	ocrpt_mem_free(br->name);
 	ocrpt_mem_free(br);
 }
@@ -133,19 +139,19 @@ DLL_EXPORT_SYM bool ocrpt_break_add_breakfield(opencreport *o, ocrpt_report *r, 
 		return false;
 
 	if (!ocrpt_break_validate(o, r, br)) {
-		ocrpt_expr_free(bf);
+		ocrpt_expr_free(o, r, bf);
 		return false;
 	}
 
 	if (ocrpt_expr_references(o, r, bf, OCRPT_VARREF_VVAR, &vartypes)) {
 		if ((vartypes & OCRPT_VARIABLE_UNKNOWN_BIT)) {
 			fprintf(stderr, "breakfield for '%s' references an unknown variable name\n", br->name);
-			ocrpt_expr_free(bf);
+			ocrpt_expr_free(o, r, bf);
 			return false;
 		}
 		if ((vartypes & ~OCRPT_VARIABLE_EXPRESSION_BIT) != 0) {
 			fprintf(stderr, "breakfield for '%s' may only reference expression variables\n", br->name);
-			ocrpt_expr_free(bf);
+			ocrpt_expr_free(o, r, bf);
 			return false;
 		}
 	}

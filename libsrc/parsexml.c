@@ -304,14 +304,14 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 	xmlFree(rows);
 	xmlFree(cols);
 	xmlFree(coltypes);
-	ocrpt_expr_free(name_e);
-	ocrpt_expr_free(datasource_e);
-	ocrpt_expr_free(value_e);
-	ocrpt_expr_free(follower_for_e);
-	ocrpt_expr_free(follower_expr_e);
-	ocrpt_expr_free(cols_e);
-	ocrpt_expr_free(rows_e);
-	ocrpt_expr_free(coltypes_e);
+	ocrpt_expr_free(o, NULL, name_e);
+	ocrpt_expr_free(o, NULL, datasource_e);
+	ocrpt_expr_free(o, NULL, value_e);
+	ocrpt_expr_free(o, NULL, follower_for_e);
+	ocrpt_expr_free(o, NULL, follower_expr_e);
+	ocrpt_expr_free(o, NULL, cols_e);
+	ocrpt_expr_free(o, NULL, rows_e);
+	ocrpt_expr_free(o, NULL, coltypes_e);
 }
 
 static void ocrpt_parse_queries_node(opencreport *o, xmlTextReaderPtr reader) {
@@ -419,17 +419,17 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	xmlFree(connstr);
 	xmlFree(optionfile);
 	xmlFree(group);
-	ocrpt_expr_free(name_e);
-	ocrpt_expr_free(type_e);
-	ocrpt_expr_free(host_e);
-	ocrpt_expr_free(unix_socket_e);
-	ocrpt_expr_free(port_e);
-	ocrpt_expr_free(dbname_e);
-	ocrpt_expr_free(user_e);
-	ocrpt_expr_free(password_e);
-	ocrpt_expr_free(connstr_e);
-	ocrpt_expr_free(optionfile_e);
-	ocrpt_expr_free(group_e);
+	ocrpt_expr_free(o, NULL, name_e);
+	ocrpt_expr_free(o, NULL, type_e);
+	ocrpt_expr_free(o, NULL, host_e);
+	ocrpt_expr_free(o, NULL, unix_socket_e);
+	ocrpt_expr_free(o, NULL, port_e);
+	ocrpt_expr_free(o, NULL, dbname_e);
+	ocrpt_expr_free(o, NULL, user_e);
+	ocrpt_expr_free(o, NULL, password_e);
+	ocrpt_expr_free(o, NULL, connstr_e);
+	ocrpt_expr_free(o, NULL, optionfile_e);
+	ocrpt_expr_free(o, NULL, group_e);
 
 	ocrpt_ignore_child_nodes(o, reader, "Datasource");
 }
@@ -496,7 +496,7 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 		e = ocrpt_expr_parse(o, r, (char *)value, NULL);
 		if (!e) {
 			good = false;
-			ocrpt_expr_free(e);
+			ocrpt_expr_free(o, r, e);
 		}
 	} else
 		good = false;

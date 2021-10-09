@@ -45,22 +45,22 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 
 	if (!o) {
 		fprintf(stderr, "invalid variable definitition: valid opencreport pointer expected\n");
-		ocrpt_expr_free(e);
+		ocrpt_expr_free(o, r, e);
 		return NULL;
 	}
 	if (!r) {
 		fprintf(stderr, "invalid variable definitition: valid ocrpt_report pointer expected\n");
-		ocrpt_expr_free(e);
+		ocrpt_expr_free(o, r, e);
 		return NULL;
 	}
 	if (!name) {
 		fprintf(stderr, "invalid variable definitition: valid name expected\n");
-		ocrpt_expr_free(e);
+		ocrpt_expr_free(o, r, e);
 		return NULL;
 	}
 
 	if (!ocrpt_report_validate(o, r)) {
-		ocrpt_expr_free(e);
+		ocrpt_expr_free(o, r, e);
 		return NULL;
 	}
 
@@ -68,7 +68,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 		var = (ocrpt_var *)ptr->data;
 		if (strcmp(var->name, name) == 0) {
 			fprintf(stderr, "variable '%s': duplicate variable name\n", name);
-			ocrpt_expr_free(e);
+			ocrpt_expr_free(o, r, e);
 			return NULL;
 		}
 	}
@@ -84,32 +84,32 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 	case OCRPT_VARIABLE_HIGHEST:
 		if (type != OCRPT_VARIABLE_COUNT && type != OCRPT_VARIABLE_COUNTALL && !e) {
 			fprintf(stderr, "variable '%s': expression is NULL\n", name);
-			ocrpt_expr_free(e);
+			ocrpt_expr_free(o, r, e);
 			return NULL;
 		}
 		if (e && ocrpt_expr_references(o, r, e, OCRPT_VARREF_VVAR, &vartypes)) {
 			if ((vartypes & OCRPT_VARIABLE_UNKNOWN_BIT)) {
 				fprintf(stderr, "variable '%s': references an unknown variable name\n", name);
-				ocrpt_expr_free(e);
+				ocrpt_expr_free(o, r, e);
 				return NULL;
 			}
 			if ((vartypes & ~OCRPT_VARIABLE_EXPRESSION_BIT) != 0) {
 				fprintf(stderr, "variable '%s': may only reference expression variables\n", name);
-				ocrpt_expr_free(e);
+				ocrpt_expr_free(o, r, e);
 				return NULL;
 			}
 		}
 		break;
 	default:
 		fprintf(stderr, "invalid type for variable '%s': %d\n", name, type);
-		ocrpt_expr_free(e);
+		ocrpt_expr_free(o, r, e);
 		return NULL;
 	}
 
 	var = ocrpt_mem_malloc(sizeof(ocrpt_var));
 	if (!var) {
 		fprintf(stderr, "variable '%s': out of memory\n", name);
-		ocrpt_expr_free(e);
+		ocrpt_expr_free(o, r, e);
 		return NULL;
 	}
 
@@ -137,7 +137,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 
 	case OCRPT_VARIABLE_COUNTALL:
 		if (e)
-			ocrpt_expr_free(e);
+			ocrpt_expr_free(o, r, e);
 
 		var->resultexpr = ocrpt_expr_parse(o, r, "r.self + 1", NULL);
 		ocrpt_variable_initialize_results(o, var->resultexpr);
@@ -244,10 +244,10 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 }
 
 DLL_EXPORT_SYM void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_var *var) {
-	ocrpt_expr_free(var->baseexpr);
-	ocrpt_expr_free(var->intermedexpr);
-	ocrpt_expr_free(var->intermed2expr);
-	ocrpt_expr_free(var->resultexpr);
+	ocrpt_expr_free(o, r, var->baseexpr);
+	ocrpt_expr_free(o, r, var->intermedexpr);
+	ocrpt_expr_free(o, r, var->intermed2expr);
+	ocrpt_expr_free(o, r, var->resultexpr);
 	ocrpt_mem_free(var->name);
 	ocrpt_mem_free(var->br_name);
 	ocrpt_mem_free(var);

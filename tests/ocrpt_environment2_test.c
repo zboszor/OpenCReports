@@ -26,7 +26,7 @@ int main(void) {
 		ocrpt_expr_optimize(o, NULL, e);
 		printf("After resolving: ");
 		ocrpt_expr_print(o, e);
-		ocrpt_expr_free(e);
+		ocrpt_expr_free(o, NULL, e);
 	} else {
 		printf("expr failed to parse: %s\n", err);
 		ocrpt_strfree(err);
@@ -44,7 +44,7 @@ int main(void) {
 		ocrpt_expr_optimize(o, NULL, e);
 		printf("After resolving: ");
 		ocrpt_expr_print(o, e);
-		ocrpt_expr_free(e);
+		ocrpt_expr_free(o, NULL, e);
 	} else {
 		printf("expr failed to parse: %s\n", err);
 		ocrpt_strfree(err);

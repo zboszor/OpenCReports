@@ -89,8 +89,8 @@ int main(void) {
 		ocrpt_strfree(err);
 	}
 
-	ocrpt_expr_free(e1);
-	ocrpt_expr_free(e2);
+	ocrpt_expr_free(o, NULL, e1);
+	ocrpt_expr_free(o, NULL, e2);
 	ocrpt_free(o);
 
 	return 0;

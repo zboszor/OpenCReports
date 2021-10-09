@@ -194,7 +194,7 @@ int main(void) {
 			printf("%s\n", err);
 			ocrpt_strfree(err);
 		}
-		ocrpt_expr_free(e);
+		ocrpt_expr_free(o, NULL, e);
 		printf("\n");
 	}
 

@@ -42,11 +42,11 @@ void create_exprs(opencreport *o) {
 	ocrpt_expr_resolve(o, NULL, adult);
 }
 
-void free_exprs(void) {
-	ocrpt_expr_free(id);
-	ocrpt_expr_free(name);
-	ocrpt_expr_free(age);
-	ocrpt_expr_free(adult);
+void free_exprs(opencreport *o, ocrpt_report *r) {
+	ocrpt_expr_free(o, r, id);
+	ocrpt_expr_free(o, r, name);
+	ocrpt_expr_free(o, r, age);
+	ocrpt_expr_free(o, r, adult);
 }
 
 int main(void) {
@@ -117,7 +117,7 @@ int main(void) {
 
 	printf("--- END ---\n");
 
-	free_exprs();
+	free_exprs(o, NULL);
 
 	/* ocrpt_free() will free it */
 	//ocrpt_free_query(o, q);

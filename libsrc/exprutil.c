@@ -19,7 +19,7 @@
 #include "exprutil.h"
 #include "datasource.h"
 
-ocrpt_expr *newblankexpr(enum ocrpt_expr_type type, uint32_t n_ops) {
+ocrpt_expr *newblankexpr(opencreport *o, ocrpt_report *r, enum ocrpt_expr_type type, uint32_t n_ops) {
 	ocrpt_expr *e;
 
 	e = ocrpt_mem_malloc(sizeof(ocrpt_expr));
@@ -31,7 +31,7 @@ ocrpt_expr *newblankexpr(enum ocrpt_expr_type type, uint32_t n_ops) {
 	e->ops = (n_ops > 0 ? ocrpt_mem_malloc(n_ops * sizeof(ocrpt_expr *)) : NULL);
 
 	if ((n_ops > 0) && !e->ops) {
-		ocrpt_expr_free(e);
+		ocrpt_expr_free(o, r, e);
 		return NULL;
 	}
 
@@ -284,7 +284,7 @@ static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_report *r, ocrpt_ex
 				//fprintf(stderr, "subexpr: \n");
 				//ocrpt_expr_print(e);
 				for (i = 0; i < e->n_ops; i++)
-					ocrpt_expr_free(e->ops[i]);
+					ocrpt_expr_free(o, r, e->ops[i]);
 				ocrpt_mem_free(e->ops);
 				e->n_ops = 0;
 				e->ops = NULL;
@@ -311,13 +311,13 @@ static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_report *r, ocrpt_ex
 		 * the other with the non-constant expressions and re-run
 		 * optimization on this node.
 		 */
-		ocrpt_expr *split1 = newblankexpr(OCRPT_EXPR, dconst);
-		ocrpt_expr *split2 = newblankexpr(OCRPT_EXPR, e->n_ops - dconst);
+		ocrpt_expr *split1 = newblankexpr(o, r, OCRPT_EXPR, dconst);
+		ocrpt_expr *split2 = newblankexpr(o, r, OCRPT_EXPR, e->n_ops - dconst);
 		int32_t nsplit1, nsplit2;
 
 		if (!split1 || !split2) {
-			ocrpt_expr_free(split1);
-			ocrpt_expr_free(split2);
+			ocrpt_expr_free(o, r, split1);
+			ocrpt_expr_free(o, r, split2);
 			return;
 		}
 
@@ -391,7 +391,7 @@ static void ocrpt_expr_optimize_worker(opencreport *o, ocrpt_report *r, ocrpt_ex
 						e->n_ops += x->n_ops - 1;
 
 						x->n_ops = 0;
-						ocrpt_expr_free(x);
+						ocrpt_expr_free(o, r, x);
 
 						expr_pulled_up = true;
 					}
@@ -525,8 +525,11 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 					ocrpt_var *v = (ocrpt_var *)ptr->data;
 					if (strcasecmp(e->name->str, v->name) == 0) {
 						e->var = v;
-						if (v->precalculate)
+						if (v->precalculate) {
 							orig_e->delayed = true;
+							if (r)
+								r->have_delayed_expr = true;
+						}
 						break;
 					}
 				}

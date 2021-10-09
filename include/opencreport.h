@@ -214,6 +214,7 @@ struct ocrpt_expr {
 	 */
 	unsigned int result_index:OCRPT_MAX_DELAYED_RESULT_BITS;
 	enum ocrpt_expr_type type:4;
+	bool result_index_set:1;
 	bool result_owned0:1;
 	bool result_owned1:1;
 	bool result_evaluated0:1;
@@ -309,13 +310,19 @@ struct ocrpt_report {
 	ocrpt_list *variables;
 	/* List of ocrpt_break elements */
 	ocrpt_list *breaks;
-	/* List of ocrpt_result arrays */
+	/* List of ocrpt_result arrays and the current list element */
 	ocrpt_list *delayed_results;
+	ocrpt_list *current_delayed_resultset;
+	/* List of expressions */
+	ocrpt_list *exprs;
+	ocrpt_list *exprs_last;
 	/*
 	 * Number of expression in the report
 	 * including internal ones created for variables
 	 */
-	uint32_t num_expressions;
+	unsigned int num_expressions:OCRPT_MAX_DELAYED_RESULT_BITS;
+	bool have_delayed_expr:1;
+	bool executing:1;
 };
 
 struct ocrpt_part {
@@ -529,7 +536,7 @@ int32_t ocrpt_expr_nodes(ocrpt_expr *e);
 /*
  * Free an expression parse tree
  */
-void ocrpt_expr_free(ocrpt_expr *e);
+void ocrpt_expr_free(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
 /*
  * Create a named report variable
  */

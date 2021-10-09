@@ -101,7 +101,7 @@ int main(void) {
 	}
 
 	for (i = 0; i < N_TEST_VARS; i++)
-		ocrpt_expr_free(e[i]);
+		ocrpt_expr_free(o, r, e[i]);
 
 	ocrpt_free(o);
 
