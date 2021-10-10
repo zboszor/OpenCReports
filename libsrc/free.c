@@ -61,7 +61,7 @@ DLL_EXPORT_SYM void ocrpt_expr_free(opencreport *o, ocrpt_report *r, ocrpt_expr 
 	if (!e)
 		return;
 
-	if (r) {
+	if (r && !r->executing) {
 		r->exprs = ocrpt_list_remove(r->exprs, e);
 		r->exprs_last = NULL;
 	}
