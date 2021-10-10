@@ -35,10 +35,10 @@ int main(void) {
 		return 0;
 	}
 
-	ds = ocrpt_datasource_find(o, "myarray");
+	ds = ocrpt_datasource_get(o, "myarray");
 	printf("datasource: array %sfound\n", ds == NULL ? "NOT " : "");
 
-	q = ocrpt_query_find(o, "a");
+	q = ocrpt_query_get(o, "a");
 	printf("query: \"a\" %sfound\n", q == NULL ? "NOT " : "");
 
 	err = NULL;

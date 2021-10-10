@@ -1960,7 +1960,7 @@ DLL_EXPORT_SYM bool ocrpt_function_add(opencreport *o, const char *fname, ocrpt_
 	return true;
 }
 
-DLL_EXPORT_SYM ocrpt_function const * const ocrpt_function_find(opencreport *o, const char *fname) {
+DLL_EXPORT_SYM ocrpt_function const * const ocrpt_function_get(opencreport *o, const char *fname) {
 	ocrpt_function **ret;
 
 	if (o->functions) {

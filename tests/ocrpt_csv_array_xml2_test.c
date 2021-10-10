@@ -67,7 +67,7 @@ int main(void) {
 		return 0;
 	}
 
-	q = ocrpt_query_find(o, "a");
+	q = ocrpt_query_get(o, "a");
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)
@@ -128,10 +128,10 @@ int main(void) {
 		return 0;
 	}
 
-	q = ocrpt_query_find(o, "a");
+	q = ocrpt_query_get(o, "a");
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("q cols %d\n", cols);
-	q2 = ocrpt_query_find(o, "b");
+	q2 = ocrpt_query_get(o, "b");
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	printf("q2 cols %d\n", cols2);
 
@@ -186,8 +186,8 @@ int main(void) {
 		return 0;
 	}
 
-	q = ocrpt_query_find(o, "a");
-	q2 = ocrpt_query_find(o, "b");
+	q = ocrpt_query_get(o, "a");
+	q2 = ocrpt_query_get(o, "b");
 
 	create_exprs(o);
 

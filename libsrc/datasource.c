@@ -24,7 +24,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char
 	if (!o || !source_name || !*source_name || !input)
 		return NULL;
 
-	s = ocrpt_datasource_find(o, source_name);
+	s = ocrpt_datasource_get(o, source_name);
 	if (s) {
 		if (s->input == input)
 			return s;
@@ -46,7 +46,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char
 	return s;
 }
 
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_find(opencreport *o, const char *source_name) {
+DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_get(opencreport *o, const char *source_name) {
 	ocrpt_list *ptr;
 
 	if (!o || !source_name)
@@ -118,7 +118,7 @@ ocrpt_query *ocrpt_query_alloc(opencreport *o, const ocrpt_datasource *source, c
 	return q;
 }
 
-DLL_EXPORT_SYM ocrpt_query *ocrpt_query_find(opencreport *o, const char *name) {
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_get(opencreport *o, const char *name) {
 	ocrpt_list *ptr;
 
 	if (!o)

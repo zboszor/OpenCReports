@@ -25,7 +25,7 @@ int main(void) {
 		return 0;
 	}
 
-	ds = ocrpt_datasource_find(o, "pgsql");
+	ds = ocrpt_datasource_get(o, "pgsql");
 	printf("Connecting to PostgreSQL database was %ssuccessful\n", (ds ? "" : "NOT "));
 
 	ocrpt_free(o);

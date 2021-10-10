@@ -24,12 +24,12 @@ int main(void) {
 		return 0;
 	}
 
-	ds = ocrpt_datasource_find(o, "pgsql");
+	ds = ocrpt_datasource_get(o, "pgsql");
 	printf("Connecting to PostgreSQL database was %ssuccessful\n", (ds ? "" : "NOT "));
 
-	q = ocrpt_query_find(o, "a");
+	q = ocrpt_query_get(o, "a");
 	printf("Adding query 'a' was %ssuccessful\n", (q ? "" : "NOT "));
-	q2 = ocrpt_query_find(o, "b");
+	q2 = ocrpt_query_get(o, "b");
 	printf("Adding query 'b' was %ssuccessful\n", (q2 ? "" : "NOT "));
 
 	qr = ocrpt_query_get_result(q, &cols);

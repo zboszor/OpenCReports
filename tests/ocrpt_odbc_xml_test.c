@@ -18,7 +18,7 @@ int main(void) {
 		return 0;
 	}
 
-	ds = ocrpt_datasource_find(o, "odbc");
+	ds = ocrpt_datasource_get(o, "odbc");
 	printf("Connecting to ODBC database was %ssuccessful\n", (ds ? "" : "NOT "));
 
 	ocrpt_free(o);

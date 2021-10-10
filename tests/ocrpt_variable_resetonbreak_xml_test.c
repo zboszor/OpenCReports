@@ -62,7 +62,7 @@ int main(void) {
 		return 0;
 	}
 
-	q = ocrpt_query_find(o, "a");
+	q = ocrpt_query_get(o, "a");
 	qr = ocrpt_query_get_result(q, &cols);
 
 	/* There is only one ocrpt_report pointer in o->parts, extract it. */

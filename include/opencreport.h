@@ -595,7 +595,7 @@ bool ocrpt_function_add(opencreport *o, const char *fname, ocrpt_function_call f
 /*
  * Find a named function
  */
-ocrpt_function const * const ocrpt_function_find(opencreport *o, const char *fname);
+ocrpt_function const * const ocrpt_function_get(opencreport *o, const char *fname);
 
 /*********************************
  * Environment related functions *
@@ -789,7 +789,7 @@ void ocrpt_datasource_free(opencreport *o, ocrpt_datasource *source);
 /*
  * Find the datasource using its name
  */
-ocrpt_datasource *ocrpt_datasource_find(opencreport *o, const char *source_name);
+ocrpt_datasource *ocrpt_datasource_get(opencreport *o, const char *source_name);
 /*
  * Validate the datasource pointer against the report structure
  */
@@ -905,7 +905,7 @@ ocrpt_query *ocrpt_query_add_odbc(opencreport *o, ocrpt_datasource *source, cons
 /*
  * Find a query using its name
  */
-ocrpt_query *ocrpt_query_find(opencreport *o, const char *name);
+ocrpt_query *ocrpt_query_get(opencreport *o, const char *name);
 /*
  * Return the query result array and the number of columns in it
  *

@@ -41,7 +41,7 @@ int main(void) {
 	err = NULL;
 	adult = ocrpt_expr_parse(o, NULL, "a.adult", &err);
 
-	q = ocrpt_query_find(o, "a");
+	q = ocrpt_query_get(o, "a");
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)

@@ -18,7 +18,7 @@ int main(void) {
 		return 0;
 	}
 
-	ds = ocrpt_datasource_find(o, "mariadb");
+	ds = ocrpt_datasource_get(o, "mariadb");
 	printf("Connecting to MariaDB database was %ssuccessful\n", (ds ? "" : "NOT "));
 
 	ocrpt_free(o);

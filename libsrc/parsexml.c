@@ -239,7 +239,7 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 
 	ocrpt_xml_expr_parse_get_value_with_fallback(o, coltypes);
 
-	ds = ocrpt_datasource_find(o, datasource_s);
+	ds = ocrpt_datasource_get(o, datasource_s);
 	if (ds) {
 		switch (ds->input->type) {
 		case OCRPT_INPUT_ARRAY:
@@ -277,7 +277,7 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 
 	if (q) {
 		if (follower_for)
-			lq = ocrpt_query_find(o, follower_for_s);
+			lq = ocrpt_query_get(o, follower_for_s);
 
 		if (lq) {
 			if (follower_expr) {

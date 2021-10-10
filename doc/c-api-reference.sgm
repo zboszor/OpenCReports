@@ -116,12 +116,12 @@ ocrpt_datasource *ocrpt_add_datasource(opencreport *o,
 			</para>
 		</sect2>
 		<sect2>
-			<title><literal>ocrpt_find_datasource</literal></title>
+			<title><literal>ocrpt_datasource_get</literal></title>
 			<para>
 				Find the data source using its name. It returns NULL
 				if the named data source is not found.
 				<programlisting>
-ocrpt_datasource *ocrpt_find_datasource(opencreport *o,
+ocrpt_datasource *ocrpt_datasource_get(opencreport *o,
                                         const char *source_name);
 				</programlisting>
 			</para>
