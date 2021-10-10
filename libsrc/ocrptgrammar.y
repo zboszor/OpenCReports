@@ -240,7 +240,7 @@ exp:
 										 * Only one argument is in arglist, we need to check
 										 * if the ident is a supported function name.
 										 */
-										const ocrpt_function *f = ocrpt_function_find(extra->o, $1->name->str);
+										const ocrpt_function *f = ocrpt_function_get(extra->o, $1->name->str);
 										if (f) {
 											ocrpt_string *fname = $1->name;
 
@@ -553,7 +553,7 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, ocrpt_list *
 
 	extra->tokens = ocrpt_list_remove(extra->tokens, fname);
 
-	f = ocrpt_function_find(extra->o, fname->str);
+	f = ocrpt_function_get(extra->o, fname->str);
 	if (!f) {
 		ocrpt_mem_string_free(fname, true);
 		parser_yyerror("invalid function name");
