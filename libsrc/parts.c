@@ -93,6 +93,7 @@ DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_breaks_free(o, r);
 	ocrpt_list_free(r->exprs);
 	r->exprs = r->exprs_last = NULL;
+	ocrpt_list_free_deep(r->newrow_callbacks, ocrpt_mem_free);
 	ocrpt_expr_free(o, r, r->query_rownum);
 	ocrpt_mem_free(r->query);
 	ocrpt_mem_free(r);
@@ -152,4 +153,46 @@ DLL_EXPORT_SYM void ocrpt_report_resolve_breaks(opencreport *o, ocrpt_report *r)
 		ocrpt_break *br = (ocrpt_break *)ptr->data;
 		ocrpt_break_resolve_fields(o, r, br);
 	}
+}
+
+DLL_EXPORT_SYM void ocrpt_report_resolve_expressions(opencreport *o, ocrpt_report *r) {
+	ocrpt_list *ptr;
+
+	for (ptr = r->exprs; ptr; ptr = ptr->next) {
+		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
+
+		ocrpt_expr_resolve(o, r, e);
+		ocrpt_expr_optimize(o, r, e);
+	}
+}
+
+DLL_EXPORT_SYM void ocrpt_report_evaluate_expressions(opencreport *o, ocrpt_report *r) {
+	ocrpt_list *ptr;
+
+	for (ptr = r->exprs; ptr; ptr = ptr->next) {
+		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
+
+		ocrpt_expr_eval(o, r, e);
+	}
+}
+
+DLL_EXPORT_SYM bool ocrpt_report_add_new_row_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data) {
+	ocrpt_report_cb_data *ptr;
+
+	if (!ocrpt_report_validate(o, r))
+		return false;
+
+	if (!func)
+		return false;
+
+	ptr = ocrpt_mem_malloc(sizeof(ocrpt_report_cb_data));
+	if (!ptr)
+		return false;
+
+	ptr->func = func;
+	ptr->data = data;
+
+	r->newrow_callbacks = ocrpt_list_append(r->newrow_callbacks, ptr);
+
+	return true;
 }

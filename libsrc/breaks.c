@@ -82,6 +82,7 @@ DLL_EXPORT_SYM void ocrpt_break_free(opencreport *o, ocrpt_report *r, ocrpt_brea
 		ocrpt_expr_free(o, r, e);
 	}
 	ocrpt_list_free(br->breakfields);
+	ocrpt_list_free_deep(br->callbacks, ocrpt_mem_free);
 	ocrpt_expr_free(o, r, br->rownum);
 	ocrpt_mem_free(br->name);
 	ocrpt_mem_free(br);
@@ -183,8 +184,14 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(opencreport *o, ocrpt_report *r, oc
 	for (ptr = br->breakfields; ptr; ptr = ptr->next) {
 		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 
-		ocrpt_expr_eval(o, r, e);
-		match = ocrpt_expr_cmp_results(o, e) && match;
+		/* Unit tests don't set this flag, close enough for now without API changes */
+		if (!r->executing)
+			ocrpt_expr_eval(o, r, e);
+
+		if (!ocrpt_expr_cmp_results(o, e)) {
+			match = false;
+			break;
+		}
 	}
 
 	if (r && r->query)
@@ -225,4 +232,25 @@ DLL_EXPORT_SYM void ocrpt_break_reset_vars(opencreport *o, ocrpt_report *r, ocrp
 		if (match)
 			ocrpt_variable_reset(o, v);
 	}
+}
+
+DLL_EXPORT_SYM bool ocrpt_break_add_trigger_cb(opencreport *o, ocrpt_report *r, ocrpt_break *br, ocrpt_break_trigger_cb func, void *data) {
+	ocrpt_break_trigger_cb_data *ptr;
+
+	if (!ocrpt_break_validate(o, r, br))
+		return false;
+
+	if (!func)
+		return false;
+
+	ptr = ocrpt_mem_malloc(sizeof(ocrpt_break_trigger_cb_data));
+	if (!ptr)
+		return false;
+
+	ptr->func = func;
+	ptr->data = data;
+
+	br->callbacks = ocrpt_list_append(br->callbacks, ptr);
+
+	return true;
 }

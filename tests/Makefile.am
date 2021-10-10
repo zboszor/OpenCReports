@@ -43,7 +43,8 @@ TESTS = \
 	ocrpt_break_rownum_xml_test \
 	ocrpt_variable_xml_test \
 	ocrpt_variable_resetonbreak_xml_test \
-	ocrpt_result_copy_test
+	ocrpt_result_copy_test \
+	ocrpt_break_multi_test ocrpt_break_multi2_test
 
 # Unstable tests by nature:
 # ocrpt_random_test produces a random number which is different every time

@@ -121,6 +121,99 @@ DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode) 
 	o->rndmode = rndmode;
 }
 
+static bool ocrpt_execute_one_report(opencreport *o, ocrpt_report *r) {
+	ocrpt_query *q;
+
+	if (!ocrpt_report_validate(o, r))
+		return false;
+
+	q = (r->query ? r->query : (o->queries ? (ocrpt_query *)o->queries->data : NULL));
+
+	r->executing = true;
+
+	/* TODO: execute report */
+	if (o->debug_report_ptr)
+		fprintf(stderr, "%s: report %p is executing\n", __func__, r);
+
+	ocrpt_query_navigate_start(o, q);
+	ocrpt_report_resolve_breaks(o, r);
+	ocrpt_report_resolve_variables(o, r);
+	ocrpt_report_resolve_expressions(o, r);
+
+	while (ocrpt_query_navigate_next(o, q)) {
+		ocrpt_list *cbl;
+		ocrpt_list *brl;
+		ocrpt_break *br = NULL;
+
+		ocrpt_report_evaluate_variables(o, r);
+		ocrpt_report_evaluate_expressions(o, r);
+
+		for (cbl = r->newrow_callbacks; cbl; cbl = cbl->next) {
+			ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+			cbd->func(o, r, cbd->data);
+		}
+
+		for (brl = r->breaks; brl; brl = brl->next) {
+			ocrpt_break *brtmp = (ocrpt_break *)brl->data;
+
+			if (ocrpt_break_check_fields(o, r, brtmp)) {
+				br = brtmp;
+				break;
+			}
+		}
+
+		if (br) {
+			if (q->current_row > 0) {
+				o->residx = !o->residx;
+				/*
+				 * TODO: process break footers in reverse order
+				 * starting at the end, ending with br
+				 */
+				o->residx = !o->residx;
+			}
+
+			for (; brl; brl = brl->next) {
+				ocrpt_break *brtmp = (ocrpt_break *)brl->data;
+				ocrpt_list *brcbl;
+
+				if (q->current_row > 0)
+					ocrpt_break_reset_vars(o, r, brtmp);
+
+				for (brcbl = brtmp->callbacks; brcbl; brcbl = brcbl->next) {
+					ocrpt_break_trigger_cb_data *cbd = (ocrpt_break_trigger_cb_data *)brcbl->data;
+
+					cbd->func(o, r, brtmp, cbd->data);
+				}
+
+				/*
+				 * TODO: process break headers in forward order
+				 * from br to the end if !r->have_delayed_expr,
+				 * otherwise do nothing here.
+				 */
+			}
+		}
+
+		if (r->have_delayed_expr) {
+			/* ocrpt_report_push_delayed_results(o, r) */
+		} else {
+			/* TODO: process row FieldDetails immediately */
+		}
+	}
+
+#if 0
+	o->residx = !o->residx;
+	/*
+	 * TODO: process all break footers in reverse order
+	 */
+	o->residx = !o->residx;
+#endif
+
+	r->executing = false;
+
+	return true;
+}
+
 DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	if (!o)
 		return false;
@@ -132,13 +225,7 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 			for (ocrpt_list *pdl = (ocrpt_list *)row->data; pdl; pdl = pdl->next) {
 				ocrpt_report *r = (ocrpt_report *)pdl->data;
 
-				r->executing = true;
-
-				/* TODO: execute report */
-				if (o->debug_report_ptr)
-					fprintf(stderr, "%s: report %p is executing\n", __func__, r);
-
-				r->executing = false;
+				ocrpt_execute_one_report(o, r);
 			}
 		}
 	}

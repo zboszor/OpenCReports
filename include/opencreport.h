@@ -277,16 +277,32 @@ enum ocrpt_break_attr_type {
 };
 typedef enum ocrpt_break_attr_type ocrpt_break_attr_type;
 
+typedef void (*ocrpt_break_trigger_cb)(opencreport *, ocrpt_report *, ocrpt_break *, void *);
+
+struct ocrpt_break_trigger_cb_data {
+	ocrpt_break_trigger_cb func;
+	void *data;
+};
+typedef struct ocrpt_break_trigger_cb_data ocrpt_break_trigger_cb_data;
+
 struct ocrpt_break {
 	const char *name;
 	bool attrs[OCRPT_BREAK_ATTRS_COUNT];
 	ocrpt_list *breakfields;	/* list of ocrpt_expr pointers */
+	ocrpt_list *callbacks;		/* list of ocrpt_break_trigger_cb_data pointers */
 	ocrpt_expr *rownum;			/* row number of the break */
 	/* TODO: add details for header and footer */
 };
 
 struct ocrpt_part;
 typedef struct ocrpt_part ocrpt_part;
+
+typedef void (*ocrpt_report_cb)(opencreport *, ocrpt_report *, void *data);
+struct ocrpt_report_cb_data {
+	ocrpt_report_cb func;
+	void *data;
+};
+typedef struct ocrpt_report_cb_data ocrpt_report_cb_data;
 
 struct ocrpt_report {
 	/*
@@ -316,6 +332,8 @@ struct ocrpt_report {
 	/* List of expressions */
 	ocrpt_list *exprs;
 	ocrpt_list *exprs_last;
+	/* List of ocrpt_report_cb_data pointers */
+	ocrpt_list *newrow_callbacks;
 	/*
 	 * Number of expression in the report
 	 * including internal ones created for variables
@@ -664,6 +682,10 @@ bool ocrpt_break_check_fields(opencreport *o, ocrpt_report *r, ocrpt_break *br);
  * Reset variables for the break
  */
 void ocrpt_break_reset_vars(opencreport *o, ocrpt_report *r, ocrpt_break *br);
+/*
+ * Add break trigger callback
+ */
+bool ocrpt_break_add_trigger_cb(opencreport *o, ocrpt_report *r, ocrpt_break *br, ocrpt_break_trigger_cb func, void *data);
 
 /****************************
  * Memory handling wrappers *
@@ -994,6 +1016,18 @@ void ocrpt_report_evaluate_variables(opencreport *o, ocrpt_report *r);
  * Resolve report breaks' break fields
  */
 void ocrpt_report_resolve_breaks(opencreport *o, ocrpt_report *r);
+/*
+ * Resolve report expressions
+ */
+void ocrpt_report_resolve_expressions(opencreport *o, ocrpt_report *r);
+/*
+ * Evaluate report expressions
+ */
+void ocrpt_report_evaluate_expressions(opencreport *o, ocrpt_report *r);
+/*
+ * Add new row callback
+ */
+bool ocrpt_report_add_new_row_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
 
 /********************************************
  * Functions related to report XML handling *
