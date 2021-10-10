@@ -42,21 +42,26 @@ ocrpt_expr *newblankexpr(opencreport *o, ocrpt_report *r, enum ocrpt_expr_type t
 }
 
 static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth, const char *delimiter, ocrpt_string *str) {
-	ocrpt_result *result = e->result[o->residx];
+	ocrpt_result *result;
 	int i;
+
+	if (!e)
+		return;
+
+	result = e->result[o->residx];
 
 	switch (e->type) {
 	case OCRPT_EXPR_ERROR:
-		ocrpt_mem_string_append_printf(str, "(ERROR)%s", result->string->str);
+		ocrpt_mem_string_append_printf(str, "(ERROR)%s", result ? result->string->str : "NULL");
 		break;
 	case OCRPT_EXPR_STRING:
-		ocrpt_mem_string_append_printf(str, "(string)%s", result->isnull ? "NULL" : result->string->str);
+		ocrpt_mem_string_append_printf(str, "(string)%s", result ? (result->isnull ? "NULL" : result->string->str) : "NULL");
 		break;
 	case OCRPT_EXPR_DATETIME:
-		ocrpt_mem_string_append_printf(str, "(datetime)%s", result->isnull ? "NULL" : result->string->str);
+		ocrpt_mem_string_append_printf(str, "(datetime)%s", result ? (result->isnull ? "NULL" : result->string->str) : NULL);
 		break;
 	case OCRPT_EXPR_NUMBER:
-		if (result->isnull)
+		if (!result || result->isnull)
 			ocrpt_mem_string_append_printf(str, "NULL");
 		else {
 			size_t len = mpfr_snprintf(NULL, 0, "%RF", result->number);

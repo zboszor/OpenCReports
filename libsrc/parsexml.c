@@ -468,10 +468,6 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 	xmlChar *resetonbreak = xmlTextReaderGetAttribute(reader, (const xmlChar *)"resetonbreak");
 	xmlChar *precalculate = xmlTextReaderGetAttribute(reader, (const xmlChar *)"precalculate");
 	ocrpt_var_type vtype = OCRPT_VARIABLE_EXPRESSION; /* default if left out */
-	ocrpt_expr *e = NULL, *p = NULL;
-	char *p_s;
-	int32_t p_i = 0;
-	bool good = true;
 
 	if (strcasecmp((char *)type, "count") == 0)
 		vtype = OCRPT_VARIABLE_COUNT;
@@ -493,24 +489,19 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 		fprintf(stderr, "unset or invalid type for variable declaration for v.'%s', using \"expression\"\n", name);
 
 	if (value) {
-		e = ocrpt_expr_parse(o, r, (char *)value, NULL);
-		if (!e) {
-			good = false;
-			ocrpt_expr_free(o, r, e);
+		ocrpt_var *v = ocrpt_variable_new(o, r, vtype, (char *)name, (char *)value, (char *)resetonbreak);
+
+		if (precalculate) {
+			ocrpt_expr *p;
+			char *p_s = NULL;
+			int32_t p_i = 0;
+
+			p = ocrpt_xml_expr_parse(o, precalculate, true);
+			ocrpt_expr_get_value(o, p, &p_s, &p_i);
+			if (p_s && !p_i)
+				p_i = atoi(p_s);
+			ocrpt_variable_set_precalculate(v, !!p_i);
 		}
-	} else
-		good = false;
-
-	if (precalculate) {
-		p = ocrpt_xml_expr_parse(o, precalculate, true);
-		ocrpt_expr_get_value(o, p, &p_s, &p_i);
-		if (p_s && !p_i)
-			p_i = atoi(p_s);
-	}
-
-	if (good) {
-		ocrpt_var *v = ocrpt_variable_new(o, r, vtype, (char *)name, e, (char *)resetonbreak);
-		ocrpt_variable_set_precalculate(v, !!p_i);
 	}
 
 	xmlFree(name);

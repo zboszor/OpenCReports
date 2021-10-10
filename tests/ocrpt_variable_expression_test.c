@@ -26,7 +26,8 @@ int main(void) {
 	ocrpt_query *q;
 	ocrpt_query_result *qr;
 	ocrpt_report *r;
-	ocrpt_expr *be, *e;
+	ocrpt_expr *e;
+	ocrpt_var *v;
 	char *err;
 	int32_t cols, row;
 
@@ -36,14 +37,11 @@ int main(void) {
 	q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 3, 5, coltypes);
 	qr = ocrpt_query_get_result(q, &cols);
 
-	err = NULL;
-	be = ocrpt_expr_parse(o, r, "id + 1", &err);
-	ocrpt_strfree(err);
-	printf("Base expression for 'var1' reprinted: ");
-	ocrpt_expr_print(o, be);
-	printf("\n");
+	v = ocrpt_variable_new(o, r, OCRPT_VARIABLE_EXPRESSION, "var1", "id + 1", NULL);
 
-	ocrpt_variable_new(o, r, OCRPT_VARIABLE_EXPRESSION, "var1", be, NULL);
+	printf("Base expression for 'var1' reprinted: ");
+	ocrpt_expr_print(o, v->resultexpr);
+	printf("\n");
 
 	err = NULL;
 	e = ocrpt_expr_parse(o, r, "v.var1", &err);

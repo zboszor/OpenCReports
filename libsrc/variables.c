@@ -37,30 +37,27 @@ static inline void ocrpt_variable_initialize_results(opencreport *o, ocrpt_expr 
  * When returning NULL, the expression is freed so the caller
  * doesn't have to distinguish between different types of error.
  */
-DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, ocrpt_var_type type, const char *name, ocrpt_expr *e, const char *reset_on_break_name) {
+DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, ocrpt_var_type type, const char *name, const char *expr, const char *reset_on_break_name) {
 	ocrpt_list *ptr;
 	ocrpt_var *var;
+	ocrpt_expr *e = NULL;
 	ocrpt_string *exprstr;
 	uint32_t vartypes;
 
 	if (!o) {
 		fprintf(stderr, "invalid variable definitition: valid opencreport pointer expected\n");
-		ocrpt_expr_free(o, r, e);
 		return NULL;
 	}
 	if (!r) {
 		fprintf(stderr, "invalid variable definitition: valid ocrpt_report pointer expected\n");
-		ocrpt_expr_free(o, r, e);
 		return NULL;
 	}
 	if (!name) {
 		fprintf(stderr, "invalid variable definitition: valid name expected\n");
-		ocrpt_expr_free(o, r, e);
 		return NULL;
 	}
 
 	if (!ocrpt_report_validate(o, r)) {
-		ocrpt_expr_free(o, r, e);
 		return NULL;
 	}
 
@@ -68,7 +65,6 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 		var = (ocrpt_var *)ptr->data;
 		if (strcmp(var->name, name) == 0) {
 			fprintf(stderr, "variable '%s': duplicate variable name\n", name);
-			ocrpt_expr_free(o, r, e);
 			return NULL;
 		}
 	}
@@ -82,11 +78,15 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 	case OCRPT_VARIABLE_AVERAGEALL:
 	case OCRPT_VARIABLE_LOWEST:
 	case OCRPT_VARIABLE_HIGHEST:
-		if (type != OCRPT_VARIABLE_COUNT && type != OCRPT_VARIABLE_COUNTALL && !e) {
+		if (type != OCRPT_VARIABLE_COUNT && type != OCRPT_VARIABLE_COUNTALL && !expr) {
 			fprintf(stderr, "variable '%s': expression is NULL\n", name);
-			ocrpt_expr_free(o, r, e);
 			return NULL;
 		}
+
+		r->dont_add_exprs = true;
+		e = ocrpt_expr_parse(o, r, expr, NULL);
+		r->dont_add_exprs = false;
+
 		if (e && ocrpt_expr_references(o, r, e, OCRPT_VARREF_VVAR, &vartypes)) {
 			if ((vartypes & OCRPT_VARIABLE_UNKNOWN_BIT)) {
 				fprintf(stderr, "variable '%s': references an unknown variable name\n", name);

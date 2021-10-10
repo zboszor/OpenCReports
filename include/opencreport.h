@@ -562,7 +562,7 @@ void ocrpt_expr_free(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
 /*
  * Create a named report variable
  */
-ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, ocrpt_var_type type, const char *name, ocrpt_expr *e, const char *reset_on_break_name);
+ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, ocrpt_var_type type, const char *name, const char *expr, const char *reset_on_break_name);
 /*
  * Free a report variable
  */
