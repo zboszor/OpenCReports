@@ -341,6 +341,7 @@ struct ocrpt_report {
 	unsigned int num_expressions:OCRPT_MAX_DELAYED_RESULT_BITS;
 	bool have_delayed_expr:1;
 	bool executing:1;
+	bool dont_add_exprs:1;
 };
 
 struct ocrpt_part {

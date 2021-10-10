@@ -120,6 +120,8 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 	if (reset_on_break_name)
 		var->br_name = ocrpt_mem_strdup(reset_on_break_name);
 
+	r->dont_add_exprs = true;
+
 	switch (type) {
 	case OCRPT_VARIABLE_EXPRESSION:
 		var->resultexpr = e;
@@ -237,6 +239,8 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 		/* cannot happen */
 		break;
 	}
+
+	r->dont_add_exprs = false;
 
 	r->variables = ocrpt_list_append(r->variables, var);
 

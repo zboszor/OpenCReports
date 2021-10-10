@@ -453,7 +453,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, con
 	ocrpt_list_free(yyextra.parsed_arglist);
 	ocrpt_list_free(yyextra.parsed_exprs);
 
-	if (r && !r->executing) {
+	if (r && !r->executing && !r->dont_add_exprs) {
 		r->exprs = ocrpt_list_end_append(r->exprs, &r->exprs_last, yyextra.last_expr);
 		yyextra.last_expr->result_index = r->num_expressions++;
 		yyextra.last_expr->result_index_set = true;
