@@ -10,19 +10,11 @@
 #include "ocrpt_test_common.h"
 
 static void test_report_start_cb(opencreport *o, ocrpt_report *r, void *dummy UNUSED) {
-	/*
-	 * Fake function name prefix in the message to keep the original result.
-	 * After all, this function is where this callback is called from.
-	 */
-	fprintf(stderr, "ocrpt_execute: report %p is executing\n", r);
+	fprintf(stderr, "report %p is executing\n", r);
 }
 
 static void test_report_added_cb(opencreport *o, ocrpt_report *r, void *dummy UNUSED) {
-	/*
-	 * Fake function name prefix in the message to keep the original result.
-	 * After all, this function is where this callback is called from.
-	 */
-	fprintf(stderr, "ocrpt_part_append_report: appending ocrpt_report %p\n", r);
+	fprintf(stderr, "appended ocrpt_report %p\n", r);
 
 	ocrpt_report_add_start_cb(o, r, test_report_start_cb, NULL);
 }
