@@ -101,6 +101,8 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	if (o->locale)
 		freelocale(o->locale);
 
+	ocrpt_list_free_deep(o->report_added_callbacks, ocrpt_mem_free);
+
 	gmp_randclear(o->randstate);
 	ocrpt_mem_string_free(o->converted, true);
 
@@ -121,8 +123,22 @@ DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode) 
 	o->rndmode = rndmode;
 }
 
+DLL_EXPORT_SYM void ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb func, void *data) {
+	ocrpt_report_cb_data *ptr;
+
+	if (!o || !func)
+		return;
+
+	ptr = ocrpt_mem_malloc(sizeof(ocrpt_report_cb_data));
+	ptr->func = func;
+	ptr->data = data;
+
+	o->report_added_callbacks = ocrpt_list_append(o->report_added_callbacks, ptr);
+}
+
 static bool ocrpt_execute_one_report(opencreport *o, ocrpt_report *r) {
 	ocrpt_query *q;
+	ocrpt_list *cbl;
 
 	if (!ocrpt_report_validate(o, r))
 		return false;
@@ -132,8 +148,14 @@ static bool ocrpt_execute_one_report(opencreport *o, ocrpt_report *r) {
 	r->executing = true;
 
 	/* TODO: execute report */
-	if (o->debug_report_ptr)
-		fprintf(stderr, "%s: report %p is executing\n", __func__, r);
+	for (cbl = r->start_callbacks; cbl; cbl = cbl->next) {
+		ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+		cbd->func(o, r, cbd->data);
+	}
+
+	if (!q)
+		goto report_done;
 
 	ocrpt_query_navigate_start(o, q);
 	ocrpt_report_resolve_breaks(o, r);
@@ -141,7 +163,6 @@ static bool ocrpt_execute_one_report(opencreport *o, ocrpt_report *r) {
 	ocrpt_report_resolve_expressions(o, r);
 
 	while (ocrpt_query_navigate_next(o, q)) {
-		ocrpt_list *cbl;
 		ocrpt_list *brl;
 		ocrpt_break *br = NULL;
 
@@ -208,6 +229,14 @@ static bool ocrpt_execute_one_report(opencreport *o, ocrpt_report *r) {
 	 */
 	o->residx = !o->residx;
 #endif
+
+report_done:
+
+	for (cbl = r->done_callbacks; cbl; cbl = cbl->next) {
+		ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+		cbd->func(o, r, cbd->data);
+	}
 
 	r->executing = false;
 

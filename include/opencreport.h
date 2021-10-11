@@ -333,6 +333,8 @@ struct ocrpt_report {
 	ocrpt_list *exprs;
 	ocrpt_list *exprs_last;
 	/* List of ocrpt_report_cb_data pointers */
+	ocrpt_list *start_callbacks;
+	ocrpt_list *done_callbacks;
 	ocrpt_list *newrow_callbacks;
 	/*
 	 * Number of expression in the report
@@ -398,6 +400,9 @@ struct opencreport {
 	ocrpt_list *parts;
 	ocrpt_list *last_part;
 
+	/* List of ocrpt_report_cb elements */
+	ocrpt_list *report_added_callbacks;
+
 	/* Locale specific data */
 	locale_t locale;
 
@@ -408,9 +413,6 @@ struct opencreport {
 
 	/* Alternating datasource row result index  */
 	bool residx:1;
-
-	/* Debugging bits */
-	bool debug_report_ptr:1;
 };
 
 /*
@@ -429,6 +431,10 @@ void ocrpt_set_numeric_precision_bits(opencreport *o, mpfr_prec_t prec);
  * Set MPFR rounding mode
  */
 void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode);
+/*
+ * Add a "report added" callback
+ */
+void ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb func, void *data);
 
 /****************************
  * Locale related functions *
@@ -1025,6 +1031,14 @@ void ocrpt_report_resolve_expressions(opencreport *o, ocrpt_report *r);
  * Evaluate report expressions
  */
 void ocrpt_report_evaluate_expressions(opencreport *o, ocrpt_report *r);
+/*
+ * Add report start callback
+ */
+bool ocrpt_report_add_start_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
+/*
+ * Add report done callback
+ */
+bool ocrpt_report_add_done_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
 /*
  * Add new row callback
  */
