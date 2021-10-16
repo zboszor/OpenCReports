@@ -501,6 +501,7 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 			if (p_s && !p_i)
 				p_i = atoi(p_s);
 			ocrpt_variable_set_precalculate(v, !!p_i);
+			ocrpt_expr_free(o, r, p);
 		}
 	}
 
