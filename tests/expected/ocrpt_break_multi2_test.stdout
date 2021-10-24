@@ -4,6 +4,8 @@ Query: 'a':
 	Col #1: 'name': string value: Fred Flintstone
 	Col #2: 'age': string value: NULL (converted to number: 31.000000)
 	Col #3: 'male': string value: NULL (converted to number: 1.000000)
+v.'age_avg'
+(number)31.000000
 break 'male' triggered
 break 'adult' triggered
 
@@ -13,6 +15,8 @@ Query: 'a':
 	Col #1: 'name': string value: Barney Rubble
 	Col #2: 'age': string value: NULL (converted to number: 29.000000)
 	Col #3: 'male': string value: NULL (converted to number: 1.000000)
+v.'age_avg'
+(number)30.000000
 
 Row #2
 Query: 'a':
@@ -20,6 +24,8 @@ Query: 'a':
 	Col #1: 'name': string value: Bamm-Bamm Rubble
 	Col #2: 'age': string value: NULL (converted to number: 2.000000)
 	Col #3: 'male': string value: NULL (converted to number: 1.000000)
+v.'age_avg'
+(number)20.666667
 break 'adult' triggered
 
 Row #3
@@ -28,6 +34,8 @@ Query: 'a':
 	Col #1: 'name': string value: Wilma Flintstone
 	Col #2: 'age': string value: NULL (converted to number: 28.000000)
 	Col #3: 'male': string value: NULL (converted to number: 0.000000)
+v.'age_avg'
+(number)28.000000
 break 'male' triggered
 break 'adult' triggered
 
@@ -37,6 +45,8 @@ Query: 'a':
 	Col #1: 'name': string value: Betty Rubble
 	Col #2: 'age': string value: NULL (converted to number: 27.000000)
 	Col #3: 'male': string value: NULL (converted to number: 0.000000)
+v.'age_avg'
+(number)27.500000
 
 Row #5
 Query: 'a':
@@ -44,4 +54,6 @@ Query: 'a':
 	Col #1: 'name': string value: Pebbles Flintstone
 	Col #2: 'age': string value: NULL (converted to number: 0.500000)
 	Col #3: 'male': string value: NULL (converted to number: 0.000000)
+v.'age_avg'
+(number)18.500000
 break 'adult' triggered

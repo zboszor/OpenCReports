@@ -34,7 +34,9 @@ DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, con
 	br->name = ocrpt_mem_strdup(name);
 
 	/* Initialize rownum to 1, start with initial value */
+	r->dont_add_exprs = true;
 	br->rownum = ocrpt_expr_parse(o, r, "r.self + 1", NULL);
+	r->dont_add_exprs = false;
 	ocrpt_expr_init_both_results(o, br->rownum, OCRPT_RESULT_NUMBER);
 	mpfr_set_ui(br->rownum->result[0]->number, 1, o->rndmode);
 	mpfr_set_ui(br->rownum->result[1]->number, 1, o->rndmode);
@@ -43,6 +45,9 @@ DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, con
 	ocrpt_expr_optimize(o, r, br->rownum);
 
 	r->breaks = ocrpt_list_append(r->breaks, br);
+	r->breaks_reverse = ocrpt_list_prepend(r->breaks_reverse, br);
+
+	br->index = ocrpt_list_length(r->breaks) - 1;
 
 	return br;
 }
@@ -101,6 +106,8 @@ DLL_EXPORT_SYM void ocrpt_breaks_free(opencreport *o, ocrpt_report *r) {
 	if (good) {
 		ocrpt_list_free(r->breaks);
 		r->breaks = NULL;
+		ocrpt_list_free(r->breaks_reverse);
+		r->breaks_reverse = NULL;
 	}
 }
 
@@ -184,9 +191,7 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(opencreport *o, ocrpt_report *r, oc
 	for (ptr = br->breakfields; ptr; ptr = ptr->next) {
 		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 
-		/* Unit tests don't set this flag, close enough for now without API changes */
-		if (!r->executing)
-			ocrpt_expr_eval(o, r, e);
+		ocrpt_expr_eval(o, r, e);
 
 		if (!ocrpt_expr_cmp_results(o, e)) {
 			match = false;
@@ -232,6 +237,11 @@ DLL_EXPORT_SYM void ocrpt_break_reset_vars(opencreport *o, ocrpt_report *r, ocrp
 		if (match)
 			ocrpt_variable_reset(o, v);
 	}
+
+	mpfr_set_ui(br->rownum->result[0]->number, 1, o->rndmode);
+    mpfr_set_ui(br->rownum->result[1]->number, 1, o->rndmode);
+	ocrpt_expr_set_iterative_start_value(br->rownum, true);
+	ocrpt_expr_eval(o, r, br->rownum);
 }
 
 DLL_EXPORT_SYM bool ocrpt_break_add_trigger_cb(opencreport *o, ocrpt_report *r, ocrpt_break *br, ocrpt_break_trigger_cb func, void *data) {

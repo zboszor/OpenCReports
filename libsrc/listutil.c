@@ -43,6 +43,19 @@ DLL_EXPORT_SYM ocrpt_list *ocrpt_makelist(const void *data, ...) {
 	return l;
 }
 
+DLL_EXPORT_SYM ocrpt_list *ocrpt_list_nth(const ocrpt_list *l, uint32_t n) {
+	ocrpt_list *l1;
+	uint32_t i;
+
+	if (n < 0)
+		return NULL;
+
+	for (i = 0, l1 = (ocrpt_list *)l; l && i < n - 1; l = l->next, i++)
+		;
+
+	return l1;
+}
+
 DLL_EXPORT_SYM ocrpt_list *ocrpt_list_last(const ocrpt_list *l) {
 	ocrpt_list *ptr;
 

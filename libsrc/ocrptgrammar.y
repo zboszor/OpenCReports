@@ -457,7 +457,8 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, con
 		r->exprs = ocrpt_list_end_append(r->exprs, &r->exprs_last, yyextra.last_expr);
 		yyextra.last_expr->result_index = r->num_expressions++;
 		yyextra.last_expr->result_index_set = true;
-	}
+	} else
+		yyextra.last_expr->result_index = OCRPT_MAXVAL_DELAYED_RESULTS;
 
 	return yyextra.last_expr;
 }

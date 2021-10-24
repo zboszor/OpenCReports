@@ -797,6 +797,15 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_report *r, oc
 	return e->result[o->residx];
 }
 
+DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_get_result(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
+	if (r && r->current_delayed_result && e->result_index < r->num_expressions) {
+		ocrpt_result *rs_array = (ocrpt_result *)r->current_delayed_result->data;
+		return &rs_array[e->result_index];
+	}
+
+	return e->result[o->residx];
+}
+
 DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *format, ...) {
 	ocrpt_result *result = e->result[o->residx];
 	va_list va;

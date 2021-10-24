@@ -6,6 +6,8 @@
 
 #include <config.h>
 
+#include <inttypes.h>
+#include <limits.h>
 #include <locale.h>
 #include <langinfo.h>
 #include <pthread.h>
@@ -22,6 +24,7 @@
 #include "scanner.h"
 #include "opencreport.h"
 #include "datasource.h"
+#include "parts.h"
 
 char cwdpath[PATH_MAX];
 static ocrpt_paper *papersizes;
@@ -136,6 +139,322 @@ DLL_EXPORT_SYM void ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb fu
 	o->report_added_callbacks = ocrpt_list_append(o->report_added_callbacks, ptr);
 }
 
+static void ocrpt_execute_tail(opencreport *o, ocrpt_report *r, ocrpt_list *brl_start) {
+	ocrpt_list *brl;
+
+	/* Use the previous row data temporarily */
+	o->residx = !o->residx;
+
+	for (brl = r->breaks; brl; brl = brl->next) {
+		ocrpt_break *br = (ocrpt_break *)brl->data;
+		ocrpt_list *brcbl;
+
+		if (br->cb_triggered)
+			continue;
+
+		for (brcbl = br->callbacks; brcbl; brcbl = brcbl->next) {
+			ocrpt_break_trigger_cb_data *cbd = (ocrpt_break_trigger_cb_data *)brcbl->data;
+
+			cbd->func(o, r, br, cbd->data);
+		}
+
+		br->cb_triggered = true;
+	}
+
+	if (brl_start == r->breaks)
+		brl = r->breaks_reverse;
+	else
+		for (brl = r->breaks_reverse; brl; brl = brl->next)
+			if (brl->data == brl_start->data)
+				break;
+
+	for (; brl; brl = brl->next) {
+		ocrpt_break *br __attribute__((unused)) = (ocrpt_break *)brl->data;
+
+		/* TODO: process break footer here */
+		//printf("ocrpt_execute_tail: r %p break '%s' footer\n", r, br->name);
+	}
+
+	/* Switch back to the current row data */
+	o->residx = !o->residx;
+}
+
+static unsigned int ocrpt_execute_one_report_immediate(opencreport *o, ocrpt_report *r, ocrpt_query *q) {
+	ocrpt_list *brl_start = NULL;
+	unsigned int rows = 0;
+
+	while (ocrpt_query_navigate_next(o, q)) {
+		ocrpt_list *brl, *brl2;
+		ocrpt_list *cbl;
+
+		rows++;
+
+		brl_start = NULL;
+		for (brl = r->breaks; brl; brl = brl->next) {
+			ocrpt_break *br = (ocrpt_break *)brl->data;
+
+			br->cb_triggered = false;
+
+			if (ocrpt_break_check_fields(o, r, br)) {
+				brl_start = brl;
+				break;
+			}
+		}
+		for (brl2 = (brl ? brl->next : NULL); brl2; brl2 = brl2->next) {
+			ocrpt_break *br = (ocrpt_break *)brl2->data;
+
+			br->cb_triggered = false;
+			ocrpt_break_check_fields(o, r, br);
+		}
+
+		if (brl) {
+			if (rows > 1) {
+				/* Use the previous row data temporarily */
+				o->residx = !o->residx;
+				for (brl2 = r->breaks_reverse; brl2; brl2 = brl2->next) {
+					ocrpt_break *br = (ocrpt_break *)brl2->data;
+
+					/* TODO: process break footer here */
+					//printf("ocrpt_execute: r %p break '%s' footer\n", r, br->name);
+
+					if (br == brl->data)
+						break;
+				}
+				/* Switch back to the current row data */
+				o->residx = !o->residx;
+
+				for (brl2 = brl; brl2; brl2 = brl2->next)
+					ocrpt_break_reset_vars(o, r, (ocrpt_break *)brl2->data);
+			}
+
+			for (brl2 = (rows == 1 ? r->breaks : brl); brl2; brl2 = brl2->next) {
+				ocrpt_break *br __attribute__((unused)) = (ocrpt_break *)brl2->data;
+
+				/* TODO: process break header here */
+				//printf("ocrpt_execute: r %p break '%s' header\n", r, br->name);
+			}
+		}
+
+		ocrpt_report_evaluate_variables(o, r);
+		ocrpt_report_evaluate_expressions(o, r);
+
+		for (cbl = r->newrow_callbacks; cbl; cbl = cbl->next) {
+			ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+			cbd->func(o, r, cbd->data);
+		}
+
+		/* TODO: process row FieldDetails here */
+		//printf("ocrpt_execute: r %p process FieldDetails\n", r);
+
+		if (brl) {
+			for (brl2 = brl; brl2; brl2 = brl2->next) {
+				ocrpt_break *br = (ocrpt_break *)brl2->data;
+				ocrpt_list *brcbl;
+
+				br->cb_triggered = true;
+				for (brcbl = br->callbacks; brcbl; brcbl = brcbl->next) {
+					ocrpt_break_trigger_cb_data *cbd = (ocrpt_break_trigger_cb_data *)brcbl->data;
+
+					cbd->func(o, r, br, cbd->data);
+				}
+			}
+		}
+	}
+
+	ocrpt_execute_tail(o, r, brl_start);
+
+	return rows;
+}
+
+static unsigned int ocrpt_execute_one_report_delayed(opencreport *o, ocrpt_report *r, ocrpt_query *q) {
+	ocrpt_list *vl;
+	ocrpt_list *brl_copy = NULL;
+	unsigned int rows = 0;
+	short min_break_index = SHRT_MAX;
+	bool has_query_row = true;
+	bool print_break_headers = true;
+
+	printf("ocrpt_execute_one_report_delayed\n");
+
+	/*
+	 * Index of the widest break for variables with resetonbreak set.
+	 * This break determines how many rows have to be pushed for
+	 * delayed processing.
+	 */
+	for (vl = r->variables; vl; vl = vl->next) {
+		ocrpt_var *v = (ocrpt_var *)vl->data;
+		if (v->br && v->break_index < min_break_index)
+			min_break_index = v->break_index;
+	}
+
+	while (has_query_row) {
+		ocrpt_list *drl_last = NULL;
+		ocrpt_list *brl = NULL;
+		ocrpt_list *cbl;
+
+		r->delayed_result_rows = 0;
+		r->current_delayed_result = NULL;
+
+		while ((has_query_row = ocrpt_query_navigate_next(o, q))) {
+			bool quit_query_loop = false;
+
+			rows++;
+
+			ocrpt_report_evaluate_variables(o, r);
+			ocrpt_report_evaluate_expressions(o, r);
+
+			ocrpt_report_push_delayed_results(o, r, &drl_last);
+
+			for (brl = r->breaks; brl; brl = brl->next) {
+				ocrpt_break *br = (ocrpt_break *)brl->data;
+
+				if (ocrpt_break_check_fields(o, r, br) && br->index == min_break_index) {
+					brl_copy = brl;
+					quit_query_loop = true;
+					break;
+				}
+			}
+
+			if (quit_query_loop && rows > 1) {
+				ocrpt_list *brl2;
+
+				for (brl2 = brl_copy; brl2; brl2 = brl2->next) {
+					ocrpt_break *br = (ocrpt_break *)brl2->data;
+
+					ocrpt_break_reset_vars(o, r, br);
+				}
+
+				/* Don't count the new (breaking) row in delayed_result_rows */
+				r->delayed_result_rows--;
+				printf("ocrpt_execute: quit_query_loop TRUE rows %d rows in delayed_results %" PRIdFAST32 " delayed_result_rows %d\n", rows, ocrpt_list_length(r->delayed_results), r->delayed_result_rows);
+				break;
+			}
+		}
+
+		if (!has_query_row) {
+			printf("ocrpt_execute: no more rows, exit outer loop\n");
+			continue;
+		}
+
+		if (brl) {
+			ocrpt_list *drl;
+			ocrpt_result *firstrow, *lastrow;
+			int row, i;
+
+			printf("ocrpt_execute: processing delayed rows\n");
+
+			if (print_break_headers) {
+				r->current_delayed_result = r->delayed_results;
+
+				for (brl = (brl_copy ? brl_copy : r->breaks); brl; brl = brl->next) {
+					ocrpt_break *br = (ocrpt_break *)brl->data;
+
+					/* TODO: process break headers */
+					printf("ocrpt_execute: r %p break '%s' header\n", r, br->name);
+				}
+
+				print_break_headers = false;
+			}
+
+			if (rows > 1) {
+				for (drl = r->delayed_results, row = 0; drl && row < r->delayed_result_rows; drl = drl->next) {
+					r->current_delayed_result = drl;
+
+					for (cbl = r->newrow_callbacks; cbl; cbl = cbl->next) {
+						ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+						cbd->func(o, r, cbd->data);
+					}
+
+					/* TODO: process row FieldDetails */
+					printf("ocrpt_execute: r %p process FieldDetails\n", r);
+				}
+			}
+
+			/* Move the breaking row to the beginning of the delayed rows */
+			firstrow = (ocrpt_result *)r->delayed_results->data;
+			lastrow = (ocrpt_result *)drl_last->data;
+
+			printf("ocrpt_execute: copying last row (%p) to first (%p)\n", lastrow, firstrow);
+			for (i = 0; i < r->num_expressions; i++) {
+				ocrpt_result_copy(o, &firstrow[i], &lastrow[i]);
+				ocrpt_result_print(&firstrow[i]);
+			}
+
+			r->delayed_result_rows = 1;
+		}
+
+#if 0
+		if (brl) {
+			ocrpt_list *exprs;
+
+			printf("xxx 1\n");
+
+			for (exprs = r->exprs; exprs; exprs = exprs->next) {
+				ocrpt_expr *e = (ocrpt_expr *)exprs->data;
+
+				if (!e->delayed)
+					continue;
+
+				for (drl = r->delayed_results; drl; drl = drl->next) {
+					ocrpt_result *rs = (ocrpt_result *)drl->data;
+
+					ocrpt_result_copy(o, &rs[e->result_index], e->result[o->residx]);
+					ocrpt_result_print(&rs[e->result_index]);
+				}
+			}
+
+			if (rows > 1) {
+				for (drl = r->delayed_results, row = 0; drl && row < r->delayed_result_rows; drl = drl->next) {
+					r->current_delayed_result = drl;
+
+					for (cbl = r->newrow_callbacks; cbl; cbl = cbl->next) {
+						ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+						cbd->func(o, r, cbd->data);
+					}
+
+					/* TODO: process row FieldDetails */
+					printf("ocrpt_execute: r %p process FieldDetails\n", r);
+				}
+
+				/* Use the last delayed row data for the footers */
+				r->current_delayed_result = ocrpt_list_nth(r->delayed_results, r->delayed_result_rows - 1);
+				for (brl = r->breaks_reverse; brl; brl = brl->next) {
+					ocrpt_break *br = (ocrpt_break *)brl->data;
+
+					/* TODO: process break footers */
+					printf("ocrpt_execute: r %p break '%s' footer\n", r, br->name);
+
+					if (brl->data == brl_copy->data)
+						break;
+				}
+
+				print_break_headers = true;
+
+			}
+
+			for (brl = brl_copy; brl; brl = brl->next) {
+				ocrpt_break *br = (ocrpt_break *)brl->data;
+				ocrpt_list *brcbl;
+
+				for (brcbl = br->callbacks; brcbl; brcbl = brcbl->next) {
+					ocrpt_break_trigger_cb_data *cbd = (ocrpt_break_trigger_cb_data *)brcbl->data;
+
+					cbd->func(o, r, br, cbd->data);
+				}
+			}
+		}
+#endif
+	}
+
+	if (rows)
+		ocrpt_execute_tail(o, r, brl_copy);
+
+	return rows;
+}
+
 static bool ocrpt_execute_one_report(opencreport *o, ocrpt_report *r) {
 	ocrpt_query *q;
 	ocrpt_list *cbl;
@@ -147,90 +466,31 @@ static bool ocrpt_execute_one_report(opencreport *o, ocrpt_report *r) {
 
 	r->executing = true;
 
-	/* TODO: execute report */
 	for (cbl = r->start_callbacks; cbl; cbl = cbl->next) {
 		ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
 
 		cbd->func(o, r, cbd->data);
 	}
 
-	if (!q)
-		goto report_done;
+	if (q) {
+		unsigned int rows;
 
-	ocrpt_query_navigate_start(o, q);
-	ocrpt_report_resolve_breaks(o, r);
-	ocrpt_report_resolve_variables(o, r);
-	ocrpt_report_resolve_expressions(o, r);
+		ocrpt_query_navigate_start(o, q);
+		ocrpt_report_resolve_breaks(o, r);
+		ocrpt_report_resolve_variables(o, r);
+		ocrpt_report_resolve_expressions(o, r);
 
-	while (ocrpt_query_navigate_next(o, q)) {
-		ocrpt_list *brl;
-		ocrpt_break *br = NULL;
+		if (r->have_delayed_expr)
+			rows = ocrpt_execute_one_report_delayed(o, r, q);
+		else
+			rows = ocrpt_execute_one_report_immediate(o, r, q);
 
-		ocrpt_report_evaluate_variables(o, r);
-		ocrpt_report_evaluate_expressions(o, r);
-
-		for (cbl = r->newrow_callbacks; cbl; cbl = cbl->next) {
-			ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
-
-			cbd->func(o, r, cbd->data);
+		if (!rows) {
+			/* TODO: no query, output the the NoData alternative part if it exists */
 		}
-
-		for (brl = r->breaks; brl; brl = brl->next) {
-			ocrpt_break *brtmp = (ocrpt_break *)brl->data;
-
-			if (ocrpt_break_check_fields(o, r, brtmp)) {
-				br = brtmp;
-				break;
-			}
-		}
-
-		if (br) {
-			if (q->current_row > 0) {
-				o->residx = !o->residx;
-				/*
-				 * TODO: process break footers in reverse order
-				 * starting at the end, ending with br
-				 */
-				o->residx = !o->residx;
-			}
-
-			for (; brl; brl = brl->next) {
-				ocrpt_break *brtmp = (ocrpt_break *)brl->data;
-				ocrpt_list *brcbl;
-
-				if (q->current_row > 0)
-					ocrpt_break_reset_vars(o, r, brtmp);
-
-				for (brcbl = brtmp->callbacks; brcbl; brcbl = brcbl->next) {
-					ocrpt_break_trigger_cb_data *cbd = (ocrpt_break_trigger_cb_data *)brcbl->data;
-
-					cbd->func(o, r, brtmp, cbd->data);
-				}
-
-				/*
-				 * TODO: process break headers in forward order
-				 * from br to the end if !r->have_delayed_expr,
-				 * otherwise do nothing here.
-				 */
-			}
-		}
-
-		if (r->have_delayed_expr) {
-			/* ocrpt_report_push_delayed_results(o, r) */
-		} else {
-			/* TODO: process row FieldDetails immediately */
-		}
+	} else {
+		/* TODO: no query, output the the NoData alternative part if it exists */
 	}
-
-#if 0
-	o->residx = !o->residx;
-	/*
-	 * TODO: process all break footers in reverse order
-	 */
-	o->residx = !o->residx;
-#endif
-
-report_done:
 
 	for (cbl = r->done_callbacks; cbl; cbl = cbl->next) {
 		ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;

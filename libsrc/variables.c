@@ -115,6 +115,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 
 	memset(var, 0, sizeof(ocrpt_var));
 	var->name = ocrpt_mem_strdup(name);
+	var->break_index = SHRT_MAX;
 	var->type = type;
 
 	if (reset_on_break_name)
@@ -294,9 +295,10 @@ DLL_EXPORT_SYM void ocrpt_variable_resolve(opencreport *o, ocrpt_report *r, ocrp
 	if (v->br_name && !v->br) {
 		ocrpt_break *br = ocrpt_break_get(o, r, v->br_name);
 
-		if (br)
+		if (br) {
 			v->br = br;
-		else {
+			v->break_index = br->index;
+		} else {
 			fprintf(stderr, "%s: break '%s' not found, disabling resetonbreak for v.'%s'\n", __func__, v->br_name, v->name);
 			ocrpt_mem_free(v->br_name);
 			v->br_name = NULL;
@@ -322,11 +324,9 @@ void ocrpt_variable_reset(opencreport *o, ocrpt_var *v) {
 		return;
 
 	/* Don't initialize ocrpt_result pointers on baseexpr */
-	if (v->intermedexpr) {
+	if (v->intermedexpr)
 		ocrpt_variable_initialize_results(o, v->intermedexpr);
-	}
-	if (v->intermed2expr) {
+	if (v->intermed2expr)
 		ocrpt_variable_initialize_results(o, v->intermed2expr);
-	}
 	ocrpt_variable_initialize_results(o, v->resultexpr);
 }

@@ -8,6 +8,9 @@
 		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="6" cols="4" />
 	</Queries>
 	<Report>
+		<Variables>
+			<Variable name="age_avg" value="age" type="average" resetonbreak="male" />
+		</Variables>
 		<Breaks>
 			<Break name="male">
 				<BreakFields>

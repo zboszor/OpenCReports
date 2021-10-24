@@ -179,6 +179,7 @@ struct ocrpt_var {
 	ocrpt_result *rowcount[2];
 	ocrpt_result *intermed[2];
 	ocrpt_result *result[2];
+	unsigned int break_index:16;
 	enum ocrpt_var_type type:4;
 	bool precalculate:1;
 };
@@ -186,6 +187,7 @@ typedef struct ocrpt_var ocrpt_var;
 
 #define OCRPT_MAX_DELAYED_RESULT_BITS (16)
 #define OCRPT_MAX_DELAYED_RESULTS (1 << OCRPT_MAX_DELAYED_RESULT_BITS)
+#define OCRPT_MAXVAL_DELAYED_RESULTS ((OCRPT_MAX_DELAYED_RESULTS) - 1)
 
 struct ocrpt_expr {
 	struct ocrpt_result *result[2];
@@ -287,11 +289,13 @@ typedef struct ocrpt_break_trigger_cb_data ocrpt_break_trigger_cb_data;
 
 struct ocrpt_break {
 	const char *name;
-	bool attrs[OCRPT_BREAK_ATTRS_COUNT];
 	ocrpt_list *breakfields;	/* list of ocrpt_expr pointers */
 	ocrpt_list *callbacks;		/* list of ocrpt_break_trigger_cb_data pointers */
 	ocrpt_expr *rownum;			/* row number of the break */
 	/* TODO: add details for header and footer */
+	short index;
+	bool attrs[OCRPT_BREAK_ATTRS_COUNT];
+	bool cb_triggered;
 };
 
 struct ocrpt_part;
@@ -326,9 +330,10 @@ struct ocrpt_report {
 	ocrpt_list *variables;
 	/* List of ocrpt_break elements */
 	ocrpt_list *breaks;
+	ocrpt_list *breaks_reverse;
 	/* List of ocrpt_result arrays and the current list element */
 	ocrpt_list *delayed_results;
-	ocrpt_list *current_delayed_resultset;
+	ocrpt_list *current_delayed_result;
 	/* List of expressions */
 	ocrpt_list *exprs;
 	ocrpt_list *exprs_last;
@@ -336,6 +341,11 @@ struct ocrpt_report {
 	ocrpt_list *start_callbacks;
 	ocrpt_list *done_callbacks;
 	ocrpt_list *newrow_callbacks;
+	/*
+	 * Actual current number of rows in delayed_results
+	 * (May be different from ocrpt_list_length(delayed_results)
+	 */
+	unsigned int delayed_result_rows;
 	/*
 	 * Number of expression in the report
 	 * including internal ones created for variables
@@ -539,6 +549,12 @@ bool ocrpt_expr_references(opencreport *o, ocrpt_report *r, ocrpt_expr *e, int32
  * The returned ocrpt_result MUST NOT be freed with ocrpt_result_free().
  */
 ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
+/*
+ * Get the current ocrpt_result without (re-)evaluation
+ *
+ * The returned ocrpt_result MUST NOT be freed with ocrpt_result_free().
+ */
+ocrpt_result *ocrpt_expr_get_result(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
 /*
  * Get the value
  */
@@ -744,6 +760,7 @@ void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc,
 ocrpt_list *ocrpt_makelist1(const void *data);
 ocrpt_list *ocrpt_makelist(const void *data1, ...);
 ocrpt_list *ocrpt_list_last(const ocrpt_list *l);
+ocrpt_list *ocrpt_list_nth(const ocrpt_list *l, uint32_t n);
 ocrpt_list *ocrpt_list_end_append(ocrpt_list *l, ocrpt_list **e, const void *data);
 ocrpt_list *ocrpt_list_append(ocrpt_list *l, const void *data);
 ocrpt_list *ocrpt_list_prepend(ocrpt_list *l, const void *data);
