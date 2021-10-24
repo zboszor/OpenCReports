@@ -57,3 +57,4 @@ Query: 'a':
 v.'age_avg'
 (number)18.500000
 break 'adult' triggered
+break 'male' triggered
