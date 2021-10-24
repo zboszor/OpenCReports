@@ -118,7 +118,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 	var->break_index = SHRT_MAX;
 	var->type = type;
 
-	if (reset_on_break_name)
+	if (reset_on_break_name && *reset_on_break_name)
 		var->br_name = ocrpt_mem_strdup(reset_on_break_name);
 
 	r->dont_add_exprs = true;
