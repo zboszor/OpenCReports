@@ -1,6 +1,6 @@
 dnl Configure template for OpenCReports
 
-dnl Copyright (c) 2019-2021 Zoltán Böszörményi (zboszor@gmail.com)
+dnl Copyright (c) 2019-2022 Zoltán Böszörményi (zboszor@gmail.com)
 dnl OpenCReports is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU Lesser General Public License as published by
 dnl the Free Software Foundation; either version 3, or (at your option)
@@ -21,9 +21,6 @@ AC_CONFIG_AUX_DIR(.)
 AM_INIT_AUTOMAKE()
 AC_CONFIG_HEADERS(config.h)
 AM_MAINTAINER_MODE
-
-OCRPT_VERSION=0.1
-AC_SUBST(OCRPT_VERSION)
 
 OCRPT_LT_CURRENT=1
 OCRPT_LT_AGE=0
