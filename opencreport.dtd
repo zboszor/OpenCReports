@@ -111,6 +111,7 @@
 <!ATTLIST field
 	value CDATA #REQUIRED
 	delayed CDATA #IMPLIED
+	precalculate CDATA #IMPLIED
 	width CDATA #IMPLIED
 	align CDATA #IMPLIED
 	format CDATA #IMPLIED
@@ -181,4 +182,5 @@
 	value CDATA #REQUIRED
 	type (expression|count|sum|average|lowest|highest) "sum"
 	resetonbreak CDATA #IMPLIED
-	precalculate CDATA #IMPLIED >
+	precalculate CDATA #IMPLIED
+	delayed CDATA #IMPLIED >

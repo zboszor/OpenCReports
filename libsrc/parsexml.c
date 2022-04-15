@@ -1,6 +1,6 @@
 /*
  * OpenCReports main header
- * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2022 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -467,6 +467,8 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 	xmlChar *type = xmlTextReaderGetAttribute(reader, (const xmlChar *)"type");
 	xmlChar *resetonbreak = xmlTextReaderGetAttribute(reader, (const xmlChar *)"resetonbreak");
 	xmlChar *precalculate = xmlTextReaderGetAttribute(reader, (const xmlChar *)"precalculate");
+	xmlChar *delayed = xmlTextReaderGetAttribute(reader, (const xmlChar *)"delayed");
+	xmlChar *precalc_or_delayed;
 	ocrpt_var_type vtype = OCRPT_VARIABLE_EXPRESSION; /* default if left out */
 
 	if (strcasecmp((char *)type, "count") == 0)
@@ -491,12 +493,19 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 	if (value) {
 		ocrpt_var *v = ocrpt_variable_new(o, r, vtype, (char *)name, (char *)value, (char *)resetonbreak);
 
-		if (precalculate) {
+		if (precalculate || delayed) {
 			ocrpt_expr *p;
 			char *p_s = NULL;
 			int32_t p_i = 0;
 
-			p = ocrpt_xml_expr_parse(o, precalculate, true);
+			if (precalculate) {
+				precalc_or_delayed = precalculate;
+				if (delayed)
+					fprintf(stderr, "\"precalculate\" and \"delayed\" are set for for variable declaration for v.'%s', using \"precalculate\"\n", name);
+			} else
+				precalc_or_delayed = delayed;
+
+			p = ocrpt_xml_expr_parse(o, precalc_or_delayed, true);
 			ocrpt_expr_get_value(o, p, &p_s, &p_i);
 			if (p_s && !p_i)
 				p_i = atoi(p_s);
@@ -510,6 +519,7 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 	xmlFree(type);
 	xmlFree(resetonbreak);
 	xmlFree(precalculate);
+	xmlFree(delayed);
 
 	ocrpt_ignore_child_nodes(o, reader, "Variable");
 }
