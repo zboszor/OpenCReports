@@ -1,6 +1,6 @@
 /*
  * OpenCReports main header
- * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2022 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 #ifndef _OPENCREPORT_H_
@@ -577,6 +577,10 @@ void ocrpt_expr_result_deep_print(opencreport *o, ocrpt_expr *e);
  * Count the number of expression nodes
  */
 int32_t ocrpt_expr_nodes(ocrpt_expr *e);
+/*
+ * Set delayed property of the expression
+ */
+void ocrpt_expr_set_delayed(opencreport *o, ocrpt_expr *e, bool delayed);
 /*
  * Free an expression parse tree
  */

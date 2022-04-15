@@ -1,6 +1,6 @@
 /*
  * Expression tree utilities
- * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2022 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -893,4 +893,41 @@ DLL_EXPORT_SYM void ocrpt_expr_get_value(opencreport *o, ocrpt_expr *e, char **s
 		if (i && OCRPT_RESULT_NUMBER)
 			*i = mpfr_get_si(r->number, o->rndmode);
 	}
+}
+
+static bool ocrpt_expr_get_precalculate_worker(opencreport *o, ocrpt_expr *e, int32_t depth) {
+	int i;
+	bool precalculate = false;
+
+	if (!e)
+		return precalculate;
+
+	switch (e->type) {
+	case OCRPT_EXPR_RVAR:
+		/* TODO: check whether internal variables are precalculated or not */
+		break;
+	case OCRPT_EXPR_VVAR:
+		if (e->var->precalculate)
+			precalculate = true;
+		break;
+	case OCRPT_EXPR:
+		for (i = 0; i < e->n_ops; i++) {
+			precalculate |= ocrpt_expr_get_precalculate_worker(o, e->ops[i], depth + 1);
+		}
+		break;
+	default:
+		break;
+	}
+
+	return precalculate;
+}
+
+static bool ocrpt_expr_get_precalculate(opencreport *o, ocrpt_expr *e) {
+	return ocrpt_expr_get_precalculate_worker(o, e, 0);
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_set_delayed(opencreport *o, ocrpt_expr *e, bool delayed) {
+	bool precalculate = ocrpt_expr_get_precalculate(o, e);
+
+	e->delayed = (precalculate | delayed);
 }
