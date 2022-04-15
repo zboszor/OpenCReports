@@ -1,0 +1,30 @@
+Row #0
+v.'age_avg'
+(number)20.666667
+break 'male' triggered
+break 'adult' triggered
+
+Row #1
+v.'age_avg'
+(number)20.666667
+
+Row #2
+v.'age_avg'
+(number)20.666667
+break 'adult' triggered
+
+Row #3
+v.'age_avg'
+(number)18.500000
+break 'male' triggered
+break 'adult' triggered
+
+Row #4
+v.'age_avg'
+(number)18.500000
+
+Row #5
+v.'age_avg'
+(number)18.500000
+break 'adult' triggered
+break 'male' triggered

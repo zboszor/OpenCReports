@@ -20,5 +20,7 @@ ocrpt_expr *newblankexpr(opencreport *o, ocrpt_report *r, enum ocrpt_expr_type t
 
 void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask);
 void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var);
+bool ocrpt_expr_get_precalculate(opencreport *o, ocrpt_expr *e);
+void ocrpt_report_expressions_add_delayed_results(opencreport *o, ocrpt_report *r);
 
 #endif

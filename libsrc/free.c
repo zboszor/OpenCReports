@@ -104,5 +104,6 @@ DLL_EXPORT_SYM void ocrpt_expr_free(opencreport *o, ocrpt_report *r, ocrpt_expr 
 		ocrpt_mem_free(e->result[0]);
 	if (e->result_owned1)
 		ocrpt_mem_free(e->result[1]);
+	ocrpt_result_free(e->delayed_result);
 	ocrpt_mem_free(e);
 }

@@ -731,12 +731,18 @@ void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrp
 	case OCRPT_EXPR_VVAR:
 		assert(e->var);
 
-		if (!ocrpt_expr_get_result_evaluated(o, e->var->resultexpr))
-			ocrpt_expr_eval_worker(o, r, e->var->resultexpr, e->var->resultexpr, e->var);
+		if (o->precalculate || !e->var->precalculate) {
 
-		if (!e->result[o->residx]) {
-			assert(e->var->resultexpr->result[o->residx]);
-			e->result[o->residx] = e->var->resultexpr->result[o->residx];
+			if (!ocrpt_expr_get_result_evaluated(o, e->var->resultexpr))
+				ocrpt_expr_eval_worker(o, r, e->var->resultexpr, e->var->resultexpr, e->var);
+
+			if (!e->result[o->residx]) {
+				assert(e->var->resultexpr->result[o->residx]);
+				e->result[o->residx] = e->var->resultexpr->result[o->residx];
+			}
+		} else {
+			assert(e->var->precalc_rptr);
+			e->result[o->residx] = (ocrpt_result *)e->var->precalc_rptr->data;
 		}
 		break;
 
@@ -789,16 +795,20 @@ void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrp
 
 DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
 	ocrpt_expr_eval_worker(o, r, e, e, NULL);
-	return e->result[o->residx];
+	if (o->precalculate || !e->delayed)
+		return e->result[o->residx];
+	else
+		return e->delayed_result;
 }
 
 DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_get_result(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
-	if (r && r->current_delayed_result && e->result_index < r->num_expressions) {
-		ocrpt_result *rs_array = (ocrpt_result *)r->current_delayed_result->data;
-		return &rs_array[e->result_index];
+	if (o->precalculate || !e->delayed) {
+		assert(e->result[o->residx]);
+		return e->result[o->residx];
+	} else {
+		assert(e->delayed_result);
+		return e->delayed_result;
 	}
-
-	return e->result[o->residx];
 }
 
 DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *format, ...) {
@@ -902,7 +912,7 @@ static bool ocrpt_expr_get_precalculate_worker(opencreport *o, ocrpt_expr *e, in
 		/* TODO: check whether internal variables are precalculated or not */
 		break;
 	case OCRPT_EXPR_VVAR:
-		if (e->var->precalculate)
+		if (e->var && e->var->precalculate)
 			precalculate = true;
 		break;
 	case OCRPT_EXPR:
@@ -917,12 +927,25 @@ static bool ocrpt_expr_get_precalculate_worker(opencreport *o, ocrpt_expr *e, in
 	return precalculate;
 }
 
-static bool ocrpt_expr_get_precalculate(opencreport *o, ocrpt_expr *e) {
+bool ocrpt_expr_get_precalculate(opencreport *o, ocrpt_expr *e) {
 	return ocrpt_expr_get_precalculate_worker(o, e, 0);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_set_delayed(opencreport *o, ocrpt_expr *e, bool delayed) {
-	bool precalculate = ocrpt_expr_get_precalculate(o, e);
+	e->delayed = delayed;
+}
 
-	e->delayed = (precalculate | delayed);
+void ocrpt_report_expressions_add_delayed_results(opencreport *o, ocrpt_report *r) {
+	ocrpt_list *ptr;
+
+	for (ptr = r->exprs; ptr; ptr = ptr->next) {
+		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
+
+		if (e->delayed) {
+			ocrpt_result *dst = ocrpt_mem_malloc(sizeof(ocrpt_result));
+			memset(dst, 0, sizeof(ocrpt_result));
+			ocrpt_result_copy(o, dst, e->result[o->residx]);
+			e->delayed_result = dst;
+		}
+	}
 }

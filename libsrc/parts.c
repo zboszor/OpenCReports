@@ -93,8 +93,6 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_report_new(opencreport *o) {
 }
 
 DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
-	ocrpt_list *l;
-
 	ocrpt_variables_free(o, r);
 	ocrpt_breaks_free(o, r);
 	ocrpt_list_free(r->exprs);
@@ -102,17 +100,6 @@ DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_list_free_deep(r->start_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(r->done_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(r->newrow_callbacks, ocrpt_mem_free);
-
-	for (l = r->delayed_results; l; l = l->next) {
-		ocrpt_result *rs_array = (ocrpt_result *)l->data;
-		int i;
-
-		for (i = 0; i < r->num_expressions; i++)
-			ocrpt_result_free_data(&rs_array[i]);
-
-		ocrpt_mem_free(rs_array);
-	}
-	ocrpt_list_free(r->delayed_results);
 
 	ocrpt_expr_free(o, r, r->query_rownum);
 	ocrpt_mem_free(r->query);
@@ -184,7 +171,7 @@ DLL_EXPORT_SYM void ocrpt_report_resolve_expressions(opencreport *o, ocrpt_repor
 		ocrpt_expr_resolve(o, r, e);
 		ocrpt_expr_optimize(o, r, e);
 
-		if (e->delayed)
+		if (e->delayed || ocrpt_expr_get_precalculate(o, e))
 			r->have_delayed_expr = true;
 	}
 }
@@ -260,37 +247,4 @@ DLL_EXPORT_SYM bool ocrpt_report_add_new_row_cb(opencreport *o, ocrpt_report *r,
 	r->newrow_callbacks = ocrpt_list_append(r->newrow_callbacks, ptr);
 
 	return true;
-}
-
-unsigned int ocrpt_report_push_delayed_results(opencreport *o, ocrpt_report *r, ocrpt_list **last) {
-	ocrpt_list *drl, *el;
-	ocrpt_result *rs_array;
-	unsigned int row;
-
-	fprintf(stderr, "%s: r %p num_exprs %d delayed_result_rows %d (%" PRIdFAST32 ")\n", __func__, r, r->num_expressions, r->delayed_result_rows, ocrpt_list_length(r->delayed_results));
-
-	for (row = 0, drl = r->delayed_results; drl && row < r->delayed_result_rows; row++, drl = drl->next)
-		;
-
-	if (!drl) {
-		rs_array = ocrpt_mem_malloc(r->num_expressions * sizeof(ocrpt_result));
-		memset(rs_array, 0, r->num_expressions * sizeof(ocrpt_result));
-		drl = r->delayed_results = ocrpt_list_end_append(r->delayed_results, last, rs_array);
-	} else {
-		*last = drl;
-	}
-
-	rs_array = (ocrpt_result *)drl->data;
-	r->delayed_result_rows++;
-
-	for (el = r->exprs; el; el = el->next) {
-		ocrpt_expr *e = (ocrpt_expr *)el->data;
-
-		if (e->result_index <= r->num_expressions) {
-			ocrpt_result_copy(o, &rs_array[e->result_index], e->result[o->residx]);
-			ocrpt_result_print(&rs_array[e->result_index]);
-		}
-	}
-
-	return row;
 }

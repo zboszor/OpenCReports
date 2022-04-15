@@ -9,5 +9,7 @@
 #include <opencreport.h>
 
 void ocrpt_variable_reset(opencreport *o, ocrpt_var *v);
+void ocrpt_variables_add_precalculated_results(opencreport *o, ocrpt_report *r, ocrpt_list *brl_start);
+void ocrpt_variables_advance_precalculated_results(opencreport *o, ocrpt_report *r, ocrpt_list *brl_start);
 
 #endif

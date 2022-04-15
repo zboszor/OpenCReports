@@ -176,9 +176,8 @@ struct ocrpt_var {
 	ocrpt_expr *intermedexpr;
 	ocrpt_expr *intermed2expr;
 	ocrpt_expr *resultexpr;
-	ocrpt_result *rowcount[2];
-	ocrpt_result *intermed[2];
-	ocrpt_result *result[2];
+	ocrpt_list *precalc_results;
+	ocrpt_list *precalc_rptr;
 	unsigned int break_index:16;
 	enum ocrpt_var_type type:4;
 	bool precalculate:1;
@@ -191,6 +190,7 @@ typedef struct ocrpt_var ocrpt_var;
 
 struct ocrpt_expr {
 	struct ocrpt_result *result[2];
+	struct ocrpt_result *delayed_result;
 	union {
 		/*
 		 * Identifiers: computed report variables,
@@ -205,11 +205,17 @@ struct ocrpt_expr {
 		struct {
 			const ocrpt_function *func;
 			ocrpt_query *q; /* set if func is rownum() */
-			ocrpt_break *br; /* set if func is brrownum() */
 			ocrpt_expr **ops;
 			uint32_t n_ops;
 		};
 	};
+	/*
+	 * Set to a valid pointer if:
+	 * - func is brrownum("break"), or
+	 * - the expression contains a reference to a VVAR
+	 *   with resetonbreak="break"
+	 */
+	struct ocrpt_break *br;
 	/*
 	 * Allow up to 2^OCRPT_MAX_DELAYED_RESULT_BITS expressions
 	 * in a report when delayed expressions are used
@@ -331,9 +337,6 @@ struct ocrpt_report {
 	/* List of ocrpt_break elements */
 	ocrpt_list *breaks;
 	ocrpt_list *breaks_reverse;
-	/* List of ocrpt_result arrays and the current list element */
-	ocrpt_list *delayed_results;
-	ocrpt_list *current_delayed_result;
 	/* List of expressions */
 	ocrpt_list *exprs;
 	ocrpt_list *exprs_last;
@@ -341,11 +344,6 @@ struct ocrpt_report {
 	ocrpt_list *start_callbacks;
 	ocrpt_list *done_callbacks;
 	ocrpt_list *newrow_callbacks;
-	/*
-	 * Actual current number of rows in delayed_results
-	 * (May be different from ocrpt_list_length(delayed_results)
-	 */
-	unsigned int delayed_result_rows;
 	/*
 	 * Number of expression in the report
 	 * including internal ones created for variables
@@ -423,6 +421,7 @@ struct opencreport {
 
 	/* Alternating datasource row result index  */
 	bool residx:1;
+	bool precalculate:1;
 };
 
 /*
@@ -499,7 +498,7 @@ static inline bool ocrpt_expr_get_result_owned(opencreport *o, ocrpt_expr *e, bo
 		return e->result_owned0;
 }
 /*
- * Inline function to set the result owned/disowned by the expression
+ * Inline function to set the result evaluated by the expression
  */
 static inline void ocrpt_expr_set_result_evaluated(opencreport *o, ocrpt_expr *e, bool which, bool evaluated) {
 	if (which)
@@ -508,7 +507,7 @@ static inline void ocrpt_expr_set_result_evaluated(opencreport *o, ocrpt_expr *e
 		e->result_evaluated0 = evaluated;
 }
 /*
- * Inline function to query the expression result ownership
+ * Inline function to query the expression result evaluated property
  */
 static inline bool ocrpt_expr_get_result_evaluated(opencreport *o, ocrpt_expr *e) {
 	if (o->residx)
