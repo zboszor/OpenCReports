@@ -1,7 +1,7 @@
 /*
  * OpenCReports array data source
  *
- * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2022 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
