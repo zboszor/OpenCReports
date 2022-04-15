@@ -120,6 +120,14 @@ static void ocrpt_postgresql_describe(ocrpt_query *query, ocrpt_query_result **q
 			case 1562: /* varbit */
 				type = OCRPT_RESULT_STRING;
 				break;
+			case 1082: /* date */
+			case 1083: /* time */
+			case 1114: /* timestamp */
+			case 1184: /* timestamptz */
+			case 1186: /* interval */
+			case 1266: /* timetz */
+				type = OCRPT_RESULT_DATETIME;
+				break;
 			default:
 				fprintf(stderr, "%s:%d: type %d\n", __func__, __LINE__, PQftype(res, i));
 				type = OCRPT_RESULT_STRING;
@@ -432,7 +440,6 @@ static ocrpt_query_result *ocrpt_mariadb_describe_early(ocrpt_query *query) {
 	for (i = 0, field = mysql_fetch_field(result->res); i < result->cols && field; field = mysql_fetch_field(result->res), i++) {
 		enum ocrpt_result_type type;
 
-		/* TODO: Handle date/time/interval types */
 		switch (field->type) {
 		case MYSQL_TYPE_DECIMAL:
 		case MYSQL_TYPE_TINY:
@@ -451,6 +458,13 @@ static ocrpt_query_result *ocrpt_mariadb_describe_early(ocrpt_query *query) {
 		case MYSQL_TYPE_VAR_STRING:
 		case MYSQL_TYPE_STRING:
 			type = OCRPT_RESULT_STRING;
+			break;
+		case MYSQL_TYPE_DATE:
+		case MYSQL_TYPE_TIME:
+		case MYSQL_TYPE_DATETIME:
+		case MYSQL_TYPE_YEAR:
+		case MYSQL_TYPE_NEWDATE:
+			type = OCRPT_RESULT_DATETIME;
 			break;
 		default:
 			fprintf(stderr, "%s:%d: type %d\n", __func__, __LINE__, field->type);
@@ -790,21 +804,12 @@ static ocrpt_query_result *ocrpt_odbc_describe_early(ocrpt_query *query) {
 		case SQL_GUID:
 			type = OCRPT_RESULT_STRING;
 			break;
-#if 0
 		case SQL_DATE:
 		case SQL_TYPE_DATE:
-			type = OCRPT_RESULT_DATE;
-			break;
 		case SQL_TIME:
 		case SQL_TYPE_TIME:
-		case SQL_TYPE_UTCTIME:
-			type = OCRPT_RESULT_TIME;
-			break;
 		case SQL_TIMESTAMP:
 		case SQL_TYPE_TIMESTAMP:
-		case SQL_TYPE_UTCDATETIME:
-			type = OCRPT_RESULT_DATETIME;
-			break;
 		case SQL_INTERVAL_MONTH:
 		case SQL_INTERVAL_YEAR:
 		case SQL_INTERVAL_YEAR_TO_MONTH:
@@ -818,9 +823,8 @@ static ocrpt_query_result *ocrpt_odbc_describe_early(ocrpt_query *query) {
 		case SQL_INTERVAL_HOUR_TO_MINUTE:
 		case SQL_INTERVAL_HOUR_TO_SECOND:
 		case SQL_INTERVAL_MINUTE_TO_SECOND:
-			type = OCRPT_RESULT_INTERVAL;
+			type = OCRPT_RESULT_DATETIME;
 			break;
-#endif
 		default:
 			fprintf(stderr, "%s:%d: type %d\n", __func__, __LINE__, col_type);
 			type = OCRPT_RESULT_STRING;

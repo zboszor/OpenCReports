@@ -16,6 +16,7 @@
 #include "opencreport.h"
 #include "datasource.h"
 #include "exprutil.h"
+#include "datetime.h"
 
 static bool ocrpt_expr_init_result_internal(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type, unsigned int which) {
 	ocrpt_result *result = e->result[which];
@@ -80,7 +81,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_uminus) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_add) {
-	int i, nnum, nstr;
+	int i, nnum, nstr, ndt;
 
 	if (e->n_ops < 2) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
@@ -89,12 +90,15 @@ OCRPT_STATIC_FUNCTION(ocrpt_add) {
 
 	nnum = 0;
 	nstr = 0;
+	ndt = 0;
 	for (i = 0; i < e->n_ops; i++) {
 		if (e->ops[i]->result[o->residx]) {
 			if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_NUMBER)
 				nnum++;
 			if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_STRING)
 				nstr++;
+			if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_DATETIME)
+				ndt++;
 		}
 	}
 
@@ -140,6 +144,10 @@ OCRPT_STATIC_FUNCTION(ocrpt_add) {
 			}
 		} else
 			ocrpt_expr_make_error_result(o, e, "out of memory");
+	} else if (ndt == e->n_ops) {
+		/* TODO: add datetime/interval values */
+	} else if ((nnum + ndt) == e->n_ops) {
+		/* TODO: add number(s) to datetime(s) */
 	} else
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 }
@@ -273,8 +281,21 @@ OCRPT_STATIC_FUNCTION(ocrpt_eq) {
 		ret = (strcmp(e->ops[0]->result[o->residx]->string->str, e->ops[1]->result[o->residx]->string->str) == 0);
 		break;
 	case OCRPT_RESULT_DATETIME:
-		/* TODO */
-		ret = false;
+		if ((e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid &&
+				e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) ||
+			(e->ops[0]->result[o->residx]->interval && e->ops[1]->result[o->residx]->interval)) {
+			ret = (memcmp(&e->ops[0]->result[o->residx]->datetime, &e->ops[1]->result[o->residx]->datetime, sizeof(struct tm)) == 0);
+		} else if (e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid) {
+			ret =
+				(e->ops[0]->result[o->residx]->datetime.tm_year == e->ops[1]->result[o->residx]->datetime.tm_year) &&
+				(e->ops[0]->result[o->residx]->datetime.tm_mon == e->ops[1]->result[o->residx]->datetime.tm_mon) &&
+				(e->ops[0]->result[o->residx]->datetime.tm_mday == e->ops[1]->result[o->residx]->datetime.tm_mday);
+		} else if (e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) {
+			ret =
+				(e->ops[0]->result[o->residx]->datetime.tm_hour == e->ops[1]->result[o->residx]->datetime.tm_hour) &&
+				(e->ops[0]->result[o->residx]->datetime.tm_min == e->ops[1]->result[o->residx]->datetime.tm_min) &&
+				(e->ops[0]->result[o->residx]->datetime.tm_sec == e->ops[1]->result[o->residx]->datetime.tm_sec);
+		}
 		break;
 	default:
 		ret = false;
@@ -320,8 +341,21 @@ OCRPT_STATIC_FUNCTION(ocrpt_ne) {
 		ret = (strcmp(e->ops[0]->result[o->residx]->string->str, e->ops[1]->result[o->residx]->string->str) != 0);
 		break;
 	case OCRPT_RESULT_DATETIME:
-		/* TODO */
-		ret = false;
+		if ((e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid &&
+				e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) ||
+			(e->ops[0]->result[o->residx]->interval && e->ops[1]->result[o->residx]->interval)) {
+			ret = (memcmp(&e->ops[0]->result[o->residx]->datetime, &e->ops[1]->result[o->residx]->datetime, sizeof(struct tm)) != 0);
+		} else if (e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid) {
+			ret =
+				(e->ops[0]->result[o->residx]->datetime.tm_year != e->ops[1]->result[o->residx]->datetime.tm_year) ||
+				(e->ops[0]->result[o->residx]->datetime.tm_mon != e->ops[1]->result[o->residx]->datetime.tm_mon) ||
+				(e->ops[0]->result[o->residx]->datetime.tm_mday != e->ops[1]->result[o->residx]->datetime.tm_mday);
+		} else if (e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) {
+			ret =
+				(e->ops[0]->result[o->residx]->datetime.tm_hour != e->ops[1]->result[o->residx]->datetime.tm_hour) ||
+				(e->ops[0]->result[o->residx]->datetime.tm_min != e->ops[1]->result[o->residx]->datetime.tm_min) ||
+				(e->ops[0]->result[o->residx]->datetime.tm_sec != e->ops[1]->result[o->residx]->datetime.tm_sec);
+		}
 		break;
 	default:
 		ret = false;
@@ -367,8 +401,55 @@ OCRPT_STATIC_FUNCTION(ocrpt_lt) {
 		ret = (strcmp(e->ops[0]->result[o->residx]->string->str, e->ops[1]->result[o->residx]->string->str) < 0);
 		break;
 	case OCRPT_RESULT_DATETIME:
-		/* TODO */
 		ret = false;
+		if ((e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid &&
+				e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) ||
+			(e->ops[0]->result[o->residx]->interval && e->ops[1]->result[o->residx]->interval)) {
+			if (e->ops[0]->result[o->residx]->datetime.tm_year < e->ops[1]->result[o->residx]->datetime.tm_year)
+				ret = true;
+			else if (e->ops[0]->result[o->residx]->datetime.tm_year == e->ops[1]->result[o->residx]->datetime.tm_year) {
+				if (e->ops[0]->result[o->residx]->datetime.tm_mon < e->ops[1]->result[o->residx]->datetime.tm_mon)
+					ret = true;
+				else if (e->ops[0]->result[o->residx]->datetime.tm_mon == e->ops[1]->result[o->residx]->datetime.tm_mon) {
+					if (e->ops[0]->result[o->residx]->datetime.tm_mday < e->ops[1]->result[o->residx]->datetime.tm_mday)
+						ret = true;
+					else if (e->ops[0]->result[o->residx]->datetime.tm_mday == e->ops[1]->result[o->residx]->datetime.tm_mday) {
+						if (e->ops[0]->result[o->residx]->datetime.tm_hour < e->ops[1]->result[o->residx]->datetime.tm_hour)
+							ret = true;
+						else if (e->ops[0]->result[o->residx]->datetime.tm_hour == e->ops[1]->result[o->residx]->datetime.tm_hour) {
+							if (e->ops[0]->result[o->residx]->datetime.tm_min < e->ops[1]->result[o->residx]->datetime.tm_min)
+								ret = true;
+							else if (e->ops[0]->result[o->residx]->datetime.tm_min == e->ops[1]->result[o->residx]->datetime.tm_min) {
+								if (e->ops[0]->result[o->residx]->datetime.tm_sec < e->ops[1]->result[o->residx]->datetime.tm_sec)
+									ret = true;
+							}
+						}
+					}
+				}
+			}
+		} else if (e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid) {
+			if (e->ops[0]->result[o->residx]->datetime.tm_year < e->ops[1]->result[o->residx]->datetime.tm_year)
+				ret = true;
+			else if (e->ops[0]->result[o->residx]->datetime.tm_year == e->ops[1]->result[o->residx]->datetime.tm_year) {
+				if (e->ops[0]->result[o->residx]->datetime.tm_mon < e->ops[1]->result[o->residx]->datetime.tm_mon)
+					ret = true;
+				else if (e->ops[0]->result[o->residx]->datetime.tm_mon == e->ops[1]->result[o->residx]->datetime.tm_mon) {
+					if (e->ops[0]->result[o->residx]->datetime.tm_mday < e->ops[1]->result[o->residx]->datetime.tm_mday)
+						ret = true;
+				}
+			}
+		} else if (e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) {
+			if (e->ops[0]->result[o->residx]->datetime.tm_hour < e->ops[1]->result[o->residx]->datetime.tm_hour)
+				ret = true;
+			else if (e->ops[0]->result[o->residx]->datetime.tm_hour == e->ops[1]->result[o->residx]->datetime.tm_hour) {
+				if (e->ops[0]->result[o->residx]->datetime.tm_min < e->ops[1]->result[o->residx]->datetime.tm_min)
+					ret = true;
+				else if (e->ops[0]->result[o->residx]->datetime.tm_min == e->ops[1]->result[o->residx]->datetime.tm_min) {
+					if (e->ops[0]->result[o->residx]->datetime.tm_sec < e->ops[1]->result[o->residx]->datetime.tm_sec)
+						ret = true;
+				}
+			}
+		}
 		break;
 	default:
 		ret = false;
@@ -414,8 +495,55 @@ OCRPT_STATIC_FUNCTION(ocrpt_le) {
 		ret = (strcmp(e->ops[0]->result[o->residx]->string->str, e->ops[1]->result[o->residx]->string->str) <= 0);
 		break;
 	case OCRPT_RESULT_DATETIME:
-		/* TODO */
 		ret = false;
+		if ((e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid &&
+				e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) ||
+			(e->ops[0]->result[o->residx]->interval && e->ops[1]->result[o->residx]->interval)) {
+			if (e->ops[0]->result[o->residx]->datetime.tm_year < e->ops[1]->result[o->residx]->datetime.tm_year)
+				ret = true;
+			else if (e->ops[0]->result[o->residx]->datetime.tm_year == e->ops[1]->result[o->residx]->datetime.tm_year) {
+				if (e->ops[0]->result[o->residx]->datetime.tm_mon < e->ops[1]->result[o->residx]->datetime.tm_mon)
+					ret = true;
+				else if (e->ops[0]->result[o->residx]->datetime.tm_mon == e->ops[1]->result[o->residx]->datetime.tm_mon) {
+					if (e->ops[0]->result[o->residx]->datetime.tm_mday < e->ops[1]->result[o->residx]->datetime.tm_mday)
+						ret = true;
+					else if (e->ops[0]->result[o->residx]->datetime.tm_mday == e->ops[1]->result[o->residx]->datetime.tm_mday) {
+						if (e->ops[0]->result[o->residx]->datetime.tm_hour < e->ops[1]->result[o->residx]->datetime.tm_hour)
+							ret = true;
+						else if (e->ops[0]->result[o->residx]->datetime.tm_hour == e->ops[1]->result[o->residx]->datetime.tm_hour) {
+							if (e->ops[0]->result[o->residx]->datetime.tm_min < e->ops[1]->result[o->residx]->datetime.tm_min)
+								ret = true;
+							else if (e->ops[0]->result[o->residx]->datetime.tm_min == e->ops[1]->result[o->residx]->datetime.tm_min) {
+								if (e->ops[0]->result[o->residx]->datetime.tm_sec <= e->ops[1]->result[o->residx]->datetime.tm_sec)
+									ret = true;
+							}
+						}
+					}
+				}
+			}
+		} else if (e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid) {
+			if (e->ops[0]->result[o->residx]->datetime.tm_year < e->ops[1]->result[o->residx]->datetime.tm_year)
+				ret = true;
+			else if (e->ops[0]->result[o->residx]->datetime.tm_year == e->ops[1]->result[o->residx]->datetime.tm_year) {
+				if (e->ops[0]->result[o->residx]->datetime.tm_mon < e->ops[1]->result[o->residx]->datetime.tm_mon)
+					ret = true;
+				else if (e->ops[0]->result[o->residx]->datetime.tm_mon == e->ops[1]->result[o->residx]->datetime.tm_mon) {
+					if (e->ops[0]->result[o->residx]->datetime.tm_mday <= e->ops[1]->result[o->residx]->datetime.tm_mday)
+						ret = true;
+				}
+			}
+		} else if (e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) {
+			if (e->ops[0]->result[o->residx]->datetime.tm_hour < e->ops[1]->result[o->residx]->datetime.tm_hour)
+				ret = true;
+			else if (e->ops[0]->result[o->residx]->datetime.tm_hour == e->ops[1]->result[o->residx]->datetime.tm_hour) {
+				if (e->ops[0]->result[o->residx]->datetime.tm_min < e->ops[1]->result[o->residx]->datetime.tm_min)
+					ret = true;
+				else if (e->ops[0]->result[o->residx]->datetime.tm_min == e->ops[1]->result[o->residx]->datetime.tm_min) {
+					if (e->ops[0]->result[o->residx]->datetime.tm_sec <= e->ops[1]->result[o->residx]->datetime.tm_sec)
+						ret = true;
+				}
+			}
+		}
 		break;
 	default:
 		ret = false;
@@ -461,8 +589,55 @@ OCRPT_STATIC_FUNCTION(ocrpt_gt) {
 		ret = (strcmp(e->ops[0]->result[o->residx]->string->str, e->ops[1]->result[o->residx]->string->str) > 0);
 		break;
 	case OCRPT_RESULT_DATETIME:
-		/* TODO */
 		ret = false;
+		if ((e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid &&
+				e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) ||
+			(e->ops[0]->result[o->residx]->interval && e->ops[1]->result[o->residx]->interval)) {
+			if (e->ops[0]->result[o->residx]->datetime.tm_year > e->ops[1]->result[o->residx]->datetime.tm_year)
+				ret = true;
+			else if (e->ops[0]->result[o->residx]->datetime.tm_year == e->ops[1]->result[o->residx]->datetime.tm_year) {
+				if (e->ops[0]->result[o->residx]->datetime.tm_mon > e->ops[1]->result[o->residx]->datetime.tm_mon)
+					ret = true;
+				else if (e->ops[0]->result[o->residx]->datetime.tm_mon == e->ops[1]->result[o->residx]->datetime.tm_mon) {
+					if (e->ops[0]->result[o->residx]->datetime.tm_mday > e->ops[1]->result[o->residx]->datetime.tm_mday)
+						ret = true;
+					else if (e->ops[0]->result[o->residx]->datetime.tm_mday == e->ops[1]->result[o->residx]->datetime.tm_mday) {
+						if (e->ops[0]->result[o->residx]->datetime.tm_hour > e->ops[1]->result[o->residx]->datetime.tm_hour)
+							ret = true;
+						else if (e->ops[0]->result[o->residx]->datetime.tm_hour == e->ops[1]->result[o->residx]->datetime.tm_hour) {
+							if (e->ops[0]->result[o->residx]->datetime.tm_min > e->ops[1]->result[o->residx]->datetime.tm_min)
+								ret = true;
+							else if (e->ops[0]->result[o->residx]->datetime.tm_min == e->ops[1]->result[o->residx]->datetime.tm_min) {
+								if (e->ops[0]->result[o->residx]->datetime.tm_sec > e->ops[1]->result[o->residx]->datetime.tm_sec)
+									ret = true;
+							}
+						}
+					}
+				}
+			}
+		} else if (e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid) {
+			if (e->ops[0]->result[o->residx]->datetime.tm_year > e->ops[1]->result[o->residx]->datetime.tm_year)
+				ret = true;
+			else if (e->ops[0]->result[o->residx]->datetime.tm_year == e->ops[1]->result[o->residx]->datetime.tm_year) {
+				if (e->ops[0]->result[o->residx]->datetime.tm_mon > e->ops[1]->result[o->residx]->datetime.tm_mon)
+					ret = true;
+				else if (e->ops[0]->result[o->residx]->datetime.tm_mon == e->ops[1]->result[o->residx]->datetime.tm_mon) {
+					if (e->ops[0]->result[o->residx]->datetime.tm_mday > e->ops[1]->result[o->residx]->datetime.tm_mday)
+						ret = true;
+				}
+			}
+		} else if (e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) {
+			if (e->ops[0]->result[o->residx]->datetime.tm_hour > e->ops[1]->result[o->residx]->datetime.tm_hour)
+				ret = true;
+			else if (e->ops[0]->result[o->residx]->datetime.tm_hour == e->ops[1]->result[o->residx]->datetime.tm_hour) {
+				if (e->ops[0]->result[o->residx]->datetime.tm_min > e->ops[1]->result[o->residx]->datetime.tm_min)
+					ret = true;
+				else if (e->ops[0]->result[o->residx]->datetime.tm_min == e->ops[1]->result[o->residx]->datetime.tm_min) {
+					if (e->ops[0]->result[o->residx]->datetime.tm_sec > e->ops[1]->result[o->residx]->datetime.tm_sec)
+						ret = true;
+				}
+			}
+		}
 		break;
 	default:
 		ret = false;
@@ -508,8 +683,55 @@ OCRPT_STATIC_FUNCTION(ocrpt_ge) {
 		ret = (strcmp(e->ops[0]->result[o->residx]->string->str, e->ops[1]->result[o->residx]->string->str) >= 0);
 		break;
 	case OCRPT_RESULT_DATETIME:
-		/* TODO */
 		ret = false;
+		if ((e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid &&
+				e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) ||
+			(e->ops[0]->result[o->residx]->interval && e->ops[1]->result[o->residx]->interval)) {
+			if (e->ops[0]->result[o->residx]->datetime.tm_year > e->ops[1]->result[o->residx]->datetime.tm_year)
+				ret = true;
+			else if (e->ops[0]->result[o->residx]->datetime.tm_year == e->ops[1]->result[o->residx]->datetime.tm_year) {
+				if (e->ops[0]->result[o->residx]->datetime.tm_mon > e->ops[1]->result[o->residx]->datetime.tm_mon)
+					ret = true;
+				else if (e->ops[0]->result[o->residx]->datetime.tm_mon == e->ops[1]->result[o->residx]->datetime.tm_mon) {
+					if (e->ops[0]->result[o->residx]->datetime.tm_mday > e->ops[1]->result[o->residx]->datetime.tm_mday)
+						ret = true;
+					else if (e->ops[0]->result[o->residx]->datetime.tm_mday == e->ops[1]->result[o->residx]->datetime.tm_mday) {
+						if (e->ops[0]->result[o->residx]->datetime.tm_hour > e->ops[1]->result[o->residx]->datetime.tm_hour)
+							ret = true;
+						else if (e->ops[0]->result[o->residx]->datetime.tm_hour == e->ops[1]->result[o->residx]->datetime.tm_hour) {
+							if (e->ops[0]->result[o->residx]->datetime.tm_min > e->ops[1]->result[o->residx]->datetime.tm_min)
+								ret = true;
+							else if (e->ops[0]->result[o->residx]->datetime.tm_min == e->ops[1]->result[o->residx]->datetime.tm_min) {
+								if (e->ops[0]->result[o->residx]->datetime.tm_sec >= e->ops[1]->result[o->residx]->datetime.tm_sec)
+									ret = true;
+							}
+						}
+					}
+				}
+			}
+		} else if (e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid) {
+			if (e->ops[0]->result[o->residx]->datetime.tm_year > e->ops[1]->result[o->residx]->datetime.tm_year)
+				ret = true;
+			else if (e->ops[0]->result[o->residx]->datetime.tm_year == e->ops[1]->result[o->residx]->datetime.tm_year) {
+				if (e->ops[0]->result[o->residx]->datetime.tm_mon > e->ops[1]->result[o->residx]->datetime.tm_mon)
+					ret = true;
+				else if (e->ops[0]->result[o->residx]->datetime.tm_mon == e->ops[1]->result[o->residx]->datetime.tm_mon) {
+					if (e->ops[0]->result[o->residx]->datetime.tm_mday >= e->ops[1]->result[o->residx]->datetime.tm_mday)
+						ret = true;
+				}
+			}
+		} else if (e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) {
+			if (e->ops[0]->result[o->residx]->datetime.tm_hour > e->ops[1]->result[o->residx]->datetime.tm_hour)
+				ret = true;
+			else if (e->ops[0]->result[o->residx]->datetime.tm_hour == e->ops[1]->result[o->residx]->datetime.tm_hour) {
+				if (e->ops[0]->result[o->residx]->datetime.tm_min > e->ops[1]->result[o->residx]->datetime.tm_min)
+					ret = true;
+				else if (e->ops[0]->result[o->residx]->datetime.tm_min == e->ops[1]->result[o->residx]->datetime.tm_min) {
+					if (e->ops[0]->result[o->residx]->datetime.tm_sec >= e->ops[1]->result[o->residx]->datetime.tm_sec)
+						ret = true;
+				}
+			}
+		}
 		break;
 	default:
 		ret = false;
@@ -666,7 +888,11 @@ OCRPT_STATIC_FUNCTION(ocrpt_iif) {
 		ocrpt_mem_string_append_len(e->result[o->residx]->string, sstring->str, sstring->len);
 		break;
 	case OCRPT_RESULT_DATETIME:
-		/* TODO */
+		e->result[o->residx]->datetime = e->ops[opidx]->result[o->residx]->datetime;
+		e->result[o->residx]->date_valid = e->ops[opidx]->result[o->residx]->date_valid;
+		e->result[o->residx]->time_valid = e->ops[opidx]->result[o->residx]->time_valid;
+		e->result[o->residx]->interval = e->ops[opidx]->result[o->residx]->interval;
+		e->result[o->residx]->day_carry = e->ops[opidx]->result[o->residx]->day_carry;
 		break;
 	default:
 		break;
@@ -1881,6 +2107,33 @@ OCRPT_STATIC_FUNCTION(ocrpt_brrownum) {
 	}
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_stodt) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	if (!ocrpt_parse_datetime(o, e->ops[0]->result[o->residx]->string->str, e->ops[0]->result[o->residx]->string->len, e->result[o->residx]))
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -1931,8 +2184,12 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "rownum",		ocrpt_rownum,	-1,	false,	false,	false,	true },
 	{ "shl",		ocrpt_shl,	2,	false,	false,	false,	false },
 	{ "shr",		ocrpt_shr,	2,	false,	false,	false,	false },
+	{ "stod",		ocrpt_stodt,	1,	false,  false,  false,  false },
+	{ "stodt",		ocrpt_stodt,	1,	false,  false,  false,  false },
+	{ "stodtsql",	ocrpt_stodt,	1,	false,  false,  false,  false },
 	{ "sub",		ocrpt_sub,	-1,	false,	false,	false,	false },
 	{ "trunc",		ocrpt_trunc,	1,	false,	false,	false,	false },
+	{ "tstod",		ocrpt_stodt,	1,	false,  false,  false,  false },
 	{ "uminus",		ocrpt_uminus,	1,	false,	false,	false,	false },
 	{ "upper",		ocrpt_upper,	1,	false,	false,	false,	false },
 	{ "val",		ocrpt_val,	1,	false,	false,	false,	false },

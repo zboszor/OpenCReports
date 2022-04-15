@@ -49,7 +49,8 @@ TESTS = \
 	ocrpt_break_multi2_test \
 	ocrpt_break_multi3_test \
 	ocrpt_break_multi4_test \
-	ocrpt_break_multi5_test
+	ocrpt_break_multi5_test \
+	ocrpt_datetime_expr_test
 
 # Unstable tests by nature:
 # ocrpt_random_test produces a random number which is different every time

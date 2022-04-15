@@ -57,9 +57,19 @@ static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth, co
 	case OCRPT_EXPR_STRING:
 		ocrpt_mem_string_append_printf(str, "(string)%s", result ? (result->isnull ? "NULL" : result->string->str) : "NULL");
 		break;
-	case OCRPT_EXPR_DATETIME:
-		ocrpt_mem_string_append_printf(str, "(datetime)%s", result ? (result->isnull ? "NULL" : result->string->str) : NULL);
+	case OCRPT_EXPR_DATETIME: {
+		char tmp[128];
+		if (!result->isnull) {
+			if (result->date_valid && result->time_valid)
+				strftime(tmp, sizeof(tmp), "%F %T %z", &result->datetime);
+			else if (result->date_valid)
+				strftime(tmp, sizeof(tmp), "%F", &result->datetime);
+			else if (result->time_valid)
+				strftime(tmp, sizeof(tmp), "%T %z", &result->datetime);
+		}
+		ocrpt_mem_string_append_printf(str, "(datetime)%s", result ? (result->isnull ? "NULL" : tmp) : NULL);
 		break;
+	}
 	case OCRPT_EXPR_NUMBER:
 		if (!result || result->isnull)
 			ocrpt_mem_string_append_printf(str, "NULL");
@@ -176,11 +186,14 @@ DLL_EXPORT_SYM void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_r
 			mpfr_set(dst->number, src->number, o->rndmode);
 			break;
 		case OCRPT_RESULT_DATETIME:
-			/* TODO */
+			dst->datetime = src->datetime;
+			dst->date_valid = src->date_valid;
+			dst->time_valid = src->time_valid;
+			dst->interval = src->interval;
+			dst->day_carry = src->day_carry;
 			break;
 		}
 	}
-
 }
 
 DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
@@ -196,9 +209,19 @@ DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
 	case OCRPT_RESULT_STRING:
 		printf("(string)%s\n", (r->isnull || !r->string) ? "NULL" : r->string->str);
 		break;
-	case OCRPT_RESULT_DATETIME:
-		printf("(datetime)%s\n", r->isnull ? "NULL" : r->string->str);
+	case OCRPT_RESULT_DATETIME: {
+		char tmp[128];
+		if (!r->isnull) {
+			if (r->date_valid && r->time_valid)
+				strftime(tmp, sizeof(tmp), "%F %T %z", &r->datetime);
+			else if (r->date_valid)
+				strftime(tmp, sizeof(tmp), "%F", &r->datetime);
+			else if (r->time_valid)
+				strftime(tmp, sizeof(tmp), "%T %z", &r->datetime);
+		}
+		printf("(datetime)%s\n", r->isnull ? "NULL" : tmp);
 		break;
+	}
 	case OCRPT_RESULT_NUMBER:
 		if (r->isnull)
 			printf("(number)NULL\n");
@@ -856,7 +879,13 @@ DLL_EXPORT_SYM bool ocrpt_expr_cmp_results(opencreport *o, ocrpt_expr *e) {
 	case OCRPT_RESULT_NUMBER:
 		return !mpfr_cmp(e->result[o->residx]->number, e->result[ocrpt_expr_prev_residx(o->residx)]->number);
 	case OCRPT_RESULT_DATETIME:
-		return false; // TODO: implement
+		if (e->result[o->residx]->date_valid != e->result[ocrpt_expr_prev_residx(o->residx)]->date_valid)
+			return false;
+		if (e->result[o->residx]->time_valid != e->result[ocrpt_expr_prev_residx(o->residx)]->time_valid)
+			return false;
+		if (e->result[o->residx]->interval != e->result[ocrpt_expr_prev_residx(o->residx)]->interval)
+			return false;
+		return !memcmp(&e->result[o->residx]->datetime, &e->result[ocrpt_expr_prev_residx(o->residx)]->datetime, sizeof(struct tm));
 	default:
 		fprintf(stderr, "%s:%d: unknown expression type %d\n", __func__, __LINE__, e->result[o->residx]->type);
 		return false;

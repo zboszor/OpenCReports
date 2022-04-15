@@ -111,6 +111,20 @@ struct ocrpt_result {
 	bool time_valid:1;
 	bool interval:1;
 	bool isnull:1;
+	/*
+	 * Date +/- month carry bits for handling invalid day-of-month.
+	 * E.g. yyyy-01-31 + 1 month -> yyyy-02-31 which is an invalid date.
+	 * How to handle this? Neither truncating to the last day of the month
+	 * (i.e. yyyy-02-28), nor automatically wrapping over to the beginning
+	 * of the next month (e.g. yyyy-03-03) are semantically valid.
+	 * Instead, truncate to last day of month but keep the surplus days
+	 * as carry bits. The next addition would also add the carry bits to
+	 * the day-of-month value, which would make adding 1 month to a date
+	 * associative, in other words these should be equivalent:
+	 * (yyyy-01-31 +  1 month) + 1 month
+	 *  yyyy-01-31 + (1 month  + 1 month)
+	 */
+	uint32_t day_carry:2;
 };
 typedef struct ocrpt_result ocrpt_result;
 

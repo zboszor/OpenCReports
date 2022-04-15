@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 #include <sys/random.h>
 
@@ -428,6 +429,9 @@ static void initialize_ocrpt(void) {
 	const char *system_paper_name;
 	const struct paper *paper_info;
 	int i;
+
+	/* Initialize time utilities */
+	tzset();
 
 	/* Use the OpenCReport allocator functions in GMP/MPFR */
 	mpfr_mp_memory_cleanup();

@@ -1,0 +1,189 @@
+string: nulldt()
+expr reprinted: nulldt()
+expr nodes: 1
+expr optimized: (datetime)NULL
+expr nodes: 1
+(datetime)NULL
+
+string: stodt(nulls())
+expr reprinted: stodt(nulls())
+expr nodes: 2
+expr optimized: (datetime)NULL
+expr nodes: 1
+(datetime)NULL
+
+string: stodt('5/5/1980')
+expr reprinted: stodt((string)5/5/1980)
+expr nodes: 2
+expr optimized: (datetime)1980-05-05
+expr nodes: 1
+(datetime)1980-05-05
+
+string: stodt('1980-05-05')
+expr reprinted: stodt((string)1980-05-05)
+expr nodes: 2
+expr optimized: (datetime)1980-05-05
+expr nodes: 1
+(datetime)1980-05-05
+
+string: stodt('06:10:15')
+expr reprinted: stodt((string)06:10:15)
+expr nodes: 2
+expr optimized: (datetime)06:10:15 
+expr nodes: 1
+(datetime)06:10:15 
+
+string: stodt('06:10')
+expr reprinted: stodt((string)06:10)
+expr nodes: 2
+expr optimized: (datetime)06:10:00 
+expr nodes: 1
+(datetime)06:10:00 
+
+string: stodt('5/5/1980 06:10:15')
+expr reprinted: stodt((string)5/5/1980 06:10:15)
+expr nodes: 2
+expr optimized: (datetime)1980-05-05 06:10:15 
+expr nodes: 1
+(datetime)1980-05-05 06:10:15 
+
+string: stodt('1980-05-05 06:10:15')
+expr reprinted: stodt((string)1980-05-05 06:10:15)
+expr nodes: 2
+expr optimized: (datetime)1980-05-05 06:10:15 
+expr nodes: 1
+(datetime)1980-05-05 06:10:15 
+
+string: stodt('1980-05-05 06:10:15+02')
+expr reprinted: stodt((string)1980-05-05 06:10:15+02)
+expr nodes: 2
+expr optimized: (datetime)1980-05-05 06:10:15 +0200
+expr nodes: 1
+(datetime)1980-05-05 06:10:15 +0200
+
+string: stodt('5/5/1980') < stodt('1980-05-05')
+expr reprinted: lt(stodt((string)5/5/1980),stodt((string)1980-05-05))
+expr nodes: 5
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: stodt('5/5/1980') <= stodt('1980-05-05')
+expr reprinted: le(stodt((string)5/5/1980),stodt((string)1980-05-05))
+expr nodes: 5
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: stodt('5/5/1980') = stodt('1980-05-05')
+expr reprinted: eq(stodt((string)5/5/1980),stodt((string)1980-05-05))
+expr nodes: 5
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: stodt('5/5/1980') != stodt('1980-05-05')
+expr reprinted: ne(stodt((string)5/5/1980),stodt((string)1980-05-05))
+expr nodes: 5
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: stodt('5/5/1980') > stodt('1980-05-05')
+expr reprinted: gt(stodt((string)5/5/1980),stodt((string)1980-05-05))
+expr nodes: 5
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: stodt('5/5/1980') >= stodt('1980-05-05')
+expr reprinted: ge(stodt((string)5/5/1980),stodt((string)1980-05-05))
+expr nodes: 5
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: stodt('06:30:17') < stodt('06:30:17')
+expr reprinted: lt(stodt((string)06:30:17),stodt((string)06:30:17))
+expr nodes: 5
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: stodt('06:30:17') <= stodt('06:30:17')
+expr reprinted: le(stodt((string)06:30:17),stodt((string)06:30:17))
+expr nodes: 5
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: stodt('06:30:17') = stodt('06:30:17')
+expr reprinted: eq(stodt((string)06:30:17),stodt((string)06:30:17))
+expr nodes: 5
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: stodt('06:30:17') != stodt('06:30:17')
+expr reprinted: ne(stodt((string)06:30:17),stodt((string)06:30:17))
+expr nodes: 5
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: stodt('06:30:17') > stodt('06:30:17')
+expr reprinted: gt(stodt((string)06:30:17),stodt((string)06:30:17))
+expr nodes: 5
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: stodt('06:30:17') >= stodt('06:30:17')
+expr reprinted: ge(stodt((string)06:30:17),stodt((string)06:30:17))
+expr nodes: 5
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: stodt('06:30') < stodt('06:30:00')
+expr reprinted: lt(stodt((string)06:30),stodt((string)06:30:00))
+expr nodes: 5
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: stodt('06:30') <= stodt('06:30:00')
+expr reprinted: le(stodt((string)06:30),stodt((string)06:30:00))
+expr nodes: 5
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: stodt('06:30') = stodt('06:30:00')
+expr reprinted: eq(stodt((string)06:30),stodt((string)06:30:00))
+expr nodes: 5
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: stodt('06:30') != stodt('06:30:00')
+expr reprinted: ne(stodt((string)06:30),stodt((string)06:30:00))
+expr nodes: 5
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: stodt('06:30') > stodt('06:30:00')
+expr reprinted: gt(stodt((string)06:30),stodt((string)06:30:00))
+expr nodes: 5
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: stodt('06:30') >= stodt('06:30:00')
+expr reprinted: ge(stodt((string)06:30),stodt((string)06:30:00))
+expr nodes: 5
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
