@@ -530,11 +530,6 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 					ocrpt_var *v = (ocrpt_var *)ptr->data;
 					if (strcasecmp(e->name->str, v->name) == 0) {
 						e->var = v;
-						if (v->precalculate) {
-							orig_e->delayed = true;
-							if (r)
-								r->have_delayed_expr = true;
-						}
 						break;
 					}
 				}

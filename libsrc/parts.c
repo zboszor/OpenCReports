@@ -1,6 +1,6 @@
 /*
  * Report part utilities
- * Copyright (C) 2019-2021 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2022 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
@@ -183,6 +183,9 @@ DLL_EXPORT_SYM void ocrpt_report_resolve_expressions(opencreport *o, ocrpt_repor
 
 		ocrpt_expr_resolve(o, r, e);
 		ocrpt_expr_optimize(o, r, e);
+
+		if (e->delayed)
+			r->have_delayed_expr = true;
 	}
 }
 
