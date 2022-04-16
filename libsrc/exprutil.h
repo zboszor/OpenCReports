@@ -23,4 +23,18 @@ void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrp
 bool ocrpt_expr_get_precalculate(opencreport *o, ocrpt_expr *e);
 void ocrpt_report_expressions_add_delayed_results(opencreport *o, ocrpt_report *r);
 
+static inline int ocrpt_expr_next_residx(int residx) {
+	int val = residx + 1;
+	if (val >= OCRPT_EXPR_RESULTS)
+		val = 0;
+	return val;
+}
+
+static inline int ocrpt_expr_prev_residx(int residx) {
+	int val = residx - 1;
+	if (val < 0)
+		val = OCRPT_EXPR_RESULTS - 1;
+	return val;
+}
+
 #endif

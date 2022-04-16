@@ -458,7 +458,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, con
 		yyextra.last_expr->result_index = r->num_expressions++;
 		yyextra.last_expr->result_index_set = true;
 	} else
-		yyextra.last_expr->result_index = OCRPT_MAXVAL_DELAYED_RESULTS;
+		yyextra.last_expr->result_index = -1;
 
 	return yyextra.last_expr;
 }
@@ -507,7 +507,8 @@ static ocrpt_expr *newstring(yyscan_t yyscanner, ocrpt_string *s) {
 	ocrpt_expr_init_result(o, e, OCRPT_RESULT_STRING);
 	e->result[o->residx]->string = s;
 	e->result[o->residx]->string_owned = true;
-	e->result[!o->residx] = e->result[o->residx];
+	e->result[ocrpt_expr_next_residx(o->residx)] = e->result[o->residx];
+	e->result[ocrpt_expr_next_residx(ocrpt_expr_next_residx(o->residx))] = e->result[o->residx];
 
 	return e;
 }
@@ -520,7 +521,8 @@ static ocrpt_expr *newnumber(yyscan_t yyscanner, ocrpt_string *n) {
 	extra->tokens = ocrpt_list_remove(extra->tokens, n);
 	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
 	mpfr_set_str(e->result[o->residx]->number, n->str, 10, o->rndmode);
-	e->result[!o->residx] = e->result[o->residx];
+	e->result[ocrpt_expr_next_residx(o->residx)] = e->result[o->residx];
+	e->result[ocrpt_expr_next_residx(ocrpt_expr_next_residx(o->residx))] = e->result[o->residx];
 	ocrpt_mem_string_free(n, true);
 
 	return e;

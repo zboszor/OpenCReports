@@ -1,3 +1,5 @@
+break 'male' triggered
+break 'adult' triggered
 Row #0
 Query: 'a':
 	Col #0: 'id': string value: NULL (converted to number: 1.000000)
@@ -6,8 +8,6 @@ Query: 'a':
 	Col #3: 'male': string value: NULL (converted to number: 1.000000)
 v.'age_avg'
 (number)31.000000
-break 'male' triggered
-break 'adult' triggered
 
 Row #1
 Query: 'a':
@@ -17,6 +17,7 @@ Query: 'a':
 	Col #3: 'male': string value: NULL (converted to number: 1.000000)
 v.'age_avg'
 (number)30.000000
+break 'adult' triggered
 
 Row #2
 Query: 'a':
@@ -26,6 +27,7 @@ Query: 'a':
 	Col #3: 'male': string value: NULL (converted to number: 1.000000)
 v.'age_avg'
 (number)20.666667
+break 'male' triggered
 break 'adult' triggered
 
 Row #3
@@ -36,8 +38,6 @@ Query: 'a':
 	Col #3: 'male': string value: NULL (converted to number: 0.000000)
 v.'age_avg'
 (number)28.000000
-break 'male' triggered
-break 'adult' triggered
 
 Row #4
 Query: 'a':
@@ -47,6 +47,8 @@ Query: 'a':
 	Col #3: 'male': string value: NULL (converted to number: 0.000000)
 v.'age_avg'
 (number)27.500000
+break 'male' triggered
+break 'adult' triggered
 
 Row #5
 Query: 'a':
@@ -56,5 +58,3 @@ Query: 'a':
 	Col #3: 'male': string value: NULL (converted to number: 0.000000)
 v.'age_avg'
 (number)18.500000
-break 'adult' triggered
-break 'male' triggered

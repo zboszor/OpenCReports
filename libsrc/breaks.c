@@ -37,9 +37,9 @@ DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, con
 	r->dont_add_exprs = true;
 	br->rownum = ocrpt_expr_parse(o, r, "r.self + 1", NULL);
 	r->dont_add_exprs = false;
-	ocrpt_expr_init_both_results(o, br->rownum, OCRPT_RESULT_NUMBER);
-	mpfr_set_ui(br->rownum->result[0]->number, 1, o->rndmode);
-	mpfr_set_ui(br->rownum->result[1]->number, 1, o->rndmode);
+	ocrpt_expr_init_results(o, br->rownum, OCRPT_RESULT_NUMBER);
+	for (int i = 0; i < OCRPT_EXPR_RESULTS; i++)
+		mpfr_set_ui(br->rownum->result[i]->number, 1, o->rndmode);
 	ocrpt_expr_set_iterative_start_value(br->rownum, true);
 	ocrpt_expr_resolve(o, r, br->rownum);
 	ocrpt_expr_optimize(o, r, br->rownum);
@@ -238,8 +238,8 @@ DLL_EXPORT_SYM void ocrpt_break_reset_vars(opencreport *o, ocrpt_report *r, ocrp
 			ocrpt_variable_reset(o, v);
 	}
 
-	mpfr_set_ui(br->rownum->result[0]->number, 1, o->rndmode);
-    mpfr_set_ui(br->rownum->result[1]->number, 1, o->rndmode);
+	for (int i = 0; i < OCRPT_EXPR_RESULTS; i++)
+		mpfr_set_ui(br->rownum->result[i]->number, 1, o->rndmode);
 	ocrpt_expr_set_iterative_start_value(br->rownum, true);
 	ocrpt_expr_eval(o, r, br->rownum);
 }

@@ -27,12 +27,13 @@ int main(void) {
 	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "array");
 	ocrpt_query *q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 5, 5, coltypes);
 	ocrpt_expr *e1, *e2;
+	int i;
 
 	e1 = ocrpt_expr_parse(o, NULL, "r.self + 2", NULL);
 	/* Initialize the value of "e" to 0 */
-	ocrpt_expr_init_both_results(o, e1, OCRPT_RESULT_NUMBER);
-	mpfr_set_ui(e1->result[0]->number, 0, o->rndmode);
-	mpfr_set_ui(e1->result[1]->number, 0, o->rndmode);
+	ocrpt_expr_init_results(o, e1, OCRPT_RESULT_NUMBER);
+	for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
+		mpfr_set_ui(e1->result[i]->number, 0, o->rndmode);
 	ocrpt_expr_set_iterative_start_value(e1, true);
 	ocrpt_expr_resolve(o, NULL, e1);
 	ocrpt_expr_optimize(o, NULL, e1);
@@ -41,9 +42,9 @@ int main(void) {
 
 	e2 = ocrpt_expr_parse(o, NULL, "r.self + 2", NULL);
 	/* Initialize the value of "e" to 0 */
-	ocrpt_expr_init_both_results(o, e2, OCRPT_RESULT_NUMBER);
-	mpfr_set_ui(e2->result[0]->number, 0, o->rndmode);
-	mpfr_set_ui(e2->result[1]->number, 0, o->rndmode);
+	ocrpt_expr_init_results(o, e2, OCRPT_RESULT_NUMBER);
+	for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
+		mpfr_set_ui(e2->result[i]->number, 0, o->rndmode);
 	/* This iterative expression starts with evaluated value */
 	//ocrpt_expr_set_iterative_start_value(e2, true);
 	ocrpt_expr_resolve(o, NULL, e2);

@@ -17,7 +17,7 @@
 #include "datasource.h"
 #include "exprutil.h"
 
-static bool ocrpt_expr_init_result_internal(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type, bool which) {
+static bool ocrpt_expr_init_result_internal(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type, unsigned int which) {
 	ocrpt_result *result = e->result[which];
 
 	if (!result) {
@@ -45,9 +45,9 @@ DLL_EXPORT_SYM bool ocrpt_expr_init_result(opencreport *o, ocrpt_expr *e, enum o
 	return ocrpt_expr_init_result_internal(o, e, type, o->residx);
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_init_both_results(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type) {
-	ocrpt_expr_init_result_internal(o, e, type, false);
-	ocrpt_expr_init_result_internal(o, e, type, true);
+DLL_EXPORT_SYM void ocrpt_expr_init_results(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type) {
+	for (unsigned int i = 0; i < OCRPT_EXPR_RESULTS; i++)
+		ocrpt_expr_init_result_internal(o, e, type, i);
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_abs) {

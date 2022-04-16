@@ -424,7 +424,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 	switch (e->type) {
 	case OCRPT_EXPR_MVAR:
 		if ((varref_exclude_mask & OCRPT_VARREF_MVAR) == 0) {
-			if (!e->result[0] && !e->result[1]) {
+			if (!e->result[0]) {
 				ocrpt_result *result = ocrpt_environment_get_c(e->name->str);
 
 				ocrpt_mem_string_free(e->query, true);
@@ -434,9 +434,10 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 				e->dotprefixed = false;
 
 				e->type = OCRPT_EXPR_STRING;
-				e->result[0] = result;
-				e->result_owned0 = true;
-				e->result[1] = result;
+				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+					e->result[i] = result;
+					ocrpt_expr_set_result_owned(o, e, i, !i);
+				}
 			}
 		}
 		break;
@@ -450,7 +451,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 				 * so a call to ocrpt_expr_eval() will use the previous
 				 * result.
 				 *
-				 * ocrpt_expr_init_both_results() must be called on the
+				 * ocrpt_expr_init_results() must be called on the
 				 * original expression before ocrpt_expr_resolve() because
 				 * only the caller may know the intended type.
 				 *
@@ -458,30 +459,24 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 				 * and iterative variables like sum and others.
 				 */
 				orig_e->iterative = true;
-				if (!e->result[0]) {
-					assert(orig_e->result[1]);
-					e->result[0] = orig_e->result[1];
-					e->result_owned0 = false;
-				}
-				if (!e->result[1]) {
-					assert(orig_e->result[0]);
-					e->result[1] = orig_e->result[0];
-					e->result_owned1 = false;
+				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+					if (!e->result[i]) {
+						assert(orig_e->result[ocrpt_expr_prev_residx(i)]);
+						e->result[i] = orig_e->result[ocrpt_expr_prev_residx(i)];
+						ocrpt_expr_set_result_owned(o, e, i, false);
+					}
 				}
 			} else if (strcmp(e->name->str, "baseexpr") == 0) {
 				assert(var);
 				e->var = var;
 				if (var->baseexpr) {
 					ocrpt_expr_resolve_worker(o, r, e->var->baseexpr, e->var->baseexpr, var, varref_exclude_mask);
-					if (!e->result[0]) {
-						assert(var->baseexpr->result[0]);
-						e->result[0] = var->baseexpr->result[0];
-						e->result_owned0 = false;
-					}
-					if (!e->result[1]) {
-						assert(var->baseexpr->result[1]);
-						e->result[1] = var->baseexpr->result[1];
-						e->result_owned1 = false;
+					for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+						if (!e->result[i]) {
+							assert(var->baseexpr->result[i]);
+							e->result[i] = var->baseexpr->result[i];
+							ocrpt_expr_set_result_owned(o, e, i, false);
+						}
 					}
 				}
 			} else if (strcmp(e->name->str, "intermedexpr") == 0) {
@@ -489,15 +484,12 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 				e->var = var;
 				if (var->intermedexpr) {
 					ocrpt_expr_resolve_worker(o, r, e->var->intermedexpr, e->var->intermedexpr, var, varref_exclude_mask);
-					if (!e->result[0]) {
-						assert(var->intermedexpr->result[0]);
-						e->result[0] = var->intermedexpr->result[0];
-						e->result_owned0 = false;
-					}
-					if (!e->result[1]) {
-						assert(var->intermedexpr->result[1]);
-						e->result[1] = var->intermedexpr->result[1];
-						e->result_owned1 = false;
+					for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+						if (!e->result[i]) {
+							assert(var->intermedexpr->result[i]);
+							e->result[i] = var->intermedexpr->result[i];
+							ocrpt_expr_set_result_owned(o, e, i, false);
+						}
 					}
 				}
 			} else if (strcmp(e->name->str, "intermed2expr") == 0) {
@@ -505,15 +497,12 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 				e->var = var;
 				if (var->intermed2expr) {
 					ocrpt_expr_resolve_worker(o, r, e->var->intermed2expr, e->var->intermed2expr, var, varref_exclude_mask);
-					if (!e->result[0]) {
-						assert(var->intermed2expr->result[0]);
-						e->result[0] = var->intermed2expr->result[0];
-						e->result_owned0 = false;
-					}
-					if (!e->result[1]) {
-						assert(var->intermed2expr->result[1]);
-						e->result[1] = var->intermed2expr->result[1];
-						e->result_owned1 = false;
+					for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+						if (!e->result[i]) {
+							assert(var->intermed2expr->result[i]);
+							e->result[i] = var->intermed2expr->result[i];
+							ocrpt_expr_set_result_owned(o, e, i, false);
+						}
 					}
 				}
 			}
@@ -563,10 +552,9 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 
 				for (i = 0; i < cols; i++) {
 					if (!strcmp(e->name->str, qr[i].name)) {
-						if (!e->result[0])
-							e->result[0] = &qr[i].result;
-						if (!e->result[1])
-							e->result[1] = &qr[cols + i].result;
+						for (int j = 0; j < OCRPT_EXPR_RESULTS; j++)
+							if (!e->result[j])
+								e->result[j] = &qr[j * cols + i].result;
 						found = true;
 						break;
 					}
@@ -659,10 +647,9 @@ static bool ocrpt_expr_reference_worker(opencreport *o, ocrpt_report *r, ocrpt_e
 
 				for (i = 0; i < cols; i++) {
 					if (!strcmp(e->name->str, qr[i].name)) {
-						if (!e->result[0])
-							e->result[0] = &qr[i].result;
-						if (!e->result[1])
-							e->result[1] = &qr[cols + i].result;
+						for (int j = 0; j < OCRPT_EXPR_RESULTS; j++)
+							if (!e->result[j])
+								e->result[j] = &qr[j * cols + i].result;
 						ident_found = true;
 						break;
 					}
@@ -733,7 +720,7 @@ void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrp
 
 		if (o->precalculate || !e->var->precalculate) {
 
-			if (!ocrpt_expr_get_result_evaluated(o, e->var->resultexpr))
+			if (!ocrpt_expr_get_result_evaluated(o, e->var->resultexpr, o->residx))
 				ocrpt_expr_eval_worker(o, r, e->var->resultexpr, e->var->resultexpr, e->var);
 
 			if (!e->result[o->residx]) {
@@ -789,7 +776,7 @@ void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrp
 
 	if (e == orig_e) {
 		ocrpt_expr_set_result_evaluated(o, e, o->residx, true);
-		ocrpt_expr_set_result_evaluated(o, e, !o->residx, false);
+		ocrpt_expr_set_result_evaluated(o, e, ocrpt_expr_next_residx(o->residx), false);
 	}
 }
 
@@ -849,15 +836,15 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_
  * in the expression are the same
  */
 DLL_EXPORT_SYM bool ocrpt_expr_cmp_results(opencreport *o, ocrpt_expr *e) {
-	if (!e->result[o->residx] || !e->result[!o->residx])
+	if (!e->result[o->residx] || !e->result[ocrpt_expr_prev_residx(o->residx)])
 		return false;
 
 	/* (SQL) NULLs compare as non-equal */
-	if (e->result[o->residx]->isnull || e->result[!o->residx]->isnull)
+	if (e->result[o->residx]->isnull || e->result[ocrpt_expr_prev_residx(o->residx)]->isnull)
 		return false;
 
 	/* Different types are obviously non-equal */
-	if (e->result[o->residx]->type != e->result[!o->residx]->type)
+	if (e->result[o->residx]->type != e->result[ocrpt_expr_prev_residx(o->residx)]->type)
 		return false;
 
 	/* Two subsequent errors compare as non-equal */
@@ -865,9 +852,9 @@ DLL_EXPORT_SYM bool ocrpt_expr_cmp_results(opencreport *o, ocrpt_expr *e) {
 	case OCRPT_RESULT_ERROR:
 		return false;
 	case OCRPT_RESULT_STRING:
-		return !strcmp(e->result[o->residx]->string->str, e->result[!o->residx]->string->str);
+		return !strcmp(e->result[o->residx]->string->str, e->result[ocrpt_expr_prev_residx(o->residx)]->string->str);
 	case OCRPT_RESULT_NUMBER:
-		return !mpfr_cmp(e->result[o->residx]->number, e->result[!o->residx]->number);
+		return !mpfr_cmp(e->result[o->residx]->number, e->result[ocrpt_expr_prev_residx(o->residx)]->number);
 	case OCRPT_RESULT_DATETIME:
 		return false; // TODO: implement
 	default:
@@ -941,7 +928,7 @@ void ocrpt_report_expressions_add_delayed_results(opencreport *o, ocrpt_report *
 	for (ptr = r->exprs; ptr; ptr = ptr->next) {
 		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 
-		if (e->delayed) {
+		if (e->delayed && !e->delayed_result) {
 			ocrpt_result *dst = ocrpt_mem_malloc(sizeof(ocrpt_result));
 			memset(dst, 0, sizeof(ocrpt_result));
 			ocrpt_result_copy(o, dst, e->result[o->residx]);

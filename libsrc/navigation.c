@@ -13,6 +13,7 @@
 
 #include "opencreport.h"
 #include "datasource.h"
+#include "exprutil.h"
 
 static void ocrpt_navigate_start_private(opencreport *o, ocrpt_query *q);
 static bool ocrpt_navigate_next_private(opencreport *o, ocrpt_query *q);
@@ -269,11 +270,11 @@ static void ocrpt_navigate_start_private(opencreport *o, ocrpt_query *q) {
 }
 
 DLL_EXPORT_SYM void ocrpt_query_navigate_start(opencreport *o, ocrpt_query *q) {
-	o->residx = true;
+	o->residx = 0;
 	ocrpt_navigate_start_private(o, q);
 }
 
 DLL_EXPORT_SYM bool ocrpt_query_navigate_next(opencreport *o, ocrpt_query *q) {
-	o->residx = !o->residx;
+	o->residx = ocrpt_expr_next_residx(o->residx);
 	return ocrpt_navigate_next_private(o, q);
 }

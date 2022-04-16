@@ -1,3 +1,6 @@
+break 'id' triggered
+break 'male' triggered
+break 'adult' triggered
 Row #0
 Query: 'a':
 	Col #0: 'id': string value: NULL (converted to number: 1.000000)
@@ -54,6 +57,3 @@ Query: 'a':
 	Col #1: 'name': string value: Pebbles Flintstone
 	Col #2: 'age': string value: NULL (converted to number: 0.500000)
 	Col #3: 'male': string value: NULL (converted to number: 0.000000)
-break 'id' triggered
-break 'male' triggered
-break 'adult' triggered

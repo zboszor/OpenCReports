@@ -6,10 +6,12 @@
 #ifndef _OPENCREPORT_H_
 #define _OPENCREPORT_H_
 
+#include <assert.h>
 #include <locale.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <time.h>
 #include <mpfr.h>
@@ -184,12 +186,10 @@ struct ocrpt_var {
 };
 typedef struct ocrpt_var ocrpt_var;
 
-#define OCRPT_MAX_DELAYED_RESULT_BITS (16)
-#define OCRPT_MAX_DELAYED_RESULTS (1 << OCRPT_MAX_DELAYED_RESULT_BITS)
-#define OCRPT_MAXVAL_DELAYED_RESULTS ((OCRPT_MAX_DELAYED_RESULTS) - 1)
+#define OCRPT_EXPR_RESULTS (3)
 
 struct ocrpt_expr {
-	struct ocrpt_result *result[2];
+	struct ocrpt_result *result[OCRPT_EXPR_RESULTS];
 	struct ocrpt_result *delayed_result;
 	union {
 		/*
@@ -216,17 +216,15 @@ struct ocrpt_expr {
 	 *   with resetonbreak="break"
 	 */
 	struct ocrpt_break *br;
-	/*
-	 * Allow up to 2^OCRPT_MAX_DELAYED_RESULT_BITS expressions
-	 * in a report when delayed expressions are used
-	 */
-	unsigned int result_index:OCRPT_MAX_DELAYED_RESULT_BITS;
+	unsigned int result_index;
 	enum ocrpt_expr_type type:4;
 	bool result_index_set:1;
 	bool result_owned0:1;
 	bool result_owned1:1;
+	bool result_owned2:1;
 	bool result_evaluated0:1;
 	bool result_evaluated1:1;
+	bool result_evaluated2:1;
 	bool parenthesized:1;
 	bool dotprefixed:1;
 	bool delayed:1;
@@ -352,7 +350,7 @@ struct ocrpt_report {
 	 * Number of expression in the report
 	 * including internal ones created for variables
 	 */
-	unsigned int num_expressions:OCRPT_MAX_DELAYED_RESULT_BITS;
+	unsigned int num_expressions;
 	bool have_delayed_expr:1;
 	bool executing:1;
 	bool dont_add_exprs:1;
@@ -424,7 +422,7 @@ struct opencreport {
 	gmp_randstate_t randstate;
 
 	/* Alternating datasource row result index  */
-	bool residx:1;
+	int residx:3;
 	bool precalculate:1;
 };
 
@@ -479,45 +477,53 @@ ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, const char *str, c
  */
 bool ocrpt_expr_init_result(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type);
 /*
- * Initialize both expression results to the specified type
+ * Initialize expression results to the specified type
  * Mainly used in functions
  */
-void ocrpt_expr_init_both_results(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type);
+void ocrpt_expr_init_results(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type);
 /*
  * Inline function to set the result owned/disowned by the expression
  */
-static inline void ocrpt_expr_set_result_owned(opencreport *o, ocrpt_expr *e, bool which, bool owned) {
-	if (which)
-		e->result_owned1 = owned;
-	else
-		e->result_owned0 = owned;
+static inline void ocrpt_expr_set_result_owned(opencreport *o, ocrpt_expr *e, unsigned int which, bool owned) {
+	switch (which) {
+	case 0: e->result_owned0 = owned; break;
+	case 1: e->result_owned1 = owned; break;
+	case 2: e->result_owned2 = owned; break;
+	default: assert(!"unreachable"); abort(); break;
+	}
 }
 /*
  * Inline function to query the expression result ownership
  */
-static inline bool ocrpt_expr_get_result_owned(opencreport *o, ocrpt_expr *e, bool which) {
-	if (which)
-		return e->result_owned1;
-	else
-		return e->result_owned0;
+static inline bool ocrpt_expr_get_result_owned(opencreport *o, ocrpt_expr *e, unsigned int which) {
+	switch (which) {
+	case 0: return e->result_owned0;
+	case 1: return e->result_owned1;
+	case 2: return e->result_owned2;
+	default: assert(!"unreachable"); abort(); break;
+	}
 }
 /*
  * Inline function to set the result evaluated by the expression
  */
-static inline void ocrpt_expr_set_result_evaluated(opencreport *o, ocrpt_expr *e, bool which, bool evaluated) {
-	if (which)
-		e->result_evaluated1 = evaluated;
-	else
-		e->result_evaluated0 = evaluated;
+static inline void ocrpt_expr_set_result_evaluated(opencreport *o, ocrpt_expr *e, unsigned int which, bool evaluated) {
+	switch (which) {
+	case 0: e->result_evaluated0 = evaluated; break;
+	case 1: e->result_evaluated1 = evaluated; break;
+	case 2: e->result_evaluated2 = evaluated; break;
+	default: assert(!"unreachable"); abort(); break;
+	}
 }
 /*
  * Inline function to query the expression result evaluated property
  */
-static inline bool ocrpt_expr_get_result_evaluated(opencreport *o, ocrpt_expr *e) {
-	if (o->residx)
-		return e->result_evaluated1;
-	else
-		return e->result_evaluated0;
+static inline bool ocrpt_expr_get_result_evaluated(opencreport *o, ocrpt_expr *e, unsigned int which) {
+	switch (which) {
+	case 0: return e->result_evaluated0;
+	case 1: return e->result_evaluated1;
+	case 2: return e->result_evaluated2;
+	default: assert(!"unreachable"); abort(); break;
+	}
 }
 /*
  * Set whether the start value for iterative expressions

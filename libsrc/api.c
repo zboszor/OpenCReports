@@ -140,60 +140,17 @@ DLL_EXPORT_SYM void ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb fu
 	o->report_added_callbacks = ocrpt_list_append(o->report_added_callbacks, ptr);
 }
 
-static void ocrpt_execute_tail(opencreport *o, ocrpt_report *r, ocrpt_list *brl_start) {
-	ocrpt_list *brl;
-
-	/* Use the previous row data temporarily */
-	o->residx = !o->residx;
-
-	if (!o->precalculate) {
-		for (brl = r->breaks; brl; brl = brl->next) {
-			ocrpt_break *br = (ocrpt_break *)brl->data;
-			ocrpt_list *brcbl;
-
-			if (br->cb_triggered)
-				continue;
-
-			for (brcbl = br->callbacks; brcbl; brcbl = brcbl->next) {
-				ocrpt_break_trigger_cb_data *cbd = (ocrpt_break_trigger_cb_data *)brcbl->data;
-
-				cbd->func(o, r, br, cbd->data);
-			}
-
-			br->cb_triggered = true;
-		}
-	}
-
-	if (brl_start == r->breaks)
-		brl = r->breaks_reverse;
-	else
-		for (brl = r->breaks_reverse; brl; brl = brl->next)
-			if (brl->data == brl_start->data)
-				break;
-
-	if (o->precalculate) {
-		ocrpt_variables_add_precalculated_results(o, r, brl);
-		ocrpt_report_expressions_add_delayed_results(o, r);
-	}
-
-	for (; brl; brl = brl->next) {
-		ocrpt_break *br __attribute__((unused)) = (ocrpt_break *)brl->data;
-
-		/* TODO: process break footer here */
-		//printf("ocrpt_execute_tail: r %p break '%s' footer\n", r, br->name);
-	}
-
-	/* Switch back to the current row data */
-	o->residx = !o->residx;
-}
-
 static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_report *r, ocrpt_query *q) {
 	ocrpt_list *brl_start = NULL;
 	unsigned int rows = 0;
+	bool have_row = ocrpt_query_navigate_next(o, q);
 
-	while (ocrpt_query_navigate_next(o, q)) {
+	while (have_row) {
 		ocrpt_list *brl;
 		ocrpt_list *cbl;
+		bool last_row = !ocrpt_query_navigate_next(o, q);
+
+		o->residx = ocrpt_expr_prev_residx(o->residx);
 
 		rows++;
 
@@ -212,7 +169,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_report *r, oc
 		if (brl_start) {
 			if (rows > 1) {
 				/* Use the previous row data temporarily */
-				o->residx = !o->residx;
+				o->residx = ocrpt_expr_prev_residx(o->residx);
 
 				if (o->precalculate)
 					ocrpt_variables_add_precalculated_results(o, r, brl_start);
@@ -226,13 +183,14 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_report *r, oc
 					if (br == brl_start->data)
 						break;
 				}
+
 				/* Switch back to the current row data */
-				o->residx = !o->residx;
+				o->residx = ocrpt_expr_next_residx(o->residx);
 
 				for (brl = brl_start; brl; brl = brl->next)
 					ocrpt_break_reset_vars(o, r, (ocrpt_break *)brl->data);
 
-				if (!o->precalculate)
+				if (!o->precalculate && !last_row)
 					ocrpt_variables_advance_precalculated_results(o, r, brl_start);
 			}
 
@@ -248,18 +206,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_report *r, oc
 		ocrpt_report_evaluate_expressions(o, r);
 
 		if (!o->precalculate) {
-			for (cbl = r->newrow_callbacks; cbl; cbl = cbl->next) {
-				ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
-
-				cbd->func(o, r, cbd->data);
-			}
-		}
-
-		/* TODO: process row FieldDetails here */
-		//printf("ocrpt_execute: r %p process FieldDetails\n", r);
-
-		if (brl_start && !o->precalculate) {
-			for (brl = brl_start; brl; brl = brl->next) {
+			for (brl = last_row ? r->breaks : brl_start; brl; brl = brl->next) {
 				ocrpt_break *br = (ocrpt_break *)brl->data;
 				ocrpt_list *brcbl;
 
@@ -271,9 +218,26 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_report *r, oc
 				}
 			}
 		}
-	}
 
-	ocrpt_execute_tail(o, r, brl_start);
+		if (!o->precalculate) {
+			for (cbl = r->newrow_callbacks; cbl; cbl = cbl->next) {
+				ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+				cbd->func(o, r, cbd->data);
+			}
+		}
+
+		/* TODO: process row FieldDetails here */
+		//printf("ocrpt_execute: r %p process FieldDetails\n", r);
+
+		if (o->precalculate && last_row) {
+			ocrpt_variables_add_precalculated_results(o, r, r->breaks);
+			ocrpt_report_expressions_add_delayed_results(o, r);
+		}
+
+		have_row = !last_row;
+		o->residx = ocrpt_expr_next_residx(o->residx);
+	}
 
 	return rows;
 }

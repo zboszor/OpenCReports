@@ -18,11 +18,10 @@
 
 static inline void ocrpt_variable_initialize_results(opencreport *o, ocrpt_expr *e) {
 	ocrpt_expr_set_iterative_start_value(e, false);
-	ocrpt_expr_init_both_results(o, e, OCRPT_RESULT_NUMBER);
-	if (ocrpt_expr_get_result_owned(o, e, false))
-		mpfr_set_ui(e->result[0]->number, 0, o->rndmode);
-	if (ocrpt_expr_get_result_owned(o, e, true))
-		mpfr_set_ui(e->result[1]->number, 0, o->rndmode);
+	ocrpt_expr_init_results(o, e, OCRPT_RESULT_NUMBER);
+	for (int i = 0; i < OCRPT_EXPR_RESULTS; i++)
+		if (ocrpt_expr_get_result_owned(o, e, i))
+			mpfr_set_ui(e->result[i]->number, 0, o->rndmode);
 }
 
 /*

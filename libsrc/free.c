@@ -71,10 +71,9 @@ DLL_EXPORT_SYM void ocrpt_expr_free(opencreport *o, ocrpt_report *r, ocrpt_expr 
 	case OCRPT_EXPR_ERROR:
 	case OCRPT_EXPR_STRING:
 	case OCRPT_EXPR_DATETIME:
-		if (e->result_owned0)
-			ocrpt_result_free_data(e->result[0]);
-		if (e->result_owned1)
-			ocrpt_result_free_data(e->result[1]);
+		for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
+			if (ocrpt_expr_get_result_owned(o, e, i))
+				ocrpt_result_free_data(e->result[i]);
 		break;
 	case OCRPT_EXPR_MVAR:
 	case OCRPT_EXPR_RVAR:
@@ -84,26 +83,23 @@ DLL_EXPORT_SYM void ocrpt_expr_free(opencreport *o, ocrpt_report *r, ocrpt_expr 
 		ocrpt_mem_string_free(e->name, true);
 		e->query = NULL;
 		e->name = NULL;
-		if (e->result_owned0)
-			ocrpt_result_free_data(e->result[0]);
-		if (e->result_owned1)
-			ocrpt_result_free_data(e->result[1]);
+		for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
+			if (ocrpt_expr_get_result_owned(o, e, i))
+				ocrpt_result_free_data(e->result[i]);
 		break;
 	case OCRPT_EXPR:
-		if (e->result_owned0)
-			ocrpt_result_free_data(e->result[0]);
-		if (e->result_owned1)
-			ocrpt_result_free_data(e->result[1]);
+		for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
+			if (ocrpt_expr_get_result_owned(o, e, i))
+				ocrpt_result_free_data(e->result[i]);
 		for (i = 0; i < e->n_ops; i++)
 			ocrpt_expr_free(o, r, e->ops[i]);
 		ocrpt_mem_free(e->ops);
 		break;
 	}
 
-	if (e->result_owned0)
-		ocrpt_mem_free(e->result[0]);
-	if (e->result_owned1)
-		ocrpt_mem_free(e->result[1]);
+	for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
+		if (ocrpt_expr_get_result_owned(o, e, i))
+			ocrpt_mem_free(e->result[i]);
 	ocrpt_result_free(e->delayed_result);
 	ocrpt_mem_free(e);
 }

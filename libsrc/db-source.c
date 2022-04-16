@@ -83,7 +83,7 @@ static void ocrpt_postgresql_describe(ocrpt_query *query, ocrpt_query_result **q
 		}
 
 		result->cols = PQnfields(res);
-		qr = ocrpt_mem_malloc(2 * result->cols * sizeof(ocrpt_query_result));
+		qr = ocrpt_mem_malloc(OCRPT_EXPR_RESULTS * result->cols * sizeof(ocrpt_query_result));
 
 		if (!qr) {
 			PQclear(res);
@@ -94,13 +94,10 @@ static void ocrpt_postgresql_describe(ocrpt_query *query, ocrpt_query_result **q
 			return;
 		}
 
-		memset(qr, 0, 2 * result->cols * sizeof(ocrpt_query_result));
+		memset(qr, 0, OCRPT_EXPR_RESULTS * result->cols * sizeof(ocrpt_query_result));
 
 		for (i = 0; i < result->cols; i++) {
 			enum ocrpt_result_type type;
-
-			qr[i].name = PQfname(res, i);
-			qr[result->cols + i].name = PQfname(res, i);
 
 			/* TODO: Handle date/time/interval types */
 			switch (PQftype(res, i)) {
@@ -129,18 +126,19 @@ static void ocrpt_postgresql_describe(ocrpt_query *query, ocrpt_query_result **q
 				break;
 			}
 
-			qr[i].result.type = type;
-			qr[result->cols + i].result.type = type;
+			for (int j = 0; j < OCRPT_EXPR_RESULTS; j++) {
+				int32_t idx = j * result->cols + i;
 
-			if (qr[i].result.type == OCRPT_RESULT_NUMBER) {
-				mpfr_init2(qr[i].result.number, query->source->o->prec);
-				qr[i].result.number_initialized = true;
-				mpfr_init2(qr[result->cols + i].result.number, query->source->o->prec);
-				qr[result->cols + i].result.number_initialized = true;
+				qr[idx].name = PQfname(res, i);
+				qr[idx].result.type = type;
+
+				if (qr[idx].result.type == OCRPT_RESULT_NUMBER) {
+					mpfr_init2(qr[idx].result.number, query->source->o->prec);
+					qr[idx].result.number_initialized = true;
+				}
+
+				qr[idx].result.isnull = true;
 			}
-
-			qr[i].result.isnull = true;
-			qr[result->cols + i].result.isnull = true;
 		}
 
 		result->result = qr;
@@ -423,18 +421,14 @@ static ocrpt_query_result *ocrpt_mariadb_describe_early(ocrpt_query *query) {
 	result->row = -1LL;
 	result->isdone = false;
 
-	qr = ocrpt_mem_malloc(2 * result->cols * sizeof(ocrpt_query_result));
+	qr = ocrpt_mem_malloc(OCRPT_EXPR_RESULTS * result->cols * sizeof(ocrpt_query_result));
 	if (!qr)
 		return NULL;
 
-	memset(qr, 0, 2 * result->cols * sizeof(ocrpt_query_result));
+	memset(qr, 0, OCRPT_EXPR_RESULTS * result->cols * sizeof(ocrpt_query_result));
 
 	for (i = 0, field = mysql_fetch_field(result->res); i < result->cols && field; field = mysql_fetch_field(result->res), i++) {
 		enum ocrpt_result_type type;
-
-		qr[i].name = ocrpt_mem_strdup(field->name);
-		qr[i].name_allocated = true;
-		qr[result->cols + i].name = qr[i].name;
 
 		/* TODO: Handle date/time/interval types */
 		switch (field->type) {
@@ -462,18 +456,24 @@ static ocrpt_query_result *ocrpt_mariadb_describe_early(ocrpt_query *query) {
 			break;
 		}
 
-		qr[i].result.type = type;
-		qr[result->cols + i].result.type = type;
+		for (int j = 0; j < OCRPT_EXPR_RESULTS; j++) {
+			int32_t idx = j * result->cols + i;
 
-		if (qr[i].result.type == OCRPT_RESULT_NUMBER) {
-			mpfr_init2(qr[i].result.number, query->source->o->prec);
-			qr[i].result.number_initialized = true;
-			mpfr_init2(qr[result->cols + i].result.number, query->source->o->prec);
-			qr[result->cols + i].result.number_initialized = true;
+			if (j == 0) {
+				qr[idx].name = ocrpt_mem_strdup(field->name);
+				qr[idx].name_allocated = true;
+			} else
+				qr[idx].name = qr[i].name;
+
+			qr[idx].result.type = type;
+
+			if (qr[idx].result.type == OCRPT_RESULT_NUMBER) {
+				mpfr_init2(qr[idx].result.number, query->source->o->prec);
+				qr[idx].result.number_initialized = true;
+			}
+
+			qr[idx].result.isnull = true;
 		}
-
-		qr[i].result.isnull = true;
-		qr[result->cols + i].result.isnull = true;
 	}
 
 	return qr;
@@ -722,11 +722,11 @@ static ocrpt_query_result *ocrpt_odbc_describe_early(ocrpt_query *query) {
 	SQLNumResultCols(result->stmt, &cols);
 	result->cols = cols;
 
-	qr = ocrpt_mem_malloc(2 * result->cols * sizeof(ocrpt_query_result));
+	qr = ocrpt_mem_malloc(OCRPT_EXPR_RESULTS * result->cols * sizeof(ocrpt_query_result));
 	if (!qr)
 		return NULL;
 
-	memset(qr, 0, 2 * result->cols * sizeof(ocrpt_query_result));
+	memset(qr, 0, OCRPT_EXPR_RESULTS * result->cols * sizeof(ocrpt_query_result));
 
 	for (i = 0; i < result->cols; i++) {
 		enum ocrpt_result_type type;
@@ -735,18 +735,26 @@ static ocrpt_query_result *ocrpt_odbc_describe_early(ocrpt_query *query) {
 		SQLSMALLINT col_type;
 		SQLULEN col_size;
 		ocrpt_string *string;
+		int32_t j;
 
 		ret = SQLDescribeCol(result->stmt, i + 1, NULL, 0, &colname_len, NULL, NULL, NULL, NULL);
 		if (!SQL_SUCCEEDED(ret))
 			continue;
 
-		qr[i].name = ocrpt_mem_malloc(colname_len + 1);
-		qr[i].name_allocated = true;
-		qr[result->cols + i].name = qr[i].name;
+		for (j = 0; j < OCRPT_EXPR_RESULTS; j++) {
+			int32_t idx = j * result->cols + i;
+
+			if (j == 0) {
+				qr[idx].name = ocrpt_mem_malloc(colname_len + 1);
+				qr[idx].name_allocated = true;
+			} else
+				qr[idx].name = qr[i].name;
+		}
 
 		ret = SQLDescribeCol(result->stmt, i + 1, (SQLCHAR *)qr[i].name, colname_len + 1, NULL, &col_type, &col_size, NULL, NULL);
 		if (!SQL_SUCCEEDED(ret))
 			continue;
+
 		string = ocrpt_mem_string_resize(result->coldata, col_size);
 		if (string) {
 			if (!result->coldata)
@@ -816,18 +824,18 @@ static ocrpt_query_result *ocrpt_odbc_describe_early(ocrpt_query *query) {
 			break;
 		}
 
-		qr[i].result.type = type;
-		qr[result->cols + i].result.type = type;
+		for (j = 0; j < OCRPT_EXPR_RESULTS; j++) {
+			int32_t idx = j * result->cols + i;
 
-		if (qr[i].result.type == OCRPT_RESULT_NUMBER) {
-			mpfr_init2(qr[i].result.number, query->source->o->prec);
-			qr[i].result.number_initialized = true;
-			mpfr_init2(qr[result->cols + i].result.number, query->source->o->prec);
-			qr[result->cols + i].result.number_initialized = true;
+			qr[idx].result.type = type;
+
+			if (qr[idx].result.type == OCRPT_RESULT_NUMBER) {
+				mpfr_init2(qr[idx].result.number, query->source->o->prec);
+				qr[idx].result.number_initialized = true;
+			}
+
+			qr[idx].result.isnull = true;
 		}
-
-		qr[i].result.isnull = true;
-		qr[result->cols + i].result.isnull = true;
 	}
 
 	result->result = qr;

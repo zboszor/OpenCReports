@@ -48,7 +48,7 @@ static void ocrpt_array_describe(ocrpt_query *query, ocrpt_query_result **qresul
 	int32_t i;
 
 	if (!result->result) {
-		ocrpt_query_result *qr = ocrpt_mem_malloc(2 * result->cols * sizeof(ocrpt_query_result));
+		ocrpt_query_result *qr = ocrpt_mem_malloc(OCRPT_EXPR_RESULTS * result->cols * sizeof(ocrpt_query_result));
 
 		if (!qr) {
 			if (qresult)
@@ -58,29 +58,25 @@ static void ocrpt_array_describe(ocrpt_query *query, ocrpt_query_result **qresul
 			return;
 		}
 
-		memset(qr, 0, 2 * result->cols * sizeof(ocrpt_query_result));
+		memset(qr, 0, OCRPT_EXPR_RESULTS * result->cols * sizeof(ocrpt_query_result));
 
 		for (i = 0; i < result->cols; i++) {
-			qr[i].name = result->data[i];
-			qr[result->cols + i].name = result->data[i];
+			for (int j = 0; j < OCRPT_EXPR_RESULTS; j++) {
+				qr[j * result->cols + i].name = result->data[i];
 
-			if (result->types) {
-				qr[i].result.type = result->types[i];
-				qr[result->cols + i].result.type = result->types[i];
-			} else {
-				qr[i].result.type = OCRPT_RESULT_STRING;
-				qr[result->cols + i].result.type = OCRPT_RESULT_STRING;
+				if (result->types)
+					qr[j * result->cols + i].result.type = result->types[i];
+				else
+					qr[j * result->cols + i].result.type = OCRPT_RESULT_STRING;
+
+				if (qr[i].result.type == OCRPT_RESULT_NUMBER) {
+					mpfr_init2(qr[j * result->cols + i].result.number, query->source->o->prec);
+					qr[j * result->cols + i].result.number_initialized = true;
+				}
+
+				qr[j * result->cols + i].result.isnull = true;
 			}
 
-			if (qr[i].result.type == OCRPT_RESULT_NUMBER) {
-				mpfr_init2(qr[i].result.number, query->source->o->prec);
-				qr[i].result.number_initialized = true;
-				mpfr_init2(qr[result->cols + i].result.number, query->source->o->prec);
-				qr[result->cols + i].result.number_initialized = true;
-			}
-
-			qr[i].result.isnull = true;
-			qr[result->cols + i].result.isnull = true;
 		}
 
 		result->result = qr;

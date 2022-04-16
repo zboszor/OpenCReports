@@ -199,12 +199,12 @@ DLL_EXPORT_SYM ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_
 	}
 	if (cols)
 		*cols = q->cols;
-	return (q->result ? (q->source->o->residx ? &q->result[q->cols] : q->result) : NULL);
+	return (q->result ? &q->result[q->source->o->residx * q->cols] : NULL);
 }
 
 void ocrpt_query_result_set_values_null(ocrpt_query *q) {
 	opencreport *o = q->source->o;
-	int32_t base = (o->residx ? q->cols: 0);
+	int32_t base = o->residx * q->cols;
 	int32_t i;
 
 	for (i = 0; i < q->cols; i++)
@@ -213,7 +213,7 @@ void ocrpt_query_result_set_values_null(ocrpt_query *q) {
 
 void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_t conv, const char *str, size_t len) {
 	opencreport *o = q->source->o;
-	int32_t base = (o->residx ? q->cols: 0);
+	int32_t base = o->residx * q->cols;
 	ocrpt_result *r = &q->result[base + i].result;
 	ocrpt_string *rstring;
 
@@ -306,7 +306,7 @@ void ocrpt_query_result_free(ocrpt_query *q) {
 	int32_t cols = q->cols, i;
 
 	if (result && cols) {
-		for (i = 0; i < 2 * cols; i++) {
+		for (i = 0; i < OCRPT_EXPR_RESULTS * cols; i++) {
 			if (result[i].name_allocated) {
 				ocrpt_strfree(result[i].name);
 				result[i].name = NULL;
