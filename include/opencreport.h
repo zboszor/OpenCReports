@@ -345,6 +345,10 @@ struct ocrpt_report {
 	ocrpt_list *done_callbacks;
 	ocrpt_list *newrow_callbacks;
 	/*
+	 * Internal accounting for number of data rows
+	 */
+	unsigned int data_rows;
+	/*
 	 * Number of expression in the report
 	 * including internal ones created for variables
 	 */
