@@ -6,6 +6,33 @@
 			Expressions in OpenCReports are based on Flex lexer and Bison grammar
 			that provide a solid and extensible basis for report expressions.
 		</para>
+		<para>
+			There are four data types in OpenCReports:
+			<literal>numeric</literal>, <literal>string</literal>,
+			<literal>datetime</literal> and <literal>error</literal>.
+		</para>
+		<para>
+			A <literal>numeric</literal> expression stores a high precision
+			number. Most functions and operators deal with numbers.
+		</para>
+		<para>
+			A <literal>string</literal> expression stores a string literal.
+			String can be concatenated or processed by string functions.
+		</para>
+		<para>
+			A <literal>datetime</literal> expression may store a date,
+			a time (with or without timezone) or both. Also, it may store
+			a time interval, e.g. <literal>2 months</literal> that can be
+			added to or subtracted from another <literal>datetime</literal>
+			value.
+		</para>
+		<para>
+			An <literal>error</literal> expression is a special case of
+			<literal>string</literal>: it stores a string literal (which
+			is an error message) but it cannot be further processed by
+			functions or operators. Instead, an error is propagated up
+			from subexpressions to the final result of the expression.
+		</para>
 	</sect1>
 	<sect1 id="constants" xreflabel="Constants">
 		<title>Constants</title>
@@ -121,6 +148,16 @@ no
 true
 false
 				</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="datetimeconstants" xreflabel="Datetime constants">
+			<title>Datetime constants</title>
+			<para>
+				There are no datetime constants per se, although expressions
+				like <literal>stodt('1980-06-30 16:00:00')</literal> (i.e.
+				function calls with constant arguments that result in a
+				<literal>datetime</literal> value) implicitly turn into
+				constants through expression optimization.
 			</para>
 		</sect2>
 	</sect1>
