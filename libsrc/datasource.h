@@ -30,6 +30,7 @@ struct ocrpt_query {
 	int32_t query_index;	/* index in r->queries and r->results */
 	int32_t current_row;	/* virtual current row, can be larger than
 							 * the actual number of rows in the input source */
+	ocrpt_expr *rownum;		/* same as current_row+1, used by rownum() function */
 	bool n_to_1_empty;		/* shortcut to track 0-row resultsets */
 	bool n_to_1_started;	/* track rows in n:1 followers */
 	bool n_to_1_matched;

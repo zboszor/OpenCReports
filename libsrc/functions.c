@@ -1793,19 +1793,10 @@ OCRPT_STATIC_FUNCTION(ocrpt_rownum) {
 		return;
 	}
 
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
-	/*
-	 * Internal row numbering is 0-based but in SQL it's 1-based.
-	 * It feels more natural to the user to use the SQL row numbers.
-	 * Also handle the case if a follow has run out of rows via ->isdone()
-	 */
-	if (e->q->source && e->q->source->input && e->q->source->input->isdone) {
-		if (e->q->source->input->isdone(e->q))
-			e->result[o->residx]->isnull = true;
-		else
-			mpfr_set_si(e->result[o->residx]->number, e->q->current_row + 1, o->rndmode);
-	} else
-		mpfr_set_si(e->result[o->residx]->number, e->q->current_row + 1, o->rndmode);
+	if (!e->result[o->residx]) {
+		e->result[o->residx] = e->q->rownum->result[o->residx];
+		ocrpt_expr_set_result_owned(o, e, o->residx, false);
+	}
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_brrownum) {

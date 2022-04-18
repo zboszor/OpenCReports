@@ -390,6 +390,8 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_postgresql(opencreport *o, ocrpt_dat
 	result->row = -1;
 	query->priv = result;
 
+	query->rownum = ocrpt_expr_parse(o, NULL, "r.rownum", NULL);
+
 	return query;
 
 	out_error:
@@ -661,6 +663,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_mariadb(opencreport *o, ocrpt_dataso
 
 	result->res = res;
 	query->priv = result;
+	query->rownum = ocrpt_expr_parse(o, NULL, "r.rownum", NULL);
 	result->result = ocrpt_mariadb_describe_early(query);
 	if (!result->result) {
 		mysql_free_result(res);
@@ -1153,6 +1156,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_odbc(opencreport *o, ocrpt_datasourc
 	result->stmt = stmt;
 	result->atstart = true;
 	query->priv = result;
+	query->rownum = ocrpt_expr_parse(o, NULL, "r.rownum", NULL);
 	result->result = ocrpt_odbc_describe_early(query);
 
 	if (!result->result) {

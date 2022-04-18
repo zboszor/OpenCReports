@@ -168,6 +168,7 @@ void ocrpt_query_free0(ocrpt_query *q) {
 	if (q->source && q->source->input && q->source->input->free)
 		q->source->input->free(q);
 
+	ocrpt_expr_free(o, NULL, q->rownum);
 	ocrpt_query_result_free(q);
 	ocrpt_strfree(q->name);
 	q->name = NULL;

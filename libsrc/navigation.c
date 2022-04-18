@@ -200,9 +200,13 @@ static bool ocrpt_navigate_next_private(opencreport *o, ocrpt_query *q) {
 		}
 		if (!q->source->input->next(q)) {
 			//fprintf(stderr, "%s:%d: query '%s' has no more rows\n", __func__, __LINE__, q->name);
+			ocrpt_expr_init_result(o, q->rownum, OCRPT_RESULT_NUMBER);
+			q->rownum->result[o->residx]->isnull = true;
 			return false;
 		}
 		q->current_row++;
+		ocrpt_expr_init_result(o, q->rownum, OCRPT_RESULT_NUMBER);
+		mpfr_set_si(q->rownum->result[o->residx]->number, q->current_row + 1, o->rndmode);
 	}
 
 	/* 1:1 followers  */
@@ -251,6 +255,8 @@ static void ocrpt_navigate_start_private(opencreport *o, ocrpt_query *q) {
 		fprintf(stderr, "%s:%d: '%s' doesn't have ->rewind() function\n", __func__, __LINE__, q->name);
 
 	q->current_row = -1;
+	ocrpt_expr_init_result(o, q->rownum, OCRPT_RESULT_NUMBER);
+	q->rownum->result[o->residx]->isnull = true;
 	q->n_to_1_empty = false;
 	q->n_to_1_started = false;
 	q->n_to_1_matched = false;

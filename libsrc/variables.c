@@ -317,8 +317,8 @@ DLL_EXPORT_SYM void ocrpt_variable_evaluate(opencreport *o, ocrpt_report *r, ocr
 			ocrpt_expr_eval_worker(o, r, v->intermedexpr, v->intermedexpr, v);
 		if (v->intermed2expr)
 			ocrpt_expr_eval_worker(o, r, v->intermed2expr, v->intermed2expr, v);
+		ocrpt_expr_eval_worker(o, r, v->resultexpr, v->resultexpr, v);
 	}
-	ocrpt_expr_eval_worker(o, r, v->resultexpr, v->resultexpr, v);
 }
 
 void ocrpt_variable_reset(opencreport *o, ocrpt_var *v) {
@@ -333,7 +333,7 @@ void ocrpt_variable_reset(opencreport *o, ocrpt_var *v) {
 	ocrpt_variable_initialize_results(o, v->resultexpr);
 }
 
-void ocrpt_variables_add_precalculated_results(opencreport *o, ocrpt_report *r, ocrpt_list *brl_start) {
+void ocrpt_variables_add_precalculated_results(opencreport *o, ocrpt_report *r, ocrpt_list *brl_start, bool last_row) {
 	ocrpt_list *l;
 
 	for (l = r->variables; l; l = l->next) {
@@ -342,12 +342,15 @@ void ocrpt_variables_add_precalculated_results(opencreport *o, ocrpt_report *r, 
 			ocrpt_list *brl;
 			bool var_br_triggered = false;
 
-			for (brl = brl_start; brl; brl = brl->next) {
-				if (var->br == brl->data) {
-					var_br_triggered = true;
-					break;
+			if (var->br) {
+				for (brl = brl_start; brl; brl = brl->next) {
+					if (var->br == brl->data) {
+						var_br_triggered = true;
+						break;
+					}
 				}
-			}
+			} else if (last_row)
+				var_br_triggered = true;
 
 			if (var_br_triggered) {
 				ocrpt_result *dst = ocrpt_mem_malloc(sizeof(ocrpt_result));
@@ -367,7 +370,7 @@ void ocrpt_variables_advance_precalculated_results(opencreport *o, ocrpt_report 
 		if (var->precalculate) {
 			if (!var->precalc_rptr)
 				var->precalc_rptr = var->precalc_results;
-			else {
+			else if (var->br) {
 				ocrpt_list *brl;
 				bool var_br_triggered = false;
 

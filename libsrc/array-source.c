@@ -214,6 +214,8 @@ static ocrpt_query *array_query_add(opencreport *o, const ocrpt_datasource *sour
 	priv->free_types = free_types;
 	query->priv = priv;
 
+	query->rownum = ocrpt_expr_parse(o, NULL, "r.rownum", NULL);
+
 	return query;
 }
 

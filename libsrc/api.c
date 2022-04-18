@@ -171,8 +171,8 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_report *r, oc
 				/* Use the previous row data temporarily */
 				o->residx = ocrpt_expr_prev_residx(o->residx);
 
-				if (o->precalculate)
-					ocrpt_variables_add_precalculated_results(o, r, brl_start);
+				if (o->precalculate && !last_row)
+					ocrpt_variables_add_precalculated_results(o, r, brl_start, last_row);
 
 				for (brl = r->breaks_reverse; brl; brl = brl->next) {
 					ocrpt_break *br = (ocrpt_break *)brl->data;
@@ -231,7 +231,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_report *r, oc
 		//printf("ocrpt_execute: r %p process FieldDetails\n", r);
 
 		if (o->precalculate && last_row) {
-			ocrpt_variables_add_precalculated_results(o, r, r->breaks);
+			ocrpt_variables_add_precalculated_results(o, r, r->breaks, last_row);
 			ocrpt_report_expressions_add_delayed_results(o, r);
 		}
 
