@@ -424,6 +424,7 @@ struct opencreport {
 	/* Alternating datasource row result index  */
 	int residx:3;
 	bool precalculate:1;
+	bool rlib_compat:1;
 };
 
 /*
@@ -1087,5 +1088,10 @@ bool ocrpt_parse_xml(opencreport *o, const char *filename);
  * Execute the reports added up to this point.
  */
 bool ocrpt_execute(opencreport *o);
+
+/*
+ * Set RLIB compatibility
+ */
+void ocrpt_set_rlib_compat(opencreport *o);
 
 #endif /* _OPENCREPORT_H_ */

@@ -418,6 +418,10 @@ DLL_EXPORT_SYM void ocrpt_set_locale(opencreport *o, const char *locale) {
 	o->locale = newlocale(LC_ALL_MASK, locale, (locale_t)0);
 }
 
+DLL_EXPORT_SYM void ocrpt_set_rlib_compat(opencreport *o) {
+	o->rlib_compat = true;
+}
+
 __attribute__((constructor))
 static void initialize_ocrpt(void) {
 	char *cwd;
