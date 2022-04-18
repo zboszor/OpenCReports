@@ -26,6 +26,15 @@ int main(void) {
 		"stodt('1980-05-05 06:10:15')",
 		"stodt('1980-05-05 06:10:15+02')",
 
+		/* Legacy RLIB formats */
+		"stodt('19800505061015')",
+		"stodt('061015')",
+		"stodt('061015p')",
+		"stodt('06:10:15p')",
+		"stodt('0610')",
+		"stodt('0610p')",
+		"stodt('06:10p')",
+
 		/* Logic checks */
 		"stodt('5/5/1980') < stodt('1980-05-05')",
 		"stodt('5/5/1980') <= stodt('1980-05-05')",

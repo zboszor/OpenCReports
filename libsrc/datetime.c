@@ -23,16 +23,76 @@ bool ocrpt_parse_datetime(opencreport *o, const char *time_string, int ts_len, o
 	char *dfmt = nl_langinfo_l(D_FMT, o->locale);
 	struct tm tm;
 	char *datefmts[] = { "%d/%m/%y", "%d/%m/%Y", "%F", dfmt, NULL };
-	char *timefmts[] = { "%T", "%R", tfmt, NULL };
+	char *timefmts[] = { "%Tp", "%T", "%Rp" ,"%R", tfmt, NULL };
 	char *fmt;
 	int i;
 	bool parsed_date = false;
 	bool parsed_time = false;
 	bool parsed_zone = false;
+	bool allnums = true;
+	bool time_pm = false;
 
 	final_time_string = malloc(ts_len + 10);
 	memset(final_time_string, 0, ts_len + 10);
 	fts_last = final_time_string;
+
+	for (i = 0; i < ts_len; i++) {
+		if (time_string[i] < '0' || time_string[i] > '9') {
+			if (i == ts_len - 1 && time_string[i] == 'p')
+				time_pm = true;
+			else
+				allnums = false;
+			break;
+		}
+	}
+
+	if (allnums) {
+		switch (ts_len) {
+		case 14:
+			ret = strptime(time_string, "%Y%m%d%H%M%S", &tm);
+			if (ret && (ret - time_string) == 14) {
+				fts_last = stpncpy(final_time_string, time_string, 14);
+				*fts_last = 0;
+				strcpy(final_fmt, "%Y%m%d%H%M%S");
+				parsed_date = true;
+				parsed_time = true;
+				goto end;
+			}
+			goto end_error;
+		case 7:
+			if (!time_pm)
+				goto end_error;
+		case 6:
+			ret = strptime(time_string, "%H%M%S", &tm);
+			if (ret && (ret - time_string) == 6) {
+				if (!time_pm || (time_pm && tm.tm_hour < 12)) {
+					fts_last = stpncpy(final_time_string, time_string, 6);
+					*fts_last = 0;
+					strcpy(final_fmt, "%H%M%S");
+					parsed_time = true;
+					goto end;
+				}
+			}
+			goto end_error;
+		case 5:
+			if (!time_pm)
+				goto end_error;
+		case 4:
+			ret = strptime(time_string, "%H%M", &tm);
+			if (ret && (ret - time_string) == 4) {
+				if (!time_pm || (time_pm && tm.tm_hour < 12)) {
+					fts_last = stpncpy(final_time_string, time_string, 4);
+					*fts_last = 0;
+					strcpy(final_fmt, "%H%M");
+					parsed_time = true;
+					goto end;
+				}
+			}
+			goto end_error;
+		default:
+			goto end_error;
+		}
+	}
 
 	/* Parse date part */
 	for (i = 0, fmt = datefmts[i]; fmt; i++, fmt = datefmts[i]) {
@@ -80,8 +140,16 @@ bool ocrpt_parse_datetime(opencreport *o, const char *time_string, int ts_len, o
 		memset(&tm, 0, sizeof(struct tm));
 		tm.tm_isdst = -1;
 		ret = strptime(rest, fmt, &tm);
-		if (ret)
+		if (ret) {
+			if (i == 0 || i == 2) {
+				if (tm.tm_hour < 12) {
+					time_pm = true;
+					break;
+				} else
+					goto end_error;
+			}
 			break;
+		}
 	}
 
 	if (ret && fmt) {
@@ -146,8 +214,11 @@ bool ocrpt_parse_datetime(opencreport *o, const char *time_string, int ts_len, o
 			time_t ts = mktime(&tm);
 			ts -= gmtoff - tm.tm_gmtoff;
 			localtime_r(&ts, &result->datetime);
-		} else
+		} else {
+			if (time_pm)
+				tm.tm_hour += 12;
 			result->datetime = tm;
+		}
 
 		result->date_valid = parsed_date;
 		result->time_valid = parsed_time;
@@ -156,6 +227,7 @@ bool ocrpt_parse_datetime(opencreport *o, const char *time_string, int ts_len, o
 		result->isnull = false;
 	}
 
+	end_error:
 	free(final_time_string);
 
 	return parsed_date || parsed_time;
