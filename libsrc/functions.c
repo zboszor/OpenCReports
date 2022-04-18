@@ -1258,7 +1258,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_xor) {
 	}
 
 	ret = mpfr_get_uj(e->ops[0]->result[o->residx]->number, o->rndmode);
-	for (i = 1; !ret && i < e->n_ops; i++) {
+	for (i = 1; i < e->n_ops; i++) {
 		uintmax_t ret1 = mpfr_get_uj(e->ops[i]->result[o->residx]->number, o->rndmode);
 		ret ^= ret1;
 	}
