@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <langinfo.h>
+#include <mpfr.h>
 
 #include "opencreport.h"
 #include "datetime.h"
@@ -231,4 +232,115 @@ bool ocrpt_parse_datetime(opencreport *o, const char *time_string, int ts_len, o
 	free(final_time_string);
 
 	return parsed_date || parsed_time;
+}
+
+static inline void fix_time_wrap(struct tm *tm) {
+	while (tm->tm_sec >= 60) {
+		tm->tm_sec -= 60;
+		tm->tm_min++;
+		if (tm->tm_min >= 60) {
+			tm->tm_min -= 60;
+			tm->tm_hour++;
+			if (tm->tm_hour >= 24) {
+				tm->tm_hour -= 24;
+				tm->tm_mday++;
+			}
+		}
+	}
+	while (tm->tm_sec < 0) {
+		tm->tm_sec += 60;
+		tm->tm_min--;
+		if (tm->tm_min < 0) {
+			tm->tm_min += 60;
+			tm->tm_hour--;
+			if (tm->tm_hour < 0) {
+				tm->tm_hour += 24;
+				tm->tm_mday--;
+			}
+		}
+	}
+}
+
+static inline bool leap_year(int y) {
+	return ((y % 100) == 0) ? ((y % 400) == 0) : ((y % 4) == 0);
+}
+
+static const int days_in_month[2][12] = {
+	{ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 },
+	{ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+};
+
+static inline void fix_day_wrap(struct tm *tm, bool interval) {
+	if (!interval) {
+		bool ly;
+		int dim;
+
+		for (ly = leap_year(tm->tm_year + 1900), dim = days_in_month[ly][tm->tm_mon]; tm->tm_mday > dim; ly = leap_year(tm->tm_year + 1900), dim = days_in_month[ly][tm->tm_mon]) {
+			tm->tm_mday -= dim;
+			tm->tm_mon++;
+			if (tm->tm_mon >= 12) {
+				tm->tm_mon -= 12;
+				tm->tm_year++;
+			}
+		}
+
+		while (tm->tm_mday < 1) {
+			tm->tm_mon--;
+			tm->tm_mday += days_in_month[leap_year(tm->tm_year + 1900)][tm->tm_mon];
+			if (tm->tm_mon < 0) {
+				tm->tm_mon += 12;
+				tm->tm_year--;
+			}
+		}
+	}
+
+	while (tm->tm_mon >= 12) {
+		tm->tm_mon -= 12;
+		tm->tm_year++;
+	}
+	while (tm->tm_mon < 0) {
+		tm->tm_mon += 12;
+		tm->tm_year--;
+	}
+}
+
+static inline void ocrpt_datetime_add_number_internal(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, long number) {
+	dst->result[o->residx]->datetime = src_datetime->datetime;
+	dst->result[o->residx]->date_valid = src_datetime->date_valid;
+	dst->result[o->residx]->time_valid = src_datetime->time_valid;
+	dst->result[o->residx]->interval = src_datetime->interval;
+	dst->result[o->residx]->day_carry = src_datetime->day_carry;
+
+	if (src_datetime->interval) {
+		dst->result[o->residx]->datetime.tm_sec += number;
+		fix_time_wrap(&dst->result[o->residx]->datetime);
+		fix_day_wrap(&dst->result[o->residx]->datetime, dst->result[o->residx]->interval);
+	} else if (src_datetime->date_valid && src_datetime->time_valid) {
+		time_t t = mktime(&src_datetime->datetime) + number;
+		localtime_r(&t, &dst->result[o->residx]->datetime);
+	} else if (src_datetime->date_valid) {
+		dst->result[o->residx]->datetime.tm_mday += number;
+		fix_day_wrap(&dst->result[o->residx]->datetime, dst->result[o->residx]->interval);
+	} else if (src_datetime->time_valid) {
+		dst->result[o->residx]->datetime.tm_sec += number;
+		fix_time_wrap(&dst->result[o->residx]->datetime);
+		dst->result[o->residx]->datetime.tm_year = 0;
+		dst->result[o->residx]->datetime.tm_mon = 0;
+		dst->result[o->residx]->datetime.tm_mday = 0;
+	} else
+		ocrpt_expr_make_error_result(o, dst, "invalid operand(s)");
+}
+
+void ocrpt_datetime_add_number(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_number) {
+	ocrpt_datetime_add_number_internal(o, dst, src_datetime, mpfr_get_si(src_number->number, o->rndmode));
+}
+
+void ocrpt_datetime_sub_number(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_number) {
+	ocrpt_datetime_add_number_internal(o, dst, src_datetime, -mpfr_get_si(src_number->number, o->rndmode));
+}
+
+void ocrpt_datetime_add_interval(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_interval) {
+}
+
+void ocrpt_datetime_sub_interval(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_interval) {
 }

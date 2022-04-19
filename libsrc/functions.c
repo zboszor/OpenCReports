@@ -25,16 +25,28 @@ static bool ocrpt_expr_init_result_internal(opencreport *o, ocrpt_expr *e, enum 
 		result = ocrpt_mem_malloc(sizeof(ocrpt_result));
 		if (result) {
 			memset(result, 0, sizeof(ocrpt_result));
-			assert(!e->result[which]);
 			e->result[which] = result;
 			ocrpt_expr_set_result_owned(o, e, which, true);
 		}
 	}
 	if (result) {
-		if (type == OCRPT_RESULT_NUMBER && !result->number_initialized) {
-			mpfr_init2(result->number, o->prec);
-			result->number_initialized = true;
+		switch (type) {
+		case OCRPT_RESULT_NUMBER:
+			if (!result->number_initialized) {
+				mpfr_init2(result->number, o->prec);
+				result->number_initialized = true;
+			}
+		case OCRPT_RESULT_DATETIME:
+			memset(&result->datetime, 0, sizeof(result->datetime));
+			result->date_valid = false;
+			result->time_valid = false;
+			result->interval = true;
+			result->day_carry = 0;
+			break;
+		default:
+			break;
 		}
+
 		result->type = type;
 		result->isnull = false;
 	}
@@ -144,16 +156,94 @@ OCRPT_STATIC_FUNCTION(ocrpt_add) {
 			}
 		} else
 			ocrpt_expr_make_error_result(o, e, "out of memory");
-	} else if (ndt == e->n_ops) {
-		/* TODO: add datetime/interval values */
-	} else if ((nnum + ndt) == e->n_ops) {
-		/* TODO: add number(s) to datetime(s) */
+	} else if (ndt > 0 && (nnum + ndt) == e->n_ops) {
+		/*
+		 * Rules for adding datetimes/intervals and numbers are a mix
+		 * of RLIB and PostgreSQL rules.
+		 *
+		 * - strictly do from left to right, no rearrangements.
+		 * - numbers are treated as integers, fractionals are truncated.
+		 *
+		 * - number + number -> number (duh)
+		 *
+		 * - number + datetime w/ valid time -> datetime + seconds
+		 * - datetime w/ valid time + number -> datetime + seconds
+		 *
+		 * - number + interval -> interval + seconds
+		 * - interval + number -> interval + seconds
+		 *
+		 * - number + datetime w/o valid time -> datetime + days
+		 * - datetime w/o valid time + number -> datetime + days
+		 *
+		 * - datetime + interval -> datetime w/ valid time
+		 * - interval + datetime -> datetime w/ valid time
+		 *
+		 * - interval + interval -> interval
+		 *
+		 * Invalid operand combinations:
+		 * - datetime + datetime
+		 */
+		ocrpt_expr_init_result(o, e, e->ops[0]->result[o->residx]->type);
+		ocrpt_result_copy(o, e->result[o->residx], e->ops[0]->result[o->residx]);
+
+		for (int32_t i = 1; i < e->n_ops; i++) {
+			switch (e->result[o->residx]->type) {
+			case OCRPT_RESULT_NUMBER:
+				switch (e->ops[i]->result[o->residx]->type) {
+				case OCRPT_RESULT_NUMBER:
+					mpfr_add(e->result[o->residx]->number, e->result[o->residx]->number, e->ops[i]->result[o->residx]->number, o->rndmode);
+					break;
+				case OCRPT_RESULT_DATETIME:
+					if (e->ops[i]->result[o->residx]->interval) {
+						ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+						return;
+					}
+					e->result[o->residx]->type = OCRPT_RESULT_DATETIME;
+					ocrpt_datetime_add_number(o, e, e->ops[i]->result[o->residx], e->result[o->residx]);
+					break;
+				default:
+					/* cannot happen */
+					ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+					return;
+				}
+				break;
+			case OCRPT_RESULT_DATETIME:
+				switch (e->ops[i]->result[o->residx]->type) {
+				case OCRPT_RESULT_NUMBER:
+					if (e->result[o->residx]->interval) {
+						ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+						return;
+					}
+					ocrpt_datetime_add_number(o, e, e->result[o->residx], e->ops[i]->result[o->residx]);
+					break;
+				case OCRPT_RESULT_DATETIME:
+					if (!e->result[o->residx]->interval && !e->ops[i]->result[o->residx]->interval) {
+						ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+						return;
+					}
+					if (e->result[o->residx]->interval)
+						ocrpt_datetime_add_interval(o, e, e->ops[i]->result[o->residx], e->result[o->residx]);
+					else
+						ocrpt_datetime_add_interval(o, e, e->result[o->residx], e->ops[i]->result[o->residx]);
+					break;
+				default:
+					/* cannot happpen */
+					ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+					return;
+				}
+				break;
+			default:
+				/* cannot happen */
+				ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+				return;
+			}
+		}
 	} else
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_sub) {
-	int i, nnum;
+	int i, nnum = 0, ndt = 0;
 
 	if (e->n_ops < 2) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
@@ -161,9 +251,15 @@ OCRPT_STATIC_FUNCTION(ocrpt_sub) {
 	}
 
 	nnum = 0;
+	ndt = 0;
 	for (i = 0; i < e->n_ops; i++) {
-		if (e->ops[i]->result[o->residx] && e->ops[i]->result[o->residx]->type == OCRPT_RESULT_NUMBER)
-			nnum++;
+		if (e->ops[i]->result[o->residx]) {
+			if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_NUMBER)
+				nnum++;
+			if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_DATETIME) {
+				ndt++;
+			}
+		}
 	}
 
 	if (nnum == e->n_ops) {
@@ -179,6 +275,79 @@ OCRPT_STATIC_FUNCTION(ocrpt_sub) {
 		mpfr_set(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
 		for (i = 1; i < e->n_ops; i++)
 			mpfr_sub(e->result[o->residx]->number, e->result[o->residx]->number, e->ops[i]->result[o->residx]->number, o->rndmode);
+	} else if (ndt > 0 && (nnum + ndt) == e->n_ops) {
+		/*
+		 * Rules for subtracting datetimes/intervals and numbers are a mix
+		 * of RLIB and PostgreSQL rules.
+		 *
+		 * - strictly do from left to right, no rearrangements
+		 * - numbers are treated as integers, fractionals are truncated.
+		 *
+		 * - number - number -> number (duh)
+		 *
+		 * - datetime w/ valid time - number -> datetime - seconds
+		 * - interval - number -> interval - seconds
+		 *
+		 * - datetime w/o valid time - number -> datetime - days
+		 *
+		 * - datetime - datetime -> interval
+		 *
+		 * - datetime - interval -> datetime w/ valid time
+		 *
+		 * - interval - interval -> interval
+		 *
+		 * Invalid operand combinations:
+		 * - number - datetime
+		 * - number - interval
+		 * - interval - datetime
+		 */
+		ocrpt_expr_init_result(o, e, e->ops[0]->result[o->residx]->type);
+		ocrpt_result_copy(o, e->result[o->residx], e->ops[0]->result[o->residx]);
+
+		for (int32_t i = 1; i < e->n_ops; i++) {
+			switch (e->result[o->residx]->type) {
+			case OCRPT_RESULT_NUMBER:
+				switch (e->ops[i]->result[o->residx]->type) {
+				case OCRPT_RESULT_NUMBER:
+					mpfr_sub(e->result[o->residx]->number, e->result[o->residx]->number, e->ops[i]->result[o->residx]->number, o->rndmode);
+					break;
+				case OCRPT_RESULT_DATETIME:
+					ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+					return;
+				default:
+					/* cannot happen */
+					ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+					return;
+				}
+				break;
+			case OCRPT_RESULT_DATETIME:
+				switch (e->ops[i]->result[o->residx]->type) {
+				case OCRPT_RESULT_NUMBER:
+					if (e->result[o->residx]->interval) {
+						ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+						return;
+					}
+					ocrpt_datetime_sub_number(o, e, e->result[o->residx], e->ops[i]->result[o->residx]);
+					break;
+				case OCRPT_RESULT_DATETIME:
+					if (e->result[o->residx]->interval && !e->ops[i]->result[o->residx]->interval) {
+						ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+						return;
+					}
+					ocrpt_datetime_sub_interval(o, e, e->result[o->residx], e->ops[i]->result[o->residx]);
+					break;
+				default:
+					/* cannot happpen */
+					ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+					return;
+				}
+				break;
+			default:
+				/* cannot happen */
+				ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+				return;
+			}
+		}
 	} else
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 }

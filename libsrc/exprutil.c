@@ -61,11 +61,11 @@ static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth, co
 		char tmp[128];
 		if (!result->isnull) {
 			if (result->date_valid && result->time_valid)
-				strftime(tmp, sizeof(tmp), "%F %T %z", &result->datetime);
+				strftime(tmp, sizeof(tmp), "%F %T", &result->datetime);
 			else if (result->date_valid)
 				strftime(tmp, sizeof(tmp), "%F", &result->datetime);
 			else if (result->time_valid)
-				strftime(tmp, sizeof(tmp), "%T %z", &result->datetime);
+				strftime(tmp, sizeof(tmp), "%T", &result->datetime);
 		}
 		ocrpt_mem_string_append_printf(str, "(datetime)%s", result ? (result->isnull ? "NULL" : tmp) : NULL);
 		break;
@@ -210,16 +210,31 @@ DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
 		printf("(string)%s\n", (r->isnull || !r->string) ? "NULL" : r->string->str);
 		break;
 	case OCRPT_RESULT_DATETIME: {
-		char tmp[128];
 		if (!r->isnull) {
-			if (r->date_valid && r->time_valid)
-				strftime(tmp, sizeof(tmp), "%F %T %z", &r->datetime);
-			else if (r->date_valid)
-				strftime(tmp, sizeof(tmp), "%F", &r->datetime);
-			else if (r->time_valid)
-				strftime(tmp, sizeof(tmp), "%T %z", &r->datetime);
-		}
-		printf("(datetime)%s\n", r->isnull ? "NULL" : tmp);
+			if (r->interval) {
+				ocrpt_string *str = ocrpt_mem_string_new_with_len("", 0);
+				if (r->datetime.tm_year)
+					ocrpt_mem_string_append_printf(str, "%d years ", r->datetime.tm_year);
+				if (r->datetime.tm_mon)
+					ocrpt_mem_string_append_printf(str, "%d mons ", r->datetime.tm_mon);
+				if (r->datetime.tm_mday)
+					ocrpt_mem_string_append_printf(str, "%d days ", r->datetime.tm_mday);
+				if (r->datetime.tm_hour && r->datetime.tm_min && r->datetime.tm_sec)
+					ocrpt_mem_string_append_printf(str, "%02d:%02d%02d", r->datetime.tm_hour, r->datetime.tm_min, r->datetime.tm_sec);
+				printf("(datetime)%s\n", str->str);
+				ocrpt_mem_string_free(str, true);
+			} else {
+				char tmp[128] = "";
+				if (r->date_valid && r->time_valid)
+					strftime(tmp, sizeof(tmp), "%F %T", &r->datetime);
+				else if (r->date_valid)
+					strftime(tmp, sizeof(tmp), "%F", &r->datetime);
+				else if (r->time_valid)
+					strftime(tmp, sizeof(tmp), "%T", &r->datetime);
+				printf("(datetime)%s\n", tmp);
+			}
+		} else
+			printf("(datetime)NULL\n");
 		break;
 	}
 	case OCRPT_RESULT_NUMBER:
