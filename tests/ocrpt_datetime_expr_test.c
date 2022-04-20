@@ -106,6 +106,20 @@ int main(void) {
 		"dim(stodt('1980-03-15'))",
 		"dim(stodt('1980-04-15'))",
 
+		/* Week-of-year tests */
+		"wiy(stodt('2022-01-01'))",
+		"wiy1(stodt('2022-01-01'))",
+		"wiyo(stodt('2022-01-01'), 1)",
+		"stdwiy(stodt('2022-01-01'))",
+		"wiy(stodt('2022-01-02'))",
+		"wiy1(stodt('2022-01-02'))",
+		"wiyo(stodt('2022-01-02'), 1)",
+		"stdwiy(stodt('2022-01-02'))",
+		"wiy(stodt('2022-01-03'))",
+		"wiy1(stodt('2022-01-03'))",
+		"wiyo(stodt('2022-01-03'), 1)",
+		"stdwiy(stodt('2022-01-03'))",
+
 		/* Invalid operand arithmetics */
 		"stodt('1980-05-05') + stodt('1980-05-05')",
 		"1 - stodt('1980-05-05 06:00')",

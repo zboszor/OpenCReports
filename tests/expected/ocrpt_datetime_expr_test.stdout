@@ -502,6 +502,90 @@ expr optimized: 30.000000
 expr nodes: 1
 (number)30.000000
 
+string: wiy(stodt('2022-01-01'))
+expr reprinted: wiy(stodt((string)2022-01-01))
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: wiy1(stodt('2022-01-01'))
+expr reprinted: wiy1(stodt((string)2022-01-01))
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: wiyo(stodt('2022-01-01'), 1)
+expr reprinted: wiyo(stodt((string)2022-01-01),1.000000)
+expr nodes: 4
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: stdwiy(stodt('2022-01-01'))
+expr reprinted: stdwiy(stodt((string)2022-01-01))
+expr nodes: 3
+expr optimized: 52.000000
+expr nodes: 1
+(number)52.000000
+
+string: wiy(stodt('2022-01-02'))
+expr reprinted: wiy(stodt((string)2022-01-02))
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: wiy1(stodt('2022-01-02'))
+expr reprinted: wiy1(stodt((string)2022-01-02))
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: wiyo(stodt('2022-01-02'), 1)
+expr reprinted: wiyo(stodt((string)2022-01-02),1.000000)
+expr nodes: 4
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: stdwiy(stodt('2022-01-02'))
+expr reprinted: stdwiy(stodt((string)2022-01-02))
+expr nodes: 3
+expr optimized: 52.000000
+expr nodes: 1
+(number)52.000000
+
+string: wiy(stodt('2022-01-03'))
+expr reprinted: wiy(stodt((string)2022-01-03))
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: wiy1(stodt('2022-01-03'))
+expr reprinted: wiy1(stodt((string)2022-01-03))
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: wiyo(stodt('2022-01-03'), 1)
+expr reprinted: wiyo(stodt((string)2022-01-03),1.000000)
+expr nodes: 4
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: stdwiy(stodt('2022-01-03'))
+expr reprinted: stdwiy(stodt((string)2022-01-03))
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
 string: stodt('1980-05-05') + stodt('1980-05-05')
 expr reprinted: add(stodt((string)1980-05-05),stodt((string)1980-05-05))
 expr nodes: 5

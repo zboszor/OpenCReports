@@ -2493,6 +2493,157 @@ OCRPT_STATIC_FUNCTION(ocrpt_dim) {
 	mpfr_set_si(e->result[o->residx]->number, days_in_month[ocrpt_leap_year(year)][mon], o->rndmode);
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_wiy) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME || e->ops[0]->result[o->residx]->interval) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->isnull || !e->ops[0]->result[o->residx]->date_valid) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	char wiy[64] = "";
+	strftime(wiy, sizeof(wiy), "%U", &e->ops[0]->result[o->residx]->datetime);
+	mpfr_set_si(e->result[o->residx]->number, atoi(wiy), o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_wiy1) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME || e->ops[0]->result[o->residx]->interval) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->isnull || !e->ops[0]->result[o->residx]->date_valid) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	char wiy[64] = "";
+	strftime(wiy, sizeof(wiy), "%W", &e->ops[0]->result[o->residx]->datetime);
+	mpfr_set_si(e->result[o->residx]->number, atoi(wiy), o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_wiyo) {
+	int32_t i;
+
+	if (e->n_ops != 2) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	for (i = 0; i < 2; i++) {
+		if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+			ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+			return;
+		}
+		if (e->ops[i]->result[o->residx]->isnull) {
+			e->result[o->residx]->isnull = true;
+			return;
+		}
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME || e->ops[0]->result[o->residx]->interval) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[1]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]->date_valid) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	ocrpt_result res = { .type = OCRPT_RESULT_DATETIME, .interval = false };
+	res.datetime = e->ops[0]->result[o->residx]->datetime;
+	res.date_valid = e->ops[0]->result[o->residx]->date_valid;
+	res.time_valid = false;
+
+	char wiy[64] = "";
+	int wyear, wyearofs;
+	long ofs = mpfr_get_si(e->ops[1]->result[o->residx]->number, o->rndmode);
+	while (ofs < 0)
+		ofs += 7;
+	ofs / ofs % 7;
+
+	strftime(wiy, sizeof(wiy), "%U", &res.datetime);
+	wyear = atoi(wiy);
+
+	ocrpt_datetime_result_add_number(o, &res, e->ops[0]->result[o->residx], -ofs);
+
+	res.datetime.tm_isdst = -1;
+	res.datetime.tm_wday = -1;
+	time_t t = mktime(&res.datetime);
+	localtime_r(&t, &res.datetime);
+
+	strftime(wiy, sizeof(wiy), "%U", &res.datetime);
+	wyearofs = atoi(wiy);
+
+	if (wyearofs > wyear)
+		wyearofs = 0;
+
+	mpfr_set_si(e->result[o->residx]->number, wyearofs, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_stdwiy) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME || e->ops[0]->result[o->residx]->interval) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->isnull || !e->ops[0]->result[o->residx]->date_valid) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	char wiy[64] = "";
+	strftime(wiy, sizeof(wiy), "%V", &e->ops[0]->result[o->residx]->datetime);
+	mpfr_set_si(e->result[o->residx]->number, atoi(wiy), o->rndmode);
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -2549,6 +2700,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "rownum",		ocrpt_rownum,	-1,	false,	false,	false,	true },
 	{ "shl",		ocrpt_shl,	2,	false,	false,	false,	false },
 	{ "shr",		ocrpt_shr,	2,	false,	false,	false,	false },
+	{ "stdwiy",		ocrpt_stdwiy,	1,	false,  false,  false,  false },
 	{ "stod",		ocrpt_stodt,	1,	false,  false,  false,  false },
 	{ "stodt",		ocrpt_stodt,	1,	false,  false,  false,  false },
 	{ "stodtsql",	ocrpt_stodt,	1,	false,  false,  false,  false },
@@ -2558,6 +2710,9 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "uminus",		ocrpt_uminus,	1,	false,	false,	false,	false },
 	{ "upper",		ocrpt_upper,	1,	false,	false,	false,	false },
 	{ "val",		ocrpt_val,	1,	false,	false,	false,	false },
+	{ "wiy",		ocrpt_wiy,	1,	false,  false,  false,  false },
+	{ "wiy1",		ocrpt_wiy1,	1,	false,  false,  false,  false },
+	{ "wiyo",		ocrpt_wiyo,	2,	false,  false,  false,  false },
 	{ "xor",		ocrpt_xor,	-1,	true,	true,	true,	false },
 	{ "year",		ocrpt_year,	1,	false,  false,  false,  false },
 };

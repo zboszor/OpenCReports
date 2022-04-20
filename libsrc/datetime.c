@@ -282,11 +282,11 @@ static inline void fix_day_wrap(struct tm *tm, bool interval) {
 
 		while (tm->tm_mday < 1) {
 			tm->tm_mon--;
-			tm->tm_mday += days_in_month[ocrpt_leap_year(tm->tm_year + 1900)][tm->tm_mon];
 			if (tm->tm_mon < 0) {
 				tm->tm_mon += 12;
 				tm->tm_year--;
 			}
+			tm->tm_mday += days_in_month[ocrpt_leap_year(tm->tm_year + 1900)][tm->tm_mon];
 		}
 	}
 
@@ -300,39 +300,46 @@ static inline void fix_day_wrap(struct tm *tm, bool interval) {
 	}
 }
 
-static inline void ocrpt_datetime_add_number_internal(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, long number) {
-	dst->result[o->residx]->datetime = src_datetime->datetime;
-	dst->result[o->residx]->date_valid = src_datetime->date_valid;
-	dst->result[o->residx]->time_valid = src_datetime->time_valid;
-	dst->result[o->residx]->interval = src_datetime->interval;
-	dst->result[o->residx]->day_carry = src_datetime->day_carry;
+bool ocrpt_datetime_result_add_number(opencreport *o, ocrpt_result *dst, ocrpt_result *src_datetime, long number) {
+	dst->datetime = src_datetime->datetime;
+	dst->date_valid = src_datetime->date_valid;
+	dst->time_valid = src_datetime->time_valid;
+	dst->interval = src_datetime->interval;
+	dst->day_carry = src_datetime->day_carry;
 
 	if (src_datetime->interval) {
-		dst->result[o->residx]->datetime.tm_sec += number;
-		fix_time_wrap(&dst->result[o->residx]->datetime);
-		fix_day_wrap(&dst->result[o->residx]->datetime, dst->result[o->residx]->interval);
+		dst->datetime.tm_sec += number;
+		fix_time_wrap(&dst->datetime);
+		fix_day_wrap(&dst->datetime, dst->interval);
+		return true;
 	} else if (src_datetime->date_valid && src_datetime->time_valid) {
 		time_t t = mktime(&src_datetime->datetime) + number;
-		localtime_r(&t, &dst->result[o->residx]->datetime);
+		localtime_r(&t, &dst->datetime);
+		return true;
 	} else if (src_datetime->date_valid) {
-		dst->result[o->residx]->datetime.tm_mday += number;
-		fix_day_wrap(&dst->result[o->residx]->datetime, dst->result[o->residx]->interval);
+		dst->datetime.tm_mday += number;
+		fix_day_wrap(&dst->datetime, dst->interval);
+		return true;
 	} else if (src_datetime->time_valid) {
-		dst->result[o->residx]->datetime.tm_sec += number;
-		fix_time_wrap(&dst->result[o->residx]->datetime);
-		dst->result[o->residx]->datetime.tm_year = 0;
-		dst->result[o->residx]->datetime.tm_mon = 0;
-		dst->result[o->residx]->datetime.tm_mday = 0;
-	} else
-		ocrpt_expr_make_error_result(o, dst, "invalid operand(s)");
+		dst->datetime.tm_sec += number;
+		fix_time_wrap(&dst->datetime);
+		dst->datetime.tm_year = 0;
+		dst->datetime.tm_mon = 0;
+		dst->datetime.tm_mday = 0;
+		return true;
+	}
+
+	return false;
 }
 
 void ocrpt_datetime_add_number(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_number) {
-	ocrpt_datetime_add_number_internal(o, dst, src_datetime, mpfr_get_si(src_number->number, o->rndmode));
+	if (!ocrpt_datetime_result_add_number(o, dst->result[o->residx], src_datetime, mpfr_get_si(src_number->number, o->rndmode)))
+		ocrpt_expr_make_error_result(o, dst, "invalid operand(s)");
 }
 
 void ocrpt_datetime_sub_number(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_number) {
-	ocrpt_datetime_add_number_internal(o, dst, src_datetime, -mpfr_get_si(src_number->number, o->rndmode));
+	if (!ocrpt_datetime_result_add_number(o, dst->result[o->residx], src_datetime, -mpfr_get_si(src_number->number, o->rndmode)))
+		ocrpt_expr_make_error_result(o, dst, "invalid operand(s)");
 }
 
 void ocrpt_datetime_add_interval(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_interval) {
