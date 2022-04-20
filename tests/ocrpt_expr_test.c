@@ -130,7 +130,7 @@ int main(void) {
 
 		/* String arithmetics tests */
 		"'a' + 'b'",			/* should be 'ab' */
-		//"'a' + nulls()",		/* should be NULL */
+		"'a' + nulls()",		/* should be NULL */
 		"concat('a', 'b')",		/* same */
 		"'a' - 'b'",			/* should be an error */
 		"left('árvíztűrő tükörfúrógép', 9)",

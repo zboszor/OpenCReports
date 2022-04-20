@@ -642,6 +642,13 @@ expr optimized: (string)ab
 expr nodes: 1
 (string)ab
 
+string: 'a' + nulls()
+expr reprinted: add((string)a,nulls())
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
 string: concat('a', 'b')
 expr reprinted: concat((string)a,(string)b)
 expr nodes: 3
