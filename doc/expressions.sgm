@@ -321,8 +321,8 @@ expression1 ? expression2 : expression3
 			The bitwise operators in this precedence class and in their
 			increasing order of precedence are:
 			bitwise OR (<literal>|</literal>),
-			bitwise XOR (<literal>^</literal>) and
-			bitwise AND (<literal>&</literal>).
+			bitwise XOR (<literal>^</literal>, only in non-RLIB
+			compatibility mode) and bitwise AND (<literal>&</literal>).
 			</para>
 		</sect2>
 		<sect2>
@@ -363,6 +363,13 @@ expression1 ? expression2 : expression3
 			<para>
 				<literal>a * b</literal>, <literal>a / b</literal> and
 				<literal>a % b</literal>.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Power-of operator</title>
+			<para>
+				<literal>a ^ b</literal> works as a-to-the-power-of-b
+				in RLIB compatibility mode.
 			</para>
 		</sect2>
 		<sect2>
@@ -858,6 +865,15 @@ a++b
 			</para>
 		</sect2>
 		<sect2>
+			<title>pow()</title>
+			<para>
+				This function raises the first operand to the power of its
+				second operand. It accepts 2 numeric operands.
+				Operator <literal>^</literal> is the shortcut for
+				this function in RLIB compatibility mode.
+			</para>
+		</sect2>
+		<sect2>
 			<title>random()</title>
 			<para>
 				Generate a pseudo-random numeric value between 0 and 1.
@@ -956,8 +972,8 @@ a++b
 			<title>xor()</title>
 			<para>
 				Bitwise exclusive OR. Operator <literal>^</literal> is
-				the shortcut for this function.
-				It accepts 2 or more numeric operands.
+				the shortcut for this function in non-RLIB compatibility
+				mode. It accepts 2 or more numeric operands.
 			</para>
 		</sect2>
 	</sect1>
