@@ -262,7 +262,6 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	time_t t = time(NULL);
 	localtime_r(&t, &o->current_date->datetime);
 	o->current_date->date_valid = true;
-	o->current_date->time_valid = false;
 	localtime_r(&t, &o->current_timestamp->datetime);
 	o->current_timestamp->date_valid = true;
 	o->current_timestamp->time_valid = true;
@@ -338,11 +337,6 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 
 				q = (r->query ? r->query : (o->queries ? (ocrpt_query *)o->queries->data : NULL));
 
-				if (!q) {
-					/* TODO: no query, output the the NoData alternative part if it exists */
-					continue;
-				}
-
 				r->executing = true;
 
 				for (cbl = r->start_callbacks; cbl; cbl = cbl->next) {
@@ -351,11 +345,16 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 					cbd->func(o, r, cbd->data);
 				}
 
-				if (!r->have_delayed_expr || r->data_rows)
-					r->data_rows = ocrpt_execute_one_report(o, r, q);
+				if (q) {
+					if (!r->have_delayed_expr || r->data_rows)
+						r->data_rows = ocrpt_execute_one_report(o, r, q);
 
-				if (!r->data_rows) {
-					/* TODO: no query rows, output the the NoData alternative part if it exists */
+					if (!r->data_rows) {
+						/* TODO: no query rows, output the the NoData alternative part if it exists */
+					}
+				} else {
+					/* TODO: no query, output the the NoData alternative part if it exists */
+					continue;
 				}
 
 				for (cbl = r->done_callbacks; cbl; cbl = cbl->next) {
