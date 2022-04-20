@@ -2385,6 +2385,114 @@ OCRPT_STATIC_FUNCTION(ocrpt_now) {
 	}
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_year) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->isnull || (!e->ops[0]->result[o->residx]->interval && !e->ops[0]->result[o->residx]->date_valid)) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	int add = (e->ops[0]->result[o->residx]->interval ? 0 : 1900);
+	mpfr_set_si(e->result[o->residx]->number, e->ops[0]->result[o->residx]->datetime.tm_year + add, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_month) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->isnull || (!e->ops[0]->result[o->residx]->interval && !e->ops[0]->result[o->residx]->date_valid)) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	int add = (e->ops[0]->result[o->residx]->interval ? 0 : 1);
+	mpfr_set_si(e->result[o->residx]->number, e->ops[0]->result[o->residx]->datetime.tm_mon + add, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_day) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->isnull || (!e->ops[0]->result[o->residx]->interval && !e->ops[0]->result[o->residx]->date_valid)) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	mpfr_set_si(e->result[o->residx]->number, e->ops[0]->result[o->residx]->datetime.tm_mday, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_dim) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME || e->ops[0]->result[o->residx]->interval) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->isnull || !e->ops[0]->result[o->residx]->date_valid) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	int mon = e->ops[0]->result[o->residx]->datetime.tm_mon;
+	int year = e->ops[0]->result[o->residx]->datetime.tm_year;
+	mpfr_set_si(e->result[o->residx]->number, days_in_month[ocrpt_leap_year(year)][mon], o->rndmode);
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -2397,7 +2505,9 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "ceil",		ocrpt_ceil,	1,	false,	false,	false,	false },
 	{ "concat",		ocrpt_concat,	-1,	false,	false,	false,	false },
 	{ "date",		ocrpt_date,	0,	false,  false,  false,  false },
+	{ "day",		ocrpt_day,	1,	false,  false,  false,  false },
 	{ "dec",		ocrpt_dec,	1,	false,	false,	false,	false },
+	{ "dim",		ocrpt_dim,	1,	false,  false,  false,  false },
 	{ "div",		ocrpt_div,	-1,	false,	false,	true,	false },
 	{ "dtos",		ocrpt_dtos,	1,	false,  false,  false,  false },
 	{ "eq",			ocrpt_eq,	2,	true,	false,	false,	false },
@@ -2419,6 +2529,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "lt",			ocrpt_lt,	2,	false,	false,	false,	false },
 	{ "mid",		ocrpt_mid,	3,	false,	false,	false,	false },
 	{ "mod",		ocrpt_remainder,	2,	false,	false,	false,	false },
+	{ "month",		ocrpt_month,	1,	false,  false,  false,  false },
 	{ "mul",		ocrpt_mul,	-1,	true,	true,	false,	false },
 	{ "ne",			ocrpt_ne,	2,	true,	false,	false,	false },
 	{ "not",		ocrpt_not,	1,	false,	false,	false,	false },
@@ -2448,6 +2559,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "upper",		ocrpt_upper,	1,	false,	false,	false,	false },
 	{ "val",		ocrpt_val,	1,	false,	false,	false,	false },
 	{ "xor",		ocrpt_xor,	-1,	true,	true,	true,	false },
+	{ "year",		ocrpt_year,	1,	false,  false,  false,  false },
 };
 
 static int n_ocrpt_functions = sizeof(ocrpt_functions) / sizeof(ocrpt_function);

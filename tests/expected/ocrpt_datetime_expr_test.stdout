@@ -453,6 +453,55 @@ expr optimized: (datetime)2100-02-28
 expr nodes: 1
 (datetime)2100-02-28
 
+string: year(stodt('1979-03-01'))
+expr reprinted: year(stodt((string)1979-03-01))
+expr nodes: 3
+expr optimized: 1979.000000
+expr nodes: 1
+(number)1979.000000
+
+string: month(stodt('1979-03-01'))
+expr reprinted: month(stodt((string)1979-03-01))
+expr nodes: 3
+expr optimized: 3.000000
+expr nodes: 1
+(number)3.000000
+
+string: day(stodt('1979-03-01'))
+expr reprinted: day(stodt((string)1979-03-01))
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: dim(stodt('1979-02-15'))
+expr reprinted: dim(stodt((string)1979-02-15))
+expr nodes: 3
+expr optimized: 28.000000
+expr nodes: 1
+(number)28.000000
+
+string: dim(stodt('1980-02-15'))
+expr reprinted: dim(stodt((string)1980-02-15))
+expr nodes: 3
+expr optimized: 29.000000
+expr nodes: 1
+(number)29.000000
+
+string: dim(stodt('1980-03-15'))
+expr reprinted: dim(stodt((string)1980-03-15))
+expr nodes: 3
+expr optimized: 31.000000
+expr nodes: 1
+(number)31.000000
+
+string: dim(stodt('1980-04-15'))
+expr reprinted: dim(stodt((string)1980-04-15))
+expr nodes: 3
+expr optimized: 30.000000
+expr nodes: 1
+(number)30.000000
+
 string: stodt('1980-05-05') + stodt('1980-05-05')
 expr reprinted: add(stodt((string)1980-05-05),stodt((string)1980-05-05))
 expr nodes: 5

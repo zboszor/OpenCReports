@@ -83,6 +83,7 @@ int main(void) {
 		"stodt('1980-05-05 23:59:59') + 1",
 		"stodt('1980-05-06 00:00:00') - 1",
 
+		/* Leap year tests */
 		"stodt('1979-02-28') + 1",
 		"stodt('1980-02-28') + 1",
 		"stodt('1980-02-29') + 1",
@@ -96,7 +97,14 @@ int main(void) {
 		"stodt('2000-03-01') - 1",
 		"stodt('2100-03-01') - 1",
 
-		/* Leap year */
+		/* Date part extraction tests */
+		"year(stodt('1979-03-01'))",
+		"month(stodt('1979-03-01'))",
+		"day(stodt('1979-03-01'))",
+		"dim(stodt('1979-02-15'))",
+		"dim(stodt('1980-02-15'))",
+		"dim(stodt('1980-03-15'))",
+		"dim(stodt('1980-04-15'))",
 
 		/* Invalid operand arithmetics */
 		"stodt('1980-05-05') + stodt('1980-05-05')",

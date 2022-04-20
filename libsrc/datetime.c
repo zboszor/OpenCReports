@@ -261,11 +261,7 @@ static inline void fix_time_wrap(struct tm *tm) {
 	}
 }
 
-static inline bool leap_year(int y) {
-	return ((y % 100) == 0) ? ((y % 400) == 0) : ((y % 4) == 0);
-}
-
-static const int days_in_month[2][12] = {
+const int days_in_month[2][12] = {
 	{ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 },
 	{ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
 };
@@ -275,7 +271,7 @@ static inline void fix_day_wrap(struct tm *tm, bool interval) {
 		bool ly;
 		int dim;
 
-		for (ly = leap_year(tm->tm_year + 1900), dim = days_in_month[ly][tm->tm_mon]; tm->tm_mday > dim; ly = leap_year(tm->tm_year + 1900), dim = days_in_month[ly][tm->tm_mon]) {
+		for (ly = ocrpt_leap_year(tm->tm_year + 1900), dim = days_in_month[ly][tm->tm_mon]; tm->tm_mday > dim; ly = ocrpt_leap_year(tm->tm_year + 1900), dim = days_in_month[ly][tm->tm_mon]) {
 			tm->tm_mday -= dim;
 			tm->tm_mon++;
 			if (tm->tm_mon >= 12) {
@@ -286,7 +282,7 @@ static inline void fix_day_wrap(struct tm *tm, bool interval) {
 
 		while (tm->tm_mday < 1) {
 			tm->tm_mon--;
-			tm->tm_mday += days_in_month[leap_year(tm->tm_year + 1900)][tm->tm_mon];
+			tm->tm_mday += days_in_month[ocrpt_leap_year(tm->tm_year + 1900)][tm->tm_mon];
 			if (tm->tm_mon < 0) {
 				tm->tm_mon += 12;
 				tm->tm_year--;
