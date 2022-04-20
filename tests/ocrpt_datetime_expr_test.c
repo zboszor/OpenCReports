@@ -104,7 +104,27 @@ int main(void) {
 		"1 - stodt('06:00')",
 	};
 	int nstr = sizeof(str) / sizeof(char *);
-	int i;
+	char *str1[] = {
+		/* Parsed datetime, date part converted to string */
+		"dtos(stodt('5/5/1980'))",
+		"dtos(stodt('1980-05-05'))",
+		"dtos(stodt('06:10:15'))",
+		"dtos(stodt('06:10'))",
+		"dtos(stodt('5/5/1980 06:10:15'))",
+		"dtos(stodt('1980-05-05 06:10:15'))",
+		"dtos(stodt('1980-05-05 06:10:15+02'))",
+	};
+	int nstr1 = sizeof(str1) / sizeof(char *);
+	char *locales[] = {
+		"C",
+		"en_US.UTF-8",
+		"en_GB.UTF-8",
+		"fr_FR.UTF-8",
+		"de_DE.UTF-8",
+		"hu_HU.UTF-8",
+	};
+	int nlocs = sizeof(locales) / sizeof(char *);
+	int i, l;
 
 	for (i = 0; i < nstr; i++) {
 		char *err = NULL;
@@ -134,6 +154,42 @@ int main(void) {
 	}
 
 	ocrpt_free(o);
+
+	for (l = 0; l < nlocs; l++) {
+		o = ocrpt_init();
+		ocrpt_set_locale(o, locales[l]);
+
+		printf("\nPrint datetime date part in %s\n\n", locales[l]);
+
+		for (i = 0; i < nstr1; i++) {
+			char *err = NULL;
+
+			printf("string: %s\n", str1[i]);
+			e = ocrpt_expr_parse(o, NULL, str1[i], &err);
+			if (e) {
+				ocrpt_result *r;
+
+				printf("expr reprinted: ");
+				ocrpt_expr_print(o, e);
+				printf("expr nodes: %d\n", ocrpt_expr_nodes(e));
+
+				ocrpt_expr_optimize(o, NULL, e);
+				printf("expr optimized: ");
+				ocrpt_expr_print(o, e);
+				printf("expr nodes: %d\n", ocrpt_expr_nodes(e));
+
+				r = ocrpt_expr_eval(o, NULL, e);
+				ocrpt_result_print(r);
+			} else {
+				printf("%s\n", err);
+				ocrpt_strfree(err);
+			}
+			ocrpt_expr_free(o, NULL, e);
+			printf("\n");
+		}
+
+		ocrpt_free(o);
+	}
 
 	return 0;
 }

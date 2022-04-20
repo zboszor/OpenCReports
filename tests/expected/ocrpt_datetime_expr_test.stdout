@@ -474,3 +474,315 @@ expr optimized: (ERROR)invalid operand(s)
 expr nodes: 1
 (ERROR)invalid operand(s)
 
+
+Print datetime date part in C
+
+string: dtos(stodt('5/5/1980'))
+expr reprinted: dtos(stodt((string)5/5/1980))
+expr nodes: 3
+expr optimized: (string)05/05/80
+expr nodes: 1
+(string)05/05/80
+
+string: dtos(stodt('1980-05-05'))
+expr reprinted: dtos(stodt((string)1980-05-05))
+expr nodes: 3
+expr optimized: (string)05/05/80
+expr nodes: 1
+(string)05/05/80
+
+string: dtos(stodt('06:10:15'))
+expr reprinted: dtos(stodt((string)06:10:15))
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: dtos(stodt('06:10'))
+expr reprinted: dtos(stodt((string)06:10))
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: dtos(stodt('5/5/1980 06:10:15'))
+expr reprinted: dtos(stodt((string)5/5/1980 06:10:15))
+expr nodes: 3
+expr optimized: (string)05/05/80
+expr nodes: 1
+(string)05/05/80
+
+string: dtos(stodt('1980-05-05 06:10:15'))
+expr reprinted: dtos(stodt((string)1980-05-05 06:10:15))
+expr nodes: 3
+expr optimized: (string)05/05/80
+expr nodes: 1
+(string)05/05/80
+
+string: dtos(stodt('1980-05-05 06:10:15+02'))
+expr reprinted: dtos(stodt((string)1980-05-05 06:10:15+02))
+expr nodes: 3
+expr optimized: (string)05/05/80
+expr nodes: 1
+(string)05/05/80
+
+
+Print datetime date part in en_US.UTF-8
+
+string: dtos(stodt('5/5/1980'))
+expr reprinted: dtos(stodt((string)5/5/1980))
+expr nodes: 3
+expr optimized: (string)05/05/1980
+expr nodes: 1
+(string)05/05/1980
+
+string: dtos(stodt('1980-05-05'))
+expr reprinted: dtos(stodt((string)1980-05-05))
+expr nodes: 3
+expr optimized: (string)05/05/1980
+expr nodes: 1
+(string)05/05/1980
+
+string: dtos(stodt('06:10:15'))
+expr reprinted: dtos(stodt((string)06:10:15))
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: dtos(stodt('06:10'))
+expr reprinted: dtos(stodt((string)06:10))
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: dtos(stodt('5/5/1980 06:10:15'))
+expr reprinted: dtos(stodt((string)5/5/1980 06:10:15))
+expr nodes: 3
+expr optimized: (string)05/05/1980
+expr nodes: 1
+(string)05/05/1980
+
+string: dtos(stodt('1980-05-05 06:10:15'))
+expr reprinted: dtos(stodt((string)1980-05-05 06:10:15))
+expr nodes: 3
+expr optimized: (string)05/05/1980
+expr nodes: 1
+(string)05/05/1980
+
+string: dtos(stodt('1980-05-05 06:10:15+02'))
+expr reprinted: dtos(stodt((string)1980-05-05 06:10:15+02))
+expr nodes: 3
+expr optimized: (string)05/05/1980
+expr nodes: 1
+(string)05/05/1980
+
+
+Print datetime date part in en_GB.UTF-8
+
+string: dtos(stodt('5/5/1980'))
+expr reprinted: dtos(stodt((string)5/5/1980))
+expr nodes: 3
+expr optimized: (string)05/05/80
+expr nodes: 1
+(string)05/05/80
+
+string: dtos(stodt('1980-05-05'))
+expr reprinted: dtos(stodt((string)1980-05-05))
+expr nodes: 3
+expr optimized: (string)05/05/80
+expr nodes: 1
+(string)05/05/80
+
+string: dtos(stodt('06:10:15'))
+expr reprinted: dtos(stodt((string)06:10:15))
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: dtos(stodt('06:10'))
+expr reprinted: dtos(stodt((string)06:10))
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: dtos(stodt('5/5/1980 06:10:15'))
+expr reprinted: dtos(stodt((string)5/5/1980 06:10:15))
+expr nodes: 3
+expr optimized: (string)05/05/80
+expr nodes: 1
+(string)05/05/80
+
+string: dtos(stodt('1980-05-05 06:10:15'))
+expr reprinted: dtos(stodt((string)1980-05-05 06:10:15))
+expr nodes: 3
+expr optimized: (string)05/05/80
+expr nodes: 1
+(string)05/05/80
+
+string: dtos(stodt('1980-05-05 06:10:15+02'))
+expr reprinted: dtos(stodt((string)1980-05-05 06:10:15+02))
+expr nodes: 3
+expr optimized: (string)05/05/80
+expr nodes: 1
+(string)05/05/80
+
+
+Print datetime date part in fr_FR.UTF-8
+
+string: dtos(stodt('5/5/1980'))
+expr reprinted: dtos(stodt((string)5/5/1980))
+expr nodes: 3
+expr optimized: (string)05/05/1980
+expr nodes: 1
+(string)05/05/1980
+
+string: dtos(stodt('1980-05-05'))
+expr reprinted: dtos(stodt((string)1980-05-05))
+expr nodes: 3
+expr optimized: (string)05/05/1980
+expr nodes: 1
+(string)05/05/1980
+
+string: dtos(stodt('06:10:15'))
+expr reprinted: dtos(stodt((string)06:10:15))
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: dtos(stodt('06:10'))
+expr reprinted: dtos(stodt((string)06:10))
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: dtos(stodt('5/5/1980 06:10:15'))
+expr reprinted: dtos(stodt((string)5/5/1980 06:10:15))
+expr nodes: 3
+expr optimized: (string)05/05/1980
+expr nodes: 1
+(string)05/05/1980
+
+string: dtos(stodt('1980-05-05 06:10:15'))
+expr reprinted: dtos(stodt((string)1980-05-05 06:10:15))
+expr nodes: 3
+expr optimized: (string)05/05/1980
+expr nodes: 1
+(string)05/05/1980
+
+string: dtos(stodt('1980-05-05 06:10:15+02'))
+expr reprinted: dtos(stodt((string)1980-05-05 06:10:15+02))
+expr nodes: 3
+expr optimized: (string)05/05/1980
+expr nodes: 1
+(string)05/05/1980
+
+
+Print datetime date part in de_DE.UTF-8
+
+string: dtos(stodt('5/5/1980'))
+expr reprinted: dtos(stodt((string)5/5/1980))
+expr nodes: 3
+expr optimized: (string)05.05.1980
+expr nodes: 1
+(string)05.05.1980
+
+string: dtos(stodt('1980-05-05'))
+expr reprinted: dtos(stodt((string)1980-05-05))
+expr nodes: 3
+expr optimized: (string)05.05.1980
+expr nodes: 1
+(string)05.05.1980
+
+string: dtos(stodt('06:10:15'))
+expr reprinted: dtos(stodt((string)06:10:15))
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: dtos(stodt('06:10'))
+expr reprinted: dtos(stodt((string)06:10))
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: dtos(stodt('5/5/1980 06:10:15'))
+expr reprinted: dtos(stodt((string)5/5/1980 06:10:15))
+expr nodes: 3
+expr optimized: (string)05.05.1980
+expr nodes: 1
+(string)05.05.1980
+
+string: dtos(stodt('1980-05-05 06:10:15'))
+expr reprinted: dtos(stodt((string)1980-05-05 06:10:15))
+expr nodes: 3
+expr optimized: (string)05.05.1980
+expr nodes: 1
+(string)05.05.1980
+
+string: dtos(stodt('1980-05-05 06:10:15+02'))
+expr reprinted: dtos(stodt((string)1980-05-05 06:10:15+02))
+expr nodes: 3
+expr optimized: (string)05.05.1980
+expr nodes: 1
+(string)05.05.1980
+
+
+Print datetime date part in hu_HU.UTF-8
+
+string: dtos(stodt('5/5/1980'))
+expr reprinted: dtos(stodt((string)5/5/1980))
+expr nodes: 3
+expr optimized: (string)1980-05-05
+expr nodes: 1
+(string)1980-05-05
+
+string: dtos(stodt('1980-05-05'))
+expr reprinted: dtos(stodt((string)1980-05-05))
+expr nodes: 3
+expr optimized: (string)1980-05-05
+expr nodes: 1
+(string)1980-05-05
+
+string: dtos(stodt('06:10:15'))
+expr reprinted: dtos(stodt((string)06:10:15))
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: dtos(stodt('06:10'))
+expr reprinted: dtos(stodt((string)06:10))
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: dtos(stodt('5/5/1980 06:10:15'))
+expr reprinted: dtos(stodt((string)5/5/1980 06:10:15))
+expr nodes: 3
+expr optimized: (string)1980-05-05
+expr nodes: 1
+(string)1980-05-05
+
+string: dtos(stodt('1980-05-05 06:10:15'))
+expr reprinted: dtos(stodt((string)1980-05-05 06:10:15))
+expr nodes: 3
+expr optimized: (string)1980-05-05
+expr nodes: 1
+(string)1980-05-05
+
+string: dtos(stodt('1980-05-05 06:10:15+02'))
+expr reprinted: dtos(stodt((string)1980-05-05 06:10:15+02))
+expr nodes: 3
+expr optimized: (string)1980-05-05
+expr nodes: 1
+(string)1980-05-05
+

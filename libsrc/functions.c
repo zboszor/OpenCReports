@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <langinfo.h>
 #include <utf8proc.h>
 
 #include "opencreport.h"
@@ -36,6 +37,7 @@ static bool ocrpt_expr_init_result_internal(opencreport *o, ocrpt_expr *e, enum 
 				mpfr_init2(result->number, o->prec);
 				result->number_initialized = true;
 			}
+			break;
 		case OCRPT_RESULT_DATETIME:
 			memset(&result->datetime, 0, sizeof(result->datetime));
 			result->date_valid = false;
@@ -2303,6 +2305,48 @@ OCRPT_STATIC_FUNCTION(ocrpt_stodt) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_dtos) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->interval) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_STRING);
+
+	if (e->ops[0]->result[o->residx]->isnull || !e->ops[0]->result[o->residx]->date_valid) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	ocrpt_string *string = ocrpt_mem_string_resize(e->result[o->residx]->string, 64);
+
+	if (string) {
+		if (!e->result[o->residx]->string) {
+			e->result[o->residx]->string = string;
+			e->result[o->residx]->string_owned = true;
+		}
+
+		char *dfmt = nl_langinfo_l(D_FMT, o->locale);
+		strftime(e->result[o->residx]->string->str, e->result[o->residx]->string->allocated_len, dfmt, &e->ops[0]->result[o->residx]->datetime);
+	} else
+		ocrpt_expr_make_error_result(o, e, "out of memory");
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -2316,6 +2360,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "concat",		ocrpt_concat,	-1,	false,	false,	false,	false },
 	{ "dec",		ocrpt_dec,	1,	false,	false,	false,	false },
 	{ "div",		ocrpt_div,	-1,	false,	false,	true,	false },
+	{ "dtos",		ocrpt_dtos,	1,	false,  false,  false,  false },
 	{ "eq",			ocrpt_eq,	2,	true,	false,	false,	false },
 	{ "error",		ocrpt_error,	1,	false,	false,	false,	false },
 	{ "factorial",	ocrpt_factorial,	1,	false,	false,	false,	false },
