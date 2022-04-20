@@ -455,7 +455,13 @@ OCRPT_STATIC_FUNCTION(ocrpt_eq) {
 		if ((e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid &&
 				e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) ||
 			(e->ops[0]->result[o->residx]->interval && e->ops[1]->result[o->residx]->interval)) {
-			ret = (memcmp(&e->ops[0]->result[o->residx]->datetime, &e->ops[1]->result[o->residx]->datetime, sizeof(struct tm)) == 0);
+			ret =
+				(e->ops[0]->result[o->residx]->datetime.tm_year == e->ops[1]->result[o->residx]->datetime.tm_year) &&
+				(e->ops[0]->result[o->residx]->datetime.tm_mon == e->ops[1]->result[o->residx]->datetime.tm_mon) &&
+				(e->ops[0]->result[o->residx]->datetime.tm_mday == e->ops[1]->result[o->residx]->datetime.tm_mday) &&
+				(e->ops[0]->result[o->residx]->datetime.tm_hour == e->ops[1]->result[o->residx]->datetime.tm_hour) &&
+				(e->ops[0]->result[o->residx]->datetime.tm_min == e->ops[1]->result[o->residx]->datetime.tm_min) &&
+				(e->ops[0]->result[o->residx]->datetime.tm_sec == e->ops[1]->result[o->residx]->datetime.tm_sec);
 		} else if (e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid) {
 			ret =
 				(e->ops[0]->result[o->residx]->datetime.tm_year == e->ops[1]->result[o->residx]->datetime.tm_year) &&
@@ -466,7 +472,8 @@ OCRPT_STATIC_FUNCTION(ocrpt_eq) {
 				(e->ops[0]->result[o->residx]->datetime.tm_hour == e->ops[1]->result[o->residx]->datetime.tm_hour) &&
 				(e->ops[0]->result[o->residx]->datetime.tm_min == e->ops[1]->result[o->residx]->datetime.tm_min) &&
 				(e->ops[0]->result[o->residx]->datetime.tm_sec == e->ops[1]->result[o->residx]->datetime.tm_sec);
-		}
+		} else
+			ret = false;
 		break;
 	default:
 		ret = false;
@@ -515,7 +522,13 @@ OCRPT_STATIC_FUNCTION(ocrpt_ne) {
 		if ((e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid &&
 				e->ops[0]->result[o->residx]->time_valid && e->ops[1]->result[o->residx]->time_valid) ||
 			(e->ops[0]->result[o->residx]->interval && e->ops[1]->result[o->residx]->interval)) {
-			ret = (memcmp(&e->ops[0]->result[o->residx]->datetime, &e->ops[1]->result[o->residx]->datetime, sizeof(struct tm)) != 0);
+			ret =
+				(e->ops[0]->result[o->residx]->datetime.tm_year != e->ops[1]->result[o->residx]->datetime.tm_year) ||
+				(e->ops[0]->result[o->residx]->datetime.tm_mon != e->ops[1]->result[o->residx]->datetime.tm_mon) ||
+				(e->ops[0]->result[o->residx]->datetime.tm_mday != e->ops[1]->result[o->residx]->datetime.tm_mday) ||
+				(e->ops[0]->result[o->residx]->datetime.tm_hour != e->ops[1]->result[o->residx]->datetime.tm_hour) ||
+				(e->ops[0]->result[o->residx]->datetime.tm_min != e->ops[1]->result[o->residx]->datetime.tm_min) ||
+				(e->ops[0]->result[o->residx]->datetime.tm_sec != e->ops[1]->result[o->residx]->datetime.tm_sec);
 		} else if (e->ops[0]->result[o->residx]->date_valid && e->ops[1]->result[o->residx]->date_valid) {
 			ret =
 				(e->ops[0]->result[o->residx]->datetime.tm_year != e->ops[1]->result[o->residx]->datetime.tm_year) ||
@@ -526,7 +539,8 @@ OCRPT_STATIC_FUNCTION(ocrpt_ne) {
 				(e->ops[0]->result[o->residx]->datetime.tm_hour != e->ops[1]->result[o->residx]->datetime.tm_hour) ||
 				(e->ops[0]->result[o->residx]->datetime.tm_min != e->ops[1]->result[o->residx]->datetime.tm_min) ||
 				(e->ops[0]->result[o->residx]->datetime.tm_sec != e->ops[1]->result[o->residx]->datetime.tm_sec);
-		}
+		} else
+			ret = false;
 		break;
 	default:
 		ret = false;
