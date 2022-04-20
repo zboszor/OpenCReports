@@ -413,10 +413,9 @@ DLL_EXPORT_SYM const ocrpt_paper *ocrpt_paper_next(opencreport *o) {
 }
 
 DLL_EXPORT_SYM void ocrpt_set_locale(opencreport *o, const char *locale) {
-	if (o->locale)
-		freelocale(o->locale);
-
-	o->locale = newlocale(LC_ALL_MASK, locale, (locale_t)0);
+	o->locale = newlocale(LC_ALL_MASK, locale, o->locale);
+	if (o->locale == (locale_t)0)
+		o->locale = newlocale(LC_ALL_MASK, "C", o->locale);
 }
 
 DLL_EXPORT_SYM void ocrpt_set_rlib_compat(opencreport *o) {
