@@ -58,7 +58,8 @@ TESTS = \
 UNSTABLE_TESTS = \
 	ocrpt_random_test \
 	ocrpt_paper_test \
-	ocrpt_execute_test
+	ocrpt_execute_test \
+	ocrpt_now_test
 
 noinst_PROGRAMS = $(TESTS) $(UNSTABLE_TESTS)
 

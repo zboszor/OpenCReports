@@ -2347,6 +2347,44 @@ OCRPT_STATIC_FUNCTION(ocrpt_dtos) {
 		ocrpt_expr_make_error_result(o, e, "out of memory");
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_date) {
+	if (e->n_ops != 0) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!o->current_date->date_valid) {
+		time_t t = time(NULL);
+		localtime_r(&t, &o->current_date->datetime);
+		o->current_date->date_valid = true;
+		o->current_date->time_valid = false;
+	}
+
+	if (!e->result[o->residx]) {
+		e->result[o->residx] = o->current_date;
+		ocrpt_expr_set_result_owned(o, e, o->residx, false);
+	}
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_now) {
+	if (e->n_ops != 0) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!o->current_date->date_valid) {
+		time_t t = time(NULL);
+		localtime_r(&t, &o->current_timestamp->datetime);
+		o->current_timestamp->date_valid = true;
+		o->current_timestamp->time_valid = true;
+	}
+
+	if (!e->result[o->residx]) {
+		e->result[o->residx] = o->current_timestamp;
+		ocrpt_expr_set_result_owned(o, e, o->residx, false);
+	}
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -2358,6 +2396,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "brrownum",	ocrpt_brrownum,	1,	false,	false,	false,	true },
 	{ "ceil",		ocrpt_ceil,	1,	false,	false,	false,	false },
 	{ "concat",		ocrpt_concat,	-1,	false,	false,	false,	false },
+	{ "date",		ocrpt_date,	0,	false,  false,  false,  false },
 	{ "dec",		ocrpt_dec,	1,	false,	false,	false,	false },
 	{ "div",		ocrpt_div,	-1,	false,	false,	true,	false },
 	{ "dtos",		ocrpt_dtos,	1,	false,  false,  false,  false },
@@ -2383,6 +2422,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "mul",		ocrpt_mul,	-1,	true,	true,	false,	false },
 	{ "ne",			ocrpt_ne,	2,	true,	false,	false,	false },
 	{ "not",		ocrpt_not,	1,	false,	false,	false,	false },
+	{ "now",		ocrpt_now,	0,	false,  false,  false,  false },
 	{ "null",		ocrpt_null,	1,	false,	false,	false,	false },
 	{ "nulldt",		ocrpt_nulldt,	0,	false,	false,	false,	false },
 	{ "nulln",		ocrpt_nulln,	0,	false,	false,	false,	false },

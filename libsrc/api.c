@@ -57,6 +57,14 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	gmp_randseed_ui(o->randstate, seed);
 	ocrpt_set_locale(o, "C");
 
+	o->current_date = ocrpt_mem_malloc(sizeof(ocrpt_result));
+	memset(o->current_date, 0, sizeof(ocrpt_result));
+	o->current_date->type = OCRPT_RESULT_DATETIME;
+
+	o->current_timestamp = ocrpt_mem_malloc(sizeof(ocrpt_result));
+	memset(o->current_timestamp, 0, sizeof(ocrpt_result));
+	o->current_timestamp->type = OCRPT_RESULT_DATETIME;
+
 	return o;
 }
 
@@ -110,6 +118,9 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 
 	gmp_randclear(o->randstate);
 	ocrpt_mem_string_free(o->converted, true);
+
+	ocrpt_result_free(o->current_date);
+	ocrpt_result_free(o->current_timestamp);
 
 	ocrpt_mem_free(o);
 }
@@ -246,6 +257,15 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_report *r, oc
 DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	if (!o)
 		return false;
+
+	/* Initialize date() and now() values */
+	time_t t = time(NULL);
+	localtime_r(&t, &o->current_date->datetime);
+	o->current_date->date_valid = true;
+	o->current_date->time_valid = false;
+	localtime_r(&t, &o->current_timestamp->datetime);
+	o->current_timestamp->date_valid = true;
+	o->current_timestamp->time_valid = true;
 
 	/* Run all reports in precalculate mode if needed */
 	o->precalculate = true;

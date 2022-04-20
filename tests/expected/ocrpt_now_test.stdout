@@ -1,0 +1,14 @@
+string: now()
+expr reprinted: now()
+expr nodes: 1
+expr optimized: (datetime)2022-04-20 10:21:32
+expr nodes: 1
+(datetime)2022-04-20 10:21:32
+
+string: date()
+expr reprinted: date()
+expr nodes: 1
+expr optimized: (datetime)2022-04-20
+expr nodes: 1
+(datetime)2022-04-20
+

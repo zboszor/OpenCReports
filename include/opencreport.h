@@ -427,6 +427,10 @@ struct opencreport {
 	/* List of ocrpt_report_cb elements */
 	ocrpt_list *report_added_callbacks;
 
+	/* The result of date() and now() functions */
+	ocrpt_result *current_date;
+	ocrpt_result *current_timestamp;
+
 	/* Locale specific data */
 	locale_t locale;
 
