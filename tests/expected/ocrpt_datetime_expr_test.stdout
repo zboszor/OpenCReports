@@ -607,6 +607,9 @@ expr optimized: (ERROR)invalid operand(s)
 expr nodes: 1
 (ERROR)invalid operand(s)
 
+string: wiy(stodt('2022-01-01'), 1)
+invalid number of operands for wiy at or near "wiy(stodt('2022-01-01'), 1)"
+
 
 Print datetime date part in C
 

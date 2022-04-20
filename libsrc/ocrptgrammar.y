@@ -245,6 +245,7 @@ exp:
 											ocrpt_string *fname = $1->name;
 
 											$1->name = NULL;
+											extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, $1);
 											ocrpt_expr_free(extra->o, extra->r, $1);
 											$$ = newexpr(yyscanner, fname, $4);
 										} else {
@@ -554,8 +555,6 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, ocrpt_list *
 	int idx;
 	const ocrpt_function *f;
 
-	extra->tokens = ocrpt_list_remove(extra->tokens, fname);
-
 	f = ocrpt_function_get(extra->o, fname->str);
 	if (!f) {
 		ocrpt_mem_string_free(fname, true);
@@ -574,6 +573,8 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, ocrpt_list *
 
 		parser_yyerror(msg);
 	}
+
+	extra->tokens = ocrpt_list_remove(extra->tokens, fname);
 
 	e = newblankexpr1(yyscanner, OCRPT_EXPR, ocrpt_list_length(l));
 	ocrpt_mem_string_free(fname, true);

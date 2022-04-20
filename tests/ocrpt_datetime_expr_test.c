@@ -124,6 +124,9 @@ int main(void) {
 		"stodt('1980-05-05') + stodt('1980-05-05')",
 		"1 - stodt('1980-05-05 06:00')",
 		"1 - stodt('06:00')",
+
+		/* Invalid operand function calls */
+		"wiy(stodt('2022-01-01'), 1)",
 	};
 	int nstr = sizeof(str) / sizeof(char *);
 	char *str1[] = {
