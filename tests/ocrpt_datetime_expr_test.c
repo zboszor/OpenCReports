@@ -127,6 +127,7 @@ int main(void) {
 		"timeof(stodt('1979-03-01'))",
 		"timeof(stodt('1979-03-01 06:15:37'))",
 		"timeof(stodt('06:15:37'))",
+
 		"chgdateof(stodt('1979-03-01'), stodt('2022-04-21'))",
 		"chgdateof(stodt('1979-03-01 06:30:21'), stodt('2022-04-21'))",
 		"chgdateof(stodt('06:30:21'), stodt('2022-04-21'))",
@@ -146,6 +147,17 @@ int main(void) {
 		"chgtimeof(stodt('1979-03-01'), stodt('14:37:12'))",
 		"chgtimeof(stodt('1979-03-01 06:30:21'), stodt('14:37:12'))",
 		"chgtimeof(stodt('06:30:21'), stodt('14:37:12'))",
+
+		"settimeinsecs(stodt('1979-03-01'), 3600)",
+		"settimeinsecs(stodt('1979-03-01 06:30:21'), 3600)",
+		"settimeinsecs(stodt('06:30:21'), 3600)",
+		"settimeinsecs(nulldt(), 3600)",
+		"settimeinsecs(stodt('1979-03-01'), nulln())",
+
+		"gettimeinsecs(stodt('1979-03-01'))",
+		"gettimeinsecs(stodt('1979-03-01 06:30:21'))",
+		"gettimeinsecs(stodt('06:30:21'))",
+		"gettimeinsecs(nulldt())",
 
 		/* Invalid operand arithmetics */
 		"stodt('1980-05-05') + stodt('1980-05-05')",

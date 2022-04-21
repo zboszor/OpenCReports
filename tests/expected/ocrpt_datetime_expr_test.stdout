@@ -754,6 +754,69 @@ expr optimized: (datetime)14:37:12
 expr nodes: 1
 (datetime)14:37:12
 
+string: settimeinsecs(stodt('1979-03-01'), 3600)
+expr reprinted: settimeinsecs(stodt((string)1979-03-01),3600.000000)
+expr nodes: 4
+expr optimized: (datetime)1979-03-01 01:00:00
+expr nodes: 1
+(datetime)1979-03-01 01:00:00
+
+string: settimeinsecs(stodt('1979-03-01 06:30:21'), 3600)
+expr reprinted: settimeinsecs(stodt((string)1979-03-01 06:30:21),3600.000000)
+expr nodes: 4
+expr optimized: (datetime)1979-03-01 01:00:00
+expr nodes: 1
+(datetime)1979-03-01 01:00:00
+
+string: settimeinsecs(stodt('06:30:21'), 3600)
+expr reprinted: settimeinsecs(stodt((string)06:30:21),3600.000000)
+expr nodes: 4
+expr optimized: (datetime)01:00:00
+expr nodes: 1
+(datetime)01:00:00
+
+string: settimeinsecs(nulldt(), 3600)
+expr reprinted: settimeinsecs(nulldt(),3600.000000)
+expr nodes: 3
+expr optimized: (datetime)NULL
+expr nodes: 1
+(datetime)NULL
+
+string: settimeinsecs(stodt('1979-03-01'), nulln())
+expr reprinted: settimeinsecs(stodt((string)1979-03-01),nulln())
+expr nodes: 4
+expr optimized: (datetime)NULL
+expr nodes: 1
+(datetime)NULL
+
+string: gettimeinsecs(stodt('1979-03-01'))
+expr reprinted: gettimeinsecs(stodt((string)1979-03-01))
+expr nodes: 3
+expr optimized: NULL
+expr nodes: 1
+(number)NULL
+
+string: gettimeinsecs(stodt('1979-03-01 06:30:21'))
+expr reprinted: gettimeinsecs(stodt((string)1979-03-01 06:30:21))
+expr nodes: 3
+expr optimized: 23421.000000
+expr nodes: 1
+(number)23421.000000
+
+string: gettimeinsecs(stodt('06:30:21'))
+expr reprinted: gettimeinsecs(stodt((string)06:30:21))
+expr nodes: 3
+expr optimized: 23421.000000
+expr nodes: 1
+(number)23421.000000
+
+string: gettimeinsecs(nulldt())
+expr reprinted: gettimeinsecs(nulldt())
+expr nodes: 2
+expr optimized: NULL
+expr nodes: 1
+(number)NULL
+
 string: stodt('1980-05-05') + stodt('1980-05-05')
 expr reprinted: add(stodt((string)1980-05-05),stodt((string)1980-05-05))
 expr nodes: 5

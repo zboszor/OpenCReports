@@ -1001,6 +1001,11 @@ OCRPT_STATIC_FUNCTION(ocrpt_nulldt) {
 	}
 
 	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
+	memset(&e->result[o->residx]->datetime, 0, sizeof(e->result[o->residx]->datetime));
+	e->result[o->residx]->date_valid = false;
+	e->result[o->residx]->time_valid = false;
+	e->result[o->residx]->interval = false;
+	e->result[o->residx]->day_carry = 0;
 	e->result[o->residx]->isnull = true;
 }
 
@@ -2810,6 +2815,80 @@ OCRPT_STATIC_FUNCTION(ocrpt_chgtimeof) {
 		e->result[o->residx]->isnull = true;
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_gettimeinsecs) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME || e->ops[0]->result[o->residx]->interval) {
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull || !e->ops[0]->result[o->residx]->time_valid) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	int ret = e->ops[0]->result[o->residx]->datetime.tm_hour * 3600 + e->ops[0]->result[o->residx]->datetime.tm_min * 60 + e->ops[0]->result[o->residx]->datetime.tm_sec;
+	mpfr_set_ui(e->result[o->residx]->number, ret, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_settimeinsecs) {
+	int32_t i;
+
+	if (e->n_ops != 2) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	for (i = 0; i < 2; i++) {
+		if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+			ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+			return;
+		}
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME || e->ops[0]->result[o->residx]->interval ||
+		e->ops[1]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
+
+	for (i = 0; i < 2; i++) {
+		if (e->ops[i]->result[o->residx]->isnull) {
+			e->result[o->residx]->isnull = true;
+			return;
+		}
+	}
+
+	ocrpt_result_copy(o, e->result[o->residx], e->ops[0]->result[o->residx]);
+
+	long ret = mpfr_get_ui(e->ops[1]->result[o->residx]->number, o->rndmode);
+	if (ret < 0 || ret >= 86400) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+
+	e->result[o->residx]->datetime.tm_sec = ret % 60;
+	ret /= 60;
+	e->result[o->residx]->datetime.tm_min = ret % 60;
+	ret /= 60;
+	e->result[o->residx]->datetime.tm_hour = ret;
+	e->result[o->residx]->time_valid = true;
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -2836,6 +2915,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "floor",		ocrpt_floor,	1,	false,	false,	false,	false },
 	{ "fmod",		ocrpt_fmod,	2,	false,	false,	false,	false },
 	{ "ge",			ocrpt_ge,	2,	false,	false,	false,	false },
+	{ "gettimeinsecs",	ocrpt_gettimeinsecs,	1,	false,	false,	false,	false },
 	{ "gt",			ocrpt_gt,	2,	false,	false,	false,	false },
 	{ "iif",		ocrpt_iif,	3,	false,	false,	false,	false },
 	{ "inc",		ocrpt_inc,	1,	false,	false,	false,	false },
@@ -2867,6 +2947,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "rint",		ocrpt_rint,	1,	false,	false,	false,	false },
 	{ "round",		ocrpt_round,	1,	false,	false,	false,	false },
 	{ "rownum",		ocrpt_rownum,	-1,	false,	false,	false,	true },
+	{ "settimeinsecs",	ocrpt_settimeinsecs,	2,	false,	false,	false,	false },
 	{ "shl",		ocrpt_shl,	2,	false,	false,	false,	false },
 	{ "shr",		ocrpt_shr,	2,	false,	false,	false,	false },
 	{ "stdwiy",		ocrpt_stdwiy,	1,	false,	false,	false,	false },
