@@ -120,6 +120,14 @@ int main(void) {
 		"wiyo(stodt('2022-01-03'), 1)",
 		"stdwiy(stodt('2022-01-03'))",
 
+		/* Modification tests */
+		"dateof(stodt('1979-03-01'))",
+		"dateof(stodt('1979-03-01 06:15:37'))",
+		"dateof(stodt('06:15:37'))",
+		"timeof(stodt('1979-03-01'))",
+		"timeof(stodt('1979-03-01 06:15:37'))",
+		"timeof(stodt('06:15:37'))",
+
 		/* Invalid operand arithmetics */
 		"stodt('1980-05-05') + stodt('1980-05-05')",
 		"1 - stodt('1980-05-05 06:00')",

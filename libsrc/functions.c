@@ -2658,6 +2658,76 @@ OCRPT_STATIC_FUNCTION(ocrpt_stdwiy) {
 	mpfr_set_si(e->result[o->residx]->number, atoi(wiy), o->rndmode);
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_dateof) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
+	ocrpt_result_copy(o, e->result[o->residx], e->ops[0]->result[o->residx]);
+
+	e->result[o->residx]->datetime.tm_hour = 0;
+	e->result[o->residx]->datetime.tm_min = 0;
+	e->result[o->residx]->datetime.tm_sec = 0;
+	e->result[o->residx]->date_valid = e->ops[0]->result[o->residx]->date_valid;
+	e->result[o->residx]->time_valid = false;
+	e->result[o->residx]->interval = e->ops[0]->result[o->residx]->interval;
+
+	if (!e->result[o->residx]->interval && !e->result[o->residx]->date_valid)
+		e->result[o->residx]->isnull = true;
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_timeof) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
+	ocrpt_result_copy(o, e->result[o->residx], e->ops[0]->result[o->residx]);
+
+	e->result[o->residx]->datetime.tm_year = 0;
+	e->result[o->residx]->datetime.tm_mon = 0;
+	e->result[o->residx]->datetime.tm_mday = 0;
+	e->result[o->residx]->date_valid = false;
+	e->result[o->residx]->time_valid = e->ops[0]->result[o->residx]->time_valid;
+	e->result[o->residx]->interval = e->ops[0]->result[o->residx]->interval;
+
+	if (!e->result[o->residx]->interval && !e->result[o->residx]->time_valid)
+		e->result[o->residx]->isnull = true;
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -2670,6 +2740,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "ceil",		ocrpt_ceil,	1,	false,	false,	false,	false },
 	{ "concat",		ocrpt_concat,	-1,	false,	false,	false,	false },
 	{ "date",		ocrpt_date,	0,	false,  false,  false,  false },
+	{ "dateof",		ocrpt_dateof,	1,	false,  false,  false,  false },
 	{ "day",		ocrpt_day,	1,	false,  false,  false,  false },
 	{ "dec",		ocrpt_dec,	1,	false,	false,	false,	false },
 	{ "dim",		ocrpt_dim,	1,	false,  false,  false,  false },
@@ -2719,6 +2790,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "stodt",		ocrpt_stodt,	1,	false,  false,  false,  false },
 	{ "stodtsql",	ocrpt_stodt,	1,	false,  false,  false,  false },
 	{ "sub",		ocrpt_sub,	-1,	false,	false,	false,	false },
+	{ "timeof",		ocrpt_timeof,	1,	false,  false,  false,  false },
 	{ "trunc",		ocrpt_trunc,	1,	false,	false,	false,	false },
 	{ "tstod",		ocrpt_stodt,	1,	false,  false,  false,  false },
 	{ "uminus",		ocrpt_uminus,	1,	false,	false,	false,	false },
