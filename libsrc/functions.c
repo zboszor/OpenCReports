@@ -2728,6 +2728,88 @@ OCRPT_STATIC_FUNCTION(ocrpt_timeof) {
 		e->result[o->residx]->isnull = true;
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_chgdateof) {
+	int32_t i;
+
+	if (e->n_ops != 2) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	for (i = 0; i < 2; i++) {
+		if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+			ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+			return;
+		}
+	}
+
+	for (i = 0; i < 2; i++) {
+		if (e->ops[i]->result[o->residx]->type != OCRPT_RESULT_DATETIME || e->ops[i]->result[o->residx]->interval) {
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+			return;
+		}
+	}
+
+	for (i = 0; i < 2; i++) {
+		if (e->ops[i]->result[o->residx]->isnull) {
+			e->result[o->residx]->isnull = true;
+			return;
+		}
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
+	ocrpt_result_copy(o, e->result[o->residx], e->ops[0]->result[o->residx]);
+
+	e->result[o->residx]->datetime.tm_year = e->ops[1]->result[o->residx]->datetime.tm_year;
+	e->result[o->residx]->datetime.tm_mon = e->ops[1]->result[o->residx]->datetime.tm_mon;
+	e->result[o->residx]->datetime.tm_mday = e->ops[1]->result[o->residx]->datetime.tm_mday;
+	e->result[o->residx]->date_valid = e->ops[1]->result[o->residx]->date_valid;
+
+	if (!e->result[o->residx]->date_valid && !e->result[o->residx]->time_valid)
+		e->result[o->residx]->isnull = true;
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_chgtimeof) {
+	int32_t i;
+
+	if (e->n_ops != 2) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	for (i = 0; i < 2; i++) {
+		if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+			ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+			return;
+		}
+	}
+
+	for (i = 0; i < 2; i++) {
+		if (e->ops[i]->result[o->residx]->type != OCRPT_RESULT_DATETIME || e->ops[i]->result[o->residx]->interval) {
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+			return;
+		}
+	}
+
+	for (i = 0; i < 2; i++) {
+		if (e->ops[i]->result[o->residx]->isnull) {
+			e->result[o->residx]->isnull = true;
+			return;
+		}
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
+	ocrpt_result_copy(o, e->result[o->residx], e->ops[0]->result[o->residx]);
+
+	e->result[o->residx]->datetime.tm_hour = e->ops[1]->result[o->residx]->datetime.tm_hour;
+	e->result[o->residx]->datetime.tm_min = e->ops[1]->result[o->residx]->datetime.tm_min;
+	e->result[o->residx]->datetime.tm_sec = e->ops[1]->result[o->residx]->datetime.tm_sec;
+	e->result[o->residx]->time_valid = e->ops[1]->result[o->residx]->time_valid;
+
+	if (!e->result[o->residx]->date_valid && !e->result[o->residx]->time_valid)
+		e->result[o->residx]->isnull = true;
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -2738,14 +2820,16 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "and",		ocrpt_and,	-1,	true,	true,	false,	false },
 	{ "brrownum",	ocrpt_brrownum,	1,	false,	false,	false,	true },
 	{ "ceil",		ocrpt_ceil,	1,	false,	false,	false,	false },
+	{ "chgdateof",	ocrpt_chgdateof,	2,	false,	false,	false,	false },
+	{ "chgtimeof",	ocrpt_chgtimeof,	2,	false,	false,	false,	false },
 	{ "concat",		ocrpt_concat,	-1,	false,	false,	false,	false },
-	{ "date",		ocrpt_date,	0,	false,  false,  false,  false },
-	{ "dateof",		ocrpt_dateof,	1,	false,  false,  false,  false },
-	{ "day",		ocrpt_day,	1,	false,  false,  false,  false },
+	{ "date",		ocrpt_date,	0,	false,	false,	false,	false },
+	{ "dateof",		ocrpt_dateof,	1,	false,	false,	false,	false },
+	{ "day",		ocrpt_day,	1,	false,	false,	false,	false },
 	{ "dec",		ocrpt_dec,	1,	false,	false,	false,	false },
-	{ "dim",		ocrpt_dim,	1,	false,  false,  false,  false },
+	{ "dim",		ocrpt_dim,	1,	false,	false,	false,	false },
 	{ "div",		ocrpt_div,	-1,	false,	false,	true,	false },
-	{ "dtos",		ocrpt_dtos,	1,	false,  false,  false,  false },
+	{ "dtos",		ocrpt_dtos,	1,	false,	false,	false,	false },
 	{ "eq",			ocrpt_eq,	2,	true,	false,	false,	false },
 	{ "error",		ocrpt_error,	1,	false,	false,	false,	false },
 	{ "factorial",	ocrpt_factorial,	1,	false,	false,	false,	false },
@@ -2765,11 +2849,11 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "lt",			ocrpt_lt,	2,	false,	false,	false,	false },
 	{ "mid",		ocrpt_mid,	3,	false,	false,	false,	false },
 	{ "mod",		ocrpt_remainder,	2,	false,	false,	false,	false },
-	{ "month",		ocrpt_month,	1,	false,  false,  false,  false },
+	{ "month",		ocrpt_month,	1,	false,	false,	false,	false },
 	{ "mul",		ocrpt_mul,	-1,	true,	true,	false,	false },
 	{ "ne",			ocrpt_ne,	2,	true,	false,	false,	false },
 	{ "not",		ocrpt_not,	1,	false,	false,	false,	false },
-	{ "now",		ocrpt_now,	0,	false,  false,  false,  false },
+	{ "now",		ocrpt_now,	0,	false,	false,	false,	false },
 	{ "null",		ocrpt_null,	1,	false,	false,	false,	false },
 	{ "nulldt",		ocrpt_nulldt,	0,	false,	false,	false,	false },
 	{ "nulln",		ocrpt_nulln,	0,	false,	false,	false,	false },
@@ -2785,22 +2869,22 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "rownum",		ocrpt_rownum,	-1,	false,	false,	false,	true },
 	{ "shl",		ocrpt_shl,	2,	false,	false,	false,	false },
 	{ "shr",		ocrpt_shr,	2,	false,	false,	false,	false },
-	{ "stdwiy",		ocrpt_stdwiy,	1,	false,  false,  false,  false },
-	{ "stod",		ocrpt_stodt,	1,	false,  false,  false,  false },
-	{ "stodt",		ocrpt_stodt,	1,	false,  false,  false,  false },
-	{ "stodtsql",	ocrpt_stodt,	1,	false,  false,  false,  false },
+	{ "stdwiy",		ocrpt_stdwiy,	1,	false,	false,	false,	false },
+	{ "stod",		ocrpt_stodt,	1,	false,	false,	false,	false },
+	{ "stodt",		ocrpt_stodt,	1,	false,	false,	false,	false },
+	{ "stodtsql",	ocrpt_stodt,	1,	false,	false,	false,	false },
 	{ "sub",		ocrpt_sub,	-1,	false,	false,	false,	false },
-	{ "timeof",		ocrpt_timeof,	1,	false,  false,  false,  false },
+	{ "timeof",		ocrpt_timeof,	1,	false,	false,	false,	false },
 	{ "trunc",		ocrpt_trunc,	1,	false,	false,	false,	false },
-	{ "tstod",		ocrpt_stodt,	1,	false,  false,  false,  false },
+	{ "tstod",		ocrpt_stodt,	1,	false,	false,	false,	false },
 	{ "uminus",		ocrpt_uminus,	1,	false,	false,	false,	false },
 	{ "upper",		ocrpt_upper,	1,	false,	false,	false,	false },
 	{ "val",		ocrpt_val,	1,	false,	false,	false,	false },
-	{ "wiy",		ocrpt_wiy,	1,	false,  false,  false,  false },
-	{ "wiy1",		ocrpt_wiy1,	1,	false,  false,  false,  false },
-	{ "wiyo",		ocrpt_wiyo,	2,	false,  false,  false,  false },
+	{ "wiy",		ocrpt_wiy,	1,	false,	false,	false,	false },
+	{ "wiy1",		ocrpt_wiy1,	1,	false,	false,	false,	false },
+	{ "wiyo",		ocrpt_wiyo,	2,	false,	false,	false,	false },
 	{ "xor",		ocrpt_xor,	-1,	true,	true,	true,	false },
-	{ "year",		ocrpt_year,	1,	false,  false,  false,  false },
+	{ "year",		ocrpt_year,	1,	false,	false,	false,	false },
 };
 
 static int n_ocrpt_functions = sizeof(ocrpt_functions) / sizeof(ocrpt_function);

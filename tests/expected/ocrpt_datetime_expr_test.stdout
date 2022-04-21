@@ -628,6 +628,132 @@ expr optimized: (datetime)06:15:37
 expr nodes: 1
 (datetime)06:15:37
 
+string: chgdateof(stodt('1979-03-01'), stodt('2022-04-21'))
+expr reprinted: chgdateof(stodt((string)1979-03-01),stodt((string)2022-04-21))
+expr nodes: 5
+expr optimized: (datetime)2022-04-21
+expr nodes: 1
+(datetime)2022-04-21
+
+string: chgdateof(stodt('1979-03-01 06:30:21'), stodt('2022-04-21'))
+expr reprinted: chgdateof(stodt((string)1979-03-01 06:30:21),stodt((string)2022-04-21))
+expr nodes: 5
+expr optimized: (datetime)2022-04-21 06:30:21
+expr nodes: 1
+(datetime)2022-04-21 06:30:21
+
+string: chgdateof(stodt('06:30:21'), stodt('2022-04-21'))
+expr reprinted: chgdateof(stodt((string)06:30:21),stodt((string)2022-04-21))
+expr nodes: 5
+expr optimized: (datetime)2022-04-21 06:30:21
+expr nodes: 1
+(datetime)2022-04-21 06:30:21
+
+string: chgdateof(stodt('1979-03-01'), stodt('2022-04-21 14:37:12'))
+expr reprinted: chgdateof(stodt((string)1979-03-01),stodt((string)2022-04-21 14:37:12))
+expr nodes: 5
+expr optimized: (datetime)2022-04-21
+expr nodes: 1
+(datetime)2022-04-21
+
+string: chgdateof(stodt('1979-03-01 06:30:21'), stodt('2022-04-21 14:37:12'))
+expr reprinted: chgdateof(stodt((string)1979-03-01 06:30:21),stodt((string)2022-04-21 14:37:12))
+expr nodes: 5
+expr optimized: (datetime)2022-04-21 06:30:21
+expr nodes: 1
+(datetime)2022-04-21 06:30:21
+
+string: chgdateof(stodt('06:30:21'), stodt('2022-04-21 14:37:12'))
+expr reprinted: chgdateof(stodt((string)06:30:21),stodt((string)2022-04-21 14:37:12))
+expr nodes: 5
+expr optimized: (datetime)2022-04-21 06:30:21
+expr nodes: 1
+(datetime)2022-04-21 06:30:21
+
+string: chgdateof(stodt('1979-03-01'), stodt('14:37:12'))
+expr reprinted: chgdateof(stodt((string)1979-03-01),stodt((string)14:37:12))
+expr nodes: 5
+expr optimized: (datetime)NULL
+expr nodes: 1
+(datetime)NULL
+
+string: chgdateof(stodt('1979-03-01 06:30:21'), stodt('14:37:12'))
+expr reprinted: chgdateof(stodt((string)1979-03-01 06:30:21),stodt((string)14:37:12))
+expr nodes: 5
+expr optimized: (datetime)06:30:21
+expr nodes: 1
+(datetime)06:30:21
+
+string: chgdateof(stodt('06:30:21'), stodt('14:37:12'))
+expr reprinted: chgdateof(stodt((string)06:30:21),stodt((string)14:37:12))
+expr nodes: 5
+expr optimized: (datetime)06:30:21
+expr nodes: 1
+(datetime)06:30:21
+
+string: chgtimeof(stodt('1979-03-01'), stodt('2022-04-21'))
+expr reprinted: chgtimeof(stodt((string)1979-03-01),stodt((string)2022-04-21))
+expr nodes: 5
+expr optimized: (datetime)1979-03-01
+expr nodes: 1
+(datetime)1979-03-01
+
+string: chgtimeof(stodt('1979-03-01 06:30:21'), stodt('2022-04-21'))
+expr reprinted: chgtimeof(stodt((string)1979-03-01 06:30:21),stodt((string)2022-04-21))
+expr nodes: 5
+expr optimized: (datetime)1979-03-01
+expr nodes: 1
+(datetime)1979-03-01
+
+string: chgtimeof(stodt('06:30:21'), stodt('2022-04-21'))
+expr reprinted: chgtimeof(stodt((string)06:30:21),stodt((string)2022-04-21))
+expr nodes: 5
+expr optimized: (datetime)NULL
+expr nodes: 1
+(datetime)NULL
+
+string: chgtimeof(stodt('1979-03-01'), stodt('2022-04-21 14:37:12'))
+expr reprinted: chgtimeof(stodt((string)1979-03-01),stodt((string)2022-04-21 14:37:12))
+expr nodes: 5
+expr optimized: (datetime)1979-03-01 14:37:12
+expr nodes: 1
+(datetime)1979-03-01 14:37:12
+
+string: chgtimeof(stodt('1979-03-01 06:30:21'), stodt('2022-04-21 14:37:12'))
+expr reprinted: chgtimeof(stodt((string)1979-03-01 06:30:21),stodt((string)2022-04-21 14:37:12))
+expr nodes: 5
+expr optimized: (datetime)1979-03-01 14:37:12
+expr nodes: 1
+(datetime)1979-03-01 14:37:12
+
+string: chgtimeof(stodt('06:30:21'), stodt('2022-04-21 14:37:12'))
+expr reprinted: chgtimeof(stodt((string)06:30:21),stodt((string)2022-04-21 14:37:12))
+expr nodes: 5
+expr optimized: (datetime)14:37:12
+expr nodes: 1
+(datetime)14:37:12
+
+string: chgtimeof(stodt('1979-03-01'), stodt('14:37:12'))
+expr reprinted: chgtimeof(stodt((string)1979-03-01),stodt((string)14:37:12))
+expr nodes: 5
+expr optimized: (datetime)1979-03-01 14:37:12
+expr nodes: 1
+(datetime)1979-03-01 14:37:12
+
+string: chgtimeof(stodt('1979-03-01 06:30:21'), stodt('14:37:12'))
+expr reprinted: chgtimeof(stodt((string)1979-03-01 06:30:21),stodt((string)14:37:12))
+expr nodes: 5
+expr optimized: (datetime)1979-03-01 14:37:12
+expr nodes: 1
+(datetime)1979-03-01 14:37:12
+
+string: chgtimeof(stodt('06:30:21'), stodt('14:37:12'))
+expr reprinted: chgtimeof(stodt((string)06:30:21),stodt((string)14:37:12))
+expr nodes: 5
+expr optimized: (datetime)14:37:12
+expr nodes: 1
+(datetime)14:37:12
+
 string: stodt('1980-05-05') + stodt('1980-05-05')
 expr reprinted: add(stodt((string)1980-05-05),stodt((string)1980-05-05))
 expr nodes: 5
