@@ -403,6 +403,8 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, con
 	base_yy_extra_type yyextra;
 	int yyresult = 1;
 
+	memset(&yyextra, 0, sizeof(yyextra));
+
 	if (setjmp(yyextra.env) == 0) {
 #if YYDEBUG
 		/*
@@ -433,15 +435,21 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, con
 
 	if (yyresult) {
 		ocrpt_list *ptr;
+		bool found_last_expr = false;
 
 		ocrpt_list_free_deep(yyextra.tokens, (ocrpt_mem_free_t)ocrpt_grammar_free_token);
 		ocrpt_list_free(yyextra.parsed_arglist);
 
 		for (ptr = yyextra.parsed_exprs; ptr; ptr = ptr->next) {
 			ocrpt_expr *e = (ocrpt_expr *)ptr->data;
+			if (yyextra.last_expr == e)
+				found_last_expr = true;
 			ocrpt_expr_free(o, r, e);
 		}
 		ocrpt_list_free(yyextra.parsed_exprs);
+
+		if (!found_last_expr)
+			ocrpt_expr_free(o, r, yyextra.last_expr);
 
 		if (err)
 			*err = yyextra.err;
