@@ -35,6 +35,13 @@ int main(void) {
 		"stodt('0610p')",
 		"stodt('06:10p')",
 
+		/* Interval function */
+		"interval(1,2,3,4,5,6)",
+		"interval('1 years 2 months 3 days 4 hours 5 minutes 6 seconds')",
+		"interval('1 yrs 2 mons 3 days 4 hrs 5 mins 6 secs')",
+		"interval('1 y 2 mo 3 d 4 h 5 m 6 s')",
+		"interval('1y 2mo 3d 4h 5m 6s')",
+
 		/* Logic checks */
 		"stodt('5/5/1980') < stodt('1980-05-05')",
 		"stodt('5/5/1980') <= stodt('1980-05-05')",
@@ -82,6 +89,61 @@ int main(void) {
 
 		"stodt('1980-05-05 23:59:59') + 1",
 		"stodt('1980-05-06 00:00:00') - 1",
+
+		"stodt('1980-01-31 23:59:59') + interval(0,0,0,0,0,1)",
+		"stodt('1980-02-01 00:00:00') - interval(0,0,0,0,0,1)",
+		"stodt('1980-01-31 23:59:59') + interval(0,0,0,0,1,0)",
+		"stodt('1980-02-01 00:00:00') - interval(0,0,0,0,1,0)",
+		"stodt('1980-01-31 23:59:59') + interval(0,0,0,1,0,0)",
+		"stodt('1980-02-01 00:00:00') - interval(0,0,0,1,0,0)",
+		"stodt('1980-01-31 23:59:59') + interval(0,0,1,0,0,0)",
+		"stodt('1980-02-01 00:00:00') - interval(0,0,1,0,0,0)",
+		"stodt('1980-01-31 23:59:59') + interval(0,1,0,0,0,0)",
+		"stodt('1980-02-01 00:00:00') - interval(0,1,0,0,0,0)",
+		"stodt('1980-01-31 23:59:59') + interval(1,0,0,0,0,0)",
+		"stodt('1980-02-01 00:00:00') - interval(1,0,0,0,0,0)",
+
+		"stodt('1980-01-31') + interval(0,0,0,0,0,1)",
+		"stodt('1980-02-01') - interval(0,0,0,0,0,1)",
+		"stodt('1980-01-31') + interval(0,0,0,0,1,0)",
+		"stodt('1980-02-01') - interval(0,0,0,0,1,0)",
+		"stodt('1980-01-31') + interval(0,0,0,1,0,0)",
+		"stodt('1980-02-01') - interval(0,0,0,1,0,0)",
+		"stodt('1980-01-31') + interval(0,0,1,0,0,0)",
+		"stodt('1980-02-01') - interval(0,0,1,0,0,0)",
+		"stodt('1980-01-31') + interval(0,1,0,0,0,0)",
+		"stodt('1980-02-01') - interval(0,1,0,0,0,0)",
+		"stodt('1980-01-31') + interval(1,0,0,0,0,0)",
+		"stodt('1980-02-01') - interval(1,0,0,0,0,0)",
+
+		"interval(1,0,0,0,0,0) + interval(0,1,0,0,0,0)",
+		"interval(1,0,0,0,0,0) - interval(0,1,0,0,0,0)",
+
+		/* Datetime - datetime */
+		"stodt('1980-03-31') - stodt('1980-01-15')",
+		"stodt('1980-03-31') - stodt('1980-01-15 12:00:00')",
+		"stodt('1980-03-31 12:00:00') - stodt('1980-01-15')",
+		"stodt('1980-03-31 12:00:00') - stodt('1980-01-15 12:00:00')",
+
+		/* Datetime - datetime, resulting in negative interval */
+		"stodt('1980-01-15') - stodt('1980-03-31')",
+		"stodt('1980-01-15') - stodt('1980-03-31 12:00:00')",
+		"stodt('1980-01-15 12:00:00') - stodt('1980-03-31')",
+		"stodt('1980-01-15 12:00:00') - stodt('1980-03-31 12:00:00')",
+
+		/* Transitivity proof */
+		"stodt('1979-01-31') + interval(0,1,0,0,0,0)",
+		"stodt('1979-01-31') + interval(0,1,0,0,0,0) + interval(0,1,0,0,0,0)",
+		"stodt('1979-01-31') + interval(0,2,0,0,0,0)",
+		"stodt('1979-03-31') - interval(0,1,0,0,0,0)",
+		"stodt('1979-03-31') - interval(0,1,0,0,0,0) - interval(0,1,0,0,0,0)",
+		"stodt('1979-03-31') - interval(0,2,0,0,0,0)",
+		"stodt('1980-01-31') + interval(0,1,0,0,0,0)",
+		"stodt('1980-01-31') + interval(0,1,0,0,0,0) + interval(0,1,0,0,0,0)",
+		"stodt('1980-01-31') + interval(0,2,0,0,0,0)",
+		"stodt('1980-03-31') - interval(0,1,0,0,0,0)",
+		"stodt('1980-03-31') - interval(0,1,0,0,0,0) - interval(0,1,0,0,0,0)",
+		"stodt('1980-03-31') - interval(0,2,0,0,0,0)",
 
 		/* Leap year tests */
 		"stodt('1979-02-28') + 1",

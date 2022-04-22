@@ -58,16 +58,30 @@ static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth, co
 		ocrpt_mem_string_append_printf(str, "(string)%s", result ? (result->isnull ? "NULL" : result->string->str) : "NULL");
 		break;
 	case OCRPT_EXPR_DATETIME: {
-		char tmp[128];
+		ocrpt_string *tmp = ocrpt_mem_string_new_with_len(NULL, 128);
 		if (!result->isnull) {
-			if (result->date_valid && result->time_valid)
-				strftime(tmp, sizeof(tmp), "%F %T", &result->datetime);
+			if (result->interval) {
+				if (result->datetime.tm_year)
+					ocrpt_mem_string_append_printf(tmp, "%d years", result->datetime.tm_year);
+				if (result->datetime.tm_mon)
+					ocrpt_mem_string_append_printf(tmp, "%s%d mons", tmp->len ? " " : "", result->datetime.tm_mon);
+				if (result->datetime.tm_mday)
+					ocrpt_mem_string_append_printf(tmp, "%s%d days", tmp->len ? " " : "", result->datetime.tm_mday);
+				if (result->datetime.tm_hour)
+					ocrpt_mem_string_append_printf(tmp, "%s%d hours", tmp->len ? " " : "", result->datetime.tm_hour);
+				if (result->datetime.tm_min)
+					ocrpt_mem_string_append_printf(tmp, "%s%d mins", tmp->len ? " " : "", result->datetime.tm_min);
+				if (result->datetime.tm_sec)
+					ocrpt_mem_string_append_printf(tmp, "%s%d seconds", tmp->len ? " " : "", result->datetime.tm_sec);
+			} else if (result->date_valid && result->time_valid)
+				strftime(tmp->str, 128, "%F %T", &result->datetime);
 			else if (result->date_valid)
-				strftime(tmp, sizeof(tmp), "%F", &result->datetime);
+				strftime(tmp->str, 128, "%F", &result->datetime);
 			else if (result->time_valid)
-				strftime(tmp, sizeof(tmp), "%T", &result->datetime);
+				strftime(tmp->str, 128, "%T", &result->datetime);
 		}
-		ocrpt_mem_string_append_printf(str, "(datetime)%s", result ? (result->isnull ? "NULL" : tmp) : NULL);
+		ocrpt_mem_string_append_printf(str, "(datetime)%s", result ? (result->isnull ? "NULL" : tmp->str) : NULL);
+		ocrpt_mem_string_free(tmp, true);
 		break;
 	}
 	case OCRPT_EXPR_NUMBER:
@@ -214,13 +228,17 @@ DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
 			if (r->interval) {
 				ocrpt_string *str = ocrpt_mem_string_new_with_len("", 0);
 				if (r->datetime.tm_year)
-					ocrpt_mem_string_append_printf(str, "%d years ", r->datetime.tm_year);
+					ocrpt_mem_string_append_printf(str, "%d years", r->datetime.tm_year);
 				if (r->datetime.tm_mon)
-					ocrpt_mem_string_append_printf(str, "%d mons ", r->datetime.tm_mon);
+					ocrpt_mem_string_append_printf(str, "%s%d mons", str->len ? " " : "", r->datetime.tm_mon);
 				if (r->datetime.tm_mday)
-					ocrpt_mem_string_append_printf(str, "%d days ", r->datetime.tm_mday);
-				if (r->datetime.tm_hour && r->datetime.tm_min && r->datetime.tm_sec)
-					ocrpt_mem_string_append_printf(str, "%02d:%02d%02d", r->datetime.tm_hour, r->datetime.tm_min, r->datetime.tm_sec);
+					ocrpt_mem_string_append_printf(str, "%s%d days", str->len ? " " : "", r->datetime.tm_mday);
+				if (r->datetime.tm_hour)
+					ocrpt_mem_string_append_printf(str, "%s%d hours", str->len ? " " : "", r->datetime.tm_hour);
+				if (r->datetime.tm_min)
+					ocrpt_mem_string_append_printf(str, "%s%d mins", str->len ? " " : "", r->datetime.tm_min);
+				if (r->datetime.tm_sec)
+					ocrpt_mem_string_append_printf(str, "%s%d seconds", str->len ? " " : "", r->datetime.tm_sec);
 				printf("(datetime)%s\n", str->str);
 				ocrpt_mem_string_free(str, true);
 			} else {

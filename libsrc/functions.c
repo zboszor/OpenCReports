@@ -223,9 +223,12 @@ OCRPT_STATIC_FUNCTION(ocrpt_add) {
 						ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 						return;
 					}
-					if (e->result[o->residx]->interval)
-						ocrpt_datetime_add_interval(o, e, e->ops[i]->result[o->residx], e->result[o->residx]);
-					else
+					if (e->result[o->residx]->interval && !e->ops[i]->result[o->residx]->interval) {
+						ocrpt_result interval = { .type = OCRPT_RESULT_DATETIME };
+						ocrpt_result_copy(o, &interval, e->result[o->residx]);
+						ocrpt_result_copy(o, e->result[o->residx], e->ops[i]->result[o->residx]);
+						ocrpt_datetime_add_interval(o, e, e->result[o->residx], &interval);
+					} else
 						ocrpt_datetime_add_interval(o, e, e->result[o->residx], e->ops[i]->result[o->residx]);
 					break;
 				default:
@@ -336,7 +339,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_sub) {
 						ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 						return;
 					}
-					ocrpt_datetime_sub_interval(o, e, e->result[o->residx], e->ops[i]->result[o->residx]);
+					ocrpt_datetime_sub_datetime(o, e, e->result[o->residx], e->ops[i]->result[o->residx]);
 					break;
 				default:
 					/* cannot happpen */
@@ -2321,7 +2324,8 @@ OCRPT_STATIC_FUNCTION(ocrpt_stodt) {
 	}
 
 	if (!ocrpt_parse_datetime(o, e->ops[0]->result[o->residx]->string->str, e->ops[0]->result[o->residx]->string->len, e->result[o->residx]))
-		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		if (!ocrpt_parse_interval(o, e->ops[0]->result[o->residx]->string->str, e->ops[0]->result[o->residx]->string->len, e->result[o->residx]))
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_dtos) {
@@ -2420,12 +2424,12 @@ OCRPT_STATIC_FUNCTION(ocrpt_year) {
 		return;
 	}
 
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
 	if (e->ops[0]->result[o->residx]->isnull || (!e->ops[0]->result[o->residx]->interval && !e->ops[0]->result[o->residx]->date_valid)) {
 		e->result[o->residx]->isnull = true;
 		return;
 	}
-
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
 
 	int add = (e->ops[0]->result[o->residx]->interval ? 0 : 1900);
 	mpfr_set_si(e->result[o->residx]->number, e->ops[0]->result[o->residx]->datetime.tm_year + add, o->rndmode);
@@ -2447,12 +2451,12 @@ OCRPT_STATIC_FUNCTION(ocrpt_month) {
 		return;
 	}
 
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
 	if (e->ops[0]->result[o->residx]->isnull || (!e->ops[0]->result[o->residx]->interval && !e->ops[0]->result[o->residx]->date_valid)) {
 		e->result[o->residx]->isnull = true;
 		return;
 	}
-
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
 
 	int add = (e->ops[0]->result[o->residx]->interval ? 0 : 1);
 	mpfr_set_si(e->result[o->residx]->number, e->ops[0]->result[o->residx]->datetime.tm_mon + add, o->rndmode);
@@ -2474,12 +2478,12 @@ OCRPT_STATIC_FUNCTION(ocrpt_day) {
 		return;
 	}
 
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
 	if (e->ops[0]->result[o->residx]->isnull || (!e->ops[0]->result[o->residx]->interval && !e->ops[0]->result[o->residx]->date_valid)) {
 		e->result[o->residx]->isnull = true;
 		return;
 	}
-
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
 
 	mpfr_set_si(e->result[o->residx]->number, e->ops[0]->result[o->residx]->datetime.tm_mday, o->rndmode);
 }
@@ -2500,12 +2504,12 @@ OCRPT_STATIC_FUNCTION(ocrpt_dim) {
 		return;
 	}
 
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
 	if (e->ops[0]->result[o->residx]->isnull || !e->ops[0]->result[o->residx]->date_valid) {
 		e->result[o->residx]->isnull = true;
 		return;
 	}
-
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
 
 	int mon = e->ops[0]->result[o->residx]->datetime.tm_mon;
 	int year = e->ops[0]->result[o->residx]->datetime.tm_year;
@@ -2528,12 +2532,12 @@ OCRPT_STATIC_FUNCTION(ocrpt_wiy) {
 		return;
 	}
 
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
 	if (e->ops[0]->result[o->residx]->isnull || !e->ops[0]->result[o->residx]->date_valid) {
 		e->result[o->residx]->isnull = true;
 		return;
 	}
-
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
 
 	char wiy[64] = "";
 	strftime(wiy, sizeof(wiy), "%U", &e->ops[0]->result[o->residx]->datetime);
@@ -2556,12 +2560,12 @@ OCRPT_STATIC_FUNCTION(ocrpt_wiy1) {
 		return;
 	}
 
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
 	if (e->ops[0]->result[o->residx]->isnull || !e->ops[0]->result[o->residx]->date_valid) {
 		e->result[o->residx]->isnull = true;
 		return;
 	}
-
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
 
 	char wiy[64] = "";
 	strftime(wiy, sizeof(wiy), "%W", &e->ops[0]->result[o->residx]->datetime);
@@ -2578,11 +2582,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_wiyo) {
 
 	for (i = 0; i < 2; i++) {
 		if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
-			ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
-			return;
-		}
-		if (e->ops[i]->result[o->residx]->isnull) {
-			e->result[o->residx]->isnull = true;
+			ocrpt_expr_make_error_result(o, e, e->ops[i]->result[o->residx]->string->str);
 			return;
 		}
 	}
@@ -2597,12 +2597,19 @@ OCRPT_STATIC_FUNCTION(ocrpt_wiyo) {
 		return;
 	}
 
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	for (i = 0; i < 2; i++) {
+		if (e->ops[i]->result[o->residx]->isnull) {
+			e->result[o->residx]->isnull = true;
+			return;
+		}
+	}
+
 	if (!e->ops[0]->result[o->residx]->date_valid) {
 		e->result[o->residx]->isnull = true;
 		return;
 	}
-
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
 
 	ocrpt_result res = { .type = OCRPT_RESULT_DATETIME, .interval = false };
 	res.datetime = e->ops[0]->result[o->residx]->datetime;
@@ -2651,12 +2658,12 @@ OCRPT_STATIC_FUNCTION(ocrpt_stdwiy) {
 		return;
 	}
 
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
 	if (e->ops[0]->result[o->residx]->isnull || !e->ops[0]->result[o->residx]->date_valid) {
 		e->result[o->residx]->isnull = true;
 		return;
 	}
-
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
 
 	char wiy[64] = "";
 	strftime(wiy, sizeof(wiy), "%V", &e->ops[0]->result[o->residx]->datetime);
@@ -2679,12 +2686,13 @@ OCRPT_STATIC_FUNCTION(ocrpt_dateof) {
 		return;
 	}
 
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
+
 	if (e->ops[0]->result[o->residx]->isnull) {
 		e->result[o->residx]->isnull = true;
 		return;
 	}
 
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
 	ocrpt_result_copy(o, e->result[o->residx], e->ops[0]->result[o->residx]);
 
 	e->result[o->residx]->datetime.tm_hour = 0;
@@ -2714,12 +2722,13 @@ OCRPT_STATIC_FUNCTION(ocrpt_timeof) {
 		return;
 	}
 
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
+
 	if (e->ops[0]->result[o->residx]->isnull) {
 		e->result[o->residx]->isnull = true;
 		return;
 	}
 
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
 	ocrpt_result_copy(o, e->result[o->residx], e->ops[0]->result[o->residx]);
 
 	e->result[o->residx]->datetime.tm_year = 0;
@@ -2743,7 +2752,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_chgdateof) {
 
 	for (i = 0; i < 2; i++) {
 		if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
-			ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+			ocrpt_expr_make_error_result(o, e, e->ops[i]->result[o->residx]->string->str);
 			return;
 		}
 	}
@@ -2755,6 +2764,8 @@ OCRPT_STATIC_FUNCTION(ocrpt_chgdateof) {
 		}
 	}
 
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
+
 	for (i = 0; i < 2; i++) {
 		if (e->ops[i]->result[o->residx]->isnull) {
 			e->result[o->residx]->isnull = true;
@@ -2762,7 +2773,6 @@ OCRPT_STATIC_FUNCTION(ocrpt_chgdateof) {
 		}
 	}
 
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
 	ocrpt_result_copy(o, e->result[o->residx], e->ops[0]->result[o->residx]);
 
 	e->result[o->residx]->datetime.tm_year = e->ops[1]->result[o->residx]->datetime.tm_year;
@@ -2784,7 +2794,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_chgtimeof) {
 
 	for (i = 0; i < 2; i++) {
 		if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
-			ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+			ocrpt_expr_make_error_result(o, e, e->ops[i]->result[o->residx]->string->str);
 			return;
 		}
 	}
@@ -2796,6 +2806,8 @@ OCRPT_STATIC_FUNCTION(ocrpt_chgtimeof) {
 		}
 	}
 
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
+
 	for (i = 0; i < 2; i++) {
 		if (e->ops[i]->result[o->residx]->isnull) {
 			e->result[o->residx]->isnull = true;
@@ -2803,7 +2815,6 @@ OCRPT_STATIC_FUNCTION(ocrpt_chgtimeof) {
 		}
 	}
 
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
 	ocrpt_result_copy(o, e->result[o->residx], e->ops[0]->result[o->residx]);
 
 	e->result[o->residx]->datetime.tm_hour = e->ops[1]->result[o->residx]->datetime.tm_hour;
@@ -2852,7 +2863,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_settimeinsecs) {
 
 	for (i = 0; i < 2; i++) {
 		if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
-			ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+			ocrpt_expr_make_error_result(o, e, e->ops[i]->result[o->residx]->string->str);
 			return;
 		}
 	}
@@ -2889,6 +2900,66 @@ OCRPT_STATIC_FUNCTION(ocrpt_settimeinsecs) {
 	e->result[o->residx]->time_valid = true;
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_interval) {
+	int32_t i;
+
+	if (e->n_ops != 1 && e->n_ops != 6) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	for (i = 0; i < e->n_ops; i++) {
+		if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+			ocrpt_expr_make_error_result(o, e, e->ops[i]->result[o->residx]->string->str);
+			return;
+		}
+	}
+
+	if (e->n_ops == 6) {
+		for (i = 0; i < 6; i++) {
+			if (e->ops[i]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+				ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+				return;
+			}
+		}
+	} else {
+		if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING) {
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+			return;
+		}
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_DATETIME);
+
+	for (i = 0; i < e->n_ops; i++) {
+		if (e->ops[i]->result[o->residx]->isnull) {
+			e->result[o->residx]->isnull = true;
+			return;
+		}
+	}
+
+	if (e->n_ops == 6) {
+		int year = mpfr_get_ui(e->ops[0]->result[o->residx]->number, o->rndmode);
+		int mon  = mpfr_get_ui(e->ops[1]->result[o->residx]->number, o->rndmode);
+		int mday = mpfr_get_ui(e->ops[2]->result[o->residx]->number, o->rndmode);
+		int hour = mpfr_get_ui(e->ops[3]->result[o->residx]->number, o->rndmode);
+		int min  = mpfr_get_ui(e->ops[4]->result[o->residx]->number, o->rndmode);
+		int sec  = mpfr_get_ui(e->ops[5]->result[o->residx]->number, o->rndmode);
+
+		memset(&e->result[o->residx]->datetime, 0, sizeof(e->result[o->residx]->datetime));
+		e->result[o->residx]->datetime.tm_year = year;
+		e->result[o->residx]->datetime.tm_mon = mon;
+		e->result[o->residx]->datetime.tm_mday = mday;
+		e->result[o->residx]->datetime.tm_hour = hour;
+		e->result[o->residx]->datetime.tm_min = min;
+		e->result[o->residx]->datetime.tm_sec = sec;
+		e->result[o->residx]->date_valid = false;
+		e->result[o->residx]->time_valid = false;
+		e->result[o->residx]->interval = true;
+	} else if (!ocrpt_parse_interval(o, e->ops[0]->result[o->residx]->string->str, e->ops[0]->result[o->residx]->string->len, e->result[o->residx]))
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -2919,6 +2990,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "gt",			ocrpt_gt,	2,	false,	false,	false,	false },
 	{ "iif",		ocrpt_iif,	3,	false,	false,	false,	false },
 	{ "inc",		ocrpt_inc,	1,	false,	false,	false,	false },
+	{ "interval",	ocrpt_interval,	-1,	false,	false,	false,	false },
 	{ "isnull",		ocrpt_isnull,	1,	false,	false,	false,	false },
 	{ "land",		ocrpt_land,	-1,	true,	true,	false,	false },
 	{ "le",			ocrpt_le,	2,	false,	false,	false,	false },

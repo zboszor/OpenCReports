@@ -17,10 +17,11 @@ static inline bool ocrpt_leap_year(int y) {
 }
 
 bool ocrpt_parse_datetime(opencreport *o, const char *time_string, int ts_len, ocrpt_result *result);
+bool ocrpt_parse_interval(opencreport *o, const char *time_string, int ts_len, ocrpt_result *result);
 bool ocrpt_datetime_result_add_number(opencreport *o, ocrpt_result *dst, ocrpt_result *src_datetime, long number);
 void ocrpt_datetime_add_number(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_number);
 void ocrpt_datetime_sub_number(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_number);
 void ocrpt_datetime_add_interval(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_interval);
-void ocrpt_datetime_sub_interval(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_interval);
+void ocrpt_datetime_sub_datetime(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime1, ocrpt_result *src_datetime2);
 
 #endif
