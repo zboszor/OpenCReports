@@ -2960,19 +2960,552 @@ OCRPT_STATIC_FUNCTION(ocrpt_interval) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_cos) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_cos(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_sin) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_sin(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_tan) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_tan(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_acos) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_acos(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_asin) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_asin(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_atan) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_atan(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_sec) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_sec(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_csc) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_csc(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_cot) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_cot(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_log) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_log(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_log2) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_log2(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_log10) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_log10(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_exp) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_exp(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_exp2) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_exp2(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_exp10) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_exp10(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_sqr) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_sqr(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_sqrt) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[o->residx]) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->isnull = true;
+		return;
+	}
+
+	mpfr_sqrt(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
  */
 static const ocrpt_function ocrpt_functions[] = {
 	{ "abs",		ocrpt_abs,	1,	false,	false,	false,	false },
+	{ "acos",		ocrpt_acos,	1,	false,	false,	false,	false },
 	{ "add",		ocrpt_add,	-1,	true,	true,	false,	false },
 	{ "and",		ocrpt_and,	-1,	true,	true,	false,	false },
+	{ "asin",		ocrpt_asin,	1,	false,	false,	false,	false },
+	{ "atan",		ocrpt_atan,	1,	false,	false,	false,	false },
 	{ "brrownum",	ocrpt_brrownum,	1,	false,	false,	false,	true },
 	{ "ceil",		ocrpt_ceil,	1,	false,	false,	false,	false },
 	{ "chgdateof",	ocrpt_chgdateof,	2,	false,	false,	false,	false },
 	{ "chgtimeof",	ocrpt_chgtimeof,	2,	false,	false,	false,	false },
 	{ "concat",		ocrpt_concat,	-1,	false,	false,	false,	false },
+	{ "cos",		ocrpt_cos,	1,	false,	false,	false,	false },
+	{ "cot",		ocrpt_cot,	1,	false,	false,	false,	false },
+	{ "csc",		ocrpt_csc,	1,	false,	false,	false,	false },
 	{ "date",		ocrpt_date,	0,	false,	false,	false,	false },
 	{ "dateof",		ocrpt_dateof,	1,	false,	false,	false,	false },
 	{ "day",		ocrpt_day,	1,	false,	false,	false,	false },
@@ -2982,6 +3515,9 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "dtos",		ocrpt_dtos,	1,	false,	false,	false,	false },
 	{ "eq",			ocrpt_eq,	2,	true,	false,	false,	false },
 	{ "error",		ocrpt_error,	1,	false,	false,	false,	false },
+	{ "exp",		ocrpt_exp,	1,	false,	false,	false,	false },
+	{ "exp10",		ocrpt_exp10,	1,	false,	false,	false,	false },
+	{ "exp2",		ocrpt_exp2,	1,	false,	false,	false,	false },
 	{ "factorial",	ocrpt_factorial,	1,	false,	false,	false,	false },
 	{ "floor",		ocrpt_floor,	1,	false,	false,	false,	false },
 	{ "fmod",		ocrpt_fmod,	2,	false,	false,	false,	false },
@@ -2995,7 +3531,11 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "land",		ocrpt_land,	-1,	true,	true,	false,	false },
 	{ "le",			ocrpt_le,	2,	false,	false,	false,	false },
 	{ "left",		ocrpt_left,	2,	false,	false,	false,	false },
+	{ "ln",			ocrpt_log,	1,	false,	false,	false,	false },
 	{ "lnot",		ocrpt_lnot,	1,	false,	false,	false,	false },
+	{ "log",		ocrpt_log,	1,	false,	false,	false,	false },
+	{ "log10",		ocrpt_log10,	1,	false,	false,	false,	false },
+	{ "log2",		ocrpt_log2,	1,	false,	false,	false,	false },
 	{ "lor",		ocrpt_lor,	-1,	true,	true,	false,	false },
 	{ "lower",		ocrpt_lower,	1,	false,	false,	false,	false },
 	{ "lt",			ocrpt_lt,	2,	false,	false,	false,	false },
@@ -3019,14 +3559,19 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "rint",		ocrpt_rint,	1,	false,	false,	false,	false },
 	{ "round",		ocrpt_round,	1,	false,	false,	false,	false },
 	{ "rownum",		ocrpt_rownum,	-1,	false,	false,	false,	true },
+	{ "sec",		ocrpt_sec,	1,	false,	false,	false,	false },
 	{ "settimeinsecs",	ocrpt_settimeinsecs,	2,	false,	false,	false,	false },
 	{ "shl",		ocrpt_shl,	2,	false,	false,	false,	false },
 	{ "shr",		ocrpt_shr,	2,	false,	false,	false,	false },
+	{ "sin",		ocrpt_sin,	1,	false,	false,	false,	false },
+	{ "sqr",		ocrpt_sqr,	1,	false,	false,	false,	false },
+	{ "sqrt",		ocrpt_sqrt,	1,	false,	false,	false,	false },
 	{ "stdwiy",		ocrpt_stdwiy,	1,	false,	false,	false,	false },
 	{ "stod",		ocrpt_stodt,	1,	false,	false,	false,	false },
 	{ "stodt",		ocrpt_stodt,	1,	false,	false,	false,	false },
 	{ "stodtsql",	ocrpt_stodt,	1,	false,	false,	false,	false },
 	{ "sub",		ocrpt_sub,	-1,	false,	false,	false,	false },
+	{ "tan",		ocrpt_tan,	1,	false,	false,	false,	false },
 	{ "timeof",		ocrpt_timeof,	1,	false,	false,	false,	false },
 	{ "trunc",		ocrpt_trunc,	1,	false,	false,	false,	false },
 	{ "tstod",		ocrpt_stodt,	1,	false,	false,	false,	false },
