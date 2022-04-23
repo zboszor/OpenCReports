@@ -18,6 +18,7 @@
 #include "opencreport.h"
 #include "datasource.h"
 #include "datetime.h"
+#include "fallthrough.h"
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const ocrpt_input *input) {
 	ocrpt_datasource *s = NULL;
@@ -294,8 +295,7 @@ void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_
 		r->type = OCRPT_RESULT_ERROR;
 		str = "invalid datetime or interval string";
 		len = strlen(str);
-		/* fallthrough */
-		__attribute__((fallthrough));
+		FALLTHROUGH;
 	case OCRPT_RESULT_STRING:
 	default:
 		if (len < 0)
