@@ -136,7 +136,7 @@ DLL_EXPORT_SYM ssize_t ocrpt_mpfr_strfmon(opencreport *o, char * __restrict s, s
 	currency_symbol = NULL;
 	pad_size = 0;
 
-	mpfr_init(val);
+	mpfr_init2(val, o->prec);
 
 	while (*fmt) {
 		/* pass nonformating characters AS IS */
