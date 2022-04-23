@@ -3487,6 +3487,52 @@ OCRPT_STATIC_FUNCTION(ocrpt_sqrt) {
 	mpfr_sqrt(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_fxpval) {
+	int32_t i;
+
+	if (e->n_ops != 2) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	for (i = 0; i < 2; i++) {
+		if (!e->ops[i]->result[o->residx]) {
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+			return;
+		}
+	}
+
+	for (i = 0; i < 2; i++) {
+		if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+			ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+			return;
+		}
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING || e->ops[1]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+
+	for (i = 0; i < 2; i++) {
+		if (e->ops[0]->result[o->residx]->isnull) {
+			e->result[o->residx]->isnull = true;
+			return;
+		}
+	}
+
+	mpfr_set_str(e->result[o->residx]->number, e->ops[0]->result[o->residx]->string->str, 10, o->rndmode);
+
+	mpfr_t tmp;
+
+	mpfr_init2(tmp, o->prec);
+	mpfr_exp10(tmp, e->ops[1]->result[o->residx]->number, o->rndmode);
+	mpfr_div(e->result[o->residx]->number, e->result[o->residx]->number, tmp, o->rndmode);
+	mpfr_clear(tmp);
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -3521,6 +3567,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "factorial",	ocrpt_factorial,	1,	false,	false,	false,	false },
 	{ "floor",		ocrpt_floor,	1,	false,	false,	false,	false },
 	{ "fmod",		ocrpt_fmod,	2,	false,	false,	false,	false },
+	{ "fxpval",		ocrpt_fxpval,	2,	false,	false,	false,	false },
 	{ "ge",			ocrpt_ge,	2,	false,	false,	false,	false },
 	{ "gettimeinsecs",	ocrpt_gettimeinsecs,	1,	false,	false,	false,	false },
 	{ "gt",			ocrpt_gt,	2,	false,	false,	false,	false },

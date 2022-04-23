@@ -803,6 +803,13 @@ expr optimized: 1.000000
 expr nodes: 1
 (number)1.000000
 
+string: fxpval('123456', 2)
+expr reprinted: fxpval((string)123456,2.000000)
+expr nodes: 3
+expr optimized: 1234.560000
+expr nodes: 1
+(number)1234.560000
+
 string: null(1)
 expr reprinted: null(1.000000)
 expr nodes: 2

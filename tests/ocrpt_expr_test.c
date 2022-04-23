@@ -158,6 +158,9 @@ int main(void) {
 		"val('yes')",
 		"val(yes)",
 
+		/* fxpval() conversion */
+		"fxpval('123456', 2)",
+
 		/* NULL tests */
 		"null(1)",
 		"null('a')",
