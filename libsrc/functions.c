@@ -2311,7 +2311,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_stodt) {
 		return;
 	}
 
-	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING) {
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING && e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 		return;
 	}
@@ -2323,7 +2323,13 @@ OCRPT_STATIC_FUNCTION(ocrpt_stodt) {
 		return;
 	}
 
-	if (!ocrpt_parse_datetime(o, e->ops[0]->result[o->residx]->string->str, e->ops[0]->result[o->residx]->string->len, e->result[o->residx]))
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_DATETIME) {
+		e->result[o->residx]->datetime = e->ops[0]->result[o->residx]->datetime;
+		e->result[o->residx]->date_valid = e->ops[0]->result[o->residx]->date_valid;
+		e->result[o->residx]->time_valid = e->ops[0]->result[o->residx]->time_valid;
+		e->result[o->residx]->interval = e->ops[0]->result[o->residx]->interval;
+		e->result[o->residx]->day_carry = e->ops[0]->result[o->residx]->day_carry;
+	} else if (!ocrpt_parse_datetime(o, e->ops[0]->result[o->residx]->string->str, e->ops[0]->result[o->residx]->string->len, e->result[o->residx]))
 		if (!ocrpt_parse_interval(o, e->ops[0]->result[o->residx]->string->str, e->ops[0]->result[o->residx]->string->len, e->result[o->residx]))
 			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 }
