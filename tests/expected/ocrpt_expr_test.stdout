@@ -810,6 +810,20 @@ expr optimized: 1234.560000
 expr nodes: 1
 (number)1234.560000
 
+string: str(1234.56, 6, 4)
+expr reprinted: str(1234.560000,6.000000,4.000000)
+expr nodes: 4
+expr optimized: (string)1234.5600
+expr nodes: 1
+(string)1234.5600
+
+string: str(1234.56, 10, 4)
+expr reprinted: str(1234.560000,10.000000,4.000000)
+expr nodes: 4
+expr optimized: (string) 1234.5600
+expr nodes: 1
+(string) 1234.5600
+
 string: null(1)
 expr reprinted: null(1.000000)
 expr nodes: 2

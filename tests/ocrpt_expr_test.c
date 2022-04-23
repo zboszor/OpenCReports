@@ -161,6 +161,10 @@ int main(void) {
 		/* fxpval() conversion */
 		"fxpval('123456', 2)",
 
+		/* str() conversion */
+		"str(1234.56, 6, 4)",
+		"str(1234.56, 10, 4)",
+
 		/* NULL tests */
 		"null(1)",
 		"null('a')",

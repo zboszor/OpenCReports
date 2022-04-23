@@ -3533,6 +3533,68 @@ OCRPT_STATIC_FUNCTION(ocrpt_fxpval) {
 	mpfr_clear(tmp);
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_str) {
+	int32_t i;
+
+	if (e->n_ops != 3) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	for (i = 0; i < 3; i++) {
+		if (!e->ops[i]->result[o->residx]) {
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+			return;
+		}
+	}
+
+	for (i = 0; i < 3; i++) {
+		if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+			ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+			return;
+		}
+	}
+
+	for (i = 0; i < 3; i++) {
+		if (e->ops[i]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+			return;
+		}
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_STRING);
+
+	for (i = 0; i < 3; i++) {
+		if (e->ops[0]->result[o->residx]->isnull) {
+			e->result[o->residx]->isnull = true;
+			return;
+		}
+	}
+
+	int len = mpfr_get_ui(e->ops[1]->result[o->residx]->number, o->rndmode);
+	int decimal = mpfr_get_ui(e->ops[2]->result[o->residx]->number, o->rndmode);
+	char fmt[16];
+
+	sprintf(fmt, "%%%d.%dRf", len, decimal);
+
+	len = mpfr_snprintf(NULL, 0, fmt, e->ops[0]->result[o->residx]->number);
+
+	ocrpt_string *string = ocrpt_mem_string_resize(e->result[o->residx]->string, len + 1);
+	if (string) {
+		if (!e->result[o->residx]->string) {
+			e->result[o->residx]->string = string;
+			e->result[o->residx]->string_owned = true;
+		}
+		string->len = 0;
+	} else {
+		ocrpt_expr_make_error_result(o, e, "out of memory");
+		return;
+	}
+
+	len = mpfr_snprintf(e->result[o->residx]->string->str, len + 1, fmt, e->ops[0]->result[o->residx]->number);
+	e->result[o->residx]->string->len = len;
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -3617,6 +3679,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "stod",		ocrpt_stodt,	1,	false,	false,	false,	false },
 	{ "stodt",		ocrpt_stodt,	1,	false,	false,	false,	false },
 	{ "stodtsql",	ocrpt_stodt,	1,	false,	false,	false,	false },
+	{ "str",		ocrpt_str,		3,	false,	false,	false,	false },
 	{ "sub",		ocrpt_sub,	-1,	false,	false,	false,	false },
 	{ "tan",		ocrpt_tan,	1,	false,	false,	false,	false },
 	{ "timeof",		ocrpt_timeof,	1,	false,	false,	false,	false },
