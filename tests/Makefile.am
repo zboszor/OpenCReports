@@ -51,7 +51,10 @@ TESTS = \
 	ocrpt_break_multi4_test \
 	ocrpt_break_multi5_test \
 	ocrpt_datetime_expr_test \
-	ocrpt_execute_test
+	ocrpt_execute_test \
+	ocrpt_break_multi6_test \
+	ocrpt_break_multi7_test \
+	ocrpt_break_multi8_test
 
 SLOW_TESTS = \
 	ocrpt_pgsql_numeric_precision_test
