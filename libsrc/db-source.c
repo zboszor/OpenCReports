@@ -359,12 +359,12 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_postgresql(opencreport *o, ocrpt_dat
 	int len;
 
 	if (!ocrpt_datasource_validate(o, source)) {
-		fprintf(stderr, "%s:%d: datasource is not for this opencreport structure\n", __func__, __LINE__);
+		fprintf(stderr, "%s: datasource is not for this opencreport structure\n", __func__);
 		return NULL;
 	}
 
 	if (source->input->type != OCRPT_INPUT_POSTGRESQL) {
-		fprintf(stderr, "%s:%d: datasource is not a PostgreSQL source\n", __func__, __LINE__);
+		fprintf(stderr, "%s: datasource is not a PostgreSQL source\n", __func__);
 		return NULL;
 	}
 
@@ -374,7 +374,12 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_postgresql(opencreport *o, ocrpt_dat
 	cursor[len] = 0;
 
 	res = PQexec(source->priv, cursor);
-	if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+	switch (PQresultStatus(res)) {
+	case PGRES_COMMAND_OK:
+	case PGRES_NONFATAL_ERROR:
+		break;
+	default:
+		fprintf(stderr, "%s: failed to execute query: %s\nwith error message: %s", __func__, querystr, PQerrorMessage(source->priv));
 		PQclear(res);
 		return NULL;
 	}

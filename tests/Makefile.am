@@ -53,6 +53,9 @@ TESTS = \
 	ocrpt_datetime_expr_test \
 	ocrpt_execute_test
 
+SLOW_TESTS = \
+	ocrpt_pgsql_numeric_precision_test
+
 # Unstable tests by nature:
 # ocrpt_random_test produces a random number which is different every time
 # ocrpt_paper_test prints paper sizes and defaults which depends on language settings
@@ -70,7 +73,10 @@ all: $(noinst_PROGRAMS)
 test: $(TESTS) execute_test.sh
 	$(foreach TEST,$(TESTS),./execute_test.sh $(TEST) &&) true
 
+slow-test: $(SLOW_TESTS) execute_test.sh
+	$(foreach TEST,$(SLOW_TESTS),./execute_test.sh $(TEST) &&) true
+
 unstable-test: $(UNSTABLE_TESTS) execute_test.sh
 	$(foreach TEST,$(UNSTABLE_TESTS),./execute_test.sh $(TEST) &&) true
 
-all-test: test unstable-test
+all-test: test slow-test unstable-test
