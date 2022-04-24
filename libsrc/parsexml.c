@@ -162,6 +162,16 @@ static ocrpt_expr *ocrpt_xml_expr_parse(opencreport *o, xmlChar *expr, bool repo
 						expr##_s = (char *)expr; \
 				}
 
+#define ocrpt_xml_expr_parse_get_int_value_with_fallback(o, expr) { \
+					expr##_e = ocrpt_xml_expr_parse(o, expr, true); \
+					ocrpt_expr_get_value(o, expr##_e, NULL, &expr##_i); \
+				}
+
+#define ocrpt_xml_expr_parse_get_int_value_with_fallback_noreport(o, expr) { \
+					expr##_e = ocrpt_xml_expr_parse(o, expr, false); \
+					ocrpt_expr_get_value(o, expr##_e, NULL, &expr##_i); \
+				}
+
 static void ocrpt_ignore_child_nodes(opencreport *o, xmlTextReaderPtr reader, const char *leaf_name) {
 	int depth, nodetype;
 
@@ -720,6 +730,19 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, xmlTextReader
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
+	xmlChar *iter = xmlTextReaderGetAttribute(reader, (const xmlChar *)"iterations");
+	int32_t iter_i;
+	ocrpt_expr *iter_e;
+
+	ocrpt_xml_expr_parse_get_int_value_with_fallback_noreport(o, iter);
+	ocrpt_expr_free(o, NULL, iter_e);
+	if (iter_i <= 0)
+		iter_i = 1;
+
+	r->iterations = iter_i;
+
+	xmlFree(iter);
+
 	depth = xmlTextReaderDepth(reader);
 	while (xmlTextReaderRead(reader) == 1) {
 		xmlChar *name = xmlTextReaderName(reader);
@@ -831,6 +854,19 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
+
+	xmlChar *iter = xmlTextReaderGetAttribute(reader, (const xmlChar *)"iterations");
+	int32_t iter_i;
+	ocrpt_expr *iter_e;
+
+	ocrpt_xml_expr_parse_get_int_value_with_fallback_noreport(o, iter);
+	ocrpt_expr_free(o, NULL, iter_e);
+	if (iter_i <= 0)
+		iter_i = 1;
+
+	p->iterations = iter_i;
+
+	xmlFree(iter);
 
 	depth = xmlTextReaderDepth(reader);
 	while (xmlTextReaderRead(reader) == 1) {

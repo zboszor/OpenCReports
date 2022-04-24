@@ -18,11 +18,20 @@
 
 DLL_EXPORT_SYM ocrpt_part *ocrpt_part_new(opencreport *o) {
 	ocrpt_part *p;
+	ocrpt_list *cbl;
 
 	p = ocrpt_mem_malloc(sizeof(ocrpt_part));
 	memset(p, 0, sizeof(ocrpt_part));
+	p->iterations = 1;
 
 	o->parts = ocrpt_list_end_append(o->parts, &o->last_part, p);
+
+	for (cbl = o->part_added_callbacks; cbl; cbl = cbl->next) {
+		ocrpt_part_cb_data *cbd = (ocrpt_part_cb_data *)cbl->data;
+
+		cbd->func(o, p, cbd->data);
+	}
+
 	return p;
 }
 
@@ -87,6 +96,7 @@ DLL_EXPORT_SYM void ocrpt_parts_free(opencreport *o) {
 DLL_EXPORT_SYM ocrpt_report *ocrpt_report_new(opencreport *o) {
 	ocrpt_report *r = ocrpt_mem_malloc(sizeof(ocrpt_report));
 	memset(r, 0, sizeof(ocrpt_report));
+	r->iterations = 1;
 	r->query_rownum = ocrpt_expr_parse(o, r, "rownum()", NULL);
 	ocrpt_expr_resolve(o, r, r->query_rownum);
 	return r;
@@ -100,6 +110,8 @@ DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_list_free_deep(r->start_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(r->done_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(r->newrow_callbacks, ocrpt_mem_free);
+	ocrpt_list_free_deep(r->precalc_done_callbacks, ocrpt_mem_free);
+	ocrpt_list_free_deep(r->iteration_callbacks, ocrpt_mem_free);
 
 	ocrpt_expr_free(o, r, r->query_rownum);
 	ocrpt_mem_free(r->query);
@@ -245,6 +257,90 @@ DLL_EXPORT_SYM bool ocrpt_report_add_new_row_cb(opencreport *o, ocrpt_report *r,
 	ptr->data = data;
 
 	r->newrow_callbacks = ocrpt_list_append(r->newrow_callbacks, ptr);
+
+	return true;
+}
+
+DLL_EXPORT_SYM bool ocrpt_report_add_precalculation_done_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data) {
+	ocrpt_report_cb_data *ptr;
+
+	if (!ocrpt_report_validate(o, r))
+		return false;
+
+	if (!func)
+		return false;
+
+	ptr = ocrpt_mem_malloc(sizeof(ocrpt_report_cb_data));
+	if (!ptr)
+		return false;
+
+	ptr->func = func;
+	ptr->data = data;
+
+	r->precalc_done_callbacks = ocrpt_list_append(r->precalc_done_callbacks, ptr);
+
+	return true;
+}
+
+DLL_EXPORT_SYM bool ocrpt_report_add_iteration_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data) {
+	ocrpt_report_cb_data *ptr;
+
+	if (!ocrpt_report_validate(o, r))
+		return false;
+
+	if (!func)
+		return false;
+
+	ptr = ocrpt_mem_malloc(sizeof(ocrpt_report_cb_data));
+	if (!ptr)
+		return false;
+
+	ptr->func = func;
+	ptr->data = data;
+
+	r->iteration_callbacks = ocrpt_list_append(r->iteration_callbacks, ptr);
+
+	return true;
+}
+
+DLL_EXPORT_SYM bool ocrpt_add_part_iteration_cb(opencreport *o, ocrpt_part_cb func, void *data) {
+	ocrpt_part_cb_data *ptr;
+
+	if (!o)
+		return false;
+
+	if (!func)
+		return false;
+
+	ptr = ocrpt_mem_malloc(sizeof(ocrpt_part_cb_data));
+	if (!ptr)
+		return false;
+
+	ptr->func = func;
+	ptr->data = data;
+
+	o->part_iteration_callbacks = ocrpt_list_append(o->part_iteration_callbacks, ptr);
+
+	return true;
+}
+
+DLL_EXPORT_SYM bool ocrpt_add_precalculation_done_cb(opencreport *o, ocrpt_cb func, void *data) {
+	ocrpt_cb_data *ptr;
+
+	if (!o)
+		return false;
+
+	if (!func)
+		return false;
+
+	ptr = ocrpt_mem_malloc(sizeof(ocrpt_cb_data));
+	if (!ptr)
+		return false;
+
+	ptr->func = func;
+	ptr->data = data;
+
+	o->precalc_done_callbacks = ocrpt_list_append(o->precalc_done_callbacks, ptr);
 
 	return true;
 }

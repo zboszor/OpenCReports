@@ -326,6 +326,20 @@ struct ocrpt_report_cb_data {
 };
 typedef struct ocrpt_report_cb_data ocrpt_report_cb_data;
 
+typedef void (*ocrpt_part_cb)(opencreport *, ocrpt_part *, void *data);
+struct ocrpt_part_cb_data {
+	ocrpt_part_cb func;
+	void *data;
+};
+typedef struct ocrpt_part_cb_data ocrpt_part_cb_data;
+
+typedef void (*ocrpt_cb)(opencreport *, void *data);
+struct ocrpt_cb_data {
+	ocrpt_cb func;
+	void *data;
+};
+typedef struct ocrpt_cb_data ocrpt_cb_data;
+
 struct ocrpt_report {
 	/*
 	 * TODO:
@@ -356,6 +370,12 @@ struct ocrpt_report {
 	ocrpt_list *start_callbacks;
 	ocrpt_list *done_callbacks;
 	ocrpt_list *newrow_callbacks;
+	ocrpt_list *precalc_done_callbacks;
+	ocrpt_list *iteration_callbacks;
+	/*
+	 * How many times should this report run
+	 */
+	unsigned int iterations;
 	/*
 	 * Internal accounting for number of data rows
 	 */
@@ -387,6 +407,10 @@ struct ocrpt_part {
 	ocrpt_list *lastrow;
 	ocrpt_list *lastcol_in_lastrow;
 	const char *path;
+	/*
+	 * How many times should this part run
+	 */
+	unsigned int iterations;
 #if 0
 	const char *xmlbuf;
 	bool allocated:1;
@@ -425,7 +449,10 @@ struct opencreport {
 	ocrpt_list *last_part;
 
 	/* List of ocrpt_report_cb elements */
+	ocrpt_list *part_added_callbacks;
 	ocrpt_list *report_added_callbacks;
+	ocrpt_list *precalc_done_callbacks;
+	ocrpt_list *part_iteration_callbacks;
 
 	/* The result of date() and now() functions */
 	ocrpt_result *current_date;
@@ -462,9 +489,21 @@ void ocrpt_set_numeric_precision_bits(opencreport *o, mpfr_prec_t prec);
  */
 void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode);
 /*
+ * Add a "part added" callback
+ */
+void ocrpt_add_part_added_cb(opencreport *o, ocrpt_part_cb func, void *data);
+/*
  * Add a "report added" callback
  */
 void ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb func, void *data);
+/*
+ * All "part iteration" callback
+ */
+bool ocrpt_add_part_iteration_cb(opencreport *o, ocrpt_part_cb func, void *data);
+/*
+ * All "all precalculations done" callback (one callback after all reports are precalculated)
+ */
+bool ocrpt_add_precalculation_done_cb(opencreport *o, ocrpt_cb func, void *data);
 
 /****************************
  * Locale related functions *
@@ -1081,17 +1120,25 @@ void ocrpt_report_resolve_expressions(opencreport *o, ocrpt_report *r);
  */
 void ocrpt_report_evaluate_expressions(opencreport *o, ocrpt_report *r);
 /*
- * Add report start callback
+ * Add "report started" callback
  */
 bool ocrpt_report_add_start_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
 /*
- * Add report done callback
+ * Add "report done" callback
  */
 bool ocrpt_report_add_done_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
 /*
- * Add new row callback
+ * Add "new row" callback
  */
 bool ocrpt_report_add_new_row_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
+/*
+ * Add "report iteration" callback
+ */
+bool ocrpt_report_add_iteration_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
+/*
+ * Add "precalculation done" callback
+ */
+bool ocrpt_report_add_precalculation_done_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
 
 /********************************************
  * Functions related to report XML handling *

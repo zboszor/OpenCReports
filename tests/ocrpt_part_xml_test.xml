@@ -27,7 +27,7 @@
 			</pd>
 		</pr>
 	</Part>
-	<Part>
+	<Part iterations="3">
 		<pr>
 			<pd>
 				<Report>
@@ -55,6 +55,6 @@
 	</Part>
 	<Report>
 	</Report>
-	<Report>
+	<Report iterations="3">
 	</Report>
 </OpenCReport>

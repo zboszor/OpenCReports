@@ -114,7 +114,10 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	if (o->locale)
 		freelocale(o->locale);
 
+	ocrpt_list_free_deep(o->part_added_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(o->report_added_callbacks, ocrpt_mem_free);
+	ocrpt_list_free_deep(o->precalc_done_callbacks, ocrpt_mem_free);
+	ocrpt_list_free_deep(o->part_iteration_callbacks, ocrpt_mem_free);
 
 	gmp_randclear(o->randstate);
 	ocrpt_mem_string_free(o->converted, true);
@@ -137,6 +140,19 @@ DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode) 
 		return;
 
 	o->rndmode = rndmode;
+}
+
+DLL_EXPORT_SYM void ocrpt_add_part_added_cb(opencreport *o, ocrpt_part_cb func, void *data) {
+	ocrpt_part_cb_data *ptr;
+
+	if (!o || !func)
+		return;
+
+	ptr = ocrpt_mem_malloc(sizeof(ocrpt_part_cb_data));
+	ptr->func = func;
+	ptr->data = data;
+
+	o->part_added_callbacks = ocrpt_list_append(o->part_added_callbacks, ptr);
 }
 
 DLL_EXPORT_SYM void ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb func, void *data) {
@@ -270,100 +286,135 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	o->precalculate = true;
 	for (ocrpt_list *pl = o->parts; pl; pl = pl->next) {
 		ocrpt_part *p = (ocrpt_part *)pl->data;
+		int32_t part_iter;
 
-		for (ocrpt_list *row = p->rows; row; row = row->next) {
-			for (ocrpt_list *pdl = (ocrpt_list *)row->data; pdl; pdl = pdl->next) {
-				ocrpt_report *r = (ocrpt_report *)pdl->data;
-				ocrpt_query *q;
+		for (part_iter = 0; part_iter < p->iterations; part_iter++) {
+			for (ocrpt_list *row = p->rows; row; row = row->next) {
+				for (ocrpt_list *pdl = (ocrpt_list *)row->data; pdl; pdl = pdl->next) {
+					ocrpt_report *r = (ocrpt_report *)pdl->data;
+					ocrpt_query *q;
+					int32_t i;
 
-				if (!ocrpt_report_validate(o, r))
-					continue;
+					if (!ocrpt_report_validate(o, r))
+						continue;
 
-				q = (r->query ? r->query : (o->queries ? (ocrpt_query *)o->queries->data : NULL));
+					q = (r->query ? r->query : (o->queries ? (ocrpt_query *)o->queries->data : NULL));
 
-				if (!q) {
-					/*
-					 * TODO: no query, output the the NoData alternative part if it
-					 * exists in precalculate mode: no output, just placeholder
-					 * for layout
-					 */
-					continue;
+					if (!q) {
+						/*
+						 * TODO: no query, output the the NoData alternative part if it
+						 * exists in precalculate mode: no output, just placeholder
+						 * for layout
+						 */
+						continue;
+					}
+
+					for (i = 0; i < r->iterations; i++) {
+						r->executing = true;
+
+						ocrpt_query_navigate_start(o, q);
+						ocrpt_report_resolve_breaks(o, r);
+						ocrpt_report_resolve_variables(o, r);
+						ocrpt_report_resolve_expressions(o, r);
+
+						if (r->have_delayed_expr) {
+							r->data_rows = ocrpt_execute_one_report(o, r, q);
+
+							ocrpt_variables_advance_precalculated_results(o, r, NULL);
+
+							/* Reset queries and breaks */
+							ocrpt_query_navigate_start(o, q);
+							for (ocrpt_list *brl = r->breaks; brl; brl = brl->next)
+								ocrpt_break_reset_vars(o, r, (ocrpt_break *)brl->data);
+						}
+
+						if (!r->data_rows) {
+							/*
+							 * TODO: no data rows, output the the NoData alternative part
+							 * if it exists in precalculate mode: no output, just placeholder
+							 * for layout
+							 */
+						}
+
+						r->executing = false;
+					}
+
+					for (ocrpt_list *cbl = r->precalc_done_callbacks; cbl; cbl = cbl->next) {
+						ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+						cbd->func(o, r, cbd->data);
+					}
 				}
-
-				r->executing = true;
-
-				ocrpt_query_navigate_start(o, q);
-				ocrpt_report_resolve_breaks(o, r);
-				ocrpt_report_resolve_variables(o, r);
-				ocrpt_report_resolve_expressions(o, r);
-
-				if (r->have_delayed_expr) {
-					r->data_rows = ocrpt_execute_one_report(o, r, q);
-
-					ocrpt_variables_advance_precalculated_results(o, r, NULL);
-
-					/* Reset queries and breaks */
-					ocrpt_query_navigate_start(o, q);
-					for (ocrpt_list *brl = r->breaks; brl; brl = brl->next)
-						ocrpt_break_reset_vars(o, r, (ocrpt_break *)brl->data);
-				}
-
-				if (!r->data_rows) {
-					/*
-					 * TODO: no data rows, output the the NoData alternative part
-					 * if it exists in precalculate mode: no output, just placeholder
-					 * for layout
-					 */
-				}
-
-				r->executing = false;
 			}
 		}
+	}
+
+	for (ocrpt_list *cbl = o->precalc_done_callbacks; cbl; cbl = cbl->next) {
+		ocrpt_cb_data *cbd = (ocrpt_cb_data *)cbl->data;
+
+		cbd->func(o, cbd->data);
 	}
 
 	/* Run all reports in layout mode */
 	o->precalculate = false;
 	for (ocrpt_list *pl = o->parts; pl; pl = pl->next) {
 		ocrpt_part *p = (ocrpt_part *)pl->data;
+		int32_t part_iter;
 
-		for (ocrpt_list *row = p->rows; row; row = row->next) {
-			for (ocrpt_list *pdl = (ocrpt_list *)row->data; pdl; pdl = pdl->next) {
-				ocrpt_report *r = (ocrpt_report *)pdl->data;
-				ocrpt_query *q;
-				ocrpt_list *cbl;
+		for (part_iter = 0; part_iter < p->iterations; part_iter++) {
+			for (ocrpt_list *row = p->rows; row; row = row->next) {
+				for (ocrpt_list *pdl = (ocrpt_list *)row->data; pdl; pdl = pdl->next) {
+					ocrpt_report *r = (ocrpt_report *)pdl->data;
+					ocrpt_query *q;
+					ocrpt_list *cbl;
+					int32_t rpt_iter;
 
-				if (!ocrpt_report_validate(o, r))
-					continue;
+					if (!ocrpt_report_validate(o, r))
+						continue;
 
-				q = (r->query ? r->query : (o->queries ? (ocrpt_query *)o->queries->data : NULL));
+					q = (r->query ? r->query : (o->queries ? (ocrpt_query *)o->queries->data : NULL));
 
-				r->executing = true;
+					for (cbl = r->start_callbacks; cbl; cbl = cbl->next) {
+						ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
 
-				for (cbl = r->start_callbacks; cbl; cbl = cbl->next) {
-					ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
-
-					cbd->func(o, r, cbd->data);
-				}
-
-				if (q) {
-					if (!r->have_delayed_expr || r->data_rows)
-						r->data_rows = ocrpt_execute_one_report(o, r, q);
-
-					if (!r->data_rows) {
-						/* TODO: no query rows, output the the NoData alternative part if it exists */
+						cbd->func(o, r, cbd->data);
 					}
-				} else {
-					/* TODO: no query, output the the NoData alternative part if it exists */
-					continue;
+
+					for (rpt_iter = 0; rpt_iter < r->iterations; rpt_iter++) {
+						r->executing = true;
+
+						if (q) {
+							if (!r->have_delayed_expr || r->data_rows)
+								r->data_rows = ocrpt_execute_one_report(o, r, q);
+
+							if (!r->data_rows) {
+								/* TODO: no query rows, output the the NoData alternative part if it exists */
+							}
+						} else {
+							/* TODO: no query, output the the NoData alternative part if it exists */
+						}
+
+						r->executing = false;
+
+						for (cbl = r->iteration_callbacks; cbl; cbl = cbl->next) {
+							ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+							cbd->func(o, r, cbd->data);
+						}
+					}
+
+					for (cbl = r->done_callbacks; cbl; cbl = cbl->next) {
+						ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+						cbd->func(o, r, cbd->data);
+					}
 				}
+			}
 
-				for (cbl = r->done_callbacks; cbl; cbl = cbl->next) {
-					ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+			for (ocrpt_list *cbl = o->part_iteration_callbacks; cbl; cbl = cbl->next) {
+				ocrpt_part_cb_data *cbd = (ocrpt_part_cb_data *)cbl->data;
 
-					cbd->func(o, r, cbd->data);
-				}
-
-				r->executing = false;
+				cbd->func(o, p, cbd->data);
 			}
 		}
 	}

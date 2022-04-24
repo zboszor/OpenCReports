@@ -50,7 +50,8 @@ TESTS = \
 	ocrpt_break_multi3_test \
 	ocrpt_break_multi4_test \
 	ocrpt_break_multi5_test \
-	ocrpt_datetime_expr_test
+	ocrpt_datetime_expr_test \
+	ocrpt_execute_test
 
 # Unstable tests by nature:
 # ocrpt_random_test produces a random number which is different every time
@@ -58,7 +59,6 @@ TESTS = \
 UNSTABLE_TESTS = \
 	ocrpt_random_test \
 	ocrpt_paper_test \
-	ocrpt_execute_test \
 	ocrpt_now_test
 
 noinst_PROGRAMS = $(TESTS) $(UNSTABLE_TESTS)
