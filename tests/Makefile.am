@@ -57,7 +57,8 @@ TESTS = \
 	ocrpt_break_multi8_test
 
 SLOW_TESTS = \
-	ocrpt_pgsql_numeric_precision_test
+	ocrpt_pgsql_numeric_precision_test \
+	ocrpt_pgsql_numeric_precision2_test
 
 # Unstable tests by nature:
 # ocrpt_random_test produces a random number which is different every time
@@ -67,7 +68,7 @@ UNSTABLE_TESTS = \
 	ocrpt_paper_test \
 	ocrpt_now_test
 
-noinst_PROGRAMS = $(TESTS) $(UNSTABLE_TESTS)
+noinst_PROGRAMS = $(TESTS) $(SLOW_TESTS) $(UNSTABLE_TESTS)
 
 $(noinst_PROGRAMS): $(top_builddir)/libsrc/libopencreport.la
 
