@@ -29,7 +29,7 @@ int main(void) {
 	ocrpt_free(o);
 
 	o = ocrpt_init();
-	ocrpt_set_rlib_compat(o);
+	ocrpt_set_caret_operator_is_pow(o);
 
 	e = ocrpt_expr_parse(o, NULL, "2 ^ 3", NULL);
 

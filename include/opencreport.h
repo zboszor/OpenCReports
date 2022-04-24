@@ -469,7 +469,7 @@ struct opencreport {
 	/* Alternating datasource row result index  */
 	int residx:3;
 	bool precalculate:1;
-	bool rlib_compat:1;
+	bool caret_is_pow:1;
 };
 
 /*
@@ -1155,8 +1155,9 @@ bool ocrpt_parse_xml(opencreport *o, const char *filename);
 bool ocrpt_execute(opencreport *o);
 
 /*
- * Set RLIB compatibility
+ * Set the behaviour of the ^ operator
+ * By default it's used for XOR
  */
-void ocrpt_set_rlib_compat(opencreport *o);
+void ocrpt_set_caret_operator_is_pow(opencreport *o);
 
 #endif /* _OPENCREPORT_H_ */
