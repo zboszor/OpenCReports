@@ -6,8 +6,8 @@ ocrptgrammar.tab.c: ocrptgrammar.y
 ocrptgrammar.tab.h: ocrptgrammar.tab.c
 	touch $@
 
-lex.yy.c: ocrptpatterns.l ocrptgrammar.tab.h
-	$(LEX) $<
+ocrptpatterns.yy.c: ocrptpatterns.l ocrptgrammar.tab.h
+	$(LEX) -o ocrptpatterns.yy.c $<
 
 libopencreport_grammar_la_CFLAGS = \
 	-Wall -O2 -g -I$(top_srcdir)/include \
@@ -16,7 +16,7 @@ libopencreport_grammar_la_CFLAGS = \
 libopencreport_grammar_la_LDFLAGS = -static
 
 libopencreport_grammar_la_SOURCES = \
-	lex.yy.c ocrptgrammar.tab.h ocrptgrammar.tab.c
+	ocrptpatterns.yy.c ocrptgrammar.tab.h ocrptgrammar.tab.c
 
 libopencreport_la_DEPENDENCIES = libopencreport_grammar.la
 
@@ -44,4 +44,4 @@ libopencreport_la_LDFLAGS = \
 	-version-info $(OCRPT_LT_CURRENT):$(OCRPT_LT_REVISION):$(OCRPT_LT_AGE) \
 	$(EXTRA_LDFLAGS)
 
-CLEANFILES = ocrptgrammar.tab.h ocrptgrammar.tab.c ocrptgrammar.output lex.yy.c
+CLEANFILES = ocrptgrammar.tab.h ocrptgrammar.tab.c ocrptgrammar.output ocrptpatterns.yy.c
