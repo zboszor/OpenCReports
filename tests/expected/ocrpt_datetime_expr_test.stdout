@@ -414,7 +414,6 @@ expr nodes: 1
 string: stodt('1980-01-31 23:59:59') + interval(0,0,0,0,0,1)
 expr reprinted: add(stodt((string)1980-01-31 23:59:59),interval(0.000000,0.000000,0.000000,0.000000,0.000000,1.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-31 00:00:00
 expr nodes: 1
 (datetime)1980-01-31 00:00:00
@@ -422,7 +421,6 @@ expr nodes: 1
 string: stodt('1980-02-01 00:00:00') - interval(0,0,0,0,0,1)
 expr reprinted: sub(stodt((string)1980-02-01 00:00:00),interval(0.000000,0.000000,0.000000,0.000000,0.000000,1.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-31 23:59:59
 expr nodes: 1
 (datetime)1980-01-31 23:59:59
@@ -430,7 +428,6 @@ expr nodes: 1
 string: stodt('1980-01-31 23:59:59') + interval(0,0,0,0,1,0)
 expr reprinted: add(stodt((string)1980-01-31 23:59:59),interval(0.000000,0.000000,0.000000,0.000000,1.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-31 00:00:59
 expr nodes: 1
 (datetime)1980-01-31 00:00:59
@@ -438,7 +435,6 @@ expr nodes: 1
 string: stodt('1980-02-01 00:00:00') - interval(0,0,0,0,1,0)
 expr reprinted: sub(stodt((string)1980-02-01 00:00:00),interval(0.000000,0.000000,0.000000,0.000000,1.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-31 23:59:00
 expr nodes: 1
 (datetime)1980-01-31 23:59:00
@@ -446,7 +442,6 @@ expr nodes: 1
 string: stodt('1980-01-31 23:59:59') + interval(0,0,0,1,0,0)
 expr reprinted: add(stodt((string)1980-01-31 23:59:59),interval(0.000000,0.000000,0.000000,1.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-31 00:59:59
 expr nodes: 1
 (datetime)1980-01-31 00:59:59
@@ -454,7 +449,6 @@ expr nodes: 1
 string: stodt('1980-02-01 00:00:00') - interval(0,0,0,1,0,0)
 expr reprinted: sub(stodt((string)1980-02-01 00:00:00),interval(0.000000,0.000000,0.000000,1.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-31 23:00:00
 expr nodes: 1
 (datetime)1980-01-31 23:00:00
@@ -462,7 +456,6 @@ expr nodes: 1
 string: stodt('1980-01-31 23:59:59') + interval(0,0,1,0,0,0)
 expr reprinted: add(stodt((string)1980-01-31 23:59:59),interval(0.000000,0.000000,1.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-02-01 23:59:59
 expr nodes: 1
 (datetime)1980-02-01 23:59:59
@@ -470,7 +463,6 @@ expr nodes: 1
 string: stodt('1980-02-01 00:00:00') - interval(0,0,1,0,0,0)
 expr reprinted: sub(stodt((string)1980-02-01 00:00:00),interval(0.000000,0.000000,1.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-31 00:00:00
 expr nodes: 1
 (datetime)1980-01-31 00:00:00
@@ -478,7 +470,6 @@ expr nodes: 1
 string: stodt('1980-01-31 23:59:59') + interval(0,1,0,0,0,0)
 expr reprinted: add(stodt((string)1980-01-31 23:59:59),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-02-29 23:59:59
 expr nodes: 1
 (datetime)1980-02-29 23:59:59
@@ -486,7 +477,6 @@ expr nodes: 1
 string: stodt('1980-02-01 00:00:00') - interval(0,1,0,0,0,0)
 expr reprinted: sub(stodt((string)1980-02-01 00:00:00),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-01 00:00:00
 expr nodes: 1
 (datetime)1980-01-01 00:00:00
@@ -494,7 +484,6 @@ expr nodes: 1
 string: stodt('1980-01-31 23:59:59') + interval(1,0,0,0,0,0)
 expr reprinted: add(stodt((string)1980-01-31 23:59:59),interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1981-01-31 23:59:59
 expr nodes: 1
 (datetime)1981-01-31 23:59:59
@@ -502,7 +491,6 @@ expr nodes: 1
 string: stodt('1980-02-01 00:00:00') - interval(1,0,0,0,0,0)
 expr reprinted: sub(stodt((string)1980-02-01 00:00:00),interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1979-02-01 00:00:00
 expr nodes: 1
 (datetime)1979-02-01 00:00:00
@@ -510,7 +498,6 @@ expr nodes: 1
 string: stodt('1980-01-31') + interval(0,0,0,0,0,1)
 expr reprinted: add(stodt((string)1980-01-31),interval(0.000000,0.000000,0.000000,0.000000,0.000000,1.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-31 00:00:01
 expr nodes: 1
 (datetime)1980-01-31 00:00:01
@@ -518,7 +505,6 @@ expr nodes: 1
 string: stodt('1980-02-01') - interval(0,0,0,0,0,1)
 expr reprinted: sub(stodt((string)1980-02-01),interval(0.000000,0.000000,0.000000,0.000000,0.000000,1.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-31 23:59:59
 expr nodes: 1
 (datetime)1980-01-31 23:59:59
@@ -526,7 +512,6 @@ expr nodes: 1
 string: stodt('1980-01-31') + interval(0,0,0,0,1,0)
 expr reprinted: add(stodt((string)1980-01-31),interval(0.000000,0.000000,0.000000,0.000000,1.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-31 00:01:00
 expr nodes: 1
 (datetime)1980-01-31 00:01:00
@@ -534,7 +519,6 @@ expr nodes: 1
 string: stodt('1980-02-01') - interval(0,0,0,0,1,0)
 expr reprinted: sub(stodt((string)1980-02-01),interval(0.000000,0.000000,0.000000,0.000000,1.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-31 23:59:00
 expr nodes: 1
 (datetime)1980-01-31 23:59:00
@@ -542,7 +526,6 @@ expr nodes: 1
 string: stodt('1980-01-31') + interval(0,0,0,1,0,0)
 expr reprinted: add(stodt((string)1980-01-31),interval(0.000000,0.000000,0.000000,1.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-31 01:00:00
 expr nodes: 1
 (datetime)1980-01-31 01:00:00
@@ -550,7 +533,6 @@ expr nodes: 1
 string: stodt('1980-02-01') - interval(0,0,0,1,0,0)
 expr reprinted: sub(stodt((string)1980-02-01),interval(0.000000,0.000000,0.000000,1.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 1
 expr optimized: (datetime)1980-01-31 23:00:00
 expr nodes: 1
 (datetime)1980-01-31 23:00:00
@@ -558,7 +540,6 @@ expr nodes: 1
 string: stodt('1980-01-31') + interval(0,0,1,0,0,0)
 expr reprinted: add(stodt((string)1980-01-31),interval(0.000000,0.000000,1.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1980-02-01
 expr nodes: 1
 (datetime)1980-02-01
@@ -566,7 +547,6 @@ expr nodes: 1
 string: stodt('1980-02-01') - interval(0,0,1,0,0,0)
 expr reprinted: sub(stodt((string)1980-02-01),interval(0.000000,0.000000,1.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1980-01-31
 expr nodes: 1
 (datetime)1980-01-31
@@ -574,7 +554,6 @@ expr nodes: 1
 string: stodt('1980-01-31') + interval(0,1,0,0,0,0)
 expr reprinted: add(stodt((string)1980-01-31),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1980-02-29
 expr nodes: 1
 (datetime)1980-02-29
@@ -582,7 +561,6 @@ expr nodes: 1
 string: stodt('1980-02-01') - interval(0,1,0,0,0,0)
 expr reprinted: sub(stodt((string)1980-02-01),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1980-01-01
 expr nodes: 1
 (datetime)1980-01-01
@@ -590,7 +568,6 @@ expr nodes: 1
 string: stodt('1980-01-31') + interval(1,0,0,0,0,0)
 expr reprinted: add(stodt((string)1980-01-31),interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1981-01-31
 expr nodes: 1
 (datetime)1981-01-31
@@ -598,7 +575,6 @@ expr nodes: 1
 string: stodt('1980-02-01') - interval(1,0,0,0,0,0)
 expr reprinted: sub(stodt((string)1980-02-01),interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1979-02-01
 expr nodes: 1
 (datetime)1979-02-01
@@ -606,7 +582,6 @@ expr nodes: 1
 string: interval(1,0,0,0,0,0) + interval(0,1,0,0,0,0)
 expr reprinted: add(interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 15
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1 years 1 mons
 expr nodes: 1
 (datetime)1 years 1 mons
@@ -614,7 +589,6 @@ expr nodes: 1
 string: interval(1,0,0,0,0,0) - interval(0,1,0,0,0,0)
 expr reprinted: sub(interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 15
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)11 mons
 expr nodes: 1
 (datetime)11 mons
@@ -678,7 +652,6 @@ expr nodes: 1
 string: stodt('1979-01-31') + interval(0,1,0,0,0,0)
 expr reprinted: add(stodt((string)1979-01-31),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1979-02-28
 expr nodes: 1
 (datetime)1979-02-28
@@ -686,8 +659,6 @@ expr nodes: 1
 string: stodt('1979-01-31') + interval(0,1,0,0,0,0) + interval(0,1,0,0,0,0)
 expr reprinted: add(add(stodt((string)1979-01-31),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000)),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 18
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1979-03-31
 expr nodes: 1
 (datetime)1979-03-31
@@ -695,7 +666,6 @@ expr nodes: 1
 string: stodt('1979-01-31') + interval(0,2,0,0,0,0)
 expr reprinted: add(stodt((string)1979-01-31),interval(0.000000,2.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1979-03-31
 expr nodes: 1
 (datetime)1979-03-31
@@ -703,7 +673,6 @@ expr nodes: 1
 string: stodt('1979-03-31') - interval(0,1,0,0,0,0)
 expr reprinted: sub(stodt((string)1979-03-31),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1979-02-28
 expr nodes: 1
 (datetime)1979-02-28
@@ -711,8 +680,6 @@ expr nodes: 1
 string: stodt('1979-03-31') - interval(0,1,0,0,0,0) - interval(0,1,0,0,0,0)
 expr reprinted: sub(sub(stodt((string)1979-03-31),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000)),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 18
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1979-01-31
 expr nodes: 1
 (datetime)1979-01-31
@@ -720,7 +687,6 @@ expr nodes: 1
 string: stodt('1979-03-31') - interval(0,2,0,0,0,0)
 expr reprinted: sub(stodt((string)1979-03-31),interval(0.000000,2.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1979-01-31
 expr nodes: 1
 (datetime)1979-01-31
@@ -728,7 +694,6 @@ expr nodes: 1
 string: stodt('1980-01-31') + interval(0,1,0,0,0,0)
 expr reprinted: add(stodt((string)1980-01-31),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1980-02-29
 expr nodes: 1
 (datetime)1980-02-29
@@ -736,8 +701,6 @@ expr nodes: 1
 string: stodt('1980-01-31') + interval(0,1,0,0,0,0) + interval(0,1,0,0,0,0)
 expr reprinted: add(add(stodt((string)1980-01-31),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000)),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 18
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1980-03-31
 expr nodes: 1
 (datetime)1980-03-31
@@ -745,7 +708,6 @@ expr nodes: 1
 string: stodt('1980-01-31') + interval(0,2,0,0,0,0)
 expr reprinted: add(stodt((string)1980-01-31),interval(0.000000,2.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1980-03-31
 expr nodes: 1
 (datetime)1980-03-31
@@ -753,7 +715,6 @@ expr nodes: 1
 string: stodt('1980-03-31') - interval(0,1,0,0,0,0)
 expr reprinted: sub(stodt((string)1980-03-31),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1980-02-29
 expr nodes: 1
 (datetime)1980-02-29
@@ -761,8 +722,6 @@ expr nodes: 1
 string: stodt('1980-03-31') - interval(0,1,0,0,0,0) - interval(0,1,0,0,0,0)
 expr reprinted: sub(sub(stodt((string)1980-03-31),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000)),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 18
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1980-01-31
 expr nodes: 1
 (datetime)1980-01-31
@@ -770,7 +729,6 @@ expr nodes: 1
 string: stodt('1980-03-31') - interval(0,2,0,0,0,0)
 expr reprinted: sub(stodt((string)1980-03-31),interval(0.000000,2.000000,0.000000,0.000000,0.000000,0.000000))
 expr nodes: 10
-ocrpt_datetime_add_interval src_date_valid 1 src_time_valid 0
 expr optimized: (datetime)1980-01-31
 expr nodes: 1
 (datetime)1980-01-31

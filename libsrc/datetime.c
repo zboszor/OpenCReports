@@ -455,8 +455,6 @@ void ocrpt_datetime_add_interval(opencreport *o, ocrpt_expr *dst, ocrpt_result *
 	bool src_date_valid = src_datetime->date_valid || (src_interval->interval && (src_interval->datetime.tm_year || src_interval->datetime.tm_mon || src_interval->datetime.tm_mday));
 	bool src_time_valid = src_datetime->time_valid || (src_interval->interval && (src_interval->datetime.tm_hour || src_interval->datetime.tm_min || src_interval->datetime.tm_sec));
 
-	printf("ocrpt_datetime_add_interval src_date_valid %d src_time_valid %d\n", src_date_valid, src_time_valid);
-
 	dst->result[o->residx]->datetime = src_datetime->datetime;
 	dst->result[o->residx]->interval = src_datetime->interval;
 	dst->result[o->residx]->date_valid = src_datetime->interval ? false : (src_datetime->date_valid || src_date_valid);
