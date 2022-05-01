@@ -160,6 +160,7 @@ int main(void) {
 
 		/* fxpval() conversion */
 		"fxpval('123456', 2)",
+		"fxpval(val('123456'), 2)",
 
 		/* str() conversion */
 		"str(1234.56, 6, 4)",

@@ -3515,7 +3515,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_fxpval) {
 		}
 	}
 
-	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING || e->ops[1]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
+	if ((e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING && e->ops[0]->result[o->residx]->type != OCRPT_RESULT_NUMBER) || e->ops[1]->result[o->residx]->type != OCRPT_RESULT_NUMBER) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 		return;
 	}
@@ -3529,7 +3529,10 @@ OCRPT_STATIC_FUNCTION(ocrpt_fxpval) {
 		}
 	}
 
-	mpfr_set_str(e->result[o->residx]->number, e->ops[0]->result[o->residx]->string->str, 10, o->rndmode);
+	if (e->ops[0]->result[o->residx]->type == OCRPT_RESULT_NUMBER)
+		mpfr_set(e->result[o->residx]->number, e->ops[0]->result[o->residx]->number, o->rndmode);
+	else
+		mpfr_set_str(e->result[o->residx]->number, e->ops[0]->result[o->residx]->string->str, 10, o->rndmode);
 
 	mpfr_t tmp;
 
