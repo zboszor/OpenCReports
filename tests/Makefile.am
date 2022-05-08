@@ -11,6 +11,7 @@ TESTS = \
 	ocrpt_compiler_test \
 	ocrpt_grammar_test ocrpt_expr_test ocrpt_function_test \
 	ocrpt_expr_rlib_compat_test \
+	ocrpt_expr_format_test \
 	ocrpt_environment_test ocrpt_environment2_test \
 	ocrpt_array_test ocrpt_array2_test ocrpt_array_resolve_test ocrpt_array_xml_test \
 	ocrpt_csv_test ocrpt_csv2_test ocrpt_csv_array_test \

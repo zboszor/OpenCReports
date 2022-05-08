@@ -66,15 +66,20 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/strfmon.c,v 1.14 2003/03/20 08:18:55 ach
 
 /* internal macros */
 #define PRINT(CH) do {						\
-	if (dst >= s + maxsize) 				\
-		goto e2big_error;				\
-	*dst++ = CH;						\
+	if (s) {								\
+		if (dst >= s + maxsize) 			\
+			goto e2big_error;				\
+		*dst++ = CH;						\
+	} else									\
+		dst++;								\
 } while (0)
 
-#define PRINTS(STR) do {					\
-	char *tmps = STR;					\
-	while (*tmps != '\0')					\
-		PRINT(*tmps++);					\
+#define PRINTS(STR) do {			\
+	char *tmps = STR;				\
+	while (*tmps != '\0') {			\
+		PRINT(*tmps);				\
+		tmps++;						\
+	}								\
 } while (0)
 
 #define GET_NUMBER(VAR)	do {					\
