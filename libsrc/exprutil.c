@@ -55,7 +55,7 @@ static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth, co
 		ocrpt_mem_string_append_printf(str, "(ERROR)%s", result ? result->string->str : "NULL");
 		break;
 	case OCRPT_EXPR_STRING:
-		ocrpt_mem_string_append_printf(str, "(string)%s", result ? (result->isnull ? "NULL" : result->string->str) : "NULL");
+		ocrpt_mem_string_append_printf(str, "(string)%s", result ? (result->isnull ? "NULL" : (result->string ? result->string->str : "NULL")) : "NULL");
 		break;
 	case OCRPT_EXPR_DATETIME: {
 		ocrpt_string *tmp = ocrpt_mem_string_new_with_len(NULL, 128);
