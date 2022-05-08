@@ -72,6 +72,10 @@ int main(void) {
 		"format(6, 'You have !#% 10d oranges')",
 		"format(6, 'You have !#{% 10d} oranges')",
 
+		/* printf(), yay!!! */
+
+		"printf('You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.', 6, 'apples', stodt('2022-05-01'), 2, 'oranges', stodt('2022-05-02'))",
+
 		/* Invalid formats */
 
 		/* Numeric format for a string */

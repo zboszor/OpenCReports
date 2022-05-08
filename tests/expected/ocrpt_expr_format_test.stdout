@@ -243,6 +243,13 @@ expr optimized: (string)You have          6 oranges
 expr nodes: 1
 (string)You have          6 oranges
 
+string: printf('You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.', 6, 'apples', stodt('2022-05-01'), 2, 'oranges', stodt('2022-05-02'))
+expr reprinted: printf((string)You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.,6.000000,(string)apples,stodt((string)2022-05-01),2.000000,(string)oranges,stodt((string)2022-05-02))
+expr nodes: 10
+expr optimized: (string)You had 6 apples on 2022-05-01 and 2 oranges on 2022-05-02 in your pocket.
+expr nodes: 1
+(string)You had 6 apples on 2022-05-01 and 2 oranges on 2022-05-02 in your pocket.
+
 string: format('apples and oranges', '%6.3d')
 expr reprinted: format((string)apples and oranges,(string)%6.3d)
 expr nodes: 3
@@ -389,16 +396,16 @@ expr nodes: 1
 string: format(stodt('2022-05-08'), '!@{%Y-%m-%d}')
 expr reprinted: format(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
 expr nodes: 4
-expr optimized: (string)2022-05-08}
+expr optimized: (string)2022-05-08
 expr nodes: 1
-(string)2022-05-08}
+(string)2022-05-08
 
 string: format(stodt('2022-05-08'), '!@{%A}')
 expr reprinted: format(stodt((string)2022-05-08),(string)!@{%A})
 expr nodes: 4
-expr optimized: (string)Sunday}
+expr optimized: (string)Sunday
 expr nodes: 1
-(string)Sunday}
+(string)Sunday
 
 string: dtosf(stodt('2022-05-08'), '!@%Y-%m-%d')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
@@ -417,16 +424,16 @@ expr nodes: 1
 string: dtosf(stodt('2022-05-08'), '!@{%Y-%m-%d}')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
 expr nodes: 4
-expr optimized: (string)2022-05-08}
+expr optimized: (string)2022-05-08
 expr nodes: 1
-(string)2022-05-08}
+(string)2022-05-08
 
 string: dtosf(stodt('2022-05-08'), '!@{%A}')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%A})
 expr nodes: 4
-expr optimized: (string)Sunday}
+expr optimized: (string)Sunday
 expr nodes: 1
-(string)Sunday}
+(string)Sunday
 
 
 Print formats in en_US.UTF-8
@@ -560,16 +567,16 @@ expr nodes: 1
 string: format(stodt('2022-05-08'), '!@{%Y-%m-%d}')
 expr reprinted: format(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
 expr nodes: 4
-expr optimized: (string)2022-05-08}
+expr optimized: (string)2022-05-08
 expr nodes: 1
-(string)2022-05-08}
+(string)2022-05-08
 
 string: format(stodt('2022-05-08'), '!@{%A}')
 expr reprinted: format(stodt((string)2022-05-08),(string)!@{%A})
 expr nodes: 4
-expr optimized: (string)Sunday}
+expr optimized: (string)Sunday
 expr nodes: 1
-(string)Sunday}
+(string)Sunday
 
 string: dtosf(stodt('2022-05-08'), '!@%Y-%m-%d')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
@@ -588,16 +595,16 @@ expr nodes: 1
 string: dtosf(stodt('2022-05-08'), '!@{%Y-%m-%d}')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
 expr nodes: 4
-expr optimized: (string)2022-05-08}
+expr optimized: (string)2022-05-08
 expr nodes: 1
-(string)2022-05-08}
+(string)2022-05-08
 
 string: dtosf(stodt('2022-05-08'), '!@{%A}')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%A})
 expr nodes: 4
-expr optimized: (string)Sunday}
+expr optimized: (string)Sunday
 expr nodes: 1
-(string)Sunday}
+(string)Sunday
 
 
 Print formats in en_GB.UTF-8
@@ -731,16 +738,16 @@ expr nodes: 1
 string: format(stodt('2022-05-08'), '!@{%Y-%m-%d}')
 expr reprinted: format(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
 expr nodes: 4
-expr optimized: (string)2022-05-08}
+expr optimized: (string)2022-05-08
 expr nodes: 1
-(string)2022-05-08}
+(string)2022-05-08
 
 string: format(stodt('2022-05-08'), '!@{%A}')
 expr reprinted: format(stodt((string)2022-05-08),(string)!@{%A})
 expr nodes: 4
-expr optimized: (string)Sunday}
+expr optimized: (string)Sunday
 expr nodes: 1
-(string)Sunday}
+(string)Sunday
 
 string: dtosf(stodt('2022-05-08'), '!@%Y-%m-%d')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
@@ -759,16 +766,16 @@ expr nodes: 1
 string: dtosf(stodt('2022-05-08'), '!@{%Y-%m-%d}')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
 expr nodes: 4
-expr optimized: (string)2022-05-08}
+expr optimized: (string)2022-05-08
 expr nodes: 1
-(string)2022-05-08}
+(string)2022-05-08
 
 string: dtosf(stodt('2022-05-08'), '!@{%A}')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%A})
 expr nodes: 4
-expr optimized: (string)Sunday}
+expr optimized: (string)Sunday
 expr nodes: 1
-(string)Sunday}
+(string)Sunday
 
 
 Print formats in fr_FR.UTF-8
@@ -902,16 +909,16 @@ expr nodes: 1
 string: format(stodt('2022-05-08'), '!@{%Y-%m-%d}')
 expr reprinted: format(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
 expr nodes: 4
-expr optimized: (string)2022-05-08}
+expr optimized: (string)2022-05-08
 expr nodes: 1
-(string)2022-05-08}
+(string)2022-05-08
 
 string: format(stodt('2022-05-08'), '!@{%A}')
 expr reprinted: format(stodt((string)2022-05-08),(string)!@{%A})
 expr nodes: 4
-expr optimized: (string)dimanche}
+expr optimized: (string)dimanche
 expr nodes: 1
-(string)dimanche}
+(string)dimanche
 
 string: dtosf(stodt('2022-05-08'), '!@%Y-%m-%d')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
@@ -930,16 +937,16 @@ expr nodes: 1
 string: dtosf(stodt('2022-05-08'), '!@{%Y-%m-%d}')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
 expr nodes: 4
-expr optimized: (string)2022-05-08}
+expr optimized: (string)2022-05-08
 expr nodes: 1
-(string)2022-05-08}
+(string)2022-05-08
 
 string: dtosf(stodt('2022-05-08'), '!@{%A}')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%A})
 expr nodes: 4
-expr optimized: (string)dimanche}
+expr optimized: (string)dimanche
 expr nodes: 1
-(string)dimanche}
+(string)dimanche
 
 
 Print formats in de_DE.UTF-8
@@ -1073,16 +1080,16 @@ expr nodes: 1
 string: format(stodt('2022-05-08'), '!@{%Y-%m-%d}')
 expr reprinted: format(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
 expr nodes: 4
-expr optimized: (string)2022-05-08}
+expr optimized: (string)2022-05-08
 expr nodes: 1
-(string)2022-05-08}
+(string)2022-05-08
 
 string: format(stodt('2022-05-08'), '!@{%A}')
 expr reprinted: format(stodt((string)2022-05-08),(string)!@{%A})
 expr nodes: 4
-expr optimized: (string)Sonntag}
+expr optimized: (string)Sonntag
 expr nodes: 1
-(string)Sonntag}
+(string)Sonntag
 
 string: dtosf(stodt('2022-05-08'), '!@%Y-%m-%d')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
@@ -1101,16 +1108,16 @@ expr nodes: 1
 string: dtosf(stodt('2022-05-08'), '!@{%Y-%m-%d}')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
 expr nodes: 4
-expr optimized: (string)2022-05-08}
+expr optimized: (string)2022-05-08
 expr nodes: 1
-(string)2022-05-08}
+(string)2022-05-08
 
 string: dtosf(stodt('2022-05-08'), '!@{%A}')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%A})
 expr nodes: 4
-expr optimized: (string)Sonntag}
+expr optimized: (string)Sonntag
 expr nodes: 1
-(string)Sonntag}
+(string)Sonntag
 
 
 Print formats in hu_HU.UTF-8
@@ -1244,16 +1251,16 @@ expr nodes: 1
 string: format(stodt('2022-05-08'), '!@{%Y-%m-%d}')
 expr reprinted: format(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
 expr nodes: 4
-expr optimized: (string)2022-05-08}
+expr optimized: (string)2022-05-08
 expr nodes: 1
-(string)2022-05-08}
+(string)2022-05-08
 
 string: format(stodt('2022-05-08'), '!@{%A}')
 expr reprinted: format(stodt((string)2022-05-08),(string)!@{%A})
 expr nodes: 4
-expr optimized: (string)vasárnap}
+expr optimized: (string)vasárnap
 expr nodes: 1
-(string)vasárnap}
+(string)vasárnap
 
 string: dtosf(stodt('2022-05-08'), '!@%Y-%m-%d')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
@@ -1272,14 +1279,14 @@ expr nodes: 1
 string: dtosf(stodt('2022-05-08'), '!@{%Y-%m-%d}')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
 expr nodes: 4
-expr optimized: (string)2022-05-08}
+expr optimized: (string)2022-05-08
 expr nodes: 1
-(string)2022-05-08}
+(string)2022-05-08
 
 string: dtosf(stodt('2022-05-08'), '!@{%A}')
 expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%A})
 expr nodes: 4
-expr optimized: (string)vasárnap}
+expr optimized: (string)vasárnap
 expr nodes: 1
-(string)vasárnap}
+(string)vasárnap
 

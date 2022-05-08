@@ -223,12 +223,12 @@ static void ocrpt_formatstring_money_length_prec(const char *fmt, int32_t *lengt
 					if (fmt[i] != '}') \
 						FORMAT_ERROR;
 
-#define COPY_FORMAT(start, end) \
+#define COPY_FORMAT(start, end, extra) \
 					do { \
 						ocrpt_mem_string_append_len(str, fmt + start, end - start); \
 						ocrpt_mem_string_append_c(str, '\0'); \
 						*out_type = type; \
-						*advance = end - start + 4; \
+						*advance = end - start + extra; \
 					} while (0)
 
 #define SWITCH_TO_LITERAL(x) \
@@ -449,7 +449,7 @@ static ocrpt_string *ocrpt_get_next_format_string(opencreport *o, const char *fm
 						type = OCRPT_FORMAT_DATETIME;
 						if (fmt[adv + 2] == '{') {
 							BRACKETED_FORMAT;
-							COPY_FORMAT(adv + 3, i);
+							COPY_FORMAT(adv + 3, i - 6, 4);
 							return str;
 						} else
 							RETURN_END_LITERAL(type, 2);
@@ -522,7 +522,7 @@ static ocrpt_string *ocrpt_get_next_format_string(opencreport *o, const char *fm
 						type = OCRPT_FORMAT_NUMBER;
 						if (fmt[adv + 2] == '{') {
 							BRACKETED_FORMAT;
-							COPY_FORMAT(adv + 3, i);
+							COPY_FORMAT(adv + 3, i, 4);
 
 							ocrpt_string *str1;
 							enum ocrpt_formatstring_type type1;
@@ -576,7 +576,7 @@ static ocrpt_string *ocrpt_get_next_format_string(opencreport *o, const char *fm
 						type = OCRPT_FORMAT_STRING;
 						if (fmt[adv + 2] == '{') {
 							BRACKETED_FORMAT;
-							COPY_FORMAT(adv + 3, i);
+							COPY_FORMAT(adv + 3, i, 4);
 
 							ocrpt_string *str1;
 							enum ocrpt_formatstring_type type1;
@@ -697,31 +697,14 @@ void ocrpt_utf8backward(const char *s, int l, int *l2, int blen, int *blen2) {
 		*blen2 = i;
 }
 
-void ocrpt_format_string(opencreport *o, ocrpt_expr *e, const char *formatstring, int32_t formatlen, ocrpt_result *data) {
-	enum ocrpt_formatstring_type types[2] = { OCRPT_FORMAT_NONE, OCRPT_FORMAT_LITERAL };
-	int32_t advance, type_idx;
+void ocrpt_format_string(opencreport *o, ocrpt_expr *e, const char *formatstring, int32_t formatlen, ocrpt_expr **expr, int32_t n_expr) {
+	int32_t i, advance;
 	locale_t locale;
 
 	/* Use the specified locale, so that thousand separators, etc. work. */
 	locale = uselocale(o->locale);
 
-	switch (data->type) {
-	case OCRPT_RESULT_STRING:
-		types[0] = OCRPT_FORMAT_STRING;
-		break;
-	case OCRPT_RESULT_NUMBER:
-		types[0] = OCRPT_FORMAT_NUMBER;
-		break;
-	case OCRPT_RESULT_DATETIME:
-		types[0] = OCRPT_FORMAT_DATETIME;
-		break;
-	case OCRPT_RESULT_ERROR:
-		ocrpt_expr_make_error_result(o, e, data->string->str);
-		return;
-	}
-
-	size_t len = (data->type == OCRPT_RESULT_STRING ? data->string->len : 16);
-	ocrpt_string *string = ocrpt_mem_string_resize(e->result[o->residx]->string, len);
+	ocrpt_string *string = ocrpt_mem_string_resize(e->result[o->residx]->string, 16);
 	if (string) {
 		if (!e->result[o->residx]->string) {
 			e->result[o->residx]->string = string;
@@ -731,85 +714,120 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, const char *formatstring
 	}
 
 	advance = 0;
-	type_idx = 0;
-	while (advance < formatlen && formatstring[advance]) {
-		ocrpt_string *tmp;
-		char *result;
-		enum ocrpt_formatstring_type type;
-		int32_t adv, length;
-		ssize_t len;
-		bool error, lpadded;
+	for (i = 0; i < n_expr; i++) {
+		ocrpt_result *data = expr[i]->result[o->residx];
+		enum ocrpt_formatstring_type types[2] = { OCRPT_FORMAT_NONE, OCRPT_FORMAT_LITERAL };
+		int32_t type_idx;
+		bool data_handled = false;
 
-		length = -1;
-		lpadded = 0;
-		tmp = ocrpt_get_next_format_string(o, formatstring + advance, types[type_idx], &type, &adv, &error, &length, &lpadded);
-
-		if (error) {
-			ocrpt_expr_make_error_result(o, e, tmp->str);
-			ocrpt_mem_string_free(tmp, true);
+		switch (data->type) {
+		case OCRPT_RESULT_STRING:
+			types[0] = OCRPT_FORMAT_STRING;
+			break;
+		case OCRPT_RESULT_NUMBER:
+			types[0] = OCRPT_FORMAT_NUMBER;
+			break;
+		case OCRPT_RESULT_DATETIME:
+			types[0] = OCRPT_FORMAT_DATETIME;
+			break;
+		case OCRPT_RESULT_ERROR:
+			ocrpt_expr_make_error_result(o, e, data->string->str);
 			return;
 		}
 
-		if (types[type_idx] == type || (types[type_idx] == OCRPT_FORMAT_NUMBER && type == OCRPT_FORMAT_MONEY))
-			type_idx++;
+		type_idx = 0;
+		while (advance < formatlen && formatstring[advance]) {
+			ocrpt_string *tmp;
+			char *result;
+			enum ocrpt_formatstring_type type;
+			int32_t adv, length;
+			ssize_t len;
+			bool error, lpadded;
 
-		switch (type) {
-		case OCRPT_FORMAT_LITERAL:
-			ocrpt_mem_string_append(string, tmp->str);
-			break;
-		case OCRPT_FORMAT_NUMBER:
-			if (mpfr_asprintf(&result, tmp->str, data->number) >= 0) {
-				ocrpt_mem_string_append(string, result);
-				mpfr_free_str(result);
+			length = -1;
+			lpadded = 0;
+			tmp = ocrpt_get_next_format_string(o, formatstring + advance, types[type_idx], &type, &adv, &error, &length, &lpadded);
+
+			if (error) {
+				ocrpt_expr_make_error_result(o, e, tmp->str);
+				ocrpt_mem_string_free(tmp, true);
+				return;
 			}
-			break;
-		case OCRPT_FORMAT_MONEY:
-			len = ocrpt_mpfr_strfmon(o, NULL, 0, tmp->str, data->number);
-			if (len >= 0) {
-				result = ocrpt_mem_malloc(len + 1);
-				ocrpt_mpfr_strfmon(o, result, len, tmp->str, data->number);
-				result[len] = 0;
-				ocrpt_mem_string_append(string, result);
-				ocrpt_mem_free(result);
+
+			if (types[type_idx] == type || (types[type_idx] == OCRPT_FORMAT_NUMBER && type == OCRPT_FORMAT_MONEY)) {
+				type_idx++;
+				data_handled = true;
 			}
-			break;
-		case OCRPT_FORMAT_DATETIME:
-			char dt[256];
 
-			strftime_l(dt, sizeof(dt), tmp->str, &data->datetime, o->locale);
-			ocrpt_mem_string_append(string, dt);
-			break;
-		case OCRPT_FORMAT_STRING:
-			int32_t blen = data->string->len;
-
-			if (length > 0) {
-				int32_t slen;
-				ocrpt_utf8forward(data->string->str, length, &slen, data->string->len, &blen);
-
-				if (lpadded) {
-					char *padstr;
-					int32_t padlen;
-
-					padlen = length - slen;
-					padstr = ocrpt_mem_malloc(padlen + 1);
-					memset(padstr, ' ', padlen);
-					padstr[padlen] = 0;
-
-					ocrpt_mem_string_append(string, padstr);
-
-					ocrpt_mem_free(padstr);
+			switch (type) {
+			case OCRPT_FORMAT_LITERAL:
+				if (!data_handled || i == (n_expr - 1))
+					ocrpt_mem_string_append(string, tmp->str);
+				else
+					goto end_inner_loop;
+				break;
+			case OCRPT_FORMAT_NUMBER:
+				if (mpfr_asprintf(&result, tmp->str, data->number) >= 0) {
+					ocrpt_mem_string_append(string, result);
+					mpfr_free_str(result);
 				}
+				data_handled = true;
+				break;
+			case OCRPT_FORMAT_MONEY:
+				len = ocrpt_mpfr_strfmon(o, NULL, 0, tmp->str, data->number);
+				if (len >= 0) {
+					result = ocrpt_mem_malloc(len + 1);
+					ocrpt_mpfr_strfmon(o, result, len, tmp->str, data->number);
+					result[len] = 0;
+					ocrpt_mem_string_append(string, result);
+					ocrpt_mem_free(result);
+				}
+				data_handled = true;
+				break;
+			case OCRPT_FORMAT_DATETIME:
+				char dt[256];
+
+				strftime_l(dt, sizeof(dt), tmp->str, &data->datetime, o->locale);
+				ocrpt_mem_string_append(string, dt);
+				data_handled = true;
+				break;
+			case OCRPT_FORMAT_STRING:
+				int32_t blen = data->string->len;
+
+				if (length > 0) {
+					int32_t slen;
+					ocrpt_utf8forward(data->string->str, length, &slen, data->string->len, &blen);
+
+					if (lpadded) {
+						char *padstr;
+						int32_t padlen;
+
+						padlen = length - slen;
+						padstr = ocrpt_mem_malloc(padlen + 1);
+						memset(padstr, ' ', padlen);
+						padstr[padlen] = 0;
+
+						ocrpt_mem_string_append(string, padstr);
+
+						ocrpt_mem_free(padstr);
+					}
+				}
+
+				ocrpt_mem_string_append_len(string, data->string->str, blen);
+				data_handled = true;
+				break;
+			case OCRPT_FORMAT_NONE:
+				break;
 			}
 
-			ocrpt_mem_string_append_len(string, data->string->str, blen);
-			break;
-		case OCRPT_FORMAT_NONE:
-			break;
+			end_inner_loop:
+			ocrpt_mem_string_free(tmp, true);
+
+			advance += adv;
+
+			if (data_handled && i != (n_expr - 1))
+				break;
 		}
-
-		advance += adv;
-
-		ocrpt_mem_string_free(tmp, true);
 	}
 
 	uselocale(locale);

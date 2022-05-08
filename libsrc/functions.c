@@ -3645,7 +3645,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_format) {
 	} else
 		formatlen = strlen(formatstring);
 
-	ocrpt_format_string(o, e, formatstring, formatlen, e->ops[0]->result[o->residx]);
+	ocrpt_format_string(o, e, formatstring, formatlen, e->ops, 1);
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_dtosf) {
@@ -3711,7 +3711,39 @@ OCRPT_STATIC_FUNCTION(ocrpt_dtosf) {
 	} else
 		formatlen = strlen(formatstring);
 
-	ocrpt_format_string(o, e, formatstring, formatlen, e->ops[0]->result[o->residx]);
+	ocrpt_format_string(o, e, formatstring, formatlen, e->ops, 1);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_printf) {
+	int32_t i;
+
+	if (e->n_ops < 2) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	for (i = 0; i < e->n_ops; i++) {
+		if (!e->ops[i]->result[o->residx]) {
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+			return;
+		}
+	}
+
+	for (i = 0; i < e->n_ops; i++) {
+		if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+			ocrpt_expr_make_error_result(o, e, e->ops[i]->result[o->residx]->string->str);
+			return;
+		}
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_STRING) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_STRING);
+
+	ocrpt_format_string(o, e, e->ops[0]->result[o->residx]->string->str, e->ops[0]->result[o->residx]->string->len, &e->ops[1], e->n_ops - 1);
 }
 
 /*
@@ -3782,6 +3814,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "nulls",		ocrpt_nulls,	0,	false,	false,	false,	false },
 	{ "or",			ocrpt_or,	-1,	true,	true,	false,	false },
 	{ "pow",		ocrpt_pow,	2,	false,	false,	false,	false },
+	{ "printf",		ocrpt_printf,	-1,	false,	false,	false,	false },
 	{ "proper",		ocrpt_proper,	1,	false,	false,	false,	false },
 	{ "random",		ocrpt_random,	0,	false,	false,	false,	true },
 	{ "remainder",	ocrpt_remainder,	2,	false,	false,	false,	false },

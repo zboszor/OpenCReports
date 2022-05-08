@@ -47,6 +47,6 @@ struct ocrpt_format_string_element_t {
 void ocrpt_utf8forward(const char *s, int l, int *l2, int blen, int *blen2);
 void ocrpt_utf8backward(const char *s, int l, int *l2, int blen, int *blen2);
 
-void ocrpt_format_string(opencreport *o, ocrpt_expr *e, const char *formatstring, int32_t formatlen, ocrpt_result *data);
+void ocrpt_format_string(opencreport *o, ocrpt_expr *e, const char *formatstring, int32_t formatlen, ocrpt_expr **data, int32_t n_expr);
 
 #endif
