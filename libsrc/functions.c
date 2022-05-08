@@ -3648,6 +3648,72 @@ OCRPT_STATIC_FUNCTION(ocrpt_format) {
 	ocrpt_format_string(o, e, formatstring, formatlen, e->ops[0]->result[o->residx]);
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_dtosf) {
+	int32_t i;
+
+	if (e->n_ops != 2) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	for (i = 0; i < e->n_ops; i++) {
+		if (!e->ops[i]->result[o->residx]) {
+			ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+			return;
+		}
+	}
+
+	for (i = 0; i < e->n_ops; i++) {
+		if (e->ops[i]->result[o->residx]->type == OCRPT_RESULT_ERROR) {
+			ocrpt_expr_make_error_result(o, e, e->ops[i]->result[o->residx]->string->str);
+			return;
+		}
+	}
+
+	if (e->ops[0]->result[o->residx]->type != OCRPT_RESULT_DATETIME) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[1]->result[o->residx]->type != OCRPT_RESULT_STRING) {
+		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_STRING);
+
+	/* If the data to be formatted is NULL, it is treated as an empty string. */
+	if (e->ops[0]->result[o->residx]->isnull) {
+		e->result[o->residx]->string->str[0] = 0;
+		e->result[o->residx]->string->len = 0;
+		return;
+	}
+
+	/*
+	 * Result would be garbage for intervals.
+	 * Let's return an empty string.
+	 */
+	if (e->ops[0]->result[o->residx]->interval) {
+		e->result[o->residx]->string->str[0] = 0;
+		e->result[o->residx]->string->len = 0;
+		return;
+	}
+
+	char *formatstring = NULL;
+	int32_t formatlen = 0;
+
+	if (e->ops[1]->result[o->residx]->isnull || e->ops[1]->result[o->residx]->string->len == 0)
+		formatstring = nl_langinfo_l(D_FMT, o->locale);
+
+	if (!formatstring) {
+		formatstring = e->ops[1]->result[o->residx]->string->str;
+		formatlen = e->ops[1]->result[o->residx]->string->len;
+	} else
+		formatlen = strlen(formatstring);
+
+	ocrpt_format_string(o, e, formatstring, formatlen, e->ops[0]->result[o->residx]);
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -3674,6 +3740,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "dim",		ocrpt_dim,	1,	false,	false,	false,	false },
 	{ "div",		ocrpt_div,	-1,	false,	false,	true,	false },
 	{ "dtos",		ocrpt_dtos,	1,	false,	false,	false,	false },
+	{ "dtosf",		ocrpt_dtosf,	2,	false,	false,	false,	false },
 	{ "eq",			ocrpt_eq,	2,	true,	false,	false,	false },
 	{ "error",		ocrpt_error,	1,	false,	false,	false,	false },
 	{ "exp",		ocrpt_exp,	1,	false,	false,	false,	false },

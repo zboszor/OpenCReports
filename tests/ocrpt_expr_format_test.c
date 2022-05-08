@@ -53,6 +53,9 @@ int main(void) {
 		"format(stodt('2022-05-08'), '')", /* default formatting */
 		"format(stodt('2022-05-08'), '%Y-%m-%d')",
 
+		"dtosf(stodt('2022-05-08'), '')", /* default formatting */
+		"dtosf(stodt('2022-05-08'), '%Y-%m-%d')",
+
 		/* New style string formats */
 
 		"format('apples and oranges', 'You have some !&% 10s pears')",
@@ -109,6 +112,9 @@ int main(void) {
 		"format(stodt('2022-05-08'), '')",
 		"format(stodt('2022-05-08'), '%A')",
 
+		"dtosf(stodt('2022-05-08'), '')",
+		"dtosf(stodt('2022-05-08'), '%A')",
+
 		/* New style datetime format */
 
 		"format(stodt('2022-05-08'), '!@%Y-%m-%d')",
@@ -116,6 +122,12 @@ int main(void) {
 
 		"format(stodt('2022-05-08'), '!@{%Y-%m-%d}')",
 		"format(stodt('2022-05-08'), '!@{%A}')",
+
+		"dtosf(stodt('2022-05-08'), '!@%Y-%m-%d')",
+		"dtosf(stodt('2022-05-08'), '!@%A')",
+
+		"dtosf(stodt('2022-05-08'), '!@{%Y-%m-%d}')",
+		"dtosf(stodt('2022-05-08'), '!@{%A}')",
 	};
 	int nstr1 = sizeof(str1) / sizeof(char *);
 	char *locales[] = {
