@@ -3602,13 +3602,6 @@ OCRPT_STATIC_FUNCTION(ocrpt_format) {
 
 	ocrpt_expr_init_result(o, e, OCRPT_RESULT_STRING);
 
-	/* If the data to be formatted is NULL, it is treated as an empty string. */
-	if (e->ops[0]->result[o->residx]->isnull) {
-		e->result[o->residx]->string->str[0] = 0;
-		e->result[o->residx]->string->len = 0;
-		return;
-	}
-
 	char *formatstring = NULL;
 	int32_t formatlen = 0;
 
@@ -3681,13 +3674,6 @@ OCRPT_STATIC_FUNCTION(ocrpt_dtosf) {
 	}
 
 	ocrpt_expr_init_result(o, e, OCRPT_RESULT_STRING);
-
-	/* If the data to be formatted is NULL, it is treated as an empty string. */
-	if (e->ops[0]->result[o->residx]->isnull) {
-		e->result[o->residx]->string->str[0] = 0;
-		e->result[o->residx]->string->len = 0;
-		return;
-	}
 
 	/*
 	 * Result would be garbage for intervals.

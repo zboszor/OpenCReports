@@ -767,15 +767,14 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, const char *formatstring
 					goto end_inner_loop;
 				break;
 			case OCRPT_FORMAT_NUMBER:
-				if (mpfr_asprintf(&result, tmp->str, data->number) >= 0) {
+				if (!data->isnull && mpfr_asprintf(&result, tmp->str, data->number) >= 0) {
 					ocrpt_mem_string_append(string, result);
 					mpfr_free_str(result);
 				}
 				data_handled = true;
 				break;
 			case OCRPT_FORMAT_MONEY:
-				len = ocrpt_mpfr_strfmon(o, NULL, 0, tmp->str, data->number);
-				if (len >= 0) {
+				if (!data->isnull && (len = ocrpt_mpfr_strfmon(o, NULL, 0, tmp->str, data->number)) >= 0) {
 					result = ocrpt_mem_malloc(len + 1);
 					ocrpt_mpfr_strfmon(o, result, len, tmp->str, data->number);
 					result[len] = 0;
@@ -785,35 +784,39 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, const char *formatstring
 				data_handled = true;
 				break;
 			case OCRPT_FORMAT_DATETIME:
-				char dt[256];
+				if (!data->isnull) {
+					char dt[256];
 
-				strftime_l(dt, sizeof(dt), tmp->str, &data->datetime, o->locale);
-				ocrpt_mem_string_append(string, dt);
+					strftime_l(dt, sizeof(dt), tmp->str, &data->datetime, o->locale);
+					ocrpt_mem_string_append(string, dt);
+				}
 				data_handled = true;
 				break;
 			case OCRPT_FORMAT_STRING:
-				int32_t blen = data->string->len;
+				if (!data->isnull) {
+					int32_t blen = data->string->len;
 
-				if (length > 0) {
-					int32_t slen;
-					ocrpt_utf8forward(data->string->str, length, &slen, data->string->len, &blen);
+					if (length > 0) {
+						int32_t slen;
+						ocrpt_utf8forward(data->string->str, length, &slen, data->string->len, &blen);
 
-					if (lpadded) {
-						char *padstr;
-						int32_t padlen;
+						if (lpadded) {
+							char *padstr;
+							int32_t padlen;
 
-						padlen = length - slen;
-						padstr = ocrpt_mem_malloc(padlen + 1);
-						memset(padstr, ' ', padlen);
-						padstr[padlen] = 0;
+							padlen = length - slen;
+							padstr = ocrpt_mem_malloc(padlen + 1);
+							memset(padstr, ' ', padlen);
+							padstr[padlen] = 0;
 
-						ocrpt_mem_string_append(string, padstr);
+							ocrpt_mem_string_append(string, padstr);
 
-						ocrpt_mem_free(padstr);
+							ocrpt_mem_free(padstr);
+						}
 					}
-				}
 
-				ocrpt_mem_string_append_len(string, data->string->str, blen);
+					ocrpt_mem_string_append_len(string, data->string->str, blen);
+				}
 				data_handled = true;
 				break;
 			case OCRPT_FORMAT_NONE:

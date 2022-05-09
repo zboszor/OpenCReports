@@ -76,6 +76,19 @@ int main(void) {
 
 		"printf('You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.', 6, 'apples', stodt('2022-05-01'), 2, 'oranges', stodt('2022-05-02'))",
 
+		/*
+		 * NULL data is treated as empty string,
+		 * regardless of the optional width specifier.
+		 * Literals from the format string are printed as is.
+		 */
+		"printf('You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.', nulln(), nulls(), nulldt(), nulln(), nulls(), nulldt())",
+
+		/*
+		 * This will throw a "format error".
+		 * Data has a type first, then the data may be NULL.
+		 */
+		"printf('You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.', nulln(), nulls(), nulldt(), nulln(), nulls(), nulls())",
+
 		/* Invalid formats */
 
 		/* Numeric format for a string */
