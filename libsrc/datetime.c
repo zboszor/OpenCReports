@@ -209,6 +209,11 @@ bool ocrpt_parse_datetime(opencreport *o, const char *time_string, int ts_len, o
 		tm.tm_isdst = -1;
 		tm.tm_gmtoff = timezone;
 		ret = strptime(final_time_string, final_fmt, &tm);
+		if (!ret) {
+			parsed_date = false;
+			parsed_time = false;
+			goto end_error;
+		}
 
 		if (parsed_zone) {
 			time_t gmtoff = tm.tm_gmtoff;
@@ -237,7 +242,7 @@ bool ocrpt_parse_datetime(opencreport *o, const char *time_string, int ts_len, o
 
 bool ocrpt_parse_interval(opencreport *o, const char *time_string, int ts_len, ocrpt_result *result) {
 	struct tm tm;
-	const char *pos = time_string;
+	char *pos = (char *)time_string;
 	char *endptr;
 
 	memset(&tm, 0, sizeof(struct tm));
@@ -246,14 +251,16 @@ bool ocrpt_parse_interval(opencreport *o, const char *time_string, int ts_len, o
 		long num;
 
 		/* Skip whitespace */
-		while (pos && isspace(*pos) && (pos - time_string) < ts_len)
+		while (isspace(*pos) && (pos - time_string) < ts_len)
 			pos++;
 
 		if ((pos - time_string) >= ts_len)
 			break;
 
-		endptr = NULL;
+		endptr = pos;
 		num = strtol(pos, &endptr, 10);
+
+		assert(endptr != NULL);
 
 		/* Number expected */
 		if (endptr == pos)

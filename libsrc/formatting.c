@@ -746,6 +746,7 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, const char *formatstring
 
 			length = -1;
 			lpadded = 0;
+			assert(type_idx < 2);
 			tmp = ocrpt_get_next_format_string(o, formatstring + advance, types[type_idx], &type, &adv, &error, &length, &lpadded);
 
 			if (error) {
