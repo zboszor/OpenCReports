@@ -41,7 +41,7 @@ DLL_EXPORT_SYM ocrpt_list *ocrpt_part_new_row(opencreport *o, ocrpt_part *p) {
 	return p->lastrow;
 }
 
-DLL_EXPORT_SYM void ocrpt_part_append_report(opencreport *o, ocrpt_part *p, ocrpt_report *r) {
+DLL_EXPORT_SYM ocrpt_part *ocrpt_part_append_report(opencreport *o, ocrpt_part *p, ocrpt_report *r) {
 	ocrpt_list *lr, *cbl;
 
 	if (!p)
@@ -58,6 +58,8 @@ DLL_EXPORT_SYM void ocrpt_part_append_report(opencreport *o, ocrpt_part *p, ocrp
 
 		cbd->func(o, r, cbd->data);
 	}
+
+	return p;
 }
 
 DLL_EXPORT_SYM void ocrpt_part_free(opencreport *o, ocrpt_part *p) {

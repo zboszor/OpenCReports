@@ -725,7 +725,7 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, xmlTextReader
 	ocrpt_report *r = ocrpt_report_new(o);
 	int depth, nodetype;
 
-	ocrpt_part_append_report(o, p, r);
+	p = ocrpt_part_append_report(o, p, r);
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;

@@ -1070,8 +1070,14 @@ ocrpt_part *ocrpt_part_new(opencreport *o);
 ocrpt_list *ocrpt_part_new_row(opencreport *o, ocrpt_part *p);
 /*
  * Append an ocrpt_report to the column list of the last row in ocrpt_part
+ *
+ * "p" may be NULL, in which case a new part is allocated and
+ * the passed-in "r" report will be made part of it.
+ *
+ * The newly allocated (or valid passed-in) "p" ocrpt_part pointer
+ * will be returned.
  */
-void ocrpt_part_append_report(opencreport *o, ocrpt_part *p, ocrpt_report *r);
+ocrpt_part *ocrpt_part_append_report(opencreport *o, ocrpt_part *p, ocrpt_report *r);
 /*
  * Free a report part and remove it from the parts list
  */
