@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="8" cols="1" />
+	</Queries>
+	<Report>
+		<Variables>
+			<Variable name="var1" type="custom" basetype="string" baseexpr="upper(left(a.text, 1))" resultexpr="r.self + r.baseexpr" />
+		</Variables>
+	</Report>
+</OpenCReport>

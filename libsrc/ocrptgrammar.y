@@ -514,6 +514,8 @@ static ocrpt_expr *newstring(yyscan_t yyscanner, ocrpt_string *s) {
 
 	extra->tokens = ocrpt_list_remove(extra->tokens, s);
 	ocrpt_expr_init_result(o, e, OCRPT_RESULT_STRING);
+	if (e->result[o->residx]->string_owned)
+		ocrpt_mem_string_free(e->result[o->residx]->string, true);
 	e->result[o->residx]->string = s;
 	e->result[o->residx]->string_owned = true;
 	e->result[ocrpt_expr_next_residx(o->residx)] = e->result[o->residx];

@@ -474,34 +474,68 @@ static void ocrpt_parse_datasources_node(opencreport *o, xmlTextReaderPtr reader
 static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr reader) {
 	xmlChar *name = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
 	xmlChar *value = xmlTextReaderGetAttribute(reader, (const xmlChar *)"value");
+	xmlChar *baseexpr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"baseexpr");
+	xmlChar *intermedexpr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"intermedexpr");
+	xmlChar *intermed2expr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"intermedexpr");
+	xmlChar *resultexpr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"resultexpr");
 	xmlChar *type = xmlTextReaderGetAttribute(reader, (const xmlChar *)"type");
+	xmlChar *basetype = xmlTextReaderGetAttribute(reader, (const xmlChar *)"basetype");
 	xmlChar *resetonbreak = xmlTextReaderGetAttribute(reader, (const xmlChar *)"resetonbreak");
 	xmlChar *precalculate = xmlTextReaderGetAttribute(reader, (const xmlChar *)"precalculate");
 	xmlChar *delayed = xmlTextReaderGetAttribute(reader, (const xmlChar *)"delayed");
 	xmlChar *precalc_or_delayed;
 	ocrpt_var_type vtype = OCRPT_VARIABLE_EXPRESSION; /* default if left out */
+	enum ocrpt_result_type rtype = OCRPT_RESULT_NUMBER;
 
-	if (strcasecmp((char *)type, "count") == 0)
-		vtype = OCRPT_VARIABLE_COUNT;
-	else if (strcasecmp((char *)type, "countall") == 0)
-		vtype = OCRPT_VARIABLE_COUNTALL;
-	else if (strcasecmp((char *)type, "expression") == 0)
-		vtype = OCRPT_VARIABLE_EXPRESSION;
-	else if (strcasecmp((char *)type, "sum") == 0)
-		vtype = OCRPT_VARIABLE_SUM;
-	else if (strcasecmp((char *)type, "average") == 0)
-		vtype = OCRPT_VARIABLE_AVERAGE;
-	else if (strcasecmp((char *)type, "averageall") == 0)
-		vtype = OCRPT_VARIABLE_AVERAGEALL;
-	else if (strcasecmp((char *)type, "lowest") == 0)
-		vtype = OCRPT_VARIABLE_LOWEST;
-	else if (strcasecmp((char *)type, "highest") == 0)
-		vtype = OCRPT_VARIABLE_HIGHEST;
-	else
-		fprintf(stderr, "unset or invalid type for variable declaration for v.'%s', using \"expression\"\n", name);
+	if (type) {
+		if (strcasecmp((char *)type, "count") == 0)
+			vtype = OCRPT_VARIABLE_COUNT;
+		else if (strcasecmp((char *)type, "countall") == 0)
+			vtype = OCRPT_VARIABLE_COUNTALL;
+		else if (strcasecmp((char *)type, "expression") == 0)
+			vtype = OCRPT_VARIABLE_EXPRESSION;
+		else if (strcasecmp((char *)type, "sum") == 0)
+			vtype = OCRPT_VARIABLE_SUM;
+		else if (strcasecmp((char *)type, "average") == 0)
+			vtype = OCRPT_VARIABLE_AVERAGE;
+		else if (strcasecmp((char *)type, "averageall") == 0)
+			vtype = OCRPT_VARIABLE_AVERAGEALL;
+		else if (strcasecmp((char *)type, "lowest") == 0)
+			vtype = OCRPT_VARIABLE_LOWEST;
+		else if (strcasecmp((char *)type, "highest") == 0)
+			vtype = OCRPT_VARIABLE_HIGHEST;
+		else if (strcasecmp((char *)type, "custom") == 0)
+			vtype = OCRPT_VARIABLE_CUSTOM;
+		else
+			fprintf(stderr, "invalid type for variable declaration for v.'%s', using \"expression\"\n", name);
+	}
 
-	if (value) {
-		ocrpt_var *v = ocrpt_variable_new(o, r, vtype, (char *)name, (char *)value, (char *)resetonbreak);
+	if (basetype) {
+		if (strcasecmp((char *)basetype, "number") == 0)
+			rtype = OCRPT_RESULT_NUMBER;
+		else if (strcasecmp((char *)basetype, "string") == 0)
+			rtype = OCRPT_RESULT_STRING;
+		else if (strcasecmp((char *)basetype, "datetime") == 0)
+			rtype = OCRPT_RESULT_DATETIME;
+		else
+			fprintf(stderr, "invalid result type for custom variable declaration for v.'%s'\n", name);
+	}
+
+	if (!baseexpr && value) {
+		baseexpr = value;
+		value = NULL;
+	}
+
+	if (baseexpr) {
+		ocrpt_var *v;
+
+		if (!intermedexpr && !intermed2expr && !resultexpr && vtype == OCRPT_VARIABLE_CUSTOM)
+			vtype = OCRPT_VARIABLE_EXPRESSION;
+
+		if (vtype == OCRPT_VARIABLE_CUSTOM)
+			v = ocrpt_variable_new_full(o, r, rtype, (char *)name, (char *)baseexpr, (char *)intermedexpr, (char *)intermed2expr, (char *)resultexpr, (char *)resetonbreak);
+		else
+			v = ocrpt_variable_new(o, r, vtype, (char *)name, (char *)baseexpr, (char *)resetonbreak);
 
 		if (precalculate || delayed) {
 			ocrpt_expr *p;
@@ -526,7 +560,12 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 
 	xmlFree(name);
 	xmlFree(value);
+	xmlFree(baseexpr);
+	xmlFree(intermedexpr);
+	xmlFree(intermed2expr);
+	xmlFree(resultexpr);
 	xmlFree(type);
+	xmlFree(basetype);
 	xmlFree(resetonbreak);
 	xmlFree(precalculate);
 	xmlFree(delayed);

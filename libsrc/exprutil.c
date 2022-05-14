@@ -523,44 +523,50 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 					}
 				}
 			} else if (strcmp(e->name->str, "baseexpr") == 0) {
-				assert(var);
-				e->var = var;
-				if (var->baseexpr) {
-					ocrpt_expr_resolve_worker(o, r, e->var->baseexpr, e->var->baseexpr, var, varref_exclude_mask);
-					for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
-						if (!e->result[i]) {
-							assert(var->baseexpr->result[i]);
-							e->result[i] = var->baseexpr->result[i];
-							ocrpt_expr_set_result_owned(o, e, i, false);
+				if (var && (orig_e == var->intermedexpr || orig_e == var->intermed2expr || orig_e == var->resultexpr)) {
+					e->var = var;
+					if (var->baseexpr) {
+						ocrpt_expr_resolve_worker(o, r, e->var->baseexpr, e->var->baseexpr, var, varref_exclude_mask);
+						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+							if (!e->result[i]) {
+								//assert(var->baseexpr->result[i]);
+								e->result[i] = var->baseexpr->result[i];
+								ocrpt_expr_set_result_owned(o, e, i, false);
+							}
 						}
 					}
-				}
+				} else
+					assert(!"illegal reference to r.baseexpr");
 			} else if (strcmp(e->name->str, "intermedexpr") == 0) {
-				assert(var);
-				e->var = var;
-				if (var->intermedexpr) {
-					ocrpt_expr_resolve_worker(o, r, e->var->intermedexpr, e->var->intermedexpr, var, varref_exclude_mask);
-					for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
-						if (!e->result[i]) {
-							assert(var->intermedexpr->result[i]);
-							e->result[i] = var->intermedexpr->result[i];
-							ocrpt_expr_set_result_owned(o, e, i, false);
+				if (var && (orig_e == var->intermed2expr || orig_e == var->resultexpr)) {
+					e->var = var;
+					if (var->intermedexpr) {
+						ocrpt_expr_resolve_worker(o, r, e->var->intermedexpr, e->var->intermedexpr, var, varref_exclude_mask);
+						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+							if (!e->result[i]) {
+								//assert(var->intermedexpr->result[i]);
+								e->result[i] = var->intermedexpr->result[i];
+								ocrpt_expr_set_result_owned(o, e, i, false);
+							}
 						}
 					}
-				}
+				} else
+					assert(!"illegal reference to r.intermedexpr");
 			} else if (strcmp(e->name->str, "intermed2expr") == 0) {
-				assert(var);
-				e->var = var;
-				if (var->intermed2expr) {
-					ocrpt_expr_resolve_worker(o, r, e->var->intermed2expr, e->var->intermed2expr, var, varref_exclude_mask);
-					for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
-						if (!e->result[i]) {
-							assert(var->intermed2expr->result[i]);
-							e->result[i] = var->intermed2expr->result[i];
-							ocrpt_expr_set_result_owned(o, e, i, false);
+				if (var && orig_e == var->resultexpr) {
+					e->var = var;
+					if (var->intermed2expr) {
+						ocrpt_expr_resolve_worker(o, r, e->var->intermed2expr, e->var->intermed2expr, var, varref_exclude_mask);
+						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+							if (!e->result[i]) {
+								//assert(var->intermed2expr->result[i]);
+								e->result[i] = var->intermed2expr->result[i];
+								ocrpt_expr_set_result_owned(o, e, i, false);
+							}
 						}
 					}
-				}
+				} else
+					assert(!"illegal reference to r.intermed2expr");
 			}
 			/* TODO: implement generally usable global report variables */
 		}

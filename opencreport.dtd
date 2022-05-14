@@ -179,8 +179,13 @@
 <!ELEMENT Variable EMPTY >
 <!ATTLIST Variable
 	name CDATA #REQUIRED
-	value CDATA #REQUIRED
-	type (expression|count|sum|average|lowest|highest) "sum"
+	value CDATA #IMPLIED
+	baseexpr CDATA #IMPLIED
+	intermedexpr CDATA #IMPLIED
+	intermed2expr CDATA #IMPLIED
+	resultexpr CDATA #IMPLIED
+	type (expression|count|sum|average|lowest|highest|custom) "sum"
+	basetype (number|string|datetime) "number"
 	resetonbreak CDATA #IMPLIED
 	precalculate CDATA #IMPLIED
 	delayed CDATA #IMPLIED >

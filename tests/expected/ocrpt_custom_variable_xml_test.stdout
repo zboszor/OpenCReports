@@ -1,0 +1,58 @@
+Variable expression reprinted: v.'var1'
+
+Row #0
+Query: 'a':
+	Col #0: 'text': string value: bad-tempered
+
+Expression: v.'var1'
+Evaluated: (string)B
+
+Row #1
+Query: 'a':
+	Col #0: 'text': string value: old
+
+Expression: v.'var1'
+Evaluated: (string)BO
+
+Row #2
+Query: 'a':
+	Col #0: 'text': string value: ladies
+
+Expression: v.'var1'
+Evaluated: (string)BOL
+
+Row #3
+Query: 'a':
+	Col #0: 'text': string value: love
+
+Expression: v.'var1'
+Evaluated: (string)BOLL
+
+Row #4
+Query: 'a':
+	Col #0: 'text': string value: our
+
+Expression: v.'var1'
+Evaluated: (string)BOLLO
+
+Row #5
+Query: 'a':
+	Col #0: 'text': string value: chic
+
+Expression: v.'var1'
+Evaluated: (string)BOLLOC
+
+Row #6
+Query: 'a':
+	Col #0: 'text': string value: kitchen
+
+Expression: v.'var1'
+Evaluated: (string)BOLLOCK
+
+Row #7
+Query: 'a':
+	Col #0: 'text': string value: sink
+
+Expression: v.'var1'
+Evaluated: (string)BOLLOCKS
+

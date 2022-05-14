@@ -152,7 +152,8 @@ enum ocrpt_var_type {
 	OCRPT_VARIABLE_AVERAGE,
 	OCRPT_VARIABLE_AVERAGEALL,
 	OCRPT_VARIABLE_LOWEST,
-	OCRPT_VARIABLE_HIGHEST
+	OCRPT_VARIABLE_HIGHEST,
+	OCRPT_VARIABLE_CUSTOM
 };
 typedef enum ocrpt_var_type ocrpt_var_type;
 
@@ -163,9 +164,11 @@ enum ocrpt_var_type_bit {
 	OCRPT_VARIABLE_COUNTALL_BIT = (1 << OCRPT_VARIABLE_COUNT),
 	OCRPT_VARIABLE_SUM_BIT = (1 << OCRPT_VARIABLE_SUM),
 	OCRPT_VARIABLE_AVERAGE_BIT = (1 << OCRPT_VARIABLE_AVERAGE),
+	OCRPT_VARIABLE_AVERAGEALL_BIT = (1 << OCRPT_VARIABLE_AVERAGEALL),
 	OCRPT_VARIABLE_LOWEST_BIT = (1 << OCRPT_VARIABLE_LOWEST),
 	OCRPT_VARIABLE_HIGHEST_BIT = (1 << OCRPT_VARIABLE_HIGHEST),
-	OCRPT_IDENT_UNKNOWN_BIT = (1 << (OCRPT_VARIABLE_HIGHEST + 1)),
+	OCRPT_VARIABLE_CUSTOM_BIT = (1 << OCRPT_VARIABLE_CUSTOM),
+	OCRPT_IDENT_UNKNOWN_BIT = (1 << (OCRPT_VARIABLE_CUSTOM + 1)),
 };
 #define OCRPT_VARIABLE_MASK_ALL ( \
 	OCRPT_VARIABLE_UNKNOWN_BIT | \
@@ -175,7 +178,8 @@ enum ocrpt_var_type_bit {
 	OCRPT_VARIABLE_SUM_BIT | \
 	OCRPT_VARIABLE_AVERAGE_BIT | \
 	OCRPT_VARIABLE_LOWEST_BIT | \
-	OCRPT_VARIABLE_HIGHEST_BIT \
+	OCRPT_VARIABLE_HIGHEST_BIT | \
+	OCRPT_VARIABLE_CUSTOM_BIT \
 )
 
 struct ocrpt_query;
@@ -196,6 +200,7 @@ struct ocrpt_var {
 	ocrpt_list *precalc_rptr;
 	unsigned int break_index:16;
 	enum ocrpt_var_type type:4;
+	enum ocrpt_result_type basetype:2;
 	bool precalculate:1;
 };
 typedef struct ocrpt_var ocrpt_var;
@@ -656,6 +661,10 @@ void ocrpt_expr_free(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
  * Create a named report variable
  */
 ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, ocrpt_var_type type, const char *name, const char *expr, const char *reset_on_break_name);
+/*
+ * Create a names custom variable
+ */
+ocrpt_var *ocrpt_variable_new_full(opencreport *o, ocrpt_report *r, enum ocrpt_result_type type, const char *name, const char *baseexpr, const char *intermedexpr, const char *intermed2expr, const char *resultexpr, const char *reset_on_break_name);
 /*
  * Free a report variable
  */

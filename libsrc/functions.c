@@ -33,6 +33,16 @@ static bool ocrpt_expr_init_result_internal(opencreport *o, ocrpt_expr *e, enum 
 	}
 	if (result) {
 		switch (type) {
+		case OCRPT_RESULT_STRING:
+			ocrpt_string *string = ocrpt_mem_string_resize(result->string, 16);
+			if (string) {
+				if (!result->string) {
+					result->string = string;
+					result->string_owned = true;
+				}
+				string->len = 0;
+			}
+			break;
 		case OCRPT_RESULT_NUMBER:
 			if (!result->number_initialized) {
 				mpfr_init2(result->number, o->prec);
