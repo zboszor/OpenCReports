@@ -82,7 +82,7 @@ int main(void) {
 	ocrpt_report_resolve_variables(o, r);
 
 	for (i = 0; i < N_TEST_VARS; i++) {
-		ocrpt_expr_resolve(o, r, e[i]);
+		ocrpt_expr_resolve(o, r, e[i], NULL);
 		ocrpt_expr_optimize(o, r, e[i]);
 	}
 
@@ -131,7 +131,7 @@ int main(void) {
 	ocrpt_report_resolve_variables(o, r);
 
 	for (i = 0; i < N_TEST_VARS; i++) {
-		ocrpt_expr_resolve(o, r, e[i]);
+		ocrpt_expr_resolve(o, r, e[i], NULL);
 		ocrpt_expr_optimize(o, r, e[i]);
 	}
 

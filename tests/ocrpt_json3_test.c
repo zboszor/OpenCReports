@@ -32,10 +32,10 @@ void create_exprs(opencreport *o) {
 	err = NULL;
 	adult = ocrpt_expr_parse(o, NULL, "a.adult", &err);
 
-	ocrpt_expr_resolve(o, NULL, id);
-	ocrpt_expr_resolve(o, NULL, name);
-	ocrpt_expr_resolve(o, NULL, age);
-	ocrpt_expr_resolve(o, NULL, adult);
+	ocrpt_expr_resolve(o, NULL, id, NULL);
+	ocrpt_expr_resolve(o, NULL, name, NULL);
+	ocrpt_expr_resolve(o, NULL, age, NULL);
+	ocrpt_expr_resolve(o, NULL, adult, NULL);
 }
 
 void free_exprs(opencreport *o, ocrpt_report *r) {
@@ -65,10 +65,10 @@ int main(void) {
 	for (i = 0; i < cols; i++)
 		printf("%d: '%s'\n", i, qr[i].name);
 
-	ocrpt_expr_resolve(o, NULL, id);
-	ocrpt_expr_resolve(o, NULL, name);
-	ocrpt_expr_resolve(o, NULL, age);
-	ocrpt_expr_resolve(o, NULL, adult);
+	ocrpt_expr_resolve(o, NULL, id, NULL);
+	ocrpt_expr_resolve(o, NULL, name, NULL);
+	ocrpt_expr_resolve(o, NULL, age, NULL);
+	ocrpt_expr_resolve(o, NULL, adult, NULL);
 
 	row = 0;
 	ocrpt_query_navigate_start(o, q);

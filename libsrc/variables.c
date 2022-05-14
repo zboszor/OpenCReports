@@ -297,19 +297,19 @@ DLL_EXPORT_SYM void ocrpt_variable_set_precalculate(ocrpt_var *var, bool value) 
 
 DLL_EXPORT_SYM void ocrpt_variable_resolve(opencreport *o, ocrpt_report *r, ocrpt_var *v) {
 	if (v->baseexpr) {
-		ocrpt_expr_resolve_worker(o, r, v->baseexpr, v->baseexpr, v, 0);
+		ocrpt_expr_resolve_worker(o, r, v->baseexpr, v->baseexpr, NULL, v, 0);
 		ocrpt_expr_optimize(o, r, v->baseexpr);
 	}
 	if (v->intermedexpr) {
-		ocrpt_expr_resolve_worker(o, r, v->intermedexpr, v->intermedexpr, v, 0);
+		ocrpt_expr_resolve_worker(o, r, v->intermedexpr, v->intermedexpr, NULL, v, 0);
 		ocrpt_expr_optimize(o, r, v->intermedexpr);
 	}
 	if (v->intermed2expr) {
-		ocrpt_expr_resolve_worker(o, r, v->intermed2expr, v->intermed2expr, v, 0);
+		ocrpt_expr_resolve_worker(o, r, v->intermed2expr, v->intermed2expr, NULL, v, 0);
 		ocrpt_expr_optimize(o, r, v->intermed2expr);
 	}
 
-	ocrpt_expr_resolve_worker(o, r, v->resultexpr, v->resultexpr, v, 0);
+	ocrpt_expr_resolve_worker(o, r, v->resultexpr, v->resultexpr, NULL, v, 0);
 	ocrpt_expr_optimize(o, r, v->resultexpr);
 
 	if (v->br_name && !v->br) {

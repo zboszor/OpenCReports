@@ -604,7 +604,7 @@ void ocrpt_expr_optimize(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
 /*
  * Resolve variable references in the expression
  */
-void ocrpt_expr_resolve(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
+void ocrpt_expr_resolve(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *rvalue);
 /*
  * Resolve variable references in the expression
  * with excluding certain variable reference types

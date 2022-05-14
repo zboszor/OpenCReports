@@ -469,7 +469,7 @@ DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(opencreport *o, ocrpt_query 
 	}
 
 	ocrpt_expr_optimize(o, NULL, match);
-	ocrpt_expr_resolve(o, NULL, match);
+	ocrpt_expr_resolve(o, NULL, match, NULL);
 
 	return ret;
 }

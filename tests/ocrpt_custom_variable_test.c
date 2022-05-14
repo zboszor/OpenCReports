@@ -63,7 +63,7 @@ int main(void) {
 	ocrpt_expr_print(o, e);
 	printf("\n");
 
-	ocrpt_expr_resolve(o, r, e);
+	ocrpt_expr_resolve(o, r, e, NULL);
 
 	while (ocrpt_query_navigate_next(o, q)) {
 		ocrpt_result *rs;

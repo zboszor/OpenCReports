@@ -56,7 +56,7 @@ int main(void) {
 	ocrpt_variable_new(o, r, OCRPT_VARIABLE_SUM, "var1", "a.num", NULL);
 
 	rd.e = ocrpt_expr_parse(o, r, "v.var1", NULL);
-	ocrpt_expr_resolve(o, r, rd.e);
+	ocrpt_expr_resolve(o, r, rd.e, NULL);
 	ocrpt_expr_optimize(o, r, rd.e);
 
 	ocrpt_execute(o);

@@ -41,7 +41,7 @@ DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, con
 	for (int i = 0; i < OCRPT_EXPR_RESULTS; i++)
 		mpfr_set_ui(br->rownum->result[i]->number, 1, o->rndmode);
 	ocrpt_expr_set_iterative_start_value(br->rownum, true);
-	ocrpt_expr_resolve(o, r, br->rownum);
+	ocrpt_expr_resolve(o, r, br->rownum, NULL);
 	ocrpt_expr_optimize(o, r, br->rownum);
 
 	r->breaks = ocrpt_list_append(r->breaks, br);
@@ -174,7 +174,7 @@ DLL_EXPORT_SYM void ocrpt_break_resolve_fields(opencreport *o, ocrpt_report *r, 
 	for (ptr = br->breakfields; ptr; ptr = ptr->next) {
 		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 
-		ocrpt_expr_resolve(o, r, e);
+		ocrpt_expr_resolve(o, r, e, NULL);
 		ocrpt_expr_optimize(o, r, e);
 	}
 }
