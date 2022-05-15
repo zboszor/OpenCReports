@@ -579,8 +579,17 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 				} else {
 					ocrpt_expr_make_error_result(o, e, "invalid usage of r.value");
 				}
+			} else if (strcmp(e->name->str, "totpages") == 0) {
+				/* TODO: total number of output pages */
+			} else if (strcmp(e->name->str, "pageno") == 0) {
+				/* TODO: current number of output page */
+			} else if (strcmp(e->name->str, "lineno") == 0) {
+				/* TODO: current number of printed <Line> sections */
+			} else if (strcmp(e->name->str, "detailcnt") == 0) {
+				/* TODO: the current number of printed <Detail> sections */
+			} else if (strcmp(e->name->str, "format") == 0) {
+				/* TODO: the format="..." string for the current field expression */
 			}
-			/* TODO: implement generally usable global report variables */
 		}
 
 		break;
