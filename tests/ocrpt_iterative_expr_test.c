@@ -35,7 +35,7 @@ int main(void) {
 	for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
 		mpfr_set_ui(e1->result[i]->number, 0, o->rndmode);
 	ocrpt_expr_set_iterative_start_value(e1, true);
-	ocrpt_expr_resolve(o, NULL, e1, NULL);
+	ocrpt_expr_resolve(o, NULL, e1);
 	ocrpt_expr_optimize(o, NULL, e1);
 	printf("e1 expr (starts with initial value): ");
 	ocrpt_expr_print(o, e1);
@@ -47,7 +47,7 @@ int main(void) {
 		mpfr_set_ui(e2->result[i]->number, 0, o->rndmode);
 	/* This iterative expression starts with evaluated value */
 	//ocrpt_expr_set_iterative_start_value(e2, true);
-	ocrpt_expr_resolve(o, NULL, e2, NULL);
+	ocrpt_expr_resolve(o, NULL, e2);
 	ocrpt_expr_optimize(o, NULL, e2);
 	printf("e2 expr (starts with evaluated value): ");
 	ocrpt_expr_print(o, e2);

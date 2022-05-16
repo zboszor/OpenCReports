@@ -43,9 +43,9 @@ int main(void) {
 
 	q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 3, 5, coltypes);
 
-	ocrpt_expr_resolve(o, NULL, id, NULL);
-	ocrpt_expr_resolve(o, NULL, name, NULL);
-	ocrpt_expr_resolve(o, NULL, err, NULL);
+	ocrpt_expr_resolve(o, NULL, id);
+	ocrpt_expr_resolve(o, NULL, name);
+	ocrpt_expr_resolve(o, NULL, err);
 
 	row = 0;
 	ocrpt_query_navigate_start(o, q);

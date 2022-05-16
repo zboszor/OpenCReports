@@ -48,7 +48,7 @@ int main(void) {
 	ocrpt_expr_print(o, e);
 	printf("\n");
 
-	ocrpt_expr_resolve(o, r, e, NULL);
+	ocrpt_expr_resolve(o, r, e);
 
 	row = 0;
 	ocrpt_query_navigate_start(o, q);

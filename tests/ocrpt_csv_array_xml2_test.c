@@ -42,10 +42,10 @@ void create_exprs(opencreport *o) {
 	err = NULL;
 	adult = ocrpt_expr_parse(o, NULL, "val(a.adult)", &err);
 
-	ocrpt_expr_resolve(o, NULL, id, NULL);
-	ocrpt_expr_resolve(o, NULL, name, NULL);
-	ocrpt_expr_resolve(o, NULL, age, NULL);
-	ocrpt_expr_resolve(o, NULL, adult, NULL);
+	ocrpt_expr_resolve(o, NULL, id);
+	ocrpt_expr_resolve(o, NULL, name);
+	ocrpt_expr_resolve(o, NULL, age);
+	ocrpt_expr_resolve(o, NULL, adult);
 }
 
 void free_exprs(opencreport *o, ocrpt_report *r) {

@@ -235,6 +235,11 @@ struct ocrpt_expr {
 	 *   with resetonbreak="break"
 	 */
 	struct ocrpt_break *br;
+	/*
+	 * Pointer for the "r.value" internal variable reference.
+	 * Valid for any expression in a <field> in the report XML except for value="..."
+	 */
+	ocrpt_expr *rvalue;
 	unsigned int result_index;
 	enum ocrpt_expr_type type:4;
 	bool result_index_set:1;
@@ -604,7 +609,7 @@ void ocrpt_expr_optimize(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
 /*
  * Resolve variable references in the expression
  */
-void ocrpt_expr_resolve(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *rvalue);
+void ocrpt_expr_resolve(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
 /*
  * Resolve variable references in the expression
  * with excluding certain variable reference types
@@ -653,6 +658,10 @@ int32_t ocrpt_expr_nodes(ocrpt_expr *e);
  * Set delayed property of the expression
  */
 void ocrpt_expr_set_delayed(opencreport *o, ocrpt_expr *e, bool delayed);
+/*
+ * Set the r.value reference
+ */
+void ocrpt_expr_set_field_expr(opencreport *o, ocrpt_expr *e, ocrpt_expr *rvalue);
 /*
  * Free an expression parse tree
  */

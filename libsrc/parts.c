@@ -100,7 +100,7 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_report_new(opencreport *o) {
 	memset(r, 0, sizeof(ocrpt_report));
 	r->iterations = 1;
 	r->query_rownum = ocrpt_expr_parse(o, r, "rownum()", NULL);
-	ocrpt_expr_resolve(o, r, r->query_rownum, NULL);
+	ocrpt_expr_resolve(o, r, r->query_rownum);
 	return r;
 }
 
@@ -182,7 +182,7 @@ DLL_EXPORT_SYM void ocrpt_report_resolve_expressions(opencreport *o, ocrpt_repor
 	for (ptr = r->exprs; ptr; ptr = ptr->next) {
 		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 
-		ocrpt_expr_resolve(o, r, e, NULL);
+		ocrpt_expr_resolve(o, r, e);
 		ocrpt_expr_optimize(o, r, e);
 
 		if (e->delayed || ocrpt_expr_get_precalculate(o, e))

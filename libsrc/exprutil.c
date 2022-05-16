@@ -19,6 +19,10 @@
 #include "exprutil.h"
 #include "datasource.h"
 
+#ifndef UNUSED
+#define UNUSED __attribute__((unused))
+#endif
+
 ocrpt_expr *newblankexpr(opencreport *o, ocrpt_report *r, enum ocrpt_expr_type type, uint32_t n_ops) {
 	ocrpt_expr *e;
 
@@ -474,7 +478,7 @@ DLL_EXPORT_SYM void ocrpt_expr_optimize(opencreport *o, ocrpt_report *r, ocrpt_e
 	ocrpt_expr_optimize_worker(o, r, e);
 }
 
-void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_expr *rvalue, ocrpt_var *var, int32_t varref_exclude_mask) {
+void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask) {
 	int32_t i;
 
 	switch (e->type) {
@@ -526,7 +530,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 				if (var && (orig_e == var->intermedexpr || orig_e == var->intermed2expr || orig_e == var->resultexpr)) {
 					e->var = var;
 					if (var->baseexpr) {
-						ocrpt_expr_resolve_worker(o, r, e->var->baseexpr, e->var->baseexpr, rvalue, var, varref_exclude_mask);
+						ocrpt_expr_resolve_worker(o, r, e->var->baseexpr, e->var->baseexpr, var, varref_exclude_mask);
 						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 							if (!e->result[i]) {
 								//assert(var->baseexpr->result[i]);
@@ -541,7 +545,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 				if (var && (orig_e == var->intermed2expr || orig_e == var->resultexpr)) {
 					e->var = var;
 					if (var->intermedexpr) {
-						ocrpt_expr_resolve_worker(o, r, e->var->intermedexpr, e->var->intermedexpr, rvalue, var, varref_exclude_mask);
+						ocrpt_expr_resolve_worker(o, r, e->var->intermedexpr, e->var->intermedexpr, var, varref_exclude_mask);
 						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 							if (!e->result[i]) {
 								//assert(var->intermedexpr->result[i]);
@@ -556,7 +560,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 				if (var && orig_e == var->resultexpr) {
 					e->var = var;
 					if (var->intermed2expr) {
-						ocrpt_expr_resolve_worker(o, r, e->var->intermed2expr, e->var->intermed2expr, rvalue, var, varref_exclude_mask);
+						ocrpt_expr_resolve_worker(o, r, e->var->intermed2expr, e->var->intermed2expr, var, varref_exclude_mask);
 						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 							if (!e->result[i]) {
 								//assert(var->intermed2expr->result[i]);
@@ -568,11 +572,11 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 				} else
 					assert(!"illegal reference to r.intermed2expr");
 			} else if (strcmp(e->name->str, "value") == 0) {
-				if (rvalue) {
+				if (orig_e->rvalue) {
 					for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 						if (!e->result[i]) {
-							assert(rvalue->result[i]);
-							e->result[i] = rvalue->result[i];
+							assert(orig_e->rvalue->result[i]);
+							e->result[i] = orig_e->rvalue->result[i];
 							ocrpt_expr_set_result_owned(o, e, i, false);
 						}
 					}
@@ -650,19 +654,19 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 		break;
 	case OCRPT_EXPR:
 		for (i = 0; i < e->n_ops; i++)
-			ocrpt_expr_resolve_worker(o, r, e->ops[i], orig_e, rvalue, var, varref_exclude_mask);
+			ocrpt_expr_resolve_worker(o, r, e->ops[i], orig_e, var, varref_exclude_mask);
 		break;
 	default:
 		break;
 	}
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_resolve(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *rvalue) {
-	ocrpt_expr_resolve_worker(o, r, e, e, rvalue, NULL, 0);
+DLL_EXPORT_SYM void ocrpt_expr_resolve(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
+	ocrpt_expr_resolve_worker(o, r, e, e, NULL, 0);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(opencreport *o, ocrpt_report *r, ocrpt_expr *e, int32_t varref_exclude_mask) {
-	ocrpt_expr_resolve_worker(o, r, e, e, NULL, NULL, varref_exclude_mask);
+	ocrpt_expr_resolve_worker(o, r, e, e, NULL, varref_exclude_mask);
 }
 
 static bool ocrpt_expr_reference_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask) {
@@ -1024,4 +1028,9 @@ void ocrpt_report_expressions_add_delayed_results(opencreport *o, ocrpt_report *
 			e->delayed_result = dst;
 		}
 	}
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_set_field_expr(opencreport *o UNUSED, ocrpt_expr *e, ocrpt_expr *rvalue) {
+	if (e)
+		e->rvalue = rvalue;
 }
