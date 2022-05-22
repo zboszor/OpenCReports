@@ -43,6 +43,8 @@ m4/lt~obsolete.m4
 opencreports.pc
 libsrc/ocrptgrammar.tab.*
 libsrc/*.yy.*
+libsrc/cairotest
+libsrc/*.pdf
 
 # Documentation
 doc/*.pdf

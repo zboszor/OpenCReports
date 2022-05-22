@@ -1,3 +1,9 @@
+noinst_PROGRAMS = cairotest
+
+cairotest_SOURCES = cairotest.c
+cairotest_CFLAGS = $(PDFGEN_CFLAGS)
+cairotest_LDADD = $(PDFGEN_LIBS)
+
 lib_LTLIBRARIES = libopencreport_grammar.la libopencreport.la
 
 ocrptgrammar.tab.c: ocrptgrammar.y
@@ -45,3 +51,6 @@ libopencreport_la_LDFLAGS = \
 	$(EXTRA_LDFLAGS)
 
 CLEANFILES = ocrptgrammar.tab.h ocrptgrammar.tab.c ocrptgrammar.output ocrptpatterns.yy.c
+
+test: cairotest
+	LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp $(builddir)/cairotest >$(builddir)/cairotest.pdf
