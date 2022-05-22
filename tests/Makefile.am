@@ -78,12 +78,12 @@ $(noinst_PROGRAMS): $(top_builddir)/libsrc/libopencreport.la
 all: $(noinst_PROGRAMS)
 
 test: $(TESTS) execute_test.sh
-	$(foreach TEST,$(TESTS),./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(TESTS),LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp ./execute_test.sh $(TEST) &&) true
 
 slow-test: $(SLOW_TESTS) execute_test.sh
-	$(foreach TEST,$(SLOW_TESTS),./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(SLOW_TESTS),LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp ./execute_test.sh $(TEST) &&) true
 
 unstable-test: $(UNSTABLE_TESTS) execute_test.sh
-	$(foreach TEST,$(UNSTABLE_TESTS),./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(UNSTABLE_TESTS),LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp ./execute_test.sh $(TEST) &&) true
 
 all-test: test slow-test unstable-test
