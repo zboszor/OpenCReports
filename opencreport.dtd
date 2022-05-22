@@ -162,6 +162,15 @@
 	side CDATA #IMPLIED
 	disabled CDATA #IMPLIED
 	color CDATA #IMPLIED >
+<!ELEMENT Chart EMPTY>
+<!ATTLIST Chart
+	row CDATA #IMPLIED
+	bar_start CDATA #IMPLIED
+	bar_end CDATA #IMPLIED
+	label CDATA #IMPLIED
+	bar_label CDATA #IMPLIED
+	bar_color CDATA #IMPLIED
+	bar_label_color CDATA #IMPLIED >
 <!ELEMENT Breaks (Break)* >
 <!ELEMENT Break (BreakHeader | BreakFooter | BreakFields)* >
 <!ATTLIST Break
