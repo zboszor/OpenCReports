@@ -188,7 +188,36 @@ void draw_rect(cairo_t *cr, double lw, double x, double y, double w, double h) {
 	cairo_stroke(cr);
 }
 
-void draw_text_with_bounding_box(cairo_t *cr, const char *font, const char *text, bool wrap, PangoAlignment align, double x, double y, double width, double *height) {
+void text_get_max_ascent_descent(cairo_t *cr, const char *font, double size, double *ascent, double *descent) {
+	PangoLayout *layout;
+	PangoFontDescription *font_description;
+	double asc, desc;
+
+	font_description = pango_font_description_new();
+
+	pango_font_description_set_family(font_description, font);
+	pango_font_description_set_weight(font_description, PANGO_WEIGHT_NORMAL);
+	pango_font_description_set_absolute_size(font_description, size * PANGO_SCALE);
+
+	layout = pango_cairo_create_layout(cr);
+	pango_layout_set_font_description(layout, font_description);
+
+	PangoContext *context = pango_layout_get_context(layout);
+	PangoLanguage *language = pango_context_get_language(context);
+	PangoFontMetrics *metrics = pango_context_get_metrics(context, font_description, language);
+
+	asc = pango_font_metrics_get_ascent(metrics) / PANGO_SCALE;
+	if (*ascent < asc)
+		*ascent = asc;
+	desc = pango_font_metrics_get_descent(metrics) / PANGO_SCALE;
+	if (*descent < desc)
+		*descent = desc;
+
+	g_object_unref(layout);
+	pango_font_description_free(font_description);
+}
+
+void draw_text_with_bounding_box(cairo_t *cr, const char *font, const char *text, bool wrap, PangoAlignment align, double size, double ascent, double descent, double x, double y, double width, double *height) {
 	PangoLayout *layout;
 	PangoFontDescription *font_description;
 
@@ -196,7 +225,7 @@ void draw_text_with_bounding_box(cairo_t *cr, const char *font, const char *text
 
 	pango_font_description_set_family(font_description, font);
 	pango_font_description_set_weight(font_description, PANGO_WEIGHT_NORMAL);
-	pango_font_description_set_absolute_size(font_description, 12.0 * PANGO_SCALE);
+	pango_font_description_set_absolute_size(font_description, size * PANGO_SCALE);
 
 	layout = pango_cairo_create_layout(cr);
 	pango_layout_set_font_description(layout, font_description);
@@ -225,105 +254,126 @@ void draw_text_with_bounding_box(cairo_t *cr, const char *font, const char *text
 		pango_layout_get_extents(layout, &ink_rect, &logical_rect);
 	} else {
 		PangoLayoutLine *pline = pango_layout_get_line(layout, 0);
-
 		pango_layout_line_get_extents(pline, &ink_rect, &logical_rect);
-
-		char *line = malloc(pline->length + 1);
-		memcpy(line, text, pline->length);
-		line[pline->length] = 0;
-		pango_layout_set_text(layout, line, -1);
-		free(line);
 	}
 
-	fprintf(stderr, "ink_rect x %d w %d logical_rect x %d y %d width %d height %d\n", ink_rect.x, ink_rect.width, logical_rect.x, logical_rect.y, logical_rect.width, logical_rect.height);
+	double h = 0.0;
+	int lines = wrap ? pango_layout_get_line_count(layout) : 1;
+	int i;
 
-	double h = (double)logical_rect.height / PANGO_SCALE;
+	for (i = 0; i < lines; i++) {
+		PangoLayoutLine *pline = pango_layout_get_line(layout, i);
+		pango_layout_line_get_extents(pline, &ink_rect, &logical_rect);
+		h += ascent + descent;
+	}
+
+	*height = h;
 
 	cairo_set_source_rgb(cr, 1.0, 0.0, 0.0);
 	cairo_rectangle(cr, x, y, width, h);
 	cairo_fill(cr);
 
 	cairo_set_source_rgb(cr, 0.0, 0.0, 1.0);
-	if (align != PANGO_ALIGN_LEFT) {
-		double xdiff = (double)(ink_rect.width - logical_rect.width) / PANGO_SCALE;
-		cairo_move_to(cr, x - xdiff, y);
-#if 0
-	} else if (align == PANGO_ALIGN_CENTER) {
-		double xdiff = (double)(ink_rect.width - logical_rect.width) / PANGO_SCALE / 2;
-		cairo_move_to(cr, x - xdiff, y);
-#endif
-	} else
-		cairo_move_to(cr, x, y);
-	pango_cairo_show_layout(cr, layout);
+
+	for (i = 0; i < lines; i++) {
+		PangoLayoutLine *pline = pango_layout_get_line(layout, i);
+
+		pango_layout_line_get_extents(pline, &ink_rect, &logical_rect);
+
+		y += ascent;
+		if (i)
+			y += descent;
+
+		double x1;
+
+		switch (align) {
+		default:
+		case PANGO_ALIGN_LEFT:
+			x1 = x;
+			break;
+		case PANGO_ALIGN_CENTER:
+			x1 = x + (width - ((double)logical_rect.width / PANGO_SCALE)) / 2.0;
+			break;
+		case PANGO_ALIGN_RIGHT:
+			x1 = x + width - ((double)logical_rect.width / PANGO_SCALE);
+			break;
+		}
+		cairo_move_to(cr, x1, y);
+		pango_cairo_show_layout_line(cr, pline);
+	}
 
 	g_object_unref(layout);
 	pango_font_description_free(font_description);
-
-	*height = h;
 }
 
 int main(void) {
 	cairo_rectangle_t page = { .x = 0.0, .y = 0.0, .width = 595.276, .height = 841.89 };
 	cairo_surface_t *rec = cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, &page);
 	cairo_t *cr = cairo_create(rec);
+	char *font[2] = { "Z003", /* "FreeMono" */ "Courier" };
 
 	double x, y;
+	double fontsize = 12.0;
 	double width = 150.0;
 	double height;
+	double ascent = 0.0, descent = 0.0;
 
-	x = 200.0;
+	for (int i = 0; i < 2; i++)
+		text_get_max_ascent_descent(cr, font[i], fontsize, &ascent, &descent);
+
+	x = 100.0;
 
 	y = 50.0;
-	draw_text_with_bounding_box(cr, "Z003", loremipsum, false, PANGO_ALIGN_LEFT, x, y, width, &height);
+	draw_text_with_bounding_box(cr, font[0], loremipsum, false, PANGO_ALIGN_LEFT, fontsize, ascent, descent, x, y, width, &height);
 	fprintf(stderr, "after draw_text_with_bounding_box w %lf h %lf\n", width, height);
 	//draw_rect(cr, 0.1, x, y, width, height);
 
 	y += height + 10.0;
-	draw_text_with_bounding_box(cr, "Z003", loremipsum, true, PANGO_ALIGN_LEFT, x, y, width, &height);
+	draw_text_with_bounding_box(cr, font[0], loremipsum, true, PANGO_ALIGN_LEFT, fontsize, ascent, descent, x, y, width, &height);
+	fprintf(stderr, "after draw_text_with_bounding_box w %lf h %lf\n", width, height);
+	//draw_rect(cr, 0.1, x, y, width, height);
+
+	x += width + 10;
+	y = 50.0;
+	draw_text_with_bounding_box(cr, font[1], loremipsum, false, PANGO_ALIGN_RIGHT, fontsize, ascent, descent, x, y, width, &height);
 	fprintf(stderr, "after draw_text_with_bounding_box w %lf h %lf\n", width, height);
 	//draw_rect(cr, 0.1, x, y, width, height);
 
 	y += height + 10.0;
-	draw_text_with_bounding_box(cr, "Z003", loremipsum, false, PANGO_ALIGN_RIGHT, x, y, width, &height);
+	draw_text_with_bounding_box(cr, font[1], loremipsum, true, PANGO_ALIGN_RIGHT, fontsize, ascent, descent, x, y, width, &height);
+	fprintf(stderr, "after draw_text_with_bounding_box w %lf h %lf\n", width, height);
+	//draw_rect(cr, 0.1, x, y, width, height);
+
+	x += width + 10.0;
+	y = 50.0;
+	draw_text_with_bounding_box(cr, font[0], loremipsum, false, PANGO_ALIGN_CENTER, fontsize, ascent, descent, x, y, width, &height);
 	fprintf(stderr, "after draw_text_with_bounding_box w %lf h %lf\n", width, height);
 	//draw_rect(cr, 0.1, x, y, width, height);
 
 	y += height + 10.0;
-	draw_text_with_bounding_box(cr, "Z003", loremipsum, true, PANGO_ALIGN_RIGHT, x, y, width, &height);
+	draw_text_with_bounding_box(cr, font[0], loremipsum, true, PANGO_ALIGN_CENTER, fontsize, ascent, descent, x, y, width, &height);
 	fprintf(stderr, "after draw_text_with_bounding_box w %lf h %lf\n", width, height);
 	//draw_rect(cr, 0.1, x, y, width, height);
 
-	y += height + 10.0;
-	draw_text_with_bounding_box(cr, "Z003", loremipsum, false, PANGO_ALIGN_CENTER, x, y, width, &height);
-	fprintf(stderr, "after draw_text_with_bounding_box w %lf h %lf\n", width, height);
-	//draw_rect(cr, 0.1, x, y, width, height);
+	put_svg_on_page(cr, "img/matplotlib.svg", 10.0, 100.0, 40.0, 40.0);
+	draw_rect(cr, 1.0, 10.0, 100.0, 40.0, 40.0);
+	put_svg_on_page(cr, "img/matplotlib.svg", 10.0, 140.0, 60.0, 40.0);
+	draw_rect(cr, 1.0, 10.0, 140.0, 60.0, 40.0);
 
-	y += height + 10.0;
-	draw_text_with_bounding_box(cr, "Z003", loremipsum, true, PANGO_ALIGN_CENTER, x, y, width, &height);
-	fprintf(stderr, "after draw_text_with_bounding_box w %lf h %lf\n", width, height);
-	//draw_rect(cr, 0.1, x, y, width, height);
+	put_png_on_page(cr, "img/math-formula.png", 10.0, 200.0, 40.0, 40.0);
+	draw_rect(cr, 1.0, 10.0, 200.0, 40.0, 40.0);
+	put_png_on_page(cr, "img/math-formula.png", 10.0, 240.0, 60.0, 40.0);
+	draw_rect(cr, 1.0, 10.0, 240.0, 60.0, 40.0);
 
-	put_svg_on_page(cr, "img/matplotlib.svg", 100.0, 100.0, 40.0, 40.0);
-	//put_svg_on_page(cr, "math-formula.svg", 100.0, 100.0, 40.0, 40.0);
-	draw_rect(cr, 1.0, 100.0, 100.0, 40.0, 40.0);
-	put_svg_on_page(cr, "img/matplotlib.svg", 100.0, 140.0, 60.0, 40.0);
-	//put_svg_on_page(cr, "math-formula.svg", 100.0, 140.0, 60.0, 40.0);
-	draw_rect(cr, 1.0, 100.0, 140.0, 60.0, 40.0);
+	put_pixbuf_on_page(cr, "img/math-formula.jpg", 10.0, 300.0, 40.0, 40.0);
+	draw_rect(cr, 1.0, 10.0, 300.0, 40.0, 40.0);
+	put_pixbuf_on_page(cr, "img/math-formula.jpg", 10.0, 340.0, 60.0, 40.0);
+	draw_rect(cr, 1.0, 10.0, 340.0, 60.0, 40.0);
 
-	put_png_on_page(cr, "img/math-formula.png", 100.0, 200.0, 40.0, 40.0);
-	draw_rect(cr, 1.0, 100.0, 200.0, 40.0, 40.0);
-	put_png_on_page(cr, "img/math-formula.png", 100.0, 240.0, 60.0, 40.0);
-	draw_rect(cr, 1.0, 100.0, 240.0, 60.0, 40.0);
-
-	put_pixbuf_on_page(cr, "img/math-formula.jpg", 100.0, 300.0, 40.0, 40.0);
-	draw_rect(cr, 1.0, 100.0, 300.0, 40.0, 40.0);
-	put_pixbuf_on_page(cr, "img/math-formula.jpg", 100.0, 340.0, 60.0, 40.0);
-	draw_rect(cr, 1.0, 100.0, 340.0, 60.0, 40.0);
-
-	put_pixbuf_on_page(cr, "img/math-formula.gif", 100.0, 400.0, 40.0, 40.0);
-	draw_rect(cr, 1.0, 100.0, 400.0, 40.0, 40.0);
-	put_pixbuf_on_page(cr, "img/math-formula.gif", 100.0, 440.0, 60.0, 40.0);
-	draw_rect(cr, 1.0, 100.0, 440.0, 60.0, 40.0);
+	put_pixbuf_on_page(cr, "img/math-formula.gif", 10.0, 400.0, 40.0, 40.0);
+	draw_rect(cr, 1.0, 10.0, 400.0, 40.0, 40.0);
+	put_pixbuf_on_page(cr, "img/math-formula.gif", 10.0, 440.0, 60.0, 40.0);
+	draw_rect(cr, 1.0, 10.0, 440.0, 60.0, 40.0);
 
 	cairo_destroy(cr);
 
