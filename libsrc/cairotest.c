@@ -248,14 +248,9 @@ void draw_text_with_bounding_box(cairo_t *cr, const char *font, const char *text
 
 	pango_layout_set_text(layout, text, -1);
 
-	PangoRectangle ink_rect, logical_rect;
-
-	if (wrap) {
-		pango_layout_get_extents(layout, &ink_rect, &logical_rect);
-	} else {
-		PangoLayoutLine *pline = pango_layout_get_line(layout, 0);
-		pango_layout_line_get_extents(pline, &ink_rect, &logical_rect);
-	}
+	PangoRectangle logical_rect;
+	PangoLayoutLine *pline = pango_layout_get_line(layout, 0);
+	pango_layout_line_get_extents(pline, NULL, &logical_rect);
 
 	double h = 0.0;
 	int lines = wrap ? pango_layout_get_line_count(layout) : 1;
@@ -263,7 +258,7 @@ void draw_text_with_bounding_box(cairo_t *cr, const char *font, const char *text
 
 	for (i = 0; i < lines; i++) {
 		PangoLayoutLine *pline = pango_layout_get_line(layout, i);
-		pango_layout_line_get_extents(pline, &ink_rect, &logical_rect);
+		pango_layout_line_get_extents(pline, NULL, &logical_rect);
 		h += ascent + descent;
 	}
 
@@ -276,9 +271,9 @@ void draw_text_with_bounding_box(cairo_t *cr, const char *font, const char *text
 	cairo_set_source_rgb(cr, 0.0, 0.0, 1.0);
 
 	for (i = 0; i < lines; i++) {
-		PangoLayoutLine *pline = pango_layout_get_line(layout, i);
+		pline = pango_layout_get_line(layout, i);
 
-		pango_layout_line_get_extents(pline, &ink_rect, &logical_rect);
+		pango_layout_line_get_extents(pline, NULL, &logical_rect);
 
 		y += ascent;
 		if (i)
