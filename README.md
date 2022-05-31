@@ -19,6 +19,10 @@ The dependencies to build OpenCReports are:
 * libpaper
 * libcsv
 * yajl
+* libgdk_pixbuf
+* librsvg
+* Cairo built with PDF support
+* PangoCairo
 * libpq (the PostgreSQL client library)
 * mariadb-connector-c
 * unixODBC (preferred) or iodbc
