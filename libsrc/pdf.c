@@ -432,14 +432,6 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		break;
 	}
 
-	fprintf(stderr, "ocrpt_pdf_draw_text: x %.2lf width %.2lf x1 %.2lf\n", x, width, x1);
-
-#if 0
-	if (align != PANGO_ALIGN_LEFT) {
-		double xdiff = (double)(ink_rect.width - logical_rect.width) / PANGO_SCALE;
-		cairo_move_to(cr, left_margin + x - xdiff, y + ascentdiff);
-	} else
-#endif
 	cairo_move_to(cr, left_margin + x1, y + ascentdiff);
 	pango_cairo_show_layout(cr, layout);
 
