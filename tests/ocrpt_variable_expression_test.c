@@ -32,7 +32,7 @@ int main(void) {
 	int32_t cols, row;
 
 	r = ocrpt_report_new(o);
-	ocrpt_part_append_report(o, NULL, r);
+	ocrpt_part_append_report(o, NULL, NULL, NULL, r);
 
 	q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 3, 5, coltypes);
 	qr = ocrpt_query_get_result(q, &cols);

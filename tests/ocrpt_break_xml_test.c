@@ -22,7 +22,6 @@
 
 int main(void) {
 	opencreport *o = ocrpt_init();
-	ocrpt_report *r;
 
 	if (!ocrpt_parse_xml(o, "ocrpt_break_xml_test.xml")) {
 		printf("XML parse error\n");
@@ -31,7 +30,10 @@ int main(void) {
 	}
 
 	/* There is only one ocrpt_report pointer in o->parts, extract it. */
-	r = (ocrpt_report *)((ocrpt_list *)(((ocrpt_part *)(o->parts->data))->rows->data))->data;
+	ocrpt_part *p = (ocrpt_part *)o->parts->data;
+	ocrpt_part_row *pr = (ocrpt_part_row *)p->rows->data;
+	ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pr->pd_list->data;
+	ocrpt_report *r = (ocrpt_report *)pd->reports->data;
 
 	if (r->breaks)
 		printf("adding a break and a breakfield to it succeeded\n");

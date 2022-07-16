@@ -27,7 +27,6 @@ int main(void) {
 	opencreport *o = ocrpt_init();
 	ocrpt_query *q;
 	ocrpt_query_result *qr;
-	ocrpt_report *r;
 	ocrpt_expr *e;
 	char *err;
 	int32_t cols, row;
@@ -42,7 +41,10 @@ int main(void) {
 	qr = ocrpt_query_get_result(q, &cols);
 
 	/* There is only one ocrpt_report pointer in o->parts, extract it. */
-	r = (ocrpt_report *)((ocrpt_list *)(((ocrpt_part *)(o->parts->data))->rows->data))->data;
+	ocrpt_part *p = (ocrpt_part *)o->parts->data;
+	ocrpt_part_row *pr = (ocrpt_part_row *)p->rows->data;
+	ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pr->pd_list->data;
+	ocrpt_report *r = (ocrpt_report *)pd->reports->data;
 
 	err = NULL;
 	e = ocrpt_expr_parse(o, r, "v.var1", &err);

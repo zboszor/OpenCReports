@@ -7,6 +7,8 @@
 #include <config.h>
 
 #include <stdio.h>
+#include <cairo.h>
+#include <glib-object.h>
 
 #include "exprutil.h"
 #include "scanner.h"
@@ -102,4 +104,39 @@ DLL_EXPORT_SYM void ocrpt_expr_free(opencreport *o, ocrpt_report *r, ocrpt_expr 
 			ocrpt_mem_free(e->result[i]);
 	ocrpt_result_free(e->delayed_result);
 	ocrpt_mem_free(e);
+}
+
+void ocrpt_image_free(const void *ptr) {
+	const ocrpt_image_file *image = (const ocrpt_image_file *)ptr;
+
+	ocrpt_mem_free(image->name);
+	cairo_surface_destroy((cairo_surface_t *)image->surface);
+	if (image->rsvg)
+		g_object_unref(image->rsvg);
+	if (image->pixbuf)
+		g_object_unref(image->pixbuf);
+	ocrpt_mem_free(ptr);
+}
+
+void ocrpt_output_free(opencreport *o, ocrpt_report *r, ocrpt_list *output_list) {
+	ocrpt_line *line;
+
+	for (ocrpt_list *l = output_list; l; l = l->next) {
+		ocrpt_output *output = (ocrpt_output *)l->data;
+		switch (output->type) {
+		case OCRPT_OUTPUT_LINE:
+			line = (ocrpt_line *)output;
+			for (ocrpt_list *l = line->elements; l; l = l->next)
+				ocrpt_mem_free(l->data);
+			ocrpt_list_free(line->elements);
+			break;
+		case OCRPT_OUTPUT_HLINE:
+		case OCRPT_OUTPUT_IMAGE:
+			break;
+		}
+
+		ocrpt_mem_free(output);
+	}
+
+	ocrpt_list_free(output_list);
 }

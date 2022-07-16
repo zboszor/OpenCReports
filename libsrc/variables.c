@@ -280,15 +280,12 @@ DLL_EXPORT_SYM void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_v
 
 DLL_EXPORT_SYM void ocrpt_variables_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_list *ptr;
-	bool good = ocrpt_report_validate(o, r);
 
-	for (ptr = good ? r->variables : NULL; ptr; ptr = ptr->next)
+	for (ptr = r->variables; ptr; ptr = ptr->next)
 		ocrpt_variable_free(o, r, (ocrpt_var *)ptr->data);
 
-	if (good) {
-		ocrpt_list_free(r->variables);
-		r->variables = NULL;
-	}
+	ocrpt_list_free(r->variables);
+	r->variables = NULL;
 }
 
 DLL_EXPORT_SYM void ocrpt_variable_set_precalculate(ocrpt_var *var, bool value) {

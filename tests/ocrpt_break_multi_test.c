@@ -43,7 +43,6 @@ static void test_break_trigger_cb(opencreport *o, ocrpt_report *r, ocrpt_break *
 int main(void) {
 	opencreport *o = ocrpt_init();
 	ocrpt_query *q;
-	ocrpt_report *r;
 	ocrpt_break *br;
 
 	if (!ocrpt_parse_xml(o, "ocrpt_break_multi_test.xml")) {
@@ -55,7 +54,10 @@ int main(void) {
 	q = ocrpt_query_get(o, "a");
 
 	/* There is only one ocrpt_report pointer in o->parts, extract it. */
-	r = (ocrpt_report *)((ocrpt_list *)(((ocrpt_part *)(o->parts->data))->rows->data))->data;
+	ocrpt_part *p = (ocrpt_part *)o->parts->data;
+	ocrpt_part_row *pr = (ocrpt_part_row *)p->rows->data;
+	ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pr->pd_list->data;
+	ocrpt_report *r = (ocrpt_report *)pd->reports->data;
 
 	ocrpt_report_add_new_row_cb(o, r, test_newrow_cb, q);
 

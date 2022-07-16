@@ -1,4 +1,7 @@
-<!ELEMENT OpenCReport (Datasources?,Queries?,(Part|Report)*)>
+<!ELEMENT OpenCReport (Settings?,Datasources?,Queries?,(Part|Report)*)>
+<!ELEMENT Settings EMPTY>
+<!ATTLIST Settings
+	size_unit CDATA #IMPLIED >
 <!ELEMENT Datasources (Datasource+)>
 <!ELEMENT Datasource EMPTY>
 <!ATTLIST Datasource
@@ -27,17 +30,20 @@
 <!ELEMENT Part (PageHeader|PageFooter|ReportHeader|ReportFooter|pr)*>
 <!ATTLIST Part
 	layout CDATA #IMPLIED
-	pagesAcross CDATA #IMPLIED
-	pages_across CDATA #IMPLIED
+	fontName CDATA #IMPLIED
+	font_name CDATA #IMPLIED
 	fontSize CDATA #IMPLIED
 	font_size CDATA #IMPLIED
+	size_unit CDATA #IMPLIED
 	orientation CDATA #IMPLIED
 	topMargin CDATA #IMPLIED
 	top_margin CDATA #IMPLIED
-	leftMargin CDATA #IMPLIED
-	left_margin CDATA #IMPLIED
 	bottomMargin CDATA #IMPLIED
 	bottom_margin CDATA #IMPLIED
+	leftMargin CDATA #IMPLIED
+	left_margin CDATA #IMPLIED
+	rightMargin CDATA #IMPLIED
+	right_margin CDATA #IMPLIED
 	paperType CDATA #IMPLIED
 	paper_type CDATA #IMPLIED
 	iterations CDATA #IMPLIED
@@ -46,34 +52,39 @@
 <!ATTLIST pr
 	layout CDATA #IMPLIED
 	newpage CDATA #IMPLIED >
-<!ELEMENT pd (Report*)>
+<!ELEMENT pd (Report|load)*>
 <!ATTLIST pd
 	width CDATA #IMPLIED
 	height CDATA #IMPLIED
 	border_width CDATA #IMPLIED
 	border_color CDATA #IMPLIED >
+<!ELEMENT load EMPTY>
+<!ATTLIST load
+	name CDATA #IMPLIED
+	query CDATA #IMPLIED >
 <!ELEMENT Report ((Alternate|NoData)|(Breaks?,Variables?)|PageHeader|PageFooter|ReportHeader|ReportFooter|(Detail|Graph|Chart)*|xi:include)* >
 <!ATTLIST Report
 	pagesAcross CDATA #IMPLIED
-	pages_across CDATA #IMPLIED
+	fontName CDATA #IMPLIED
+	font_name CDATA #IMPLIED
 	fontSize CDATA #IMPLIED
 	font_size CDATA #IMPLIED
+	size_unit CDATA #IMPLIED
 	orientation CDATA #IMPLIED
 	topMargin CDATA #IMPLIED
 	top_margin CDATA #IMPLIED
-	leftMargin CDATA #IMPLIED
-	left_margin CDATA #IMPLIED
 	bottomMargin CDATA #IMPLIED
 	bottom_margin CDATA #IMPLIED
+	leftMargin CDATA #IMPLIED
+	left_margin CDATA #IMPLIED
+	rightMargin CDATA #IMPLIED
+	right_margin CDATA #IMPLIED
 	paperType CDATA #IMPLIED
 	paper_type CDATA #IMPLIED
 	iterations CDATA #IMPLIED
 	suppressPageHeaderFirstPage CDATA #IMPLIED
-
 	query CDATA #IMPLIED
 	xmlns:xi CDATA #IMPLIED
-	suppress CDATA #IMPLIED
-	uniquerow CDATA #IMPLIED
 	detail_columns CDATA #IMPLIED
 	column_pad CDATA #IMPLIED >
 <!ELEMENT xi:include EMPTY>
@@ -88,18 +99,63 @@
 <!ELEMENT Output (Line | HorizontalLine | Image)* >
 <!ELEMENT Line (field | literal)* >
 <!ATTLIST Line
+	fontName CDATA #IMPLIED
+	font_name CDATA #IMPLIED
 	fontSize CDATA #IMPLIED
+	font_size CDATA #IMPLIED
 	bold CDATA #IMPLIED
+	italic CDATA #IMPLIED
+	italics CDATA #IMPLIED
 	suppress CDATA #IMPLIED
 	color CDATA #IMPLIED
 	bgcolor CDATA #IMPLIED >
+<!ELEMENT field EMPTY>
+<!ATTLIST field
+	value CDATA #REQUIRED
+	delayed CDATA #IMPLIED
+	precalculate CDATA #IMPLIED
+	format CDATA #IMPLIED
+	width CDATA #IMPLIED
+	align CDATA #IMPLIED
+	color CDATA #IMPLIED
+	bgcolor CDATA #IMPLIED
+	fontName CDATA #IMPLIED
+	font_name CDATA #IMPLIED
+	fontSize CDATA #IMPLIED
+	font_size CDATA #IMPLIED
+	bold CDATA #IMPLIED
+	italic CDATA #IMPLIED
+	italics CDATA #IMPLIED
+	link CDATA #IMPLIED
+	memo CDATA #IMPLIED
+	memo_wrap_chars CDATA #IMPLIED
+	memo_max_lines CDATA #IMPLIED
+	col CDATA #IMPLIED >
+<!ELEMENT literal (#PCDATA) >
+<!ATTLIST literal
+	width CDATA #IMPLIED
+	align CDATA #IMPLIED
+	color CDATA #IMPLIED
+	bgcolor CDATA #IMPLIED
+	fontName CDATA #IMPLIED
+	font_name CDATA #IMPLIED
+	fontSize CDATA #IMPLIED
+	font_size CDATA #IMPLIED
+	bold CDATA #IMPLIED
+	italic CDATA #IMPLIED
+	italics CDATA #IMPLIED
+	link CDATA #IMPLIED
+	translate CDATA #IMPLIED
+	col CDATA #IMPLIED >
 <!ELEMENT HorizontalLine EMPTY>
 <!ATTLIST HorizontalLine
 	size CDATA #IMPLIED
 	indent CDATA #IMPLIED
 	length CDATA #IMPLIED
 	fontSize CDATA #IMPLIED
+	font_size CDATA #IMPLIED
 	suppress CDATA #IMPLIED
+	color CDATA #IMPLIED
 	bgcolor CDATA #IMPLIED >
 <!ELEMENT Image EMPTY >
 <!ATTLIST Image
@@ -107,30 +163,6 @@
 	type CDATA #REQUIRED
 	width CDATA #REQUIRED
 	height CDATA #REQUIRED >
-<!ELEMENT field EMPTY>
-<!ATTLIST field
-	value CDATA #REQUIRED
-	delayed CDATA #IMPLIED
-	precalculate CDATA #IMPLIED
-	width CDATA #IMPLIED
-	align CDATA #IMPLIED
-	format CDATA #IMPLIED
-	bgcolor CDATA #IMPLIED
-	color CDATA #IMPLIED
-	link CDATA #IMPLIED
-	maxlines CDATA #IMPLIED
-	col CDATA #IMPLIED >
-<!ELEMENT literal (#PCDATA) >
-<!ATTLIST literal
-	align CDATA #IMPLIED
-	bgcolor CDATA #IMPLIED
-	color CDATA #IMPLIED
-	width CDATA #IMPLIED
-	bold CDATA #IMPLIED
-	italics CDATA #IMPLIED
-	link CDATA #IMPLIED
-	translate CDATA #IMPLIED
-	col CDATA #IMPLIED >
 <!ELEMENT Detail (FieldHeaders?, FieldDetails?) >
 <!ELEMENT FieldHeaders (Output)* >
 <!ELEMENT FieldDetails (Output)* >

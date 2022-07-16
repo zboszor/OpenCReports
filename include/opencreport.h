@@ -43,6 +43,16 @@ enum ocrpt_result_type {
 	OCRPT_RESULT_DATETIME
 };
 
+enum ocrpt_format_type {
+	OCRPT_OUTPUT_UNSET,
+	OCRPT_OUTPUT_PDF,
+	OCRPT_OUTPUT_HTML,
+	OCRPT_OUTPUT_TXT,
+	OCRPT_OUTPUT_CSV,
+	OCRPT_OUTPUT_XML
+};
+typedef enum ocrpt_format_type ocrpt_format_type;
+
 /*
  * The first part of the definitions are the same as enum ocrpt_result_type
  */
@@ -240,6 +250,7 @@ struct ocrpt_expr {
 	 * Valid for any expression in a <field> in the report XML except for value="..."
 	 */
 	ocrpt_expr *rvalue;
+	ocrpt_expr *format;
 	unsigned int result_index;
 	enum ocrpt_expr_type type:4;
 	bool result_index_set:1;
@@ -320,11 +331,18 @@ struct ocrpt_break {
 	ocrpt_list *breakfields;	/* list of ocrpt_expr pointers */
 	ocrpt_list *callbacks;		/* list of ocrpt_break_trigger_cb_data pointers */
 	ocrpt_expr *rownum;			/* row number of the break */
-	/* TODO: add details for header and footer */
+	ocrpt_list *header;
+	ocrpt_list *footer;
 	short index;
 	bool attrs[OCRPT_BREAK_ATTRS_COUNT];
 	bool cb_triggered;
 };
+
+struct ocrpt_part_row_data;
+typedef struct ocrpt_part_row_data ocrpt_part_row_data;
+
+struct ocrpt_part_row;
+typedef struct ocrpt_part_row ocrpt_part_row;
 
 struct ocrpt_part;
 typedef struct ocrpt_part ocrpt_part;
@@ -350,18 +368,141 @@ struct ocrpt_cb_data {
 };
 typedef struct ocrpt_cb_data ocrpt_cb_data;
 
-struct ocrpt_report {
-	/*
-	 * TODO:
-	 * ocrpt_output *nodata;
-	 * ocrpt_output *pageheader;
-	 * ocrpt_output *pagefooter;
-	 * ocrpt_output *reportheader;
-	 * orcpt_output *reportfooter;
-	 * ocrpt_output *detail;
-	 * ...
-	 */
+struct ocrpt_color {
+	const char *name;
+	const char *html;
+	double r;
+	double g;
+	double b;
+};
+typedef struct ocrpt_color ocrpt_color;
 
+enum ocrpt_output_type {
+	OCRPT_OUTPUT_LINE,
+	OCRPT_OUTPUT_HLINE,
+	OCRPT_OUTPUT_IMAGE
+};
+typedef enum ocrpt_output_type ocrpt_output_type;
+
+struct ocrpt_line_element {
+	ocrpt_expr *value;
+	ocrpt_expr *format;
+	ocrpt_expr *width;
+	ocrpt_expr *align;
+	ocrpt_expr *color;
+	ocrpt_expr *bgcolor;
+	ocrpt_expr *font_name;
+	ocrpt_expr *font_size;
+	ocrpt_expr *bold;
+	ocrpt_expr *italic;
+	ocrpt_expr *link;
+	ocrpt_expr *translate;
+
+	/* Shortcuts carried over between get_text_sizes() and draw_text() */
+	const char *font;
+	const char *value_str;
+	double fontsz;
+	double font_width;
+	double start;
+	double ascent;
+	double descent;
+	double width_computed;
+	size_t value_len;
+
+	int32_t memo_max_lines;
+	int32_t col;
+	bool memo:1;
+	bool memo_wrap_chars:1;
+	bool bold_computed:1; /* Also a shortcut */
+	bool bold_is_set:1;
+	bool bold_value:1;
+	bool italic_is_set:1;
+	bool italic_value:1;
+	bool value_allocated:1;
+};
+typedef struct ocrpt_line_element ocrpt_line_element;
+
+struct ocrpt_line {
+	ocrpt_output_type type;
+	double ascent;
+	double descent;
+	double fontsz;
+	double font_width;
+	ocrpt_expr *font_name;
+	ocrpt_expr *font_size;
+	ocrpt_expr *color;
+	ocrpt_expr *bgcolor;
+	ocrpt_expr *bold;
+	ocrpt_expr *italic;
+	ocrpt_expr *suppress;
+	ocrpt_list *elements; /* ocrpt_line_element */
+	bool bold_is_set:1;
+	bool bold_value:1;
+	bool italic_is_set:1;
+	bool italic_value:1;
+};
+typedef struct ocrpt_line ocrpt_line;
+
+struct ocrpt_hline {
+	ocrpt_output_type type;
+	double font_width;
+	ocrpt_expr *size;
+	ocrpt_expr *indent;
+	ocrpt_expr *length;
+	ocrpt_expr *font_size;
+	ocrpt_expr *suppress;
+	ocrpt_expr *color;
+};
+typedef struct ocrpt_hline ocrpt_hline;
+
+struct ocrpt_image {
+	ocrpt_output_type type;
+	ocrpt_expr *value; /* name of the image file */
+	ocrpt_expr *imgtype; /* 'png', 'jpg', 'raster', or 'svg' */
+	ocrpt_expr *width;
+	ocrpt_expr *height;
+};
+typedef struct ocrpt_image ocrpt_image;
+
+struct ocrpt_image_file {
+	char *name;
+	void *surface;
+	void *rsvg;
+	void *pixbuf;
+	double width;
+	double height;
+};
+typedef struct ocrpt_image_file ocrpt_image_file;
+
+struct ocrpt_output {
+	ocrpt_output_type type;
+};
+typedef struct ocrpt_output ocrpt_output;
+
+struct ocrpt_output_functions {
+	void (*draw_hline)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_hline *, double, double, double, double);
+	void (*get_text_sizes)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_line *, ocrpt_line_element *, double *, double *, double *);
+	void (*draw_text)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_line *, ocrpt_line_element *, double, double, double, double, double);
+	void (*finalize)(opencreport *o);
+};
+typedef struct ocrpt_output_functions ocrpt_output_functions;
+
+struct ocrpt_report {
+	char *font_name;
+	double font_size;
+	double font_width;
+	double top_margin;
+	double bottom_margin;
+	double left_margin;
+	double right_margin;
+	double column_pad;
+
+	/* Output elements */
+	ocrpt_list *nodata;
+	ocrpt_list *reportheader;
+	ocrpt_list *reportfooter;
+	ocrpt_list *fieldheader;
+	ocrpt_list *fielddetails;
 	/* Parent part */
 	ocrpt_part *part;
 	/* Toplevel query */
@@ -383,6 +524,10 @@ struct ocrpt_report {
 	ocrpt_list *precalc_done_callbacks;
 	ocrpt_list *iteration_callbacks;
 	/*
+	 * Hint for the number of detail columns
+	 */
+	unsigned int detail_columns;
+	/*
 	 * How many times should this report run
 	 */
 	unsigned int iterations;
@@ -398,24 +543,63 @@ struct ocrpt_report {
 	bool have_delayed_expr:1;
 	bool executing:1;
 	bool dont_add_exprs:1;
+	bool font_size_set:1;
+	bool size_unit_set:1;
+	bool size_in_points:1;
+	bool top_margin_set:1;
+	bool bottom_margin_set:1;
+	bool left_margin_set:1;
+	bool right_margin_set:1;
+	bool orientation_set:1;
+	bool landscape:1;
+	bool suppress_pageheader_firstpage:1;
+};
+
+struct ocrpt_part_row_data {
+	double width;
+	double height;
+	double border_width;
+	ocrpt_color border_color;
+	ocrpt_list *reports;
+	ocrpt_list *last_report;
+	bool width_set:1;
+	bool height_set:1;
+	bool border_width_set:1;
+};
+
+struct ocrpt_part_row {
+	ocrpt_list *pd_list;
+	ocrpt_list *pd_last;
+	bool newpage_set:1;
+	bool newpage:1;
+	bool layout_set:1;
+	bool fixed:1;
 };
 
 struct ocrpt_part {
-	/*
-	 * TODO:
-	 * ocrpt_output *pageheader;
-	 * ocrpt_output *pagefooter;
-	 * ocrpt_output *reportheader;
-	 * orcpt_output *reportfooter;
-	 */
+	double font_size;
+	double font_width;
+	double top_margin;
+	double bottom_margin;
+	double left_margin;
+	double right_margin;
+	char *font_name;
+
+	/* Common header and footer for all reports in this part */
+	ocrpt_list *pageheader;
+	ocrpt_list *pagefooter;
+
+	/* Paper */
+	const ocrpt_paper *paper;
+	double page_position;
 
 	/*
-	 * List of ocrpt_list, each child list is the columns for the given row,
+	 * List of ocrpt_part_row structures
+	 * Each child list is the columns for the given row,
 	 * which in turn are ocrpt_report elements.
 	 */
 	ocrpt_list *rows;
-	ocrpt_list *lastrow;
-	ocrpt_list *lastcol_in_lastrow;
+	ocrpt_list *row_last;
 	const char *path;
 	/*
 	 * How many times should this part run
@@ -426,12 +610,19 @@ struct ocrpt_part {
 	bool allocated:1;
 	bool parsed:1;
 #endif
+	bool layout_set:1;
+	bool fixed:1;
+	bool font_size_set:1;
+	bool size_unit_set:1;
+	bool size_in_points:1;
+	bool orientation_set:1;
+	bool landscape:1;
+	bool top_margin_set:1;
+	bool bottom_margin_set:1;
+	bool left_margin_set:1;
+	bool right_margin_set:1;
+	bool suppress_pageheader_firstpage:1;
 };
-
-#if 0
-struct report_line;
-typedef struct report_line report_line;
-#endif
 
 #define OCRPT_MPFR_PRECISION_BITS	(256)
 
@@ -454,6 +645,9 @@ struct opencreport {
 	/* Internal area for encoding conversion */
 	ocrpt_string *converted;
 
+	/* File search paths */
+	ocrpt_list *search_paths;
+
 	/* List of struct ocrpt_part elements */
 	ocrpt_list *parts;
 	ocrpt_list *last_part;
@@ -464,9 +658,22 @@ struct opencreport {
 	ocrpt_list *precalc_done_callbacks;
 	ocrpt_list *part_iteration_callbacks;
 
+	/* Output buffer for spooling */
+	ocrpt_string *output_buffer;
+
+	/* Page handling for PDF output, lists of cairo_surface_t pointers */
+	ocrpt_output_functions output_functions;
+	ocrpt_list *images;
+	ocrpt_list *pages;
+	ocrpt_list *last_page;
+	ocrpt_list *current_page;
+
 	/* The result of date() and now() functions */
 	ocrpt_result *current_date;
 	ocrpt_result *current_timestamp;
+	/* The result of r.pageno and r.totpages */
+	ocrpt_result *pageno;
+	ocrpt_result *totpages;
 
 	/* Locale specific data */
 	locale_t locale;
@@ -476,10 +683,17 @@ struct opencreport {
 	mpfr_rnd_t rndmode;
 	gmp_randstate_t randstate;
 
+	/* Global (default) font size and approximate width */
+	double font_size;
+	double font_width;
+
 	/* Alternating datasource row result index  */
-	int residx:3;
+	unsigned int residx:3;
+	unsigned int output_format:3;
 	bool precalculate:1;
 	bool caret_is_pow:1;
+	bool size_unit_set:1;
+	bool size_in_points:1;
 };
 
 /*
@@ -633,9 +847,11 @@ ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
  */
 ocrpt_result *ocrpt_expr_get_result(opencreport *o, ocrpt_report *r, ocrpt_expr *e);
 /*
- * Get the value
+ * Get the basic type value
  */
-void ocrpt_expr_get_value(opencreport *o, ocrpt_expr *e, char **s, int32_t *i);
+const char *ocrpt_expr_get_string_value(opencreport *o, ocrpt_expr *e);
+long ocrpt_expr_get_long_value(opencreport *o, ocrpt_expr *e);
+double ocrpt_expr_get_double_value(opencreport *o, ocrpt_expr *e);
 /*
  * Compare two subsequent row data in the expression,
  * return true if they are identical.
@@ -870,6 +1086,7 @@ ocrpt_string *ocrpt_mem_string_new_printf(const char *format, ...) __attribute__
 ocrpt_string *ocrpt_mem_string_resize(ocrpt_string *string, size_t len);
 char *ocrpt_mem_string_free(ocrpt_string *string, bool free_str);
 void ocrpt_mem_string_append_len(ocrpt_string *string, const char *str, const size_t len);
+void ocrpt_mem_string_append_len_binary(ocrpt_string *string, const char *str, const size_t len);
 void ocrpt_mem_string_append(ocrpt_string *string, const char *str);
 void ocrpt_mem_string_append_c(ocrpt_string *string, const char c);
 void ocrpt_mem_string_append_printf(ocrpt_string *string, const char *format, ...);
@@ -1085,17 +1302,22 @@ ocrpt_part *ocrpt_part_new(opencreport *o);
 /*
  * Create a new row in ocrpt_part
  */
-ocrpt_list *ocrpt_part_new_row(opencreport *o, ocrpt_part *p);
+ocrpt_part_row *ocrpt_part_new_row(opencreport *o, ocrpt_part *p);
 /*
- * Append an ocrpt_report to the column list of the last row in ocrpt_part
+ * Create a new column element in a row
+ */
+ocrpt_part_row_data *ocrpt_part_row_new_data(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr);
+/*
+ * Append an ocrpt_report to the last column data of the last row in ocrpt_part
  *
- * "p" may be NULL, in which case a new part is allocated and
- * the passed-in "r" report will be made part of it.
+ * "p" may be NULL, in which case a new part, a new row and
+ * a new column are allocated and the passed-in "r" report
+ * will be made part of it.
  *
  * The newly allocated (or valid passed-in) "p" ocrpt_part pointer
  * will be returned.
  */
-ocrpt_part *ocrpt_part_append_report(opencreport *o, ocrpt_part *p, ocrpt_report *r);
+ocrpt_part *ocrpt_part_append_report(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r);
 /*
  * Free a report part and remove it from the parts list
  */
@@ -1179,9 +1401,68 @@ bool ocrpt_parse_xml(opencreport *o, const char *filename);
 bool ocrpt_execute(opencreport *o);
 
 /*
+ * Send the output to stdout
+ */
+void ocrpt_spool(opencreport *o);
+
+/*
+ * Set output format
+ */
+void ocrpt_set_output_format(opencreport *o, ocrpt_format_type format);
+
+/*
  * Set the behaviour of the ^ operator
  * By default it's used for XOR
  */
 void ocrpt_set_caret_operator_is_pow(opencreport *o);
+
+/**************************************
+ * Functions related to file handling *
+ *************************************/
+
+/*
+ * Returns a sanitized ("canonicalized") path
+ *
+ * The returned path contains only single directory separators
+ * and doesn't contains symlinks.
+ */
+char *ocrpt_canonicalize_path(const char *path);
+
+/*
+ * Add search path (toplevel directories)
+ *
+ * Useful to find files relative to the search paths.
+ */
+void ocrpt_add_search_path(opencreport *o, const char *path);
+
+/*
+ * Find a file and return the canonicalized path to it
+ *
+ * This function takes the search paths into account.
+ */
+char *ocrpt_find_file(opencreport *o, const char *filename);
+
+/**********************************************************
+ * Functions related to finding or converting color names *
+ **********************************************************/
+
+/*
+ * Find a color by its name
+ *
+ * The function fills in the ocrpt_color structure with RGB values
+ * in Cairo values (0.0 ... 1.0)
+ *
+ * If the color name starts with "#" or "0x" or "0X" then it must be
+ * in HTML notation.
+ *
+ * Otherwise, the color name is looked up in the color name database
+ * case-insensitively. If found, the passed-in ocrpt_color structure is
+ * filled with the RGB color value of that name.
+ *
+ * If not found or the passed-in color name is NULL, depending on the
+ * the expected usage (foreground or background color), the ocrpt_color
+ * structure is filled with either white or black.
+ */
+void ocrpt_get_color(opencreport *o, const char *cname, ocrpt_color *color, bool bgcolor) __attribute__((nonnull(1,3)));
 
 #endif /* _OPENCREPORT_H_ */

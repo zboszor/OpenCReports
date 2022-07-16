@@ -27,15 +27,19 @@ static void print_result_row(const char *name, ocrpt_query_result *qr, int32_t c
 
 static void print_part_reports(char *name, ocrpt_part *p) UNUSED;
 static void print_part_reports(char *name, ocrpt_part *p) {
-	ocrpt_list *row, *col;
+	ocrpt_list *prl, *pdl, *rl;
 	int i, j;
 
 	printf("part %s:\n", name);
-	for (row = p->rows, i = 0; row; row = row->next, i++) {
+	for (prl = p->rows, i = 0; prl; prl = prl->next, i++) {
+		ocrpt_part_row *pr = (ocrpt_part_row *)prl->data;
+
 		printf("row %d reports:", i);
-		for (col = (ocrpt_list *)row->data, j = 0; col; col = col->next, j++) {
-			ocrpt_report *r = (ocrpt_report *) col->data;
-			if (r)
+		j = 0;
+		for (pdl = pr->pd_list; pdl; pdl = pdl->next) {
+			ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pdl->data;
+
+			for (rl = pd->reports; rl; rl = rl->next, j++)
 				printf(" %d", j);
 		}
 		printf("\n");

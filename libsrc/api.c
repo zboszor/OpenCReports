@@ -6,6 +6,7 @@
 
 #include <config.h>
 
+#include <assert.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <locale.h>
@@ -17,7 +18,9 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/random.h>
+#include <sys/stat.h>
 
+#include <cairo.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <paper.h>
@@ -27,6 +30,9 @@
 #include "datasource.h"
 #include "variables.h"
 #include "exprutil.h"
+#include "color.h"
+#include "layout.h"
+#include "pdf.h"
 
 char cwdpath[PATH_MAX];
 static ocrpt_paper *papersizes;
@@ -64,6 +70,20 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	o->current_timestamp = ocrpt_mem_malloc(sizeof(ocrpt_result));
 	memset(o->current_timestamp, 0, sizeof(ocrpt_result));
 	o->current_timestamp->type = OCRPT_RESULT_DATETIME;
+
+	o->pageno = ocrpt_mem_malloc(sizeof(ocrpt_result));
+	memset(o->pageno, 0, sizeof(ocrpt_result));
+	o->pageno->type = OCRPT_RESULT_NUMBER;
+	mpfr_init2(o->pageno->number, o->prec);
+	o->pageno->number_initialized = true;
+	mpfr_set_ui(o->pageno->number, 0, o->rndmode);
+
+	o->totpages = ocrpt_mem_malloc(sizeof(ocrpt_result));
+	memset(o->totpages, 0, sizeof(ocrpt_result));
+	o->totpages->type = OCRPT_RESULT_NUMBER;
+	mpfr_init2(o->totpages->number, o->prec);
+	o->totpages->number_initialized = true;
+	mpfr_set_ui(o->totpages->number, 0, o->rndmode);
 
 	return o;
 }
@@ -119,11 +139,19 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	ocrpt_list_free_deep(o->precalc_done_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(o->part_iteration_callbacks, ocrpt_mem_free);
 
+	ocrpt_list_free_deep(o->search_paths, ocrpt_mem_free);
+	ocrpt_list_free_deep(o->images, ocrpt_image_free);
+	ocrpt_list_free_deep(o->pages, (ocrpt_mem_free_t)cairo_surface_destroy);
+
 	gmp_randclear(o->randstate);
 	ocrpt_mem_string_free(o->converted, true);
 
 	ocrpt_result_free(o->current_date);
 	ocrpt_result_free(o->current_timestamp);
+	ocrpt_result_free(o->pageno);
+	ocrpt_result_free(o->totpages);
+
+	ocrpt_mem_string_free(o->output_buffer, true);
 
 	ocrpt_mem_free(o);
 }
@@ -168,7 +196,7 @@ DLL_EXPORT_SYM void ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb fu
 	o->report_added_callbacks = ocrpt_list_append(o->report_added_callbacks, ptr);
 }
 
-static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_report *r, ocrpt_query *q) {
+static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_query *q, double page_width, double page_indent, double *page_position) {
 	ocrpt_list *brl_start = NULL;
 	unsigned int rows = 0;
 	bool have_row = ocrpt_query_navigate_next(o, q);
@@ -205,8 +233,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_report *r, oc
 				for (brl = r->breaks_reverse; brl; brl = brl->next) {
 					ocrpt_break *br = (ocrpt_break *)brl->data;
 
-					/* TODO: process break footer here */
-					//printf("ocrpt_execute: r %p break '%s' footer\n", r, br->name);
+					ocrpt_layout_output(o, p, pr, pd, r, br->footer, page_width, page_indent, page_position);
 
 					if (br == brl_start->data)
 						break;
@@ -225,8 +252,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_report *r, oc
 			for (brl = (rows == 1 ? r->breaks : brl_start); brl; brl = brl->next) {
 				ocrpt_break *br __attribute__((unused)) = (ocrpt_break *)brl->data;
 
-				/* TODO: process break header here */
-				//printf("ocrpt_execute: r %p break '%s' header\n", r, br->name);
+				ocrpt_layout_output(o, p, pr, pd, r, br->header, page_width, page_indent, page_position);
 			}
 		}
 
@@ -255,8 +281,8 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_report *r, oc
 			}
 		}
 
-		/* TODO: process row FieldDetails here */
-		//printf("ocrpt_execute: r %p process FieldDetails\n", r);
+		ocrpt_layout_output(o, p, pr, pd, r, r->fieldheader, page_width, page_indent, page_position);
+		ocrpt_layout_output(o, p, pr, pd, r, r->fielddetails, page_width, page_indent, page_position);
 
 		if (o->precalculate && last_row) {
 			ocrpt_variables_add_precalculated_results(o, r, r->breaks, last_row);
@@ -271,89 +297,126 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_report *r, oc
 }
 
 static void ocrpt_execute_parts(opencreport *o) {
+	const ocrpt_paper *paper = o->paper;
+	double page_width = paper->width;
+	//double page_height = paper->height;
+	double page_indent = 0.0;
+	double page_position = 0.0;
+
+	o->current_page = NULL;
+	mpfr_set_ui(o->pageno->number, 0, o->rndmode);
+
 	for (ocrpt_list *pl = o->parts; pl; pl = pl->next) {
 		ocrpt_part *p = (ocrpt_part *)pl->data;
 		int32_t part_iter;
+		bool newpage = false;
+
+		if (!p->paper)
+			p->paper = o->paper;
+
+		if (paper->width != p->paper->width || paper->height != p->paper->height) {
+			paper = p->paper;
+			newpage = true;
+		}
+
+		if (p->font_size_set)
+			ocrpt_layout_set_font_sizes(o, p->font_name ? p->font_name : "Courier", p->font_size, false, false, NULL, &p->font_width);
+		else {
+			p->font_size = o->font_size;
+			p->font_width = o->font_width;
+		}
 
 		for (part_iter = 0; part_iter < p->iterations; part_iter++) {
 			for (ocrpt_list *row = p->rows; row; row = row->next) {
-				for (ocrpt_list *pdl = (ocrpt_list *)row->data; pdl; pdl = pdl->next) {
-					ocrpt_report *r = (ocrpt_report *)pdl->data;
-					ocrpt_query *q;
-					ocrpt_list *cbl;
-					int32_t rpt_iter;
+				ocrpt_part_row *pr = (ocrpt_part_row *)row->data;
 
-					if (!ocrpt_report_validate(o, r))
-						continue;
+				if (newpage || (pl == o->parts && (part_iter == 0 || pr->newpage)))
+					ocrpt_layout_add_new_page(o, p, &page_position);
 
-					q = (r->query ? r->query : (o->queries ? (ocrpt_query *)o->queries->data : NULL));
+				for (ocrpt_list *pdl = (ocrpt_list *)pr->pd_list; pdl; pdl = pdl->next) {
+					ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pdl->data;
 
-					if (!o->precalculate) {
-						for (cbl = r->start_callbacks; cbl; cbl = cbl->next) {
-							ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+					for (ocrpt_list *rl = pd->reports; rl; rl = rl->next) {
+						ocrpt_report *r = (ocrpt_report *)rl->data;
+						ocrpt_query *q;
+						ocrpt_list *cbl;
+						int32_t rpt_iter;
 
-							cbd->func(o, r, cbd->data);
-						}
-					}
-
-					for (rpt_iter = 0; rpt_iter < r->iterations; rpt_iter++) {
-						r->executing = true;
-
-						if (q) {
-							if (o->precalculate) {
-								ocrpt_query_navigate_start(o, q);
-								ocrpt_report_resolve_breaks(o, r);
-								ocrpt_report_resolve_variables(o, r);
-								ocrpt_report_resolve_expressions(o, r);
-
-								if (r->have_delayed_expr) {
-									r->data_rows = ocrpt_execute_one_report(o, r, q);
-
-									ocrpt_variables_advance_precalculated_results(o, r, NULL);
-
-									/* Reset queries and breaks */
-									ocrpt_query_navigate_start(o, q);
-									for (ocrpt_list *brl = r->breaks; brl; brl = brl->next)
-										ocrpt_break_reset_vars(o, r, (ocrpt_break *)brl->data);
-								}
-							} else {
-								if (!r->have_delayed_expr || r->data_rows)
-									r->data_rows = ocrpt_execute_one_report(o, r, q);
-							}
-
-							if (!r->data_rows) {
-								/*
-								 * TODO: no query rows, output the NoData alternative part
-								 * if it exists. In precalculate mode: no output, just
-								 * placeholder for layout
-								 */
-							}
-						} else {
-							/* TODO: no query, output the the NoData alternative part if it exists */
+						if (!ocrpt_report_validate(o, r)) {
+							fprintf(stderr, "ocrpt_execute_parts: report not valid???\n");
+							continue;
 						}
 
-						r->executing = false;
+						if (r->font_size_set)
+							ocrpt_layout_set_font_sizes(o, r->font_name ? r->font_name : (p->font_name ? p->font_name : "Courier"), r->font_size, false, false, NULL, &r->font_width);
+						else {
+							r->font_size = p->font_size;
+							r->font_width = p->font_width;
+						}
+
+						q = (r->query ? r->query : (o->queries ? (ocrpt_query *)o->queries->data : NULL));
 
 						if (!o->precalculate) {
-							for (cbl = r->iteration_callbacks; cbl; cbl = cbl->next) {
+							for (cbl = r->start_callbacks; cbl; cbl = cbl->next) {
 								ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
 
 								cbd->func(o, r, cbd->data);
 							}
 						}
-					}
 
-					if (o->precalculate) {
-						for (ocrpt_list *cbl = r->precalc_done_callbacks; cbl; cbl = cbl->next) {
-							ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+						for (rpt_iter = 0; rpt_iter < r->iterations; rpt_iter++) {
+							r->executing = true;
 
-							cbd->func(o, r, cbd->data);
+							if (q) {
+								if (o->precalculate) {
+									ocrpt_query_navigate_start(o, q);
+									ocrpt_report_resolve_breaks(o, r);
+									ocrpt_report_resolve_variables(o, r);
+									ocrpt_report_resolve_expressions(o, r);
+
+									if (r->have_delayed_expr) {
+										r->data_rows = ocrpt_execute_one_report(o, p, pr, pd, r, q, page_width, page_indent, &page_position);
+
+										ocrpt_variables_advance_precalculated_results(o, r, NULL);
+
+										/* Reset queries and breaks */
+										ocrpt_query_navigate_start(o, q);
+										for (ocrpt_list *brl = r->breaks; brl; brl = brl->next)
+											ocrpt_break_reset_vars(o, r, (ocrpt_break *)brl->data);
+									}
+								} else {
+									if (!r->have_delayed_expr || r->data_rows)
+										r->data_rows = ocrpt_execute_one_report(o, p, pr, pd, r, q, page_width, page_indent, &page_position);
+								}
+
+								if (!r->data_rows)
+									ocrpt_layout_output(o, p, pr, pd, r, r->nodata, page_width, page_indent, &page_position);
+							} else
+								ocrpt_layout_output(o, p, pr, pd, r, r->nodata, page_width, page_indent, &page_position);
+
+							r->executing = false;
+
+							if (!o->precalculate) {
+								for (cbl = r->iteration_callbacks; cbl; cbl = cbl->next) {
+									ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+									cbd->func(o, r, cbd->data);
+								}
+							}
 						}
-					} else {
-						for (cbl = r->done_callbacks; cbl; cbl = cbl->next) {
-							ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
 
-							cbd->func(o, r, cbd->data);
+						if (o->precalculate) {
+							for (ocrpt_list *cbl = r->precalc_done_callbacks; cbl; cbl = cbl->next) {
+								ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+								cbd->func(o, r, cbd->data);
+							}
+						} else {
+							for (cbl = r->done_callbacks; cbl; cbl = cbl->next) {
+								ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+								cbd->func(o, r, cbd->data);
+							}
 						}
 					}
 				}
@@ -374,6 +437,14 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	if (!o)
 		return false;
 
+	switch (o->output_format) {
+	case OCRPT_OUTPUT_PDF:
+		ocrpt_pdf_init(o);
+		break;
+	default:
+		break;
+	}
+
 	/* Initialize date() and now() values */
 	time_t t = time(NULL);
 	localtime_r(&t, &o->current_date->datetime);
@@ -381,6 +452,9 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	localtime_r(&t, &o->current_timestamp->datetime);
 	o->current_timestamp->date_valid = true;
 	o->current_timestamp->time_valid = true;
+
+	/* Set global default font sizes */
+	ocrpt_layout_set_font_sizes(o, "Courier", OCRPT_DEFAULT_FONT_SIZE, false, false, &o->font_size, &o->font_width);
 
 	/* Run all reports in precalculate mode if needed */
 	o->precalculate = true;
@@ -396,7 +470,240 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	o->precalculate = false;
 	ocrpt_execute_parts(o);
 
+	if (o->output_functions.finalize)
+		o->output_functions.finalize(o);
+
 	return true;
+}
+
+DLL_EXPORT_SYM void ocrpt_spool(opencreport *o) {
+	if (!o->output_buffer)
+		return;
+
+	ssize_t ret = write(fileno(stdout), o->output_buffer->str, o->output_buffer->len);
+	assert(ret == o->output_buffer->len);
+}
+
+DLL_EXPORT_SYM void ocrpt_set_output_format(opencreport *o, ocrpt_format_type format) {
+	if (!o)
+		return;
+	o->output_format = format;
+}
+
+DLL_EXPORT_SYM char *ocrpt_canonicalize_path(const char *path) {
+	bool free_path = false;
+
+	again:
+
+	if (!path)
+		return NULL;
+
+	int len0 = strlen(path);
+	if (!len0)
+		return NULL;
+
+	char *path_copy = NULL;
+	int len = 0;
+	if (*path != '/') {
+		char *cwd = ocrpt_mem_malloc(PATH_MAX);
+
+		if (!getcwd(cwd, PATH_MAX)) {
+			ocrpt_mem_free(cwd);
+			return NULL;
+		}
+
+		path_copy = ocrpt_mem_malloc(strlen(cwd) + len0 + 2);
+		if (!path_copy) {
+			ocrpt_mem_free(cwd);
+			return NULL;
+		}
+
+		len = sprintf(path_copy, "%s/", cwd);
+		ocrpt_mem_free(cwd);
+	} else {
+		path_copy = ocrpt_mem_malloc(len0 + 1);
+		if (!path_copy)
+			return NULL;
+	}
+
+	int i;
+	for (i = 0; i < len0; i++, len++) {
+		char c = path[i];
+#ifdef _WIN32
+		if (c == '\\')
+			c = '/';
+		while (i < len0 - 1 && c == '/' && (path[i + 1] == '/' || path[i + 1] == '\\'))
+#else
+		while (i < len0 - 1 && c == '/' && path[i + 1] == '/')
+#endif
+			i++;
+
+		path_copy[len] = c;
+	}
+
+	if (!len) {
+		ocrpt_mem_free(path_copy);
+		return NULL;
+	}
+
+	if (path_copy[len - 1] == '/')
+		len--;
+	path_copy[len] = '\0';
+
+	ocrpt_list *path_elements = NULL, *last_element = NULL;
+	char *c = path_copy + 1;
+	bool dotdot = false;
+
+	while (c) {
+		char *nc = strchr(c + 1, '/');
+		ssize_t elem_len = nc ? nc - c: strlen(c);
+		char *c1 = ocrpt_mem_malloc(elem_len + 1);
+		strncpy(c1, c, elem_len);
+		c1[elem_len] = '\0';
+
+		/* Leave out path elements referencing the current directory */
+		if (dotdot) {
+			ocrpt_mem_free(last_element->data);
+			last_element->data = c1;
+			dotdot = false;
+		} else if (!strcmp(c1, "."))
+			ocrpt_mem_free(c1);
+		else if (!strcmp(c1, "..")) {
+			dotdot = true;
+			ocrpt_mem_free(c1);
+		} else
+			path_elements = ocrpt_list_end_append(path_elements, &last_element, c1);
+		c = nc ? nc + 1 : NULL;
+	}
+
+	ocrpt_mem_free(path_copy);
+
+	ocrpt_string *result = ocrpt_mem_string_new(NULL, true);
+	bool valid = true;
+
+	for (ocrpt_list *l = path_elements; l; l = l->next) {
+		ocrpt_mem_string_append_printf(result, "/%s", (char *)l->data);
+		struct stat st;
+
+		if (valid) {
+			if (stat(result->str, &st))
+				valid = false;
+		}
+
+		if (valid) {
+			if (!lstat(result->str, &st)) {
+				if (S_ISLNK(st.st_mode)) {
+					ocrpt_string *link = ocrpt_mem_string_new_with_len(NULL, result->len);
+					ssize_t linksz = readlink(result->str, link->str, link->allocated_len);
+					if (linksz > link->allocated_len) {
+						ocrpt_mem_string_resize(link, linksz);
+						linksz = readlink(result->str, link->str, link->allocated_len);
+						assert(linksz <= link->allocated_len);
+					}
+					link->str[linksz] = '\0';
+
+					result->len = 0;
+					if (link->str[0] == '/') {
+						ocrpt_mem_string_append_printf(result, "%s", link->str);
+					} else {
+						for (ocrpt_list *ll = path_elements; ll && ll != l; ll = ll->next)
+							ocrpt_mem_string_append_printf(result, "/%s", (char *)ll->data);
+
+						ocrpt_mem_string_append_printf(result, "/%s", link->str);
+					}
+					for (l = l->next; l; l = l->next)
+						ocrpt_mem_string_append_printf(result, "/%s", (char *)l->data);
+
+					ocrpt_mem_string_free(link, true);
+
+					if (free_path)
+						ocrpt_mem_free(path);
+
+					path = ocrpt_mem_string_free(result, false);
+					ocrpt_list_free_deep(path_elements, ocrpt_mem_free);
+					free_path = true;
+					goto again;
+				}
+			} else
+				valid = false;
+		}
+	}
+
+	ocrpt_list_free_deep(path_elements, ocrpt_mem_free);
+
+	if (free_path)
+		ocrpt_mem_free(path);
+
+	return ocrpt_mem_string_free(result, false);
+}
+
+DLL_EXPORT_SYM void ocrpt_add_search_path(opencreport *o, const char *path) {
+	char *cpath = ocrpt_canonicalize_path(path);
+
+	if (!cpath)
+		return;
+
+	bool found = false;
+	for (ocrpt_list *spl = o->search_paths; spl; spl = spl->next) {
+		if (!strcmp(cpath, (char *)spl->data)) {
+			found = true;
+			break;
+		}
+	}
+
+	if (found)
+		ocrpt_mem_free(cpath);
+	else
+		o->search_paths = ocrpt_list_append(o->search_paths, cpath);
+}
+
+DLL_EXPORT_SYM char *ocrpt_find_file(opencreport *o, const char *filename) {
+	struct stat st;
+
+	if (!o || !filename)
+		return NULL;
+
+	if (*filename == '/') {
+		if (stat(filename, &st) == 0 && S_ISREG(st.st_mode))
+			return ocrpt_mem_strdup(filename);
+		return NULL;
+	}
+
+	for (ocrpt_list *l = o->search_paths; l; l = l->next) {
+		ocrpt_string *s = ocrpt_mem_string_new((char *)l->data, true);
+
+		ocrpt_mem_string_append_printf(s, "/%s", filename);
+
+		char *file = ocrpt_canonicalize_path(s->str);
+
+		if (stat(file, &st) == 0 && S_ISREG(st.st_mode)) {
+			ocrpt_mem_string_free(s, true);
+			return file;
+		}
+		ocrpt_mem_string_free(s, true);
+		ocrpt_mem_free(file);
+	}
+
+	char *cwd = ocrpt_mem_malloc(PATH_MAX);
+
+	if (!getcwd(cwd, PATH_MAX)) {
+		ocrpt_mem_free(cwd);
+		return NULL;
+	}
+
+	ocrpt_string *s = ocrpt_mem_string_new(cwd, false);
+	ocrpt_mem_string_append_printf(s, "/%s", filename);
+
+	char *file = ocrpt_canonicalize_path(s->str);
+
+	if (stat(file, &st) == 0 && S_ISREG(st.st_mode)) {
+		ocrpt_mem_string_free(s, true);
+		return file;
+	}
+	ocrpt_mem_string_free(s, true);
+	ocrpt_mem_free(file);
+
+	return NULL;
 }
 
 static int papersortcmp(const void *a, const void *b) {
@@ -519,6 +826,8 @@ static void initialize_ocrpt(void) {
 	free((void *)system_paper_name);
 
 	paperdone();
+
+	ocrpt_init_color();
 
 	LIBXML_TEST_VERSION;
 	xmlInitParser();

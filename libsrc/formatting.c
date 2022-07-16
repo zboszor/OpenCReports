@@ -662,7 +662,7 @@ static ocrpt_string *ocrpt_get_next_format_string(opencreport *o, const char *fm
 void ocrpt_utf8forward(const char *s, int l, int *l2, int blen, int *blen2) {
 	int i = 0, j = 0;
 
-	while (j < l && i < blen) {
+	while ((l >= 0 && blen >= 0 && j < l && i < blen) || (l < 0 && blen < 0 && s[i])) {
 		if ((s[i] & 0xf8) == 0xf0)
 			i+= 4, j++;
 		else if ((s[i] & 0xf0) == 0xe0)

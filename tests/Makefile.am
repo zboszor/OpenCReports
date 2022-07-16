@@ -57,7 +57,10 @@ TESTS = \
 	ocrpt_break_multi7_test \
 	ocrpt_break_multi8_test \
 	ocrpt_custom_variable_test \
-	ocrpt_custom_variable_xml_test
+	ocrpt_custom_variable_xml_test \
+	ocrpt_canonicalize_path_test \
+	ocrpt_find_file_test \
+	ocrpt_color_test
 
 SLOW_TESTS = \
 	ocrpt_pgsql_numeric_precision_test \
@@ -66,10 +69,14 @@ SLOW_TESTS = \
 # Unstable tests by nature:
 # ocrpt_random_test produces a random number which is different every time
 # ocrpt_paper_test prints paper sizes and defaults which depends on language settings
+# All PDF output tests are unstable because Cairo:
+# * sets the /Producer PDF property with its own name and version
+# * different Cairo versions support different PDF versions
 UNSTABLE_TESTS = \
 	ocrpt_random_test \
 	ocrpt_paper_test \
-	ocrpt_now_test
+	ocrpt_now_test \
+	ocrpt_layout_pdf_xml_test
 
 noinst_PROGRAMS = $(TESTS) $(SLOW_TESTS) $(UNSTABLE_TESTS)
 
@@ -78,12 +85,12 @@ $(noinst_PROGRAMS): $(top_builddir)/libsrc/libopencreport.la
 all: $(noinst_PROGRAMS)
 
 test: $(TESTS) execute_test.sh
-	$(foreach TEST,$(TESTS),LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp ./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(TESTS),LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
 
 slow-test: $(SLOW_TESTS) execute_test.sh
-	$(foreach TEST,$(SLOW_TESTS),LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp ./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(SLOW_TESTS),LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
 
 unstable-test: $(UNSTABLE_TESTS) execute_test.sh
-	$(foreach TEST,$(UNSTABLE_TESTS),LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp ./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(UNSTABLE_TESTS),LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
 
 all-test: test slow-test unstable-test

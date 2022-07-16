@@ -1,0 +1,6 @@
+srcdir equals canonical srcdir
+Two subdirs relative to abs_srcdir are equal after canonicalization:
+	images/images
+	images/images
+Bad recursive symlink, returned as is: images/images5
+Canonicalized path of 'images2/images2' relative to abs_builddir: 'images/images'

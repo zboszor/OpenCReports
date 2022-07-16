@@ -45,6 +45,24 @@ ocrpt_expr *newblankexpr(opencreport *o, ocrpt_report *r, enum ocrpt_expr_type t
 	return e;
 }
 
+ocrpt_expr *ocrpt_newstring(opencreport *o, ocrpt_report *r, const char *string) {
+	ocrpt_expr *e = newblankexpr(o, r, OCRPT_EXPR_STRING, 0);
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_STRING);
+	ocrpt_mem_string_append_printf(e->result[o->residx]->string, "%s", string);
+	e->result[o->residx]->string_owned = true;
+	e->result[ocrpt_expr_next_residx(o->residx)] = e->result[o->residx];
+	e->result[ocrpt_expr_next_residx(ocrpt_expr_next_residx(o->residx))] = e->result[o->residx];
+
+	if (r && !r->executing && !r->dont_add_exprs) {
+		r->exprs = ocrpt_list_end_append(r->exprs, &r->exprs_last, e);
+		e->result_index = r->num_expressions++;
+		e->result_index_set = true;
+	}
+
+	return e;
+}
+
 static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth, const char *delimiter, ocrpt_string *str) {
 	ocrpt_result *result;
 	int i;
@@ -584,15 +602,38 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 					ocrpt_expr_make_error_result(o, e, "invalid usage of r.value");
 				}
 			} else if (strcmp(e->name->str, "totpages") == 0) {
-				/* TODO: total number of output pages */
+				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+					if (!e->result[i]) {
+						e->result[i] = o->totpages;
+						ocrpt_expr_set_result_owned(o, e, i, false);
+					}
+				}
+				if (r)
+					r->have_delayed_expr = true;
 			} else if (strcmp(e->name->str, "pageno") == 0) {
-				/* TODO: current number of output page */
+				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+					if (!e->result[i]) {
+						e->result[i] = o->pageno;
+						ocrpt_expr_set_result_owned(o, e, i, false);
+					}
+				}
 			} else if (strcmp(e->name->str, "lineno") == 0) {
-				/* TODO: current number of printed <Line> sections */
+				if (r) {
+					/* TODO: current number of printed <Line> sections for <FieldDetails> */
+				} else
+					ocrpt_expr_make_error_result(o, e, "invalid usage of r.lineno");
 			} else if (strcmp(e->name->str, "detailcnt") == 0) {
-				/* TODO: the current number of printed <Detail> sections */
+				if (r) {
+					/* TODO: alias for rownum() */
+				} else
+					ocrpt_expr_make_error_result(o, e, "invalid usage of r.detailcnt");
 			} else if (strcmp(e->name->str, "format") == 0) {
-				/* TODO: the format="..." string for the current field expression */
+				if (orig_e->rvalue && orig_e->rvalue->format) {
+					for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+						e->result[i] = orig_e->rvalue->format->result[i];
+						ocrpt_expr_set_result_owned(o, e, i, false);
+					}
+				}
 			}
 		}
 
@@ -961,23 +1002,46 @@ DLL_EXPORT_SYM void ocrpt_expr_set_iterative_start_value(ocrpt_expr *e, bool sta
 	e->iterative_start_with_init = start_with_init;
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_get_value(opencreport *o, ocrpt_expr *e, char **s, int32_t *i) {
+DLL_EXPORT_SYM const char *ocrpt_expr_get_string_value(opencreport *o, ocrpt_expr *e) {
 	ocrpt_result *r;
 
-	if (s)
-		*s = NULL;
-	if (i)
-		*i = 0;
 	if (!e)
-		return;
+		return NULL;
 
 	r = ocrpt_expr_eval(o, NULL, e);
-	if (r) {
-		if (s && r->type == OCRPT_RESULT_STRING)
-			*s = r->string->str;
-		if (i && OCRPT_RESULT_NUMBER)
-			*i = mpfr_get_si(r->number, o->rndmode);
-	}
+
+	if (r && r->type == OCRPT_RESULT_STRING)
+		return r->string->str;
+
+	return NULL;
+}
+
+DLL_EXPORT_SYM long ocrpt_expr_get_long_value(opencreport *o, ocrpt_expr *e) {
+	ocrpt_result *r;
+
+	if (!e)
+		return 0;
+
+	r = ocrpt_expr_eval(o, NULL, e);
+
+	if (r && r->type == OCRPT_RESULT_NUMBER)
+		return mpfr_get_si(r->number, o->rndmode);
+
+	return 0;
+}
+
+DLL_EXPORT_SYM double ocrpt_expr_get_double_value(opencreport *o, ocrpt_expr *e) {
+	ocrpt_result *r;
+
+	if (!e)
+		return 0.0;
+
+	r = ocrpt_expr_eval(o, NULL, e);
+
+	if (r && r->type == OCRPT_RESULT_NUMBER)
+		return mpfr_get_d(r->number, o->rndmode);
+
+	return 0.0;
 }
 
 static bool ocrpt_expr_get_precalculate_worker(opencreport *o, ocrpt_expr *e, int32_t depth) {

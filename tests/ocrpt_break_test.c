@@ -32,7 +32,7 @@ int main(void) {
 	q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 3, 5, coltypes);
 
 	r = ocrpt_report_new(o);
-	ocrpt_part_append_report(o, NULL, r);
+	ocrpt_part_append_report(o, NULL, NULL, NULL, r);
 
 	br = ocrpt_break_new(o, r, "age");
 	if (!br) {

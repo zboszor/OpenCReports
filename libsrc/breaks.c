@@ -15,6 +15,7 @@
 #include "exprutil.h"
 #include "datasource.h"
 #include "variables.h"
+#include "layout.h"
 
 DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, const char *name) {
 	ocrpt_break *br;
@@ -90,25 +91,24 @@ DLL_EXPORT_SYM void ocrpt_break_free(opencreport *o, ocrpt_report *r, ocrpt_brea
 	ocrpt_list_free_deep(br->callbacks, ocrpt_mem_free);
 	ocrpt_expr_free(o, r, br->rownum);
 	ocrpt_mem_free(br->name);
+	ocrpt_output_free(o, r, br->header);
+	ocrpt_output_free(o, r, br->footer);
 	ocrpt_mem_free(br);
 }
 
 DLL_EXPORT_SYM void ocrpt_breaks_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_list *ptr;
-	bool good = ocrpt_report_validate(o, r);
 
-	for (ptr = good ? r->breaks : NULL; ptr; ptr = ptr->next) {
+	for (ptr = r->breaks; ptr; ptr = ptr->next) {
 		ocrpt_break *br = (ocrpt_break *)ptr->data;
 
 		ocrpt_break_free(o, r, br);
 	}
 
-	if (good) {
-		ocrpt_list_free(r->breaks);
-		r->breaks = NULL;
-		ocrpt_list_free(r->breaks_reverse);
-		r->breaks_reverse = NULL;
-	}
+	ocrpt_list_free(r->breaks);
+	r->breaks = NULL;
+	ocrpt_list_free(r->breaks_reverse);
+	r->breaks_reverse = NULL;
 }
 
 DLL_EXPORT_SYM ocrpt_break *ocrpt_break_get(opencreport *o, ocrpt_report *r, const char *name) {

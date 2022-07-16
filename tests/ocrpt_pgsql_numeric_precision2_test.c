@@ -49,7 +49,7 @@ int main(void) {
 	}
 
 	r = ocrpt_report_new(o);
-	ocrpt_part_append_report(o, NULL, r);
+	ocrpt_part_append_report(o, NULL, NULL, NULL, r);
 
 	ocrpt_report_add_new_row_cb(o, r, test_newrow_cb, &rd);
 
