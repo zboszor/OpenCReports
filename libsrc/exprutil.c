@@ -1076,6 +1076,8 @@ bool ocrpt_expr_get_precalculate(opencreport *o, ocrpt_expr *e) {
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_set_delayed(opencreport *o, ocrpt_expr *e, bool delayed) {
+	if (!o || !e)
+		return;
 	e->delayed = delayed;
 }
 
