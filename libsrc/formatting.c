@@ -697,16 +697,16 @@ void ocrpt_utf8backward(const char *s, int l, int *l2, int blen, int *blen2) {
 		*blen2 = i;
 }
 
-void ocrpt_format_string(opencreport *o, ocrpt_expr *e, const char *formatstring, int32_t formatlen, ocrpt_expr **expr, int32_t n_expr) {
+void ocrpt_format_string(opencreport *o, ocrpt_expr *e, ocrpt_string *string0, const char *formatstring, int32_t formatlen, ocrpt_expr **expr, int32_t n_expr) {
 	int32_t i, advance;
 	locale_t locale;
 
 	/* Use the specified locale, so that thousand separators, etc. work. */
 	locale = uselocale(o->locale);
 
-	ocrpt_string *string = ocrpt_mem_string_resize(e->result[o->residx]->string, 16);
+	ocrpt_string *string = ocrpt_mem_string_resize(string0, 16);
 	if (string) {
-		if (!e->result[o->residx]->string) {
+		if (e && !e->result[o->residx]->string) {
 			e->result[o->residx]->string = string;
 			e->result[o->residx]->string_owned = true;
 		}
@@ -731,7 +731,12 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, const char *formatstring
 			types[0] = OCRPT_FORMAT_DATETIME;
 			break;
 		case OCRPT_RESULT_ERROR:
-			ocrpt_expr_make_error_result(o, e, data->string->str);
+			if (e)
+				ocrpt_expr_make_error_result(o, e, data->string->str);
+			else {
+				string->len = 0;
+				ocrpt_mem_string_append(string, data->string->str);
+			}
 			return;
 		}
 
@@ -750,7 +755,12 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, const char *formatstring
 			tmp = ocrpt_get_next_format_string(o, formatstring + advance, types[type_idx], &type, &adv, &error, &length, &lpadded);
 
 			if (error) {
-				ocrpt_expr_make_error_result(o, e, tmp->str);
+				if (e)
+					ocrpt_expr_make_error_result(o, e, tmp->str);
+				else {
+					string->len = 0;
+					ocrpt_mem_string_append(string, tmp->str);
+				}
 				ocrpt_mem_string_free(tmp, true);
 				return;
 			}

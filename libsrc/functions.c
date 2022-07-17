@@ -3648,7 +3648,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_format) {
 	} else
 		formatlen = strlen(formatstring);
 
-	ocrpt_format_string(o, e, formatstring, formatlen, e->ops, 1);
+	ocrpt_format_string(o, e, e->result[o->residx]->string, formatstring, formatlen, e->ops, 1);
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_dtosf) {
@@ -3707,7 +3707,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_dtosf) {
 	} else
 		formatlen = strlen(formatstring);
 
-	ocrpt_format_string(o, e, formatstring, formatlen, e->ops, 1);
+	ocrpt_format_string(o, e, e->result[o->residx]->string, formatstring, formatlen, e->ops, 1);
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_printf) {
@@ -3739,7 +3739,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_printf) {
 
 	ocrpt_expr_init_result(o, e, OCRPT_RESULT_STRING);
 
-	ocrpt_format_string(o, e, e->ops[0]->result[o->residx]->string->str, e->ops[0]->result[o->residx]->string->len, &e->ops[1], e->n_ops - 1);
+	ocrpt_format_string(o, e, e->result[o->residx]->string, e->ops[0]->result[o->residx]->string->str, e->ops[0]->result[o->residx]->string->len, &e->ops[1], e->n_ops - 1);
 }
 
 /*
