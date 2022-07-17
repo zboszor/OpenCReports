@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #include <opencreport.h>
-#include "ocrpt_test_common.h"
+#include "test_common.h"
 
 /* NOT static */ const char *array[4][6] = {
 	{ "id", "id2", "name", "property", "age", "adult" },

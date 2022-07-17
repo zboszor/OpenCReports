@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #include <opencreport.h>
-#include "ocrpt_test_common.h"
+#include "test_common.h"
 
 ocrpt_part *parts[16];
 int nparts = 0;
