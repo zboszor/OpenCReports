@@ -711,7 +711,6 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	else
 		elem->value = ocrpt_xml_expr_parse(o, r, value, true, false);
 	ocrpt_expr_set_delayed(o, elem->value, !!delayed_i);
-	ocrpt_expr_print(o, elem->value);
 
 	elem->format = ocrpt_xml_expr_parse(o, r, format, true, false);
 	if (elem->format)
@@ -721,7 +720,10 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	if (elem->width)
 		elem->width->rvalue = elem->value;
 
-	elem->align = ocrpt_xml_expr_parse(o, r, align, true, false);
+	if (align && (strcasecmp((char *)align, "left") == 0 || strcasecmp((char *)align, "right") == 0 || strcasecmp((char *)align, "center") == 0))
+		elem->align = ocrpt_newstring(o, r, (char *)align);
+	else
+		elem->align = ocrpt_xml_expr_parse(o, r, align, true, false);
 	if (elem->align)
 		elem->align->rvalue = elem->value;
 
