@@ -6,6 +6,7 @@
 
 #include <config.h>
 
+#include <langinfo.h>
 #include <cairo.h>
 #include <cairo-pdf.h>
 #include <cairo-svg.h>
@@ -242,12 +243,49 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 
 	le->fontsz = size;
 
-	if (le->value && le->value->result[o->residx] && le->value->result[o->residx]->type == OCRPT_RESULT_STRING && le->value->result[o->residx]->string) {
-		le->value_str = le->value->result[o->residx]->string->str;
-		le->value_len = le->value->result[o->residx]->string->len;
-	} else {
-		le->value_str = "";
-		le->value_len = 0;
+	bool has_format = false;
+	bool has_value = false;
+
+	if (le->format && le->format->result[o->residx] && le->format->result[o->residx]->type == OCRPT_RESULT_STRING && le->format->result[o->residx]->string)
+		has_format = true;
+
+	if (le->value && le->value->result[o->residx] &&
+		(
+			(le->value->result[o->residx]->type == OCRPT_RESULT_STRING && le->value->result[o->residx]->string) ||
+			(le->value->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->value->result[o->residx]->number_initialized) ||
+			(le->value->result[o->residx]->type == OCRPT_RESULT_DATETIME && (le->value->result[o->residx]->date_valid || le->value->result[o->residx]->time_valid))
+		))
+		has_value = true;
+
+	ocrpt_string *string = ocrpt_mem_string_resize(le->value_str, 16);
+	if (string) {
+		le->value_str = string;
+		string->len = 0;
+	}
+
+	if (has_format && has_value)
+		ocrpt_format_string(o, NULL, string, le->format->result[o->residx]->string->str, le->format->result[o->residx]->string->len, &le->value, 1);
+	else if (has_value) {
+		const char *fmt = NULL;
+		int fmtlen = 0;
+
+		switch (le->value->result[o->residx]->type) {
+		case OCRPT_RESULT_STRING:
+		case OCRPT_RESULT_ERROR:
+			fmt = "%s";
+			fmtlen = 2;
+			break;
+		case OCRPT_RESULT_NUMBER:
+			fmt = "%d";
+			fmtlen = 2;
+			break;
+		case OCRPT_RESULT_DATETIME:
+			fmt = nl_langinfo_l(D_FMT, o->locale);
+			fmtlen = strlen(fmt);
+			break;
+		}
+
+		ocrpt_format_string(o, NULL, string, fmt, fmtlen, &le->value, 1);
 	}
 
 	pango_font_description_set_family(font_description, le->font);
@@ -293,7 +331,7 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 		w *= ocrpt_pdf_get_font_size_multiplier_for_width(o, p, r, l);
 	} else {
 		int l;
-		ocrpt_utf8forward(le->value_str, -1, &l, -1, NULL);
+		ocrpt_utf8forward(le->value_str->str, -1, &l, -1, NULL);
 
 		w = l * le->font_width;
 	}
@@ -366,27 +404,27 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		pango_layout_set_wrap(layout, PANGO_WRAP_CHAR);
 	}
 
-	pango_layout_set_text(layout, le->value_str, -1);
+	pango_layout_set_text(layout, le->value_str->str, le->value_str->len);
 
 	PangoRectangle logical_rect;
 
 	if (le->memo) {
 		pango_layout_set_width(layout, width * PANGO_SCALE);
-		fprintf(stderr, "ocrpt_pdf_draw_text: MEMO line '%s'\n", le->value_str);
+		fprintf(stderr, "ocrpt_pdf_draw_text: MEMO line '%s'\n", le->value_str->str);
 		pango_layout_get_extents(layout, NULL, &logical_rect);
 	} else {
 		pango_layout_get_extents(layout, NULL, &logical_rect);
 		double render_width = (double)logical_rect.width / PANGO_SCALE;
 
-		const char *pos = le->value_str;
-		int len = le->value_len;
+		const char *pos = le->value_str->str;
+		int len = le->value_str->len;
 		while (render_width > width) {
 			int len1;
 			ocrpt_utf8forward(pos, 1, NULL, len, &len1);
 			pos += len1;
 			len -= len1;
 
-			pango_layout_set_text(layout, pos, -1);
+			pango_layout_set_text(layout, pos, len);
 			pango_layout_get_extents(layout, NULL, &logical_rect);
 			render_width = (double)logical_rect.width / PANGO_SCALE;
 		}

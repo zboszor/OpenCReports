@@ -400,14 +400,13 @@ struct ocrpt_line_element {
 
 	/* Shortcuts carried over between get_text_sizes() and draw_text() */
 	const char *font;
-	const char *value_str;
+	ocrpt_string *value_str;
 	double fontsz;
 	double font_width;
 	double start;
 	double ascent;
 	double descent;
 	double width_computed;
-	size_t value_len;
 
 	int32_t memo_max_lines;
 	int32_t col;

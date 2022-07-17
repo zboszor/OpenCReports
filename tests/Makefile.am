@@ -76,7 +76,8 @@ UNSTABLE_TESTS = \
 	ocrpt_random_test \
 	ocrpt_paper_test \
 	ocrpt_now_test \
-	ocrpt_layout_pdf_xml_test
+	ocrpt_layout_pdf_xml_test \
+	ocrpt_layout_pdf_xml2_test
 
 noinst_PROGRAMS = $(TESTS) $(SLOW_TESTS) $(UNSTABLE_TESTS)
 

@@ -126,8 +126,11 @@ void ocrpt_output_free(opencreport *o, ocrpt_report *r, ocrpt_list *output_list)
 		switch (output->type) {
 		case OCRPT_OUTPUT_LINE:
 			line = (ocrpt_line *)output;
-			for (ocrpt_list *l = line->elements; l; l = l->next)
+			for (ocrpt_list *l = line->elements; l; l = l->next) {
+				ocrpt_line_element *le = (ocrpt_line_element *)l->data;
+				ocrpt_mem_string_free(le->value_str, true);
 				ocrpt_mem_free(l->data);
+			}
 			ocrpt_list_free(line->elements);
 			break;
 		case OCRPT_OUTPUT_HLINE:
