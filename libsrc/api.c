@@ -308,7 +308,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 	const ocrpt_paper *paper = o->paper;
 	double page_width = paper->width;
 	//double page_height = paper->height;
-	double page_indent = 0.0;
+	//double page_indent = 0.0;
 	double page_position = 0.0;
 
 	o->current_page = NULL;
@@ -375,6 +375,9 @@ static void ocrpt_execute_parts(opencreport *o) {
 						for (rpt_iter = 0; rpt_iter < r->iterations; rpt_iter++) {
 							r->executing = true;
 
+							double left_margin = ocrpt_layout_left_margin(o, p, r);
+							double right_margin = ocrpt_layout_right_margin(o, p, r);
+
 							if (q) {
 								if (o->precalculate) {
 									ocrpt_query_navigate_start(o, q);
@@ -383,7 +386,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 									ocrpt_report_resolve_expressions(o, r);
 
 									if (r->have_delayed_expr) {
-										r->data_rows = ocrpt_execute_one_report(o, p, pr, pd, r, q, page_width, page_indent, &page_position);
+										r->data_rows = ocrpt_execute_one_report(o, p, pr, pd, r, q, page_width - (left_margin + right_margin), left_margin, &page_position);
 
 										ocrpt_variables_advance_precalculated_results(o, r, NULL);
 
@@ -394,13 +397,13 @@ static void ocrpt_execute_parts(opencreport *o) {
 									}
 								} else {
 									if (!r->have_delayed_expr || r->data_rows)
-										r->data_rows = ocrpt_execute_one_report(o, p, pr, pd, r, q, page_width, page_indent, &page_position);
+										r->data_rows = ocrpt_execute_one_report(o, p, pr, pd, r, q, page_width - (left_margin + right_margin), left_margin, &page_position);
 								}
 
 								if (!r->data_rows)
-									ocrpt_layout_output(o, p, pr, pd, r, r->nodata, page_width, page_indent, &page_position);
+									ocrpt_layout_output(o, p, pr, pd, r, r->nodata, page_width - (left_margin + right_margin), left_margin, &page_position);
 							} else
-								ocrpt_layout_output(o, p, pr, pd, r, r->nodata, page_width, page_indent, &page_position);
+								ocrpt_layout_output(o, p, pr, pd, r, r->nodata, page_width - (left_margin + right_margin), left_margin, &page_position);
 
 							r->executing = false;
 

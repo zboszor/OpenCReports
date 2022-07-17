@@ -454,15 +454,6 @@ struct ocrpt_hline {
 };
 typedef struct ocrpt_hline ocrpt_hline;
 
-struct ocrpt_image {
-	ocrpt_output_type type;
-	ocrpt_expr *value; /* name of the image file */
-	ocrpt_expr *imgtype; /* 'png', 'jpg', 'raster', or 'svg' */
-	ocrpt_expr *width;
-	ocrpt_expr *height;
-};
-typedef struct ocrpt_image ocrpt_image;
-
 struct ocrpt_image_file {
 	char *name;
 	void *surface;
@@ -473,6 +464,16 @@ struct ocrpt_image_file {
 };
 typedef struct ocrpt_image_file ocrpt_image_file;
 
+struct ocrpt_image {
+	ocrpt_output_type type;
+	ocrpt_expr *value; /* name of the image file */
+	ocrpt_expr *imgtype; /* 'png', 'jpg', 'raster', or 'svg' */
+	ocrpt_expr *width;
+	ocrpt_expr *height;
+	ocrpt_image_file *img_file;
+};
+typedef struct ocrpt_image ocrpt_image;
+
 struct ocrpt_output {
 	ocrpt_output_type type;
 };
@@ -482,6 +483,7 @@ struct ocrpt_output_functions {
 	void (*draw_hline)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_hline *, double, double, double, double);
 	void (*get_text_sizes)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_line *, ocrpt_line_element *, double *, double *, double *);
 	void (*draw_text)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_line *, ocrpt_line_element *, double, double, double, double, double);
+	void (*draw_image)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_image *, double, double, double, double);
 	void (*finalize)(opencreport *o);
 };
 typedef struct ocrpt_output_functions ocrpt_output_functions;
@@ -495,6 +497,9 @@ struct ocrpt_report {
 	double left_margin;
 	double right_margin;
 	double column_pad;
+	double old_page_position;
+	double current_image_width;
+	double current_image_height;
 
 	/* Output elements */
 	ocrpt_list *nodata;

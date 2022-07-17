@@ -932,9 +932,37 @@ static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt
 
 static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt_list **list_p, xmlTextReaderPtr reader) {
 	ocrpt_image *img = ocrpt_mem_malloc(sizeof(ocrpt_image));
+	xmlChar *value, *type, *width, *height;
+	struct {
+		char *attrs;
+		xmlChar **attrp;
+	} xmlattrs[] = {
+		{ "value", &value },
+		{ "type", &type },
+		{ "width", &width },
+		{ "height", &height },
+		{ NULL, NULL },
+	};
+	int32_t i;
+
+	for (i = 0; xmlattrs[i].attrp; i++)
+		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
+
 	memset(img, 0, sizeof(ocrpt_image));
 	img->type = OCRPT_OUTPUT_IMAGE;
 	*list_p = ocrpt_list_append(*list_p, img);
+
+	img->value = ocrpt_xml_expr_parse(o, r, value, true, false);
+	img->imgtype = ocrpt_xml_expr_parse(o, r, type, true, false);
+	img->width = ocrpt_xml_expr_parse(o, r, width, true, false);
+	img->height = ocrpt_xml_expr_parse(o, r, height, true, false);
+
+	xmlFree(value);
+	xmlFree(type);
+	xmlFree(width);
+	xmlFree(height);
+
+	ocrpt_ignore_child_nodes(o, reader, -1, "Image");
 }
 
 static void ocrpt_parse_output_node(opencreport *o, ocrpt_report *r, ocrpt_list **list_p, xmlTextReaderPtr reader) {

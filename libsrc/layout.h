@@ -18,6 +18,9 @@ void *ocrpt_layout_new_page(opencreport *o, const ocrpt_paper *paper, bool lands
 void ocrpt_layout_set_font_sizes(opencreport *o, const char *font, double wanted_font_size, bool bold, bool italic, double *result_font_size, double *result_font_width);
 
 double ocrpt_layout_top_margin(opencreport *o, ocrpt_part *p);
+double ocrpt_layout_left_margin(opencreport *o, ocrpt_part *p, ocrpt_report *r);
+double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p, ocrpt_report *r);
+
 void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_list *output_list, double page_width, double page_indent, double *page_position);
 void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, double *page_position);
 void ocrpt_output_free(opencreport *o, ocrpt_report *r, ocrpt_list *output_list);
