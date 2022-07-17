@@ -8,76 +8,76 @@ $(top_builddir)/libsrc/libopencreport.la:
 	$(MAKE) -C $(top_builddir)/libsrc libopencreport.la
 
 TESTS = \
-	ocrpt_compiler_test \
-	ocrpt_grammar_test ocrpt_expr_test ocrpt_function_test \
-	ocrpt_expr_rlib_compat_test \
-	ocrpt_expr_format_test \
-	ocrpt_environment_test ocrpt_environment2_test \
-	ocrpt_array_test ocrpt_array2_test ocrpt_array_resolve_test ocrpt_array_xml_test \
-	ocrpt_csv_test ocrpt_csv2_test ocrpt_csv_array_test \
-	ocrpt_csv_xml_test ocrpt_csv_array_xml_test ocrpt_csv_array_xml2_test \
-	ocrpt_json_test ocrpt_json2_test ocrpt_json3_test ocrpt_json4_test ocrpt_json5_test \
-	ocrpt_json6_test ocrpt_json7_test ocrpt_json8_test \
-	ocrpt_json_xml_test ocrpt_json_xml2_test \
-	ocrpt_xml_test ocrpt_xml2_test ocrpt_xml3_test ocrpt_xml4_test ocrpt_xml5_test \
-	ocrpt_xml_xml_test ocrpt_xml_xml2_test \
-	ocrpt_pgsql_test ocrpt_pgsql2_test \
-	ocrpt_pgsql_xml_test ocrpt_pgsql_xml2_test ocrpt_pgsql_xml3_test ocrpt_pgsql_xml4_test \
-	ocrpt_pgsql_xml5_test ocrpt_pgsql_xml6_test ocrpt_pgsql_xml7_test ocrpt_pgsql_xml8_test \
-	ocrpt_pgsql_xml9_test ocrpt_pgsql_xml10_test ocrpt_pgsql_xml11_test \
-	ocrpt_mariadb_test ocrpt_mariadb2_test \
-	ocrpt_mariadb_xml_test ocrpt_mariadb_xml2_test ocrpt_mariadb_xml3_test \
-	ocrpt_mariadb_xml4_test \
-	ocrpt_odbc_test ocrpt_odbc2_test ocrpt_odbc3_test ocrpt_odbc4_test \
-	ocrpt_odbc5_test ocrpt_odbc6_test ocrpt_odbc7_test \
-	ocrpt_odbc_xml_test ocrpt_odbc_xml2_test ocrpt_odbc_xml3_test \
-	ocrpt_odbc_xml4_test \
-	ocrpt_follower_circular_test \
-	ocrpt_follower_invalidref_test \
-	ocrpt_rownum_test \
-	ocrpt_part_test ocrpt_part_xml_test \
-	ocrpt_locale_test \
-	ocrpt_variable_expression_test ocrpt_variable_expression_xml_test \
-	ocrpt_variable_check_test \
-	ocrpt_break_test ocrpt_break_xml_test ocrpt_break_xml2_test \
-	ocrpt_break_xml3_test \
-	ocrpt_iterative_expr_test \
-	ocrpt_break_rownum_xml_test \
-	ocrpt_variable_xml_test \
-	ocrpt_variable_resetonbreak_xml_test \
-	ocrpt_result_copy_test \
-	ocrpt_break_multi_test \
-	ocrpt_break_multi2_test \
-	ocrpt_break_multi3_test \
-	ocrpt_break_multi4_test \
-	ocrpt_break_multi5_test \
-	ocrpt_datetime_expr_test \
-	ocrpt_execute_test \
-	ocrpt_break_multi6_test \
-	ocrpt_break_multi7_test \
-	ocrpt_break_multi8_test \
-	ocrpt_custom_variable_test \
-	ocrpt_custom_variable_xml_test \
-	ocrpt_canonicalize_path_test \
-	ocrpt_find_file_test \
-	ocrpt_color_test
+	compiler_test \
+	grammar_test expr_test function_test \
+	expr_rlib_compat_test \
+	expr_format_test \
+	environment_test environment2_test \
+	array_test array2_test array_resolve_test array_xml_test \
+	csv_test csv2_test csv_array_test \
+	csv_xml_test csv_array_xml_test csv_array_xml2_test \
+	json_test json2_test json3_test json4_test json5_test \
+	json6_test json7_test json8_test \
+	json_xml_test json_xml2_test \
+	xml_test xml2_test xml3_test xml4_test xml5_test \
+	xml_xml_test xml_xml2_test \
+	pgsql_test pgsql2_test \
+	pgsql_xml_test pgsql_xml2_test pgsql_xml3_test pgsql_xml4_test \
+	pgsql_xml5_test pgsql_xml6_test pgsql_xml7_test pgsql_xml8_test \
+	pgsql_xml9_test pgsql_xml10_test pgsql_xml11_test \
+	mariadb_test mariadb2_test \
+	mariadb_xml_test mariadb_xml2_test mariadb_xml3_test \
+	mariadb_xml4_test \
+	odbc_test odbc2_test odbc3_test odbc4_test \
+	odbc5_test odbc6_test odbc7_test \
+	odbc_xml_test odbc_xml2_test odbc_xml3_test \
+	odbc_xml4_test \
+	follower_circular_test \
+	follower_invalidref_test \
+	rownum_test \
+	part_test part_xml_test \
+	locale_test \
+	variable_expression_test variable_expression_xml_test \
+	variable_check_test \
+	break_test break_xml_test break_xml2_test \
+	break_xml3_test \
+	iterative_expr_test \
+	break_rownum_xml_test \
+	variable_xml_test \
+	variable_resetonbreak_xml_test \
+	result_copy_test \
+	break_multi_test \
+	break_multi2_test \
+	break_multi3_test \
+	break_multi4_test \
+	break_multi5_test \
+	datetime_expr_test \
+	execute_test \
+	break_multi6_test \
+	break_multi7_test \
+	break_multi8_test \
+	custom_variable_test \
+	custom_variable_xml_test \
+	canonicalize_path_test \
+	find_file_test \
+	color_test
 
 SLOW_TESTS = \
-	ocrpt_pgsql_numeric_precision_test \
-	ocrpt_pgsql_numeric_precision2_test
+	pgsql_numeric_precision_test \
+	pgsql_numeric_precision2_test
 
 # Unstable tests by nature:
-# ocrpt_random_test produces a random number which is different every time
-# ocrpt_paper_test prints paper sizes and defaults which depends on language settings
+# random_test produces a random number which is different every time
+# paper_test prints paper sizes and defaults which depends on language settings
 # All PDF output tests are unstable because Cairo:
 # * sets the /Producer PDF property with its own name and version
 # * different Cairo versions support different PDF versions
 UNSTABLE_TESTS = \
-	ocrpt_random_test \
-	ocrpt_paper_test \
-	ocrpt_now_test \
-	ocrpt_layout_pdf_xml_test \
-	ocrpt_layout_pdf_xml2_test
+	random_test \
+	paper_test \
+	now_test \
+	layout_pdf_xml_test \
+	layout_pdf_xml2_test
 
 noinst_PROGRAMS = $(TESTS) $(SLOW_TESTS) $(UNSTABLE_TESTS)
 
@@ -95,3 +95,5 @@ unstable-test: $(UNSTABLE_TESTS) execute_test.sh
 	$(foreach TEST,$(UNSTABLE_TESTS),LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
 
 all-test: test slow-test unstable-test
+
+CLEANFILES = results/*

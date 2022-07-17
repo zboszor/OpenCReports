@@ -9,11 +9,13 @@
 #include <opencreport.h>
 #include "ocrpt_test_common.h"
 
-/* NOT static */ const char *array[4][6] = {
+/* NOT static */ const char *array[6][6] = {
 	{ "id", "id2", "name", "property", "age", "adult" },
 	{ "1", "1", "Fred Flintstone", "strong", "31", "yes" },
 	{ "2", NULL, "Wilma Flintstone", "charming", "28", "yes" },
-	{ "3", "3", "Pebbles Flintstone", "young", "5e-1", "no" }
+	{ "3", "3", "Pebbles Flintstone", "young", "5e-1", "no" },
+	{ "4", NULL, "Betty Rubble", "beautiful", "27", "yes" },
+	{ "5", "5", "Barney Rubble", "small", "29", "yes" }
 };
 
 /* NOT static */ const enum ocrpt_result_type coltypes[6] = {
@@ -49,10 +51,11 @@ int main(void) {
 	opencreport *o = ocrpt_init();
 	ocrpt_query *q;
 	ocrpt_query_result *qr;
+	ocrpt_break *br;
 	ocrpt_expr *e[N_TEST_VARS];
 	int32_t cols, row, i;
 
-	if (!ocrpt_parse_xml(o, "ocrpt_variable_xml_test.xml")) {
+	if (!ocrpt_parse_xml(o, "variable_resetonbreak_xml_test.xml")) {
 		printf("XML parse error\n");
 		ocrpt_free(o);
 		return 0;
@@ -67,11 +70,17 @@ int main(void) {
 	ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pr->pd_list->data;
 	ocrpt_report *r = (ocrpt_report *)pd->reports->data;
 
+	/* There is only one break in the report, extract it */
+	br = (ocrpt_break *)r->breaks->data;
+
 	for (i = 0; i < N_TEST_VARS; i++)
 		e[i] = ocrpt_expr_parse(o, r, test_vars[i], NULL);
 
+	printf("First run of the query\n\n");
+
 	row = 0;
 	ocrpt_query_navigate_start(o, q);
+	ocrpt_report_resolve_breaks(o, r);
 	ocrpt_report_resolve_variables(o, r);
 
 	for (i = 0; i < N_TEST_VARS; i++) {
@@ -83,6 +92,58 @@ int main(void) {
 		ocrpt_result *rs;
 
 		qr = ocrpt_query_get_result(q, &cols);
+
+		if (ocrpt_break_check_fields(o, r, br)) {
+			long rownum;
+			printf("Break triggers\n");
+
+			rownum = ocrpt_expr_get_long_value(o, r->query_rownum);
+			if (rownum > 1)
+				ocrpt_break_reset_vars(o, r, br);
+		}
+
+		ocrpt_report_evaluate_variables(o, r);
+
+		printf("Row #%d\n", row++);
+		print_result_row("a", qr, cols);
+
+		printf("\n");
+
+		for (i = 0; i < N_TEST_VARS; i++) {
+			printf("Expression: ");
+			ocrpt_expr_print(o, e[i]);
+			rs = ocrpt_expr_eval(o, r, e[i]);
+#if 0
+			printf("Deep print: ");
+			ocrpt_expr_result_deep_print(o, e[i]);
+#endif
+			printf("Evaluated: ");
+			ocrpt_result_print(rs);
+		}
+
+		printf("\n");
+	}
+
+#if 0
+	printf("Second run of the query\n\n");
+
+	row = 0;
+	ocrpt_query_navigate_start(o, q);
+	ocrpt_report_resolve_breaks(o, r);
+	ocrpt_report_resolve_variables(o, r);
+
+	for (i = 0; i < N_TEST_VARS; i++) {
+		ocrpt_expr_resolve(o, r, e[i]);
+		ocrpt_expr_optimize(o, r, e[i]);
+	}
+
+	while (ocrpt_query_navigate_next(o, q)) {
+		ocrpt_result *rs;
+
+		qr = ocrpt_query_get_result(q, &cols);
+
+		if (ocrpt_break_check_fields(o, r, br))
+			printf("Break triggers\n");
 
 		ocrpt_report_evaluate_variables(o, r);
 
@@ -101,6 +162,7 @@ int main(void) {
 
 		printf("\n");
 	}
+#endif
 
 	for (i = 0; i < N_TEST_VARS; i++)
 		ocrpt_expr_free(o, r, e[i]);

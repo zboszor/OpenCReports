@@ -27,10 +27,9 @@ int main(void) {
 	ocrpt_query *q;
 	ocrpt_query_result *qr;
 	ocrpt_break *br;
-	ocrpt_expr *e;
 	int32_t row, cols;
 
-	if (!ocrpt_parse_xml(o, "ocrpt_break_xml3_test.xml")) {
+	if (!ocrpt_parse_xml(o, "break_xml3_test.xml")) {
 		printf("XML parse error\n");
 		ocrpt_free(o);
 		return 0;
@@ -48,15 +47,13 @@ int main(void) {
 	/* There is only one break in the report, extract it */
 	br = (ocrpt_break *)r->breaks->data;
 
-	e = ocrpt_expr_parse(o, r, "brrownum('adult')", NULL);
+	printf("First run of the query\n\n");
 
 	row = 0;
 	ocrpt_query_navigate_start(o, q);
 	ocrpt_report_resolve_breaks(o, r);
 
 	while (ocrpt_query_navigate_next(o, q)) {
-		ocrpt_result *rs;
-
 		qr = ocrpt_query_get_result(q, &cols);
 
 		if (ocrpt_break_check_fields(o, r, br))
@@ -67,16 +64,28 @@ int main(void) {
 		printf("Row #%d\n", row++);
 		print_result_row("a", qr, cols);
 
-		printf("Expression: ");
-		ocrpt_expr_print(o, e);
-		rs = ocrpt_expr_eval(o, r, e);
-		printf("Evaluated: ");
-		ocrpt_result_print(rs);
-
 		printf("\n");
 	}
 
-	ocrpt_expr_free(o, r, e);
+	printf("Second run of the query\n\n");
+
+	row = 0;
+	ocrpt_query_navigate_start(o, q);
+	ocrpt_report_resolve_breaks(o, r);
+
+	while (ocrpt_query_navigate_next(o, q)) {
+		qr = ocrpt_query_get_result(q, &cols);
+
+		if (ocrpt_break_check_fields(o, r, br))
+			printf("Break triggers\n");
+
+		printf("\n");
+
+		printf("Row #%d\n", row++);
+		print_result_row("a", qr, cols);
+
+		printf("\n");
+	}
 
 	ocrpt_free(o);
 

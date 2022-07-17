@@ -23,27 +23,17 @@
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 
-struct rowdata {
-	ocrpt_query *q;
-	ocrpt_expr *e;
-};
-
 static int32_t row = 0;
 
 static void test_newrow_cb(opencreport *o, ocrpt_report *r, void *ptr) {
-	struct rowdata *rd = ptr;
 	int32_t cols;
-	ocrpt_query_result *qr = ocrpt_query_get_result(rd->q, &cols);
-	ocrpt_result *rs;
+	ocrpt_query *q = ptr;
+	ocrpt_query_result *qr = ocrpt_query_get_result(q, &cols);
 
 	if (row)
 		printf("\n");
 	printf("Row #%d\n", row++);
 	print_result_row("a", qr, cols);
-
-	rs = ocrpt_expr_get_result(o, r, rd->e);
-	ocrpt_expr_print(o, rd->e);
-	ocrpt_result_print(rs);
 }
 
 static void test_break_trigger_cb(opencreport *o, ocrpt_report *r, ocrpt_break *br, void *dummy UNUSED) {
@@ -52,16 +42,16 @@ static void test_break_trigger_cb(opencreport *o, ocrpt_report *r, ocrpt_break *
 
 int main(void) {
 	opencreport *o = ocrpt_init();
-	struct rowdata rd;
+	ocrpt_query *q;
 	ocrpt_break *br;
 
-	if (!ocrpt_parse_xml(o, "ocrpt_break_multi2_test.xml")) {
+	if (!ocrpt_parse_xml(o, "break_multi_test.xml")) {
 		printf("XML parse error\n");
 		ocrpt_free(o);
 		return 0;
 	}
 
-	rd.q = ocrpt_query_get(o, "a");
+	q = ocrpt_query_get(o, "a");
 
 	/* There is only one ocrpt_report pointer in o->parts, extract it. */
 	ocrpt_part *p = (ocrpt_part *)o->parts->data;
@@ -69,9 +59,10 @@ int main(void) {
 	ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pr->pd_list->data;
 	ocrpt_report *r = (ocrpt_report *)pd->reports->data;
 
-	rd.e = ocrpt_expr_parse(o, r, "v.age_avg", NULL);
+	ocrpt_report_add_new_row_cb(o, r, test_newrow_cb, q);
 
-	ocrpt_report_add_new_row_cb(o, r, test_newrow_cb, &rd);
+	br = ocrpt_break_get(o, r, "id");
+	ocrpt_break_add_trigger_cb(o, r, br, test_break_trigger_cb, NULL);
 
 	br = ocrpt_break_get(o, r, "male");
 	ocrpt_break_add_trigger_cb(o, r, br, test_break_trigger_cb, NULL);
@@ -80,8 +71,6 @@ int main(void) {
 	ocrpt_break_add_trigger_cb(o, r, br, test_break_trigger_cb, NULL);
 
 	ocrpt_execute(o);
-
-	ocrpt_expr_free(o, r, rd.e);
 
 	ocrpt_free(o);
 

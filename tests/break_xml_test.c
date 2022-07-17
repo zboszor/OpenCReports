@@ -22,19 +22,12 @@
 
 int main(void) {
 	opencreport *o = ocrpt_init();
-	ocrpt_query *q;
-	ocrpt_query_result *qr;
-	ocrpt_break *br;
-	int32_t row, cols;
 
-	if (!ocrpt_parse_xml(o, "ocrpt_break_xml_test.xml")) {
+	if (!ocrpt_parse_xml(o, "break_xml_test.xml")) {
 		printf("XML parse error\n");
 		ocrpt_free(o);
 		return 0;
 	}
-
-	q = ocrpt_query_get(o, "a");
-	qr = ocrpt_query_get_result(q, &cols);
 
 	/* There is only one ocrpt_report pointer in o->parts, extract it. */
 	ocrpt_part *p = (ocrpt_part *)o->parts->data;
@@ -42,26 +35,8 @@ int main(void) {
 	ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pr->pd_list->data;
 	ocrpt_report *r = (ocrpt_report *)pd->reports->data;
 
-	/* There is only one break in the report, extract it */
-	br = (ocrpt_break *)r->breaks->data;
-
-	row = 0;
-	ocrpt_query_navigate_start(o, q);
-	ocrpt_report_resolve_breaks(o, r);
-
-	while (ocrpt_query_navigate_next(o, q)) {
-		qr = ocrpt_query_get_result(q, &cols);
-
-		if (ocrpt_break_check_fields(o, r, br))
-			printf("Break triggers\n");
-
-		printf("\n");
-
-		printf("Row #%d\n", row++);
-		print_result_row("a", qr, cols);
-
-		printf("\n");
-	}
+	if (r->breaks)
+		printf("adding a break and a breakfield to it succeeded\n");
 
 	ocrpt_free(o);
 

@@ -9,13 +9,11 @@
 #include <opencreport.h>
 #include "ocrpt_test_common.h"
 
-/* NOT static */ const char *array[6][5] = {
+/* NOT static */ const char *array[4][5] = {
 	{ "id", "name", "property", "age", "adult" },
 	{ "1", "Fred Flintstone", "strong", "31", "yes" },
 	{ "2", "Wilma Flintstone", "charming", "28", "yes" },
-	{ "3", "Pebbles Flintstone", "young", "5e-1", "no" },
-	{ "4", "Betty Rubble", "beautiful", "27", "yes" },
-	{ "5", "Barney Rubble", "small", "29", "yes" }
+	{ "3", "Pebbles Flintstone", "young", "5e-1", "no" }
 };
 
 /* NOT static */ const enum ocrpt_result_type coltypes[5] = {
@@ -26,10 +24,11 @@ int main(void) {
 	opencreport *o = ocrpt_init();
 	ocrpt_query *q;
 	ocrpt_query_result *qr;
-	ocrpt_break *br;
-	int32_t row, cols;
+	ocrpt_expr *e;
+	char *err;
+	int32_t cols, row;
 
-	if (!ocrpt_parse_xml(o, "ocrpt_break_xml3_test.xml")) {
+	if (!ocrpt_parse_xml(o, "variable_expression_xml_test.xml")) {
 		printf("XML parse error\n");
 		ocrpt_free(o);
 		return 0;
@@ -44,48 +43,41 @@ int main(void) {
 	ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pr->pd_list->data;
 	ocrpt_report *r = (ocrpt_report *)pd->reports->data;
 
-	/* There is only one break in the report, extract it */
-	br = (ocrpt_break *)r->breaks->data;
+	err = NULL;
+	e = ocrpt_expr_parse(o, r, "v.var1", &err);
+	ocrpt_strfree(err);
+	printf("Variable expression reprinted: ");
+	ocrpt_expr_print(o, e);
+	printf("\n");
 
-	printf("First run of the query\n\n");
+	ocrpt_expr_resolve(o, r, e);
 
 	row = 0;
 	ocrpt_query_navigate_start(o, q);
-	ocrpt_report_resolve_breaks(o, r);
+	ocrpt_report_resolve_variables(o, r);
 
 	while (ocrpt_query_navigate_next(o, q)) {
+		ocrpt_result *rs;
+
 		qr = ocrpt_query_get_result(q, &cols);
-
-		if (ocrpt_break_check_fields(o, r, br))
-			printf("Break triggers\n");
-
-		printf("\n");
 
 		printf("Row #%d\n", row++);
 		print_result_row("a", qr, cols);
 
 		printf("\n");
-	}
 
-	printf("Second run of the query\n\n");
+		ocrpt_report_evaluate_variables(o, r);
 
-	row = 0;
-	ocrpt_query_navigate_start(o, q);
-	ocrpt_report_resolve_breaks(o, r);
-
-	while (ocrpt_query_navigate_next(o, q)) {
-		qr = ocrpt_query_get_result(q, &cols);
-
-		if (ocrpt_break_check_fields(o, r, br))
-			printf("Break triggers\n");
-
-		printf("\n");
-
-		printf("Row #%d\n", row++);
-		print_result_row("a", qr, cols);
+		printf("Expression: ");
+		ocrpt_expr_print(o, e);
+		rs = ocrpt_expr_eval(o, r, e);
+		printf("Evaluated: ");
+		ocrpt_result_print(rs);
 
 		printf("\n");
 	}
+
+	ocrpt_expr_free(o, r, e);
 
 	ocrpt_free(o);
 

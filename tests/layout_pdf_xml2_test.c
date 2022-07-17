@@ -7,10 +7,15 @@
 #include <stdio.h>
 
 #include <opencreport.h>
-#include "ocrpt_test_common.h"
+//#include "ocrpt_test_common.h"
 
-const char *array[1][5] = {
+const char *array[6][5] = {
 	{ "id", "name", "property", "age", "adult" },
+	{ "1", "Fred Flintstone", "strong", "31", "yes" },
+	{ "2", "Wilma Flintstone", "charming", "28", "yes" },
+	{ "3", "Pebbles Flintstone", "young", "5e-1", "no" },
+	{ "4", "Betty Rubble", "beautiful", "27", "yes" },
+	{ "5", "Barney Rubble", "small", "29", "yes" }
 };
 
 const enum ocrpt_result_type coltypes[5] = {
@@ -20,7 +25,7 @@ const enum ocrpt_result_type coltypes[5] = {
 int main(void) {
 	opencreport *o = ocrpt_init();
 
-	if (!ocrpt_parse_xml(o, "ocrpt_layout_pdf_xml_test.xml")) {
+	if (!ocrpt_parse_xml(o, "layout_pdf_xml2_test.xml")) {
 		printf("XML parse error\n");
 		ocrpt_free(o);
 		return 0;

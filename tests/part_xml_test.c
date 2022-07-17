@@ -18,7 +18,7 @@ int main(void) {
 	ocrpt_list *pl;
 	int32_t i;
 
-	if (!ocrpt_parse_xml(o, "ocrpt_part_xml_test.xml")) {
+	if (!ocrpt_parse_xml(o, "part_xml_test.xml")) {
 		printf("XML parse error\n");
 		ocrpt_free(o);
 		return 0;

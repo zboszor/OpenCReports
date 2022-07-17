@@ -25,7 +25,6 @@
 
 struct rowdata {
 	ocrpt_query *q;
-	ocrpt_expr *age;
 	ocrpt_expr *e;
 };
 
@@ -38,10 +37,6 @@ static void test_newrow_cb(opencreport *o, ocrpt_report *r, void *ptr) {
 	if (row)
 		printf("\n");
 	printf("Row #%d\n", row++);
-
-	rs = ocrpt_expr_get_result(o, r, rd->age);
-	ocrpt_expr_print(o, rd->age);
-	ocrpt_result_print(rs);
 
 	rs = ocrpt_expr_get_result(o, r, rd->e);
 	ocrpt_expr_print(o, rd->e);
@@ -57,7 +52,7 @@ int main(void) {
 	struct rowdata rd;
 	ocrpt_break *br;
 
-	if (!ocrpt_parse_xml(o, "ocrpt_break_multi5_test.xml")) {
+	if (!ocrpt_parse_xml(o, "break_multi2_test.xml")) {
 		printf("XML parse error\n");
 		ocrpt_free(o);
 		return 0;
@@ -71,10 +66,9 @@ int main(void) {
 	ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pr->pd_list->data;
 	ocrpt_report *r = (ocrpt_report *)pd->reports->data;
 
-	rd.age = ocrpt_expr_parse(o, r, "age", NULL);
-
 	/* This is a precalculate="yes" variable, resulting in delayed expression calculation */
 	rd.e = ocrpt_expr_parse(o, r, "v.age_avg", NULL);
+	ocrpt_expr_set_delayed(o, rd.e, true);
 
 	ocrpt_report_add_new_row_cb(o, r, test_newrow_cb, &rd);
 
@@ -86,7 +80,6 @@ int main(void) {
 
 	ocrpt_execute(o);
 
-	ocrpt_expr_free(o, r, rd.age);
 	ocrpt_expr_free(o, r, rd.e);
 
 	ocrpt_free(o);

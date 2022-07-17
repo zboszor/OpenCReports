@@ -92,7 +92,7 @@ int main(void) {
 	ocrpt_add_part_iteration_cb(o, test_part_iteration_cb, NULL);
 	ocrpt_add_report_added_cb(o, test_report_added_cb, NULL);
 
-	if (!ocrpt_parse_xml(o, "ocrpt_part_xml_test.xml")) {
+	if (!ocrpt_parse_xml(o, "part_xml_test.xml")) {
 		printf("XML parse error\n");
 		ocrpt_free(o);
 		return 0;

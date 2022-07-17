@@ -9,16 +9,19 @@
 #include <opencreport.h>
 #include "ocrpt_test_common.h"
 
-/* NOT static */ const char *array[4][5] = {
-	{ "id", "name", "property", "age", "adult" },
-	{ "1", "Fred Flintstone", "strong", "31", "yes" },
-	{ "2", "Wilma Flintstone", "charming", "28", "yes" },
-	{ "3", "Pebbles Flintstone", "young", "5e-1", "no" }
+/* NOT static */ const char *array[9][1] = {
+	{ "text" },
+	{ "bad-tempered" },
+	{ "old" },
+	{ "ladies" },
+	{ "love" },
+	{ "our" },
+	{ "chic" },
+	{ "kitchen" },
+	{ "sink" },
 };
 
-/* NOT static */ const enum ocrpt_result_type coltypes[5] = {
-	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
-};
+/* NOT static */ const enum ocrpt_result_type coltypes[1] = { OCRPT_RESULT_STRING };
 
 int main(void) {
 	opencreport *o = ocrpt_init();
@@ -28,7 +31,7 @@ int main(void) {
 	char *err;
 	int32_t cols, row;
 
-	if (!ocrpt_parse_xml(o, "ocrpt_variable_expression_xml_test.xml")) {
+	if (!ocrpt_parse_xml(o, "custom_variable_xml_test.xml")) {
 		printf("XML parse error\n");
 		ocrpt_free(o);
 		return 0;
@@ -82,4 +85,5 @@ int main(void) {
 	ocrpt_free(o);
 
 	return 0;
+
 }
