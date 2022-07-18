@@ -61,6 +61,7 @@
 					<literal width="5" color="'Aqua'" bgcolor="'Silver'" >data</literal>
 					<field value="'here.'" width="5" color="'Fuchsia'" bgcolor="'Green'"  />
 				</Line>
+				<HorizontalLine size="1" length="1000" color="'Purple'" />
 			</Output>
 		</NoData>
 	</Report>

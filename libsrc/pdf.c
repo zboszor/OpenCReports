@@ -352,6 +352,8 @@ void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocr
 			size_multiplier = hline->font_width;
 
 		length = mpfr_get_d(hline->length->result[o->residx]->number, o->rndmode) * size_multiplier;
+		if (length > page_width - indent)
+			length = page_width - indent;
 	} else
 		length = page_width - indent;
 
