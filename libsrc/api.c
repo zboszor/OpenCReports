@@ -202,12 +202,8 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 	bool have_row = ocrpt_query_navigate_next(o, q);
 	bool page_break = false;
 
-	if (have_row)
-		ocrpt_layout_output(o, p, pr, pd, r, r->reportheader, page_width, page_indent, page_position);
-
 	while (have_row) {
 		ocrpt_list *brl;
-		ocrpt_list *cbl;
 		bool last_row = !ocrpt_query_navigate_next(o, q);
 
 		o->residx = ocrpt_expr_prev_residx(o->residx);
@@ -234,15 +230,6 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 				if (o->precalculate && !last_row)
 					ocrpt_variables_add_precalculated_results(o, r, brl_start, last_row);
 
-				for (brl = r->breaks_reverse; brl; brl = brl->next) {
-					ocrpt_break *br = (ocrpt_break *)brl->data;
-
-					ocrpt_layout_output(o, p, pr, pd, r, br->footer, page_width, page_indent, page_position);
-
-					if (br == brl_start->data)
-						break;
-				}
-
 				/* Switch back to the current row data */
 				o->residx = ocrpt_expr_next_residx(o->residx);
 
@@ -252,23 +239,17 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 				if (!o->precalculate && !last_row)
 					ocrpt_variables_advance_precalculated_results(o, r, brl_start);
 			}
-
-			for (brl = (rows == 1 ? r->breaks : brl_start); brl; brl = brl->next) {
-				ocrpt_break *br __attribute__((unused)) = (ocrpt_break *)brl->data;
-
-				ocrpt_layout_output(o, p, pr, pd, r, br->header, page_width, page_indent, page_position);
-			}
 		}
 
 		ocrpt_report_evaluate_variables(o, r);
 		ocrpt_report_evaluate_expressions(o, r);
 
-		if (!o->precalculate) {
-			for (brl = last_row ? r->breaks : brl_start; brl; brl = brl->next) {
-				ocrpt_break *br = (ocrpt_break *)brl->data;
-				ocrpt_list *brcbl;
+		for (brl = last_row ? r->breaks : brl_start; brl; brl = brl->next) {
+			ocrpt_break *br = (ocrpt_break *)brl->data;
+			ocrpt_list *brcbl;
 
-				br->cb_triggered = true;
+			br->cb_triggered = true;
+			if (!o->precalculate) {
 				for (brcbl = br->callbacks; brcbl; brcbl = brcbl->next) {
 					ocrpt_break_trigger_cb_data *cbd = (ocrpt_break_trigger_cb_data *)brcbl->data;
 
@@ -277,15 +258,42 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			}
 		}
 
+		if (rows == 1)
+			ocrpt_layout_output(o, p, pr, pd, r, r->reportheader, page_width, page_indent, page_position);
+
+		if (rows > 1 && brl_start) {
+			/* Use the previous row data temporarily */
+			o->residx = ocrpt_expr_prev_residx(o->residx);
+
+			for (brl = r->breaks_reverse; brl; brl = brl->next) {
+				ocrpt_break *br = (ocrpt_break *)brl->data;
+
+				ocrpt_layout_output(o, p, pr, pd, r, br->footer, page_width, page_indent, page_position);
+
+				if (br == brl_start->data)
+					break;
+			}
+
+			/* Switch back to the current row data */
+			o->residx = ocrpt_expr_next_residx(o->residx);
+		}
+
+		for (brl = (rows == 1 ? r->breaks : brl_start); brl; brl = brl->next) {
+			ocrpt_break *br __attribute__((unused)) = (ocrpt_break *)brl->data;
+
+			if (br->cb_triggered)
+				ocrpt_layout_output(o, p, pr, pd, r, br->header, page_width, page_indent, page_position);
+		}
+
 		if (!o->precalculate) {
-			for (cbl = r->newrow_callbacks; cbl; cbl = cbl->next) {
+			for (ocrpt_list *cbl = r->newrow_callbacks; cbl; cbl = cbl->next) {
 				ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
 
 				cbd->func(o, r, cbd->data);
 			}
 		}
 
-		if (rows == 1 || page_break)
+		if (rows == 1 || (rows > 1 && brl_start) || page_break)
 			ocrpt_layout_output(o, p, pr, pd, r, r->fieldheader, page_width, page_indent, page_position);
 		ocrpt_layout_output(o, p, pr, pd, r, r->fielddetails, page_width, page_indent, page_position);
 
@@ -298,8 +306,21 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		o->residx = ocrpt_expr_next_residx(o->residx);
 	}
 
-	if (rows)
+	if (rows) {
+		/* Use the previous row data temporarily */
+		o->residx = ocrpt_expr_prev_residx(o->residx);
+
+		for (ocrpt_list *brl = r->breaks_reverse; brl; brl = brl->next) {
+			ocrpt_break *br = (ocrpt_break *)brl->data;
+
+			ocrpt_layout_output(o, p, pr, pd, r, br->footer, page_width, page_indent, page_position);
+		}
+
 		ocrpt_layout_output(o, p, pr, pd, r, r->reportfooter, page_width, page_indent, page_position);
+
+		/* Switch back to the current row data */
+		o->residx = ocrpt_expr_next_residx(o->residx);
+	}
 
 	return rows;
 }

@@ -78,7 +78,8 @@ UNSTABLE_TESTS = \
 	now_test \
 	layout_pdf_xml_test \
 	layout_pdf_xml2_test \
-	layout_pdf_xml3_test
+	layout_pdf_xml3_test \
+	layout_pdf_xml4_test
 
 noinst_PROGRAMS = $(TESTS) $(SLOW_TESTS) $(UNSTABLE_TESTS)
 
