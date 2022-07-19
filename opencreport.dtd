@@ -1,6 +1,5 @@
-<!ELEMENT OpenCReport (Settings?,Datasources?,Queries?,(Part|Report)*)>
-<!ELEMENT Settings EMPTY>
-<!ATTLIST Settings
+<!ELEMENT OpenCReport (Datasources?,Queries?,(Part|Report)*)>
+<!ATTLIST OpenCReport
 	size_unit CDATA #IMPLIED >
 <!ELEMENT Datasources (Datasource+)>
 <!ELEMENT Datasource EMPTY>
