@@ -54,6 +54,7 @@ tests/expected/*.png
 tests/results/*.png
 tests/results/*.stderr
 tests/results/*.stdout
+tests/results/*.asanout.*
 
 # Test binaries
 tests/*_test
