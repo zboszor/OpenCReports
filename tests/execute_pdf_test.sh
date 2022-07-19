@@ -14,10 +14,10 @@ OCRPT_TEST=1
 export OCRPT_TEST
 
 mkdir -p ${abs_builddir}/results
+rm -f results/${TEST}.stdout.*.png results/${TEST}.asanout.*
 ./${TEST} 2>results/${TEST}.stderr >results/${TEST}.stdout
 
 if [[ -f ${abs_srcdir}/expected/${TEST}.stdout ]]; then
-	rm -f results/${TEST}.stdout.*.png
 
 	OUTEXP=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r300 -sOutputFile=results/${TEST}.stdout.exp.%d.png ${abs_srcdir}/expected/${TEST}.stdout)
 	OUTRES=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r300 -sOutputFile=results/${TEST}.stdout.%d.png results/${TEST}.stdout)

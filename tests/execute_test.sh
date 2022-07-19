@@ -12,6 +12,8 @@ fi
 OCRPT_TEST=1
 export OCRPT_TEST
 
+mkdir -p ${abs_builddir}/results
+rm -f results/${TEST}.stdout.*.png results/${TEST}.asanout.*
 ./${TEST} 2>results/${TEST}.stderr >results/${TEST}.stdout
 
 OUTDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.stdout ${abs_srcdir}/results/${TEST}.stdout 2>/dev/null)
