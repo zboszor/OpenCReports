@@ -66,29 +66,44 @@ SLOW_TESTS = \
 	pgsql_numeric_precision_test \
 	pgsql_numeric_precision2_test
 
-# Unstable tests by nature:
-# random_test produces a random number which is different every time
-# paper_test prints paper sizes and defaults which depends on language settings
-# All PDF output tests are unstable because Cairo:
+# All PDF output tests are inherently unstable because Cairo:
 # * sets the /Producer PDF property with its own name and version
 # * different Cairo versions support different PDF versions
-UNSTABLE_TESTS = \
-	random_test \
-	paper_test \
-	now_test \
+# So they need to be treated differently: execute_pdf_test.sh
+# converts the PDF pages to individual PNGs which are then
+# compared with the ImageMagick "compare" utility. This slows down
+# running these tests but makes them reliable across Cairo versions.
+PDF_TESTS = \
 	layout_pdf_xml_test \
 	layout_pdf_xml2_test \
 	layout_pdf_xml3_test \
 	layout_pdf_xml4_test
 
-noinst_PROGRAMS = $(TESTS) $(SLOW_TESTS) $(UNSTABLE_TESTS)
+# Unstable tests by nature:
+# random_test produces a random number which is different every time
+# paper_test prints paper sizes and defaults which depends on language settings
+UNSTABLE_TESTS = \
+	random_test \
+	paper_test \
+	now_test
+
+noinst_PROGRAMS = $(TESTS) $(SLOW_TESTS) $(PDF_TESTS) $(UNSTABLE_TESTS)
 
 $(noinst_PROGRAMS): $(top_builddir)/libsrc/libopencreport.la
 
 all: $(noinst_PROGRAMS)
 
-test: $(TESTS) execute_test.sh
+basic-test: $(TESTS) execute_test.sh
 	$(foreach TEST,$(TESTS),LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
+
+if ENABLE_PDF_TESTS
+
+pdf-test: $(PDF_TESTS) execute_pdf_test.sh
+	$(foreach TEST,$(PDF_TESTS),LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_pdf_test.sh $(TEST) &&) true
+
+endif
+
+test: basic-test pdf-test
 
 slow-test: $(SLOW_TESTS) execute_test.sh
 	$(foreach TEST,$(SLOW_TESTS),LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true

@@ -113,6 +113,10 @@ AC_ARG_ENABLE([tests],
 AC_MSG_RESULT([$enable_tests])
 AM_CONDITIONAL(ENABLE_TESTS, [test x$enable_tests = xyes])
 
+AC_CHECK_PROG(GHOSTSCRIPT,[ghostscript],[ghostscript],[false])
+AC_CHECK_PROG(IMCOMPARE,[compare],[compare],[false])
+AM_CONDITIONAL(ENABLE_PDF_TESTS, [test x$ac_cv_prog_GHOSTSCRIPT = xghostscript -a x$ac_cv_prog_IMCOMPARE = xcompare])
+
 AC_CONFIG_FILES([
 	Makefile
 	opencreports.pc

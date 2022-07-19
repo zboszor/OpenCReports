@@ -50,6 +50,8 @@ libsrc/*.pdf
 doc/*.pdf
 
 # Test results
+tests/expected/*.png
+tests/results/*.png
 tests/results/*.stderr
 tests/results/*.stdout
 
