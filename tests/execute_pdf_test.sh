@@ -17,10 +17,9 @@ mkdir -p ${abs_builddir}/results
 ./${TEST} 2>results/${TEST}.stderr >results/${TEST}.stdout
 
 if [[ -f ${abs_srcdir}/expected/${TEST}.stdout ]]; then
-	rm -f ${abs_srcdir}/expected/${TEST}.stdout.*.png
 	rm -f results/${TEST}.stdout.*.png
 
-	OUTEXP=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r300 -sOutputFile=${abs_srcdir}/expected/${TEST}.stdout.%d.png ${abs_srcdir}/expected/${TEST}.stdout)
+	OUTEXP=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r300 -sOutputFile=results/${TEST}.stdout.exp.%d.png ${abs_srcdir}/expected/${TEST}.stdout)
 	OUTRES=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r300 -sOutputFile=results/${TEST}.stdout.%d.png results/${TEST}.stdout)
 	PAGESEXP=$(echo "$OUTEXP" | grep 'Processing pages .* through')
 	PAGESEXPEND=$(echo "$PAGESEXP" | sed 's/^Processing pages .* through \([^\.]*\).*$/\1/')
@@ -31,7 +30,7 @@ if [[ -f ${abs_srcdir}/expected/${TEST}.stdout ]]; then
 		OUTDIFF="Number of expected pages ($PAGESEXPEND) differ from the number of result pages ($PAGESRESEND)"
 	else
 		for i in $(seq 1 $PAGESEXPEND) ; do
-			DIFF=$(compare -metric AE -fuzz 1% ${abs_srcdir}/expected/layout_pdf_xml_test.stdout.1.png results/layout_pdf_xml_test.stdout.1.png results/layout_pdf_xml_test.stdout.1.diff.png 2>&1)
+			DIFF=$(compare -metric AE -fuzz 1% results/${TEST}.stdout.exp.${i}.png results/${TEST}.stdout.${i}.png results/${TEST}.stdout.${i}.diff.png 2>&1)
 			if [[ $DIFF -gt 0 ]]; then
 				OUTDIFF="Page $i differs"
 				break
