@@ -7,7 +7,7 @@
 	<Queries>
 		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="6" cols="6" />
 	</Queries>
-	<Report fontSize="12" field_header_priority="low">
+	<Report fontSize="12">
 		<Variables>
 			<Variable name="age_avg" value="age" type="average" resetonbreak="male" precalculate="yes" />
 			<Variable name="age_avg2" value="age" type="average" precalculate="yes" />

@@ -557,6 +557,7 @@ struct ocrpt_report {
 	bool orientation_set:1;
 	bool landscape:1;
 	bool suppress_pageheader_firstpage:1;
+	bool fieldheader_high_priority:1;
 };
 
 struct ocrpt_part_row_data {

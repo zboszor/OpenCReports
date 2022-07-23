@@ -31,7 +31,7 @@ if [[ -f ${abs_srcdir}/expected/${TEST}.stdout ]]; then
 	else
 		for i in $(seq 1 $PAGESEXPEND) ; do
 			DIFF=$(compare -metric AE -fuzz 1% results/${TEST}.stdout.exp.${i}.png results/${TEST}.stdout.${i}.png results/${TEST}.stdout.${i}.diff.png 2>&1)
-			if [[ $DIFF -gt 0 ]]; then
+			if [[ $DIFF != "0" ]]; then
 				OUTDIFF="Page $i differs"
 				break
 			fi

@@ -1239,7 +1239,7 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 	xmlChar *font_name, *font_size, *size_unit, *orientation;
 	xmlChar *top_margin, *bottom_margin, *left_margin, *right_margin;
 	xmlChar *paper_type, *iterations, *suppress_pageheader_firstpage, *query;
-	xmlChar *detail_columns, *column_pad;
+	xmlChar *field_header_priority, *detail_columns, *column_pad;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
@@ -1256,6 +1256,7 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 		{ { "iterations" }, &iterations },
 		{ { "suppressPageHeaderFirstPage" }, &suppress_pageheader_firstpage },
 		{ { "query" }, &query },
+		{ { "field_header_priority" }, &field_header_priority },
 		{ { "detail_columns" }, &detail_columns },
 		{ { "column_pad" }, &column_pad },
 		{ { NULL }, NULL },
@@ -1406,6 +1407,18 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 		ocrpt_expr_free(o, NULL, query_e);
 	}
 
+	r->fieldheader_high_priority = true;
+	if (field_header_priority) {
+		ocrpt_expr *field_header_priority_e;
+		char *field_header_priority_s;
+
+		ocrpt_xml_const_expr_parse_get_value_with_fallback(o, field_header_priority);
+		if (field_header_priority_s && strcasecmp(field_header_priority_s, "low") == 0)
+			r->fieldheader_high_priority = false;
+
+		ocrpt_expr_free(o, NULL, field_header_priority_e);
+	}
+
 	if (detail_columns) {
 		ocrpt_expr *detail_columns_e;
 		int32_t detail_columns_i;
@@ -1436,6 +1449,7 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 	xmlFree(iterations);
 	xmlFree(suppress_pageheader_firstpage);
 	xmlFree(query);
+	xmlFree(field_header_priority);
 	xmlFree(detail_columns);
 	xmlFree(column_pad);
 

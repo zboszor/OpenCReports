@@ -261,6 +261,22 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		if (rows == 1)
 			ocrpt_layout_output(o, p, pr, pd, r, r->reportheader, page_width, page_indent, page_position);
 
+		/*
+		 * Debatable preference in taste:
+		 * a) field headers have higher precedence than break headers
+		 *    and break footers, meaning the field headers are printed
+		 *    once per page at the top, with break headers and footers
+		 *    printed after it, or
+		 * b) break headers and footers have higher precedence than
+		 *    field headers, with break headers printed first, then
+		 *    the field headers, followed by break footers.
+		 *
+		 * It is configurable via <Report field_header_preference="high/low">
+		 * with the default "high" value.
+		 */
+		if (r->fieldheader_high_priority && (rows == 1 /* || (rows > 1 && brl_start) */ || page_break))
+			ocrpt_layout_output(o, p, pr, pd, r, r->fieldheader, page_width, page_indent, page_position);
+
 		if (rows > 1 && brl_start) {
 			/* Use the previous row data temporarily */
 			o->residx = ocrpt_expr_prev_residx(o->residx);
@@ -293,7 +309,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			}
 		}
 
-		if (rows == 1 || (rows > 1 && brl_start) || page_break)
+		if (!r->fieldheader_high_priority && (rows == 1 || (rows > 1 && brl_start) || page_break))
 			ocrpt_layout_output(o, p, pr, pd, r, r->fieldheader, page_width, page_indent, page_position);
 		ocrpt_layout_output(o, p, pr, pd, r, r->fielddetails, page_width, page_indent, page_position);
 

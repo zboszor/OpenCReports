@@ -84,6 +84,7 @@
 	suppressPageHeaderFirstPage CDATA #IMPLIED
 	query CDATA #IMPLIED
 	xmlns:xi CDATA #IMPLIED
+	field_header_priority CDATA #IMPLIED
 	detail_columns CDATA #IMPLIED
 	column_pad CDATA #IMPLIED >
 <!ELEMENT xi:include EMPTY>
