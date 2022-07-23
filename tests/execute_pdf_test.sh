@@ -14,13 +14,12 @@ OCRPT_TEST=1
 export OCRPT_TEST
 
 mkdir -p ${abs_builddir}/results
-rm -f results/${TEST}.stdout.*.png results/${TEST}.asanout.*
-./${TEST} 2>results/${TEST}.stderr >results/${TEST}.stdout
+rm -f results/${TEST}.pdf.*.png results/${TEST}.asanout.*
+./${TEST} 2>results/${TEST}.stderr >results/${TEST}.pdf
 
-if [[ -f ${abs_srcdir}/expected/${TEST}.stdout ]]; then
-
-	OUTEXP=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r300 -sOutputFile=results/${TEST}.stdout.exp.%d.png ${abs_srcdir}/expected/${TEST}.stdout)
-	OUTRES=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r300 -sOutputFile=results/${TEST}.stdout.%d.png results/${TEST}.stdout)
+if [[ -f ${abs_srcdir}/expected/${TEST}.pdf ]]; then
+	OUTEXP=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r300 -sOutputFile=results/${TEST}.pdf.exp.%d.png ${abs_srcdir}/expected/${TEST}.pdf)
+	OUTRES=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r300 -sOutputFile=results/${TEST}.pdf.%d.png results/${TEST}.pdf)
 	PAGESEXP=$(echo "$OUTEXP" | grep 'Processing pages .* through')
 	PAGESEXPEND=$(echo "$PAGESEXP" | sed 's/^Processing pages .* through \([^\.]*\).*$/\1/')
 	PAGESRES=$(echo "$OUTRES" | grep 'Processing pages .* through')
@@ -30,7 +29,7 @@ if [[ -f ${abs_srcdir}/expected/${TEST}.stdout ]]; then
 		OUTDIFF="Number of expected pages ($PAGESEXPEND) differ from the number of result pages ($PAGESRESEND)"
 	else
 		for i in $(seq 1 $PAGESEXPEND) ; do
-			DIFF=$(compare -metric AE -fuzz 1% results/${TEST}.stdout.exp.${i}.png results/${TEST}.stdout.${i}.png results/${TEST}.stdout.${i}.diff.png 2>&1)
+			DIFF=$(compare -metric AE -fuzz 1% results/${TEST}.pdf.exp.${i}.png results/${TEST}.pdf.${i}.png results/${TEST}.pdf.${i}.diff.png 2>&1)
 			if [[ $DIFF != "0" ]]; then
 				OUTDIFF="Page $i differs"
 				break
@@ -38,7 +37,7 @@ if [[ -f ${abs_srcdir}/expected/${TEST}.stdout ]]; then
 		done
 	fi
 else
-	OUTDIFF="expected/${TEST}.stdout does not exist"
+	OUTDIFF="expected/${TEST}.pdf does not exist"
 fi
 
 ERRDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.stderr ${abs_builddir}/results/${TEST}.stderr 2>/dev/null)
