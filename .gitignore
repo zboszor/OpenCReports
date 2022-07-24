@@ -52,6 +52,7 @@ doc/*.pdf
 # Test results
 tests/expected/*.png
 tests/results/*.png
+tests/results/*.pdf
 tests/results/*.stderr
 tests/results/*.stdout
 tests/results/*.asanout.*
