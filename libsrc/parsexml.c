@@ -1394,7 +1394,7 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 		int32_t suppress_pageheader_firstpage_i;
 
 		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, suppress_pageheader_firstpage);
-		r->suppress_pageheader_firstpage = !!suppress_pageheader_firstpage_i;
+		p->suppress_pageheader_firstpage = !!suppress_pageheader_firstpage_i;
 		ocrpt_expr_free(o, NULL, suppress_pageheader_firstpage_e);
 	}
 

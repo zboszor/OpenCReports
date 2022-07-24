@@ -66,10 +66,18 @@ static double ocrpt_pdf_get_font_size_multiplier_for_width(opencreport *o, ocrpt
 }
 
 void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double *width, double *ascent, double *descent) {
-	cairo_t *cr = cairo_create((cairo_surface_t *)o->current_page->data);
+	cairo_surface_t *cs = NULL;
+	cairo_t *cr;
 	PangoLayout *layout;
 	PangoFontDescription *font_description;
 	double size, w;
+
+	if (o && o->current_page)
+		cr = cairo_create((cairo_surface_t *)o->current_page->data);
+	else {
+		cs = ocrpt_layout_new_page(o, o->paper, false);
+		cr = cairo_create(cs);
+	}
 
 	font_description = pango_font_description_new();
 
@@ -77,7 +85,7 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 		le->font = le->font_name->result[o->residx]->string->str;
 	else if (l->font_name && l->font_name->result[o->residx] && l->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && l->font_name->result[o->residx]->string)
 		le->font = l->font_name->result[o->residx]->string->str;
-	else if (r->font_name)
+	else if (r && r->font_name)
 		le->font = r->font_name;
 	else if (p->font_name)
 		le->font = p->font_name;
@@ -202,6 +210,8 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 	pango_font_description_free(font_description);
 
 	cairo_destroy(cr);
+	if (cs)
+		cairo_surface_destroy(cs);
 }
 
 void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double x, double y, double width, double maxheight, double ascentdiff) {
@@ -405,7 +415,6 @@ void ocrpt_pdf_finalize(opencreport *o) {
 	}
 
 	cairo_surface_destroy(pdf);
-
 }
 
 void ocrpt_pdf_init(opencreport *o) {

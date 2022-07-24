@@ -497,9 +497,6 @@ struct ocrpt_report {
 	double left_margin;
 	double right_margin;
 	double column_pad;
-	double old_page_position;
-	double current_image_width;
-	double current_image_height;
 
 	/* Output elements */
 	ocrpt_list *nodata;
@@ -556,7 +553,6 @@ struct ocrpt_report {
 	bool right_margin_set:1;
 	bool orientation_set:1;
 	bool landscape:1;
-	bool suppress_pageheader_firstpage:1;
 	bool fieldheader_high_priority:1;
 };
 
@@ -588,6 +584,11 @@ struct ocrpt_part {
 	double bottom_margin;
 	double left_margin;
 	double right_margin;
+	double page_header_height;
+	double page_footer_height;
+	double old_page_position;
+	double current_image_width;
+	double current_image_height;
 	char *font_name;
 
 	/* Common header and footer for all reports in this part */
