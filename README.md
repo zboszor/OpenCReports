@@ -8,6 +8,11 @@ under verbal consent from the original authors:
 * Bobby Doan <bdoan@sicom.com>
 * Christian Betz <cbetz@sicom.com>
 
+## Licensing
+
+OpenCReports (the library part) is free software, with "free" as in speech.
+It is licensed under LGPLv3.
+
 ## Build and installation
 
 The dependencies to build OpenCReports are:
