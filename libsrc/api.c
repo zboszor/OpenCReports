@@ -200,7 +200,6 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 	ocrpt_list *brl_start = NULL;
 	unsigned int rows = 0;
 	bool have_row = ocrpt_query_navigate_next(o, q);
-	bool page_break = false;
 
 	while (have_row) {
 		ocrpt_list *brl;
@@ -258,25 +257,6 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			}
 		}
 
-		if (rows == 1)
-			ocrpt_layout_output(o, p, pr, pd, r, r->reportheader, page_width, page_height, page_indent, page_position);
-
-		/*
-		 * Debatable preference in taste:
-		 * a) field headers have higher precedence than break headers
-		 *    and break footers, meaning the field headers are printed
-		 *    once per page at the top, with break headers and footers
-		 *    printed after it, or
-		 * b) break headers and footers have higher precedence than
-		 *    field headers, with break headers printed first, then
-		 *    the field headers, followed by break footers.
-		 *
-		 * It is configurable via <Report field_header_preference="high/low">
-		 * with the default "high" value.
-		 */
-		if (r->fieldheader_high_priority && (rows == 1 /* || (rows > 1 && brl_start) */ || page_break))
-			ocrpt_layout_output(o, p, pr, pd, r, r->fieldheader, page_width, page_height, page_indent, page_position);
-
 		if (rows > 1 && brl_start) {
 			/* Use the previous row data temporarily */
 			o->residx = ocrpt_expr_prev_residx(o->residx);
@@ -284,7 +264,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			for (brl = r->breaks_reverse; brl; brl = brl->next) {
 				ocrpt_break *br = (ocrpt_break *)brl->data;
 
-				ocrpt_layout_output(o, p, pr, pd, r, br->footer, page_width, page_height, page_indent, page_position);
+				ocrpt_layout_output(o, p, pr, pd, r, br->footer, rows, page_width, page_height, page_indent, page_position);
 
 				if (br == brl_start->data)
 					break;
@@ -298,7 +278,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			ocrpt_break *br __attribute__((unused)) = (ocrpt_break *)brl->data;
 
 			if (br->cb_triggered)
-				ocrpt_layout_output(o, p, pr, pd, r, br->header, page_width, page_height, page_indent, page_position);
+				ocrpt_layout_output(o, p, pr, pd, r, br->header, rows, page_width, page_height, page_indent, page_position);
 		}
 
 		if (!o->precalculate) {
@@ -309,10 +289,24 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			}
 		}
 
-
-		if (!r->fieldheader_high_priority && (rows == 1 || (rows > 1 && brl_start) || page_break))
-			ocrpt_layout_output(o, p, pr, pd, r, r->fieldheader, page_width, page_height, page_indent, page_position);
-		ocrpt_layout_output(o, p, pr, pd, r, r->fielddetails, page_width, page_height, page_indent, page_position);
+		if (!r->fieldheader_high_priority && (rows == 1 || brl_start)) {
+			/*
+			 * Debatable preference in taste:
+			 * a) field headers have higher precedence than break headers
+			 *    and break footers, meaning the field headers are printed
+			 *    once per page at the top, with break headers and footers
+			 *    printed after it, or
+			 * b) break headers and footers have higher precedence than
+			 *    field headers, with break headers printed first, then
+			 *    the field headers, followed by all the field details,
+			 *    then finally the break footers.
+			 *
+			 * It is configurable via <Report field_header_preference="high/low">
+			 * with the default "high" value.
+			 */
+			ocrpt_layout_output(o, p, pr, pd, r, r->fieldheader, rows, page_width, page_height, page_indent, page_position);
+		}
+		ocrpt_layout_output(o, p, pr, pd, r, r->fielddetails, rows, page_width, page_height, page_indent, page_position);
 
 		if (o->precalculate && last_row) {
 			ocrpt_variables_add_precalculated_results(o, r, r->breaks, last_row);
@@ -330,10 +324,10 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		for (ocrpt_list *brl = r->breaks_reverse; brl; brl = brl->next) {
 			ocrpt_break *br = (ocrpt_break *)brl->data;
 
-			ocrpt_layout_output(o, p, pr, pd, r, br->footer, page_width, page_height, page_indent, page_position);
+			ocrpt_layout_output(o, p, pr, pd, r, br->footer, rows, page_width, page_height, page_indent, page_position);
 		}
 
-		ocrpt_layout_output(o, p, pr, pd, r, r->reportfooter, page_width, page_height, page_indent, page_position);
+		ocrpt_layout_output(o, p, pr, pd, r, r->reportfooter, rows, page_width, page_height, page_indent, page_position);
 
 		/* Switch back to the current row data */
 		o->residx = ocrpt_expr_next_residx(o->residx);
@@ -354,7 +348,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 	for (ocrpt_list *pl = o->parts; pl; pl = pl->next) {
 		ocrpt_part *p = (ocrpt_part *)pl->data;
 		int32_t part_iter;
-		bool newpage = false;
+		bool newpage __attribute__((unused)) = false;
 
 		if (!p->paper)
 			p->paper = o->paper;
@@ -382,9 +376,6 @@ static void ocrpt_execute_parts(opencreport *o) {
 		for (part_iter = 0; part_iter < p->iterations; part_iter++) {
 			for (ocrpt_list *row = p->rows; row; row = row->next) {
 				ocrpt_part_row *pr = (ocrpt_part_row *)row->data;
-
-				if (newpage || (pl == o->parts && (part_iter == 0 || pr->newpage)))
-					ocrpt_layout_add_new_page(o, p, page_width - (left_margin + right_margin), page_height, left_margin, &page_position);
 
 				for (ocrpt_list *pdl = (ocrpt_list *)pr->pd_list; pdl; pdl = pdl->next) {
 					ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pdl->data;
@@ -446,9 +437,9 @@ static void ocrpt_execute_parts(opencreport *o) {
 								}
 
 								if (!r->data_rows)
-									ocrpt_layout_output(o, p, pr, pd, r, r->nodata, page_width - (left_margin + right_margin), page_height, left_margin, &page_position);
+									ocrpt_layout_output(o, p, pr, pd, r, r->nodata, 0, page_width - (left_margin + right_margin), page_height, left_margin, &page_position);
 							} else
-								ocrpt_layout_output(o, p, pr, pd, r, r->nodata, page_width - (left_margin + right_margin), page_height, left_margin, &page_position);
+								ocrpt_layout_output(o, p, pr, pd, r, r->nodata, 0, page_width - (left_margin + right_margin), page_height, left_margin, &page_position);
 
 							r->executing = false;
 

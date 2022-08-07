@@ -14,6 +14,7 @@
 #include <pango/pangocairo.h>
 
 #include "opencreport.h"
+#include "datasource.h"
 #include "layout.h"
 
 /*
@@ -314,10 +315,13 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 	}
 }
 
-bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_list *output_list, double page_width, double page_height, double page_indent, double *page_position) {
-	ocrpt_list *old_current_page = o->current_page;
+bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_list *output_list, unsigned int rows, double page_width, double page_height, double page_indent, double *page_position) {
+	ocrpt_list *old_current_page;
 	double old_page_position, new_page_position;
 	bool page_break = false;
+
+	if (!o->current_page)
+		ocrpt_layout_add_new_page(o, p, pr, pd, r, rows, page_width, page_height, page_indent, page_position);
 
 	/*
 	 * The bool value in o->precalculate means !draw in layout context.
@@ -331,6 +335,7 @@ bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	 * 2. In the second round, Set o->precalculate to what it was and if it's false then draw
 	 *    the section.
 	 */
+	old_current_page = o->current_page;
 	old_page_position = new_page_position = *page_position;
 
 	ocrpt_layout_output_internal(false, o, p, pr, pd, r, output_list, page_width, page_indent, &new_page_position);
@@ -342,7 +347,7 @@ bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			new_page_position = page_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height;
 			ocrpt_layout_output_internal(true, o, p, NULL, NULL, NULL, p->pagefooter, page_width, page_indent, &new_page_position);
 		}
-		ocrpt_layout_add_new_page(o, p, page_width, page_height, page_indent, &new_page_position);
+		ocrpt_layout_add_new_page(o, p, pr, pd, r, rows, page_width, page_height, page_indent, &new_page_position);
 		page_break = true;
 	}
 
@@ -407,7 +412,7 @@ double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p, ocrpt_report *r)
 	return right_margin;
 }
 
-void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, double page_width, double page_height, double page_indent, double *page_position) {
+void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, unsigned int rows, double page_width, double page_height, double page_indent, double *page_position) {
 	if (o->precalculate) {
 		if (!o->current_page) {
 			if (!o->pages) {
@@ -434,6 +439,27 @@ void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, double page_width,
 	}
 
 	*page_position = ocrpt_layout_top_margin(o, p) + p->page_header_height;
+
+	if (rows == 1)
+		ocrpt_layout_output(o, p, pr, pd, r, r->reportheader, rows, page_width, page_height, page_indent, page_position);
+
+	if (r && r->fieldheader && r->fieldheader_high_priority) {
+		/*
+		 * Debatable preference in taste:
+		 * a) field headers have higher precedence than break headers
+		 *    and break footers, meaning the field headers are printed
+		 *    once per page at the top, with break headers and footers
+		 *    printed after it, or
+		 * b) break headers and footers have higher precedence than
+		 *    field headers, with break headers printed first, then
+		 *    the field headers, followed by all the field details,
+		 *    then finallly the break footers.
+		 *
+		 * It is configurable via <Report field_header_preference="high/low">
+		 * with the default "high" value.
+		 */
+		ocrpt_layout_output(o, p, pr, pd, r, r->fieldheader, rows, page_width, page_height, page_indent, page_position);
+	}
 }
 
 void *ocrpt_layout_new_page(opencreport *o, const ocrpt_paper *paper, bool landscape) {
