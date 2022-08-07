@@ -1310,12 +1310,12 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 		char *orientation_s;
 
 		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, orientation);
-		if (orientation_s && strcasecmp(orientation_s, "portrait") == 0) {
-			r->orientation_set = true;
-			r->landscape = false;
-		} else if (orientation_s && strcasecmp((char *)orientation, "landscape") == 0) {
-			r->orientation_set = true;
-			r->landscape = true;
+		if (!p->orientation_set && orientation_s && strcasecmp(orientation_s, "portrait") == 0) {
+			p->orientation_set = true;
+			p->landscape = false;
+		} else if (!p->orientation_set && orientation_s && strcasecmp((char *)orientation, "landscape") == 0) {
+			p->orientation_set = true;
+			p->landscape = true;
 		}
 		ocrpt_expr_free(o, NULL, orientation_e);
 	}

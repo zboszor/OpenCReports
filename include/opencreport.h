@@ -551,8 +551,6 @@ struct ocrpt_report {
 	bool bottom_margin_set:1;
 	bool left_margin_set:1;
 	bool right_margin_set:1;
-	bool orientation_set:1;
-	bool landscape:1;
 	bool fieldheader_high_priority:1;
 };
 

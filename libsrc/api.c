@@ -353,6 +353,11 @@ static void ocrpt_execute_parts(opencreport *o) {
 		if (!p->paper)
 			p->paper = o->paper;
 
+		if (p->orientation_set && p->landscape) {
+			page_width = paper->height;
+			page_height = paper->width;
+		}
+
 		if (paper->width != p->paper->width || paper->height != p->paper->height) {
 			paper = p->paper;
 			newpage = true;
