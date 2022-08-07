@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="30" cols="6" />
+	</Queries>
+	<Report fontSize="12" paperType="A4" orientation="landscape" detail_columns="2" column_pad="1">
+		<Variables>
+			<Variable name="age_avg" value="age" type="average" resetonbreak="male" precalculate="yes" />
+			<Variable name="age_avg2" value="age" type="average" precalculate="yes" />
+		</Variables>
+
+		<Breaks>
+			<Break name="male">
+				<BreakHeader>
+					<Output>
+						<HorizontalLine size="1" color="'Red'" /><Line/>
+						<Line fontSize="13">
+							<field width="20" value="(male ? 'Male' : 'Female') + ' break header'" />
+							<field width="8" value="v.age_avg" format="'%.2d'" />
+							<field width="4" value="r.pageno" />
+							<field width="4" value="r.totpages" />
+						</Line>
+						<Line/><HorizontalLine size="1" color="'Red'"/>
+					</Output>
+				</BreakHeader>
+
+				<BreakFooter>
+					<Output>
+						<HorizontalLine size="1" color="'Red'" /><Line/>
+						<Line fontSize="13">
+							<field width="20" value="(male ? 'Male' : 'Female') + ' break footer'" />
+							<field width="8" value="v.age_avg" format="'%.2d'" />
+							<field width="4" value="r.pageno" />
+							<field width="4" value="r.totpages" />
+						</Line>
+						<HorizontalLine size="1" bgcolor="'Red'"/>
+					</Output>
+				</BreakFooter>
+
+				<BreakFields>
+					<BreakField value="male" />
+				</BreakFields>
+			</Break>
+
+			<Break name="adult">
+				<BreakHeader>
+					<Output>
+						<HorizontalLine size="1" color="'Green'" /><Line/>
+						<Line fontSize="13">
+							<field width="20" value="((age > 18) ? 'Adult' : 'Kid') + ' break header'" />
+							<field width="8" value="v.age_avg" format="'%.2d'" />
+							<field width="4" value="r.pageno" />
+							<field width="4" value="r.totpages" />
+						</Line>
+						<Line/><HorizontalLine size="1" color="'Green'" />
+					</Output>
+				</BreakHeader>
+
+				<BreakFooter>
+					<Output>
+						<HorizontalLine size="1" color="'Green'" /><Line/>
+						<Line fontSize="13">
+							<field width="20" value="((age > 18) ? 'Adult' : 'Kid') + ' break footer'" />
+							<field width="8" value="v.age_avg" format="'%.2d'" />
+							<field width="4" value="r.pageno" />
+							<field width="4" value="r.totpages" />
+						</Line>
+						<Line/><HorizontalLine size="1" color="'Green'" />
+					</Output>
+				</BreakFooter>
+
+				<BreakFields>
+					<BreakField value="age > 18" />
+				</BreakFields>
+			</Break>
+		</Breaks>
+
+		<NoData>
+			<Output>
+				<HorizontalLine size="1" color="'Black'" />
+				<Line>
+					<field value="'There'" width="6" color="'Red'" bgcolor="'Blue'" bold="yes" />
+					<literal width="3" align="'right'" color="'White'" bgcolor="'Black'" >is</literal>
+					<field value="'no'" width="3" align="'center'" color="'Lime'" bgcolor="'Teal'" italic="yes" />
+					<literal width="5" color="'Aqua'" bgcolor="'Silver'" >data</literal>
+					<field value="'here.'" width="5" color="'Fuchsia'" bgcolor="'Green'"  />
+				</Line>
+				<HorizontalLine size="1" color="'Black'" />
+			</Output>
+		</NoData>
+
+		<PageHeader>
+			<Output>
+				<HorizontalLine size="2" color="'Black'"/><Line/>
+				<Line fontSize="14">
+					<field value="printf('Page header: %d / %d', r.pageno, r.totpages)" align="right" />
+				</Line>
+				<Line/><HorizontalLine size="2" color="'Black'"/>
+				<Line fontSize="4" />
+				<Line/><HorizontalLine size="4" color="'white'"/>
+			</Output>
+		</PageHeader>
+
+		<PageFooter>
+			<Output>
+				<Line fontSize="4" />
+				<HorizontalLine size="2" color="'Black'"/><Line/>
+				<Line fontSize="14">
+					<field value="printf('Page footer: %d / %d', r.pageno, r.totpages)" align="right" />
+				</Line>
+				<Line/><HorizontalLine size="2" color="'Black'"/>
+			</Output>
+		</PageFooter>
+
+		<ReportHeader>
+			<Output>
+				<HorizontalLine size="2" color="'Teal'"/><Line/>
+				<Line fontSize="14">
+					<literal>Yabba dabba doo header </literal>
+					<field value="printf('average age: %.2d', v.age_avg2)" />
+				</Line>
+				<Line/><HorizontalLine size="2" color="'Teal'"/>
+			</Output>
+		</ReportHeader>
+
+		<ReportFooter>
+			<Output>
+				<HorizontalLine size="2" color="'Teal'"/><Line/>
+				<Line fontSize="14">
+					<literal>Yabba dabba doo footer </literal>
+					<field value="printf('average age: %.2d', v.age_avg2)" />
+				</Line>
+				<Line/><HorizontalLine size="2" color="'Teal'"/>
+			</Output>
+		</ReportFooter>
+
+		<Detail>
+			<FieldHeaders>
+				<Output>
+					<HorizontalLine size="1" bgcolor="'black'"/>
+					<Line bgcolor="'0xe5e5e5'">
+						<literal width="4" col="1">ID</literal>
+						<literal width="1"/>
+						<literal width="20" col="2">Name</literal>
+						<literal width="1"/>
+						<literal width="10" col="3">Property</literal>
+						<literal width="1"/>
+						<literal width="5" col="4">Age</literal>
+						<literal width="1"/>
+						<literal width="5" col="5">Adult</literal>
+					</Line>
+					<HorizontalLine size="1" bgcolor="'black'"/>
+					<HorizontalLine size="4" bgcolor="'white'"/>
+				</Output>
+			</FieldHeaders>
+
+			<FieldDetails>
+				<Output>
+					<Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+						<field value="id" width="4" align="right" col="1"/>
+						<literal width="1"/>
+						<field value="name" width="20" align="left" col="2"/>
+						<literal width="1"/>
+						<field value="property" width="10" align="'left'" col="3"/>
+						<literal width="1"/>
+						<field value="age" width="5" format="'%.2d'" align="'right'" col="4"/>
+						<literal width="1"/>
+						<field value="adult ? 'yes' : 'no'" width="5" align="'center'" col="5"/>
+					</Line>
+				</Output>
+			</FieldDetails>
+		</Detail>
+
+	</Report>
+</OpenCReport>

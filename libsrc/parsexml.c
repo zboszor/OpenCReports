@@ -1419,20 +1419,27 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 		ocrpt_expr_free(o, NULL, field_header_priority_e);
 	}
 
+	r->detail_columns = 1;
 	if (detail_columns) {
 		ocrpt_expr *detail_columns_e;
 		int32_t detail_columns_i;
 
 		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, detail_columns);
+		if (detail_columns_i < 1)
+			detail_columns_i = 1;
 		r->detail_columns = detail_columns_i;
 		ocrpt_expr_free(o, NULL, detail_columns_e);
 	}
 
+	r->column_pad = 0.0;
 	if (column_pad) {
 		ocrpt_expr *column_pad_e;
 		double column_pad_d;
 
 		ocrpt_xml_const_expr_parse_get_double_value_with_fallback_noreport(o, column_pad);
+		if (column_pad_d < 0.0)
+
+			column_pad_d = 0.0;
 		r->column_pad = column_pad_d;
 		ocrpt_expr_free(o, NULL, column_pad_e);
 	}

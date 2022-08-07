@@ -498,6 +498,11 @@ struct ocrpt_report {
 	double right_margin;
 	double column_pad;
 
+	/* Temporaries */
+	double column_width;
+	double page_start;
+	double page_indent;
+
 	/* Output elements */
 	ocrpt_list *nodata;
 	ocrpt_list *reportheader;
@@ -525,9 +530,10 @@ struct ocrpt_report {
 	ocrpt_list *precalc_done_callbacks;
 	ocrpt_list *iteration_callbacks;
 	/*
-	 * Hint for the number of detail columns
+	 * Total and current number of detail columns
 	 */
 	unsigned int detail_columns;
+	unsigned int current_column;
 	/*
 	 * How many times should this report run
 	 */
@@ -588,6 +594,11 @@ struct ocrpt_part {
 	double current_image_width;
 	double current_image_height;
 	char *font_name;
+
+	/* Temporaries */
+	double paper_width;
+	double paper_height;
+	double page_width;
 
 	/* Common header and footer for all reports in this part */
 	ocrpt_list *pageheader;
