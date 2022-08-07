@@ -278,7 +278,7 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 			if (l->font_size && l->font_size->result[o->residx] && l->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->font_size->result[o->residx]->number_initialized)
 				font_size = mpfr_get_d(l->font_size->result[o->residx]->number, o->rndmode);
 			else
-				font_size = r->font_size;
+				font_size = r ? r->font_size : p->font_size;
 
 			ocrpt_layout_set_font_sizes(o, font_name, font_size, false, false, &l->fontsz, &l->font_width);
 			ocrpt_layout_line(draw, o, p, pr, pd, r, l, page_width - p->current_image_width, page_indent + p->current_image_width, page_position);

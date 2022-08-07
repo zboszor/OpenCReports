@@ -24,11 +24,10 @@
 
 		<ReportHeader>
 			<Output>
-				<HorizontalLine size="1" color="'Red'" /><Line/>
+				<HorizontalLine size="1" color="'Red'" />
 				<Line fontSize="14">
 					<literal>Flintstones report 1 header</literal>
 				</Line>
-				<Line fontsize="4"/>
 				<HorizontalLine size="4" bgcolor="'white'"/>
 				<HorizontalLine size="2" bgcolor="'black'"/>
 				<HorizontalLine size="4" bgcolor="'white'"/>
@@ -37,11 +36,10 @@
 
 		<ReportFooter>
 			<Output>
-				<HorizontalLine size="1" color="'Red'" /><Line/>
+				<HorizontalLine size="1" color="'Red'" />
 				<Line fontSize="14">
 					<literal>Flintstones report 1 footer</literal>
 				</Line>
-				<Line fontsize="4"/>
 				<HorizontalLine size="4" bgcolor="'white'"/>
 				<HorizontalLine size="2" bgcolor="'black'"/>
 				<HorizontalLine size="4" bgcolor="'white'"/>

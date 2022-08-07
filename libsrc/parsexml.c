@@ -811,9 +811,6 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 static void ocrpt_parse_output_line_node(opencreport *o, ocrpt_report *r, ocrpt_list **list_p, xmlTextReaderPtr reader) {
 	ocrpt_line *line;
 
-	if (xmlTextReaderIsEmptyElement(reader))
-		return;
-
 	line = ocrpt_mem_malloc(sizeof(ocrpt_line));
 	memset(line, 0, sizeof(ocrpt_line));
 	line->type = OCRPT_OUTPUT_LINE;
@@ -859,6 +856,9 @@ static void ocrpt_parse_output_line_node(opencreport *o, ocrpt_report *r, ocrpt_
 	xmlFree(suppress);
 	xmlFree(color);
 	xmlFree(bgcolor);
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return;
 
 	int depth = xmlTextReaderDepth(reader);
 	while (xmlTextReaderRead(reader) == 1) {

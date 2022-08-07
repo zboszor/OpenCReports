@@ -17,20 +17,20 @@
 			<Break name="male">
 				<BreakHeader>
 					<Output>
-						<HorizontalLine size="1" color="'Red'" /><Line/>
+						<HorizontalLine size="1" color="'Red'" />
 						<Line fontSize="13">
 							<field width="20" value="(male ? 'Male' : 'Female') + ' break header'" />
 							<field width="8" value="v.age_avg" format="'%.2d'" />
 							<field width="4" value="r.pageno" />
 							<field width="4" value="r.totpages" />
 						</Line>
-						<Line/><HorizontalLine size="1" color="'Red'"/>
+						<HorizontalLine size="1" color="'Red'"/>
 					</Output>
 				</BreakHeader>
 
 				<BreakFooter>
 					<Output>
-						<HorizontalLine size="1" color="'Red'" /><Line/>
+						<HorizontalLine size="1" color="'Red'" />
 						<Line fontSize="13">
 							<field width="20" value="(male ? 'Male' : 'Female') + ' break footer'" />
 							<field width="8" value="v.age_avg" format="'%.2d'" />
@@ -49,27 +49,27 @@
 			<Break name="adult">
 				<BreakHeader>
 					<Output>
-						<HorizontalLine size="1" color="'Green'" /><Line/>
+						<HorizontalLine size="1" color="'Green'" />
 						<Line fontSize="13">
 							<field width="20" value="((age > 18) ? 'Adult' : 'Kid') + ' break header'" />
 							<field width="8" value="v.age_avg" format="'%.2d'" />
 							<field width="4" value="r.pageno" />
 							<field width="4" value="r.totpages" />
 						</Line>
-						<Line/><HorizontalLine size="1" color="'Green'" />
+						<HorizontalLine size="1" color="'Green'" />
 					</Output>
 				</BreakHeader>
 
 				<BreakFooter>
 					<Output>
-						<HorizontalLine size="1" color="'Green'" /><Line/>
+						<HorizontalLine size="1" color="'Green'" />
 						<Line fontSize="13">
 							<field width="20" value="((age > 18) ? 'Adult' : 'Kid') + ' break footer'" />
 							<field width="8" value="v.age_avg" format="'%.2d'" />
 							<field width="4" value="r.pageno" />
 							<field width="4" value="r.totpages" />
 						</Line>
-						<Line/><HorizontalLine size="1" color="'Green'" />
+						<HorizontalLine size="1" color="'Green'" />
 					</Output>
 				</BreakFooter>
 
@@ -95,46 +95,44 @@
 
 		<PageHeader>
 			<Output>
-				<HorizontalLine size="2" color="'Black'"/><Line/>
+				<HorizontalLine size="2" color="'Black'"/>
 				<Line fontSize="14">
 					<field value="printf('Page header: %d / %d', r.pageno, r.totpages)" align="right" />
 				</Line>
-				<Line/><HorizontalLine size="2" color="'Black'"/>
-				<Line fontSize="4" />
-				<Line/><HorizontalLine size="4" color="'white'"/>
+				<HorizontalLine size="2" color="'Black'"/>
+				<HorizontalLine size="4" color="'white'"/>
 			</Output>
 		</PageHeader>
 
 		<PageFooter>
 			<Output>
-				<Line fontSize="4" />
-				<HorizontalLine size="2" color="'Black'"/><Line/>
+				<HorizontalLine size="2" color="'Black'"/>
 				<Line fontSize="14">
 					<field value="printf('Page footer: %d / %d', r.pageno, r.totpages)" align="right" />
 				</Line>
-				<Line/><HorizontalLine size="2" color="'Black'"/>
+				<HorizontalLine size="2" color="'Black'"/>
 			</Output>
 		</PageFooter>
 
 		<ReportHeader>
 			<Output>
-				<HorizontalLine size="2" color="'Teal'"/><Line/>
+				<HorizontalLine size="2" color="'Teal'"/>
 				<Line fontSize="14">
 					<literal>Yabba dabba doo header </literal>
 					<field value="printf('average age: %.2d', v.age_avg2)" />
 				</Line>
-				<Line/><HorizontalLine size="2" color="'Teal'"/>
+				<HorizontalLine size="2" color="'Teal'"/>
 			</Output>
 		</ReportHeader>
 
 		<ReportFooter>
 			<Output>
-				<HorizontalLine size="2" color="'Teal'"/><Line/>
+				<HorizontalLine size="2" color="'Teal'"/>
 				<Line fontSize="14">
 					<literal>Yabba dabba doo footer </literal>
 					<field value="printf('average age: %.2d', v.age_avg2)" />
 				</Line>
-				<Line/><HorizontalLine size="2" color="'Teal'"/>
+				<HorizontalLine size="2" color="'Teal'"/>
 			</Output>
 		</ReportFooter>
 
