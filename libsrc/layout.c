@@ -315,7 +315,7 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 	}
 }
 
-bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_list *output_list, unsigned int rows, double page_width, double page_height, double page_indent, double *page_position) {
+void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_list *output_list, unsigned int rows, double page_width, double page_height, double page_indent, double *page_position) {
 	ocrpt_list *old_current_page;
 	double old_page_position, new_page_position;
 	bool page_break = false;
@@ -360,8 +360,6 @@ bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	}
 
 	*page_position = new_page_position;
-
-	return page_break;
 }
 
 double ocrpt_layout_top_margin(opencreport *o, ocrpt_part *p) {
