@@ -215,10 +215,18 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 }
 
 void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double x, double y, double width, double maxheight, double ascentdiff) {
-	cairo_t *cr = cairo_create((cairo_surface_t *)o->current_page->data);
+	cairo_surface_t *cs = NULL;
+	cairo_t *cr;
 	PangoLayout *layout;
 	PangoFontDescription *font_description;
 	PangoAlignment align;
+
+	if (o && o->current_page)
+		cr = cairo_create((cairo_surface_t *)o->current_page->data);
+	else {
+		cs = ocrpt_layout_new_page(o, o->paper, false);
+		cr = cairo_create(cs);
+	}
 
 	if (le->align && le->align->result[o->residx] && le->align->result[o->residx]->type == OCRPT_RESULT_STRING && le->align->result[o->residx]->string) {
 		const char *alignment = le->align->result[o->residx]->string->str;
@@ -339,6 +347,8 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	pango_font_description_free(font_description);
 
 	cairo_destroy(cr);
+	if (cs)
+		cairo_surface_destroy(cs);
 }
 
 void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_hline *hline, double page_width, double page_indent, double page_position, double size) {
@@ -367,9 +377,17 @@ void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocr
 	} else
 		length = page_width - indent;
 
-	cairo_t *cr = cairo_create((cairo_surface_t *)o->current_page->data);
+	cairo_surface_t *cs = NULL;
+	cairo_t *cr;
 	ocrpt_color color;
 	char *color_name = NULL;
+
+	if (o && o->current_page)
+		cr = cairo_create((cairo_surface_t *)o->current_page->data);
+	else {
+		cs = ocrpt_layout_new_page(o, o->paper, false);
+		cr = cairo_create(cs);
+	}
 
 	if (hline->color && hline->color->result[o->residx] && hline->color->result[o->residx]->type == OCRPT_RESULT_STRING && hline->color->result[o->residx]->string)
 		color_name = hline->color->result[o->residx]->string->str;
@@ -382,6 +400,8 @@ void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocr
 	cairo_fill(cr);
 
 	cairo_destroy(cr);
+	if (cs)
+		cairo_surface_destroy(cs);
 }
 
 void ocrpt_pdf_finalize(opencreport *o) {
