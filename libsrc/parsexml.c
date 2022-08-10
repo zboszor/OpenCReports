@@ -1292,17 +1292,18 @@ static void ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 		ocrpt_expr_free(o, NULL, font_size_e);
 	}
 
-	if (size_unit) {
+	if (size_unit && !o->size_unit_set) {
 		ocrpt_expr *size_unit_e;
 		char *size_unit_s;
 		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, size_unit);
 		if (size_unit_s && strcasecmp(size_unit_s, "points") == 0) {
-			r->size_unit_set = true;
-			r->size_in_points = true;
+			o->size_unit_set = true;
+			o->size_in_points = true;
 		} else if (size_unit_s && (strcasecmp(size_unit_s, "chars") == 0 || strcasecmp(size_unit_s, "characters") == 0)) {
-			r->size_unit_set = true;
-			r->size_in_points = false;
+			o->size_unit_set = true;
+			o->size_in_points = false;
 		}
+		ocrpt_expr_free(o, NULL, size_unit_e);
 	}
 
 	if (orientation) {
@@ -1735,17 +1736,18 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 		ocrpt_expr_free(o, NULL, font_size_e);
 	}
 
-	if (size_unit) {
+	if (size_unit && !o->size_unit_set) {
 		ocrpt_expr *size_unit_e;
 		char *size_unit_s;
 		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, size_unit);
 		if (size_unit_s && strcasecmp(size_unit_s, "points") == 0) {
-			p->size_unit_set = true;
-			p->size_in_points = true;
+			o->size_unit_set = true;
+			o->size_in_points = true;
 		} else if (size_unit_s && (strcasecmp(size_unit_s, "chars") == 0 || strcasecmp(size_unit_s, "characters") == 0)) {
-			p->size_unit_set = true;
-			p->size_in_points = false;
+			o->size_unit_set = true;
+			o->size_in_points = false;
 		}
+		ocrpt_expr_free(o, NULL, size_unit_e);
 	}
 
 	if (orientation) {

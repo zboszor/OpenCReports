@@ -551,8 +551,6 @@ struct ocrpt_report {
 	bool executing:1;
 	bool dont_add_exprs:1;
 	bool font_size_set:1;
-	bool size_unit_set:1;
-	bool size_in_points:1;
 	bool top_margin_set:1;
 	bool bottom_margin_set:1;
 	bool left_margin_set:1;
@@ -628,8 +626,6 @@ struct ocrpt_part {
 	bool layout_set:1;
 	bool fixed:1;
 	bool font_size_set:1;
-	bool size_unit_set:1;
-	bool size_in_points:1;
 	bool orientation_set:1;
 	bool landscape:1;
 	bool top_margin_set:1;

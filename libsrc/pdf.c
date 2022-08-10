@@ -49,22 +49,6 @@ static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	cairo_destroy(cr);
 }
 
-static double ocrpt_pdf_get_font_size_multiplier_for_width(opencreport *o, ocrpt_part *p, ocrpt_report *r, ocrpt_line *l) {
-	bool size_in_points = false;
-
-	if (r->size_unit_set)
-		size_in_points = r->size_in_points;
-	else if (p->size_unit_set)
-		size_in_points = p->size_unit_set;
-	else if (o->size_unit_set)
-		size_in_points = p->size_unit_set;
-
-	if (size_in_points)
-		return 1.0;
-
-	return l->font_width;
-}
-
 void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double *width, double *ascent, double *descent) {
 	cairo_surface_t *cs = NULL;
 	cairo_t *cr;
@@ -190,7 +174,7 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 
 	if (le->width && le->width->result[o->residx] && le->width->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->width->result[o->residx]->number_initialized) {
 		w = mpfr_get_d(le->width->result[o->residx]->number, o->rndmode);
-		w *= ocrpt_pdf_get_font_size_multiplier_for_width(o, p, r, l);
+		w *= o->size_in_points ? 1.0 : l->font_width;
 	} else {
 		int l;
 		ocrpt_utf8forward(le->value_str->str, -1, &l, -1, NULL);
@@ -362,11 +346,7 @@ void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocr
 	if (hline->length && hline->length->result[o->residx] && hline->length->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->length->result[o->residx]->number_initialized) {
 		double size_multiplier;
 
-		if (r->size_unit_set && r->size_in_points)
-			size_multiplier = 1.0;
-		else if (p->size_unit_set && p->size_in_points)
-			size_multiplier = 1.0;
-		else if (o->size_unit_set && o->size_in_points)
+		if (o->size_unit_set && o->size_in_points)
 			size_multiplier = 1.0;
 		else
 			size_multiplier = hline->font_width;

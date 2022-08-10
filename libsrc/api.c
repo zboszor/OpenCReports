@@ -404,7 +404,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 						r->column_width = p->page_width;
 						if (r->detail_columns > 1)
-							r->column_width = (p->page_width - (r->column_pad * (r->detail_columns - 1))) / (double)r->detail_columns;
+							r->column_width = (p->page_width - ((o->size_in_points ? r->column_pad : r->column_pad * 72.0) * (r->detail_columns - 1))) / (double)r->detail_columns;
 
 						if (r->font_size_set)
 							ocrpt_layout_set_font_sizes(o, r->font_name ? r->font_name : (p->font_name ? p->font_name : "Courier"), r->font_size, false, false, NULL, &r->font_width);
