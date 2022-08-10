@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
 	"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!ENTITY introduction SYSTEM "introduction.sgm">
 <!ENTITY expressions SYSTEM "expressions.sgm">
+<!ENTITY breaks SYSTEM "breaks.sgm">
+<!ENTITY variables SYSTEM "variables.sgm">
 <!ENTITY c-api-reference SYSTEM "c-api-reference.sgm">
 ]>
 <book>
@@ -9,6 +12,7 @@
 		<title>OpenCReports Manual</title>
 		<author><firstname>Zoltán</firstname><surname>Böszörményi</surname></author>
 		<copyright><year>2019-2020</year><holder>Zoltán Böszörményi</holder></copyright>
+		<address><email><ulink url="mailto:zboszor@gmail.com"/></email></address>
 		<legalnotice>
 			<blockquote>
 				<para>
@@ -23,6 +27,9 @@
 		</legalnotice>
 	</bookinfo>
 
+	&introduction;
 	&expressions;
+	&breaks;
+	&variables;
 	&c-api-reference;
 </book>

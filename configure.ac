@@ -117,6 +117,9 @@ AC_CHECK_PROG(GHOSTSCRIPT,[ghostscript],[ghostscript],[false])
 AC_CHECK_PROG(IMCOMPARE,[compare],[compare],[false])
 AM_CONDITIONAL(ENABLE_PDF_TESTS, [test x$ac_cv_prog_GHOSTSCRIPT = xghostscript -a x$ac_cv_prog_IMCOMPARE = xcompare])
 
+AC_CHECK_PROG(DOCBOOK2PDF,[docbook2pdf],[docbook2pdf],[false])
+AM_CONDITIONAL(ENABLE_DOCS, [test x$ac_cv_prog_DOCBOOK2PDF = xdocbook2pdf])
+
 AC_CONFIG_FILES([
 	Makefile
 	opencreports.pc

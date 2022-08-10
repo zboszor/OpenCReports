@@ -1,0 +1,224 @@
+<chapter id="introduction" xreflabel="Introduction to OpenCReports">
+	<title>Introduction to OpenCReports</title>
+	<sect1>
+		<title>The predecessor: RLIB</title>
+		<para>
+			The idea to write <ulink url="https://github.com/zboszor/OpenCReports"><citetitle>OpenCReports</citetitle></ulink>
+			started with my getting acqauinted with <ulink url="https://github.com/SICOM/rlib"><citetitle>RLIB</citetitle></ulink>
+			in 2005 and working with it (and on it) for a very long time,
+			with the original implementors finally losing interest in developing
+			RLIB further.
+		</para>
+		<para>
+			RLIB is a report generator library, so is OpenCReports.
+		</para>
+		<para>
+			This means that using a tabular data source (for example an
+			array with labels for the column names, or an SQL query) and
+			a description file that specifies how to display the data,
+			the input data is transformed into various output formats,
+			some for human viewing, some for further machine processing.
+			Such output formats may be PDF, HTML, XML, plain text or CSV.
+		</para>
+		<para>
+			To overcome some of the shortcomings seen in the
+			predecessor, the <literal>ideas</literal> of RLIB
+			were used for a completely new implementation with
+			high level of compatibility to the original.
+		</para>
+		<para>
+			The name OpenCReports came from the fact that it's written
+			in the C programming language and is implemented in an
+			open way and using an free software license.
+		</para>
+	</sect1>
+	<sect1>
+		<title>OpenCReports features</title>
+		<sect2>
+			<title>XML based report description</title>
+			<para>
+				OpenCReports uses an RLIB-compatible report description
+				with extensions.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Extensive API for report creation</title>
+			<para>
+				The low level API allows creating a report purely
+				via program code. The high level API allows loading
+				an XML report description that contains all details
+				about the report including database access. Mixing
+				the high and low level APIs allows a balance anywhere
+				between the two extremes, e.g. loading the report
+				description but passing database access details via
+				program code.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Strict expression parser</title>
+			<para>
+				OpenCReports uses a Flex based tokenizer and  Bison grammar
+				to parse expressions. This allows to pinpoint buggy
+				reports with bad expressions easily.
+				See the <xref linkend="expressions"/> chapter.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Expression optimization</title>
+			<para>
+				OpenCReports does some expression optimization
+				to reduce runtime cost of computing expression
+				values.
+			</para>
+		</sect2>
+		<sect2>
+			<title>UTF-8 aware string type and functions</title>
+			<para>
+				OpenCReports exclusively uses UTF-8 internally and
+				externally.
+			</para>
+		</sect2>
+		<sect2>
+			<title>High precision numeric data type</title>
+			<para>
+				OpenCReports uses GNU MPFR behind the scenes with
+				256-bit floating point values by default. This allows
+				storing very large and very small numbers with high
+				precision. See <xref linkend="numericconstants"/> in
+				the <xref linkend="expressions"/> chapter.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Datetime and interval data types</title>
+			<para>
+				OpenCReports differentiates between timestamp and
+				time interval data types, with the latter allowing
+				adding or subtracting a custom time period to and from
+				timestamp data. See See <xref linkend="datetimeconstants"/>
+				in
+                the <xref linkend="expressions"/> chapter.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Extensive and extensible set of functions</title>
+			<para>
+				OpenCReports has many functions to process the input data.
+				See <xref linkend="opsandfunc"/> in
+				the <xref linkend="expressions"/> chapter
+			</para>
+			<para>
+				Custom functions can also be added to a report by programming.
+				Custom functions may override stock functions.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Report variables</title>
+			<para>
+				OpenCReports supports using standard report variables
+				for calculating sums, minimum, maximum and average values
+				or custom defined ones. See <xref linkend="variables"/>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Report breaks</title>
+			<para>
+				OpenCReports supports report breaks defined on arbitrary
+				expressions. Breaks occurs on the border of changes in the
+				expression value. See <xref linkend="breaks"/>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Multi-column reports</title>
+			<para>
+				OpenCReports, together with the basic single-column report
+				layout, supports multi-column report layout.
+			</para>
+			<para>
+				If a report is "narrow", so more columns would fit on
+				the same page, the report may be set to use multiple
+				columns on the same page.
+			</para>
+		</sect2>
+		<sect2>
+			<title>PDF output format</title>
+			<para>
+				By using the excellent drawing possibilities of Cairo 1.16.0
+				or later, OpenCReports supports generating the report
+				in PDF format.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Extensive set of unit tests</title>
+			<para>
+				The unit tests ensure that OpenCReports' features keep
+				working when adding new features or fixes. Units tests
+				exercise many aspects of the high and low level API,
+				report description handling, runtime behavior and output
+				generation.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Standard Linux dependencies</title>
+			<para>
+				OpenCReports uses
+				<ulink url="https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home"><citetitle>LibXML2</citetitle></ulink>,
+				<ulink url="https://juliastrings.github.io/utf8proc/"><citetitle>utf8proc</citetitle></ulink>,
+				<ulink url="https://www.mpfr.org"><citetitle>MPFR</citetitle></ulink>,
+				<ulink url="http://packages.qa.debian.org/libp/libpaper.html"><citetitle>libpaper</citetitle></ulink>,
+				<ulink url="https://github.com/rgamble/libcsv"><citetitle>libcsv</citetitle></ulink>,
+				<ulink url="http://lloyd.github.com/yajl/"><citetitle>yajl</citetitle></ulink>,
+				<ulink url="https://www.cairographics.org"><citetitle>Cairo</citetitle></ulink>,
+				<ulink url="https://pango.gnome.org"><citetitle>Pango</citetitle></ulink>,
+				<ulink url="https://wiki.gnome.org/Projects/LibRsvg"><citetitle>librsvg2</citetitle></ulink>,
+				<ulink url="https://gitlab.gnome.org/GNOME/gdk-pixbuf"><citetitle>gdk-pixbuf2</citetitle></ulink>,
+				<ulink url="https://www.postgresql.org"><citetitle>PostgreSQL</citetitle></ulink>,
+				<ulink url="https://mariadb.com"><citetitle>MariaDB</citetitle></ulink>
+				and
+				<ulink url="http://www.unixodbc.org"><citetitle>unixODBC</citetitle></ulink>.
+			</para>
+			<para>
+				For running the unit tests,
+				<ulink url="https://www.ghostscript.com"><citetitle>Ghostscript</citetitle></ulink>
+				and <literal>compare</literal> from
+				<ulink url="https://imagemagick.org"><citetitle>Imagemagick</citetitle></ulink>
+				are also needed.
+			</para>
+			<para>
+				<literal>docbook2pdf</literal> from
+				<ulink url="http://sources.redhat.com/docbook-tools/"><citetitle>Docbook</citetitle></ulink>
+				is used to generate the documentation.
+			</para>
+		</sect2>
+	</sect1>
+	<sect1>
+		<title>OpenCReports planned features</title>
+		<sect2>
+			<title>Multi-row fields</title>
+			<para>
+				The so called "memo" fields are not implemented yet.
+			</para>
+		</sect2>
+		<sect2>
+			<title>More output formats</title>
+			<para>
+				XML, CSV, plaintext and JSON are not currently supported as
+				output formats.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Graph and chart support in XML and PDF output</title>
+			<para>
+				Currently Gantt chart and various graph types (like
+				barchart, pie chart and their various subtypes) are
+				not supported.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Visual editor for report XML descriptions</title>
+			<para>
+				There are other report generators on the market with
+				nice GUIs to create the report visually.
+			</para>
+		</sect2>
+	</sect1>
+</chapter>

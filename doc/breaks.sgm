@@ -1,0 +1,35 @@
+<chapter id="breaks" xreflabel="Report breaks">
+	<title>Report breaks</title>
+	<sect1>
+		<title>Introduction to report breaks</title>
+		<para>
+			It is often necessary to group data by certain properties.
+			Imagine a list of employees of a company, grouped by their
+			departments, pay grade, or location of employment. A report
+			may show the list of the employees with visual separation
+			according to any of these properties.
+		</para>
+		<para>
+			Such grouping (properties of distinction) may co-exist in
+			a report with prioritization: first by department, then
+			in each department, subgrouping would separate employees
+			according to the pay grade, etc.
+		</para>
+	</sect1>
+	<sect1>
+		<title>Report breaks in OpenCReports</title>
+		<para>
+			OpenCReports supports report breaks defined on arbitrary
+			expressions. Breaks occurs on the border of changes in the
+			expression value.
+		</para>
+		<para>
+			The prioritization of breaks is done according their order
+			of declaration.
+		</para>
+		<para>
+			Visual separation is optionally helped with break headers
+			and footers.
+		</para>
+	</sect1>
+</chapter>

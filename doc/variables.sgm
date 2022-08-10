@@ -1,0 +1,37 @@
+<chapter id="variables" xreflabel="Report variables">
+	<title>Report variables</title>
+	<sect1>
+		<title>Introduction to report variables</title>
+		<para>
+			Variables are aliases for either basic or iterative
+			expressions.
+		</para>
+		<para>
+			For basic expressions, the value of a variable is
+			calculated from the aliased expression using the current
+			row of data from the data source. This can be thought of
+			as a kind of shortcut. A variable calculates the
+			value of a long or often used expression, and the variable
+			in turn can be used in other expressions. The can save
+			both typing (in the report XML) or runtime during the
+			report generation, since the expression value is calculated
+			once per row.
+		</para>
+		<para>
+			Iterative variables use both the values of the current row
+			of data and the value of the variable calculated for the
+			previous row. Such use case are counting values (with either
+			accounting or ignoring NULL values), summing or averaging
+			values, or calculating the highest or lowest value of the
+			dataset.
+		</para>
+		<para>
+			Variables may be reset at break boundaries.
+			See <xref linkend="breaks"/>.
+		</para>
+		<para>
+			Custom variables may be defined that use any supported
+			data type and custom accumulator functions.
+		</para>
+	</sect1>
+</chapter>

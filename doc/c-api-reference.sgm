@@ -1,4 +1,4 @@
-<chapter label="2" id="c-api-reference" xreflabel="C API Reference">
+<chapter id="c-api-reference" xreflabel="C API Reference">
 	<title>C language API reference</title>
 	<sect1>
 		<title>Report header</title>
