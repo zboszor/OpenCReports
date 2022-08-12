@@ -303,6 +303,11 @@ struct ocrpt_input {
 
 typedef struct ocrpt_input ocrpt_input;
 
+struct ocrpt_output {
+	ocrpt_list *output_list;
+};
+typedef struct ocrpt_output ocrpt_output;
+
 struct ocrpt_paper {
 	const char *name;
 	double width;
@@ -331,8 +336,8 @@ struct ocrpt_break {
 	ocrpt_list *breakfields;	/* list of ocrpt_expr pointers */
 	ocrpt_list *callbacks;		/* list of ocrpt_break_trigger_cb_data pointers */
 	ocrpt_expr *rownum;			/* row number of the break */
-	ocrpt_list *header;
-	ocrpt_list *footer;
+	ocrpt_output header;
+	ocrpt_output footer;
 	short index;
 	bool attrs[OCRPT_BREAK_ATTRS_COUNT];
 	bool cb_triggered;
@@ -474,10 +479,10 @@ struct ocrpt_image {
 };
 typedef struct ocrpt_image ocrpt_image;
 
-struct ocrpt_output {
+struct ocrpt_output_element {
 	ocrpt_output_type type;
 };
-typedef struct ocrpt_output ocrpt_output;
+typedef struct ocrpt_output_element ocrpt_output_element;
 
 struct ocrpt_output_functions {
 	void (*draw_hline)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_hline *, double, double, double, double);
@@ -504,11 +509,12 @@ struct ocrpt_report {
 	double page_indent;
 
 	/* Output elements */
-	ocrpt_list *nodata;
-	ocrpt_list *reportheader;
-	ocrpt_list *reportfooter;
-	ocrpt_list *fieldheader;
-	ocrpt_list *fielddetails;
+	ocrpt_output nodata;
+	ocrpt_output reportheader;
+	ocrpt_output reportfooter;
+	ocrpt_output fieldheader;
+	ocrpt_output fielddetails;
+
 	/* Parent part */
 	ocrpt_part *part;
 	/* Toplevel query */
@@ -599,8 +605,8 @@ struct ocrpt_part {
 	double page_width;
 
 	/* Common header and footer for all reports in this part */
-	ocrpt_list *pageheader;
-	ocrpt_list *pagefooter;
+	ocrpt_output pageheader;
+	ocrpt_output pagefooter;
 
 	/* Paper */
 	const ocrpt_paper *paper;

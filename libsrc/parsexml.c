@@ -808,14 +808,14 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 		ocrpt_ignore_child_nodes(o, reader, depth, literal ? "literal" : "field");
 }
 
-static void ocrpt_parse_output_line_node(opencreport *o, ocrpt_report *r, ocrpt_list **list_p, xmlTextReaderPtr reader) {
+static void ocrpt_parse_output_line_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
 	ocrpt_line *line;
 
 	line = ocrpt_mem_malloc(sizeof(ocrpt_line));
 	memset(line, 0, sizeof(ocrpt_line));
 	line->type = OCRPT_OUTPUT_LINE;
 
-	*list_p = ocrpt_list_append(*list_p, line);
+	output->output_list = ocrpt_list_append(output->output_list, line);
 
 	xmlChar *font_name, *font_size, *bold, *italic, *suppress, *color, *bgcolor;
 	struct {
@@ -884,7 +884,7 @@ static void ocrpt_parse_output_line_node(opencreport *o, ocrpt_report *r, ocrpt_
 	}
 }
 
-static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt_list **list_p, xmlTextReaderPtr reader) {
+static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
 	ocrpt_hline *hline = ocrpt_mem_malloc(sizeof(ocrpt_hline));
 	xmlChar *size, *indent, *length, *font_size, *suppress, *color;
 	struct {
@@ -925,12 +925,12 @@ static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt
 	xmlFree(suppress);
 	xmlFree(color);
 
-	*list_p = ocrpt_list_append(*list_p, hline);
+	output->output_list = ocrpt_list_append(output->output_list, hline);
 
 	ocrpt_ignore_child_nodes(o, reader, -1, "HorizontalLine");
 }
 
-static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt_list **list_p, xmlTextReaderPtr reader) {
+static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
 	ocrpt_image *img = ocrpt_mem_malloc(sizeof(ocrpt_image));
 	xmlChar *value, *type, *width, *height;
 	struct {
@@ -950,7 +950,7 @@ static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt
 
 	memset(img, 0, sizeof(ocrpt_image));
 	img->type = OCRPT_OUTPUT_IMAGE;
-	*list_p = ocrpt_list_append(*list_p, img);
+	output->output_list = ocrpt_list_append(output->output_list, img);
 
 	img->value = ocrpt_xml_expr_parse(o, r, value, true, false);
 	img->imgtype = ocrpt_xml_expr_parse(o, r, type, true, false);
@@ -965,7 +965,7 @@ static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt
 	ocrpt_ignore_child_nodes(o, reader, -1, "Image");
 }
 
-static void ocrpt_parse_output_node(opencreport *o, ocrpt_report *r, ocrpt_list **list_p, xmlTextReaderPtr reader) {
+static void ocrpt_parse_output_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
@@ -984,18 +984,18 @@ static void ocrpt_parse_output_node(opencreport *o, ocrpt_report *r, ocrpt_list 
 
 		if (nodetype == XML_READER_TYPE_ELEMENT) {
 			if (!strcmp((char *)name, "Line"))
-				ocrpt_parse_output_line_node(o, r, list_p, reader);
+				ocrpt_parse_output_line_node(o, r, output, reader);
 			else if (!strcmp((char *)name, "HorizontalLine"))
-				ocrpt_parse_output_hline_node(o, r, list_p, reader);
+				ocrpt_parse_output_hline_node(o, r, output, reader);
 			else if (!strcmp((char *)name, "Image"))
-				ocrpt_parse_output_image_node(o, r, list_p, reader);
+				ocrpt_parse_output_image_node(o, r, output, reader);
 		}
 
 		xmlFree(name);
 	}
 }
 
-static void ocrpt_parse_output_parent_node(opencreport *o, ocrpt_report *r, const char *nodename, ocrpt_list **list_p, xmlTextReaderPtr reader) {
+static void ocrpt_parse_output_parent_node(opencreport *o, ocrpt_report *r, const char *nodename, ocrpt_output *output, xmlTextReaderPtr reader) {
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
@@ -1014,7 +1014,7 @@ static void ocrpt_parse_output_parent_node(opencreport *o, ocrpt_report *r, cons
 
 		if (nodetype == XML_READER_TYPE_ELEMENT) {
 			if (!strcmp((char *)name, "Output"))
-				ocrpt_parse_output_node(o, r, list_p, reader);
+				ocrpt_parse_output_node(o, r, output, reader);
 		}
 
 		xmlFree(name);

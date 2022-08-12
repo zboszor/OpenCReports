@@ -100,8 +100,8 @@ DLL_EXPORT_SYM void ocrpt_part_free(opencreport *o, ocrpt_part *p) {
 	if (p->allocated)
 		ocrpt_mem_free(p->xmlbuf);
 #endif
-	ocrpt_output_free(o, NULL, p->pageheader);
-	ocrpt_output_free(o, NULL, p->pagefooter);
+	ocrpt_output_free(o, NULL, &p->pageheader);
+	ocrpt_output_free(o, NULL, &p->pagefooter);
 	ocrpt_mem_free(p);
 }
 
@@ -139,11 +139,11 @@ DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_list_free_deep(r->newrow_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(r->precalc_done_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(r->iteration_callbacks, ocrpt_mem_free);
-	ocrpt_output_free(o, r, r->nodata);
-	ocrpt_output_free(o, r, r->reportheader);
-	ocrpt_output_free(o, r, r->reportfooter);
-	ocrpt_output_free(o, r, r->fieldheader);
-	ocrpt_output_free(o, r, r->fielddetails);
+	ocrpt_output_free(o, r, &r->nodata);
+	ocrpt_output_free(o, r, &r->reportheader);
+	ocrpt_output_free(o, r, &r->reportfooter);
+	ocrpt_output_free(o, r, &r->fieldheader);
+	ocrpt_output_free(o, r, &r->fielddetails);
 	ocrpt_mem_free(r->query);
 	ocrpt_mem_free(r);
 }

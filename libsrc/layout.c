@@ -252,7 +252,7 @@ static void ocrpt_layout_image(bool draw, opencreport *o, ocrpt_part *p, ocrpt_p
 	p->current_image_width = width;
 }
 
-void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_list *output_list, double page_width, double page_indent, double *page_position) {
+void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, double page_width, double page_indent, double *page_position) {
 	bool had_image = false;
 
 	if (r) {
@@ -261,8 +261,8 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 		p->current_image_height = 0.0;
 	}
 
-	for (ocrpt_list *ol = output_list; ol; ol = ol->next) {
-		ocrpt_output *output = (ocrpt_output *)ol->data;
+	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
+		ocrpt_output_element *output = (ocrpt_output_element *)ol->data;
 		char *font_name;
 		double font_size;
 
@@ -315,7 +315,7 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 	}
 }
 
-void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_list *output_list, unsigned int rows, double *page_indent, double *page_position) {
+void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, unsigned int rows, double *page_indent, double *page_position) {
 	ocrpt_list *old_current_page;
 	double old_page_position, new_page_position;
 	bool page_break = false;
@@ -338,7 +338,7 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	old_current_page = o->current_page;
 	old_page_position = new_page_position = *page_position;
 
-	ocrpt_layout_output_internal(false, o, p, pr, pd, r, output_list, r->column_width, *page_indent, &new_page_position);
+	ocrpt_layout_output_internal(false, o, p, pr, pd, r, output, r->column_width, *page_indent, &new_page_position);
 
 	if (new_page_position > p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height) {
 		r->current_column++;
@@ -352,9 +352,9 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 			if (!o->precalculate) {
 				new_page_position = ocrpt_layout_top_margin(o, p);
-				ocrpt_layout_output_internal(true, o, p, NULL, NULL, NULL, p->pageheader, p->page_width, *page_indent, &new_page_position);
+				ocrpt_layout_output_internal(true, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, *page_indent, &new_page_position);
 				new_page_position = p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height;
-				ocrpt_layout_output_internal(true, o, p, NULL, NULL, NULL, p->pagefooter, p->page_width, *page_indent, &new_page_position);
+				ocrpt_layout_output_internal(true, o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, *page_indent, &new_page_position);
 			}
 			ocrpt_layout_add_new_page(o, p, pr, pd, r, rows, page_indent, &new_page_position);
 		} else {
@@ -371,7 +371,7 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			o->current_page = old_current_page;
 			new_page_position = old_page_position;
 		}
-		ocrpt_layout_output_internal(true, o, p, pr, pd, r, output_list, r->column_width, *page_indent, &new_page_position);
+		ocrpt_layout_output_internal(true, o, p, pr, pd, r, output, r->column_width, *page_indent, &new_page_position);
 	}
 
 	*page_position = new_page_position;
@@ -426,7 +426,7 @@ double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p, ocrpt_report *r)
 }
 
 void ocrpt_layout_output_highprio_fieldheader(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, unsigned int rows, double *page_indent, double *page_position) {
-	if (r && r->fieldheader && r->fieldheader_high_priority) {
+	if (r && r->fieldheader.output_list && r->fieldheader_high_priority) {
 		/*
 		 * Debatable preference in taste:
 		 * a) field headers have higher precedence than break headers
@@ -441,7 +441,7 @@ void ocrpt_layout_output_highprio_fieldheader(opencreport *o, ocrpt_part *p, ocr
 		 * It is configurable via <Report field_header_preference="high/low">
 		 * with the default "high" value.
 		 */
-		ocrpt_layout_output(o, p, pr, pd, r, r->fieldheader, rows, page_indent, page_position);
+		ocrpt_layout_output(o, p, pr, pd, r, &r->fieldheader, rows, page_indent, page_position);
 	}
 }
 
@@ -474,7 +474,7 @@ void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr
 	r->page_start = *page_position = ocrpt_layout_top_margin(o, p) + p->page_header_height;
 
 	if (rows == 1)
-		ocrpt_layout_output(o, p, pr, pd, r, r->reportheader, rows, page_indent, page_position);
+		ocrpt_layout_output(o, p, pr, pd, r, &r->reportheader, rows, page_indent, page_position);
 
 	ocrpt_layout_output_highprio_fieldheader(o, p, pr, pd, r, rows, page_indent, page_position);
 }

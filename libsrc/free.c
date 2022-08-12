@@ -118,11 +118,11 @@ void ocrpt_image_free(const void *ptr) {
 	ocrpt_mem_free(ptr);
 }
 
-void ocrpt_output_free(opencreport *o, ocrpt_report *r, ocrpt_list *output_list) {
+void ocrpt_output_free(opencreport *o, ocrpt_report *r, ocrpt_output *output) {
 	ocrpt_line *line;
 
-	for (ocrpt_list *l = output_list; l; l = l->next) {
-		ocrpt_output *output = (ocrpt_output *)l->data;
+	for (ocrpt_list *l = output->output_list; l; l = l->next) {
+		ocrpt_output_element *output = (ocrpt_output_element *)l->data;
 		switch (output->type) {
 		case OCRPT_OUTPUT_LINE:
 			line = (ocrpt_line *)output;
@@ -141,5 +141,6 @@ void ocrpt_output_free(opencreport *o, ocrpt_report *r, ocrpt_list *output_list)
 		ocrpt_mem_free(output);
 	}
 
-	ocrpt_list_free(output_list);
+	ocrpt_list_free(output->output_list);
+	output->output_list = NULL;
 }
