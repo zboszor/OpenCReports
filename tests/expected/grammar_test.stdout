@@ -1267,7 +1267,7 @@ expr reprinted: mod(.'a',.'b')
 expr nodes: 3
 
 string: a ^ b
-expr reprinted: xor(.'a',.'b')
+expr reprinted: pow(.'a',.'b')
 expr nodes: 3
 
 string: a | b

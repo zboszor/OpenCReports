@@ -216,7 +216,7 @@ xdinside		[^"]*
  /* Binary ops */
 "^"		{
 			SET_YYLLOC();
-			yylval->s = ocrpt_mem_string_new_with_len(parser_yyget_extra(yyscanner)->o->caret_is_pow ? "pow" : "xor", 3);
+			yylval->s = ocrpt_mem_string_new_with_len("pow", 3);
 			parser_yyget_extra(yyscanner)->tokens = ocrpt_list_prepend(parser_yyget_extra(yyscanner)->tokens, yylval->s);
 			return yytext[0];
 		}

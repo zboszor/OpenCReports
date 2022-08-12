@@ -1,4 +1,0 @@
-expr '2 ^ 3' reprinted (OCRPT mode): xor(2.000000,3.000000)
-(number)1.000000
-expr '2 ^ 3' reprinted (RLIB mode): pow(2.000000,3.000000)
-(number)8.000000

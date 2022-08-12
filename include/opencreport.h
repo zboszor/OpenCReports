@@ -708,7 +708,6 @@ struct opencreport {
 	unsigned int residx:3;
 	unsigned int output_format:3;
 	bool precalculate:1;
-	bool caret_is_pow:1;
 	bool size_unit_set:1;
 	bool size_in_points:1;
 };
@@ -1426,12 +1425,6 @@ void ocrpt_spool(opencreport *o);
  * Set output format
  */
 void ocrpt_set_output_format(opencreport *o, ocrpt_format_type format);
-
-/*
- * Set the behaviour of the ^ operator
- * By default it's used for XOR
- */
-void ocrpt_set_caret_operator_is_pow(opencreport *o);
 
 /**************************************
  * Functions related to file handling *

@@ -74,13 +74,13 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, ocrpt_list *
 %left		L_OR
 %left		L_AND
 %left		'|'
-%left		'^'
 %left		'&'
 %left		CMPEQ
 %left		CMP
 %left		BSHIFT
 %left		'+' '-'
 %left		'*' '/' '%'
+%left		'^'
 %precedence	'!'
 %precedence	'~' UMINUS
 %right		INCDEC

@@ -50,19 +50,6 @@ void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode);
 				</programlisting>
 			</para>
 		</sect2>
-		<sect2>
-			<title><literal>ocrpt_set_rlib_compat</literal></title>
-			<para>
-				Set RLIB compatibilty mode. It's a one-way setting.
-				It controls some low level behavioural details to
-				match RLIB better. For example, the <literal>^</literal>
-				operator will be parsed as the <literal>pow()</literal>
-				function instead of <literal>xor()</literal>.
-				<programlisting>
-void ocrpt_set_rlib_compat(opencreport *o);
-				</programlisting>
-			</para>
-		</sect2>
 	</sect1>
 	<sect1>
 		<title>Data source related functions</title>

@@ -10,7 +10,6 @@ $(top_builddir)/libsrc/libopencreport.la:
 TESTS = \
 	compiler_test \
 	grammar_test expr_test function_test \
-	expr_rlib_compat_test \
 	expr_format_test \
 	environment_test environment2_test \
 	array_test array2_test array_resolve_test array_xml_test \
