@@ -17,6 +17,7 @@ mkdir -p ${abs_builddir}/results
 rm -f results/${TEST}.pdf.*.png results/${TEST}.asanout.*
 ./${TEST} 2>results/${TEST}.stderr >results/${TEST}.pdf
 
+WARNINGS=
 if [[ -f ${abs_srcdir}/expected/${TEST}.pdf ]]; then
 	OUTEXP=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r150 -sOutputFile=results/${TEST}.pdf.exp.%d.png ${abs_srcdir}/expected/${TEST}.pdf)
 	OUTRES=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r150 -sOutputFile=results/${TEST}.pdf.%d.png results/${TEST}.pdf)
@@ -29,10 +30,18 @@ if [[ -f ${abs_srcdir}/expected/${TEST}.pdf ]]; then
 		OUTDIFF="Number of expected pages ($PAGESEXPEND) differ from the number of result pages ($PAGESRESEND)"
 	else
 		for i in $(seq 1 $PAGESEXPEND) ; do
-			DIFF=$(compare -metric AE -fuzz 1% results/${TEST}.pdf.exp.${i}.png results/${TEST}.pdf.${i}.png results/${TEST}.pdf.${i}.diff.png 2>&1)
-			if [[ $DIFF != "0" ]]; then
+			DIFF=$(compare -metric AE -fuzz '1%' results/${TEST}.pdf.exp.${i}.png results/${TEST}.pdf.${i}.png -colorspace RGB results/${TEST}.pdf.${i}.diff.png 2>&1)
+			DIFF1=$(echo "$DIFF" | sed 's#^\([0-9]*\)compare:.*$#\1#')
+			if [[ $DIFF1 != "0" ]]; then
 				OUTDIFF="Page $i differs"
 				break
+			fi
+			if [[ "$DIFF" != "$DIFF1" ]]; then
+				if [[ -z $WARNINGS ]]; then
+					WARNINGS="$DIFF"
+				else
+					WARNINGS="$WARNINGS\n$DIFF"
+				fi
 			fi
 		done
 	fi
@@ -62,4 +71,7 @@ elif [[ $ERRERROR -eq 1 ]]; then
 	echo "${ERRDIFF}"
 else
 	echo -e "[ \\033[38;05;34mOK\\033[0;39m ] ${TEST}"
+	[[ -n "$WARNINGS" ]] && echo -e "$WARNINGS"
 fi
+
+exit 0
