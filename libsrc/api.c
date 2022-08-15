@@ -27,9 +27,14 @@
 
 #include "scanner.h"
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
 #include "datasource.h"
 #include "variables.h"
+#include "breaks.h"
 #include "exprutil.h"
+#include "functions.h"
+#include "parts.h"
 #include "color.h"
 #include "layout.h"
 #include "pdf.h"
@@ -202,6 +207,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 	bool have_row = ocrpt_query_navigate_next(o, q);
 
 	r->current_column = 0;
+	ocrpt_expr_init_iterative_results(o, r->detailcnt, OCRPT_RESULT_NUMBER);
 
 	while (have_row) {
 		ocrpt_list *brl;
@@ -306,6 +312,11 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			 * It is configurable via <Report field_header_preference="high/low">
 			 * with the default "high" value.
 			 */
+			if (rows > 1) {
+				ocrpt_expr_init_iterative_results(o, r->detailcnt, OCRPT_RESULT_NUMBER);
+				ocrpt_expr_eval(o, r, r->detailcnt);
+				ocrpt_report_evaluate_detailcnt_dependees(o, r);
+			}
 			ocrpt_layout_output(o, p, pr, pd, r, &r->fieldheader, rows, page_indent, page_position);
 		}
 		ocrpt_layout_output(o, p, pr, pd, r, &r->fielddetails, rows, page_indent, page_position);
@@ -844,6 +855,10 @@ DLL_EXPORT_SYM void ocrpt_set_locale(opencreport *o, const char *locale) {
 	o->locale = newlocale(LC_ALL_MASK, locale, o->locale);
 	if (o->locale == (locale_t)0)
 		o->locale = newlocale(LC_ALL_MASK, "C", o->locale);
+}
+
+DLL_EXPORT_SYM locale_t ocrpt_get_locale(opencreport *o) {
+	return o ? o->locale : (locale_t)0;
 }
 
 __attribute__((constructor))

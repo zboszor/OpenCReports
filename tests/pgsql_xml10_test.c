@@ -44,11 +44,11 @@ int main(void) {
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns (a):\n");
 		for (i = 0; i < cols; i++)
-			printf("%d: '%s'\n", i, qr[i].name);
+			printf("%d: '%s'\n", i, ocrpt_query_result_column_name(qr, i));
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	printf("Query columns (b):\n");
 		for (i = 0; i < cols2; i++)
-			printf("%d: '%s'\n", i, qr2[i].name);
+			printf("%d: '%s'\n", i, ocrpt_query_result_column_name(qr2, i));
 
 	row = 0;
 	ocrpt_query_navigate_start(o, q);

@@ -8,8 +8,26 @@
 
 #include <opencreport.h>
 
+struct ocrpt_var {
+	const char *name;
+	char *br_name;
+	ocrpt_break *br;
+	ocrpt_expr *baseexpr;
+	ocrpt_expr *intermedexpr;
+	ocrpt_expr *intermed2expr;
+	ocrpt_expr *resultexpr;
+	ocrpt_list *precalc_results;
+	ocrpt_list *precalc_rptr;
+	unsigned int break_index:16;
+	enum ocrpt_var_type type:4;
+	enum ocrpt_result_type basetype:2;
+	bool precalculate:1;
+};
+
 void ocrpt_variable_reset(opencreport *o, ocrpt_var *v);
 void ocrpt_variables_add_precalculated_results(opencreport *o, ocrpt_report *r, ocrpt_list *brl_start, bool last_row);
 void ocrpt_variables_advance_precalculated_results(opencreport *o, ocrpt_report *r, ocrpt_list *brl_start);
+void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_var *var);
+void ocrpt_variables_free(opencreport *o, ocrpt_report *r);
 
 #endif

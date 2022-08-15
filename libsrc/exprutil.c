@@ -12,16 +12,25 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <mpfr.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
 #include "exprutil.h"
+#include "functions.h"
+#include "variables.h"
 #include "datasource.h"
+#include "parts.h"
 
 #ifndef UNUSED
 #define UNUSED __attribute__((unused))
 #endif
+
+void ocrpt_result_print_internal(ocrpt_result *r, FILE *stream);
 
 ocrpt_expr *newblankexpr(opencreport *o, ocrpt_report *r, enum ocrpt_expr_type type, uint32_t n_ops) {
 	ocrpt_expr *e;
@@ -148,44 +157,48 @@ static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth, co
 		ocrpt_mem_string_append_printf(str, "%s", delimiter);
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_print(opencreport *o, ocrpt_expr *e) {
+static void ocrpt_expr_print_internal(opencreport *o, ocrpt_expr *e, FILE *stream) {
 	ocrpt_string *str = ocrpt_mem_string_new_with_len(NULL, 256);
 	ocrpt_expr_print_worker(o, e, 0, "\n", str);
-	printf("%s", str->str);
+	fprintf(stream, "%s", str->str);
 	ocrpt_mem_string_free(str, true);
 }
 
-static void ocrpt_expr_result_deep_print_worker(opencreport *o, ocrpt_expr *e) {
+DLL_EXPORT_SYM void ocrpt_expr_print(opencreport *o, ocrpt_expr *e) {
+	ocrpt_expr_print_internal(o, e, stdout);
+}
+
+void ocrpt_expr_result_deep_print_worker(opencreport *o, ocrpt_expr *e, FILE *stream) {
 	ocrpt_string *str = ocrpt_mem_string_new_with_len(NULL, 256);
 	int i;
 
 	switch (e->type) {
 	case OCRPT_EXPR:
 		for (i = 0; i < e->n_ops; i++)
-			ocrpt_expr_result_deep_print(o, e->ops[i]);
+			ocrpt_expr_result_deep_print_worker(o, e->ops[i], stream);
 		break;
 	case OCRPT_EXPR_VVAR:
 		assert(e->var);
 		if (e->var->baseexpr)
-			ocrpt_expr_result_deep_print(o, e->var->baseexpr);
+			ocrpt_expr_result_deep_print_worker(o, e->var->baseexpr, stream);
 		if (e->var->intermedexpr)
-			ocrpt_expr_result_deep_print(o, e->var->intermedexpr);
+			ocrpt_expr_result_deep_print_worker(o, e->var->intermedexpr, stream);
 		if (e->var->intermed2expr)
-			ocrpt_expr_result_deep_print(o, e->var->intermed2expr);
-		ocrpt_expr_result_deep_print(o, e->var->resultexpr);
+			ocrpt_expr_result_deep_print_worker(o, e->var->intermed2expr, stream);
+		ocrpt_expr_result_deep_print_worker(o, e->var->resultexpr, stream);
 		break;
 	default:
 		break;
 	}
 
 	ocrpt_expr_print_worker(o, e, 0, " - ", str);
-	printf("%s", str->str);
+	fprintf(stream, "%s\n", str->str);
 	ocrpt_mem_string_free(str, true);
-	ocrpt_result_print(e->result[o->residx]);
+	ocrpt_result_print_internal(e->result[o->residx], stream);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_result_deep_print(opencreport *o, ocrpt_expr *e) {
-	ocrpt_expr_result_deep_print_worker(o, e);
+	ocrpt_expr_result_deep_print_worker(o, e, stdout);
 }
 
 DLL_EXPORT_SYM void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_result *src) {
@@ -232,18 +245,18 @@ DLL_EXPORT_SYM void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_r
 	}
 }
 
-DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
+void ocrpt_result_print_internal(ocrpt_result *r, FILE *stream) {
 	if (!r) {
-		printf("ERROR: ocrpt_result is NULL\n");
+		fprintf(stream, "ERROR: ocrpt_result is NULL\n");
 		return;
 	}
 
 	switch (r->type) {
 	case OCRPT_RESULT_ERROR:
-		printf("(ERROR)%s\n", (r->isnull || !r->string) ? "NULL" : r->string->str);
+		fprintf(stream, "(ERROR)%s\n", (r->isnull || !r->string) ? "NULL" : r->string->str);
 		break;
 	case OCRPT_RESULT_STRING:
-		printf("(string)%s\n", (r->isnull || !r->string) ? "NULL" : r->string->str);
+		fprintf(stream, "(string)%s\n", (r->isnull || !r->string) ? "NULL" : r->string->str);
 		break;
 	case OCRPT_RESULT_DATETIME: {
 		if (!r->isnull) {
@@ -261,7 +274,7 @@ DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
 					ocrpt_mem_string_append_printf(str, "%s%d mins", str->len ? " " : "", r->datetime.tm_min);
 				if (r->datetime.tm_sec)
 					ocrpt_mem_string_append_printf(str, "%s%d seconds", str->len ? " " : "", r->datetime.tm_sec);
-				printf("(datetime)%s\n", str->str);
+				fprintf(stream, "(datetime)%s\n", str->str);
 				ocrpt_mem_string_free(str, true);
 			} else {
 				char tmp[128] = "";
@@ -271,19 +284,23 @@ DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
 					strftime(tmp, sizeof(tmp), "%F", &r->datetime);
 				else if (r->time_valid)
 					strftime(tmp, sizeof(tmp), "%T", &r->datetime);
-				printf("(datetime)%s\n", tmp);
+				fprintf(stream, "(datetime)%s\n", tmp);
 			}
 		} else
-			printf("(datetime)NULL\n");
+			fprintf(stream, "(datetime)NULL\n");
 		break;
 	}
 	case OCRPT_RESULT_NUMBER:
 		if (r->isnull)
-			printf("(number)NULL\n");
+			fprintf(stream, "(number)NULL\n");
 		else
-			mpfr_printf("(number)%RF\n", r->number);
+			mpfr_fprintf(stream, "(number)%RF\n", r->number);
 		break;
 	}
+}
+
+DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
+	ocrpt_result_print_internal(r, stdout);
 }
 
 static void ocrpt_expr_nodes_worker(ocrpt_expr *e, int *nodes) {
@@ -492,7 +509,6 @@ DLL_EXPORT_SYM void ocrpt_expr_optimize(opencreport *o, ocrpt_report *r, ocrpt_e
 	if (!o || !e)
 		return;
 
-	//fprintf(stderr, "%s:%d\n", __func__, __LINE__);
 	ocrpt_expr_optimize_worker(o, r, e);
 }
 
@@ -618,22 +634,38 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 					}
 				}
 			} else if (strcmp(e->name->str, "lineno") == 0) {
-				if (r) {
-					/* TODO: current number of printed <Line> sections for <FieldDetails> */
-				} else
-					ocrpt_expr_make_error_result(o, e, "invalid usage of r.lineno");
+				/* This is aliased in the grammar. */
+				assert(!"lineno cannot occur here");
+				abort();
 			} else if (strcmp(e->name->str, "detailcnt") == 0) {
 				if (r) {
-					/* TODO: alias for rownum() */
+					ocrpt_list *l;
+
+					for (l = r->detailcnt_dependees; l; l = l->next) {
+						if (l->data == orig_e)
+							break;
+					}
+					if (!l)
+						r->detailcnt_dependees = ocrpt_list_append(r->detailcnt_dependees, orig_e);
+
+					if (!e->result[o->residx]) {
+						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+							e->result[i] = r->detailcnt->result[i];
+							ocrpt_expr_set_result_owned(o, e, i, false);
+						}
+					}
 				} else
 					ocrpt_expr_make_error_result(o, e, "invalid usage of r.detailcnt");
 			} else if (strcmp(e->name->str, "format") == 0) {
 				if (orig_e->rvalue && orig_e->rvalue->format) {
 					for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
-						e->result[i] = orig_e->rvalue->format->result[i];
-						ocrpt_expr_set_result_owned(o, e, i, false);
+						if (!e->result[i]) {
+							e->result[i] = orig_e->rvalue->format->result[i];
+							ocrpt_expr_set_result_owned(o, e, i, false);
+						}
 					}
-				}
+				} else
+					ocrpt_expr_make_error_result(o, e, "invalid usage of r.format");
 			}
 		}
 
@@ -916,7 +948,10 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_report *r, oc
 		return e->delayed_result;
 }
 
-DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_get_result(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
+DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_get_result(opencreport *o, ocrpt_expr *e) {
+	if (!o || !e)
+		return NULL;
+
 	if (o->precalculate || !e->delayed) {
 		assert(e->result[o->residx]);
 		return e->result[o->residx];
@@ -924,6 +959,22 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_get_result(opencreport *o, ocrpt_report 
 		assert(e->delayed_result);
 		return e->delayed_result;
 	}
+}
+
+DLL_EXPORT_SYM int32_t ocrpt_expr_get_num_operands(ocrpt_expr *e) {
+	if (!e)
+		return 0;
+
+	return e->n_ops;
+}
+
+DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_operand_get_result(opencreport *o, ocrpt_expr *e, int32_t opnum) {
+	if (!o || !e || opnum < 0 || opnum >= e->n_ops)
+		return NULL;
+
+	assert(e->ops[opnum]);
+	assert(e->ops[opnum]->result[o->residx]);
+	return e->ops[opnum]->result[o->residx];
 }
 
 DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *format, ...) {
@@ -1027,7 +1078,23 @@ DLL_EXPORT_SYM long ocrpt_expr_get_long_value(opencreport *o, ocrpt_expr *e) {
 	if (r && r->type == OCRPT_RESULT_NUMBER)
 		return mpfr_get_si(r->number, o->rndmode);
 
-	return 0;
+	return 0L;
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_set_long_value(opencreport *o, ocrpt_expr *e, long l) {
+	if (!o || !e)
+		return;
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+	mpfr_set_si(e->result[o->residx]->number, l, o->rndmode);
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_long_value(opencreport *o, ocrpt_expr *e, int which, long l) {
+	if (!o || !e || which < 0 || which >= OCRPT_EXPR_RESULTS)
+		return;
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+	mpfr_set_si(e->result[which]->number, l, o->rndmode);
 }
 
 DLL_EXPORT_SYM double ocrpt_expr_get_double_value(opencreport *o, ocrpt_expr *e) {
@@ -1042,6 +1109,22 @@ DLL_EXPORT_SYM double ocrpt_expr_get_double_value(opencreport *o, ocrpt_expr *e)
 		return mpfr_get_d(r->number, o->rndmode);
 
 	return 0.0;
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_set_double_value(opencreport *o, ocrpt_expr *e, double d) {
+	if (!o || !e)
+		return;
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+	mpfr_set_d(e->result[o->residx]->number, d, o->rndmode);
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_double_value(opencreport *o, ocrpt_expr *e, int which, double d) {
+	if (!o || !e || which < 0 || which >= OCRPT_EXPR_RESULTS)
+		return;
+
+	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+	mpfr_set_d(e->result[which]->number, d, o->rndmode);
 }
 
 static bool ocrpt_expr_get_precalculate_worker(opencreport *o, ocrpt_expr *e, int32_t depth) {
@@ -1099,4 +1182,71 @@ void ocrpt_report_expressions_add_delayed_results(opencreport *o, ocrpt_report *
 DLL_EXPORT_SYM void ocrpt_expr_set_field_expr(opencreport *o UNUSED, ocrpt_expr *e, ocrpt_expr *rvalue) {
 	if (e)
 		e->rvalue = rvalue;
+}
+
+DLL_EXPORT_SYM ocrpt_result *ocrpt_result_new(void) {
+	ocrpt_result *result = ocrpt_mem_malloc(sizeof(ocrpt_result));
+
+	memset(result, 0, sizeof(ocrpt_result));
+
+	return result;
+}
+
+DLL_EXPORT_SYM enum ocrpt_result_type ocrpt_result_get_type(ocrpt_result *result) {
+	if (!result)
+		return OCRPT_RESULT_ERROR;
+
+	return result->type;
+}
+
+DLL_EXPORT_SYM bool ocrpt_result_isnull(ocrpt_result *result) {
+	if (!result)
+		return true;
+
+	return result->isnull;
+}
+
+DLL_EXPORT_SYM bool ocrpt_result_isnumber(ocrpt_result *result) {
+	if (!result)
+		return false;
+
+	return result->number_initialized && result->type == OCRPT_RESULT_NUMBER;
+}
+
+DLL_EXPORT_SYM mpfr_ptr ocrpt_result_get_number(ocrpt_result *result) {
+	if (!result)
+		return NULL;
+
+	return result->number;
+}
+
+DLL_EXPORT_SYM ocrpt_string *ocrpt_result_get_string(ocrpt_result *result) {
+	if (!result)
+		return NULL;
+
+	return result->string;
+}
+
+void ocrpt_expr_init_iterative_results(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type) {
+	ocrpt_expr_set_iterative_start_value(e, false);
+	ocrpt_expr_init_results(o, e, type);
+	for (int i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+		if (ocrpt_expr_get_result_owned(o, e, i))
+			switch (type) {
+			case OCRPT_RESULT_NUMBER:
+				mpfr_set_ui(e->result[i]->number, 0, o->rndmode);
+				break;
+			case OCRPT_RESULT_STRING:
+				e->result[i]->string->len = 0;
+				break;
+			case OCRPT_RESULT_DATETIME:
+				memset(&e->result[i]->datetime, 0, sizeof(struct tm));
+				e->result[i]->date_valid = false;
+				e->result[i]->time_valid = false;
+				e->result[i]->interval = false;
+				break;
+			default:
+				break;
+			}
+	}
 }

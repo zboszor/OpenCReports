@@ -24,7 +24,7 @@ static void test_newrow_cb(opencreport *o, ocrpt_report *r, void *ptr) {
 		printf("at row %d\n", rd->rownum);
 	if (rd->rownum == ROWS) {
 		printf("\nShowing off numbers not possible with RLIB...\n");
-		ocrpt_result *rs = ocrpt_expr_get_result(o, r, rd->e);
+		ocrpt_result *rs = ocrpt_expr_get_result(o, rd->e);
 		ocrpt_result_print(rs);
 	}
 }

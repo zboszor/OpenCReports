@@ -15,7 +15,8 @@ const enum ocrpt_result_type coltypes[5] = {
 
 int main(void) {
 	opencreport *o = ocrpt_init();
-	ocrpt_list *pl;
+	ocrpt_list *pl = NULL;
+	ocrpt_part *p;
 	int32_t i;
 
 	if (!ocrpt_parse_xml(o, "part_xml_test.xml")) {
@@ -24,9 +25,8 @@ int main(void) {
 		return 0;
 	}
 
-	for (pl = o->parts, i = 0; pl; pl = pl->next, i++) {
+	for (p = ocrpt_part_get_next(o, &pl), i = 0; p; p = ocrpt_part_get_next(o, &pl), i++) {
 		char partname[16];
-		ocrpt_part *p = (ocrpt_part *)pl->data;
 
 		sprintf(partname, "part %d", i);
 		print_part_reports(partname, p);

@@ -44,8 +44,8 @@
 		<sect2>
 			<title>Extensive API for report creation</title>
 			<para>
-				The low level API allows creating a report purely
-				via program code. The high level API allows loading
+				The <xref linkend="lowlevelapi"/> allows creating a report purely
+				via program code. The <xref linkend="highlevelapi"/> allows loading
 				an XML report description that contains all details
 				about the report including database access. Mixing
 				the high and low level APIs allows a balance anywhere
@@ -85,7 +85,9 @@
 				256-bit floating point values by default. This allows
 				storing very large and very small numbers with high
 				precision. See <xref linkend="numericconstants"/> in
-				the <xref linkend="expressions"/> chapter.
+				the <xref linkend="expressions"/> chapter and the
+				<xref linkend="numerictuning"/> part in the
+				<xref linkend="lowlevelapi"/> chapter.
 			</para>
 		</sect2>
 		<sect2>

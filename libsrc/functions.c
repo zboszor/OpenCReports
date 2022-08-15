@@ -15,10 +15,15 @@
 #include <utf8proc.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
 #include "datasource.h"
 #include "exprutil.h"
+#include "breaks.h"
 #include "datetime.h"
 #include "formatting.h"
+#include "parts.h"
+#include "functions.h"
 
 static bool ocrpt_expr_init_result_internal(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type, unsigned int which) {
 	ocrpt_result *result = e->result[which];
@@ -2606,7 +2611,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_wiyo) {
 	long ofs = mpfr_get_si(e->ops[1]->result[o->residx]->number, o->rndmode);
 	while (ofs < 0)
 		ofs += 7;
-	ofs / ofs % 7;
+	ofs = ofs % 7;
 
 	strftime(wiy, sizeof(wiy), "%U", &res.datetime);
 	wyear = atoi(wiy);

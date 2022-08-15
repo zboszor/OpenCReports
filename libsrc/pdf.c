@@ -14,8 +14,12 @@
 #include <pango/pangocairo.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
+#include "exprutil.h"
 #include "formatting.h"
 #include "layout.h"
+#include "parts.h"
 #include "pdf.h"
 
 static cairo_status_t ocrpt_write_pdf(void *closure, const unsigned char *data, unsigned int length) {

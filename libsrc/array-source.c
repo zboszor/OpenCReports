@@ -24,6 +24,8 @@
 #include <libxml/xmlreader.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
 #include "datasource.h"
 
 #ifndef UNUSED

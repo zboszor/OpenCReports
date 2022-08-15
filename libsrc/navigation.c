@@ -12,6 +12,8 @@
 #include <opencreport.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
 #include "datasource.h"
 #include "exprutil.h"
 

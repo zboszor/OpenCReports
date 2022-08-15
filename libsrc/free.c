@@ -10,8 +10,12 @@
 #include <cairo.h>
 #include <glib-object.h>
 
+#include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
 #include "exprutil.h"
 #include "scanner.h"
+#include "parts.h"
 
 static const char *ocrpt_type_name(enum ocrpt_expr_type type) __attribute__((unused));
 static const char *ocrpt_type_name(enum ocrpt_expr_type type) {
@@ -38,7 +42,7 @@ static const char *ocrpt_type_name(enum ocrpt_expr_type type) {
 	return "UNKNOWN_TYPE";
 }
 
-DLL_EXPORT_SYM void ocrpt_result_free_data(ocrpt_result *r) {
+void ocrpt_result_free_data(ocrpt_result *r) {
 	if (!r)
 		return;
 

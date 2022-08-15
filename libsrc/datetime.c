@@ -15,6 +15,8 @@
 #include <mpfr.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "exprutil.h"
 #include "datetime.h"
 
 bool ocrpt_parse_datetime(opencreport *o, const char *time_string, int ts_len, ocrpt_result *result) {

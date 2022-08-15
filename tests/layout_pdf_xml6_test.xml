@@ -157,7 +157,7 @@
 
 			<FieldDetails>
 				<Output>
-					<Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+					<Line>
 						<field value="id" width="4" align="right" col="1"/>
 						<literal width="1"/>
 						<field value="name" width="20" align="left" col="2"/>

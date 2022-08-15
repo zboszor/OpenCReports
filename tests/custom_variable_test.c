@@ -43,11 +43,11 @@ int main(void) {
 	v = ocrpt_variable_new_full(o, r, OCRPT_RESULT_STRING, "var1", "upper(left(a.text, 1))", NULL, NULL, "r.self + r.baseexpr", NULL);
 
 	printf("Base expression for 'var1' reprinted: ");
-	ocrpt_expr_print(o, v->baseexpr);
+	ocrpt_expr_print(o, ocrpt_variable_baseexpr(v));
 	printf("\n");
 
 	printf("Result expression for 'var1' reprinted: ");
-	ocrpt_expr_print(o, v->resultexpr);
+	ocrpt_expr_print(o, ocrpt_variable_resultexpr(v));
 	printf("\n");
 
 	row = 0;

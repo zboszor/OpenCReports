@@ -12,8 +12,9 @@
 #include <string.h>
 
 #include "opencreport.h"
+#include "color.h"
 
-static ocrpt_color compat_color_names[] = {
+static ocrpt_named_color compat_color_names[] = {
 	{ "Aqua",		"#00ffff" },
 	{ "Black",		"#000000" },
 	{ "Blue",		"#0000ff" },
@@ -34,53 +35,57 @@ static ocrpt_color compat_color_names[] = {
 	{ "Yellow",		"#ffff00" },
 };
 
-static int32_t compat_color_names_n = sizeof(compat_color_names) / sizeof(ocrpt_color);
+static int32_t compat_color_names_n = sizeof(compat_color_names) / sizeof(ocrpt_named_color);
 
 static int colorsortcmp(const void *a, const void *b) {
-	return strcasecmp(((ocrpt_color *)a)->name, ((ocrpt_color *)b)->name);
+	return strcasecmp(((ocrpt_named_color *)a)->name, ((ocrpt_named_color *)b)->name);
 }
 
 static int colorfindcmp(const void *key, const void *a) {
-	return strcasecmp(key, ((ocrpt_color *)a)->name);
+	return strcasecmp(key, ((ocrpt_named_color *)a)->name);
 }
 
 /* We assume cname is 6 digits long. Callers should make sure. */
-static void ocrpt_parse_html_color(const char *cname, ocrpt_color *color) {
+static void ocrpt_parse_html_color(const char *cname, ocrpt_named_color *color) {
 	char *endptr = NULL;
 	long html = strtol(cname, &endptr, 16);
 
 	if (*endptr == 0) {
-		color->r = (double)((html >> 16) & 0xff) / 255.0;
-		color->g = (double)((html >>  8) & 0xff) / 255.0;
-		color->b = (double)((html      ) & 0xff) / 255.0;
+		color->c.r = (double)((html >> 16) & 0xff) / 255.0;
+		color->c.g = (double)((html >>  8) & 0xff) / 255.0;
+		color->c.b = (double)((html      ) & 0xff) / 255.0;
 	} else {
-		color->r = 0.0;
-		color->g = 0.0;
-		color->b = 0.0;
+		color->c.r = 0.0;
+		color->c.g = 0.0;
+		color->c.b = 0.0;
 	}
 }
 
 void ocrpt_init_color(void) {
-	qsort(&compat_color_names, compat_color_names_n, sizeof(ocrpt_color), colorsortcmp);
+	qsort(&compat_color_names, compat_color_names_n, sizeof(ocrpt_named_color), colorsortcmp);
 
 	for (int32_t i = 0; i < compat_color_names_n; i++)
 		ocrpt_parse_html_color(compat_color_names[i].html + 1, &compat_color_names[i]);
 }
 
 DLL_EXPORT_SYM void ocrpt_get_color(opencreport *o, const char *cname, ocrpt_color *color, bool bgcolor) {
+	ocrpt_named_color nc;
+
 	if (!cname || *cname == 0)
 		cname = bgcolor ? "White" : "Black";
 
-	if (*cname == '#')
-		ocrpt_parse_html_color(cname + 1, color);
-	else if (strncasecmp(cname, "0x", 2) == 0)
-		ocrpt_parse_html_color(cname + 2, color);
-	else {
-		ocrpt_color *c;
+	if (*cname == '#') {
+		ocrpt_parse_html_color(cname + 1, &nc);
+		*color = nc.c;
+	} else if (strncasecmp(cname, "0x", 2) == 0) {
+		ocrpt_parse_html_color(cname + 2, &nc);
+		*color = nc.c;
+	}  else {
+		ocrpt_named_color *c;
 
-		while (!(c = bsearch(cname, &compat_color_names, compat_color_names_n, sizeof(ocrpt_color), colorfindcmp)))
+		while (!(c = bsearch(cname, &compat_color_names, compat_color_names_n, sizeof(ocrpt_named_color), colorfindcmp)))
 			cname = bgcolor ? "White" : "Black";
 
-		*color = *c;
+		*color = (*c).c;
 	}
 }

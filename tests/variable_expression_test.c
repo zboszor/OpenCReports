@@ -40,7 +40,7 @@ int main(void) {
 	v = ocrpt_variable_new(o, r, OCRPT_VARIABLE_EXPRESSION, "var1", "id + 1", NULL);
 
 	printf("Base expression for 'var1' reprinted: ");
-	ocrpt_expr_print(o, v->resultexpr);
+	ocrpt_expr_print(o, ocrpt_variable_resultexpr(v));
 	printf("\n");
 
 	err = NULL;

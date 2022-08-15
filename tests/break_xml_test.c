@@ -30,12 +30,10 @@ int main(void) {
 	}
 
 	/* There is only one ocrpt_report pointer in o->parts, extract it. */
-	ocrpt_part *p = (ocrpt_part *)o->parts->data;
-	ocrpt_part_row *pr = (ocrpt_part_row *)p->rows->data;
-	ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pr->pd_list->data;
-	ocrpt_report *r = (ocrpt_report *)pd->reports->data;
+	ocrpt_report *r = get_first_report(o);
 
-	if (r->breaks)
+	ocrpt_list *l = NULL;
+	if (ocrpt_break_get_next(r, &l))
 		printf("adding a break and a breakfield to it succeeded\n");
 
 	ocrpt_free(o);

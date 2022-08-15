@@ -18,32 +18,60 @@ static void print_result_row(const char *name, ocrpt_query_result *qr, int32_t c
 
 	printf("Query: '%s':\n", name);
 	for (i = 0; i < cols; i++) {
-		printf("\tCol #%d: '%s': string value: %s", i, qr[i].name, (qr[i].result.isnull || !qr[i].result.string) ? "NULL" : qr[i].result.string->str);
-		if (!qr[i].result.isnull && qr[i].result.number_initialized)
-			mpfr_printf(" (converted to number: %.6RF)", qr[i].result.number);
+		const char *name = ocrpt_query_result_column_name(qr, i);
+		ocrpt_result *r = ocrpt_query_result_column_result(qr, i);
+		ocrpt_string *s = ocrpt_result_get_string(r);
+		bool isnull = ocrpt_result_isnull(r);
+		bool isnumber = ocrpt_result_isnumber(r);
+
+		printf("\tCol #%d: '%s': string value: %s", i, name, (isnull || !s) ? "NULL" : s->str);
+		if (!isnull && isnumber) {
+			mpfr_ptr number = ocrpt_result_get_number(r);
+			mpfr_printf(" (converted to number: %.6RF)", number);
+		}
 		printf("\n");
 	}
 }
 
 static void print_part_reports(char *name, ocrpt_part *p) UNUSED;
 static void print_part_reports(char *name, ocrpt_part *p) {
-	ocrpt_list *prl, *pdl, *rl;
+	ocrpt_list *prl = NULL;
+	ocrpt_part_row *pr;
 	int i, j;
 
 	printf("part %s:\n", name);
-	for (prl = p->rows, i = 0; prl; prl = prl->next, i++) {
-		ocrpt_part_row *pr = (ocrpt_part_row *)prl->data;
+	for (pr = ocrpt_part_row_get_next(p, &prl), i = 0; pr; pr = ocrpt_part_row_get_next(p, &prl), i++) {
+		ocrpt_list *pdl = NULL;
 
 		printf("row %d reports:", i);
 		j = 0;
-		for (pdl = pr->pd_list; pdl; pdl = pdl->next) {
-			ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pdl->data;
+		for (ocrpt_part_row_data *pd = ocrpt_part_row_data_get_next(pr, &pdl); pd; pd = ocrpt_part_row_data_get_next(pr, &pdl)) {
+			ocrpt_list *rl = NULL;
 
-			for (rl = pd->reports; rl; rl = rl->next, j++)
+			for (ocrpt_report *r = ocrpt_report_get_next(pd, &rl); r; r = ocrpt_report_get_next(pd, &rl), j++)
 				printf(" %d", j);
 		}
 		printf("\n");
 	}
+}
+
+static ocrpt_report *get_first_report(opencreport *o) UNUSED;
+static ocrpt_report *get_first_report(opencreport *o) {
+	ocrpt_list *l;
+
+	l = NULL;
+	ocrpt_part *p = ocrpt_part_get_next(o, &l);
+
+	l = NULL;
+	ocrpt_part_row *pr = ocrpt_part_row_get_next(p, &l);
+
+	l = NULL;
+	ocrpt_part_row_data *pd = ocrpt_part_row_data_get_next(pr, &l);
+
+	l = NULL;
+	ocrpt_report *r = ocrpt_report_get_next(pd, &l);
+
+	return r;
 }
 
 #endif

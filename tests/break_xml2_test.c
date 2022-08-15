@@ -24,7 +24,6 @@ int main(void) {
 	opencreport *o = ocrpt_init();
 	ocrpt_query *q;
 	ocrpt_query_result *qr;
-	ocrpt_break *br;
 	int32_t row, cols;
 
 	if (!ocrpt_parse_xml(o, "break_xml_test.xml")) {
@@ -37,13 +36,11 @@ int main(void) {
 	qr = ocrpt_query_get_result(q, &cols);
 
 	/* There is only one ocrpt_report pointer in o->parts, extract it. */
-	ocrpt_part *p = (ocrpt_part *)o->parts->data;
-	ocrpt_part_row *pr = (ocrpt_part_row *)p->rows->data;
-	ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pr->pd_list->data;
-	ocrpt_report *r = (ocrpt_report *)pd->reports->data;
+	ocrpt_report *r = get_first_report(o);
 
 	/* There is only one break in the report, extract it */
-	br = (ocrpt_break *)r->breaks->data;
+	ocrpt_list *brl = NULL;
+	ocrpt_break *br = ocrpt_break_get_next(r, &brl);
 
 	row = 0;
 	ocrpt_query_navigate_start(o, q);

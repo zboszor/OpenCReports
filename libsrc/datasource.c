@@ -16,6 +16,9 @@
 #include <iconv.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
+#include "exprutil.h"
 #include "datasource.h"
 #include "datetime.h"
 #include "fallthrough.h"
@@ -133,6 +136,20 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_get(opencreport *o, const char *name) {
 	}
 
 	return NULL;
+}
+
+DLL_EXPORT_SYM const char *ocrpt_query_result_column_name(ocrpt_query_result *qr, int32_t col) {
+	if (!qr)
+		return NULL;
+
+	return qr[col].name;
+}
+
+DLL_EXPORT_SYM ocrpt_result *ocrpt_query_result_column_result(ocrpt_query_result *qr, int32_t col) {
+	if (!qr)
+		return NULL;
+
+	return &qr[col].result;
 }
 
 void ocrpt_query_free0(ocrpt_query *q) {

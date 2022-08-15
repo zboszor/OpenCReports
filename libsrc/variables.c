@@ -12,29 +12,13 @@
 #include <mpfr.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
 #include "exprutil.h"
 #include "datasource.h"
 #include "variables.h"
-
-static inline void ocrpt_variable_initialize_results(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type) {
-	ocrpt_expr_set_iterative_start_value(e, false);
-	ocrpt_expr_init_results(o, e, type);
-	for (int i = 0; i < OCRPT_EXPR_RESULTS; i++) {
-		if (ocrpt_expr_get_result_owned(o, e, i))
-			switch (type) {
-			case OCRPT_RESULT_NUMBER:
-				mpfr_set_ui(e->result[i]->number, 0, o->rndmode);
-				break;
-			case OCRPT_RESULT_STRING:
-				e->result[i]->string->len = 0;
-				break;
-			case OCRPT_RESULT_DATETIME:
-				break;
-			default:
-				break;
-			}
-	}
-}
+#include "breaks.h"
+#include "parts.h"
 
 /*
  * Create a custom named report variable
@@ -127,7 +111,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(opencreport *o, ocrpt_report *
 		} else
 			e = ocrpt_expr_parse(o, r, "1", NULL);
 		if (i)
-			ocrpt_variable_initialize_results(o, e, type);
+			ocrpt_expr_init_iterative_results(o, e, type);
 		if (err) {
 			ocrpt_expr_make_error_result(o, e, err);
 			if (free_err)
@@ -344,10 +328,10 @@ void ocrpt_variable_reset(opencreport *o, ocrpt_var *v) {
 
 	/* Don't initialize ocrpt_result pointers on baseexpr */
 	if (v->intermedexpr)
-		ocrpt_variable_initialize_results(o, v->intermedexpr, v->basetype);
+		ocrpt_expr_init_iterative_results(o, v->intermedexpr, v->basetype);
 	if (v->intermed2expr)
-		ocrpt_variable_initialize_results(o, v->intermed2expr, v->basetype);
-	ocrpt_variable_initialize_results(o, v->resultexpr, v->basetype);
+		ocrpt_expr_init_iterative_results(o, v->intermed2expr, v->basetype);
+	ocrpt_expr_init_iterative_results(o, v->resultexpr, v->basetype);
 }
 
 void ocrpt_variables_add_precalculated_results(opencreport *o, ocrpt_report *r, ocrpt_list *brl_start, bool last_row) {
@@ -403,4 +387,20 @@ void ocrpt_variables_advance_precalculated_results(opencreport *o, ocrpt_report 
 			}
 		}
 	}
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_variable_baseexpr(ocrpt_var *v) {
+	return v ? v->baseexpr : NULL;
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_variable_intermedexpr(ocrpt_var *v) {
+	return v ? v->intermedexpr : NULL;
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_variable_intermed2expr(ocrpt_var *v) {
+	return v ? v->intermed2expr : NULL;
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_variable_resultexpr(ocrpt_var *v) {
+	return v ? v->resultexpr : NULL;
 }

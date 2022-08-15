@@ -6,10 +6,13 @@
 
 #include <config.h>
 
+#include <stdarg.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
 #include "datasource.h"
 
 DLL_EXPORT_SYM ocrpt_environment_query_func ocrpt_environment_get = ocrpt_environment_get_c;

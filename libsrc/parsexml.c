@@ -20,8 +20,12 @@
 #include <libxml/xmlreader.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
 #include "datasource.h"
 #include "exprutil.h"
+#include "breaks.h"
+#include "parts.h"
 
 #ifndef O_BINARY
 #define O_BINARY (0)

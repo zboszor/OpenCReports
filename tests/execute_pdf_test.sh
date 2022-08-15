@@ -18,8 +18,8 @@ rm -f results/${TEST}.pdf.*.png results/${TEST}.asanout.*
 ./${TEST} 2>results/${TEST}.stderr >results/${TEST}.pdf
 
 if [[ -f ${abs_srcdir}/expected/${TEST}.pdf ]]; then
-	OUTEXP=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r300 -sOutputFile=results/${TEST}.pdf.exp.%d.png ${abs_srcdir}/expected/${TEST}.pdf)
-	OUTRES=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r300 -sOutputFile=results/${TEST}.pdf.%d.png results/${TEST}.pdf)
+	OUTEXP=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r150 -sOutputFile=results/${TEST}.pdf.exp.%d.png ${abs_srcdir}/expected/${TEST}.pdf)
+	OUTRES=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r150 -sOutputFile=results/${TEST}.pdf.%d.png results/${TEST}.pdf)
 	PAGESEXP=$(echo "$OUTEXP" | grep 'Processing pages .* through')
 	PAGESEXPEND=$(echo "$PAGESEXP" | sed 's/^Processing pages .* through \([^\.]*\).*$/\1/')
 	PAGESRES=$(echo "$OUTRES" | grep 'Processing pages .* through')

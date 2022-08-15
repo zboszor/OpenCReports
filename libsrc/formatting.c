@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -16,6 +17,8 @@
 #include <time.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "exprutil.h"
 #include "formatting.h"
 
 static bool ocrpt_good_conv(char c) {

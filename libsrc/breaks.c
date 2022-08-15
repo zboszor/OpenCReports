@@ -12,9 +12,13 @@
 #include <mpfr.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
 #include "exprutil.h"
 #include "datasource.h"
 #include "variables.h"
+#include "breaks.h"
+#include "parts.h"
 #include "layout.h"
 
 DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, const char *name) {
@@ -122,6 +126,10 @@ DLL_EXPORT_SYM ocrpt_break *ocrpt_break_get(opencreport *o, ocrpt_report *r, con
 	}
 
 	return NULL;
+}
+
+DLL_EXPORT_SYM const char *ocrpt_break_get_name(ocrpt_break *br) {
+	return br ? br->name : NULL;
 }
 
 DLL_EXPORT_SYM bool ocrpt_break_validate(opencreport *o, ocrpt_report *r, ocrpt_break *br) {
@@ -263,4 +271,12 @@ DLL_EXPORT_SYM bool ocrpt_break_add_trigger_cb(opencreport *o, ocrpt_report *r, 
 	br->callbacks = ocrpt_list_append(br->callbacks, ptr);
 
 	return true;
+}
+
+DLL_EXPORT_SYM ocrpt_break *ocrpt_break_get_next(ocrpt_report *r, ocrpt_list **list) {
+	if (!r || !list)
+		return NULL;
+
+	*list = *list ? (*list)->next : r->breaks;
+	return (ocrpt_break *)(*list ? (*list)->data : NULL);
 }

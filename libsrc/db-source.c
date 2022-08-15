@@ -46,6 +46,8 @@
 #endif
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
 #include "datasource.h"
 
 /* Fetch (cache) this many rows at once from the cursor */

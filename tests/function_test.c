@@ -9,19 +9,20 @@
 #include <opencreport.h>
 
 OCRPT_STATIC_FUNCTION(my_inc) {
-	if (e->n_ops != 1 || !e->ops[0]->result[o->residx]) {
+	if (ocrpt_expr_get_num_operands(e) != 1 || !ocrpt_expr_operand_get_result(o, e, 0)) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 		return;
 	}
 
-	switch (e->ops[0]->result[o->residx]->type) {
+	switch (ocrpt_result_get_type(ocrpt_expr_operand_get_result(o, e, 0))) {
 	case OCRPT_RESULT_NUMBER:
 		ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
 
-		mpfr_set_ui(e->result[o->residx]->number, 1, o->rndmode);
+		ocrpt_expr_set_long_value(o, e, 1L);
 		break;
 	case OCRPT_RESULT_ERROR:
-		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		ocrpt_result *rs = ocrpt_expr_operand_get_result(o, e, 0);
+		ocrpt_expr_make_error_result(o, e, rs ? ocrpt_result_get_string(rs)->str : "invalid operand(s)");
 		break;
 	case OCRPT_RESULT_STRING:
 	case OCRPT_RESULT_DATETIME:
@@ -32,19 +33,20 @@ OCRPT_STATIC_FUNCTION(my_inc) {
 }
 
 OCRPT_STATIC_FUNCTION(my_dec) {
-	if (e->n_ops != 1 || !e->ops[0]->result[o->residx]) {
+	if (ocrpt_expr_get_num_operands(e) != 1 || !ocrpt_expr_operand_get_result(o, e, 0)) {
 		ocrpt_expr_make_error_result(o, e, "invalid operand(s)");
 		return;
 	}
 
-	switch (e->ops[0]->result[o->residx]->type) {
+	switch (ocrpt_result_get_type(ocrpt_expr_operand_get_result(o, e, 0))) {
 	case OCRPT_RESULT_NUMBER:
 		ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
 
-		mpfr_set_ui(e->result[o->residx]->number, 0, o->rndmode);
+		ocrpt_expr_set_long_value(o, e, 0L);
 		break;
 	case OCRPT_RESULT_ERROR:
-		ocrpt_expr_make_error_result(o, e, e->ops[0]->result[o->residx]->string->str);
+		ocrpt_result *rs = ocrpt_expr_operand_get_result(o, e, 0);
+		ocrpt_expr_make_error_result(o, e, rs ? ocrpt_result_get_string(rs)->str : "invalid operand(s)");
 		break;
 	case OCRPT_RESULT_STRING:
 	case OCRPT_RESULT_DATETIME:

@@ -23,7 +23,7 @@ static void test_newrow_cb(opencreport *o, ocrpt_report *r, void *ptr) {
 	if (rd->rownum % 100000 == 0)
 		printf("at row %d\n", rd->rownum);
 	if (rd->rownum == ROWS) {
-		ocrpt_result *rs = ocrpt_expr_get_result(o, r, rd->e);
+		ocrpt_result *rs = ocrpt_expr_get_result(o, rd->e);
 		ocrpt_result_print(rs);
 	}
 }

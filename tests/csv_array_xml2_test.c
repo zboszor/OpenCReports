@@ -71,7 +71,7 @@ int main(void) {
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)
-		printf("%d: '%s'\n", i, qr[i].name);
+		printf("%d: '%s'\n", i, ocrpt_query_result_column_name(qr, i));
 
 	create_exprs(o);
 

@@ -1,7 +1,7 @@
 <chapter id="c-api-reference" xreflabel="C API Reference">
 	<title>C language API reference</title>
 	<sect1>
-		<title>Report header</title>
+		<title>Header file</title>
 		<para>
 			For using OpenCReports, this single header must be used:
 			<programlisting>
@@ -9,46 +9,354 @@
 			</programlisting>
 		</para>
 	</sect1>
-	<sect1>
-		<title>Report handling functions</title>
-		<sect2>
-		<title><literal>ocrpt_init</literal></title>
+	<sect1 id="highlevelapi" xreflabel="High level C API">
+		<title>High level C API</title>
 		<para>
-			Report handler initialization. It returns a pointer to
-			an opaque structure.
+			Example code using the high level C API where everything
+			concerning the report (including the data source)
+			is described in the report XML:
+			<programlisting>
+#include &lt;opencreport.h&gt;
+
+int main(void) {
+    opencreport *o = ocrpt_init();
+
+    if (!ocrpt_parse_xml(o, "report.xml")) {
+        printf("XML parse error\n");
+        ocrpt_free(o);
+        return 1;
+    }
+
+    ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);
+    ocrpt_execute(o);
+    ocrpt_spool(o);
+    ocrpt_free(o);
+    return 0;
+}
+			</programlisting>
+		</para>
+		<para>
+			The above code will load <literal>report.xml</literal>,
+			set the output format to PDF, runs the report and prints
+			it output on <literal>stdout</literal>.
+		</para>
+		<sect2>
+		<title>Report handler initialization</title>
+		<para>
 			<programlisting>
 opencreport *ocrpt_init(void);
 			</programlisting>
 		</para>
 		</sect2>
 		<sect2>
-			<title><literal>ocrpt_free</literal></title>
+			<title>Load a report XML description</title>
 			<para>
-				Report handler destruction.
+				This function loads the specified XML file
+				into the report handler. It returns
+				<literal>true</literal> for success,
+				<literal>false</literal> for failure.
+				<programlisting>
+bool ocrpt_parse_xml(opencreport *o, const char *filename);
+				</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Set report output format</title>
+			<para>
+				<programlisting>
+enum ocrpt_format_type {
+    OCRPT_OUTPUT_UNSET,
+    OCRPT_OUTPUT_PDF,
+    OCRPT_OUTPUT_HTML,
+    OCRPT_OUTPUT_TXT,
+    OCRPT_OUTPUT_CSV,
+    OCRPT_OUTPUT_XML
+};
+typedef enum ocrpt_format_type ocrpt_format_type;
+
+void ocrpt_set_output_format(opencreport *o,
+                             ocrpt_format_type format);
+				</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Run the report</title>
+			<para>
+				This function executes the report, constructs
+				the result in memory. It returns <literal>true</literal>
+				for success, <literal>false</literal> for failure.
+				It is a failure if the output format is unset.
+				<programlisting>
+bool ocrpt_execute(opencreport *o);
+				</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Dump report result</title>
+			<para>
+				Dump the report output on the program's
+				standard output channel.
+				<programlisting>
+void ocrpt_spool(opencreport *o);
+				</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Report handler destruction</title>
+			<para>
+				Calling this function frees up the report handler
+				structure and everything created for it, even
+				the details that were created by the low level API.
 				<programlisting>
 void ocrpt_free(opencreport *o);
 				</programlisting>
 			</para>
 		</sect2>
-		<sect2>
-			<title><literal>ocrpt_set_numeric_precision_bits</literal></title>
-			<para>
-				Set MPFR numeric precision. The default is 256 bits of
-				floating point precision.
-				<programlisting>
-void ocrpt_set_numeric_precision_bits(opencreport *o, mpfr_prec_t prec);
-				</programlisting>
-			</para>
+	</sect1>
+	<sect1 id="lowlevelapi" xreflabel="Low level C API">
+		<title>Low level C API</title>
+		<para>
+			The <xref linkend="highlevelapi"/> is also part of the
+			low level API. The functions described below allow
+			creating a report using program code, or simply
+			fine tuning the report behavior by mostly using the
+			<xref linkend="highlevelapi"/>.
+		</para>
+		<sect2 id="numerictuning" xreflabel="Numeric behavior related functions">
+			<title>Numeric behavior related functions</title>
+			<sect3>
+				<title><literal>Set numeric precision</literal></title>
+				<para>
+					The default is 256 bits of floating point precision.
+					<programlisting>
+void ocrpt_set_numeric_precision_bits(opencreport *o,
+                                      mpfr_prec_t prec);
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set rounding mode</title>
+				<para>
+					OpenCReports uses GNU MPFR under the hood and does't
+					hide this fact. The MPFR rounding mode constants are
+					used as is to set the rounding behaviour.
+					The default is <literal>MPFR_RNDN</literal>, round
+					to nearest.
+					<programlisting>
+void ocrpt_set_rounding_mode(opencreport *o,
+                             mpfr_rnd_t rndmode);
+					</programlisting>
+				</para>
+			</sect3>
 		</sect2>
 		<sect2>
-			<title><literal>ocrpt_set_rounding_mode</literal></title>
+			<title>Locale related functions</title>
+			<sect3>
+				<title>Set report locale</title>
+				<para>
+					Setting the locale for the report does not affect
+					the main program or other threads. Locale setting
+					includes the language, the country. The UTF-8 suffix
+					is necessary. E.g.: <literal>en_GB.UTF-8</literal> or
+					<literal>de_DE.UTF-8</literal>
+					<programlisting>
+void ocrpt_set_locale(opencreport *o,
+                      const char *locale);
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Print monetary data in the report locale</title>
+				<para>
+					A customized monetary printing function was implemented
+					for the purposes of the report which MPFR doesn't
+					provide. It is used in OpenCReports both internally
+					and by unit tests.
+					<programlisting>
+ssize_t ocrpt_mpfr_strfmon(opencreport *o,
+                           char *s, size_t maxsize,
+                           const char *format, ...);
+					</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2 id="exprfunc" xreflabel="Expression related functions">
+			<title>Expression related functions</title>
 			<para>
-				Set MPFR rounding mode. The default is MPFR_RNDN,
-				round to nearest.
-				<programlisting>
-void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode);
-				</programlisting>
+				Expressions in OpenCReports is explained in the
+				<xref linkend="expressions"/> chapter.
 			</para>
+			<sect3>
+				<title>Parse an expression string</title>
+				<para>
+					This function parses an expression string and
+					creates an expression tree. It returns a pointer
+					to the <literal>ocrpt_expr</literal> structure.
+				</para>
+				<para>
+					If an error occurs, it returns NULL and optionally
+					returns the error message in <literal>err</literal>
+					pointer if it's not <literal>NULL</literal>.
+				</para>
+				<para>
+					The <literal>ocrpt_report</literal> pointer may be
+					valid or NULL. If valid, the expression is bound
+					to this <literal>ocrpt_report</literal>.
+					<programlisting>
+ocrpt_expr *ocrpt_expr_parse(opencreport *o,
+                             ocrpt_report *r,
+                             const char *str,
+                             char **err);
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Free an expression parse tree</title>
+				<para>
+					Free an expression parse tree. If it was bound
+					to the passed-in <literal>ocrpt_report</literal>,
+					this association is also deleted.
+					<programlisting>
+void ocrpt_expr_free(opencreport *o,
+                     ocrpt_report *r,
+                     ocrpt_expr *e);
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Resolve expression references</title>
+				<para>
+					This function resolves variable (identifier)
+					references in the expression. This is needed
+					to bind query columns to expressions that
+					use them.
+					<programlisting>
+void ocrpt_expr_resolve(opencreport *o,
+                        ocrpt_report *r,
+                        ocrpt_expr *e);
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Optimize an expression</title>
+				<para>
+					This function optimizes an expression so
+					it may needs fewer computation steps during
+					report execution.
+					<programlisting>
+void ocrpt_expr_optimize(opencreport *o,
+                         ocrpt_report *r,
+                         ocrpt_expr *e);
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Evaluate an expression</title>
+				<para>
+					This function evaluates the expression.
+					It returns the expression's
+					<literal>ocrpt_result</literal> result structure.
+					The result must not be freed with
+					<literal>ocrpt_result_free()</literal>.
+					It will be done by <literal>ocrpt_expr_free()</literal>
+				</para>
+				<para>
+					For expressions with query column references,
+					this function must be called after
+					<literal>ocrpt_query_navigate_next</literal>
+					otherwise the result is not valid.
+					<programlisting>
+ocrpt_result *ocrpt_expr_eval(opencreport *o,
+                              ocrpt_report *r,
+                              ocrpt_expr *e);
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get expression result without evaluation</title>
+				<para>
+					This function returns the expression result
+					if it was already evaluated.
+					The result must not be freed with
+					<literal>ocrpt_result_free()</literal>.
+					It will be done by <literal>ocrpt_expr_free()</literal>.
+					Used by unit tests.
+					<programlisting>
+ocrpt_result *ocrpt_expr_get_result(opencreport *o,
+                                    ocrpt_expr *e);
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Print an expression tree</title>
+				<para>
+					Print an expression tree in its processed form on the
+					standard output. Used by unit tests.
+					<programlisting>
+void ocrpt_expr_print(opencreport *o,
+                      ocrpt_expr *e);
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Print an expression tree with subexpressions and their results</title>
+				<para>
+					Print an expression tree with subexpressions
+					and their results in its processed form on the
+					standard output. Used by unit tests.
+					<programlisting>
+void ocrpt_expr_result_deep_print(opencreport *o,
+                                  ocrpt_expr *e);
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Count the number of expression nodes</title>
+				<para>
+					This function returns the number of expression nodes.
+					Used by unit tests to validate optimizazion.
+					<programlisting>
+int32_t ocrpt_expr_nodes(ocrpt_expr *e);
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Initialize expression result type</title>
+				<para>
+					OpenCReports keeps track of the last three query
+					rows and computes three result values for expressions
+					for internal reasons. These functions initialize
+					the type for either the current result or all results
+					of the expression.
+					<programlisting>
+enum ocrpt_result_type {
+    OCRPT_RESULT_ERROR,
+    OCRPT_RESULT_STRING,
+    OCRPT_RESULT_NUMBER,
+    OCRPT_RESULT_DATETIME
+};
+
+bool ocrpt_expr_init_result(opencreport *o,
+                            ocrpt_expr *e,
+                            enum ocrpt_result_type type);
+
+void ocrpt_expr_init_results(opencreport *o,
+                             ocrpt_expr *e,
+                             enum ocrpt_result_type type);
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set an error string as expression result</title>
+				<para>
+					<programlisting>
+ocrpt_result *
+ocrpt_expr_make_error_result(opencreport *o,
+                             ocrpt_expr *e,
+                             const char *format, ...);
+					</programlisting>
+				</para>
+			</sect3>
 		</sect2>
 	</sect1>
 	<sect1>
@@ -270,94 +578,6 @@ void ocrpt_navigate_start(opencreport *o, ocrpt_query *q);
 				calls contain invalid data.
 				<programlisting>
 bool ocrpt_navigate_next(opencreport *o, ocrpt_query *q);
-				</programlisting>
-			</para>
-		</sect2>
-	</sect1>
-	<sect1 id="exprfunc" xreflabel="Expression related functions">
-		<title>Expression related functions</title>
-		<para>
-			Expressions in OpenCReports is explained in the
-			<xref linkend="expressions"/> chapter.
-		</para>
-		<sect2>
-			<title><literal>ocrpt_expr_parse</literal></title>
-			<para>
-				Parse an expression string and create an expression tree.
-				Returns a pointer to an opaque structure. If a parsing
-				error occurs, it returns NULL and returns the error message
-				in <literal>err</literal>.
-				<programlisting>
-ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *str, char **err);
-				</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_free_expr</literal></title>
-			<para>
-				Free an expression parse tree.
-				<programlisting>
-void ocrpt_free_expr(ocrpt_expr *e);
-				</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_expr_optimize</literal></title>
-			<para>
-				Optimize an expression so it needs less computation steps
-				while executing the report.
-				<programlisting>
-void ocrpt_expr_optimize(opencreport *o, ocrpt_expr *e);
-				</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_expr_resolve</literal></title>
-			<para>
-				Resolve variable (identifier) references in the expression.
-				This is needed to bind query columns to expressions that
-				use them.
-				<programlisting>
-void ocrpt_expr_resolve(opencreport *o, ocrpt_expr *e);
-				</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_expr_eval</literal></title>
-			<para>
-				Evaluate the expression. It computes and returns the
-				expression's <literal>ocrpt_result</literal> result structure.
-				<programlisting>
-ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_expr *e);
-				</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_expr_print</literal></title>
-			<para>
-				Print an expression tree in its processed form on the
-				standard output. Good for unit testing.
-				<programlisting>
-void ocrpt_expr_print(opencreport *o, ocrpt_expr *e);
-				</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_expr_result_print</literal></title>
-			<para>
-				Print the result data on the standard output.
-				Good for unit testing.
-				<programlisting>
-void ocrpt_expr_result_print(ocrpt_result *r);
-				</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_expr_nodes</literal></title>
-			<para>
-				Count the number of expression nodes. Good for unit testing.
-				<programlisting>
-int ocrpt_expr_nodes(ocrpt_expr *e);
 				</programlisting>
 			</para>
 		</sect2>

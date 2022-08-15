@@ -33,7 +33,7 @@ int main(void) {
 	/* Initialize the value of "e" to 0 */
 	ocrpt_expr_init_results(o, e1, OCRPT_RESULT_NUMBER);
 	for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
-		mpfr_set_ui(e1->result[i]->number, 0, o->rndmode);
+		ocrpt_expr_set_nth_result_long_value(o, e1, i, 0);
 	ocrpt_expr_set_iterative_start_value(e1, true);
 	ocrpt_expr_resolve(o, NULL, e1);
 	ocrpt_expr_optimize(o, NULL, e1);
@@ -44,7 +44,7 @@ int main(void) {
 	/* Initialize the value of "e" to 0 */
 	ocrpt_expr_init_results(o, e2, OCRPT_RESULT_NUMBER);
 	for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
-		mpfr_set_ui(e2->result[i]->number, 0, o->rndmode);
+		ocrpt_expr_set_nth_result_long_value(o, e2, i, 0);
 	/* This iterative expression starts with evaluated value */
 	//ocrpt_expr_set_iterative_start_value(e2, true);
 	ocrpt_expr_resolve(o, NULL, e2);

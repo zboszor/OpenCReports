@@ -53,6 +53,7 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/strfmon.c,v 1.14 2003/03/20 08:18:55 ach
 #include <string.h>
 #include <mpfr.h>
 #include <opencreport.h>
+#include "ocrpt-private.h"
 
 /* internal flags */
 #define	NEED_GROUPING		0x01	/* print digits grouped (default) */

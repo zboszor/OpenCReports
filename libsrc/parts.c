@@ -13,9 +13,13 @@
 #include <mpfr.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
 #include "exprutil.h"
+#include "variables.h"
 #include "datasource.h"
 #include "layout.h"
+#include "parts.h"
 
 DLL_EXPORT_SYM ocrpt_part *ocrpt_part_new(opencreport *o) {
 	ocrpt_part *p;
@@ -120,8 +124,12 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_report_new(opencreport *o) {
 	ocrpt_report *r = ocrpt_mem_malloc(sizeof(ocrpt_report));
 	memset(r, 0, sizeof(ocrpt_report));
 	r->iterations = 1;
+
 	r->query_rownum = ocrpt_expr_parse(o, r, "rownum()", NULL);
-	ocrpt_expr_resolve(o, r, r->query_rownum);
+
+	r->detailcnt = ocrpt_expr_parse(o, r, "r.self + 1", NULL);
+	ocrpt_expr_init_iterative_results(o, r->detailcnt, OCRPT_RESULT_NUMBER);
+
 	return r;
 }
 
@@ -134,6 +142,7 @@ DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_list_free(r->exprs);
 	r->executing = false;
 	r->exprs = r->exprs_last = NULL;
+	ocrpt_list_free(r->detailcnt_dependees);
 	ocrpt_list_free_deep(r->start_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(r->done_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(r->newrow_callbacks, ocrpt_mem_free);
@@ -224,6 +233,15 @@ DLL_EXPORT_SYM void ocrpt_report_evaluate_expressions(opencreport *o, ocrpt_repo
 	for (ptr = r->exprs; ptr; ptr = ptr->next) {
 		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 
+		ocrpt_expr_eval(o, r, e);
+	}
+}
+
+void ocrpt_report_evaluate_detailcnt_dependees(opencreport *o, ocrpt_report *r) {
+	ocrpt_list *ptr;
+
+	for (ptr = r->detailcnt_dependees; ptr; ptr = ptr->next) {
+		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 		ocrpt_expr_eval(o, r, e);
 	}
 }
@@ -373,4 +391,43 @@ DLL_EXPORT_SYM bool ocrpt_add_precalculation_done_cb(opencreport *o, ocrpt_cb fu
 	o->precalc_done_callbacks = ocrpt_list_append(o->precalc_done_callbacks, ptr);
 
 	return true;
+}
+
+DLL_EXPORT_SYM ocrpt_part *ocrpt_part_get_next(opencreport *o, ocrpt_list **list) {
+	if (!o || !list)
+		return NULL;
+
+	*list = *list ? (*list)->next : o->parts;
+	return (ocrpt_part *)(*list ? (*list)->data : NULL);
+}
+
+DLL_EXPORT_SYM ocrpt_part_row *ocrpt_part_row_get_next(ocrpt_part *p, ocrpt_list **list) {
+	if (!p || !list)
+		return NULL;
+
+	*list = *list ? (*list)->next : p->rows;
+	return (ocrpt_part_row *)(*list ? (*list)->data : NULL);
+}
+
+DLL_EXPORT_SYM ocrpt_part_row_data *ocrpt_part_row_data_get_next(ocrpt_part_row *pr, ocrpt_list **list) {
+	if (!pr || !list)
+		return NULL;
+
+	*list = *list ? (*list)->next : pr->pd_list;
+	return (ocrpt_part_row_data *)(*list ? (*list)->data : NULL);
+}
+
+DLL_EXPORT_SYM ocrpt_report *ocrpt_report_get_next(ocrpt_part_row_data *pd, ocrpt_list **list) {
+	if (!pd || !list)
+		return NULL;
+
+	*list = *list ? (*list)->next : pd->reports;
+	return (ocrpt_report *)(*list ? (*list)->data : NULL);
+}
+
+DLL_EXPORT_SYM long ocrpt_report_get_query_rownum(opencreport *o, ocrpt_report *r) {
+	if (!o || !r || !r->query_rownum)
+		return 0L;
+
+	return ocrpt_expr_get_long_value(o, r->query_rownum);
 }

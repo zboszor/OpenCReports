@@ -164,117 +164,349 @@ false
 	<sect1 id="identifiers" xreflabel="Identifiers">
 		<title>Identifiers</title>
 		<para>
-			In OpenCReports expressions, identifiers can reference query column
-			names, environment variables, internal variables and custom
-			report variables. Their values are evaluated or computed
-			during the report execution.
+			Expressions may reference query column names, environment
+			variables, internal variables and user defined variables.
+			These references are called <literal>identifiers</literal>.
+			Their values are evaluated or computed during the report execution.
 		</para>
-		<para>
-			Identifiers are in the format <literal>[[domain].]identifier</literal>
-			where the domain name or the dot are optional.
-		</para>
-		<para>
-			OpenCReports is using the UTF-8 encoding. This means that valid
-			<literal>domain</literal> and <literal>identifier</literal>
-			names may start with an underscore or UTF-8 letters and may
-			contain underscore, UTF-8 letters and numbers in subsequent
-			characters. Examples:
-			<programlisting>
-valid_field_name
-_valid_field_name5
-query2.column1
+		<sect2>
+			<title>Valid identifier names</title>
+			<para>
+				Identifiers are in the format <literal>[[domain].]identifier</literal>
+				where the domain name or the dot are optional.
+			</para>
+			<para>
+				OpenCReports is using UTF-8 encoding even in identifier
+				names. Accented characters are accepted as identifiers.
+			</para>
+			<para>
+				Valid names for <literal>domain</literal> and
+				<literal>identifier</literal> may start with an underscore
+				or UTF-8 letters and may contain underscore, UTF-8 letters
+				and numbers in subsequent characters.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Query field identifiers</title>
+			<para>
+				Any valid identifier is by default a query column
+				reference, with or without the domain name. Examples:
+				<programlisting>
+field_name
+field_name5
+myquery1.field_name
 mező_név
 lekérdezés.mező_név
-			</programlisting>
-		</para>
-		<para>
-			Both <literal>domain</literal> and <literal>identifier</literal>
-			names may be quoted or unquoted. Quoting identifiers allows
-			using semi-reserved and reserved words as identifers and also
-			allow special characters in identifier names. Examples:
-			<programlisting>
-query.column1
-query."column2"
-query."column with space in the name"
-"query2".column3
+				</programlisting>
+				By the way, in the above example,
+				<literal>mező_név</literal> means
+				<literal>field_name</literal>, and
+				<literal>lekérdezés.mező_név</literal> means
+				<literal>query.field_name</literal> in Hungarian.
+				The accented characters are a courtesy of UTF-8.
+			</para>
+			<para>
+				Query field identifiers in expressions are matched
+				during expression resolution. If the domain name
+				is specified, a query with that name must be present
+				in the report, either as the main query or as a
+				follower query. If the domain name is not specified,
+				the field names of the main query and all the follower
+				queries are matched with the expression.
+			</para>
+			<para>
+				For exceptions and exceptions from under the exceptions,
+				see below.
+			</para>
+		</sect2>
+		<sect2 id="speciddomains" xreflabel="Special purpose identifier domains">
+			<title>Special purpose identifier domains</title>
+			<para>
+				Some identifier domain names carry special meaning for the report.
+			</para>
+			<sect3>
+				<title>Environment variables</title>
+				<para>
+					Domain <literal>m</literal> indicates the domain
+					of environment variables. The list of environment variables
+					depend on the languange binding. In C, it's the variables
+					in the operating environment. In PHP, they are simply global
+					PHP variables. Example:
+					<programlisting>
+m.current_date
+					</programlisting>
+				</para>
+				<para>
+					Since such a setting is controlled outside the report,
+					and for the duration of running the report, its value
+					cannot change, environment variable references are treated
+					as constants and are resolved into constant values
+					for the expression result evaluation.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Internal report variables</title>
+				<para>
+					Domain <literal>r</literal> indicates the domain
+					of internal report variables.
+				</para>
+				<sect4>
+					<title>Current page number</title>
+					<para>
+						<programlisting>
+r.pageno
+						</programlisting>
+						The current page of the report is maintained by
+						the report layout and is intertwined with running
+						a report. For example, if an expression is evaluated
+						on page 4 of the report, and happens to reference
+						the current page number variable, then this variable
+						will have the value 4 in the result.
+					</para>
+				</sect4>
+				<sect4>
+					<title>Total number of pages</title>
+					<para>
+						<programlisting>
+r.totpages
+						</programlisting>
+						This variable carries the total number of pages
+						in the report. Its value is maintained by the
+						report layout and it interwined with running a report.
+						This variable is inherently precalculated.
+						This means that the report is actually run twice.
+						The first run computes the final values for
+						<literal>precalculated</literal> variables and
+						<literal>delayed</literal> expressions. The actual
+						report output in the second run will use the
+						pre-computed values.
+					</para>
+				</sect4>
+				<sect4>
+					<title>Line number</title>
+					<para>
+						<programlisting>
+r.lineno
+						</programlisting>
+						This variable is an alias to the
+						<literal>rownum()</literal> function, i.e.
+						it is the current row (line) number in the data set.
+					</para>
+					<para>
+						Being an alias means that the variable is replaced by
+						the <literal>rownum()</literal> function call in the
+						grammar. Please, be aware, that functions may be
+						overridden by user defined functions. If
+						<literal>rownum()</literal> is overridden, then it will
+						be called with zero arguments by the grammar transformation,
+						which may or may not work for the user defined function
+						and the variable will not work as intended.
+					</para>
+				</sect4>
+				<sect4>
+					<title>Detail count</title>
+					<para>
+						<programlisting>
+r.detailcnt
+						</programlisting>
+						This variable works similarly to the row number
+						counter, e.g. <literal>rownum()</literal> or
+						<literal>r.lineno</literal>, except it restarts
+						from 1 at every <literal>&lt;FieldHeaders&gt;</literal>.
+					</para>
+					<para>
+						With the default behaviour of
+						<literal>&lt;Breaks&gt;</literal> vs
+						<literal>&lt;FieldHeaders&gt;</literal>,
+						i.e. when <literal>&lt;FieldHeaders&gt;</literal>
+						is printed on the top of every page,
+						<literal>r.detailcnt</literal> works as a per page
+						line count value.
+					</para>
+					<para>
+						When <literal>&lt;Report field_header_priority="low"&gt;</literal>
+						is used, the effect may be more emphasized because
+						the value of this variable is reset more often.
+					</para>
+				</sect4>
+				<sect4>
+					<title>Field value for <literal>&lt;field value="..."&gt;</literal></title>
+					<para>
+						<programlisting>
+r.value
+						</programlisting>
+						The report field description has an expression for its
+						value. It also has supplementary expressions, like the
+						foreground and backgroun colors, the format string, and
+						others.
+					</para>
+					<para>
+						The supplementary expressions may reference the field
+						value's expression result to make their own result
+						depend on the field expression, without having to
+						type out the field value expression multiple times.
+					</para>
+					<para>
+						Using <literal>r.value</literal> also helps reducing
+						the report runtime because the value expression
+						is not computed multiple times.
+					</para>
+					<para>
+						Referencing <literal>r.value</literal> is only valid
+						for supplementary expressions for the same field
+						description, i.e. other XML attributes for a
+						<literal>&lt;field value="..." .../&gt;</literal>
+						line. This variable cannot cross-reference other
+						field descriptions, or anything not in the same scope.
+					</para>
+				</sect4>
+				<sect4>
+					<title>Format string value for <literal>&lt;field format="..."&gt;</literal></title>
+					<para>
+						<programlisting>
+r.format
+						</programlisting>
+						Similarly to <literal>r.value</literal>, the field
+						description has an expression for its formatting.
+						This expession may be used by other expressions
+						to format their values. It has very few use cases,
+						if any. It exists mainly for compatibility with
+						RLIB.
+					</para>
+				</sect4>
+				<sect4>
+					<title>Expression self reference</title>
+					<para>
+						<programlisting>
+r.self
+						</programlisting>
+						This variable references the previous result of
+						the expression. It is used in iterative expressions,
+						like in internal representations of user-defined
+						variables.
+					</para>
+				</sect4>
+				<sect4>
+					<title>Subexpressions of user-defined variables</title>
+					<para>
+						<programlisting>
+r.baseexpr
+r.intermedexpr
+r.intermed2expr
+						</programlisting>
+						These variables are references for the three
+						subexpressions that potentially make up a user
+						defined variable. The expressions in order are:
+						base expression, intermediary expressions one and
+						two.
+					</para>
+					<para>
+						Actually, there's a fourth subexpression that exists
+						in every user defined variable, namely the result
+						expression. It's reference is simply the user variable
+						reference, see <xref linkend="uservariables"/>.
+					</para>
+					<para>
+						For example, a running average over a data series
+						needs two intermediary expressions: one for
+						the sum of the values, the other for the number
+						of values in the series. The result is the
+						sum of values divided by the number of values.
+					</para>
+					<para>
+						Their usage is only valid when declaring a custom
+						user defined variable.
+					</para>
+				</sect4>
+			</sect3>
+			<sect3 id="uservariables" xreflabel="User defined variables">
+				<title>User defined variables</title>
+				<para>
+					Domain <literal>v</literal> signifies user defined
+					report variables, which can be used in breaks or
+					to shortcut expressions. Example:
+					<programlisting>
+v.my_variable
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Quoted and dot-prefixed identifiers</title>
+				<para>
+					Both <literal>domain</literal> and <literal>identifier</literal>
+					names may be quoted or unquoted. Quoting names allow using
+					semi-reserved and reserved words as identifers and also
+					allow special characters in identifier names. Examples:
+					<programlisting>
+query.field_name1
+query."field_name2"
+query."field with space in the name"
+"query2".field_name3
 "query2"."and"
-			</programlisting>
-		</para>
-		<para>
-			Semi-reserved words are the boolean constants. They can be used
-			as identifiers with dot-prefixed identifier names without
-			a domain name:
-			<programlisting>
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Dot-prefixed identifiers</title>
+				<para>
+					A dot-prefixed identifier is one where the domain name
+					is not specified, but the identifier name is prefixed
+					with a dot. Examples:
+					<programlisting>
+.field_name
+."field_name"
+					</programlisting>
+				</para>
+				<para>
+					Semi-reserved words are the boolean constants. They can be used
+					as identifiers with dot-prefixed identifier names without
+					a domain name and without quoting:
+					<programlisting>
 .yes
 .no
 .true
 .false
 yes.no
-			</programlisting>
-			These can also be used as quoted identifiers:
-			<programlisting>
+					</programlisting>
+					The above unquoted identifiers are equivalent with
+					these quoted ones below:
+					<programlisting>
 ."yes"
 ."no"
 ."true"
 ."false"
-"true"."false"
-			</programlisting>
-			They can also be used in domain-qualified identifiers with
-			or without quoting either the domain name or the identifier.
-		</para>
-		<para>
-			Reserved words are the ones that can appear as operator names:
-			<literal>and</literal> and <literal>or</literal>. They cannot
-			be used with dot-prefixed operator names, as it would cause
-			an expression syntax error. But they can be used as quoted
-			identifiers, in case you would want to use such a query name
-			and column name:
-			<programlisting>
+"yes"."no"
+					</programlisting>
+				</para>
+				<para>
+					Operator names are reserved words, e.g. <literal>and</literal>
+					and <literal>or</literal>. They cannot be used with dot-prefixed
+					operator names without quoting, as it would cause an
+					expression syntax error. But they can be used as quoted
+					identifiers, in case you would want to use such a query name
+					and column name:
+					<programlisting>
 ."and"
 ."or"
 "and"."or"
-			</programlisting>
-		</para>
-		<sect2 id="speciddomains" xreflabel="Special identifier domains">
-			<title>Special identifier domains</title>
-			<para>
-				Unquoted domain <literal>m</literal> indicates the domain
-				of environment variables. The list of environment variables
-				depend on the languange binding. In C, it's the variables
-				in the operating environment. In PHP, they are the global
-				PHP variables. Example:
-				<programlisting>
-m.current_date
-				</programlisting>
-			</para>
-			<para>
-				Unquoted domain <literal>r</literal> indicates the domain
-				of internal report variables, like the current page of the
-				report or total number of pages. The latter implies delayed
-				evaluation, where the complete report is paginated. Example:
-				<programlisting>
-r.totpages
-				</programlisting>
-			</para>
-			<para>
-				Domain <literal>v</literal> signifies custom report variables,
-				used e.g. in breaks or to shortcut expressions. Example:
-				<programlisting>
-v.break1
-				</programlisting>
-			</para>
-			<para>
-				When these identifier domains are quoted, they lose their
-				special meaning and these identifiers become query
-				identifiers. Of course, in this case, such a query name must
-				exist and the query must have such a column name specified
-				in the identifier. Examples:
-				<programlisting>
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Quoted special purpose identifier domains</title>
+				<para>
+					When identifier domains are quoted, they lose their special
+					meaning and the identifiers become query field identifiers.
+					Of course, in this case, such a query name must exist and
+					the query must have a field name specified in the identifier.
+					Examples:
+					<programlisting>
 "m".current_date
 "r".totpages
-"v".break1
-				</programlisting>
-			</para>
+"v".my_variable
+					</programlisting>
+				</para>
+			</sect3>
 		</sect2>
 	</sect1>
 	<sect1 id="opsandfunc" xreflabel="Operators and functions">
@@ -591,7 +823,8 @@ a++b
 			<title>abs()</title>
 			<para>
 				Absolute value. Operator <literal>|...|</literal>
-				is a shortcut for this function. It takes one numeric operand.
+				is a shortcut for this function.
+				It takes one numeric operand.
 			</para>
 		</sect2>
 		<sect2>
@@ -850,7 +1083,8 @@ a++b
 			<para>
 				Greater-or-equal. It takes two operands of the same type,
 				which can be either numeric, string or datetime operands.
-				The operator <literal>&gt;=</literal> is the shortcut for it.
+				The operator <literal>&gt;=</literal> is the shortcut for
+				this function.
 			</para>
 		</sect2>
 		<sect2>
@@ -865,7 +1099,8 @@ a++b
 			<para>
 				Greater-than. It takes two operands of the same type,
 				which can be either numeric, string or datetime operands.
-				The operator <literal>&gt;</literal> is the shortcut for it.
+				The operator <literal>&gt;</literal> is the shortcut for
+				this function.
 			</para>
 		</sect2>
 		<sect2>
@@ -877,7 +1112,7 @@ a++b
 				the result will be the value of the second operand,
 				else it will be the third operand.
 				The trinary operator <literal>exp1 ? exp2 : exp3</literal>
-				is the shortcut for it.
+				is the shortcut for this function.
 			</para>
 		</sect2>
 		<sect2>
@@ -911,11 +1146,11 @@ a++b
 		<sect2>
 			<title>land()</title>
 			<para>
-				Boolean logic AND. Operator <literal>&&</literal> is a shortcut for
-				this function. It takes two or more numeric operands that
-				are treated as boolean logic values. The function is executed
-				until the result is fully determined, i.e. it stops at
-				the first false value.
+				Boolean logic AND. Operator <literal>&&</literal> is a
+				shortcut for this function. It takes two or more numeric
+				operands that are treated as boolean logic values. The
+				function is executed until the result is fully determined,
+				i.e. it stops at the first false value.
 			</para>
 		</sect2>
 		<sect2>
@@ -923,7 +1158,8 @@ a++b
 			<para>
 				Less-or-equal. It takes two operands of the same type,
 				which can be either numeric, string or datetime operands.
-				The operator <literal>&lt;=</literal> is the shortcut for it.
+				The operator <literal>&lt;=</literal> is the shortcut for
+				this function.
 			</para>
 		</sect2>
 		<sect2>
@@ -988,7 +1224,8 @@ a++b
 			<para>
 				Less-than. It takes two operands of the same type,
 				which can be either numeric, string or datetime operands.
-				The operator <literal>&lt;</literal> is the shortcut for it.
+				The operator <literal>&lt;</literal> is the shortcut for this
+				function.
 			</para>
 		</sect2>
 		<sect2>

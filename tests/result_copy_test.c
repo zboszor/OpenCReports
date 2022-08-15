@@ -27,10 +27,8 @@ int main(void) {
 	ocrpt_query *q;
 	ocrpt_query_result *qr;
 	ocrpt_expr *id, *name, *err;
-	ocrpt_result rs;
+	ocrpt_result *rs = ocrpt_result_new();
 	int32_t cols, row;
-
-	memset(&rs, 0, sizeof(rs));
 
 	id = ocrpt_expr_parse(o, NULL, "id", NULL);
 	ocrpt_expr_print(o, id);
@@ -66,8 +64,8 @@ int main(void) {
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 		printf("Copied: ");
-		ocrpt_result_copy(o, &rs, id->result[o->residx]);
-		ocrpt_result_print(&rs);
+		ocrpt_result_copy(o, rs, ocrpt_expr_get_result(o, id));
+		ocrpt_result_print(rs);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, name);
@@ -75,8 +73,8 @@ int main(void) {
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 		printf("Copied: ");
-		ocrpt_result_copy(o, &rs, name->result[o->residx]);
-		ocrpt_result_print(&rs);
+		ocrpt_result_copy(o, rs, ocrpt_expr_get_result(o, name));
+		ocrpt_result_print(rs);
 
 		printf("Expression: ");
 		ocrpt_expr_print(o, err);
@@ -84,8 +82,8 @@ int main(void) {
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 		printf("Copied: ");
-		ocrpt_result_copy(o, &rs, err->result[o->residx]);
-		ocrpt_result_print(&rs);
+		ocrpt_result_copy(o, rs, ocrpt_expr_get_result(o, err));
+		ocrpt_result_print(rs);
 
 		printf("\n");
 	}
@@ -93,7 +91,7 @@ int main(void) {
 	ocrpt_expr_free(o, NULL, id);
 	ocrpt_expr_free(o, NULL, name);
 	ocrpt_expr_free(o, NULL, err);
-	ocrpt_result_free_data(&rs);
+	ocrpt_result_free(rs);
 
 	/* ocrpt_free() will free it */
 	//ocrpt_free_query(o, q);

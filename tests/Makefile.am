@@ -82,7 +82,9 @@ PDF_TESTS = \
 	layout_pdf_xml7_test \
 	layout_pdf_xml8_test \
 	layout_pdf_xml9_test \
-	layout_pdf_xml10_test
+	layout_pdf_xml10_test \
+	layout_pdf_xml11_test \
+	layout_pdf_xml12_test
 
 # Unstable tests by nature:
 # random_test produces a random number which is different every time

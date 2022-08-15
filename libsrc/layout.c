@@ -14,7 +14,12 @@
 #include <pango/pangocairo.h>
 
 #include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
+#include "exprutil.h"
+#include "variables.h"
 #include "datasource.h"
+#include "parts.h"
 #include "layout.h"
 
 /*
@@ -441,6 +446,11 @@ void ocrpt_layout_output_highprio_fieldheader(opencreport *o, ocrpt_part *p, ocr
 		 * It is configurable via <Report field_header_preference="high/low">
 		 * with the default "high" value.
 		 */
+		if (rows > 1) {
+			ocrpt_expr_init_iterative_results(o, r->detailcnt, OCRPT_RESULT_NUMBER);
+			ocrpt_expr_eval(o, r, r->detailcnt);
+			ocrpt_report_evaluate_detailcnt_dependees(o, r);
+		}
 		ocrpt_layout_output(o, p, pr, pd, r, &r->fieldheader, rows, page_indent, page_position);
 	}
 }

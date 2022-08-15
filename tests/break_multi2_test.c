@@ -41,13 +41,13 @@ static void test_newrow_cb(opencreport *o, ocrpt_report *r, void *ptr) {
 	printf("Row #%d\n", row++);
 	print_result_row("a", qr, cols);
 
-	rs = ocrpt_expr_get_result(o, r, rd->e);
+	rs = ocrpt_expr_get_result(o, rd->e);
 	ocrpt_expr_print(o, rd->e);
 	ocrpt_result_print(rs);
 }
 
 static void test_break_trigger_cb(opencreport *o, ocrpt_report *r, ocrpt_break *br, void *dummy UNUSED) {
-	printf("break '%s' triggered\n", br->name);
+	printf("break '%s' triggered\n", ocrpt_break_get_name(br));
 }
 
 int main(void) {
@@ -64,10 +64,7 @@ int main(void) {
 	rd.q = ocrpt_query_get(o, "a");
 
 	/* There is only one ocrpt_report pointer in o->parts, extract it. */
-	ocrpt_part *p = (ocrpt_part *)o->parts->data;
-	ocrpt_part_row *pr = (ocrpt_part_row *)p->rows->data;
-	ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pr->pd_list->data;
-	ocrpt_report *r = (ocrpt_report *)pd->reports->data;
+	ocrpt_report *r = get_first_report(o);
 
 	rd.e = ocrpt_expr_parse(o, r, "v.age_avg", NULL);
 

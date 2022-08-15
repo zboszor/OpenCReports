@@ -24,6 +24,7 @@
 int main(void) {
 	opencreport *o1 = ocrpt_init();
 	opencreport *o2 = ocrpt_init();
+	locale_t o1l, o2l;
 	double dval = 1000000.0;
 	mpfr_t mval;
 	char sval[64];
@@ -34,28 +35,31 @@ int main(void) {
 	ocrpt_set_locale(o1, "hu_HU.UTF-8");
 	ocrpt_set_locale(o2, "fr_FR.UTF-8");
 
+	o1l = ocrpt_get_locale(o1);
+	o2l = ocrpt_get_locale(o2);
+
 	printf("Hungarian month names:\n");
 	for (i = 0; i < 12; i++)
-		printf("%s %s\n", nl_langinfo_l(MON_1 + i, o1->locale), nl_langinfo_l(ABMON_1 + i, o1->locale));
+		printf("%s %s\n", nl_langinfo_l(MON_1 + i, o1l), nl_langinfo_l(ABMON_1 + i, o1l));
 	printf("\n");
 
 	printf("Hungarian weekday names:\n");
 	for (i = 0; i < 7; i++)
-		printf("%s %s\n", nl_langinfo_l(DAY_1 + i, o1->locale), nl_langinfo_l(ABDAY_1 + i, o1->locale));
+		printf("%s %s\n", nl_langinfo_l(DAY_1 + i, o1l), nl_langinfo_l(ABDAY_1 + i, o1l));
 	printf("\n");
 
 	printf("French month names:\n");
 	for (i = 0; i < 12; i++)
-		printf("%s %s\n", nl_langinfo_l(MON_1 + i, o2->locale), nl_langinfo_l(ABMON_1 + i, o2->locale));
+		printf("%s %s\n", nl_langinfo_l(MON_1 + i, o2l), nl_langinfo_l(ABMON_1 + i, o2l));
 	printf("\n");
 
 	printf("French weekday names:\n");
 	for (i = 0; i < 7; i++)
-		printf("%s %s\n", nl_langinfo_l(DAY_1 + i, o2->locale), nl_langinfo_l(ABDAY_1 + i, o2->locale));
+		printf("%s %s\n", nl_langinfo_l(DAY_1 + i, o2l), nl_langinfo_l(ABDAY_1 + i, o2l));
 	printf("\n");
 
-	mpfr_init2(mval, o1->prec);
-	mpfr_set_si(mval, 1000000, o1->rndmode);
+	mpfr_init2(mval, OCRPT_MPFR_PRECISION_BITS);
+	mpfr_set_si(mval, 1000000, MPFR_RNDN);
 
 	errno = 0;
 	ret = ocrpt_mpfr_strfmon(o1, sval, sizeof(sval), "%^=*#12n", mval);
@@ -65,7 +69,7 @@ int main(void) {
 	ret = ocrpt_mpfr_strfmon(o1, sval, sizeof(sval), "%=*#12i", mval);
 	printf("Hungarian money (international notation): %s (%d %d)\n\n", sval, ret, errno);
 
-	char *sep1 = nl_langinfo_l(__MON_THOUSANDS_SEP, o2->locale), *sep2 = nl_langinfo_l(__THOUSANDS_SEP, o2->locale);
+	char *sep1 = nl_langinfo_l(__MON_THOUSANDS_SEP, o2l), *sep2 = nl_langinfo_l(__THOUSANDS_SEP, o2l);
 	printf("thousands separator: money '%s' regular '%s'\n", sep1, sep2);
 	errno = 0;
 	ret = ocrpt_mpfr_strfmon(o2, sval, sizeof(sval), "%^=*#12n", mval);
