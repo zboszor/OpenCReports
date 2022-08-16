@@ -2,6 +2,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
 	"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
 <!ENTITY introduction SYSTEM "introduction.sgm">
+<!ENTITY xmldescription SYSTEM "xmldescription.sgm">
 <!ENTITY expressions SYSTEM "expressions.sgm">
 <!ENTITY breaks SYSTEM "breaks.sgm">
 <!ENTITY variables SYSTEM "variables.sgm">
@@ -28,6 +29,7 @@
 	</bookinfo>
 
 	&introduction;
+	&xmldescription;
 	&expressions;
 	&breaks;
 	&variables;

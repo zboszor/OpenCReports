@@ -38,7 +38,7 @@
 			<title>XML based report description</title>
 			<para>
 				OpenCReports uses an RLIB-compatible report description
-				with extensions.
+				with extensions. See <xref linkend="xmldescriptor"/>.
 			</para>
 		</sect2>
 		<sect2>

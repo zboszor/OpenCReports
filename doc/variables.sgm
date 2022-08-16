@@ -3,19 +3,21 @@
 	<sect1>
 		<title>Introduction to report variables</title>
 		<para>
-			Variables are aliases for either basic or iterative
+			Variables are named aliases for either basic or iterative
 			expressions.
 		</para>
+	</sect1>
+	<sect1 id="exprvar" xreflabel="Expression variables">
+		<title>Expression variables</title>
 		<para>
 			For basic expressions, the value of a variable is
 			calculated from the aliased expression using the current
 			row of data from the data source. This can be thought of
 			as a kind of shortcut. A variable calculates the
 			value of a long or often used expression, and the variable
-			in turn can be used in other expressions. The can save
-			both typing (in the report XML) or runtime during the
-			report generation, since the expression value is calculated
-			once per row.
+			result may in turn be used in other expressions.
+			This can save both typing (in the report XML) and runtime
+			cost during the report generation.
 		</para>
 		<para>
 			Iterative variables use both the values of the current row

@@ -3,6 +3,7 @@ if ENABLE_DOCS
 SGMLFILES = \
 	OpenCReports.sgm \
 	introduction.sgm \
+	xmldescription.sgm \
 	breaks.sgm \
 	variables.sgm \
 	expressions.sgm \

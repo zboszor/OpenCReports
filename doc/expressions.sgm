@@ -330,21 +330,23 @@ r.detailcnt
 					</para>
 				</sect4>
 				<sect4>
-					<title>Field value for <literal>&lt;field value="..."&gt;</literal></title>
+					<title>Field value</title>
 					<para>
 						<programlisting>
 r.value
 						</programlisting>
 						The report field description has an expression for its
-						value. It also has supplementary expressions, like the
-						foreground and backgroun colors, the format string, and
-						others.
+						value in the  form of
+						<literal>&lt;field value="..."&gt;</literal>.
+						It also has supplementary expressions, like the
+						foreground and background colors, the format string,
+						and others.
 					</para>
 					<para>
 						The supplementary expressions may reference the field
-						value's expression result to make their own result
-						depend on the field expression, without having to
-						type out the field value expression multiple times.
+						value to make their own result
+						depend on its result, without having to
+						type out the field expression multiple times.
 					</para>
 					<para>
 						Using <literal>r.value</literal> also helps reducing
@@ -361,17 +363,19 @@ r.value
 					</para>
 				</sect4>
 				<sect4>
-					<title>Format string value for <literal>&lt;field format="..."&gt;</literal></title>
+					<title>Format string value</title>
 					<para>
 						<programlisting>
 r.format
 						</programlisting>
-						Similarly to <literal>r.value</literal>, the field
-						description has an expression for its formatting.
-						This expession may be used by other expressions
-						to format their values. It has very few use cases,
-						if any. It exists mainly for compatibility with
-						RLIB.
+						Similarly to the field value a.k.a.<literal>r.value</literal>,
+						the field description has an an optional expression
+						for its formatting. This expession may be used by
+						other expressions in the form of
+						<literal>&lt;field format="..."&gt;</literal>,
+						possible to format their values. It has very few
+						use cases, if any. It only exists for compatibility
+						with RLIB that has this internal variable.
 					</para>
 				</sect4>
 				<sect4>

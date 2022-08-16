@@ -1,0 +1,826 @@
+<chapter id="xmldescriptor" xreflabel="XML description">
+	<title>Report XML description</title>
+	<sect1>
+		<title>XML description structure</title>
+		<para>
+			OpenCReports uses an RLIB-compatible report description
+			with extensions.
+		</para>
+		<para>
+			The report XML description, like all XML files start with
+			declaring that it's an XML file and the optional declaration
+			of the Document Type Definition that the XML file can be
+			checked against. For an OpenCReports report description,
+			the first two lines are:
+			<programlisting>
+&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE OpenCReport SYSTEM "opencreport.dtd"&gt;
+			</programlisting>
+			The DTD file <literal>opencreport.dtd</literal> can be
+			found in the sources of OpenCReports.
+		</para>
+		<para>
+			After the XML header lines, a fully specified report
+			description looks like this:
+			<programlisting>
+&lt;OpenCReport&gt;
+    &lt;Datasources&gt;
+        ...
+    &lt;/Datasources&gt;
+    &lt;Queries&gt;
+        ...
+    &lt;/Queries&gt;
+    &lt;Part&gt;
+        &lt;pr&gt;
+            &lt;pd&gt;
+                &lt;Report&gt;
+                    ...
+                &lt;/Report&gt;
+            &lt;/pd&gt;
+        &lt;/pr&gt;
+    &lt;/Part&gt;
+&lt;/OpenCReport&gt;
+			</programlisting>
+			or like this:
+			<programlisting>
+&lt;OpenCReport&gt;
+    &lt;Datasources&gt;
+        ...
+    &lt;/Datasources&gt;
+    &lt;Queries&gt;
+        ...
+    &lt;/Queries&gt;
+    &lt;Report&gt;
+        ...
+    &lt;/Report&gt;
+&lt;/OpenCReport&gt;
+			</programlisting>
+		</para>
+		<para>
+			The XML sections <literal>&lt;Datasources&gt;</literal>
+			and <literal>&lt;Queries&gt;</literal> are optional
+			in the report XML description. They can be substituted
+			by program code using the datasource and query related
+			calls in the <xref linkend="lowlevelapi"/>, similarly
+			to RLIB.
+		</para>
+		<para>
+			For RLIB compatibility, a report description may start
+			with either <literal>&lt;Part&gt;</literal> or
+			<literal>&lt;Report&gt;</literal> as the toplevel node.
+			In this case, there's no other way to add datasources
+			and queries, but through program code, like the
+			<xref linkend="lowlevelapi"/>.
+		</para>
+		<sect2>
+			<title>Notes about XML syntax and attributes</title>
+			<para>
+				Most (if not all) XML attributes in the report
+				description file are handled with the expression
+				parser, with fallback to plain strings if the
+				the location of expression wouldn't allow identifier
+				references.
+			</para>
+			<para>
+				For example, in the below examples, the datasource name
+				may be declared this way:
+				<programlisting>
+&lt;Datasource name="mysource" ... /&gt;
+				</programlisting>
+				or this way:
+				<programlisting>
+&lt;Datasource name="'mysource'" ... /&gt;
+				</programlisting>
+				or even this way:
+				<programlisting>
+&lt;Datasource name="&amp;quot;mysource&amp;quot;" ... /&gt;
+				</programlisting>
+			</para>
+			<para>
+				The first form is a regular XML string value.
+				Since expression parsing would find that
+				<literal>mysource</literal> is an identifier
+				which may be a query column name and this is not
+				a valid place for a query reference, the non-parsed
+				string value is used.
+			</para>
+			<para>
+				The second form is a single quoted OpenCReports
+				string constant. The parsed string constant's
+				value is used.
+			</para>
+			<para>
+				The third form is a double quoted OpenCReports
+				string constant, but in XML the double quote
+				character must be substituted with
+				<literal>&amp;quot;</literal> because they are
+				reserved for quoting the attribute values.
+				The parsed string constant's value is used.
+			</para>
+			<para>
+				To make the XML easier to read, the second form
+				is recommended because it still allows
+				embedding the single quote character inside
+				a string (see <xref linkend="xmldescriptor"/>)
+				in case e.g. a strong password contains this.
+				For security-by-obscurity, the third form may
+				be used because it is harder to read. For all
+				special characters that should be escaped in
+				XML, see
+				<ulink url="https://stackoverflow.com/a/46637835/290085"><citetitle>Simplified XML Escaping</citetitle></ulink>.
+			</para>
+		</sect2>
+		<sect2 id="datasources" xreflabel="Datasources">
+			<title>Datasources</title>
+			<para>
+				Datasources in OpenCReports are either database
+				connections, or accessors (mini-drivers) for data
+				files in certain formats.
+			</para>
+			<para>
+				Datasource descriptions are in the following format:
+				<programlisting>
+&lt;Datasources&gt;
+    &lt;Datasource name="mysource" type="..." ... /&gt;
+&lt;/Datasources&gt;
+				</programlisting>
+			</para>
+			<para>
+				A report may have multiple datasources, i.e.
+				the description may list multiple
+				<literal>&lt;Datasource&gt;</literal> lines.
+			</para>
+			<para>
+				Datasources must have unique names in a report and
+				their type may be: <literal>mariadb</literal>,
+				<literal>mariadb</literal> (or <literal>mysql</literal>),
+				<literal>postgresql</literal>, <literal>odbc</literal>,
+				<literal>csv</literal>, <literal>json</literal>,
+				<literal>xml</literal> or <literal>array</literal>.
+			</para>
+			<sect3>
+				<title>MariaDB (MySQL) database connection</title>
+				<para>
+					A MariaDB database connection may be declared in three
+					ways. Either by using the database host and port
+					database name, user name and password directly:
+					<programlisting>
+&lt;Datasource
+    name="mysource" type="mariadb"
+    host="..." port="..."
+    dbname="..." user="..." password="..." /&gt;
+					</programlisting>
+					or alternatively, instead of the host and port,
+					specifying the the UNIX Domain Socket file for
+					a local connection if it's not in the standard
+					location:
+					<programlisting>
+&lt;Datasource
+    name="mysource" type="mariadb"
+    unix_socket="..."
+    dbname="..." user="..." password="..." /&gt;
+					</programlisting>
+					or moving these details out to an external
+					configuration file in an INI file format:
+					<programlisting>
+&lt;Datasource
+    name="mysource" type="mariadb"
+    optionfile="myconn.cnf" group="myconn" /&gt;
+					</programlisting>
+				</para>
+				<para>
+					In the second case, the configuration file <literal>myconn.cnf</literal>
+					would contain something like this:
+					<programlisting>
+[myconn]
+!include /etc/my.cnf
+database=mydb
+user=myuser
+#password=
+#host=
+#port=
+#unix_socket=
+					</programlisting>
+					Please note that the INI group name <literal>[myconn]</literal>
+					matches <literal>group="myconn"</literal> in the above
+					datasource declaration.
+				</para>
+				<para>
+					The database name and user name are mandatory. The
+					user password is optional, depending on the database
+					security authentication setup.
+				</para>
+				<para>
+					The database host and port, or the socket file location
+					are all optional. Without these, a local connection is
+					attempted using the default settings.
+				</para>
+			</sect3>
+			<sect3>
+				<title>PostgreSQL database connection</title>
+				<para>
+					A PostgreSQL database connection may be declared in three
+					ways. Either by using the database host and port
+					database name, user name and password directly:
+					<programlisting>
+&lt;Datasource
+    name="mysource" type="postgresql"
+    host="..." port="..."
+    dbname="..." user="..." password="..." /&gt;
+					</programlisting>
+					or alternatively, instead of the host and port,
+					specifying the the UNIX Domain Socket file for
+					a local connection if it's not in the standard
+					location:
+					<programlisting>
+&lt;Datasource
+    name="mysource" type="postgresql"
+    unix_socket="..."
+    dbname="..." user="..." password="..." /&gt;
+					</programlisting>
+					or using a so called connection string:
+					<programlisting>
+&lt;Datasource
+    name="mysource" type="postgresql"
+    connstr="..." /&gt;
+					</programlisting>
+				</para>
+				<para>
+					For the connection string format, see the
+					<ulink url="https://www.postgresql.org/docs"><citetitle>PostgreSQL documentation</citetitle></ulink>.
+				</para>
+				<para>
+					The database name and user name are mandatory. The
+					user password is optional, depending on the database
+					security authentication setup.
+				</para>
+				<para>
+					The database host and port, or the socket file location
+					are all optional. Without these, a local connection is
+					attempted using the default settings.
+				</para>
+			</sect3>
+			<sect3>
+				<title>ODBC database connection</title>
+				<para>
+					The above described MariaDB and PostgreSQL database
+					connection types are using their respective client
+					libraries. There is a more generic way, i.e. ODBC.
+					ODBC was invented by Microsoft in the 1990s for Windows.
+					See
+					<ulink url="https://docs.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc"><citetitle>Microsoft Open Database Connectivity (ODBC)</citetitle></ulink>
+					In their solution, there's an abstract client library
+					and individual database drivers adhere to the APIs
+					offered by ODBC toplevel library. Since then, UNIX and
+					UNIX-like systems also gained their ODBC client libraries
+					in two different implementations, both of which are
+					supported by OpenCReports:
+					<ulink url="https://www.unixodbc.org"><citetitle>unixODBC</citetitle></ulink>
+					and
+					<ulink url="https://www.iodbc.org"><citetitle>iODBC</citetitle></ulink>.
+				</para>
+				<para>
+					An ODBC database setup is done a differently. There are
+					two system-wide configuration files. The first one is
+					<literal>odbcinst.ini</literal> that lists the database
+					drivers installed into the system. The second one is
+					<literal>odbc.ini</literal> which references the first
+					one and lists pre-defined database connections. These
+					database connections are named. In ODBC speak, these
+					are called Data Source Names or DSNs. The DSNs specify
+					the low level connection parameters, like the database
+					host and port, and optionally the user name and
+					password, too.
+				</para>
+				<para>
+					Thus, an ODBC database connection may be declared in two
+					ways. The first way is by using the DSN name, and
+					optionally the user name and password:
+					<programlisting>
+&lt;Datasource
+    name="mysource" type="odbc"
+    dbname="..." user="..." password="..." /&gt;
+					</programlisting>
+					In this case, the <literal>dbname</literal> attribute
+					is not the low level database name, but the ODBC
+					abstract DSN name.
+				</para>
+				<para>
+					There's also a way to use the so called connection string
+					which contain the same connection information:
+					<programlisting>
+&lt;Datasource
+    name="mysource" type="odbc"
+    connstr="..." /&gt;
+					</programlisting>
+				</para>
+				<para>
+					For the connection string format, see the
+					<ulink url="https://www.connectionstrings.com/"><citetitle>public examples</citetitle></ulink>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>CSV file datasource</title>
+				<para>
+					CSV ("Comma Separated Values") is a simple tabulated
+					file format. Every line must have the same number of
+					columns, for which the values are separated by commas.
+					The first line in the file contains the column names.
+				</para>
+				<para>
+					A CSV file datasource is declared very simply:
+					<programlisting>
+&lt;Datasource name="mysource" type="'csv'" /&gt;
+					</programlisting>
+					In this case, the actual CSV file is not declared,
+					only that a "query" using a CSV file will be listed
+					later under <literal>&lt;Queries&gt;</literal>.
+				</para>
+				<para>
+					This datasource is less smart than others, in that
+					is cannot specify data type for columns. Every column
+					is assumed to be a string, regardless if the values
+					themselves are quoted or not in the file. Data
+					conversion functions must be used, like
+					<literal>val()</literal>, <literal>stodt()</literal>
+					or <literal>interval()</literal>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>JSON file datasource</title>
+				<para>
+					Similarly to CSV, the JSON file datasource is also declared
+					very simply:
+					<programlisting>
+&lt;Datasource name="mysource" type="'json'" /&gt;
+					</programlisting>
+					In this case, the actual JSON file is not declared,
+					only that a "query" using a JSON file will be listed
+					later under <literal>&lt;Queries&gt;</literal>.
+				</para>
+				<para>
+					A JSON file datasource is expected in this format:
+					<programlisting>
+{
+    "columns": ["colname1", ... ],
+    "coltypes": ["type", ... ],
+    "rows": [
+	    { "colname1": value1, ...  },
+        ...
+    ]
+}
+					</programlisting>
+				</para>
+				<para>
+					The JSON file is expected to list the column
+					names in a string array called <literal>columns</literal>.
+				</para>
+				<para>
+					The column types are optionally listed in the string
+					array called <literal>coltypes</literal>. If they are
+					listed, the <literal>coltypes</literal> array must have
+					the same number of strings as the <literal>columns</literal>
+					array. The types may be <literal>string</literal>,
+					<literal>number</literal> or <literal>datatime</literal>.
+					If the column type array is missing, then all data
+					values are assumed to be strings and data conversion
+					functions must be used, like <literal>val()</literal>,
+					<literal>stodt()</literal> or <literal>interval()</literal>.
+				</para>
+				<para>
+					The rows are listed in an array called <literal>rows</literal>
+					and column data values for each row are in a collection
+					with data names from the <literal>columns</literal> and
+					data types from the <literal>coltypes</literal> arrays.
+				</para>
+			</sect3>
+			<sect3>
+				<title>XML file datasource</title>
+				<para>
+					Similarly to CSV and JSON, the XML file datasource is also declared
+					very simply:
+					<programlisting>
+&lt;Datasource name="mysource" type="'xml'" /&gt;
+					</programlisting>
+					In this case, the actual XML file is not declared,
+					only that a "query" using an XML file will be listed
+					later under <literal>&lt;Queries&gt;</literal>.
+				</para>
+				<para>
+					An XML file datasource is expected in this format:
+					<programlisting>
+&lt;?xml version="1.0"?&gt;
+&lt;data&gt;
+	&lt;rows&gt;
+		&lt;row&gt;
+			&lt;col&gt;value&lt;/col&gt;
+            ...
+		&lt;/row&gt;
+        ...
+	&lt;/rows&gt;
+	&lt;fields&gt;
+		&lt;field&gt;column1&lt;/field&gt;
+        ...
+	&lt;/fields&gt;
+	&lt;coltypes&gt;
+		&lt;col&gt;type1&lt;/col&gt;
+        ...
+	&lt;/coltypes&gt;
+&lt;/data&gt;
+					</programlisting>
+					The XML section names <literal>&lt;data&gt;</literal>,
+					<literal>&lt;rows&gt;</literal> and
+					<literal>&lt;fields&gt;</literal>
+					are the same as they were in RLIB for its XML data
+					source. The order of <literal>&lt;rows&gt;</literal>
+					and <literal>&lt;fields&gt;</literal> is not important.
+					But the order of field names in <literal>&lt;fields&gt;</literal>
+					must match the column value order in each
+					<literal>&lt;row&gt;</literal>.
+				</para>
+				<para>
+					The section &lt;coltypes&gt; is new in OpenCReports and
+					is optional. If it's present, then it must list
+					the data types in the same order as the section
+					<literal>&lt;fields&gt;</literal>.
+					The types may be <literal>string</literal>,
+					<literal>number</literal> or <literal>datatime</literal>.
+					If this section is not present, all values are assumed
+					to be strings and data conversion functions must be
+					used, like <literal>val()</literal>, <literal>stodt()</literal>
+                    or <literal>interval()</literal>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Array datasource</title>
+				<para>
+					Arrays are global in-memory structures in the
+					application that should be accessible to the
+					OpenCReports library. For example, when using
+					the C programming language, global non-static
+					symbols are visible to libraries if the application
+					is compiled with <literal>-rdynamic</literal>.
+				</para>
+				<para>
+					Similarly to file based datasources, the array
+					datasource is declared very simply:
+					<programlisting>
+&lt;Datasource name="mysource" type="'array'" /&gt;
+					</programlisting>
+					In this case, the actual array is not declared,
+					only that a "query" using an array will be listed
+					later under <literal>&lt;Queries&gt;</literal>.
+				</para>
+				<para>
+					A C array is declared in this format:
+					<programlisting>
+const char *array[ROWS + 1][COLUMNS] = {
+    { "column1", ... },
+    { "value1",  ... },
+    ...
+};
+					</programlisting>
+					The array is declared as a two-dimensional array of
+					C strings. The first row of the array is the column
+					names, <literal>[ROWS + 1]</literal> in the array
+					declaration accounts for the title row.
+				</para>
+				<para>
+					All rows have the same number of columns. Column values
+					may be NULL, in which case they will be treated the same
+					as SQL NULLs in SQL query results.
+				</para>
+				<para>
+					Optionally, a column types array is declared
+					separately:
+					<programlisting>
+#include &lt;opencreport.h&gt;
+
+const enum ocrpt_result_type coltypes[COLUMNS] = {
+    ...
+};
+					</programlisting>
+					If this array is present, it must have the same number
+					of <literal>COLUMNS</literal> as the matching data
+					array. The <literal>enum ocrpt_result_type</literal>
+					usable in data array type declaration are
+					<literal>OCRPT_RESULT_STRING</literal>,
+					<literal>OCRPT_RESULT_NUMBER</literal> and
+					<literal>OCRPT_RESULT_DATETIME</literal>. 
+				</para>
+			</sect3>
+		</sect2>
+		<sect2 id="queries" xreflabel="Queries">
+			<title>Queries</title>
+			<para>
+				Queries in OpenCReports are SQL queries for database
+				connections, or data files files in certain formats.
+				The queries are declared like this:
+&lt;Queries&gt;
+    &lt;Query name="..." ... /&gt;
+    ...
+&lt;/Queries&gt;
+			</para>
+			<sect3>
+				<title>SQL queries for SQL datasources</title>
+				<para>
+					SQL queries for MariaDB, PostgreSQL and ODBC
+					datasources may be declared two ways, either
+					as the XML value for <literal>&lt;Query&gt;</literal>:
+					<programlisting>
+&lt;Query
+    name="myquery"
+    datasource="mysource"&gt;
+SELECT * FROM some_table
+&lt;/Query&gt;
+					</programlisting>
+					or as the <literal>value</literal> attribute:
+					<programlisting>
+&lt;Query
+    name="myquery"
+    datasource="mysource"
+    value="SELECT * FROM some_table" /&gt;
+					</programlisting>
+				</para>
+				<para>
+					Note, that the XML attribute <literal>datasource="..."</literal>
+					must match a previously declared datasource.
+				</para>
+				<para>
+					The SQL query can be any <literal>SELECT</literal>
+					statement.
+				</para>
+				<sect4>
+					<title>Special note for SQL datasources</title>
+					<para>
+						The database client libraries for MariaDB,
+						PostgreSQL and ODBC return all the query rows
+						from the database server at once by default.
+						As such, it is possible that a long query result
+						doesn't fit into the computer memory.
+					</para>
+					<para>
+						The report needs to traverse the query result twice
+						to pre-compute "delayed" values, so it needs to
+						be able to rewind the data set once it was read
+						to the end.
+					</para>
+					<para>
+						The alternative API in MariaDB to load the rows one by
+						one doesn't allow rewinding, so it's not usable
+						for the report's purposes.
+					</para>
+					<para>
+						It is only PostgreSQL that allows using an
+						<emphasis>SQL cursor</emphasis> as a standalone entity,
+						i.e. outside SQL procedures as defined by the SQL
+						standard. This PostgreSQL extension to the standard
+						allows saving memory in such a way that it allows
+						processing very long queries. Behind the scenes,
+						a <literal>WITH HOLD</literal> cursor is used and
+						1024 rows are loaded in one go from the server.
+					</para>
+				</sect4>
+			</sect3>
+			<sect3>
+				<title>Queries for file based datasources</title>
+				<para>
+					Queries for CSV, XML and JSON datasources may
+					be declared two ways. Either as the XML value for
+					<literal>&lt;Query&gt;</literal>:
+					<programlisting>
+&lt;Query
+    name="myquery"
+    datasource="mysource"
+&gt;xmldata.xml&lt;/Query&gt;
+					</programlisting>
+					or as the <literal>value</literal> attribute:
+					<programlisting>
+&lt;Query
+    name="myquery"
+    datasource="mysource"
+    value="'xmldata.xml'" /&gt;
+					</programlisting>
+				</para>
+				<para>
+					Notes:
+					<itemizedlist>
+						<listitem override="bullet">
+							<para>
+								The XML attribute <literal>datasource="..."</literal>
+								must match a previously declared datasource.
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								It is recommended that the <literal>value="..."</literal>
+								form is used, since it's not ensured that
+								whitespace before or after the file name
+								is trimmed in the first variant if the XML
+								is "beautified". The file name that the
+								OpenCReports library receives must be correct
+								in order to use it.
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								The declaration must specify a file in the
+								correct format for the datasource type.
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								The optional type declaration for columns
+								in the XML and JSON file formats, or for CSV,
+								the complete lack of it can be supplemented
+								with a memory array using the optional
+								<literal>coltypes="..."</literal> attribute.
+								For details, see the <xref linkend="arrayqueries"/>.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+			</sect3>
+			<sect3 id="arrayqueries" xreflabel="Array queries">
+				<title>Queries for array based datasources</title>
+				<para>
+					Queries for array datasources may be declared two ways.
+					Either as the XML value for
+					<literal>&lt;Query&gt;</literal>:
+					<programlisting>
+&lt;Query
+    name="myquery"
+    datasource="mysource"
+    coltypes="'coltypes'"
+    rows="30"
+    cols="6"
+&gt;array&lt;/Query&gt;
+					</programlisting>
+					or as the <literal>value</literal> attribute:
+					<programlisting>
+&lt;Query
+    name="myquery"
+    datasource="mysource"
+    value="'array'"
+    coltypes="'coltypes'"
+    rows="30"
+    cols="6" /&gt;
+					</programlisting>
+				</para>
+				<para>
+					Notes:
+					<itemizedlist>
+						<listitem override="bullet">
+							<para>
+								The XML attribute <literal>datasource="..."</literal>
+								must match a previously declared datasource.
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								It is recommended that the <literal>value="..."</literal>
+								form is used, since it's not ensured that
+								whitespace before or after the symbol name
+								is trimmed in the first variant if the XML
+								is "beautified". The symbol name that the
+								OpenCReports library receives must be correct
+								in order to use it. The array name must match
+								the correct global symbol name. It will be
+								looked up via <literal>dlsym()</literal>.
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								Similarly to the array symbol name, the
+								<literal>coltypes="..."</literal> array name
+								must match the correct global symbol name.
+								It will be looked up via <literal>dlsym()</literal>.
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								The value for <literal>cols</literal>
+								must match the second dimension of the
+								data array.
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								The value for <literal>rows</literal>
+								must be one less than the first dimension
+								of the C data array. (The title row is not
+								counted in the XML description.)
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+				<para>
+					Failing to fulfill the above may cause crashes
+					or wrong data to be used in the report.
+				</para>
+			</sect3>
+			<sect3 id="followerqueries" xreflabel="Follower queries">
+				<title>Follower queries</title>
+				<para>
+					Multiple queries may be declared. But by default,
+					only the first one is actually used by a report.
+				</para>
+				<para>
+					Secondary queries may be associated with the
+					primary query as so called "follower" queries.
+					Any query may be a follower to the primary query.
+				</para>
+				<para>
+					There are two kinds of follower queries:
+					<itemizedlist>
+						<listitem override="bullet">
+							<para>
+								regular, or basic follower queries, and
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								so called N:1 (N-to-one) followers in RLIB
+								speak.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+				<sect4>
+					<title>Regular follower queries</title>
+					<para>
+						A follower query is run along the primary query and
+						their rows are laid out side by side. The first row
+						of the follower query is assigned the first row of the
+						primary query. The second row of the follower query
+						is assigned to the second row of the primary query,
+						and so on. The number of rows of the complete data
+						set is determined by the primary query. If the
+						follower query runs out of rows before the primary,
+						the columns values will be presented as SQL NULLs.
+					</para>
+					<para>
+						This is similar to using <literal>LEFT OUTER JOIN</literal>
+						and using <literal>ROWNUM</literal> in Oracle or
+						the <literal>row_number()</literal> SQL function
+						in PostgreSQL as the matching value between the
+						primary query and the follower query.
+					</para>
+					<para>
+						A regular follower query is declared by adding
+						the <literal>follower_for="..."</literal> attribute.
+						The value for <literal>follower_for="..."</literal>
+						is the <literal>name</literal> of a previously
+						declared query. Example:
+						<programlisting>
+&lt;Query
+    name="myquery1"
+    datasource="mysource1"
+    value="'SELECT * FROM table1'" /&gt;
+
+&lt;Query
+    name="myquery2"
+    datasource="mysource2"
+    value="'SELECT * FROM table1'"
+    follower_for="myquery1" /&gt;
+						</programlisting>
+					</para>
+					<para>
+						In this example, two queries of two different
+						datasources are used. This is one of the advantages
+						of using follower queries, i.e. data from different
+						databases may be used. Nowadays, with foreign
+						queries implemented in e.g. PostgreSQL, its use
+						case is more limited.
+					</para>
+				</sect4>
+				<sect4>
+					<title>N:1 follower queries</title>
+					<para>
+						An N:1 follower query, for all intents and
+						purposes, is the right side query in a
+						<literal>LEFT OUTER JOIN</literal> query, with
+						the primary query on the left side. Rows of the
+						main query and the follower query are matched
+						according to the boolean expression specified
+						with the <literal>follower_expr="..."</literal>
+						attribute. Example:
+						<programlisting>
+&lt;Query
+    name="myquery1"
+    datasource="mysource1"
+    value="'SELECT * FROM table1'" /&gt;
+
+&lt;Query
+    name="myquery2"
+    datasource="mysource2"
+    value="'SELECT * FROM table1'"
+    follower_for="myquery1"
+    follower_expr="myquery1.id = myquery2.id" /&gt;
+						</programlisting>
+					</para>
+				</sect4>
+			</sect3>
+		</sect2>
+	</sect1>
+</chapter>
