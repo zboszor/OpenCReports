@@ -512,6 +512,50 @@ DLL_EXPORT_SYM void ocrpt_expr_optimize(opencreport *o, ocrpt_report *r, ocrpt_e
 	ocrpt_expr_optimize_worker(o, r, e);
 }
 
+static bool ocrpt_resolve_ident(ocrpt_expr *e, ocrpt_query *q) {
+	ocrpt_query_result *qr = NULL;
+	ocrpt_list *ql;
+	int32_t cols, i;
+	bool found = false;
+
+	/*
+	 * Identifier is either non-domain qualified,
+	 * or domain-qualified and it matches the query name:
+	 * try to resolve the identifier name in this query.
+	 */
+	if (!e->query || strcmp(e->query->str, q->name) == 0) {
+		/* ocrpt_query_get_result() cannot be used here, we need the whole array */
+		if (!q->result)
+			q->source->input->describe(q, &q->result, &q->cols);
+		qr = q->result;
+		cols = (q->result ? q->cols : 0);
+
+		for (i = 0; i < cols; i++) {
+			if (!strcmp(e->name->str, qr[i].name)) {
+				for (int j = 0; j < OCRPT_EXPR_RESULTS; j++)
+					if (!e->result[j])
+						e->result[j] = &qr[j * cols + i].result;
+				found = true;
+				break;
+			}
+		}
+	}
+
+	for (ql = q->followers; !found && ql; ql = ql->next) {
+		found = ocrpt_resolve_ident(e, (ocrpt_query *)ql->data);
+		if (found)
+			break;
+	}
+
+	for (ql = q->followers_n_to_1; !found && ql; ql = ql->next) {
+		found = ocrpt_resolve_ident(e, (ocrpt_query *)ql->data);
+		if (found)
+			break;
+	}
+
+	return found;
+}
+
 void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask) {
 	int32_t i;
 
@@ -689,40 +733,18 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 		break;
 	case OCRPT_EXPR_IDENT:
 		if ((varref_exclude_mask & OCRPT_VARREF_IDENT) == 0) {
-			ocrpt_list *ptr;
 			bool found = false;
 
 			/* Resolve the identifier ocrpt_query_result from the queries */
 			if (e->result[o->residx] && e->result[o->residx]->type != OCRPT_RESULT_ERROR)
 				break;
-			for (ptr = o->queries; ptr; ptr = ptr->next) {
-				ocrpt_query *q = (ocrpt_query *)ptr->data;
-				ocrpt_query_result *qr = NULL;
-				int32_t cols;
+			if (r && r->query)
+				found = ocrpt_resolve_ident(e, r->query);
+			else if (o->queries)
+				found = ocrpt_resolve_ident(e, (ocrpt_query *)o->queries->data);
 
-				/* Identifier is domain-qualified and it doesn't match the query name */
-				if (e->query && strcmp(e->query->str, q->name))
-					continue;
-
-				/* ocrpt_query_get_result() cannot be used here, we need the whole array */
-				if (!q->result)
-					q->source->input->describe(q, &q->result, &q->cols);
-				qr = q->result;
-				cols = (q->result ? q->cols : 0);
-
-				for (i = 0; i < cols; i++) {
-					if (!strcmp(e->name->str, qr[i].name)) {
-						for (int j = 0; j < OCRPT_EXPR_RESULTS; j++)
-							if (!e->result[j])
-								e->result[j] = &qr[j * cols + i].result;
-						found = true;
-						break;
-					}
-				}
-
-				if (!found)
-					ocrpt_expr_make_error_result(o, e, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
-			}
+			if (!found)
+				ocrpt_expr_make_error_result(o, e, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
 		}
 		break;
 	case OCRPT_EXPR:
