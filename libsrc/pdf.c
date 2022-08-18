@@ -245,7 +245,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 	pango_font_description_set_weight(font_description, bold ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
 	pango_font_description_set_style(font_description, italic ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
-	pango_font_description_set_absolute_size(font_description, 12.0 * PANGO_SCALE);
+	pango_font_description_set_absolute_size(font_description, le->fontsz * PANGO_SCALE);
 
 	layout = pango_cairo_create_layout(cr);
 	pango_layout_set_font_description(layout, font_description);
