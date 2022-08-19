@@ -271,6 +271,9 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		if (rows == 1 && !*newpage)
 			ocrpt_layout_output(o, p, pr, pd, r, &r->reportheader, rows, newpage, page_indent, page_position);
 
+		if (r->fieldheader_high_priority && rows == 1)
+			ocrpt_layout_output(o, p, pr, pd, r, &r->fieldheader, rows, newpage, page_indent, page_position);
+
 		if (rows > 1 && brl_start) {
 			/* Use the previous row data temporarily */
 			o->residx = ocrpt_expr_prev_residx(o->residx);
