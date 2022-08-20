@@ -178,12 +178,16 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 
 	if (le->width && le->width->result[o->residx] && le->width->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->width->result[o->residx]->number_initialized) {
 		w = mpfr_get_d(le->width->result[o->residx]->number, o->rndmode);
-		w *= o->size_in_points ? 1.0 : l->font_width;
+		if (!o->size_in_points)
+			w *= l->font_width;
+	} else if (ocrpt_list_length(l->elements) == 1) {
+		w = p->page_width;
 	} else {
-		int l;
-		ocrpt_utf8forward(le->value_str->str, -1, &l, -1, NULL);
-
-		w = l * le->font_width;
+		int len;
+		ocrpt_utf8forward(le->value_str->str, -1, &len, -1, NULL);
+		if (!len)
+			len = 1;
+		w = len * l->font_width;
 	}
 
 	le->width_computed = w;
@@ -267,6 +271,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	pango_layout_set_text(layout, le->value_str->str, le->value_str->len);
 
 	PangoRectangle logical_rect;
+	bool use_bb = false;
 
 	if (le->memo) {
 		pango_layout_set_width(layout, width * PANGO_SCALE);
@@ -276,18 +281,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		pango_layout_get_extents(layout, NULL, &logical_rect);
 		double render_width = (double)logical_rect.width / PANGO_SCALE;
 
-		const char *pos = le->value_str->str;
-		int len = le->value_str->len;
-		while (render_width > width) {
-			int len1;
-			ocrpt_utf8forward(pos, 1, NULL, len, &len1);
-			pos += len1;
-			len -= len1;
-
-			pango_layout_set_text(layout, pos, len);
-			pango_layout_get_extents(layout, NULL, &logical_rect);
-			render_width = (double)logical_rect.width / PANGO_SCALE;
-		}
+		use_bb = (render_width > width);
 	}
 
 	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
@@ -326,6 +320,18 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	case PANGO_ALIGN_RIGHT:
 		x1 = x + width - ((double)logical_rect.width / PANGO_SCALE);
 		break;
+	}
+
+	if (use_bb) {
+		/*
+		 * Apply the bounding box over the text piece
+		 * so it doesn't spill out. While the text
+		 * is not shown in print, by double clicking
+		 * on such a masked piece of text the whole
+		 * of it is shown and can be copy&pasted.
+		 */
+		cairo_rectangle(cr, x, y, width, maxheight);
+		cairo_clip(cr);
 	}
 
 	cairo_move_to(cr, x1, y + ascentdiff);
