@@ -56,7 +56,9 @@
 	width CDATA #IMPLIED
 	height CDATA #IMPLIED
 	border_width CDATA #IMPLIED
-	border_color CDATA #IMPLIED >
+	border_color CDATA #IMPLIED
+	detail_columns CDATA #IMPLIED
+	column_pad CDATA #IMPLIED >
 <!ELEMENT load EMPTY>
 <!ATTLIST load
 	name CDATA #IMPLIED

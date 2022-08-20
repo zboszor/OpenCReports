@@ -574,7 +574,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 				e->type = OCRPT_EXPR_STRING;
 				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 					e->result[i] = result;
-					ocrpt_expr_set_result_owned(o, e, i, !i);
+					ocrpt_expr_set_result_owned(e, i, !i);
 				}
 			}
 		}
@@ -601,7 +601,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 					if (!e->result[i]) {
 						assert(orig_e->result[ocrpt_expr_prev_residx(i)]);
 						e->result[i] = orig_e->result[ocrpt_expr_prev_residx(i)];
-						ocrpt_expr_set_result_owned(o, e, i, false);
+						ocrpt_expr_set_result_owned(e, i, false);
 					}
 				}
 			} else if (strcmp(e->name->str, "baseexpr") == 0) {
@@ -613,7 +613,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 							if (!e->result[i]) {
 								//assert(var->baseexpr->result[i]);
 								e->result[i] = var->baseexpr->result[i];
-								ocrpt_expr_set_result_owned(o, e, i, false);
+								ocrpt_expr_set_result_owned(e, i, false);
 							}
 						}
 					}
@@ -628,7 +628,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 							if (!e->result[i]) {
 								//assert(var->intermedexpr->result[i]);
 								e->result[i] = var->intermedexpr->result[i];
-								ocrpt_expr_set_result_owned(o, e, i, false);
+								ocrpt_expr_set_result_owned(e, i, false);
 							}
 						}
 					}
@@ -643,7 +643,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 							if (!e->result[i]) {
 								//assert(var->intermed2expr->result[i]);
 								e->result[i] = var->intermed2expr->result[i];
-								ocrpt_expr_set_result_owned(o, e, i, false);
+								ocrpt_expr_set_result_owned(e, i, false);
 							}
 						}
 					}
@@ -655,7 +655,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 						if (!e->result[i]) {
 							assert(orig_e->rvalue->result[i]);
 							e->result[i] = orig_e->rvalue->result[i];
-							ocrpt_expr_set_result_owned(o, e, i, false);
+							ocrpt_expr_set_result_owned(e, i, false);
 						}
 					}
 				} else {
@@ -665,7 +665,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 					if (!e->result[i]) {
 						e->result[i] = o->totpages;
-						ocrpt_expr_set_result_owned(o, e, i, false);
+						ocrpt_expr_set_result_owned(e, i, false);
 					}
 				}
 				if (r)
@@ -674,7 +674,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 					if (!e->result[i]) {
 						e->result[i] = o->pageno;
-						ocrpt_expr_set_result_owned(o, e, i, false);
+						ocrpt_expr_set_result_owned(e, i, false);
 					}
 				}
 			} else if (strcmp(e->name->str, "lineno") == 0) {
@@ -695,7 +695,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 					if (!e->result[o->residx]) {
 						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 							e->result[i] = r->detailcnt->result[i];
-							ocrpt_expr_set_result_owned(o, e, i, false);
+							ocrpt_expr_set_result_owned(e, i, false);
 						}
 					}
 				} else
@@ -705,7 +705,7 @@ void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, o
 					for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 						if (!e->result[i]) {
 							e->result[i] = orig_e->rvalue->format->result[i];
-							ocrpt_expr_set_result_owned(o, e, i, false);
+							ocrpt_expr_set_result_owned(e, i, false);
 						}
 					}
 				} else
@@ -902,7 +902,7 @@ void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrp
 
 		if (o->precalculate || !e->var->precalculate) {
 
-			if (!ocrpt_expr_get_result_evaluated(o, e->var->resultexpr, o->residx))
+			if (!ocrpt_expr_get_result_evaluated(e->var->resultexpr, o->residx))
 				ocrpt_expr_eval_worker(o, r, e->var->resultexpr, e->var->resultexpr, e->var);
 
 			if (!e->result[o->residx]) {
@@ -957,8 +957,8 @@ void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrp
 	}
 
 	if (e == orig_e) {
-		ocrpt_expr_set_result_evaluated(o, e, o->residx, true);
-		ocrpt_expr_set_result_evaluated(o, e, ocrpt_expr_next_residx(o->residx), false);
+		ocrpt_expr_set_result_evaluated(e, o->residx, true);
+		ocrpt_expr_set_result_evaluated(e, ocrpt_expr_next_residx(o->residx), false);
 	}
 }
 
@@ -1012,7 +1012,7 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_
 		memset(result, 0, sizeof(ocrpt_result));
 		assert(!e->result[o->residx]);
 		e->result[o->residx] = result;
-		ocrpt_expr_set_result_owned(o, e, o->residx, true);
+		ocrpt_expr_set_result_owned(e, o->residx, true);
 	}
 
 	result->type = OCRPT_RESULT_ERROR;
@@ -1253,7 +1253,7 @@ void ocrpt_expr_init_iterative_results(opencreport *o, ocrpt_expr *e, enum ocrpt
 	ocrpt_expr_set_iterative_start_value(e, false);
 	ocrpt_expr_init_results(o, e, type);
 	for (int i = 0; i < OCRPT_EXPR_RESULTS; i++) {
-		if (ocrpt_expr_get_result_owned(o, e, i))
+		if (ocrpt_expr_get_result_owned(e, i))
 			switch (type) {
 			case OCRPT_RESULT_NUMBER:
 				mpfr_set_ui(e->result[i]->number, 0, o->rndmode);

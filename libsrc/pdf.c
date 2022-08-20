@@ -53,7 +53,7 @@ static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	cairo_destroy(cr);
 }
 
-void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double *width, double *ascent, double *descent) {
+void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double total_width, double *width, double *ascent, double *descent) {
 	cairo_surface_t *cs = NULL;
 	cairo_t *cr;
 	PangoLayout *layout;
@@ -181,7 +181,7 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 		if (!o->size_in_points)
 			w *= l->font_width;
 	} else if (ocrpt_list_length(l->elements) == 1) {
-		w = p->page_width;
+		w = total_width;
 	} else {
 		int len;
 		ocrpt_utf8forward(le->value_str->str, -1, &len, -1, NULL);

@@ -1236,9 +1236,21 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 	if (xmlTextReaderIsEmptyElement(reader))
 		return NULL;
 
-	ocrpt_report *r = ocrpt_report_new(o);
+	bool create_parents = false;
 
-	p = ocrpt_part_append_report(o, p, pr, pd, r);
+	if (!p) {
+		p = ocrpt_part_new(o);
+		create_parents = true;
+	}
+
+	if (create_parents || !pr)
+		pr = ocrpt_part_new_row(o, p);
+
+	if (create_parents || !pd)
+		pd = ocrpt_part_row_new_data(o, p, pr);
+
+	ocrpt_report *r = ocrpt_report_new(o);
+	ocrpt_part_append_report(o, p, pr, pd, r);
 
 	xmlChar *font_name, *font_size, *size_unit, *orientation;
 	xmlChar *top_margin, *bottom_margin, *left_margin, *right_margin;
@@ -1325,50 +1337,50 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_expr_free(o, NULL, orientation_e);
 	}
 
-	if (top_margin) {
+	if (!p->top_margin_set && top_margin) {
 		ocrpt_expr *top_margin_e;
 		double top_margin_d;
 
 		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, top_margin);
 		if (top_margin_d > 0.0) {
-			r->top_margin_set = true;
-			r->top_margin = top_margin_d;
+			p->top_margin_set = true;
+			p->top_margin = top_margin_d;
 		}
 		ocrpt_expr_free(o, NULL, top_margin_e);
 	}
 
-	if (bottom_margin) {
+	if (!p->bottom_margin_set && bottom_margin) {
 		ocrpt_expr *bottom_margin_e;
 		double bottom_margin_d;
 
 		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, bottom_margin);
 		if (bottom_margin_d > 0.0) {
-			r->bottom_margin_set = true;
-			r->bottom_margin = bottom_margin_d;
+			p->bottom_margin_set = true;
+			p->bottom_margin = bottom_margin_d;
 		}
 		ocrpt_expr_free(o, NULL, bottom_margin_e);
 	}
 
-	if (left_margin) {
+	if (!p->left_margin_set && left_margin) {
 		ocrpt_expr *left_margin_e;
 		double left_margin_d;
 
 		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, left_margin);
 		if (left_margin_d > 0.0) {
-			r->left_margin_set = true;
-			r->left_margin = left_margin_d;
+			p->left_margin_set = true;
+			p->left_margin = left_margin_d;
 		}
 		ocrpt_expr_free(o, NULL, left_margin_e);
 	}
 
-	if (right_margin) {
+	if (!p->right_margin_set && right_margin) {
 		ocrpt_expr *right_margin_e;
 		double right_margin_d;
 
 		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, right_margin);
 		if (right_margin_d > 0.0) {
-			r->right_margin_set = true;
-			r->right_margin = right_margin_d;
+			p->right_margin_set = true;
+			p->right_margin = right_margin_d;
 		}
 		ocrpt_expr_free(o, NULL, right_margin_e);
 	}
@@ -1424,29 +1436,33 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_expr_free(o, NULL, field_header_priority_e);
 	}
 
-	r->detail_columns = 1;
-	if (detail_columns) {
-		ocrpt_expr *detail_columns_e;
-		int32_t detail_columns_i;
+	if (!pd->detail_columns_set) {
+		pd->detail_columns = 1;
+		if (detail_columns) {
+			ocrpt_expr *detail_columns_e;
+			int32_t detail_columns_i;
 
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, detail_columns);
-		if (detail_columns_i < 1)
-			detail_columns_i = 1;
-		r->detail_columns = detail_columns_i;
-		ocrpt_expr_free(o, NULL, detail_columns_e);
-	}
+			ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, detail_columns);
+			if (detail_columns_i < 1)
+				detail_columns_i = 1;
+			pd->detail_columns = detail_columns_i;
+			ocrpt_expr_free(o, NULL, detail_columns_e);
+		}
 
-	r->column_pad = 0.0;
-	if (column_pad) {
-		ocrpt_expr *column_pad_e;
-		double column_pad_d;
+		pd->column_pad = 0.0;
+		if (column_pad) {
+			ocrpt_expr *column_pad_e;
+			double column_pad_d;
 
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback_noreport(o, column_pad);
-		if (column_pad_d < 0.0)
+			ocrpt_xml_const_expr_parse_get_double_value_with_fallback_noreport(o, column_pad);
+			if (column_pad_d < 0.0)
 
-			column_pad_d = 0.0;
-		r->column_pad = column_pad_d;
-		ocrpt_expr_free(o, NULL, column_pad_e);
+				column_pad_d = 0.0;
+			pd->column_pad = column_pad_d;
+			ocrpt_expr_free(o, NULL, column_pad_e);
+		}
+
+		pd->detail_columns_set = true;
 	}
 
 	xmlFree(font_name);
@@ -1547,7 +1563,7 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 		reader = xmlReaderForFile(real_filename, NULL, XML_PARSE_RECOVER |
 									XML_PARSE_NOENT | XML_PARSE_NOBLANKS |
 									XML_PARSE_XINCLUDE | XML_PARSE_NOXINCNODE);
-
+		ocrpt_mem_free(real_filename);
 		if (!reader) {
 			fprintf(stderr, "ocrpt_parse_load: invalid XML file name or invalid contents\n");
 			return;
@@ -1564,7 +1580,7 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 				/* ignore - xmllint validation is enough */
 			} else if (nodeType == XML_READER_TYPE_ELEMENT && depth == 0) {
 				if (!strcmp((char *)name, "Report"))
-					r = ocrpt_parse_report_node(o, NULL, NULL, NULL, reader);
+					r = ocrpt_parse_report_node(o, p, pr, pd, reader);
 			}
 
 			xmlFree(name);
@@ -1582,16 +1598,13 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 
 	xmlFree(filename);
 	xmlFree(query);
-
 }
 
 static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, xmlTextReaderPtr reader) {
-	if (xmlTextReaderIsEmptyElement(reader))
-		return;
-
 	ocrpt_part_row_data *pd = ocrpt_part_row_new_data(o, p, pr);
 
 	xmlChar *width, *height, *border_width, *border_color;
+	xmlChar *detail_columns, *column_pad;
 	struct {
 		char *attr;
 		xmlChar **attrp;
@@ -1600,6 +1613,8 @@ static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		{ "height", &height },
 		{ "border_width", &border_width },
 		{ "border_color", &border_color },
+		{ "detail_columns", &detail_columns },
+		{ "column_pad", &column_pad },
 		{ NULL, NULL },
 	};
 	int32_t i;
@@ -1647,10 +1662,41 @@ static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 	}
 	ocrpt_get_color(o, border_color_s, &pd->border_color, true);
 
+	pd->detail_columns = 1;
+	if (detail_columns) {
+		ocrpt_expr *detail_columns_e;
+		int32_t detail_columns_i;
+
+		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, detail_columns);
+		if (detail_columns_i < 1)
+			detail_columns_i = 1;
+		pd->detail_columns = detail_columns_i;
+		ocrpt_expr_free(o, NULL, detail_columns_e);
+	}
+	pd->detail_columns_set = true;
+
+	pd->column_pad = 0.0;
+	if (column_pad) {
+		ocrpt_expr *column_pad_e;
+		double column_pad_d;
+
+		ocrpt_xml_const_expr_parse_get_double_value_with_fallback_noreport(o, column_pad);
+		if (column_pad_d < 0.0)
+
+			column_pad_d = 0.0;
+		pd->column_pad = column_pad_d;
+		ocrpt_expr_free(o, NULL, column_pad_e);
+	}
+
 	xmlFree(width);
 	xmlFree(height);
 	xmlFree(border_width);
 	xmlFree(border_color);
+	xmlFree(detail_columns);
+	xmlFree(column_pad);
+
+	if (xmlTextReaderIsEmptyElement(reader))
+		return;
 
 	int depth = xmlTextReaderDepth(reader);
 	while (xmlTextReaderRead(reader) == 1) {
@@ -1847,53 +1893,54 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 		ocrpt_expr_free(o, NULL, orientation_e);
 	}
 
+	p->top_margin = OCRPT_DEFAULT_TOP_MARGIN;
 	if (top_margin) {
 		ocrpt_expr *top_margin_e;
 		double top_margin_d;
 
 		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, top_margin);
-		if (top_margin_d > 0.0) {
-			p->top_margin_set = true;
+		if (top_margin_d > 0.0)
 			p->top_margin = top_margin_d;
-		}
+
 		ocrpt_expr_free(o, NULL, top_margin_e);
 	}
+	p->top_margin_set = true;
 
+	p->bottom_margin = OCRPT_DEFAULT_BOTTOM_MARGIN;
 	if (bottom_margin) {
 		ocrpt_expr *bottom_margin_e;
 		double bottom_margin_d;
 
 		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, bottom_margin);
-		if (bottom_margin_d > 0.0) {
-			p->bottom_margin_set = true;
+		if (bottom_margin_d > 0.0)
 			p->bottom_margin = bottom_margin_d;
-		}
 		ocrpt_expr_free(o, NULL, bottom_margin_e);
 	}
+	p->bottom_margin_set = true;
 
+	p->left_margin = OCRPT_DEFAULT_LEFT_MARGIN;
 	if (left_margin) {
 		ocrpt_expr *left_margin_e;
 		double left_margin_d;
 
 		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, left_margin);
-		if (left_margin_d > 0.0) {
-			p->left_margin_set = true;
+		if (left_margin_d > 0.0)
 			p->left_margin = left_margin_d;
-		}
 		ocrpt_expr_free(o, NULL, left_margin_e);
 	}
+	p->left_margin_set = true;
 
+	p->right_margin = OCRPT_DEFAULT_LEFT_MARGIN;
 	if (right_margin) {
 		ocrpt_expr *right_margin_e;
 		double right_margin_d;
 
 		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, right_margin);
-		if (right_margin_d > 0.0) {
-			p->right_margin_set = true;
+		if (right_margin_d > 0.0)
 			p->right_margin = right_margin_d;
-		}
 		ocrpt_expr_free(o, NULL, right_margin_e);
 	}
+	p->right_margin_set = true;
 
 	if (paper_type) {
 		ocrpt_expr *paper_type_e;

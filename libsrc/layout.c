@@ -40,7 +40,7 @@ static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_pa
 			double width = 0.0, ascent = 0.0, descent = 0.0;
 			int rows = 0;
 
-			o->output_functions.get_text_sizes(o, p, pr, pd, r, line, elem, &width, &ascent, &descent);
+			o->output_functions.get_text_sizes(o, p, pr, pd, r, line, elem, page_width, &width, &ascent, &descent);
 
 			elem->start = next_start;
 			next_start += width;
@@ -346,17 +346,17 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	old_current_page = o->current_page;
 	old_page_position = new_page_position = *page_position;
 
-	ocrpt_layout_output_internal(false, o, p, pr, pd, r, output, r->column_width, *page_indent, &new_page_position);
+	ocrpt_layout_output_internal(false, o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
 
 	if (new_page_position > p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height) {
-		r->current_column++;
+		pd->current_column++;
 
-		if (r->current_column >= r->detail_columns)
+		if (pd->current_column >= pd->detail_columns)
 			page_break = true;
 
 		if (page_break) {
-			r->current_column = 0;
-			*page_indent = r->page_indent;
+			pd->current_column = 0;
+			*page_indent = pd->page_indent;
 
 			if (!o->precalculate) {
 				new_page_position = ocrpt_layout_top_margin(o, p);
@@ -368,8 +368,8 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			*newpage = false;
 			ocrpt_layout_add_new_page(o, p, pr, pd, r, rows, newpage, page_indent, &new_page_position);
 		} else {
-			*page_indent += r->column_width + (o->size_in_points ? r->column_pad : r->column_pad * 72.0);
-			new_page_position = r->page_start;
+			*page_indent += pd->column_width + (o->size_in_points ? pd->column_pad : pd->column_pad * 72.0);
+			new_page_position = pd->page_start;
 			ocrpt_layout_output_highprio_fieldheader(o, p, pr, pd, r, rows, newpage, page_indent, &new_page_position);
 		}
 
@@ -381,7 +381,7 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			o->current_page = old_current_page;
 			new_page_position = old_page_position;
 		}
-		ocrpt_layout_output_internal(true, o, p, pr, pd, r, output, r->column_width, *page_indent, &new_page_position);
+		ocrpt_layout_output_internal(true, o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
 	}
 
 	*page_position = new_page_position;
@@ -409,12 +409,10 @@ double ocrpt_layout_bottom_margin(opencreport *o, ocrpt_part *p) {
 	return bottom_margin;
 }
 
-double ocrpt_layout_left_margin(opencreport *o, ocrpt_part *p, ocrpt_report *r) {
+double ocrpt_layout_left_margin(opencreport *o, ocrpt_part *p) {
 	double left_margin;
 
-	if (r && r->left_margin_set)
-		left_margin = r->left_margin;
-	else if (p->left_margin_set)
+	if (p->left_margin_set)
 		left_margin = p->left_margin;
 	else
 		left_margin = OCRPT_DEFAULT_LEFT_MARGIN;
@@ -422,15 +420,13 @@ double ocrpt_layout_left_margin(opencreport *o, ocrpt_part *p, ocrpt_report *r) 
 	return left_margin;
 }
 
-double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p, ocrpt_report *r) {
+double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p) {
 	double right_margin;
 
-	if (r && r->right_margin_set)
-		right_margin = r->right_margin;
-	else if (p->right_margin_set)
+	if (p->right_margin_set)
 		right_margin = p->right_margin;
 	else
-		right_margin = ocrpt_layout_left_margin(o, p, r);
+		right_margin = ocrpt_layout_left_margin(o, p);
 
 	return right_margin;
 }
@@ -486,10 +482,13 @@ void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr
 		}
 	}
 
-	r->page_start = *page_position = ocrpt_layout_top_margin(o, p) + p->page_header_height;
+	pd->page_start = *page_position = ocrpt_layout_top_margin(o, p) + p->page_header_height;
 
-	if (rows == 1)
+	if (rows == 1 && !pr->start_page) {
+		pr->start_page = o->current_page;
+		pr->start_page_position = *page_position;
 		ocrpt_layout_output(o, p, pr, pd, r, &r->reportheader, rows, newpage, page_indent, page_position);
+	}
 
 	ocrpt_layout_output_highprio_fieldheader(o, p, pr, pd, r, rows, newpage, page_indent, page_position);
 }

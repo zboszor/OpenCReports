@@ -30,16 +30,6 @@ struct ocrpt_report {
 	char *font_name;
 	double font_size;
 	double font_width;
-	double top_margin;
-	double bottom_margin;
-	double left_margin;
-	double right_margin;
-	double column_pad;
-
-	/* Temporaries */
-	double column_width;
-	double page_start;
-	double page_indent;
 
 	/* Output elements */
 	ocrpt_output nodata;
@@ -73,11 +63,6 @@ struct ocrpt_report {
 	ocrpt_list *precalc_done_callbacks;
 	ocrpt_list *iteration_callbacks;
 	/*
-	 * Total and current number of detail columns
-	 */
-	unsigned int detail_columns;
-	unsigned int current_column;
-	/*
 	 * How many times should this report run
 	 */
 	unsigned int iterations;
@@ -94,26 +79,36 @@ struct ocrpt_report {
 	bool executing:1;
 	bool dont_add_exprs:1;
 	bool font_size_set:1;
-	bool top_margin_set:1;
-	bool bottom_margin_set:1;
-	bool left_margin_set:1;
-	bool right_margin_set:1;
 	bool fieldheader_high_priority:1;
 };
 
 struct ocrpt_part_row_data {
 	double width;
+	double real_width;
 	double height;
 	double border_width;
+	double column_pad;
+
+	/* Temporaries */
+	double column_width;
+	double page_start;
+	double page_indent;
+
 	ocrpt_color border_color;
 	ocrpt_list *reports;
 	ocrpt_list *last_report;
+	unsigned int detail_columns;
+	unsigned int current_column;
 	bool width_set:1;
+	bool real_width_set:1;
 	bool height_set:1;
 	bool border_width_set:1;
+	bool detail_columns_set:1;
 };
 
 struct ocrpt_part_row {
+	double start_page_position;
+	ocrpt_list *start_page;
 	ocrpt_list *pd_list;
 	ocrpt_list *pd_last;
 	bool newpage_set:1;

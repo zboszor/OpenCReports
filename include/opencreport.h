@@ -140,7 +140,9 @@ typedef struct ocrpt_function ocrpt_function;
 struct ocrpt_list;
 typedef struct ocrpt_list ocrpt_list;
 
-#define OCRPT_FUNCTION_PARAMS opencreport *o, ocrpt_report *r, ocrpt_expr *e
+#define OCRPT_UNUSED_PARAM __attribute__((unused))
+
+#define OCRPT_FUNCTION_PARAMS opencreport *o, ocrpt_report *r OCRPT_UNUSED_PARAM, ocrpt_expr *e
 #define OCRPT_FUNCTION(name) void name(OCRPT_FUNCTION_PARAMS)
 #define OCRPT_STATIC_FUNCTION(name) static void name(OCRPT_FUNCTION_PARAMS)
 typedef void (*ocrpt_function_call)(OCRPT_FUNCTION_PARAMS);
@@ -391,7 +393,7 @@ bool ocrpt_function_add(opencreport *o, const char *fname, ocrpt_function_call f
 /*
  * Find a named function
  */
-ocrpt_function const * const ocrpt_function_get(opencreport *o, const char *fname);
+const ocrpt_function *ocrpt_function_get(opencreport *o, const char *fname);
 /*
  * Return the number of operands of an expression
  *

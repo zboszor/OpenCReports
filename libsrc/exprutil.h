@@ -113,7 +113,7 @@ bool ocrpt_expr_get_precalculate(opencreport *o, ocrpt_expr *e);
 void ocrpt_report_expressions_add_delayed_results(opencreport *o, ocrpt_report *r);
 void ocrpt_expr_init_iterative_results(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type);
 
-static inline void ocrpt_expr_set_result_owned(opencreport *o, ocrpt_expr *e, unsigned int which, bool owned) {
+static inline void ocrpt_expr_set_result_owned(ocrpt_expr *e, unsigned int which, bool owned) {
 	switch (which) {
 	case 0: e->result_owned0 = owned; break;
 	case 1: e->result_owned1 = owned; break;
@@ -122,7 +122,7 @@ static inline void ocrpt_expr_set_result_owned(opencreport *o, ocrpt_expr *e, un
 	}
 }
 
-static inline bool ocrpt_expr_get_result_owned(opencreport *o, ocrpt_expr *e, unsigned int which) {
+static inline bool ocrpt_expr_get_result_owned(ocrpt_expr *e, unsigned int which) {
 	switch (which) {
 	case 0: return e->result_owned0;
 	case 1: return e->result_owned1;
@@ -131,7 +131,7 @@ static inline bool ocrpt_expr_get_result_owned(opencreport *o, ocrpt_expr *e, un
 	}
 }
 
-static inline void ocrpt_expr_set_result_evaluated(opencreport *o, ocrpt_expr *e, unsigned int which, bool evaluated) {
+static inline void ocrpt_expr_set_result_evaluated(ocrpt_expr *e, unsigned int which, bool evaluated) {
 	switch (which) {
 	case 0: e->result_evaluated0 = evaluated; break;
 	case 1: e->result_evaluated1 = evaluated; break;
@@ -140,7 +140,7 @@ static inline void ocrpt_expr_set_result_evaluated(opencreport *o, ocrpt_expr *e
 	}
 }
 
-static inline bool ocrpt_expr_get_result_evaluated(opencreport *o, ocrpt_expr *e, unsigned int which) {
+static inline bool ocrpt_expr_get_result_evaluated(ocrpt_expr *e, unsigned int which) {
 	switch (which) {
 	case 0: return e->result_evaluated0;
 	case 1: return e->result_evaluated1;

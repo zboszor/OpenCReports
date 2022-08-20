@@ -118,7 +118,7 @@ typedef struct ocrpt_output_element ocrpt_output_element;
 
 struct ocrpt_output_functions {
 	void (*draw_hline)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_hline *, double, double, double, double);
-	void (*get_text_sizes)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_line *, ocrpt_line_element *, double *, double *, double *);
+	void (*get_text_sizes)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_line *, ocrpt_line_element *, double, double *, double *, double *);
 	void (*draw_text)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_line *, ocrpt_line_element *, double, double, double, double, double);
 	void (*draw_image)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_image *, double, double, double, double);
 	void (*finalize)(opencreport *o);
@@ -134,14 +134,14 @@ void ocrpt_layout_set_font_sizes(opencreport *o, const char *font, double wanted
 
 double ocrpt_layout_top_margin(opencreport *o, ocrpt_part *p);
 double ocrpt_layout_bottom_margin(opencreport *o, ocrpt_part *p);
-double ocrpt_layout_left_margin(opencreport *o, ocrpt_part *p, ocrpt_report *r);
-double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p, ocrpt_report *r);
+double ocrpt_layout_left_margin(opencreport *o, ocrpt_part *p);
+double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p);
 
 void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, double page_width, double page_indent, double *page_position);
 void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, unsigned int rows, bool *newpage, double *page_indent, double *page_position);
 void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, unsigned int rows, bool *newpage, double *page_indent, double *page_position);
 void ocrpt_layout_output_highprio_fieldheader(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, unsigned int rows, bool *newpage, double *page_indent, double *page_position);
-void ocrpt_output_free(opencreport *o, ocrpt_report *r, ocrpt_output *output);
+void ocrpt_output_free(ocrpt_output *output);
 void ocrpt_image_free(const void *ptr);
 
 #endif
