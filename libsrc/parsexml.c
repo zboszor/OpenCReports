@@ -1613,6 +1613,7 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 
 	xmlFree(filename);
 	xmlFree(query);
+	xmlFree(iterations);
 }
 
 static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, xmlTextReaderPtr reader) {
