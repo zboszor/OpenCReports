@@ -6,6 +6,7 @@
 #ifndef _PARTS_H_
 #define _PARTS_H_
 
+#include <stdint.h>
 #include "layout.h"
 
 struct ocrpt_report_cb_data {
@@ -65,16 +66,18 @@ struct ocrpt_report {
 	/*
 	 * How many times should this report run
 	 */
-	unsigned int iterations;
+	uint32_t iterations;
+	uint32_t current_iteration;
+
 	/*
 	 * Internal accounting for number of data rows
 	 */
-	unsigned int data_rows;
+	uint32_t data_rows;
 	/*
 	 * Number of expression in the report
 	 * including internal ones created for variables
 	 */
-	unsigned int num_expressions;
+	uint32_t num_expressions;
 	bool have_delayed_expr:1;
 	bool executing:1;
 	bool dont_add_exprs:1;
@@ -97,8 +100,8 @@ struct ocrpt_part_row_data {
 	ocrpt_color border_color;
 	ocrpt_list *reports;
 	ocrpt_list *last_report;
-	unsigned int detail_columns;
-	unsigned int current_column;
+	uint32_t detail_columns;
+	uint32_t current_column;
 	bool width_set:1;
 	bool real_width_set:1;
 	bool height_set:1;
@@ -155,7 +158,8 @@ struct ocrpt_part {
 	/*
 	 * How many times should this part run
 	 */
-	unsigned int iterations;
+	uint32_t iterations;
+	uint32_t current_iteration;
 #if 0
 	const char *xmlbuf;
 	bool allocated:1;

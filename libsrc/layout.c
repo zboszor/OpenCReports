@@ -329,6 +329,11 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		/* Set newpage to false first to prevent infinite recursion. */
 		*newpage = false;
 		ocrpt_layout_add_new_page(o, p, pr, pd, r, rows, newpage, page_indent, page_position);
+
+		if (!pr->start_page && !r->current_iteration) {
+			pr->start_page = o->current_page;
+			pr->start_page_position = *page_position;
+		}
 	}
 
 	/*
@@ -485,8 +490,10 @@ void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr
 	pd->page_start = *page_position = ocrpt_layout_top_margin(o, p) + p->page_header_height;
 
 	if (rows == 1 && !pr->start_page) {
-		pr->start_page = o->current_page;
-		pr->start_page_position = *page_position;
+		if (r->current_iteration == 0) {
+			pr->start_page = o->current_page;
+			pr->start_page_position = *page_position;
+		}
 		ocrpt_layout_output(o, p, pr, pd, r, &r->reportheader, rows, newpage, page_indent, page_position);
 	}
 

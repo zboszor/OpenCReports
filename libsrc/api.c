@@ -268,8 +268,10 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		}
 
 		if (rows == 1 && !*newpage) {
-			pr->start_page = o->current_page;
-			pr->start_page_position = *page_position;
+			if (!pr->start_page && !r->current_iteration) {
+				pr->start_page = o->current_page;
+				pr->start_page_position = *page_position;
+			}
 			ocrpt_layout_output(o, p, pr, pd, r, &r->reportheader, rows, newpage, page_indent, page_position);
 		}
 
@@ -368,7 +370,6 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 	for (ocrpt_list *pl = o->parts; pl; pl = pl->next) {
 		ocrpt_part *p = (ocrpt_part *)pl->data;
-		int32_t part_iter;
 
 		if (!p->paper)
 			p->paper = o->paper;
@@ -398,7 +399,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 		ocrpt_layout_output_internal(false, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, left_margin, &p->page_header_height);
 		ocrpt_layout_output_internal(false, o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, left_margin, &p->page_footer_height);
 
-		for (part_iter = 0; part_iter < p->iterations; part_iter++) {
+		for (p->current_iteration = 0; p->current_iteration < p->iterations; p->current_iteration++) {
 			bool newpage = true; /* <Part>'s every iteration must start on a new page */
 
 			for (ocrpt_list *row = p->rows; row; row = row->next) {
@@ -471,7 +472,6 @@ static void ocrpt_execute_parts(opencreport *o) {
 						ocrpt_report *r = (ocrpt_report *)rl->data;
 						ocrpt_query *q;
 						ocrpt_list *cbl;
-						int32_t rpt_iter;
 
 						if (!ocrpt_report_validate(o, r)) {
 							fprintf(stderr, "ocrpt_execute_parts: report not valid???\n");
@@ -495,7 +495,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 							}
 						}
 
-						for (rpt_iter = 0; rpt_iter < r->iterations; rpt_iter++) {
+						for (r->current_iteration = 0; r->current_iteration < r->iterations; r->current_iteration++) {
 							r->executing = true;
 
 							if (q) {

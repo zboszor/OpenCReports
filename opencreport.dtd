@@ -62,7 +62,8 @@
 <!ELEMENT load EMPTY>
 <!ATTLIST load
 	name CDATA #IMPLIED
-	query CDATA #IMPLIED >
+	query CDATA #IMPLIED
+	iterations CDATA #IMPLIED >
 <!ELEMENT Report ((Alternate|NoData)|(Breaks?,Variables?)|PageHeader|PageFooter|ReportHeader|ReportFooter|(Detail|Graph|Chart)*|xi:include)* >
 <!ATTLIST Report
 	pagesAcross CDATA #IMPLIED

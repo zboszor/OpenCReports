@@ -1528,13 +1528,14 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 }
 
 static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, xmlTextReaderPtr reader_parent) {
-	xmlChar *filename, *query;
+	xmlChar *filename, *query, *iterations;
 	struct {
 		char *attr;
 		xmlChar **attrp;
 	} xmlattrs[] = {
 		{ "name", &filename },
 		{ "query", &query },
+		{ "iterations", &iterations },
 		{ NULL, NULL },
 	};
 	int32_t i;
@@ -1546,6 +1547,7 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 		ocrpt_expr *filename_e, *query_e = NULL;
 		char *filename_s, *real_filename, *query_s = NULL;
 		ocrpt_report *r = NULL;
+		int32_t iterations_i;
 
 		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, filename);
 
@@ -1557,6 +1559,16 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 
 		if (query)
 			ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, query);
+
+		iterations_i = 1;
+		if (iterations) {
+			ocrpt_expr *iterations_e;
+
+			ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, iterations);
+			if (iterations_i < 1)
+				iterations_i = 1;
+			ocrpt_expr_free(o, NULL, iterations_e);
+		}
 
 		xmlTextReaderPtr reader;
 
@@ -1589,8 +1601,11 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 		xmlFreeTextReader(reader);
 
 		/* If there was a query specified in <load> then set it for the report */
-		if (r && query_s)
-			r->query = ocrpt_query_get(o, query_s);
+		if (r) {
+			if (query_s)
+				r->query = ocrpt_query_get(o, query_s);
+			r->iterations = iterations_i;
+		}
 
 		ocrpt_expr_free(o, NULL, filename_e);
 		ocrpt_expr_free(o, NULL, query_e);
