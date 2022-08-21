@@ -394,6 +394,27 @@ void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocr
 		cairo_surface_destroy(cs);
 }
 
+void ocrpt_pdf_draw_rectangle(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_color *color, double line_width, double x, double y, double width, double height) {
+	cairo_surface_t *cs = NULL;
+	cairo_t *cr;
+
+	if (o && o->current_page)
+		cr = cairo_create((cairo_surface_t *)o->current_page->data);
+	else {
+		cs = ocrpt_layout_new_page(o, o->paper, false);
+		cr = cairo_create(cs);
+	}
+
+	cairo_set_source_rgb(cr, color->r, color->g, color->b);
+	cairo_set_line_width(cr, line_width);
+	cairo_rectangle(cr, x, y, width, height);
+	cairo_stroke(cr);
+
+	cairo_destroy(cr);
+	if (cs)
+		cairo_surface_destroy(cs);
+}
+
 void ocrpt_pdf_finalize(opencreport *o) {
 	ocrpt_list *page;
 	cairo_surface_t *pdf = cairo_pdf_surface_create_for_stream(ocrpt_write_pdf, o, o->paper->width, o->paper->height);
@@ -433,5 +454,6 @@ void ocrpt_pdf_init(opencreport *o) {
 	o->output_functions.get_text_sizes = ocrpt_pdf_get_text_sizes;
 	o->output_functions.draw_text = ocrpt_pdf_draw_text;
 	o->output_functions.draw_image = ocrpt_pdf_draw_image;
+	o->output_functions.draw_rectangle = ocrpt_pdf_draw_rectangle;
 	o->output_functions.finalize = ocrpt_pdf_finalize;
 }

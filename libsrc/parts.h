@@ -95,7 +95,9 @@ struct ocrpt_part_row_data {
 	/* Temporaries */
 	double column_width;
 	double page_start;
+	double max_page_position;
 	double page_indent;
+	double page_indent0;
 
 	ocrpt_color border_color;
 	ocrpt_list *reports;
@@ -138,6 +140,8 @@ struct ocrpt_part {
 	double paper_width;
 	double paper_height;
 	double page_width;
+	double left_margin_value;
+	double right_margin_value;
 
 	/* Common header and footer for all reports in this part */
 	ocrpt_output pageheader;

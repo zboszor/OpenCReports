@@ -1668,15 +1668,15 @@ static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		ocrpt_expr_free(o, NULL, border_width_e);
 	}
 
-	char *border_color_s = NULL;
 	if (border_color) {
 		ocrpt_expr *border_color_e;
 		char *border_color_s;
 
 		ocrpt_xml_const_expr_parse_get_value_with_fallback(o, border_color);
+		ocrpt_get_color(o, border_color_s, &pd->border_color, false);
 		ocrpt_expr_free(o, NULL, border_color_e);
-	}
-	ocrpt_get_color(o, border_color_s, &pd->border_color, true);
+	} else
+		ocrpt_get_color(o, NULL, &pd->border_color, false);
 
 	pd->detail_columns = 1;
 	if (detail_columns) {
