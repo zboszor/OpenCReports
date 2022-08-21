@@ -64,6 +64,7 @@ struct ocrpt_line {
 	double descent;
 	double fontsz;
 	double font_width;
+	double page_indent;
 	ocrpt_expr *font_name;
 	ocrpt_expr *font_size;
 	ocrpt_expr *color;

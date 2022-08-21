@@ -271,6 +271,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	pango_layout_set_text(layout, le->value_str->str, le->value_str->len);
 
 	PangoRectangle logical_rect;
+	double field_width = width;
 	bool use_bb = false;
 
 	if (le->memo) {
@@ -281,7 +282,10 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		pango_layout_get_extents(layout, NULL, &logical_rect);
 		double render_width = (double)logical_rect.width / PANGO_SCALE;
 
-		use_bb = (render_width > width);
+		if (pd && (l->page_indent + pd->column_width < x + width))
+			field_width = l->page_indent + pd->column_width - x;
+
+		use_bb = (render_width > field_width);
 	}
 
 	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
@@ -296,7 +300,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	 * The background filler is 0.1 points wider.
 	 * This way, there's no lines between the line elements.
 	 */
-	cairo_rectangle(cr, x, y, width + 0.1, maxheight);
+	cairo_rectangle(cr, x, y, field_width + 0.1, maxheight);
 	cairo_fill(cr);
 
 	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
@@ -330,12 +334,26 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		 * on such a masked piece of text the whole
 		 * of it is shown and can be copy&pasted.
 		 */
-		cairo_rectangle(cr, x, y, width, maxheight);
+		cairo_rectangle(cr, x, y, field_width, maxheight);
 		cairo_clip(cr);
+	}
+
+	char *link = NULL;
+
+	if (le->link && le->link->result[o->residx] && le->link->result[o->residx]->type == OCRPT_RESULT_STRING && le->link->result[o->residx]->string)
+		link = le->link->result[o->residx]->string->str;
+
+	if (link) {
+		ocrpt_string *uri = ocrpt_mem_string_new_printf("uri='%s'", link);
+		cairo_tag_begin(cr, CAIRO_TAG_LINK, uri->str);
+		ocrpt_mem_string_free(uri, true);
 	}
 
 	cairo_move_to(cr, x1, y + ascentdiff);
 	pango_cairo_show_layout(cr, layout);
+
+	if (link)
+		cairo_tag_end(cr, CAIRO_TAG_LINK);
 
 	g_object_unref(layout);
 	pango_font_description_free(font_description);

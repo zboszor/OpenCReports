@@ -32,6 +32,8 @@ static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_pa
 	double next_start, maxascent = 0.0, maxdescent = 0.0;
 	int maxrows = 1;
 
+	line->page_indent = page_indent;
+
 	if (o->output_functions.get_text_sizes) {
 		next_start = page_indent;
 
@@ -62,7 +64,8 @@ static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_pa
 		for (ocrpt_list *l = line->elements; l; l = l->next) {
 			ocrpt_line_element *elem = (ocrpt_line_element *)l->data;
 
-			o->output_functions.draw_text(o, p, pr, pd, r, line, elem, elem->start, *page_position, elem->width_computed, maxheight, maxascent - elem->ascent);
+			if ((elem->start - page_indent) < page_width)
+				o->output_functions.draw_text(o, p, pr, pd, r, line, elem, elem->start, *page_position, elem->width_computed, maxheight, maxascent - elem->ascent);
 		}
 	}
 
