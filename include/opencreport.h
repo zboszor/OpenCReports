@@ -832,7 +832,7 @@ bool ocrpt_report_validate(opencreport *o, ocrpt_report *r);
 /*
  * Set the main query of an ocrpt_report
  */
-void ocrpt_report_set_main_query(ocrpt_report *r, const char *query);
+void ocrpt_report_set_main_query(opencreport *o, ocrpt_report *r, const char *query);
 /*
  * Get the current row number of the main query
  */

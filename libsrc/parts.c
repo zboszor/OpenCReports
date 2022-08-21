@@ -179,8 +179,8 @@ DLL_EXPORT_SYM bool ocrpt_report_validate(opencreport *o, ocrpt_report *r) {
 	return false;
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_main_query(ocrpt_report *r, const char *query) {
-	r->query = ocrpt_mem_strdup(query);
+DLL_EXPORT_SYM void ocrpt_report_set_main_query(opencreport *o, ocrpt_report *r, const char *query) {
+	r->query = ocrpt_query_get(o, query);
 }
 
 DLL_EXPORT_SYM void ocrpt_report_resolve_variables(opencreport *o, ocrpt_report *r) {

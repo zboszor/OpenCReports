@@ -412,12 +412,11 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 				newpage = newpage || pr->newpage;
 
-				if (newpage) {
+				if (newpage)
 					pr->start_page = NULL;
-				} else {
+				else
 					pr->start_page = o->current_page;
-					pr->start_page_position = page_position;
-				}
+				pr->start_page_position = page_position;
 
 				uint32_t pds_without_width = 0;
 				double pds_total_width = 0;
@@ -425,6 +424,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 				for (pdl = pr->pd_list; pdl; pdl = pdl->next) {
 					ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pdl->data;
 
+					pd->finished = false;
 					if (pd->width_set) {
 						if (!pd->real_width_set) {
 							pd->real_width = (o->size_in_points ? 1.0: p->font_width) * pd->width;
@@ -472,7 +472,6 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 					for (ocrpt_list *rl = pd->reports; rl; rl = rl->next) {
 						ocrpt_report *r = (ocrpt_report *)rl->data;
-						ocrpt_query *q;
 						ocrpt_list *cbl;
 
 						if (!ocrpt_report_validate(o, r)) {
@@ -487,8 +486,6 @@ static void ocrpt_execute_parts(opencreport *o) {
 							r->font_width = p->font_width;
 						}
 
-						q = (r->query ? r->query : (o->queries ? (ocrpt_query *)o->queries->data : NULL));
-
 						if (!o->precalculate) {
 							for (cbl = r->start_callbacks; cbl; cbl = cbl->next) {
 								ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
@@ -500,26 +497,26 @@ static void ocrpt_execute_parts(opencreport *o) {
 						for (r->current_iteration = 0; r->current_iteration < r->iterations; r->current_iteration++) {
 							r->executing = true;
 
-							if (q) {
-								ocrpt_query_navigate_start(o, q);
+							if (r->query) {
+								ocrpt_query_navigate_start(o, r->query);
 								if (o->precalculate) {
 									ocrpt_report_resolve_breaks(o, r);
 									ocrpt_report_resolve_variables(o, r);
 									ocrpt_report_resolve_expressions(o, r);
 
 									if (r->have_delayed_expr) {
-										r->data_rows = ocrpt_execute_one_report(o, p, pr, pd, r, q, &newpage, &page_indent, &page_position, &old_page_position);
+										r->data_rows = ocrpt_execute_one_report(o, p, pr, pd, r, r->query, &newpage, &page_indent, &page_position, &old_page_position);
 
 										ocrpt_variables_advance_precalculated_results(o, r, NULL);
 
 										/* Reset queries and breaks */
-										ocrpt_query_navigate_start(o, q);
+										ocrpt_query_navigate_start(o, r->query);
 										for (ocrpt_list *brl = r->breaks; brl; brl = brl->next)
 											ocrpt_break_reset_vars(o, r, (ocrpt_break *)brl->data);
 									}
 								} else {
 									if (!r->have_delayed_expr || r->data_rows)
-										r->data_rows = ocrpt_execute_one_report(o, p, pr, pd, r, q, &newpage, &page_indent, &page_position, &old_page_position);
+										r->data_rows = ocrpt_execute_one_report(o, p, pr, pd, r, r->query, &newpage, &page_indent, &page_position, &old_page_position);
 								}
 
 								if (!r->data_rows)
@@ -556,12 +553,37 @@ static void ocrpt_execute_parts(opencreport *o) {
 					if (!o->precalculate && pd->border_width_set && o->output_functions.draw_rectangle) {
 						double top_page_position = ocrpt_layout_top_margin(o, p);
 						ocrpt_layout_output_internal(false, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, page_indent, &top_page_position);
+						double bx, by, bw, bh;
+
+						bx = pd->page_indent0;
+
+						if (pd->height_set && pd->finished)
+							by = pr->start_page_position;
+						else
+							by = top_page_position;
+
+						bw = pd->real_width;
+
+						if (pd->height_set && pd->finished)
+							bh = pd->height;
+						else
+							bh = pd->max_page_position - top_page_position;
+
+						if (pd->border_width_set) {
+							bx += 0.5 * pd->border_width;
+							by += 0.5 * pd->border_width;
+							bw -= pd->border_width;
+						}
+
 						o->output_functions.draw_rectangle(o, p, pr, pd, NULL,
 														&pd->border_color, pd->border_width,
-														pd->page_indent0 + 0.5 * pd->border_width,
-														top_page_position + 0.5 * pd->border_width,
-														pd->real_width - pd->border_width,
-														pd->max_page_position - top_page_position);
+														bx, by, bw, bh);
+
+						if (pd->height_set && pd->finished) {
+							page_position = pr->start_page_position + pd->height;
+							if (pd->border_width_set)
+								page_position += pd->border_width;
+						}
 					}
 
 					page_indent = pd->page_indent;

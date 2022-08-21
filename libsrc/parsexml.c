@@ -1422,7 +1422,8 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_xml_const_expr_parse_get_value_with_fallback(o, query);
 		r->query = ocrpt_query_get(o, query_s);
 		ocrpt_expr_free(o, NULL, query_e);
-	}
+	} else if (o->queries)
+		r->query = (ocrpt_query *)o->queries->data;
 
 	r->fieldheader_high_priority = true;
 	if (field_header_priority) {
@@ -1604,6 +1605,9 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 		if (r) {
 			if (query_s)
 				r->query = ocrpt_query_get(o, query_s);
+			else if (o->queries)
+				r->query = (ocrpt_query *)o->queries->data;
+
 			r->iterations = iterations_i;
 		}
 

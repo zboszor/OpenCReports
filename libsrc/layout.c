@@ -336,6 +336,9 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		}
 	}
 
+	if (pd && pd->finished)
+		return;
+
 	/*
 	 * The bool value in o->precalculate means !draw in layout context.
 	 * Since the complete <Output> section is (usually) drawn as an atomic unit
@@ -353,12 +356,21 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 	ocrpt_layout_output_internal(false, o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
 
-	if ((new_page_position + ((pd && pd->border_width_set) ? pd->border_width : 0.0)) > p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height) {
+	bool height_exceeded = (new_page_position + ((pd && pd->border_width_set) ? pd->border_width : 0.0)) > p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height;
+	bool pd_height_exceeded = pr && pd && pd->height_set && (new_page_position > (pr->start_page_position + pd->height));
+
+	if (height_exceeded || pd_height_exceeded) {
+		bool pd_finished = false;
+
 		pd->max_page_position = *old_page_position;
 		pd->current_column++;
 
-		if (pd->current_column >= pd->detail_columns)
-			page_break = true;
+		if (pd->current_column >= pd->detail_columns) {
+			if (pd_height_exceeded)
+				pd_finished = true;
+			else
+				page_break = true;
+		}
 
 		if (page_break) {
 			pd->current_column = 0;
@@ -385,7 +397,7 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			*newpage = false;
 			ocrpt_layout_add_new_page(o, p, pr, pd, r, rows, newpage, page_indent, &new_page_position, old_page_position);
 			pd->max_page_position = 0.0;
-		} else {
+		} else if (!pd_finished) {
 			*page_indent += pd->column_width + (o->size_in_points ? pd->column_pad : pd->column_pad * 72.0);
 			new_page_position = pr->start_page_position;
 			if (pd->border_width_set)
@@ -393,6 +405,10 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			ocrpt_layout_output_highprio_fieldheader(o, p, pr, pd, r, rows, newpage, page_indent, &new_page_position, old_page_position);
 		}
 
+		if (pd_finished) {
+			pd->finished = true;
+			return;
+		}
 		page_break = true;
 	}
 

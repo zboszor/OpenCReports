@@ -108,6 +108,7 @@ struct ocrpt_part_row_data {
 	bool height_set:1;
 	bool border_width_set:1;
 	bool detail_columns_set:1;
+	bool finished:1;
 };
 
 struct ocrpt_part_row {
