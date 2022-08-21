@@ -94,7 +94,6 @@ struct ocrpt_part_row_data {
 
 	/* Temporaries */
 	double column_width;
-	double page_start;
 	double max_page_position;
 	double page_indent;
 	double page_indent0;

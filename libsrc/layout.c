@@ -387,7 +387,7 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			pd->max_page_position = 0.0;
 		} else {
 			*page_indent += pd->column_width + (o->size_in_points ? pd->column_pad : pd->column_pad * 72.0);
-			new_page_position = pd->page_start;
+			new_page_position = pr->start_page_position;
 			if (pd->border_width_set)
 				new_page_position += pd->border_width;
 			ocrpt_layout_output_highprio_fieldheader(o, p, pr, pd, r, rows, newpage, page_indent, &new_page_position, old_page_position);
@@ -504,7 +504,7 @@ void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr
 		}
 	}
 
-	pd->page_start = *page_position = ocrpt_layout_top_margin(o, p) + p->page_header_height;
+	*page_position = ocrpt_layout_top_margin(o, p) + p->page_header_height;
 
 	if (rows == 1 && !pr->start_page) {
 		if (r->current_iteration == 0) {
