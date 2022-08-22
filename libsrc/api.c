@@ -417,6 +417,8 @@ static void ocrpt_execute_parts(opencreport *o) {
 				else
 					pr->start_page = o->current_page;
 				pr->start_page_position = page_position;
+				pr->end_page = NULL;
+				pr->end_page_position = 0.0;
 
 				uint32_t pds_without_width = 0;
 				double pds_total_width = 0;
@@ -557,7 +559,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 						bx = pd->page_indent0;
 
-						if (pd->height_set && pd->finished)
+						if ((pd->height_set && pd->finished) || (pr->start_page == o->current_page))
 							by = pr->start_page_position;
 						else
 							by = top_page_position;
@@ -578,17 +580,45 @@ static void ocrpt_execute_parts(opencreport *o) {
 						o->output_functions.draw_rectangle(o, p, pr, pd, NULL,
 														&pd->border_color, pd->border_width,
 														bx, by, bw, bh);
+					}
 
-						if (pd->height_set && pd->finished) {
-							page_position = pr->start_page_position + pd->height;
-							if (pd->border_width_set)
-								page_position += pd->border_width;
+					if (pd->height_set && pd->finished) {
+						page_position = pr->start_page_position + pd->height;
+						if (pd->border_width_set)
+							page_position += pd->border_width;
+					} else if (pd->border_width_set)
+						page_position += 1.5 * pd->border_width;
+
+					if (!pr->end_page) {
+						pr->end_page = o->current_page;
+						pr->end_page_position = page_position;
+					} else {
+						if (pr->end_page == o->current_page) {
+							if (pr->end_page_position < page_position)
+								pr->end_page_position = page_position;
+						} else {
+							ocrpt_list *pagel;
+							bool earlier = false;
+
+							for (pagel = pr->start_page; pagel && pagel != pr->end_page; pagel = pagel->next) {
+								if (pagel == o->current_page) {
+									earlier = true;
+									break;
+								}
+							}
+							if (!earlier) {
+								pr->end_page = o->current_page;
+								pr->end_page_position = page_position;
+							}
 						}
 					}
 
 					page_indent = pd->page_indent;
 					page_indent += pd->real_width;
 				}
+
+				o->current_page = pr->end_page;
+				page_position = pr->end_page_position;
 			}
 
 			if (!o->precalculate) {

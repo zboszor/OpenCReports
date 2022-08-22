@@ -113,7 +113,9 @@ struct ocrpt_part_row_data {
 
 struct ocrpt_part_row {
 	double start_page_position;
+	double end_page_position;
 	ocrpt_list *start_page;
+	ocrpt_list *end_page;
 	ocrpt_list *pd_list;
 	ocrpt_list *pd_last;
 	bool newpage_set:1;
@@ -149,7 +151,6 @@ struct ocrpt_part {
 
 	/* Paper */
 	const ocrpt_paper *paper;
-	double page_position;
 
 	/*
 	 * List of ocrpt_part_row structures
