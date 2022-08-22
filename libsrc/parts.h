@@ -97,6 +97,8 @@ struct ocrpt_part_row_data {
 	double max_page_position;
 	double page_indent;
 	double page_indent0;
+	double start_page_position;
+	double remaining_height;
 
 	ocrpt_color border_color;
 	ocrpt_list *reports;

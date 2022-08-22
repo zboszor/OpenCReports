@@ -271,6 +271,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			if (!pr->start_page && !r->current_iteration) {
 				pr->start_page = o->current_page;
 				pr->start_page_position = *page_position;
+				pd->start_page_position = *page_position;
 			}
 			if (pd->border_width_set)
 				*page_position += pd->border_width;
@@ -461,6 +462,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 						o->current_page = pr->start_page;
 						page_position = pr->start_page_position;
 					}
+					pd->start_page_position = pr->start_page_position;
 
 					pd->page_indent0 = pd->page_indent = page_indent;
 					if (pd->border_width_set)
@@ -470,6 +472,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 					if (pd->detail_columns > 1)
 						pd->column_width = (pd->column_width - ((o->size_in_points ? pd->column_pad : pd->column_pad * 72.0) * (pd->detail_columns - 1))) / (double)pd->detail_columns;
 
+					pd->remaining_height = pd->height;
 					pd->current_column = 0;
 
 					for (ocrpt_list *rl = pd->reports; rl; rl = rl->next) {
@@ -553,23 +556,16 @@ static void ocrpt_execute_parts(opencreport *o) {
 					}
 
 					if (!o->precalculate && pd->border_width_set && o->output_functions.draw_rectangle) {
-						double top_page_position = ocrpt_layout_top_margin(o, p);
-						ocrpt_layout_output_internal(false, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, page_indent, &top_page_position);
 						double bx, by, bw, bh;
 
 						bx = pd->page_indent0;
-
-						if ((pd->height_set && pd->finished) || (pr->start_page == o->current_page))
-							by = pr->start_page_position;
-						else
-							by = top_page_position;
-
+						by = pd->start_page_position;
 						bw = pd->real_width;
 
 						if (pd->height_set && pd->finished)
-							bh = pd->height;
+							bh = pd->remaining_height;
 						else
-							bh = pd->max_page_position - top_page_position;
+							bh = pd->max_page_position - pd->start_page_position;
 
 						if (pd->border_width_set) {
 							bx += 0.5 * pd->border_width;
@@ -583,11 +579,11 @@ static void ocrpt_execute_parts(opencreport *o) {
 					}
 
 					if (pd->height_set && pd->finished) {
-						page_position = pr->start_page_position + pd->height;
+						page_position = pd->start_page_position + pd->remaining_height;
 						if (pd->border_width_set)
 							page_position += pd->border_width;
 					} else if (pd->border_width_set)
-						page_position += 1.5 * pd->border_width;
+						page_position += pd->border_width;
 
 					if (!pr->end_page) {
 						pr->end_page = o->current_page;
