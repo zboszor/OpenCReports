@@ -42,7 +42,7 @@ static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_pa
 			double width = 0.0, ascent = 0.0, descent = 0.0;
 			int rows = 0;
 
-			o->output_functions.get_text_sizes(o, p, pr, pd, r, line, elem, page_width, &width, &ascent, &descent);
+			o->output_functions.get_text_sizes(o, p, pr, pd, r, line, elem, page_width - ((pd && pd->border_width_set) ? 2 * pd->border_width: 0.0), &width, &ascent, &descent);
 
 			elem->start = next_start;
 			next_start += width;
@@ -260,6 +260,154 @@ static void ocrpt_layout_image(bool draw, opencreport *o, ocrpt_part *p, ocrpt_p
 	p->current_image_width = width;
 }
 
+void ocrpt_layout_output_resolve(opencreport *o, ocrpt_part *p, ocrpt_report *r, ocrpt_output *output) {
+	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
+		ocrpt_output_element *output = (ocrpt_output_element *)ol->data;
+
+		switch (output->type) {
+		case OCRPT_OUTPUT_LINE:
+			ocrpt_line *line = (ocrpt_line *)output;
+
+			ocrpt_expr_resolve(o, r, line->font_name);
+			ocrpt_expr_optimize(o, r, line->font_name);
+
+			ocrpt_expr_resolve(o, r, line->font_size);
+			ocrpt_expr_optimize(o, r, line->font_size);
+
+			ocrpt_expr_resolve(o, r, line->color);
+			ocrpt_expr_optimize(o, r, line->color);
+
+			ocrpt_expr_resolve(o, r, line->bgcolor);
+			ocrpt_expr_optimize(o, r, line->bgcolor);
+
+			ocrpt_expr_resolve(o, r, line->bold);
+			ocrpt_expr_optimize(o, r, line->bold);
+
+			ocrpt_expr_resolve(o, r, line->italic);
+			ocrpt_expr_optimize(o, r, line->italic);
+
+			ocrpt_expr_resolve(o, r, line->suppress);
+			ocrpt_expr_optimize(o, r, line->suppress);
+
+			for (ocrpt_list *l = line->elements; l; l = l->next) {
+				ocrpt_line_element *elem = (ocrpt_line_element *)l->data;
+
+				ocrpt_expr_resolve(o, r, elem->value);
+				ocrpt_expr_optimize(o, r, elem->value);
+
+				ocrpt_expr_resolve(o, r, elem->format);
+				ocrpt_expr_optimize(o, r, elem->format);
+
+				ocrpt_expr_resolve(o, r, elem->width);
+				ocrpt_expr_optimize(o, r, elem->width);
+
+				ocrpt_expr_resolve(o, r, elem->align);
+				ocrpt_expr_optimize(o, r, elem->align);
+
+				ocrpt_expr_resolve(o, r, elem->color);
+				ocrpt_expr_optimize(o, r, elem->color);
+
+				ocrpt_expr_resolve(o, r, elem->bgcolor);
+				ocrpt_expr_optimize(o, r, elem->bgcolor);
+
+				ocrpt_expr_resolve(o, r, elem->font_name);
+				ocrpt_expr_optimize(o, r, elem->font_name);
+
+				ocrpt_expr_resolve(o, r, elem->font_size);
+				ocrpt_expr_optimize(o, r, elem->font_size);
+
+				ocrpt_expr_resolve(o, r, elem->bold);
+				ocrpt_expr_optimize(o, r, elem->bold);
+
+				ocrpt_expr_resolve(o, r, elem->italic);
+				ocrpt_expr_optimize(o, r, elem->italic);
+
+				ocrpt_expr_resolve(o, r, elem->link);
+				ocrpt_expr_optimize(o, r, elem->link);
+
+				ocrpt_expr_resolve(o, r, elem->translate);
+				ocrpt_expr_optimize(o, r, elem->translate);
+			}
+
+			break;
+		case OCRPT_OUTPUT_HLINE:
+			ocrpt_hline *hline = (ocrpt_hline *)output;
+
+			ocrpt_expr_resolve(o, r, hline->size);
+			ocrpt_expr_optimize(o, r, hline->size);
+
+			ocrpt_expr_resolve(o, r, hline->indent);
+			ocrpt_expr_optimize(o, r, hline->indent);
+
+			ocrpt_expr_resolve(o, r, hline->length);
+			ocrpt_expr_optimize(o, r, hline->length);
+
+			ocrpt_expr_resolve(o, r, hline->font_size);
+			ocrpt_expr_optimize(o, r, hline->font_size);
+
+			ocrpt_expr_resolve(o, r, hline->suppress);
+			ocrpt_expr_optimize(o, r, hline->suppress);
+
+			ocrpt_expr_resolve(o, r, hline->color);
+			ocrpt_expr_optimize(o, r, hline->color);
+
+			break;
+		case OCRPT_OUTPUT_IMAGE:
+			break;
+		}
+	}
+}
+
+void ocrpt_layout_output_evaluate(opencreport *o, ocrpt_part *p, ocrpt_report *r, ocrpt_output *output) {
+	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
+		ocrpt_output_element *output = (ocrpt_output_element *)ol->data;
+
+		switch (output->type) {
+		case OCRPT_OUTPUT_LINE:
+			ocrpt_line *line = (ocrpt_line *)output;
+
+			ocrpt_expr_eval(o, r, line->font_name);
+			ocrpt_expr_eval(o, r, line->font_size);
+			ocrpt_expr_eval(o, r, line->color);
+			ocrpt_expr_eval(o, r, line->bgcolor);
+			ocrpt_expr_eval(o, r, line->bold);
+			ocrpt_expr_eval(o, r, line->italic);
+			ocrpt_expr_eval(o, r, line->suppress);
+
+			for (ocrpt_list *l = line->elements; l; l = l->next) {
+				ocrpt_line_element *elem = (ocrpt_line_element *)l->data;
+
+				ocrpt_expr_eval(o, r, elem->value);
+				ocrpt_expr_eval(o, r, elem->format);
+				ocrpt_expr_eval(o, r, elem->width);
+				ocrpt_expr_eval(o, r, elem->align);
+				ocrpt_expr_eval(o, r, elem->color);
+				ocrpt_expr_eval(o, r, elem->bgcolor);
+				ocrpt_expr_eval(o, r, elem->font_name);
+				ocrpt_expr_eval(o, r, elem->font_size);
+				ocrpt_expr_eval(o, r, elem->bold);
+				ocrpt_expr_eval(o, r, elem->italic);
+				ocrpt_expr_eval(o, r, elem->link);
+				ocrpt_expr_eval(o, r, elem->translate);
+			}
+
+			break;
+		case OCRPT_OUTPUT_HLINE:
+			ocrpt_hline *hline = (ocrpt_hline *)output;
+
+			ocrpt_expr_eval(o, r, hline->size);
+			ocrpt_expr_eval(o, r, hline->indent);
+			ocrpt_expr_eval(o, r, hline->length);
+			ocrpt_expr_eval(o, r, hline->font_size);
+			ocrpt_expr_eval(o, r, hline->suppress);
+			ocrpt_expr_eval(o, r, hline->color);
+			break;
+		case OCRPT_OUTPUT_IMAGE:
+			break;
+		}
+	}
+}
+
 void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, double page_width, double page_indent, double *page_position) {
 	bool had_image = false;
 
@@ -278,6 +426,13 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 		case OCRPT_OUTPUT_LINE:
 			ocrpt_line *l = (ocrpt_line *)output;
 
+			if (l->suppress && l->suppress->result[o->residx] && l->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->suppress->result[o->residx]->number_initialized) {
+				long suppress = mpfr_get_si(l->suppress->result[o->residx]->number, o->rndmode);
+
+				if (suppress)
+					break;
+			}
+
 			if (l->font_name && l->font_name->result[o->residx] && l->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && l->font_name->result[o->residx]->string)
 				font_name = l->font_name->result[o->residx]->string->str;
 			else
@@ -294,6 +449,13 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 		case OCRPT_OUTPUT_HLINE:
 			ocrpt_hline *hl = (ocrpt_hline *)output;
 
+			if (hl->suppress && hl->suppress->result[o->residx] && hl->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && hl->suppress->result[o->residx]->number_initialized) {
+				long suppress = mpfr_get_si(hl->suppress->result[o->residx]->number, o->rndmode);
+
+				if (suppress)
+					break;
+			}
+
 			font_name = (r && r->font_name) ? r->font_name : (p->font_name ? p->font_name : "Courier");
 
 			if (hl->font_size && hl->font_size->result[o->residx] && hl->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && hl->font_size->result[o->residx]->number_initialized)
@@ -305,6 +467,15 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 			ocrpt_layout_hline(draw, o, p, pr, pd, r, hl, page_width - p->current_image_width, page_indent + p->current_image_width, page_position);
 			break;
 		case OCRPT_OUTPUT_IMAGE:
+			ocrpt_image *img = (ocrpt_image *)output;
+
+			if (img->suppress && img->suppress->result[o->residx] && img->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && img->suppress->result[o->residx]->number_initialized) {
+				long suppress = mpfr_get_si(img->suppress->result[o->residx]->number, o->rndmode);
+
+				if (suppress)
+					break;
+			}
+
 			if (had_image)
 				*page_position = p->old_page_position + p->current_image_height;
 			ocrpt_layout_image(draw, o, p, pr, pd, r, (ocrpt_image *)output, page_width, page_indent, page_position);
@@ -329,6 +500,17 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	bool page_break = false;
 
 	if (*newpage) {
+		if (o->current_page) {
+			ocrpt_layout_output_evaluate(o, p, NULL, &p->pageheader);
+			ocrpt_layout_output_evaluate(o, p, NULL, &p->pagefooter);
+
+			double top_page_position = ocrpt_layout_top_margin(o, p);
+			ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &top_page_position);
+
+			double bottom_page_position = p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height;
+			ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, p->left_margin_value, &bottom_page_position);
+		}
+
 		/* Set newpage to false first to prevent infinite recursion. */
 		*newpage = false;
 		ocrpt_layout_add_new_page(o, p, pr, pd, r, rows, newpage, page_indent, page_position, old_page_position);
@@ -341,12 +523,13 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		}
 	}
 
-	if (pd && pd->finished)
+	if ((pd && pd->finished) || (r && r->finished))
 		return;
 
 	/*
 	 * The bool value in o->precalculate means !draw in layout context.
 	 * Since the complete <Output> section is (usually) drawn as an atomic unit
+
 	 * ("memo" values will break this!!!) we need to calculate the last
 	 * page position without drawing first. So, draw in two rounds.
 	 *
@@ -362,7 +545,11 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	ocrpt_layout_output_internal(false, o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
 
 	bool height_exceeded = (new_page_position + ((pd && pd->border_width_set) ? pd->border_width : 0.0)) > p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height;
-	bool pd_height_exceeded = pr && pd && pd->height_set && (new_page_position > (pd->start_page_position + pd->remaining_height));
+	bool pd_height_exceeded = pd && pd->height_set && (new_page_position > (pd->start_page_position + pd->remaining_height));
+	bool r_height_exceeded = r && r->height_set && (r->remaining_height < (new_page_position - *old_page_position));
+
+	if (r_height_exceeded)
+		r->finished = true;
 
 	if (height_exceeded || pd_height_exceeded) {
 		pd->max_page_position = *old_page_position;
@@ -371,8 +558,9 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		if (pd->current_column >= pd->detail_columns) {
 			if (pd_height_exceeded)
 				pd->finished = true;
-			if (height_exceeded)
+			if (height_exceeded) {
 				page_break = true;
+			}
 		}
 
 		if (page_break) {
@@ -383,6 +571,9 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			*page_indent = pd->page_indent;
 			if (pd->border_width_set)
 				*page_indent += pd->border_width;
+
+			ocrpt_layout_output_evaluate(o, p, NULL, &p->pageheader);
+			ocrpt_layout_output_evaluate(o, p, NULL, &p->pagefooter);
 
 			double top_page_position = ocrpt_layout_top_margin(o, p);
 			ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &top_page_position);
@@ -404,7 +595,7 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 			pd->max_page_position = 0.0;
 		} else if (!pd->finished) {
-			*page_indent += pd->column_width + (o->size_in_points ? pd->column_pad : pd->column_pad * 72.0);
+			*page_indent += pd->column_width + (o->size_in_points ? 1.0 : 72.0) * pd->column_pad;
 			new_page_position = pd->start_page_position;
 			if (pd->border_width_set)
 				new_page_position += pd->border_width;
@@ -421,7 +612,12 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		o->current_page = old_current_page;
 		new_page_position = *old_page_position;
 	}
-	ocrpt_layout_output_internal(!o->precalculate, o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
+
+	if (!r || (r && !r->finished))
+		ocrpt_layout_output_internal(!o->precalculate, o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
+
+	if (r && r->height_set)
+		r->remaining_height -= new_page_position - *old_page_position;
 
 	*page_position = new_page_position;
 	if (pd->max_page_position < new_page_position)

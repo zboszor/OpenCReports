@@ -84,6 +84,7 @@
 	paperType CDATA #IMPLIED
 	paper_type CDATA #IMPLIED
 	iterations CDATA #IMPLIED
+	suppress CDATA #IMPLIED
 	suppressPageHeaderFirstPage CDATA #IMPLIED
 	query CDATA #IMPLIED
 	xmlns:xi CDATA #IMPLIED
@@ -163,6 +164,7 @@
 <!ELEMENT Image EMPTY >
 <!ATTLIST Image
 	value CDATA #REQUIRED
+	suppress CDATA #IMPLIED
 	type CDATA #REQUIRED
 	width CDATA #REQUIRED
 	height CDATA #REQUIRED >

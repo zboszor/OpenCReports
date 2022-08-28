@@ -80,13 +80,13 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 	else
 		le->font = "Courier";
 
-	if (le->font_size && le->font_size->result[o->residx] && le->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->font_size->result[o->residx]->number_initialized)
+	if (le && le->font_size && le->font_size->result[o->residx] && le->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->font_size->result[o->residx]->number_initialized)
 		size = mpfr_get_d(le->font_size->result[o->residx]->number, o->rndmode);
-	else if (l->font_size && l->font_size->result[o->residx] && l->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->font_size->result[o->residx]->number_initialized)
+	else if (l && l->font_size && l->font_size->result[o->residx] && l->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->font_size->result[o->residx]->number_initialized)
 		size = mpfr_get_d(l->font_size->result[o->residx]->number, o->rndmode);
-	else if (r->font_size_set)
+	else if (r && r->font_size_set)
 		size = r->font_size;
-	else if (p->font_size_set)
+	else if (p && p->font_size_set)
 		size = p->font_size;
 	else
 		size = OCRPT_DEFAULT_FONT_SIZE;
@@ -183,11 +183,12 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 	} else if (ocrpt_list_length(l->elements) == 1) {
 		w = total_width;
 	} else {
-		int len;
-		ocrpt_utf8forward(le->value_str->str, -1, &len, -1, NULL);
-		if (!len)
-			len = 1;
-		w = len * l->font_width;
+		PangoRectangle logical_rect;
+
+		pango_layout_set_text(layout, le->value_str->str, le->value_str->len);
+		pango_layout_get_extents(layout, NULL, &logical_rect);
+
+		w = (double)logical_rect.width / PANGO_SCALE;
 	}
 
 	le->width_computed = w;

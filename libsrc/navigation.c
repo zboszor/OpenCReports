@@ -240,7 +240,10 @@ static void ocrpt_navigate_start_private(opencreport *o, ocrpt_query *q) {
 	ocrpt_query_result *qr;
 	int32_t cols;
 
-	if (!o || !q || !q->source || !q->source->o || o != q->source->o) {
+	if (!o || !q)
+		return;
+
+	if (!q->source || !q->source->o || o != q->source->o) {
 		fprintf(stderr, "%s:%d: opencreport and ocrpt_query structures do not match\n", __func__, __LINE__);
 		return;
 	}

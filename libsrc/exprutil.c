@@ -157,7 +157,7 @@ static void ocrpt_expr_print_worker(opencreport *o, ocrpt_expr *e, int depth, co
 		ocrpt_mem_string_append_printf(str, "%s", delimiter);
 }
 
-static void ocrpt_expr_print_internal(opencreport *o, ocrpt_expr *e, FILE *stream) {
+void ocrpt_expr_print_internal(opencreport *o, ocrpt_expr *e, FILE *stream) {
 	ocrpt_string *str = ocrpt_mem_string_new_with_len(NULL, 256);
 	ocrpt_expr_print_worker(o, e, 0, "\n", str);
 	fprintf(stream, "%s", str->str);
@@ -171,6 +171,9 @@ DLL_EXPORT_SYM void ocrpt_expr_print(opencreport *o, ocrpt_expr *e) {
 void ocrpt_expr_result_deep_print_worker(opencreport *o, ocrpt_expr *e, FILE *stream) {
 	ocrpt_string *str = ocrpt_mem_string_new_with_len(NULL, 256);
 	int i;
+
+	if (!o || !e)
+		return;
 
 	switch (e->type) {
 	case OCRPT_EXPR:
@@ -558,6 +561,9 @@ static bool ocrpt_resolve_ident(ocrpt_expr *e, ocrpt_query *q) {
 
 void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask) {
 	int32_t i;
+
+	if (!e)
+		return;
 
 	switch (e->type) {
 	case OCRPT_EXPR_MVAR:
@@ -963,6 +969,8 @@ void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrp
 }
 
 DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_eval(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
+	if (!o || !e)
+		return NULL;
 	ocrpt_expr_eval_worker(o, r, e, e, NULL);
 	if (o->precalculate || !e->delayed)
 		return e->result[o->residx];

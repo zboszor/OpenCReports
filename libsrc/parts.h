@@ -31,6 +31,11 @@ struct ocrpt_report {
 	char *font_name;
 	double font_size;
 	double font_width;
+	double height;
+
+	/* Temporaries */
+	double start_page_position;
+	double remaining_height;
 
 	/* Output elements */
 	ocrpt_output nodata;
@@ -79,16 +84,20 @@ struct ocrpt_report {
 	 */
 	uint32_t num_expressions;
 	bool have_delayed_expr:1;
+	bool suppress:1;
 	bool executing:1;
 	bool dont_add_exprs:1;
 	bool font_size_set:1;
+	bool height_set:1;
 	bool fieldheader_high_priority:1;
+	bool finished:1;
 };
 
 struct ocrpt_part_row_data {
 	double width;
 	double real_width;
 	double height;
+	double real_height;
 	double border_width;
 	double column_pad;
 
@@ -106,10 +115,10 @@ struct ocrpt_part_row_data {
 	uint32_t detail_columns;
 	uint32_t current_column;
 	bool width_set:1;
-	bool real_width_set:1;
 	bool height_set:1;
 	bool border_width_set:1;
 	bool detail_columns_set:1;
+	bool suppress:1;
 	bool finished:1;
 };
 

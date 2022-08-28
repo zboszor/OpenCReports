@@ -7,7 +7,7 @@
 	<Queries>
 		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="120" cols="6" />
 	</Queries>
-	<Part>
+	<Part fontSize="10">
 		<pr>
 			<pd>
 				<Report query="nonexisting">
@@ -20,7 +20,7 @@
 			</pd>
 		</pr>
 		<pr>
-			<pd detail_columns="2" column_pad="0.2" height="250">
+			<pd detail_columns="2" column_pad="0.2" height="25">
 				<Report fontSize="12" paperType="A4" orientation="landscape">
 					<NoData>
 						<Output>

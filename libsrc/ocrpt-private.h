@@ -100,6 +100,8 @@ struct opencreport {
 	unsigned int residx:3;
 	unsigned int output_format:3;
 	bool precalculate:1;
+	bool rlib_compat_set:1;
+	bool rlib_compat:1;
 	bool size_unit_set:1;
 	bool size_in_points:1;
 };

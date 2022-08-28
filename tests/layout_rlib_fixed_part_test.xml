@@ -1,0 +1,745 @@
+<?xml version="1.0"?>
+<!DOCTYPE report>
+<Part layout="'fixed'" fontSize="14" orientation="landscape" iterations="2">
+  <PageHeader>
+    <Output>
+      <Line fontSize="26">
+        <literal>Fixed Part Test</literal>
+      </Line>
+      <Line>
+        <literal>ICR</literal>
+      </Line>
+      <HorizontalLine size="4" bgcolor="'black'"/>
+      <HorizontalLine size="10" bgcolor="'white'"/>
+    </Output>
+  </PageHeader>
+  <pr>
+    <pd>
+      <Report fontSize="9" query="'inventory'">
+        <Alternate>
+          <NoData>
+            <Output>
+              <Line fontSize="12">
+                <literal>NO DATA</literal>
+              </Line>
+            </Output>
+          </NoData>
+        </Alternate>
+        <ReportHeader>
+          <Output>
+            <Line/>
+            <Line fontSize="9">
+              <literal>      INVENTORY REPORT</literal>
+            </Line>
+            <HorizontalLine size="2" bgcolor="'white'"/>
+          </Output>
+        </ReportHeader>
+        <Detail>
+          <FieldHeaders>
+            <Output>
+              <HorizontalLine size="1" bgcolor="'black'"/>
+              <Line bgcolor="'0xe5e5e5'">
+                <literal width="3" col="1">NUM</literal>
+                <literal width="1"/>
+                <literal width="20" col="2">NAME</literal>
+                <literal width="1"/>
+                <literal width="10" col="3">UNIT</literal>
+                <literal width="1"/>
+                <literal width="10" col="4">OPEN</literal>
+                <literal width="1"/>
+                <literal width="10" col="5">USAGE</literal>
+                <literal width="1"/>
+                <literal width="10" col="6">RECEIVED</literal>
+                <literal width="1"/>
+                <literal width="10" col="7">TRANS IN</literal>
+                <literal width="1"/>
+                <literal width="10" col="8">TRANS OUT</literal>
+                <literal width="1"/>
+                <literal width="10" col="9">WASTE</literal>
+                <literal width="1"/>
+              </Line>
+              <HorizontalLine size="1" bgcolor="'black'"/>
+              <HorizontalLine size="4" bgcolor="'white'"/>
+            </Output>
+          </FieldHeaders>
+          <FieldDetails>
+            <Output>
+              <Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+                <field value="num" width="3" align="left" col="1"/>
+                <literal width="1"/>
+                <field value="name" width="20" align="left" col="2"/>
+                <literal width="1"/>
+                <field value="unit" width="10" align="left" col="3"/>
+                <literal width="1"/>
+                <field value="open" width="10" align="left" col="4"/>
+                <literal width="1"/>
+                <field value="usage" width="10" align="left" col="5"/>
+                <literal width="1"/>
+                <field value="received" width="10" align="left" col="6"/>
+                <literal width="1"/>
+                <field value="transfer_in" width="10" align="left" col="7"/>
+                <literal width="1"/>
+                <field value="transfer_out" width="10" align="left" col="8"/>
+                <literal width="1"/>
+                <field value="waste" width="10" align="left" col="9"/>
+                <literal width="1"/>
+              </Line>
+            </Output>
+          </FieldDetails>
+        </Detail>
+      </Report>
+    </pd>
+  </pr>
+  <pr newpage="yes">
+    <pd width="30" height="81" border_width="2" border_color="'black'">
+      <Report fontSize="9" query="'yields'" height="19" leftMargin="0.1">
+        <Alternate>
+          <NoData>
+            <Output>
+              <Line fontSize="12">
+                <literal>NO DATA</literal>
+              </Line>
+            </Output>
+          </NoData>
+        </Alternate>
+        <ReportHeader>
+          <Output>
+            <Line fontSize="9">
+              <literal>YIELDS</literal>
+            </Line>
+            <HorizontalLine size="2" bgcolor="'white'"/>
+          </Output>
+        </ReportHeader>
+        <Detail>
+          <FieldHeaders>
+            <Output>
+              <HorizontalLine size="1" bgcolor="'black'" length="39"/>
+              <Line bgcolor="'0xe5e5e5'">
+                <literal width="10" col="1">Item</literal>
+                <literal width="1"/>
+                <literal width="9" col="2">Portions</literal>
+                <literal width="1"/>
+                <literal width="7" col="3">EQV</literal>
+                <literal width="1"/>
+                <literal width="10" col="4">REG EQUIV</literal>
+              </Line>
+              <HorizontalLine size="1" bgcolor="'black'" length="39"/>
+              <HorizontalLine size="4" bgcolor="'white'"/>
+            </Output>
+          </FieldHeaders>
+          <FieldDetails>
+            <Output>
+              <Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+                <field value="item" width="10" align="left" col="1"/>
+                <literal width="1"/>
+                <field value="portions" width="9" align="left" col="2"/>
+                <literal width="1"/>
+                <field value="eqv" width="10" align="left" col="3"/>
+              </Line>
+            </Output>
+          </FieldDetails>
+        </Detail>
+        <ReportFooter>
+          <Output>
+            <Line fontSize="9">
+              <literal>      YIELDS</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>      YIELDS</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>      YIELDS</literal>
+            </Line>
+          </Output>
+        </ReportFooter>
+      </Report>
+      <Report fontSize="9" query="'coupons'" height="32" leftMargin="0.1" suppress="yes">
+        <Alternate>
+          <NoData>
+            <Output>
+              <Line fontSize="12">
+                <literal>NO DATA</literal>
+              </Line>
+            </Output>
+          </NoData>
+        </Alternate>
+        <ReportHeader>
+          <Output>
+            <Line/>
+            <Line fontSize="9">
+              <literal>      COUPONSXX</literal>
+            </Line>
+            <HorizontalLine size="2" bgcolor="'white'"/>
+          </Output>
+        </ReportHeader>
+        <Detail>
+          <FieldHeaders>
+            <Output>
+              <HorizontalLine size="1" bgcolor="'black'" length="39"/>
+              <Line bgcolor="'0xe5e5e5'">
+                <literal width="15" col="1">Name</literal>
+                <literal width="1"/>
+                <literal width="11" col="2">   PHY.CNT </literal>
+                <literal width="1"/>
+                <literal width="11" col="3">      POS    </literal>
+              </Line>
+              <HorizontalLine size="1" bgcolor="'black'" length="39"/>
+              <HorizontalLine size="4" bgcolor="'white'"/>
+            </Output>
+          </FieldHeaders>
+          <FieldDetails>
+            <Output>
+              <Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+                <field value="name" width="15" align="left" col="1"/>
+                <literal width="1"/>
+                <field value="actual_amount" width="11" align="left" col="2"/>
+                <literal width="1"/>
+                <field value="computed_amount" width="11" align="left" col="3"/>
+              </Line>
+            </Output>
+          </FieldDetails>
+        </Detail>
+      </Report>
+      <Report fontSize="9" query="'dttiming'" height="20" leftMargin="0.1">
+        <Alternate>
+          <NoData>
+            <Output>
+              <Line fontSize="12">
+                <literal>NO DATA</literal>
+              </Line>
+            </Output>
+          </NoData>
+        </Alternate>
+        <ReportHeader>
+          <Output>
+            <Line/>
+            <Line>
+              <literal>   WWW.DT TIMING</literal>
+              <field value="m.sillypants" width="5"/>
+            </Line>
+            <Line fontSize="9">
+              <literal>NUMBER OF CARS</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>NUMBER PARKED</literal>
+            </Line>
+            <Line/>
+            <Line fontSize="9">
+              <literal>EXCEED COUNT</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>NUMBER PARKED</literal>
+            </Line>
+            <Line/>
+            <Line fontSize="9">
+              <literal>AVE PARK TIME</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>AVE TOTAL TIME</literal>
+            </Line>
+            <HorizontalLine size="2" bgcolor="'white'"/>
+          </Output>
+        </ReportHeader>
+      </Report>
+    </pd>
+    <pd width="30" height="81" border_width="2" border_color="'black'">
+      <Report fontSize="9" query="'deposits'" height="17" leftMargin="0.1">
+        <Alternate>
+          <NoData>
+            <Output>
+              <Line fontSize="12">
+                <literal>NO DATA</literal>
+              </Line>
+            </Output>
+          </NoData>
+        </Alternate>
+        <ReportHeader>
+          <Output>
+            <Line fontSize="9">
+              <literal>DEPOSITS</literal>
+            </Line>
+            <HorizontalLine size="2" bgcolor="'white'"/>
+          </Output>
+        </ReportHeader>
+        <Detail>
+          <FieldHeaders>
+            <Output>
+              <HorizontalLine size="1" bgcolor="'black'" length="39"/>
+              <Line bgcolor="'0xe5e5e5'">
+                <literal width="8" col="1">  TIME  </literal>
+                <literal width="1"/>
+                <literal width="10" col="2"> BAG ID   </literal>
+                <literal width="1"/>
+                <literal width="9" col="3"> MGR. ID </literal>
+                <literal width="1"/>
+                <literal width="10" col="4">   AMOUNT</literal>
+              </Line>
+              <HorizontalLine size="1" bgcolor="'black'" length="39"/>
+              <HorizontalLine size="4" bgcolor="'white'"/>
+            </Output>
+          </FieldHeaders>
+          <FieldDetails>
+            <Output>
+              <Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+                <field value="time" width="8" align="left" col="1"/>
+                <literal width="1"/>
+                <field value="bag_id" width="10" align="left" col="2"/>
+                <literal width="1"/>
+                <field value="manager_id" width="9" align="left" col="3"/>
+                <literal width="1"/>
+                <field value="amount" width="10" align="left" col="4"/>
+              </Line>
+            </Output>
+          </FieldDetails>
+        </Detail>
+        <ReportFooter>
+          <Output>
+            <Line fontSize="9">
+              <literal> TOTAL DEPOSITS</literal>
+            </Line>
+          </Output>
+        </ReportFooter>
+      </Report>
+      <Report fontSize="9" query="'other'" height="41" leftMargin="0.1">
+        <Alternate>
+          <NoData>
+            <Output>
+              <Line fontSize="12">
+                <literal>NO DATA</literal>
+              </Line>
+            </Output>
+          </NoData>
+        </Alternate>
+        <ReportHeader>
+          <Output>
+            <Line/>
+            <Line>
+              <literal>OTHER??? </literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>BREAK FAST SALES</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>BREAKFAST SALES</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>SALAD SALES</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>SALAD SALES</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>DRIVE-THRU SALES</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>DRIVE-THRU SALES</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>OVER-RINGS</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>OVER-RINGS</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>OVER-RINGS</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>COUPONS MEALS WASTE</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>COUPONS MEALS WASTE</literal>
+            </Line>
+            <HorizontalLine size="2" bgcolor="'white'"/>
+          </Output>
+        </ReportHeader>
+      </Report>
+      <Report fontSize="9" query="'inv_transfer'" height="15" leftMargin="0.1">
+        <Alternate>
+          <NoData>
+            <Output>
+              <Line fontSize="12">
+                <literal>NO DATA</literal>
+              </Line>
+            </Output>
+          </NoData>
+        </Alternate>
+        <ReportHeader>
+          <Output>
+            <Line/>
+            <Line fontSize="9">
+              <literal>      INVENTORY TRANSFER</literal>
+            </Line>
+            <HorizontalLine size="2" bgcolor="'white'"/>
+          </Output>
+        </ReportHeader>
+        <Detail>
+          <FieldHeaders>
+            <Output>
+              <HorizontalLine size="1" bgcolor="'black'" length="31"/>
+              <Line bgcolor="'0xe5e5e5'">
+                <literal width="5" col="1">QTY</literal>
+                <literal width="1"/>
+                <literal width="15" col="2">Name</literal>
+                <literal width="1"/>
+                <literal width="4" col="3">FROM</literal>
+                <literal width="1"/>
+                <literal width="4" col="4">TO</literal>
+              </Line>
+              <HorizontalLine size="1" bgcolor="'black'" length="31"/>
+              <HorizontalLine size="4" bgcolor="'white'"/>
+            </Output>
+          </FieldHeaders>
+          <FieldDetails>
+            <Output>
+              <Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+                <field value="qty" width="5" align="left" col="1"/>
+                <literal width="1"/>
+                <field value="name" width="15" align="left" col="2"/>
+                <literal width="1"/>
+                <field value="from" width="4" align="left" col="3"/>
+                <literal width="1"/>
+                <field value="to" width="4" align="left" col="4"/>
+              </Line>
+            </Output>
+          </FieldDetails>
+        </Detail>
+      </Report>
+    </pd>
+    <pd width="40" height="81" border_width="2" border_color="'black'">
+      <Report fontSize="9" query="'cash'" height="47" leftMargin="0.1">
+        <Alternate>
+          <NoData>
+            <Output>
+              <Line fontSize="12">
+                <literal>NO DATA</literal>
+              </Line>
+            </Output>
+          </NoData>
+        </Alternate>
+        <ReportHeader>
+          <Output>
+            <Line>
+              <literal>     CASH RECONCILIATION </literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>NET SALES </literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>TAX 	</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>GROSS SALES </literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>RESTAURANT BANK</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>ADJUSTED GROSS CASH</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>AMOUNT DEPOSITED</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>GIFT REDEEMED</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>MISC. INCOME</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>PETTY CASH</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>NET SALES</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>TAX</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>CASH OVER/SHORT </literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>CASHIER OVER/SHORT </literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>OVER/SHORT RECONCILIATION</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>NET SALES </literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>GIFT CERT. SOLD </literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>OTHER NON-FOOD</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>NET FOOD SALES</literal>
+            </Line>
+            <HorizontalLine size="2" bgcolor="'white'"/>
+          </Output>
+        </ReportHeader>
+      </Report>
+      <Report fontSize="9" query="'petty_cash'" leftMargin="0.1">
+        <Alternate>
+          <NoData>
+            <Output>
+              <Line fontSize="12">
+                <literal>NO DATA</literal>
+              </Line>
+            </Output>
+          </NoData>
+        </Alternate>
+        <ReportHeader>
+          <Output>
+            <Line/>
+            <Line fontSize="9">
+              <literal>      PETTY CASH</literal>
+            </Line>
+            <HorizontalLine size="2" bgcolor="'white'"/>
+          </Output>
+        </ReportHeader>
+        <Detail>
+          <FieldHeaders>
+            <Output>
+              <HorizontalLine size="1" bgcolor="'black'" length="42"/>
+              <Line bgcolor="'0xe5e5e5'">
+                <literal width="8" col="1">  TIME  </literal>
+                <literal width="1"/>
+                <literal width="20" col="2"> NAME   </literal>
+                <literal width="1"/>
+                <literal width="12" col="3">    AMOUNT  </literal>
+              </Line>
+              <HorizontalLine size="1" bgcolor="'black'" length="42"/>
+              <HorizontalLine size="4" bgcolor="'white'"/>
+            </Output>
+          </FieldHeaders>
+          <FieldDetails>
+            <Output>
+              <Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+                <field value="time" width="8" align="left" col="1"/>
+                <literal width="1"/>
+                <field value="name" width="20" align="left" col="2"/>
+                <literal width="1"/>
+                <field value="amount" width="12" align="left" col="3"/>
+              </Line>
+            </Output>
+          </FieldDetails>
+        </Detail>
+        <ReportFooter>
+          <Output>
+            <Line fontSize="9">
+              <literal> TOTAL PETTY CASH</literal>
+            </Line>
+          </Output>
+        </ReportFooter>
+      </Report>
+      <Report fontSize="9" query="'misc_income'" leftMargin="0.1">
+        <Alternate>
+          <NoData>
+            <Output>
+              <Line fontSize="12">
+                <literal>NO DATA</literal>
+              </Line>
+            </Output>
+          </NoData>
+        </Alternate>
+        <ReportHeader>
+          <Output>
+            <Line/>
+            <Line fontSize="9">
+              <literal>      MISC INCOME</literal>
+            </Line>
+            <HorizontalLine size="2" bgcolor="'white'"/>
+          </Output>
+        </ReportHeader>
+        <Detail>
+          <FieldHeaders>
+            <Output>
+              <HorizontalLine size="1" bgcolor="'black'" length="42"/>
+              <Line bgcolor="'0xe5e5e5'">
+                <literal width="8" col="1">  TIME  </literal>
+                <literal width="1"/>
+                <literal width="20" col="2"> NAME   </literal>
+                <literal width="1"/>
+                <literal width="12" col="3">    AMOUNT  </literal>
+              </Line>
+              <HorizontalLine size="1" bgcolor="'black'" length="42"/>
+              <HorizontalLine size="4" bgcolor="'white'"/>
+            </Output>
+          </FieldHeaders>
+          <FieldDetails>
+            <Output>
+              <Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+                <field value="time" width="8" align="left" col="1"/>
+                <literal width="1"/>
+                <field value="name" width="20" align="left" col="2"/>
+                <literal width="1"/>
+                <field value="amount" width="12" align="left" col="3"/>
+              </Line>
+            </Output>
+          </FieldDetails>
+        </Detail>
+        <ReportFooter>
+          <Output>
+            <Line fontSize="9">
+              <literal> TOTAL MISC INCOME</literal>
+            </Line>
+          </Output>
+        </ReportFooter>
+      </Report>
+    </pd>
+  </pr>
+  <pr>
+    <pd width="30" height="15" border_width="2" border_color="'black'">
+      <Report fontSize="9" query="'labor'" leftMargin="0.1">
+        <Alternate>
+          <NoData>
+            <Output>
+              <Line fontSize="12">
+                <literal>NO DATA</literal>
+              </Line>
+            </Output>
+          </NoData>
+        </Alternate>
+        <ReportHeader>
+          <Output>
+            <Line/>
+            <Line>
+              <literal>     LABOR </literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>FORMULA HRS</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>ACTUAL HRS</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>DIFFERENCE</literal>
+            </Line>
+            <HorizontalLine size="2" bgcolor="'white'"/>
+          </Output>
+        </ReportHeader>
+      </Report>
+    </pd>
+    <pd width="70" height="15" border_width="2" border_color="'black'">
+      <Report fontSize="9" leftMargin="0.1">
+        <Alternate>
+          <NoData>
+            <Output>
+              <Line fontSize="12">
+                <literal>NO DATA</literal>
+              </Line>
+            </Output>
+          </NoData>
+        </Alternate>
+        <ReportHeader>
+          <Output>
+            <Line/>
+            <Line>
+              <literal> ---------    Comments  ------------------</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>slashdot.org</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>philadelphiaeagles.com</literal>
+            </Line>
+            <Line fontSize="9">
+              <literal>sicom.com                  EAT               MORE                 CHEESE</literal>
+            </Line>
+            <HorizontalLine size="2" bgcolor="'white'"/>
+          </Output>
+        </ReportHeader>
+      </Report>
+    </pd>
+  </pr>
+  <pr newpage="yes">
+    <pd>
+      <Report fontSize="9" query="'inventory'">
+        <Alternate>
+          <NoData>
+            <Output>
+              <Line fontSize="12">
+                <literal>NO DATA</literal>
+              </Line>
+            </Output>
+          </NoData>
+        </Alternate>
+        <ReportHeader>
+          <Output>
+            <Line/>
+            <Line fontSize="9">
+              <literal>      INVENTORY REPORT</literal>
+            </Line>
+            <HorizontalLine size="2" bgcolor="'white'"/>
+          </Output>
+        </ReportHeader>
+        <Detail>
+          <FieldHeaders>
+            <Output>
+              <HorizontalLine size="1" bgcolor="'black'"/>
+              <Line bgcolor="'0xe5e5e5'">
+                <literal width="3" col="1">NUM</literal>
+                <literal width="1"/>
+                <literal width="20" col="2">NAME</literal>
+                <literal width="1"/>
+                <literal width="10" col="3">UNIT</literal>
+                <literal width="1"/>
+                <literal width="10" col="4">OPEN</literal>
+                <literal width="1"/>
+                <literal width="10" col="5">USAGE</literal>
+                <literal width="1"/>
+                <literal width="10" col="6">RECEIVED</literal>
+                <literal width="1"/>
+                <literal width="10" col="7">TRANS IN</literal>
+                <literal width="1"/>
+                <literal width="10" col="8">TRANS OUT</literal>
+                <literal width="1"/>
+                <literal width="10" col="9">WASTE</literal>
+                <literal width="1"/>
+              </Line>
+              <HorizontalLine size="1" bgcolor="'black'"/>
+              <HorizontalLine size="4" bgcolor="'white'"/>
+            </Output>
+          </FieldHeaders>
+          <FieldDetails>
+            <Output>
+              <Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+                <field value="num" width="3" align="left" col="1"/>
+                <literal width="1"/>
+                <field value="name" width="20" align="left" col="2"/>
+                <literal width="1"/>
+                <field value="unit" width="10" align="left" col="3"/>
+                <literal width="1"/>
+                <field value="open" width="10" align="left" col="4"/>
+                <literal width="1"/>
+                <field value="usage" width="10" align="left" col="5"/>
+                <literal width="1"/>
+                <field value="received" width="10" align="left" col="6"/>
+                <literal width="1"/>
+                <field value="transfer_in" width="10" align="left" col="7"/>
+                <literal width="1"/>
+                <field value="transfer_out" width="10" align="left" col="8"/>
+                <literal width="1"/>
+                <field value="waste" width="10" align="left" col="9"/>
+                <literal width="1"/>
+              </Line>
+            </Output>
+          </FieldDetails>
+        </Detail>
+      </Report>
+    </pd>
+  </pr>
+  <PageFooter>
+    <Output>
+      <Line>
+        <literal>Page: </literal>
+        <field value="r.pageno" width="3" align="right"/>
+      </Line>
+      <Line>
+        <literal>Wheeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee: </literal>
+        <field value="r.pageno" width="3" align="right"/>
+      </Line>
+    </Output>
+  </PageFooter>
+</Part>
