@@ -261,6 +261,9 @@ static void ocrpt_layout_image(bool draw, opencreport *o, ocrpt_part *p, ocrpt_p
 }
 
 void ocrpt_layout_output_resolve(opencreport *o, ocrpt_part *p, ocrpt_report *r, ocrpt_output *output) {
+	ocrpt_expr_resolve(o, r, output->suppress);
+	ocrpt_expr_optimize(o, r, output->suppress);
+
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
 		ocrpt_output_element *output = (ocrpt_output_element *)ol->data;
 
@@ -409,6 +412,13 @@ void ocrpt_layout_output_evaluate(opencreport *o, ocrpt_part *p, ocrpt_report *r
 }
 
 void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, double page_width, double page_indent, double *page_position) {
+	if (output->suppress && output->suppress->result[o->residx] && output->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && output->suppress->result[o->residx]->number_initialized) {
+		long suppress = mpfr_get_si(output->suppress->result[o->residx]->number, o->rndmode);
+
+		if (suppress)
+			return;
+	}
+
 	bool had_image = false;
 
 	if (r) {

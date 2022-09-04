@@ -182,4 +182,7 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 
 	ocrpt_list_free(output->output_list);
 	output->output_list = NULL;
+
+	if (free_subexprs)
+		ocrpt_expr_free(o, NULL, output->suppress);
 }

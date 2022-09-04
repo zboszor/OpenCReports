@@ -256,22 +256,41 @@ static void ocrpt_ignore_child_nodes(opencreport *o, xmlTextReaderPtr reader, in
 }
 
 static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
-	xmlChar *name = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
-	xmlChar *value_att = xmlTextReaderGetAttribute(reader, (const xmlChar *)"value");
-	xmlChar *value = NULL;
-	xmlChar *datasource = xmlTextReaderGetAttribute(reader, (const xmlChar *)"datasource");
-	xmlChar *follower_for = xmlTextReaderGetAttribute(reader, (const xmlChar *)"follower_for");
-	xmlChar *follower_expr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"follower_expr");
-	xmlChar *cols = xmlTextReaderGetAttribute(reader, (const xmlChar *)"cols");
-	xmlChar *rows = xmlTextReaderGetAttribute(reader, (const xmlChar *)"rows");
-	xmlChar *coltypes = xmlTextReaderGetAttribute(reader, (const xmlChar *)"coltypes");
-	ocrpt_expr *name_e, *value_e, *datasource_e, *follower_for_e, *follower_expr_e, *cols_e, *rows_e, *coltypes_e;
-	char *name_s, *value_s, *datasource_s, *follower_for_s, *follower_expr_s, *coltypes_s;
+	xmlChar *name, *value_att, *value = NULL;
+	xmlChar *datasource, *follower_for, *follower_expr;
+	xmlChar *cols, *rows, *coltypes;
+
+	ocrpt_expr *name_e, *value_e, *datasource_e;
+	ocrpt_expr *follower_for_e, *follower_expr_e;
+	ocrpt_expr *cols_e, *rows_e, *coltypes_e;
+
+	char *name_s, *value_s, *datasource_s;
+	char *follower_for_s, *follower_expr_s, *coltypes_s;
 	int32_t cols_i, rows_i;
+
 	void *arrayptr, *coltypesptr;
 	ocrpt_datasource *ds;
 	ocrpt_query *q = NULL, *lq = NULL;
 	int ret, depth, nodetype;
+
+	struct {
+		char *attrs;
+		xmlChar **attrp;
+	} xmlattrs[] = {
+		{ "name", &name },
+		{ "value", &value_att },
+		{ "datasource", &datasource },
+		{ "follower_for", &follower_for },
+		{ "follower_expr", &follower_expr },
+		{ "cols", &cols },
+		{ "rows", &rows },
+		{ "coltypes", &coltypes },
+		{ NULL, NULL },
+	};
+	int32_t i;
+
+	for (i = 0; xmlattrs[i].attrp; i++)
+		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
 
 	depth = xmlTextReaderDepth(reader);
 
@@ -358,16 +377,13 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 	} else
 		fprintf(stderr, "cannot add query \"%s\"\n", name_s);
 
-	xmlFree(name);
-	xmlFree(datasource);
-	xmlFree(value_att);
+
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
+
 	if (value != value_att)
 		xmlFree(value);
-	xmlFree(follower_for);
-	xmlFree(follower_expr);
-	xmlFree(rows);
-	xmlFree(cols);
-	xmlFree(coltypes);
+
 	ocrpt_expr_free(o, NULL, name_e);
 	ocrpt_expr_free(o, NULL, datasource_e);
 	ocrpt_expr_free(o, NULL, value_e);
@@ -404,20 +420,37 @@ static void ocrpt_parse_queries_node(opencreport *o, xmlTextReaderPtr reader) {
 }
 
 static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader) {
-	xmlChar *name = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
-	xmlChar *type = xmlTextReaderGetAttribute(reader, (const xmlChar *)"type");
-	xmlChar *host = xmlTextReaderGetAttribute(reader, (const xmlChar *)"host");
-	xmlChar *unix_socket = xmlTextReaderGetAttribute(reader, (const xmlChar *)"unix_socket");
-	xmlChar *port = xmlTextReaderGetAttribute(reader, (const xmlChar *)"port");
-	xmlChar *dbname = xmlTextReaderGetAttribute(reader, (const xmlChar *)"dbname");
-	xmlChar *user = xmlTextReaderGetAttribute(reader, (const xmlChar *)"user");
-	xmlChar	*password = xmlTextReaderGetAttribute(reader, (const xmlChar *)"password");
-	xmlChar *connstr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"connstr");
-	xmlChar *optionfile = xmlTextReaderGetAttribute(reader, (const xmlChar *)"optionfile");
-	xmlChar *group = xmlTextReaderGetAttribute(reader, (const xmlChar *)"group");
-	ocrpt_expr *name_e, *type_e, *host_e, *unix_socket_e, *port_e, *dbname_e, *user_e, *password_e, *connstr_e, *optionfile_e, *group_e;
-	char *name_s, *type_s, *host_s, *unix_socket_s, *port_s, *dbname_s, *user_s, *password_s, *connstr_s, *optionfile_s, *group_s;
-	int32_t port_i;
+	xmlChar *name, *type, *host, *unix_socket;
+	xmlChar *port, *dbname, *user, *password;
+	xmlChar *connstr, *optionfile, *group;
+	ocrpt_expr *name_e, *type_e, *host_e, *unix_socket_e;
+	ocrpt_expr *port_e, *dbname_e, *user_e, *password_e;
+	ocrpt_expr *connstr_e, *optionfile_e, *group_e;
+	char *name_s, *type_s, *host_s, *unix_socket_s;
+	char *port_s, *dbname_s, *user_s, *password_s;
+	char *connstr_s, *optionfile_s, *group_s;
+	int32_t port_i, i;
+
+	struct {
+		char *attrs;
+		xmlChar **attrp;
+	} xmlattrs[] = {
+		{ "name", &name },
+		{ "type", &type },
+		{ "host", &host },
+		{ "unix_socket", &unix_socket },
+		{ "port", &port },
+		{ "dbname", &dbname },
+		{ "user", &user },
+		{ "password", &password },
+		{ "connstr", &connstr },
+		{ "optionfile", &optionfile },
+		{ "group", &group },
+		{ NULL, NULL },
+	};
+
+	for (i = 0; xmlattrs[i].attrp; i++)
+		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
 
 	ocrpt_xml_const_expr_parse_get_value_with_fallback(o, name);
 	ocrpt_xml_const_expr_parse_get_value_with_fallback(o, type);
@@ -470,17 +503,9 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 		}
 	}
 
-	xmlFree(name);
-	xmlFree(type);
-	xmlFree(host);
-	xmlFree(unix_socket);
-	xmlFree(port);
-	xmlFree(dbname);
-	xmlFree(user);
-	xmlFree(password);
-	xmlFree(connstr);
-	xmlFree(optionfile);
-	xmlFree(group);
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
+
 	ocrpt_expr_free(o, NULL, name_e);
 	ocrpt_expr_free(o, NULL, type_e);
 	ocrpt_expr_free(o, NULL, host_e);
@@ -522,19 +547,33 @@ static void ocrpt_parse_datasources_node(opencreport *o, xmlTextReaderPtr reader
 }
 
 static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr reader) {
-	xmlChar *name = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
-	xmlChar *value = xmlTextReaderGetAttribute(reader, (const xmlChar *)"value");
-	xmlChar *baseexpr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"baseexpr");
-	xmlChar *intermedexpr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"intermedexpr");
-	xmlChar *intermed2expr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"intermedexpr");
-	xmlChar *resultexpr = xmlTextReaderGetAttribute(reader, (const xmlChar *)"resultexpr");
-	xmlChar *type = xmlTextReaderGetAttribute(reader, (const xmlChar *)"type");
-	xmlChar *basetype = xmlTextReaderGetAttribute(reader, (const xmlChar *)"basetype");
-	xmlChar *resetonbreak = xmlTextReaderGetAttribute(reader, (const xmlChar *)"resetonbreak");
-	xmlChar *precalculate = xmlTextReaderGetAttribute(reader, (const xmlChar *)"precalculate");
-	xmlChar *delayed = xmlTextReaderGetAttribute(reader, (const xmlChar *)"delayed");
+	xmlChar *name, *value;
+	xmlChar *baseexpr, *intermedexpr, *intermed2expr, *resultexpr;
+	xmlChar *type, *basetype, *resetonbreak, *precalculate, *delayed;
 	ocrpt_var_type vtype = OCRPT_VARIABLE_EXPRESSION; /* default if left out */
 	enum ocrpt_result_type rtype = OCRPT_RESULT_NUMBER;
+	int32_t i;
+
+	struct {
+		char *attrs;
+		xmlChar **attrp;
+	} xmlattrs[] = {
+		{ "name", &name },
+		{ "value", &value },
+		{ "baseexpr", &baseexpr },
+		{ "intermedexpr", &intermedexpr },
+		{ "intermed2expr", &intermed2expr },
+		{ "resultexpr", &resultexpr },
+		{ "type", &type },
+		{ "basetype", &basetype },
+		{ "resetonbreak", &resetonbreak },
+		{ "precalculate", &precalculate },
+		{ "delayed", &delayed },
+		{ NULL, NULL },
+	};
+
+	for (i = 0; xmlattrs[i].attrp; i++)
+		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
 
 	if (type) {
 		if (strcasecmp((char *)type, "count") == 0)
@@ -604,17 +643,8 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 		}
 	}
 
-	xmlFree(name);
-	xmlFree(value);
-	xmlFree(baseexpr);
-	xmlFree(intermedexpr);
-	xmlFree(intermed2expr);
-	xmlFree(resultexpr);
-	xmlFree(type);
-	xmlFree(basetype);
-	xmlFree(resetonbreak);
-	xmlFree(precalculate);
-	xmlFree(delayed);
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
 
 	ocrpt_ignore_child_nodes(o, reader, -1, "Variable");
 }
@@ -791,22 +821,8 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 		ocrpt_expr_free(o, r, col_e);
 	}
 
-	xmlFree(value);
-	xmlFree(delayed);
-	xmlFree(format);
-	xmlFree(width);
-	xmlFree(align);
-	xmlFree(color);
-	xmlFree(bgcolor);
-	xmlFree(font_name);
-	xmlFree(font_size);
-    xmlFree(bold);
-	xmlFree(italic);
-	xmlFree(link);
-	xmlFree(memo);
-	xmlFree(memo_wrap_chars);
-	xmlFree(memo_max_lines);
-	xmlFree(col);
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
 
 	if (run_ignore_child)
 		ocrpt_ignore_child_nodes(o, reader, depth, literal ? "literal" : "field");
@@ -845,21 +861,23 @@ static void ocrpt_parse_output_line_node(opencreport *o, ocrpt_report *r, ocrpt_
 		}
 	}
 
-	line->font_name = ocrpt_xml_expr_parse(o, r, font_name, false, true);
-	line->font_size = ocrpt_xml_expr_parse(o, r, font_size, true, false);
-	line->bold = ocrpt_xml_expr_parse(o, r, bold, true, false);
-	line->italic = ocrpt_xml_expr_parse(o, r, italic, true, false);
-	line->suppress = ocrpt_xml_expr_parse(o, r, suppress, true, false);
-	line->color = ocrpt_xml_expr_parse(o, r, color, true, false);
-	line->bgcolor = ocrpt_xml_expr_parse(o, r, bgcolor, true, false);
+	if (font_name)
+		line->font_name = ocrpt_xml_expr_parse(o, r, font_name, false, true);
+	if (font_size)
+		line->font_size = ocrpt_xml_expr_parse(o, r, font_size, true, false);
+	if (bold)
+		line->bold = ocrpt_xml_expr_parse(o, r, bold, true, false);
+	if (italic)
+		line->italic = ocrpt_xml_expr_parse(o, r, italic, true, false);
+	if (suppress)
+		line->suppress = ocrpt_xml_expr_parse(o, r, suppress, true, false);
+	if (color)
+		line->color = ocrpt_xml_expr_parse(o, r, color, true, false);
+	if (bgcolor)
+		line->bgcolor = ocrpt_xml_expr_parse(o, r, bgcolor, true, false);
 
-	xmlFree(font_name);
-	xmlFree(font_size);
-	xmlFree(bold);
-	xmlFree(italic);
-	xmlFree(suppress);
-	xmlFree(color);
-	xmlFree(bgcolor);
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
@@ -889,7 +907,7 @@ static void ocrpt_parse_output_line_node(opencreport *o, ocrpt_report *r, ocrpt_
 }
 
 static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
-	ocrpt_hline *hline = ocrpt_mem_malloc(sizeof(ocrpt_hline));
+	ocrpt_hline *hline;
 	xmlChar *size, *indent, *length, *font_size, *suppress, *color;
 	struct {
 		char *attrs[5];
@@ -913,21 +931,25 @@ static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt
 		}
 	}
 
+	hline = ocrpt_mem_malloc(sizeof(ocrpt_hline));
+	memset(hline, 0, sizeof(ocrpt_hline));
 	hline->type = OCRPT_OUTPUT_HLINE;
 
-	hline->size = ocrpt_xml_expr_parse(o, r, size, true, false);
-	hline->indent = ocrpt_xml_expr_parse(o, r, indent, true, false);
-	hline->length =  ocrpt_xml_expr_parse(o, r, length, true, false);
-	hline->font_size = ocrpt_xml_expr_parse(o, r, font_size, true, false);
-	hline->suppress = ocrpt_xml_expr_parse(o, r, suppress, true, false);
-	hline->color = ocrpt_xml_expr_parse(o, r, color, false, true);
+	if (size)
+		hline->size = ocrpt_xml_expr_parse(o, r, size, true, false);
+	if (indent)
+		hline->indent = ocrpt_xml_expr_parse(o, r, indent, true, false);
+	if (length)
+		hline->length =  ocrpt_xml_expr_parse(o, r, length, true, false);
+	if (font_size)
+		hline->font_size = ocrpt_xml_expr_parse(o, r, font_size, true, false);
+	if (suppress)
+		hline->suppress = ocrpt_xml_expr_parse(o, r, suppress, true, false);
+	if (color)
+		hline->color = ocrpt_xml_expr_parse(o, r, color, false, true);
 
-	xmlFree(size);
-	xmlFree(indent);
-	xmlFree(length);
-	xmlFree(font_size);
-	xmlFree(suppress);
-	xmlFree(color);
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
 
 	output->output_list = ocrpt_list_append(output->output_list, hline);
 
@@ -957,22 +979,43 @@ static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt
 	img->type = OCRPT_OUTPUT_IMAGE;
 	output->output_list = ocrpt_list_append(output->output_list, img);
 
-	img->value = ocrpt_xml_expr_parse(o, r, value, true, false);
-	img->suppress = ocrpt_xml_expr_parse(o, r, value, true, false);
-	img->imgtype = ocrpt_xml_expr_parse(o, r, type, true, false);
-	img->width = ocrpt_xml_expr_parse(o, r, width, true, false);
-	img->height = ocrpt_xml_expr_parse(o, r, height, true, false);
+	if (value)
+		img->value = ocrpt_xml_expr_parse(o, r, value, true, false);
+	if (suppress)
+		img->suppress = ocrpt_xml_expr_parse(o, r, suppress, true, false);
+	if (type)
+		img->imgtype = ocrpt_xml_expr_parse(o, r, type, true, false);
+	if (width)
+		img->width = ocrpt_xml_expr_parse(o, r, width, true, false);
+	if (height)
+		img->height = ocrpt_xml_expr_parse(o, r, height, true, false);
 
-	xmlFree(value);
-	xmlFree(suppress);
-	xmlFree(type);
-	xmlFree(width);
-	xmlFree(height);
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
 
 	ocrpt_ignore_child_nodes(o, reader, -1, "Image");
 }
 
 static void ocrpt_parse_output_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
+	xmlChar *suppress;
+	struct {
+		char *attr;
+		xmlChar **attrp;
+	} xmlattrs[] = {
+		{ "suppress", &suppress },
+		{ NULL, NULL },
+	};
+	int32_t i;
+
+	for (i = 0; xmlattrs[i].attrp; i++)
+		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attr);
+
+	if (suppress)
+		output->suppress = ocrpt_xml_expr_parse(o, r, suppress, true, false);
+
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
+
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
@@ -1496,23 +1539,8 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		pd->detail_columns_set = true;
 	}
 
-	xmlFree(font_name);
-	xmlFree(font_size);
-	xmlFree(size_unit);
-	xmlFree(orientation);
-	xmlFree(top_margin);
-	xmlFree(bottom_margin);
-	xmlFree(left_margin);
-	xmlFree(right_margin);
-	xmlFree(paper_type);
-	xmlFree(iterations);
-	xmlFree(suppress_pageheader_firstpage);
-	xmlFree(query);
-	xmlFree(field_header_priority);
-	xmlFree(detail_columns);
-	xmlFree(column_pad);
-	xmlFree(height);
-	xmlFree(suppress);
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
 
 	int depth = xmlTextReaderDepth(reader);
 	while (xmlTextReaderRead(reader) == 1) {
@@ -1647,16 +1675,15 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 		ocrpt_expr_free(o, NULL, query_e);
 	}
 
-	xmlFree(filename);
-	xmlFree(query);
-	xmlFree(iterations);
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
 }
 
 static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, xmlTextReaderPtr reader) {
 	ocrpt_part_row_data *pd = ocrpt_part_row_new_data(o, p, pr);
 
 	xmlChar *width, *height, *border_width, *border_color;
-	xmlChar *detail_columns, *column_pad;
+	xmlChar *detail_columns, *column_pad, *suppress;
 	struct {
 		char *attr;
 		xmlChar **attrp;
@@ -1667,6 +1694,7 @@ static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		{ "border_color", &border_color },
 		{ "detail_columns", &detail_columns },
 		{ "column_pad", &column_pad },
+		{ "suppress", &suppress },
 		{ NULL, NULL },
 	};
 	int32_t i;
@@ -1740,12 +1768,16 @@ static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		ocrpt_expr_free(o, NULL, column_pad_e);
 	}
 
-	xmlFree(width);
-	xmlFree(height);
-	xmlFree(border_width);
-	xmlFree(border_color);
-	xmlFree(detail_columns);
-	xmlFree(column_pad);
+	if (suppress) {
+		ocrpt_expr *suppress_e;
+		int32_t suppress_i;
+		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, suppress);
+		pd->suppress = !!suppress_i;
+		ocrpt_expr_free(o, NULL, suppress_e);
+	}
+
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
@@ -1820,8 +1852,8 @@ static void ocrpt_parse_partrow_node(opencreport *o, ocrpt_part *p, xmlTextReade
 		ocrpt_expr_free(o, NULL, newpage_e);
 	}
 
-	xmlFree(layout);
-	xmlFree(newpage);
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
 
 	int depth = xmlTextReaderDepth(reader);
 	while (xmlTextReaderRead(reader) == 1) {
@@ -2030,18 +2062,8 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 		ocrpt_expr_free(o, NULL, suppress_pageheader_firstpage_e);
 	}
 
-	xmlFree(layout);
-	xmlFree(font_name);
-	xmlFree(font_size);
-	xmlFree(size_unit);
-	xmlFree(orientation);
-	xmlFree(top_margin);
-	xmlFree(bottom_margin);
-	xmlFree(left_margin);
-	xmlFree(right_margin);
-	xmlFree(paper_type);
-	xmlFree(iterations);
-	xmlFree(suppress_pageheader_firstpage);
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
 
 	int depth = xmlTextReaderDepth(reader);
 	while (xmlTextReaderRead(reader) == 1) {

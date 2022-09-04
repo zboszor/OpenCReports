@@ -58,7 +58,8 @@
 	border_width CDATA #IMPLIED
 	border_color CDATA #IMPLIED
 	detail_columns CDATA #IMPLIED
-	column_pad CDATA #IMPLIED >
+	column_pad CDATA #IMPLIED
+	suppress CDATA #IMPLIED >
 <!ELEMENT load EMPTY>
 <!ATTLIST load
 	name CDATA #IMPLIED
@@ -101,6 +102,8 @@
 <!ELEMENT ReportFooter (Output)* >
 <!ELEMENT PageFooter (Output)* >
 <!ELEMENT Output (Line | HorizontalLine | Image)* >
+<!ATTLIST Output
+    suppress CDATA #IMPLIED >
 <!ELEMENT Line (field | literal)* >
 <!ATTLIST Line
 	fontName CDATA #IMPLIED
