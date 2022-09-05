@@ -514,8 +514,10 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			ocrpt_layout_output_evaluate(o, p, NULL, &p->pageheader);
 			ocrpt_layout_output_evaluate(o, p, NULL, &p->pagefooter);
 
-			double top_page_position = ocrpt_layout_top_margin(o, p);
-			ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &top_page_position);
+			if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && o->current_page != o->pages)) {
+				double top_page_position = ocrpt_layout_top_margin(o, p);
+				ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &top_page_position);
+			}
 
 			double bottom_page_position = p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height;
 			ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, p->left_margin_value, &bottom_page_position);
@@ -582,11 +584,11 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			if (pd->border_width_set)
 				*page_indent += pd->border_width;
 
-			ocrpt_layout_output_evaluate(o, p, NULL, &p->pageheader);
-			ocrpt_layout_output_evaluate(o, p, NULL, &p->pagefooter);
-
 			double top_page_position = ocrpt_layout_top_margin(o, p);
-			ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &top_page_position);
+			if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && o->current_page != o->pages)) {
+				ocrpt_layout_output_evaluate(o, p, NULL, &p->pageheader);
+				ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &top_page_position);
+			}
 
 			if (!o->precalculate && pd && pd->border_width_set && o->output_functions.draw_rectangle)
 				o->output_functions.draw_rectangle(o, p, pr, pd, r,
@@ -597,6 +599,7 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 													pd->max_page_position - pd->start_page_position);
 
 			double bottom_page_position = p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height;
+			ocrpt_layout_output_evaluate(o, p, NULL, &p->pagefooter);
 			ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, p->left_margin_value, &bottom_page_position);
 
 			/* Set newpage to false first to prevent infinite recursion. */
@@ -729,7 +732,9 @@ void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr
 		}
 	}
 
-	*page_position = ocrpt_layout_top_margin(o, p) + p->page_header_height;
+	*page_position = ocrpt_layout_top_margin(o, p);
+	if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && o->current_page != o->pages))
+		*page_position += p->page_header_height;
 
 	if (rows == 1 && !pr->start_page) {
 		if (r->current_iteration == 0) {

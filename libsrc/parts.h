@@ -190,6 +190,7 @@ struct ocrpt_part {
 	bool bottom_margin_set:1;
 	bool left_margin_set:1;
 	bool right_margin_set:1;
+	bool suppress_pageheader_firstpage_set:1;
 	bool suppress_pageheader_firstpage:1;
 };
 

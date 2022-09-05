@@ -1470,11 +1470,12 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 	} else
 		r->iterations = 1;
 
-	if (suppress_pageheader_firstpage) {
+	if (!p->suppress_pageheader_firstpage_set && suppress_pageheader_firstpage) {
 		ocrpt_expr *suppress_pageheader_firstpage_e;
 		int32_t suppress_pageheader_firstpage_i;
 
 		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, suppress_pageheader_firstpage);
+		p->suppress_pageheader_firstpage_set = true;
 		p->suppress_pageheader_firstpage = !!suppress_pageheader_firstpage_i;
 		ocrpt_expr_free(o, NULL, suppress_pageheader_firstpage_e);
 	}
@@ -2058,6 +2059,7 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 		int32_t suppress_pageheader_firstpage_i;
 
 		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, suppress_pageheader_firstpage);
+		p->suppress_pageheader_firstpage_set = true;
 		p->suppress_pageheader_firstpage = !!suppress_pageheader_firstpage_i;
 		ocrpt_expr_free(o, NULL, suppress_pageheader_firstpage_e);
 	}
