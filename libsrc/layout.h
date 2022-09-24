@@ -61,6 +61,11 @@ typedef struct ocrpt_line_element ocrpt_line_element;
 
 struct ocrpt_line {
 	ocrpt_output_type type;
+	bool bold_is_set:1;
+	bool bold_value:1;
+	bool italic_is_set:1;
+	bool italic_value:1;
+	bool suppress_line:1;
 	double ascent;
 	double descent;
 	double line_height;
@@ -76,15 +81,12 @@ struct ocrpt_line {
 	ocrpt_expr *suppress;
 	ocrpt_list *elements; /* ocrpt_line_element */
 	uint32_t maxlines;
-	bool bold_is_set:1;
-	bool bold_value:1;
-	bool italic_is_set:1;
-	bool italic_value:1;
 };
 typedef struct ocrpt_line ocrpt_line;
 
 struct ocrpt_hline {
 	ocrpt_output_type type;
+	bool suppress_hline:1;
 	double font_width;
 	ocrpt_expr *size;
 	ocrpt_expr *indent;
@@ -107,6 +109,9 @@ typedef struct ocrpt_image_file ocrpt_image_file;
 
 struct ocrpt_image {
 	ocrpt_output_type type;
+	bool suppress_image:1;
+	double image_width;
+	double image_height;
 	ocrpt_expr *suppress;
 	ocrpt_expr *value; /* name of the image file */
 	ocrpt_expr *imgtype; /* 'png', 'jpg', 'raster', or 'svg' */
@@ -134,8 +139,7 @@ typedef struct ocrpt_output_functions ocrpt_output_functions;
 struct ocrpt_output {
 	ocrpt_list *output_list;
 	ocrpt_expr *suppress;
-	double current_image_width;
-	double current_image_height;
+	ocrpt_image *current_image;
 };
 
 void *ocrpt_layout_new_page(opencreport *o, const ocrpt_paper *paper, bool landscape);

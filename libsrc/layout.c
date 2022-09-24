@@ -28,7 +28,7 @@
  * and the final number of pages.
  */
 
-static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *line, double page_width, double page_indent, double *page_position) {
+static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *line, double page_width, double page_indent, double *page_position) {
 	double next_start;
 
 	line->page_indent = page_indent;
@@ -58,7 +58,9 @@ static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_pa
 	}
 
 	line->line_height = line->ascent + line->descent;
+}
 
+static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *line, double page_width, double page_indent, double *page_position) {
 	if (draw && o->output_functions.draw_text) {
 		for (ocrpt_list *l = line->elements; l; l = l->next) {
 			ocrpt_line_element *elem = (ocrpt_line_element *)l->data;
@@ -187,76 +189,82 @@ static bool ocrpt_load_pixbuf(ocrpt_image_file *img) {
 	return true;
 }
 
-static void ocrpt_layout_image(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_image *image, double page_width, double page_indent, double *page_position) {
-	if (!draw) {
-		/* Don't render the image if the filename, the width or the height are not set. */
-		if (!image->value || !image->value->result[o->residx] || image->value->result[o->residx]->type != OCRPT_RESULT_STRING || !image->value->result[o->residx]->string)
-			return;
+static void ocrpt_layout_image_setup(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_image *image, double page_width, double page_indent, double *page_position) {
+	/* Don't render the image if the filename, the width or the height are not set. */
+	if (!image->value || !image->value->result[o->residx] || image->value->result[o->residx]->type != OCRPT_RESULT_STRING || !image->value->result[o->residx]->string) {
+		image->suppress_image = true;
+		return;
+	}
 
-		if (!image->width || !image->width->result[o->residx] || image->width->result[o->residx]->type != OCRPT_RESULT_NUMBER || !image->width->result[o->residx]->number_initialized)
-			return;
+	if (!image->width || !image->width->result[o->residx] || image->width->result[o->residx]->type != OCRPT_RESULT_NUMBER || !image->width->result[o->residx]->number_initialized) {
+		image->suppress_image = true;
+		return;
+	}
 
-		if (!image->height || !image->height->result[o->residx] || image->height->result[o->residx]->type != OCRPT_RESULT_NUMBER || !image->height->result[o->residx]->number_initialized)
-			return;
+	if (!image->height || !image->height->result[o->residx] || image->height->result[o->residx]->type != OCRPT_RESULT_NUMBER || !image->height->result[o->residx]->number_initialized) {
+		image->suppress_image = true;
+		return;
+	}
 
-		char *img_filename = ocrpt_find_file(o, image->value->result[o->residx]->string->str);
+	char *img_filename = ocrpt_find_file(o, image->value->result[o->residx]->string->str);
 
-		if (!img_filename)
-			return;
+	if (!img_filename) {
+		image->suppress_image = true;
+		return;
+	}
 
-		ocrpt_image_file *imgf = NULL;
-		for (ocrpt_list *il = o->images; il; il = il->next) {
-			ocrpt_image_file *img = (ocrpt_image_file *)il->data;
-			if (strcmp(img_filename, img->name) == 0) {
-				ocrpt_strfree(img_filename);
-				imgf = img;
-				break;
-			}
-		}
-
-		if (!imgf) {
-			imgf = ocrpt_mem_malloc(sizeof(ocrpt_image_file));
-			memset(imgf, 0, sizeof(ocrpt_image_file));
-			imgf->name = img_filename;
-
-			bool svg = false;
-			bool valid = false;
-
-			if (image->imgtype && image->imgtype->result[o->residx] && image->imgtype->result[o->residx]->type == OCRPT_RESULT_STRING && image->imgtype->result[o->residx]->string) {
-				svg = strcasecmp(image->imgtype->result[o->residx]->string->str, "svg") == 0;
-			} else {
-				ocrpt_string *s = image->value->result[o->residx]->string;
-				if (s->len > 4)
-					svg = strcasecmp(s->str + s->len - 4, ".svg") == 0;
-			}
-
-			if (svg)
-				valid = ocrpt_load_svg(imgf);
-			else
-				valid = ocrpt_load_pixbuf(imgf);
-
-			if (valid) {
-				o->images = ocrpt_list_append(o->images, imgf);
-				image->img_file = imgf;
-			} else
-				ocrpt_image_free(imgf);
+	ocrpt_image_file *imgf = NULL;
+	for (ocrpt_list *il = o->images; il; il = il->next) {
+		ocrpt_image_file *img = (ocrpt_image_file *)il->data;
+		if (strcmp(img_filename, img->name) == 0) {
+			ocrpt_strfree(img_filename);
+			imgf = img;
+			break;
 		}
 	}
 
-	double height = 0.0;
-	double width = 0.0;
+	if (!imgf) {
+		imgf = ocrpt_mem_malloc(sizeof(ocrpt_image_file));
+		memset(imgf, 0, sizeof(ocrpt_image_file));
+		imgf->name = img_filename;
+
+		bool svg = false;
+		bool valid = false;
+
+		if (image->imgtype && image->imgtype->result[o->residx] && image->imgtype->result[o->residx]->type == OCRPT_RESULT_STRING && image->imgtype->result[o->residx]->string) {
+			svg = strcasecmp(image->imgtype->result[o->residx]->string->str, "svg") == 0;
+		} else {
+			ocrpt_string *s = image->value->result[o->residx]->string;
+			if (s->len > 4)
+				svg = strcasecmp(s->str + s->len - 4, ".svg") == 0;
+		}
+
+		if (svg)
+			valid = ocrpt_load_svg(imgf);
+		else
+			valid = ocrpt_load_pixbuf(imgf);
+
+		if (valid) {
+			o->images = ocrpt_list_append(o->images, imgf);
+			image->img_file = imgf;
+		} else
+			ocrpt_image_free(imgf);
+	}
 
 	if (image->img_file) {
-		height = mpfr_get_d(image->height->result[o->residx]->number, o->rndmode);
-		width = mpfr_get_d(image->width->result[o->residx]->number, o->rndmode);
-
-		if (draw && o->output_functions.draw_image)
-			o->output_functions.draw_image(o, p, pr, pd, r, image, page_indent, *page_position, width, height);
+		image->image_width = mpfr_get_d(image->width->result[o->residx]->number, o->rndmode);
+		image->image_height = mpfr_get_d(image->height->result[o->residx]->number, o->rndmode);
 	}
 
+	output->current_image = image;
+}
+
+static void ocrpt_layout_image(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_image *image, double page_width, double page_indent, double *page_position) {
+	if (draw && o->output_functions.draw_image && image->img_file)
+		o->output_functions.draw_image(o, p, pr, pd, r, image, page_indent, *page_position, image->image_width, image->image_height);
+
 	p->old_page_position = *page_position;
-	output->current_image_height = height;
-	output->current_image_width = width;
+	output->current_image = image;
 }
 
 void ocrpt_layout_output_resolve(opencreport *o, ocrpt_part *p, ocrpt_report *r, ocrpt_output *output) {
@@ -418,13 +426,10 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 			return;
 	}
 
-	bool had_image = false;
-
-	if (r) {
+	if (r)
 		p->old_page_position = *page_position;
-		output->current_image_width = 0.0;
-		output->current_image_height = 0.0;
-	}
+
+	output->current_image = NULL;
 
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
@@ -435,11 +440,14 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 		case OCRPT_OUTPUT_LINE:
 			ocrpt_line *l = (ocrpt_line *)oe;
 
+			l->suppress_line = false;
 			if (l->suppress && l->suppress->result[o->residx] && l->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->suppress->result[o->residx]->number_initialized) {
 				long suppress = mpfr_get_si(l->suppress->result[o->residx]->number, o->rndmode);
 
-				if (suppress)
+				if (suppress) {
+					l->suppress_line = true;
 					break;
+				}
 			}
 
 			if (l->font_name && l->font_name->result[o->residx] && l->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && l->font_name->result[o->residx]->string)
@@ -453,16 +461,22 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 				font_size = r ? r->font_size : p->font_size;
 
 			ocrpt_layout_set_font_sizes(o, font_name, font_size, false, false, &l->fontsz, &l->font_width);
-			ocrpt_layout_line(draw, o, p, pr, pd, r, l, page_width - output->current_image_width, page_indent + output->current_image_width, page_position);
+			if (output->current_image)
+				ocrpt_layout_line_get_text_sizes(o, p, pr, pd, r, l, page_width - output->current_image->image_width, page_indent + output->current_image->image_width, page_position);
+			else
+				ocrpt_layout_line_get_text_sizes(o, p, pr, pd, r, l, page_width, page_indent, page_position);
 			break;
 		case OCRPT_OUTPUT_HLINE:
 			ocrpt_hline *hl = (ocrpt_hline *)oe;
 
+			hl->suppress_hline = false;
 			if (hl->suppress && hl->suppress->result[o->residx] && hl->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && hl->suppress->result[o->residx]->number_initialized) {
 				long suppress = mpfr_get_si(hl->suppress->result[o->residx]->number, o->rndmode);
 
-				if (suppress)
+				if (suppress) {
+					hl->suppress_hline = true;
 					break;
+				}
 			}
 
 			font_name = (r && r->font_name) ? r->font_name : (p->font_name ? p->font_name : "Courier");
@@ -473,34 +487,73 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 				font_size = (r ? r->font_size : p->font_size);
 
 			ocrpt_layout_set_font_sizes(o, font_name, font_size, false, false, NULL, &hl->font_width);
-			ocrpt_layout_hline(draw, o, p, pr, pd, r, hl, page_width - output->current_image_width, page_indent + output->current_image_width, page_position);
 			break;
 		case OCRPT_OUTPUT_IMAGE:
 			ocrpt_image *img = (ocrpt_image *)oe;
 
+			output->current_image = NULL;
+			img->suppress_image = false;
 			if (img->suppress && img->suppress->result[o->residx] && img->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && img->suppress->result[o->residx]->number_initialized) {
 				long suppress = mpfr_get_si(img->suppress->result[o->residx]->number, o->rndmode);
 
-				if (suppress)
+				if (suppress) {
+					img->suppress_image = true;
 					break;
+				}
 			}
 
-			if (had_image)
-				*page_position = p->old_page_position + output->current_image_height;
-			ocrpt_layout_image(draw, o, p, pr, pd, r, output, img, page_width, page_indent, page_position);
-			had_image = true;
-			p->old_page_position = *page_position;
+			ocrpt_layout_image_setup(o, p, pr, pd, r, output, img, page_width, page_indent, page_position);
 			break;
 		}
 	}
 
-	if (had_image)
-		*page_position = p->old_page_position + output->current_image_height;
+	output->current_image = NULL;
 
-	if (r) {
-		output->current_image_width = 0.0;
-		output->current_image_height = 0.0;
+	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
+		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
+
+		switch (oe->type) {
+		case OCRPT_OUTPUT_LINE:
+			ocrpt_line *l = (ocrpt_line *)oe;
+
+			if (l->suppress_line)
+				break;
+
+			if (output->current_image)
+				ocrpt_layout_line(draw, o, p, pr, pd, r, l, page_width - output->current_image->image_width, page_indent + output->current_image->image_width, page_position);
+			else
+				ocrpt_layout_line(draw, o, p, pr, pd, r, l, page_width, page_indent, page_position);
+			break;
+		case OCRPT_OUTPUT_HLINE:
+			ocrpt_hline *hl = (ocrpt_hline *)oe;
+
+			if (hl->suppress_hline)
+				break;
+
+			if (output->current_image)
+				ocrpt_layout_hline(draw, o, p, pr, pd, r, hl, page_width - output->current_image->image_width, page_indent + output->current_image->image_width, page_position);
+			else
+				ocrpt_layout_hline(draw, o, p, pr, pd, r, hl, page_width, page_indent, page_position);
+			break;
+		case OCRPT_OUTPUT_IMAGE:
+			ocrpt_image *img = (ocrpt_image *)oe;
+
+			if (output->current_image)
+				*page_position = p->old_page_position + output->current_image->image_height;
+
+			output->current_image = NULL;
+			if (img->suppress_image)
+				break;
+
+			ocrpt_layout_image(draw, o, p, pr, pd, r, output, img, page_width, page_indent, page_position);
+			break;
+		}
 	}
+
+	if (output->current_image)
+		*page_position = p->old_page_position + output->current_image->image_height;
+
+	output->current_image = NULL;
 }
 
 void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, unsigned int rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
