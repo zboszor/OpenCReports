@@ -264,11 +264,11 @@ void ocrpt_layout_output_resolve(opencreport *o, ocrpt_part *p, ocrpt_report *r,
 	ocrpt_expr_optimize(o, r, output->suppress);
 
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
-		ocrpt_output_element *output = (ocrpt_output_element *)ol->data;
+		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
 
-		switch (output->type) {
+		switch (oe->type) {
 		case OCRPT_OUTPUT_LINE:
-			ocrpt_line *line = (ocrpt_line *)output;
+			ocrpt_line *line = (ocrpt_line *)oe;
 
 			ocrpt_expr_resolve(o, r, line->font_name);
 			ocrpt_expr_optimize(o, r, line->font_name);
@@ -333,7 +333,7 @@ void ocrpt_layout_output_resolve(opencreport *o, ocrpt_part *p, ocrpt_report *r,
 
 			break;
 		case OCRPT_OUTPUT_HLINE:
-			ocrpt_hline *hline = (ocrpt_hline *)output;
+			ocrpt_hline *hline = (ocrpt_hline *)oe;
 
 			ocrpt_expr_resolve(o, r, hline->size);
 			ocrpt_expr_optimize(o, r, hline->size);
@@ -362,11 +362,11 @@ void ocrpt_layout_output_resolve(opencreport *o, ocrpt_part *p, ocrpt_report *r,
 
 void ocrpt_layout_output_evaluate(opencreport *o, ocrpt_part *p, ocrpt_report *r, ocrpt_output *output) {
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
-		ocrpt_output_element *output = (ocrpt_output_element *)ol->data;
+		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
 
-		switch (output->type) {
+		switch (oe->type) {
 		case OCRPT_OUTPUT_LINE:
-			ocrpt_line *line = (ocrpt_line *)output;
+			ocrpt_line *line = (ocrpt_line *)oe;
 
 			ocrpt_expr_eval(o, r, line->font_name);
 			ocrpt_expr_eval(o, r, line->font_size);
@@ -395,7 +395,7 @@ void ocrpt_layout_output_evaluate(opencreport *o, ocrpt_part *p, ocrpt_report *r
 
 			break;
 		case OCRPT_OUTPUT_HLINE:
-			ocrpt_hline *hline = (ocrpt_hline *)output;
+			ocrpt_hline *hline = (ocrpt_hline *)oe;
 
 			ocrpt_expr_eval(o, r, hline->size);
 			ocrpt_expr_eval(o, r, hline->indent);
@@ -427,13 +427,13 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 	}
 
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
-		ocrpt_output_element *output = (ocrpt_output_element *)ol->data;
+		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
 		char *font_name;
 		double font_size;
 
-		switch (output->type) {
+		switch (oe->type) {
 		case OCRPT_OUTPUT_LINE:
-			ocrpt_line *l = (ocrpt_line *)output;
+			ocrpt_line *l = (ocrpt_line *)oe;
 
 			if (l->suppress && l->suppress->result[o->residx] && l->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->suppress->result[o->residx]->number_initialized) {
 				long suppress = mpfr_get_si(l->suppress->result[o->residx]->number, o->rndmode);
@@ -456,7 +456,7 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 			ocrpt_layout_line(draw, o, p, pr, pd, r, l, page_width - p->current_image_width, page_indent + p->current_image_width, page_position);
 			break;
 		case OCRPT_OUTPUT_HLINE:
-			ocrpt_hline *hl = (ocrpt_hline *)output;
+			ocrpt_hline *hl = (ocrpt_hline *)oe;
 
 			if (hl->suppress && hl->suppress->result[o->residx] && hl->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && hl->suppress->result[o->residx]->number_initialized) {
 				long suppress = mpfr_get_si(hl->suppress->result[o->residx]->number, o->rndmode);
@@ -476,7 +476,7 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 			ocrpt_layout_hline(draw, o, p, pr, pd, r, hl, page_width - p->current_image_width, page_indent + p->current_image_width, page_position);
 			break;
 		case OCRPT_OUTPUT_IMAGE:
-			ocrpt_image *img = (ocrpt_image *)output;
+			ocrpt_image *img = (ocrpt_image *)oe;
 
 			if (img->suppress && img->suppress->result[o->residx] && img->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && img->suppress->result[o->residx]->number_initialized) {
 				long suppress = mpfr_get_si(img->suppress->result[o->residx]->number, o->rndmode);
@@ -487,7 +487,7 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 
 			if (had_image)
 				*page_position = p->old_page_position + p->current_image_height;
-			ocrpt_layout_image(draw, o, p, pr, pd, r, (ocrpt_image *)output, page_width, page_indent, page_position);
+			ocrpt_layout_image(draw, o, p, pr, pd, r, img, page_width, page_indent, page_position);
 			had_image = true;
 			p->old_page_position = *page_position;
 			break;
