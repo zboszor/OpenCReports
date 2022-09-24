@@ -46,6 +46,7 @@ struct ocrpt_line_element {
 	double width_computed;
 
 	int32_t memo_max_lines;
+	int32_t lines;
 	int32_t col;
 	bool memo:1;
 	bool memo_wrap_chars:1;
@@ -62,6 +63,7 @@ struct ocrpt_line {
 	ocrpt_output_type type;
 	double ascent;
 	double descent;
+	double line_height;
 	double fontsz;
 	double font_width;
 	double page_indent;
@@ -73,6 +75,7 @@ struct ocrpt_line {
 	ocrpt_expr *italic;
 	ocrpt_expr *suppress;
 	ocrpt_list *elements; /* ocrpt_line_element */
+	uint32_t maxlines;
 	bool bold_is_set:1;
 	bool bold_value:1;
 	bool italic_is_set:1;
@@ -120,8 +123,8 @@ typedef struct ocrpt_output_element ocrpt_output_element;
 
 struct ocrpt_output_functions {
 	void (*draw_hline)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_hline *, double, double, double, double);
-	void (*get_text_sizes)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_line *, ocrpt_line_element *, double, double *, double *, double *);
-	void (*draw_text)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_line *, ocrpt_line_element *, double, double, double, double, double);
+	void (*get_text_sizes)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_line *, ocrpt_line_element *, double);
+	void (*draw_text)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_line *, ocrpt_line_element *, double, double, double);
 	void (*draw_image)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_image *, double, double, double, double);
 	void (*draw_rectangle)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_color *, double, double, double, double, double);
 	void (*finalize)(opencreport *o);

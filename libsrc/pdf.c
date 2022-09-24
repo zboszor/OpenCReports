@@ -53,7 +53,7 @@ static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	cairo_destroy(cr);
 }
 
-void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double total_width, double *width, double *ascent, double *descent) {
+void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double total_width) {
 	cairo_surface_t *cs = NULL;
 	cairo_t *cr;
 	PangoLayout *layout;
@@ -176,6 +176,14 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 	int char_width = pango_font_metrics_get_approximate_char_width(metrics);
 	le->font_width = (double)char_width / PANGO_SCALE;
 
+	/* Start accounting memo lines */
+	if (le->memo)
+		pango_layout_set_wrap(layout, le->memo_wrap_chars ? PANGO_WRAP_CHAR : PANGO_WRAP_WORD);
+	else
+		pango_layout_set_wrap(layout, PANGO_WRAP_CHAR);
+
+	pango_layout_set_text(layout, le->value_str->str, le->value_str->len);
+
 	if (le->width && le->width->result[o->residx] && le->width->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->width->result[o->residx]->number_initialized) {
 		w = mpfr_get_d(le->width->result[o->residx]->number, o->rndmode);
 		if (!o->size_in_points)
@@ -185,19 +193,25 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 	} else {
 		PangoRectangle logical_rect;
 
-		pango_layout_set_text(layout, le->value_str->str, le->value_str->len);
+		/* This assumes pango_layout_set_text() was called previously */
 		pango_layout_get_extents(layout, NULL, &logical_rect);
-
 		w = (double)logical_rect.width / PANGO_SCALE;
 	}
 
 	le->width_computed = w;
-	*width = w;
+
+	if (le->memo)
+		pango_layout_set_width(layout, w * PANGO_SCALE);
+
+	if (le->memo) {
+		le->lines = pango_layout_get_line_count(layout);
+		if (le->memo_max_lines && le->memo_max_lines < le->lines)
+			le->lines = le->memo_max_lines;
+	} else
+		le->lines = 1;
 
 	le->ascent = pango_font_metrics_get_ascent(metrics) / PANGO_SCALE;
-	*ascent = le->ascent;
 	le->descent = pango_font_metrics_get_descent(metrics) / PANGO_SCALE;
-	*descent = le->descent;
 
 	g_object_unref(layout);
 	pango_font_description_free(font_description);
@@ -207,7 +221,7 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 		cairo_surface_destroy(cs);
 }
 
-void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double x, double y, double width, double maxheight, double ascentdiff) {
+void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double x, double y, double width) {
 	cairo_surface_t *cs = NULL;
 	cairo_t *cr;
 	PangoLayout *layout;
@@ -301,7 +315,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	 * The background filler is 0.1 points wider.
 	 * This way, there's no lines between the line elements.
 	 */
-	cairo_rectangle(cr, x, y, field_width + 0.1, maxheight);
+	cairo_rectangle(cr, x, y, field_width + 0.1, l->line_height);
 	cairo_fill(cr);
 
 	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
@@ -335,7 +349,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		 * on such a masked piece of text the whole
 		 * of it is shown and can be copy&pasted.
 		 */
-		cairo_rectangle(cr, x, y, field_width, maxheight);
+		cairo_rectangle(cr, x, y, field_width, l->line_height);
 		cairo_clip(cr);
 	}
 
@@ -350,7 +364,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		ocrpt_mem_string_free(uri, true);
 	}
 
-	cairo_move_to(cr, x1, y + ascentdiff);
+	cairo_move_to(cr, x1, y + l->ascent - le->ascent);
 	pango_cairo_show_layout(cr, layout);
 
 	if (link)

@@ -29,50 +29,49 @@
  */
 
 static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *line, double page_width, double page_indent, double *page_position) {
-	double next_start, maxascent = 0.0, maxdescent = 0.0;
-	int maxrows = 1;
+	double next_start;
 
 	line->page_indent = page_indent;
+	line->ascent = 0.0;
+	line->descent = 0.0;
+	line->maxlines = 1;
 
 	if (o->output_functions.get_text_sizes) {
 		next_start = page_indent;
 
 		for (ocrpt_list *l = line->elements; l; l = l->next) {
 			ocrpt_line_element *elem = (ocrpt_line_element *)l->data;
-			double width = 0.0, ascent = 0.0, descent = 0.0;
-			int rows = 0;
 
-			o->output_functions.get_text_sizes(o, p, pr, pd, r, line, elem, page_width - ((pd && pd->border_width_set) ? 2 * pd->border_width: 0.0), &width, &ascent, &descent);
+			o->output_functions.get_text_sizes(o, p, pr, pd, r, line, elem, page_width - ((pd && pd->border_width_set) ? 2 * pd->border_width: 0.0));
 
 			elem->start = next_start;
-			next_start += width;
+			next_start += elem->width_computed;
 
-			if (maxascent < ascent)
-				maxascent = ascent;
-			if (maxdescent < descent)
-				maxdescent = descent;
+			if (line->ascent < elem->ascent)
+				line->ascent = elem->ascent;
+			if (line->descent < elem->descent)
+				line->descent = elem->descent;
 
-			/* TODO: get number of rows here */
-			if (maxrows < rows)
-				maxrows = rows;
+			if (line->maxlines < elem->lines)
+				line->maxlines = elem->lines;
 		}
 	}
 
-	if (draw && o->output_functions.draw_text) {
-		double maxheight = maxascent + maxdescent;
+	line->line_height = line->ascent + line->descent;
 
+	if (draw && o->output_functions.draw_text) {
 		for (ocrpt_list *l = line->elements; l; l = l->next) {
 			ocrpt_line_element *elem = (ocrpt_line_element *)l->data;
 
 			if ((elem->start - page_indent) < page_width)
-				o->output_functions.draw_text(o, p, pr, pd, r, line, elem, elem->start, *page_position, elem->width_computed, maxheight, maxascent - elem->ascent);
+				o->output_functions.draw_text(o, p, pr, pd, r, line, elem, elem->start, *page_position, elem->width_computed);
 		}
 	}
 
 	if (line->fontsz > 0.0 && !line->elements)
 		*page_position += line->fontsz;
 	else
-		*page_position += maxascent + maxdescent;
+		*page_position += line->ascent + line->descent;
 }
 
 static void ocrpt_layout_hline(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_hline *hline, double page_width, double page_indent, double *page_position) {
