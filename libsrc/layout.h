@@ -134,6 +134,8 @@ typedef struct ocrpt_output_functions ocrpt_output_functions;
 struct ocrpt_output {
 	ocrpt_list *output_list;
 	ocrpt_expr *suppress;
+	double current_image_width;
+	double current_image_height;
 };
 
 void *ocrpt_layout_new_page(opencreport *o, const ocrpt_paper *paper, bool landscape);

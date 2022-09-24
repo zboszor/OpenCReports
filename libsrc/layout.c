@@ -187,7 +187,7 @@ static bool ocrpt_load_pixbuf(ocrpt_image_file *img) {
 	return true;
 }
 
-static void ocrpt_layout_image(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_image *image, double page_width, double page_indent, double *page_position) {
+static void ocrpt_layout_image(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_image *image, double page_width, double page_indent, double *page_position) {
 	if (!draw) {
 		/* Don't render the image if the filename, the width or the height are not set. */
 		if (!image->value || !image->value->result[o->residx] || image->value->result[o->residx]->type != OCRPT_RESULT_STRING || !image->value->result[o->residx]->string)
@@ -255,8 +255,8 @@ static void ocrpt_layout_image(bool draw, opencreport *o, ocrpt_part *p, ocrpt_p
 	}
 
 	p->old_page_position = *page_position;
-	p->current_image_height = height;
-	p->current_image_width = width;
+	output->current_image_height = height;
+	output->current_image_width = width;
 }
 
 void ocrpt_layout_output_resolve(opencreport *o, ocrpt_part *p, ocrpt_report *r, ocrpt_output *output) {
@@ -422,8 +422,8 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 
 	if (r) {
 		p->old_page_position = *page_position;
-		p->current_image_width = 0.0;
-		p->current_image_height = 0.0;
+		output->current_image_width = 0.0;
+		output->current_image_height = 0.0;
 	}
 
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
@@ -453,7 +453,7 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 				font_size = r ? r->font_size : p->font_size;
 
 			ocrpt_layout_set_font_sizes(o, font_name, font_size, false, false, &l->fontsz, &l->font_width);
-			ocrpt_layout_line(draw, o, p, pr, pd, r, l, page_width - p->current_image_width, page_indent + p->current_image_width, page_position);
+			ocrpt_layout_line(draw, o, p, pr, pd, r, l, page_width - output->current_image_width, page_indent + output->current_image_width, page_position);
 			break;
 		case OCRPT_OUTPUT_HLINE:
 			ocrpt_hline *hl = (ocrpt_hline *)oe;
@@ -473,7 +473,7 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 				font_size = (r ? r->font_size : p->font_size);
 
 			ocrpt_layout_set_font_sizes(o, font_name, font_size, false, false, NULL, &hl->font_width);
-			ocrpt_layout_hline(draw, o, p, pr, pd, r, hl, page_width - p->current_image_width, page_indent + p->current_image_width, page_position);
+			ocrpt_layout_hline(draw, o, p, pr, pd, r, hl, page_width - output->current_image_width, page_indent + output->current_image_width, page_position);
 			break;
 		case OCRPT_OUTPUT_IMAGE:
 			ocrpt_image *img = (ocrpt_image *)oe;
@@ -486,8 +486,8 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 			}
 
 			if (had_image)
-				*page_position = p->old_page_position + p->current_image_height;
-			ocrpt_layout_image(draw, o, p, pr, pd, r, img, page_width, page_indent, page_position);
+				*page_position = p->old_page_position + output->current_image_height;
+			ocrpt_layout_image(draw, o, p, pr, pd, r, output, img, page_width, page_indent, page_position);
 			had_image = true;
 			p->old_page_position = *page_position;
 			break;
@@ -495,11 +495,11 @@ void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 	}
 
 	if (had_image)
-		*page_position = p->old_page_position + p->current_image_height;
+		*page_position = p->old_page_position + output->current_image_height;
 
 	if (r) {
-		p->current_image_width = 0.0;
-		p->current_image_height = 0.0;
+		output->current_image_width = 0.0;
+		output->current_image_height = 0.0;
 	}
 }
 
