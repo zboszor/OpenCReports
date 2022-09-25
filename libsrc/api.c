@@ -209,6 +209,7 @@ static void ocrpt_print_reportheader(opencreport *o, ocrpt_part *p, ocrpt_part_r
 	}
 	if (pd->border_width_set)
 		*page_position += pd->border_width;
+	ocrpt_layout_output_init(&r->reportheader);
 	ocrpt_layout_output(o, p, pr, pd, r, &r->reportheader, rows, newpage, page_indent, page_position, old_page_position);
 }
 
@@ -281,8 +282,10 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		if (rows == 1 && !*newpage)
 			ocrpt_print_reportheader(o, p, pr, pd, r, rows, newpage, page_indent, page_position, old_page_position);
 
-		if (r->fieldheader_high_priority && rows == 1)
+		if (r->fieldheader_high_priority && rows == 1) {
+			ocrpt_layout_output_init(&r->fieldheader);
 			ocrpt_layout_output(o, p, pr, pd, r, &r->fieldheader, rows, newpage, page_indent, page_position, old_page_position);
+		}
 
 		if (rows > 1 && brl_start) {
 			/* Use the previous row data temporarily */
@@ -291,6 +294,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			for (brl = r->breaks_reverse; brl; brl = brl->next) {
 				ocrpt_break *br = (ocrpt_break *)brl->data;
 
+				ocrpt_layout_output_init(&br->footer);
 				ocrpt_layout_output(o, p, pr, pd, r, &br->footer, rows, newpage, page_indent, page_position, old_page_position);
 
 				if (br == brl_start->data)
@@ -304,8 +308,10 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		for (brl = (rows == 1 ? r->breaks : brl_start); brl; brl = brl->next) {
 			ocrpt_break *br __attribute__((unused)) = (ocrpt_break *)brl->data;
 
-			if (br->cb_triggered)
+			if (br->cb_triggered) {
+				ocrpt_layout_output_init(&br->header);
 				ocrpt_layout_output(o, p, pr, pd, r, &br->header, rows, newpage, page_indent, page_position, old_page_position);
+			}
 		}
 
 		if (!o->precalculate) {
@@ -336,8 +342,10 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 				ocrpt_expr_eval(o, r, r->detailcnt);
 				ocrpt_report_evaluate_detailcnt_dependees(o, r);
 			}
+			ocrpt_layout_output_init(&r->fieldheader);
 			ocrpt_layout_output(o, p, pr, pd, r, &r->fieldheader, rows, newpage, page_indent, page_position, old_page_position);
 		}
+		ocrpt_layout_output_init(&r->fielddetails);
 		ocrpt_layout_output(o, p, pr, pd, r, &r->fielddetails, rows, newpage, page_indent, page_position, old_page_position);
 
 		if (o->precalculate && last_row) {
@@ -356,9 +364,11 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		for (ocrpt_list *brl = r->breaks_reverse; brl; brl = brl->next) {
 			ocrpt_break *br = (ocrpt_break *)brl->data;
 
+			ocrpt_layout_output_init(&br->footer);
 			ocrpt_layout_output(o, p, pr, pd, r, &br->footer, rows, newpage, page_indent, page_position, old_page_position);
 		}
 
+		ocrpt_layout_output_init(&r->reportfooter);
 		ocrpt_layout_output(o, p, pr, pd, r, &r->reportfooter, rows, newpage, page_indent, page_position, old_page_position);
 
 		/* Switch back to the current row data */
@@ -406,8 +416,10 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 		p->page_header_height = 0.0;
 		p->page_footer_height = 0.0;
+		ocrpt_layout_output_init(&p->pageheader);
 		ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &p->page_header_height);
 		ocrpt_layout_output_internal(false, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &p->page_header_height);
+		ocrpt_layout_output_init(&p->pagefooter);
 		ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, p->left_margin_value, &p->page_footer_height);
 		ocrpt_layout_output_internal(false, o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, p->left_margin_value, &p->page_footer_height);
 
@@ -686,12 +698,14 @@ static void ocrpt_execute_parts(opencreport *o) {
 				page_position = ocrpt_layout_top_margin(o, p);
 				if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && o->current_page != o->pages)) {
 					ocrpt_layout_output_evaluate(o, p, NULL, &p->pageheader);
+					ocrpt_layout_output_init(&p->pageheader);
 					ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &page_position);
 					ocrpt_layout_output_internal(true, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &page_position);
 				}
 
 				page_position = p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height;
 				ocrpt_layout_output_evaluate(o, p, NULL, &p->pagefooter);
+				ocrpt_layout_output_init(&p->pagefooter);
 				ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, p->left_margin_value, &page_position);
 				ocrpt_layout_output_internal(true, o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, p->left_margin_value, &page_position);
 

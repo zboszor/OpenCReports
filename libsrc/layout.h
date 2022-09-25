@@ -8,6 +8,8 @@
 #ifndef _LAYOUT_H_
 #define _LAYOUT_H_
 
+#include "listutil.h"
+
 /* Margin defaults are in inches. 72.0 is the default DPI for PDF and others in Cairo */
 #define OCRPT_DEFAULT_TOP_MARGIN (0.2 * 72.0)
 #define OCRPT_DEFAULT_BOTTOM_MARGIN (0.2 * 72.0)
@@ -81,6 +83,7 @@ struct ocrpt_line {
 	ocrpt_list *elements; /* ocrpt_line_element */
 	uint32_t maxlines;
 	uint32_t current_line;
+	uint32_t current_line_pushed;
 };
 typedef struct ocrpt_line ocrpt_line;
 
@@ -137,9 +140,14 @@ struct ocrpt_output_functions {
 typedef struct ocrpt_output_functions ocrpt_output_functions;
 
 struct ocrpt_output {
+	double old_page_position;
+	double old_page_position_pushed;
 	ocrpt_list *output_list;
+	ocrpt_list *iter;
+	ocrpt_list *iter_pushed;
 	ocrpt_expr *suppress;
 	ocrpt_image *current_image;
+	ocrpt_image *current_image_pushed;
 	bool suppress_output:1;
 	bool has_memo:1;
 };
@@ -153,6 +161,53 @@ double ocrpt_layout_top_margin(opencreport *o, ocrpt_part *p);
 double ocrpt_layout_bottom_margin(opencreport *o, ocrpt_part *p);
 double ocrpt_layout_left_margin(opencreport *o, ocrpt_part *p);
 double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p);
+
+static inline void ocrpt_layout_output_init(ocrpt_output *output) {
+	output->has_memo = false;
+	output->iter = output->iter_pushed = NULL;
+	output->current_image = output->current_image_pushed = NULL;
+
+	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
+		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
+
+		switch (oe->type) {
+		case OCRPT_OUTPUT_LINE:
+			ocrpt_line *l = (ocrpt_line *)oe;
+			l->current_line = 0;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+static inline void ocrpt_layout_output_position_push(ocrpt_output *output) {
+	output->iter_pushed = output->iter;
+	output->current_image_pushed = output->current_image;
+	output->old_page_position_pushed = output->old_page_position;
+
+	if (output->iter) {
+		ocrpt_output_element *oe = (ocrpt_output_element *)output->iter->data;
+		if (oe->type == OCRPT_OUTPUT_LINE) {
+			ocrpt_line *l = (ocrpt_line *)oe;
+			l->current_line_pushed = l->current_line;
+		}
+	}
+}
+
+static inline void ocrpt_layout_output_position_pop(ocrpt_output *output) {
+	output->iter = output->iter_pushed;
+	output->current_image = output->current_image_pushed;
+	output->old_page_position = output->old_page_position_pushed;
+
+	if (output->iter) {
+		ocrpt_output_element *oe = (ocrpt_output_element *)output->iter->data;
+		if (oe->type == OCRPT_OUTPUT_LINE) {
+			ocrpt_line *l = (ocrpt_line *)oe;
+			l->current_line = l->current_line_pushed;
+		}
+	}
+}
 
 void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, double page_width, double page_indent, double *page_position);
 void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, double page_width, double page_indent, double *page_position);

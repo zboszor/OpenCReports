@@ -144,7 +144,6 @@ struct ocrpt_part {
 	double right_margin;
 	double page_header_height;
 	double page_footer_height;
-	double old_page_position;
 	char *font_name;
 
 	/* Temporaries */
