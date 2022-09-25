@@ -28,18 +28,17 @@
  * and the final number of pages.
  */
 
-static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, double page_width, double page_indent, double *page_position) {
+static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, double page_width, double *page_position) {
 	double next_start;
 
 	output->has_memo = false;
 
-	line->page_indent = page_indent;
 	line->ascent = 0.0;
 	line->descent = 0.0;
 	line->maxlines = 1;
 
 	if (o->output_functions.get_text_sizes) {
-		next_start = page_indent;
+		next_start = 0;
 
 		for (ocrpt_list *l = line->elements; l; l = l->next) {
 			ocrpt_line_element *elem = (ocrpt_line_element *)l->data;
@@ -69,8 +68,8 @@ static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_pa
 		for (ocrpt_list *l = line->elements; l; l = l->next) {
 			ocrpt_line_element *elem = (ocrpt_line_element *)l->data;
 
-			if ((elem->start - page_indent) < page_width)
-				o->output_functions.draw_text(o, p, pr, pd, r, line, elem, elem->start, *page_position, elem->width_computed);
+			if (elem->start < page_width)
+				o->output_functions.draw_text(o, p, pr, pd, r, line, elem, page_indent, *page_position);
 		}
 	}
 
@@ -470,9 +469,9 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 
 			ocrpt_layout_set_font_sizes(o, font_name, font_size, false, false, &l->fontsz, &l->font_width);
 			if (output->current_image)
-				ocrpt_layout_line_get_text_sizes(o, p, pr, pd, r, output, l, page_width - output->current_image->image_width, page_indent + output->current_image->image_width, page_position);
+				ocrpt_layout_line_get_text_sizes(o, p, pr, pd, r, output, l, page_width - output->current_image->image_width, page_position);
 			else
-				ocrpt_layout_line_get_text_sizes(o, p, pr, pd, r, output, l, page_width, page_indent, page_position);
+				ocrpt_layout_line_get_text_sizes(o, p, pr, pd, r, output, l, page_width, page_position);
 			break;
 		case OCRPT_OUTPUT_HLINE:
 			ocrpt_hline *hl = (ocrpt_hline *)oe;

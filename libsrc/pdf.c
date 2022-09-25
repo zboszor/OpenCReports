@@ -221,7 +221,7 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 		cairo_surface_destroy(cs);
 }
 
-void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double x, double y, double width) {
+void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double page_indent, double y) {
 	cairo_surface_t *cs = NULL;
 	cairo_t *cr;
 	PangoLayout *layout;
@@ -282,7 +282,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	double field_width = le->width_computed;
 
 	if (le->memo) {
-		pango_layout_set_width(layout, field_width * PANGO_SCALE);
+		pango_layout_set_width(layout, le->width_computed * PANGO_SCALE);
 		pango_layout_set_wrap(layout, le->memo_wrap_chars ? PANGO_WRAP_CHAR : PANGO_WRAP_WORD);
 	} else {
 		pango_layout_set_wrap(layout, PANGO_WRAP_CHAR);
@@ -300,8 +300,8 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	if (!le->memo) {
 		double render_width = (double)logical_rect.width / PANGO_SCALE;
 
-		if (pd && (l->page_indent + pd->column_width < x + field_width))
-			field_width = l->page_indent + pd->column_width - x;
+		if (pd && (pd->column_width < le->start + le->width_computed))
+			field_width = pd->column_width - le->start;
 
 		use_bb = (l->current_line == 0 && render_width > field_width);
 	}
@@ -318,7 +318,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	 * The background filler is 0.1 points wider.
 	 * This way, there's no lines between the line elements.
 	 */
-	cairo_rectangle(cr, x, y, field_width + 0.1, l->line_height);
+	cairo_rectangle(cr, page_indent + le->start, y, field_width + 0.1, l->line_height);
 	cairo_fill(cr);
 
 	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
@@ -337,7 +337,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		 * on such a masked piece of text the whole
 		 * of it is shown and can be copy&pasted.
 		 */
-		cairo_rectangle(cr, x, y, field_width, l->line_height);
+		cairo_rectangle(cr, page_indent + le->start, y, field_width, l->line_height);
 		cairo_clip(cr);
 	}
 
@@ -358,17 +358,17 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		switch (align) {
 		default:
 		case PANGO_ALIGN_LEFT:
-			x1 = x;
+			x1 = le->start;
 			break;
 		case PANGO_ALIGN_CENTER:
-			x1 = x + (width - ((double)logical_rect.width / PANGO_SCALE)) / 2.0;
+			x1 = le->start + (le->width_computed - ((double)logical_rect.width / PANGO_SCALE)) / 2.0;
 			break;
 		case PANGO_ALIGN_RIGHT:
-			x1 = x + width - ((double)logical_rect.width / PANGO_SCALE);
+			x1 = le->start + le->width_computed - ((double)logical_rect.width / PANGO_SCALE);
 			break;
 		}
 
-		cairo_move_to(cr, x1, y + l->ascent);
+		cairo_move_to(cr, page_indent + x1, y + l->ascent);
 		pango_cairo_show_layout_line(cr, pline);
 
 		if (link)
