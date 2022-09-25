@@ -271,36 +271,39 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 	pango_layout_set_alignment(layout, align);
 
+	PangoAttrList *alist = pango_layout_get_attributes(layout);
+	if (!alist)
+		alist = pango_attr_list_new();
+
+	PangoAttribute *nohyph = pango_attr_insert_hyphens_new(FALSE);
+	pango_attr_list_insert(alist, nohyph);
+	pango_layout_set_attributes(layout, alist);
+
+	double field_width = le->width_computed;
+
 	if (le->memo) {
+		pango_layout_set_width(layout, field_width * PANGO_SCALE);
 		pango_layout_set_wrap(layout, le->memo_wrap_chars ? PANGO_WRAP_CHAR : PANGO_WRAP_WORD);
 	} else {
-		PangoAttrList *alist = pango_layout_get_attributes(layout);
-		if (!alist)
-			alist = pango_attr_list_new();
-		PangoAttribute *nohyph = pango_attr_insert_hyphens_new(FALSE);
-		pango_attr_list_insert(alist, nohyph);
-		pango_layout_set_attributes(layout, alist);
 		pango_layout_set_wrap(layout, PANGO_WRAP_CHAR);
 	}
 
 	pango_layout_set_text(layout, le->value_str->str, le->value_str->len);
 
-	PangoRectangle logical_rect;
-	double field_width = width;
+	PangoLayoutLine *pline = (l->current_line < l->maxlines) ? pango_layout_get_line(layout, l->current_line) : NULL;
+	PangoRectangle logical_rect = {};
 	bool use_bb = false;
 
-	if (le->memo) {
-		pango_layout_set_width(layout, width * PANGO_SCALE);
-		fprintf(stderr, "ocrpt_pdf_draw_text: MEMO line '%s'\n", le->value_str->str);
-		pango_layout_get_extents(layout, NULL, &logical_rect);
-	} else {
-		pango_layout_get_extents(layout, NULL, &logical_rect);
+	if (pline)
+		pango_layout_line_get_extents(pline, NULL, &logical_rect);
+
+	if (!le->memo) {
 		double render_width = (double)logical_rect.width / PANGO_SCALE;
 
-		if (pd && (l->page_indent + pd->column_width < x + width))
+		if (pd && (l->page_indent + pd->column_width < x + field_width))
 			field_width = l->page_indent + pd->column_width - x;
 
-		use_bb = (render_width > field_width);
+		use_bb = (l->current_line == 0 && render_width > field_width);
 	}
 
 	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
@@ -326,21 +329,6 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 	cairo_set_source_rgb(cr, color.r, color.g, color.b);
 
-	double x1;
-
-	switch (align) {
-	default:
-	case PANGO_ALIGN_LEFT:
-		x1 = x;
-		break;
-	case PANGO_ALIGN_CENTER:
-		x1 = x + (width - ((double)logical_rect.width / PANGO_SCALE)) / 2.0;
-		break;
-	case PANGO_ALIGN_RIGHT:
-		x1 = x + width - ((double)logical_rect.width / PANGO_SCALE);
-		break;
-	}
-
 	if (use_bb) {
 		/*
 		 * Apply the bounding box over the text piece
@@ -353,22 +341,39 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		cairo_clip(cr);
 	}
 
-	char *link = NULL;
+	if (pline) {
+		char *link = NULL;
 
-	if (le->link && le->link->result[o->residx] && le->link->result[o->residx]->type == OCRPT_RESULT_STRING && le->link->result[o->residx]->string)
-		link = le->link->result[o->residx]->string->str;
+		if (le->link && le->link->result[o->residx] && le->link->result[o->residx]->type == OCRPT_RESULT_STRING && le->link->result[o->residx]->string)
+			link = le->link->result[o->residx]->string->str;
 
-	if (link) {
-		ocrpt_string *uri = ocrpt_mem_string_new_printf("uri='%s'", link);
-		cairo_tag_begin(cr, CAIRO_TAG_LINK, uri->str);
-		ocrpt_mem_string_free(uri, true);
+		if (link) {
+			ocrpt_string *uri = ocrpt_mem_string_new_printf("uri='%s'", link);
+			cairo_tag_begin(cr, CAIRO_TAG_LINK, uri->str);
+			ocrpt_mem_string_free(uri, true);
+		}
+
+		double x1;
+
+		switch (align) {
+		default:
+		case PANGO_ALIGN_LEFT:
+			x1 = x;
+			break;
+		case PANGO_ALIGN_CENTER:
+			x1 = x + (width - ((double)logical_rect.width / PANGO_SCALE)) / 2.0;
+			break;
+		case PANGO_ALIGN_RIGHT:
+			x1 = x + width - ((double)logical_rect.width / PANGO_SCALE);
+			break;
+		}
+
+		cairo_move_to(cr, x1, y + l->ascent);
+		pango_cairo_show_layout_line(cr, pline);
+
+		if (link)
+			cairo_tag_end(cr, CAIRO_TAG_LINK);
 	}
-
-	cairo_move_to(cr, x1, y + l->ascent - le->ascent);
-	pango_cairo_show_layout(cr, layout);
-
-	if (link)
-		cairo_tag_end(cr, CAIRO_TAG_LINK);
 
 	g_object_unref(layout);
 	pango_font_description_free(font_description);

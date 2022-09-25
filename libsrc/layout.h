@@ -81,6 +81,7 @@ struct ocrpt_line {
 	ocrpt_expr *suppress;
 	ocrpt_list *elements; /* ocrpt_line_element */
 	uint32_t maxlines;
+	uint32_t current_line;
 };
 typedef struct ocrpt_line ocrpt_line;
 
@@ -140,6 +141,8 @@ struct ocrpt_output {
 	ocrpt_list *output_list;
 	ocrpt_expr *suppress;
 	ocrpt_image *current_image;
+	bool suppress_output:1;
+	bool has_memo:1;
 };
 
 void *ocrpt_layout_new_page(opencreport *o, const ocrpt_paper *paper, bool landscape);
@@ -152,6 +155,7 @@ double ocrpt_layout_bottom_margin(opencreport *o, ocrpt_part *p);
 double ocrpt_layout_left_margin(opencreport *o, ocrpt_part *p);
 double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p);
 
+void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, double page_width, double page_indent, double *page_position);
 void ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, double page_width, double page_indent, double *page_position);
 void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, unsigned int rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position);
 void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, unsigned int rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position);
