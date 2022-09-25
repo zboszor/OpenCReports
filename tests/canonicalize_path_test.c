@@ -7,14 +7,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <opencreport.h>
 
 int main(void) {
+	char srcdir0[PATH_MAX];
 	char *srcdir = getenv("abs_srcdir");
+	if (!srcdir || !*srcdir)
+		srcdir = getcwd(srcdir0, sizeof(srcdir0));
 	char *csrcdir = ocrpt_canonicalize_path(srcdir);
 	size_t slen = strlen(csrcdir);
-	char *builddir = ocrpt_canonicalize_path(getenv("abs_builddir"));
+	char abs_builddir0[PATH_MAX];
+	char *abs_builddir = getenv("abs_builddir");
+	if (!abs_builddir || !*abs_builddir)
+		abs_builddir = getcwd(abs_builddir0, sizeof(abs_builddir0));
+	char *builddir = ocrpt_canonicalize_path(abs_builddir);
 	size_t blen = strlen(builddir);
 
 	ocrpt_string *s1 = ocrpt_mem_string_new_with_len(NULL, strlen(csrcdir) * 2);

@@ -7,11 +7,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <opencreport.h>
 
 int main(void) {
-	char *csrcdir = ocrpt_canonicalize_path(getenv("abs_srcdir"));
+	char srcdir0[PATH_MAX];
+	char *abs_srcdir = getenv("abs_srcdir");
+	if (!abs_srcdir || !*abs_srcdir)
+		abs_srcdir = getcwd(srcdir0, sizeof(srcdir0));
+	char *csrcdir = ocrpt_canonicalize_path(abs_srcdir);
 	size_t cslen = strlen(csrcdir);
 	opencreport *o = ocrpt_init();
 	char *files[] = {

@@ -2,7 +2,8 @@
 
 TEST=$1
 
-abs_srcdir=${abs_srcdir:-.}
+abs_srcdir=${abs_srcdir:-$(pwd)}
+abs_builddir=${abs_builddir:-$(pwd)}
 
 if [[ ! -x ${TEST} ]]; then
 	echo -e "[ \\033[1;31mERROR\\033[0;39m ] ${TEST} - does not exist"

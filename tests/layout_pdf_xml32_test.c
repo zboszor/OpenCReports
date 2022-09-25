@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <opencreport.h>
 #include "test_common.h"
@@ -27,7 +28,11 @@ int main(void) {
 		return 0;
 	}
 
-	char *csrcdir = ocrpt_canonicalize_path(getenv("abs_srcdir"));
+	char srcdir0[PATH_MAX];
+	char *srcdir = getenv("abs_srcdir");
+	if (!srcdir || !*srcdir)
+		srcdir = getcwd(srcdir0, sizeof(srcdir0));
+	char *csrcdir = ocrpt_canonicalize_path(srcdir);
 	ocrpt_string *imgdir = ocrpt_mem_string_new("", true);
 	ocrpt_mem_string_append_printf(imgdir, "%s/images/images", csrcdir);
 	ocrpt_add_search_path(o, imgdir->str);
