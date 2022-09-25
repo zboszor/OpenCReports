@@ -656,7 +656,7 @@ bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		 */
 		new_page_position = *old_page_position;
 
-		ocrpt_layout_output_position_pop(output, false);
+		ocrpt_layout_output_position_pop(output);
 		ocrpt_layout_output_internal_preamble(o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
 		memo_break = ocrpt_layout_output_internal(!o->precalculate, o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
 
@@ -744,7 +744,7 @@ bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 	if (!r || (r && !r->finished)) {
 		if (!memo_break)
-			ocrpt_layout_output_position_pop(output, false);
+			ocrpt_layout_output_position_pop(output);
 		ocrpt_layout_output_internal_preamble(o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
 		memo_break = ocrpt_layout_output_internal(!o->precalculate, o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
 	}

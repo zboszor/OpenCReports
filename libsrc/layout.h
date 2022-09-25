@@ -141,13 +141,10 @@ typedef struct ocrpt_output_functions ocrpt_output_functions;
 
 struct ocrpt_output {
 	double old_page_position;
-	double old_page_position_pushed;
 	ocrpt_list *output_list;
 	ocrpt_list *iter;
-	ocrpt_list *iter_pushed;
 	ocrpt_expr *suppress;
 	ocrpt_image *current_image;
-	ocrpt_image *current_image_pushed;
 	bool suppress_output:1;
 	bool has_memo:1;
 	bool height_exceeded:1;
@@ -167,8 +164,8 @@ double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p);
 
 static inline void ocrpt_layout_output_init(ocrpt_output *output) {
 	output->has_memo = false;
-	output->iter = output->iter_pushed = NULL;
-	output->current_image = output->current_image_pushed = NULL;
+	output->iter = NULL;
+	output->current_image = NULL;
 
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
@@ -185,10 +182,6 @@ static inline void ocrpt_layout_output_init(ocrpt_output *output) {
 }
 
 static inline void ocrpt_layout_output_position_push(ocrpt_output *output) {
-	output->iter_pushed = output->iter;
-	output->current_image_pushed = output->current_image;
-	output->old_page_position_pushed = output->old_page_position;
-
 	if (output->iter) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)output->iter->data;
 		if (oe->type == OCRPT_OUTPUT_LINE) {
@@ -198,13 +191,7 @@ static inline void ocrpt_layout_output_position_push(ocrpt_output *output) {
 	}
 }
 
-static inline void ocrpt_layout_output_position_pop(ocrpt_output *output, bool full) {
-	if (full) {
-		output->iter = output->iter_pushed;
-		output->current_image = output->current_image_pushed;
-		output->old_page_position = output->old_page_position_pushed;
-	}
-
+static inline void ocrpt_layout_output_position_pop(ocrpt_output *output) {
 	if (output->iter) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)output->iter->data;
 		if (oe->type == OCRPT_OUTPUT_LINE) {
