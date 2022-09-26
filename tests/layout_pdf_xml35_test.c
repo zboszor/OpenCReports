@@ -8,24 +8,19 @@
 
 #include <opencreport.h>
 
+#define LOREMIPSUM "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+
 const char *array[10][5] = {
 	{ "id", "name", "property", "age", "adult" },
 	{ "1", "Fred Flintstone", "strong", "31", "yes" },
-	{ "2", "Wilma Flintstone "
-			"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-							, "charming", "28", "yes" },
+	{ "2", "Wilma Flintstone " LOREMIPSUM, "charming", "28", "yes" },
 	{ "3", "Pebbles Flintstone", "young", "5e-1", "no" },
-	{ "4", "Betty Rubble "
-			"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-							, "beautiful", "27", "yes" },
+	{ "4", "Betty Rubble " LOREMIPSUM, "beautiful", "27", "yes" },
 	{ "5", "Barney Rubble", "small", "29", "yes" },
 	{ "6", "Mr. George Slate", "grumpy", "53", "yes" },
 	{ "7", "Joe Rockhead", "friendly", "33", "yes" },
 	{ "8", "Sam Slagheap", "leader", "37", "yes" },
-	{ "9", "The Great Gazoo "
-			"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-							, "hostile alien", "1200", "yes" },
-
+	{ "9", "The Great Gazoo " LOREMIPSUM, "hostile alien", "1200", "yes" },
 };
 
 const enum ocrpt_result_type coltypes[6] = {
