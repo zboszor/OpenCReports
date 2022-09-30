@@ -2095,9 +2095,17 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 
 static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader) {
 	xmlChar *size_unit = xmlTextReaderGetAttribute(reader, (const xmlChar *)"size_unit");
+	xmlChar *rlib_compat = xmlTextReaderGetAttribute(reader, (const xmlChar *)"rlib_compat");
 
-	o->rlib_compat_set = true;
 	o->rlib_compat = false;
+	if (rlib_compat) {
+		ocrpt_expr *rlib_compat_e;
+		int32_t rlib_compat_i;
+		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, rlib_compat);
+		ocrpt_expr_free(o, NULL, rlib_compat_e);
+		o->rlib_compat = !!rlib_compat_i;
+	}
+	o->rlib_compat_set = true;
 
 	if (size_unit) {
 		ocrpt_expr *size_unit_e;

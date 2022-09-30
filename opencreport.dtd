@@ -1,6 +1,7 @@
 <!ELEMENT OpenCReport (Datasources?,Queries?,(Part|Report)*)>
 <!ATTLIST OpenCReport
-	size_unit CDATA #IMPLIED >
+	size_unit CDATA #IMPLIED
+	rlib_compat CDATA #IMPLIED >
 <!ELEMENT Datasources (Datasource+)>
 <!ELEMENT Datasource EMPTY>
 <!ATTLIST Datasource
