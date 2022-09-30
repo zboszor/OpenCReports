@@ -275,7 +275,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	if (!alist)
 		alist = pango_attr_list_new();
 
-	PangoAttribute *nohyph = pango_attr_insert_hyphens_new(FALSE);
+	PangoAttribute *nohyph = pango_attr_insert_hyphens_new(TRUE);
 	pango_attr_list_insert(alist, nohyph);
 	pango_layout_set_attributes(layout, alist);
 

@@ -346,11 +346,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			ocrpt_layout_output(o, p, pr, pd, r, &r->fieldheader, rows, newpage, page_indent, page_position, old_page_position);
 		}
 		ocrpt_layout_output_init(&r->fielddetails);
-		bool again = false;
-		do {
-			*newpage = again;
-			again = ocrpt_layout_output(o, p, pr, pd, r, &r->fielddetails, rows, newpage, page_indent, page_position, old_page_position);
-		} while (again);
+		ocrpt_layout_output(o, p, pr, pd, r, &r->fielddetails, rows, newpage, page_indent, page_position, old_page_position);
 
 		if (o->precalculate && last_row) {
 			ocrpt_variables_add_precalculated_results(o, r, r->breaks, last_row);

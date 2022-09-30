@@ -54,7 +54,7 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 			if (line->maxlines < elem->lines)
 				line->maxlines = elem->lines;
 
-			output->has_memo = output->has_memo || elem->memo;
+			output->has_memo = output->has_memo || (elem->memo && (elem->lines > 1));
 		}
 	}
 
@@ -521,9 +521,6 @@ bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 	if (output->suppress_output)
 		return false;
 
-	if (!output->iter)
-		output->iter = output->output_list;
-
 	for (; output->iter; output->iter = output->iter->next) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)output->iter->data;
 
@@ -590,7 +587,7 @@ bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 	return false;
 }
 
-bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, unsigned int rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
+void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, unsigned int rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
 	ocrpt_list *old_current_page;
 	double new_page_position;
 	bool page_break = false;
@@ -625,8 +622,10 @@ bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		}
 	}
 
+	restart:
+
 	if ((pd && pd->finished) || (r && r->finished))
-		return false;
+		return;
 
 	/*
 	 * The bool value in o->precalculate means !draw in layout context.
@@ -647,7 +646,7 @@ bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	ocrpt_layout_output_internal_preamble(o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
 	bool memo_break = ocrpt_layout_output_internal(false, o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
 
-	bool height_exceeded = false, pd_height_exceeded = false, r_height_exceeded = false;
+	bool height_exceeded, pd_height_exceeded, r_height_exceeded;
 
 	if (memo_break) {
 		/*
@@ -672,7 +671,7 @@ bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	if (r_height_exceeded)
 		r->finished = true;
 
-	if (height_exceeded || pd_height_exceeded || memo_break) {
+	if (height_exceeded || pd_height_exceeded) {
 		if (!memo_break)
 			pd->max_page_position = *old_page_position;
 		pd->current_column++;
@@ -683,14 +682,13 @@ bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			if (height_exceeded) {
 				page_break = true;
 			}
-		}
-
-		if (page_break || memo_break) {
-			if (pd->height_set)
-				pd->remaining_height -= new_page_position - pd->start_page_position;
-		}
+		} else
+			page_break = false;
 
 		if (page_break) {
+			if (pd->height_set)
+				pd->remaining_height -= new_page_position - pd->start_page_position;
+
 			pd->current_column = 0;
 			*page_indent = pd->page_indent;
 			if (pd->border_width_set)
@@ -732,7 +730,7 @@ bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		}
 
 		if (pd->finished)
-			return false;
+			return;
 
 		page_break = true;
 	}
@@ -742,9 +740,9 @@ bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		new_page_position = *old_page_position;
 	}
 
-	if (!r || (r && !r->finished)) {
-		if (!memo_break)
-			ocrpt_layout_output_position_pop(output);
+	if (!r || (r && !r->finished /* && pd && !pd->finished */)) {
+		if (!output->has_memo || !memo_break)
+			ocrpt_layout_output_init(output);
 		ocrpt_layout_output_internal_preamble(o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
 		memo_break = ocrpt_layout_output_internal(!o->precalculate, o, p, pr, pd, r, output, pd->column_width, *page_indent, &new_page_position);
 	}
@@ -756,7 +754,8 @@ bool ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	if (pd->max_page_position < new_page_position)
 		pd->max_page_position = new_page_position;
 
-	return memo_break;
+	if (memo_break)
+		goto restart;
 }
 
 double ocrpt_layout_top_margin(opencreport *o, ocrpt_part *p) {
