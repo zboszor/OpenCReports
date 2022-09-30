@@ -83,7 +83,7 @@ PKG_CHECK_MODULES(YAJL, yajl)
 AC_SUBST(YAJL_CFLAGS)
 AC_SUBST(YAJL_LIBS)
 
-PKG_CHECK_MODULES(PDFGEN, cairo >= 1.16.0 cairo-pdf pangocairo librsvg-2.0 gdk-pixbuf-2.0)
+PKG_CHECK_MODULES(PDFGEN, cairo >= 1.16.0 cairo-pdf >= 1.16.0 pangocairo >= 1.44 librsvg-2.0 gdk-pixbuf-2.0)
 AC_SUBST(PDFGEN_CFLAGS)
 AC_SUBST(PDFGEN_LIBS)
 
