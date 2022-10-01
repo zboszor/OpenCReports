@@ -89,6 +89,7 @@ DLL_EXPORT_SYM void ocrpt_part_free(opencreport *o, ocrpt_part *p) {
 				ocrpt_report_free(o, (ocrpt_report *)rl->data);
 
 			ocrpt_list_free(pd->reports);
+			ocrpt_output_free(o, &pd->border, true);
 			ocrpt_mem_free(pd);
 		}
 
@@ -105,6 +106,7 @@ DLL_EXPORT_SYM void ocrpt_part_free(opencreport *o, ocrpt_part *p) {
 	if (p->allocated)
 		ocrpt_mem_free(p->xmlbuf);
 #endif
+	ocrpt_output_free(o, &p->global_output, true);
 	ocrpt_output_free(o, &p->pageheader, true);
 	ocrpt_output_free(o, &p->pagefooter, true);
 	ocrpt_mem_free(p);
@@ -149,6 +151,7 @@ DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_list_free_deep(r->newrow_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(r->precalc_done_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(r->iteration_callbacks, ocrpt_mem_free);
+	ocrpt_output_free(o, &r->global_output, false);
 	ocrpt_output_free(o, &r->nodata, false);
 	ocrpt_output_free(o, &r->reportheader, false);
 	ocrpt_output_free(o, &r->reportfooter, false);

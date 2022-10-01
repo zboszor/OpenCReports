@@ -49,9 +49,6 @@ struct ocrpt_input {
 };
 typedef struct ocrpt_input ocrpt_input;
 
-struct ocrpt_output;
-typedef struct ocrpt_output ocrpt_output;
-
 struct ocrpt_paper {
 	const char *name;
 	double width;

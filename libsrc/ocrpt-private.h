@@ -8,7 +8,7 @@
 
 #include <time.h>
 #include "opencreport.h"
-#include "layout.h"
+#include "output.h"
 #include "color.h"
 
 enum ocrpt_var_type_bit {
@@ -71,11 +71,15 @@ struct opencreport {
 	ocrpt_string *output_buffer;
 
 	/* Page handling for PDF output, lists of cairo_surface_t pointers */
+	ocrpt_output global_output;
 	ocrpt_output_functions output_functions;
 	ocrpt_list *images;
 	ocrpt_list *pages;
 	ocrpt_list *last_page;
 	ocrpt_list *current_page;
+	ocrpt_list *drawing_page;
+	cairo_surface_t *nullpage_cs;
+	cairo_t *cr;
 
 	/* The result of date() and now() functions */
 	ocrpt_result *current_date;

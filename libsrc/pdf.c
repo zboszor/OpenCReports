@@ -30,55 +30,47 @@ static cairo_status_t ocrpt_write_pdf(void *closure, const unsigned char *data, 
 	return CAIRO_STATUS_SUCCESS;
 }
 
-static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_image *img, double x, double y, double w, double h) {
+static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_image *img, double x, double y, double w, double h) {
 	ocrpt_image_file *img_file = img->img_file;
 
 	if (!img_file)
 		return;
 
-	cairo_t *cr = cairo_create((cairo_surface_t *)o->current_page->data);
+	ocrpt_cairo_create(o);
 
-	cairo_translate(cr, x, y);
-	cairo_scale(cr, w / img->img_file->width, h / img->img_file->height);
+	cairo_save(o->cr);
 
-	cairo_set_source_surface(cr, img_file->surface, 0.0, 0.0);
+	cairo_translate(o->cr, x, y);
+	cairo_scale(o->cr, w / img->img_file->width, h / img->img_file->height);
+
+	cairo_set_source_surface(o->cr, img_file->surface, 0.0, 0.0);
 
 	if (img->img_file->rsvg) {
 		RsvgRectangle rect = { .x = 0.0, .y = 0.0, .width = img_file->width, .height = img_file->height };
-		rsvg_handle_render_document(img_file->rsvg, cr, &rect, NULL);
+		rsvg_handle_render_document(img_file->rsvg, o->cr, &rect, NULL);
 	}
 
-	cairo_paint(cr);
+	cairo_paint(o->cr);
 
-	cairo_destroy(cr);
+	cairo_restore(o->cr);
 }
 
-void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double total_width) {
-	cairo_surface_t *cs = NULL;
-	cairo_t *cr;
-	PangoLayout *layout;
-	PangoFontDescription *font_description;
+void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_line_element *le, double total_width) {
+	char *font;
 	double size, w;
 
-	if (o && o->current_page)
-		cr = cairo_create((cairo_surface_t *)o->current_page->data);
-	else {
-		cs = ocrpt_layout_new_page(o, o->paper, false);
-		cr = cairo_create(cs);
-	}
-
-	font_description = pango_font_description_new();
+	ocrpt_cairo_create(o);
 
 	if (le->font_name && le->font_name->result[o->residx] && le->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && le->font_name->result[o->residx]->string)
-		le->font = le->font_name->result[o->residx]->string->str;
+		font = le->font_name->result[o->residx]->string->str;
 	else if (l->font_name && l->font_name->result[o->residx] && l->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && l->font_name->result[o->residx]->string)
-		le->font = l->font_name->result[o->residx]->string->str;
+		font = l->font_name->result[o->residx]->string->str;
 	else if (r && r->font_name)
-		le->font = r->font_name;
+		font = r->font_name;
 	else if (p->font_name)
-		le->font = p->font_name;
+		font = p->font_name;
 	else
-		le->font = "Courier";
+		font = "Courier";
 
 	if (le && le->font_size && le->font_size->result[o->residx] && le->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->font_size->result[o->residx]->number_initialized)
 		size = mpfr_get_d(le->font_size->result[o->residx]->number, o->rndmode);
@@ -91,6 +83,12 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 	else
 		size = OCRPT_DEFAULT_FONT_SIZE;
 
+	ocrpt_pangocairo_free_layout_if_needed(o, le, font, size);
+
+	if (!le->font_description)
+		le->font_description = pango_font_description_new();
+
+	le->font = font;
 	le->fontsz = size;
 
 	bool has_format = false;
@@ -138,51 +136,57 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 		ocrpt_format_string(o, NULL, string, fmt, fmtlen, &le->value, 1);
 	}
 
-	pango_font_description_set_family(font_description, le->font);
+	pango_font_description_set_family(le->font_description, le->font);
 
 	bool bold = false, italic = false;
 
-	if (le->bold && le->bold->result[o->residx] && le->bold->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->bold->result[o->residx]->number_initialized) {
+	if (le->bold && le->bold->result[o->residx] && le->bold->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->bold->result[o->residx]->number_initialized)
 		bold = !!mpfr_get_ui(le->bold->result[o->residx]->number, o->rndmode);
-		le->bold_is_set = true;
-		le->bold_value = bold;
-	} else if (l->bold && l->bold->result[o->residx] && l->bold->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->bold->result[o->residx]->number_initialized) {
+	else if (l->bold && l->bold->result[o->residx] && l->bold->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->bold->result[o->residx]->number_initialized)
 		bold = !!mpfr_get_ui(l->bold->result[o->residx]->number, o->rndmode);
-		l->bold_is_set = true;
-		l->bold_value = bold;
-	}
 
-	if (le->italic && le->italic->result[o->residx] && le->italic->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->italic->result[o->residx]->number_initialized) {
+	if (le->italic && le->italic->result[o->residx] && le->italic->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->italic->result[o->residx]->number_initialized)
 		italic = !!mpfr_get_ui(le->italic->result[o->residx]->number, o->rndmode);
-		le->italic_is_set = true;
-		le->italic_value = italic;
-	} else if (l->italic && l->italic->result[o->residx] && l->italic->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->italic->result[o->residx]->number_initialized) {
+	else if (l->italic && l->italic->result[o->residx] && l->italic->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->italic->result[o->residx]->number_initialized)
 		italic = !!mpfr_get_ui(l->italic->result[o->residx]->number, o->rndmode);
-		l->italic_is_set = true;
-		l->italic_value = italic;
-	}
 
-	pango_font_description_set_weight(font_description, bold ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
-	pango_font_description_set_style(font_description, italic ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
-	pango_font_description_set_absolute_size(font_description, le->fontsz * PANGO_SCALE);
+	pango_font_description_set_weight(le->font_description, bold ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
+	pango_font_description_set_style(le->font_description, italic ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
+	pango_font_description_set_absolute_size(le->font_description, le->fontsz * PANGO_SCALE);
 
-	layout = pango_cairo_create_layout(cr);
-	pango_layout_set_font_description(layout, font_description);
+	if (!le->layout)
+		le->layout = pango_cairo_create_layout(o->cr);
+	pango_layout_set_font_description(le->layout, le->font_description);
 
-	PangoContext *context = pango_layout_get_context(layout);
+	PangoContext *context = pango_layout_get_context(le->layout);
 	PangoLanguage *language = pango_context_get_language(context);
-	PangoFontMetrics *metrics = pango_context_get_metrics(context, font_description, language);
+	PangoFontMetrics *metrics = pango_context_get_metrics(context, le->font_description, language);
 
 	int char_width = pango_font_metrics_get_approximate_char_width(metrics);
 	le->font_width = (double)char_width / PANGO_SCALE;
 
-	/* Start accounting memo lines */
-	if (le->memo)
-		pango_layout_set_wrap(layout, le->memo_wrap_chars ? PANGO_WRAP_CHAR : PANGO_WRAP_WORD);
-	else
-		pango_layout_set_wrap(layout, PANGO_WRAP_CHAR);
+	if (le->align && le->align->result[o->residx] && le->align->result[o->residx]->type == OCRPT_RESULT_STRING && le->align->result[o->residx]->string) {
+		const char *alignment = le->align->result[o->residx]->string->str;
+		if (strcasecmp(alignment, "right") == 0)
+			le->p_align = PANGO_ALIGN_RIGHT;
+		else if (strcasecmp(alignment, "center") == 0)
+			le->p_align = PANGO_ALIGN_CENTER;
+		else
+			le->p_align = PANGO_ALIGN_LEFT;
+	} else
+		le->p_align = PANGO_ALIGN_LEFT;
 
-	pango_layout_set_text(layout, le->value_str->str, le->value_str->len);
+	pango_layout_set_alignment(le->layout, le->p_align);
+
+	PangoAttrList *alist = pango_layout_get_attributes(le->layout);
+	if (!alist)
+		alist = pango_attr_list_new();
+
+	PangoAttribute *nohyph = pango_attr_insert_hyphens_new(TRUE);
+	pango_attr_list_insert(alist, nohyph);
+	pango_layout_set_attributes(le->layout, alist);
+
+	pango_layout_set_text(le->layout, le->value_str->str, le->value_str->len);
 
 	if (le->width && le->width->result[o->residx] && le->width->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->width->result[o->residx]->number_initialized) {
 		w = mpfr_get_d(le->width->result[o->residx]->number, o->rndmode);
@@ -194,17 +198,21 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 		PangoRectangle logical_rect;
 
 		/* This assumes pango_layout_set_text() was called previously */
-		pango_layout_get_extents(layout, NULL, &logical_rect);
+		pango_layout_get_extents(le->layout, NULL, &logical_rect);
 		w = (double)logical_rect.width / PANGO_SCALE;
 	}
 
 	le->width_computed = w;
 
-	if (le->memo)
-		pango_layout_set_width(layout, w * PANGO_SCALE);
+	if (le->memo) {
+		pango_layout_set_width(le->layout, w * PANGO_SCALE);
+		pango_layout_set_wrap(le->layout, le->memo_wrap_chars ? PANGO_WRAP_CHAR : PANGO_WRAP_WORD);
+	} else {
+		pango_layout_set_wrap(le->layout, PANGO_WRAP_CHAR);
+	}
 
 	if (le->memo) {
-		le->lines = pango_layout_get_line_count(layout);
+		le->lines = pango_layout_get_line_count(le->layout);
 		if (le->memo_max_lines && le->memo_max_lines < le->lines)
 			le->lines = le->memo_max_lines;
 	} else
@@ -212,85 +220,16 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 
 	le->ascent = pango_font_metrics_get_ascent(metrics) / PANGO_SCALE;
 	le->descent = pango_font_metrics_get_descent(metrics) / PANGO_SCALE;
-
-	g_object_unref(layout);
-	pango_font_description_free(font_description);
-
-	cairo_destroy(cr);
-	if (cs)
-		cairo_surface_destroy(cs);
 }
 
-void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_line *l, ocrpt_line_element *le, double page_indent, double y) {
-	cairo_surface_t *cs = NULL;
-	cairo_t *cr;
-	PangoLayout *layout;
-	PangoFontDescription *font_description;
-	PangoAlignment align;
+void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_line_element *le, double page_indent, double y) {
+	ocrpt_cairo_create(o);
 
-	if (o && o->current_page)
-		cr = cairo_create((cairo_surface_t *)o->current_page->data);
-	else {
-		cs = ocrpt_layout_new_page(o, o->paper, false);
-		cr = cairo_create(cs);
-	}
-
-	if (le->align && le->align->result[o->residx] && le->align->result[o->residx]->type == OCRPT_RESULT_STRING && le->align->result[o->residx]->string) {
-		const char *alignment = le->align->result[o->residx]->string->str;
-		if (strcasecmp(alignment, "right") == 0)
-			align = PANGO_ALIGN_RIGHT;
-		else if (strcasecmp(alignment, "center") == 0)
-			align = PANGO_ALIGN_CENTER;
-		else
-			align = PANGO_ALIGN_LEFT;
-	} else
-		align = PANGO_ALIGN_LEFT;
-
-	font_description = pango_font_description_new();
-
-	pango_font_description_set_family(font_description, le->font);
-
-	bool bold = false, italic = false;
-
-	if (le->bold_is_set)
-		bold = le->bold_value;
-	else if (l->bold_is_set)
-		bold = l->bold_value;
-
-	if (le->italic_is_set)
-		italic = le->italic;
-	else if (l->italic_is_set)
-		italic = l->italic;
-
-	pango_font_description_set_weight(font_description, bold ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
-	pango_font_description_set_style(font_description, italic ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
-	pango_font_description_set_absolute_size(font_description, le->fontsz * PANGO_SCALE);
-
-	layout = pango_cairo_create_layout(cr);
-	pango_layout_set_font_description(layout, font_description);
-
-	pango_layout_set_alignment(layout, align);
-
-	PangoAttrList *alist = pango_layout_get_attributes(layout);
-	if (!alist)
-		alist = pango_attr_list_new();
-
-	PangoAttribute *nohyph = pango_attr_insert_hyphens_new(TRUE);
-	pango_attr_list_insert(alist, nohyph);
-	pango_layout_set_attributes(layout, alist);
+	cairo_save(o->cr);
 
 	double field_width = le->width_computed;
 
-	if (le->memo) {
-		pango_layout_set_width(layout, le->width_computed * PANGO_SCALE);
-		pango_layout_set_wrap(layout, le->memo_wrap_chars ? PANGO_WRAP_CHAR : PANGO_WRAP_WORD);
-	} else {
-		pango_layout_set_wrap(layout, PANGO_WRAP_CHAR);
-	}
-
-	pango_layout_set_text(layout, le->value_str->str, le->value_str->len);
-
-	PangoLayoutLine *pline = (l->current_line < l->maxlines) ? pango_layout_get_line(layout, l->current_line) : NULL;
+	PangoLayoutLine *pline = (l->current_line < l->maxlines) ? pango_layout_get_line(le->layout, l->current_line) : NULL;
 	PangoRectangle logical_rect = {};
 	bool use_bb = false;
 
@@ -312,14 +251,14 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	else if (l->bgcolor && l->bgcolor->result[o->residx] && l->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && l->bgcolor->result[o->residx]->string)
 		ocrpt_get_color(o, l->bgcolor->result[o->residx]->string->str, &bgcolor, true);
 
-	cairo_set_source_rgb(cr, bgcolor.r, bgcolor.g, bgcolor.b);
-	cairo_set_line_width(cr, 0.0);
+	cairo_set_source_rgb(o->cr, bgcolor.r, bgcolor.g, bgcolor.b);
+	cairo_set_line_width(o->cr, 0.0);
 	/*
 	 * The background filler is 0.1 points wider.
 	 * This way, there's no lines between the line elements.
 	 */
-	cairo_rectangle(cr, page_indent + le->start, y, field_width + 0.1, l->line_height);
-	cairo_fill(cr);
+	cairo_rectangle(o->cr, page_indent + le->start, y, field_width + 0.1, l->line_height);
+	cairo_fill(o->cr);
 
 	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
 	if (le->color && le->color->result[o->residx] && le->color->result[o->residx]->type == OCRPT_RESULT_STRING && le->color->result[o->residx]->string)
@@ -327,7 +266,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	else if (l->color && l->color->result[o->residx] && l->color->result[o->residx]->type == OCRPT_RESULT_STRING && l->color->result[o->residx]->string)
 		ocrpt_get_color(o, l->color->result[o->residx]->string->str, &color, true);
 
-	cairo_set_source_rgb(cr, color.r, color.g, color.b);
+	cairo_set_source_rgb(o->cr, color.r, color.g, color.b);
 
 	if (use_bb) {
 		/*
@@ -337,8 +276,8 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		 * on such a masked piece of text the whole
 		 * of it is shown and can be copy&pasted.
 		 */
-		cairo_rectangle(cr, page_indent + le->start, y, field_width, l->line_height);
-		cairo_clip(cr);
+		cairo_rectangle(o->cr, page_indent + le->start, y, field_width, l->line_height);
+		cairo_clip(o->cr);
 	}
 
 	if (pline) {
@@ -349,13 +288,13 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 		if (link) {
 			ocrpt_string *uri = ocrpt_mem_string_new_printf("uri='%s'", link);
-			cairo_tag_begin(cr, CAIRO_TAG_LINK, uri->str);
+			cairo_tag_begin(o->cr, CAIRO_TAG_LINK, uri->str);
 			ocrpt_mem_string_free(uri, true);
 		}
 
 		double x1;
 
-		switch (align) {
+		switch (le->p_align) {
 		default:
 		case PANGO_ALIGN_LEFT:
 			x1 = le->start;
@@ -368,22 +307,17 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			break;
 		}
 
-		cairo_move_to(cr, page_indent + x1, y + l->ascent);
-		pango_cairo_show_layout_line(cr, pline);
+		cairo_move_to(o->cr, page_indent + x1, y + l->ascent);
+		pango_cairo_show_layout_line(o->cr, pline);
 
 		if (link)
-			cairo_tag_end(cr, CAIRO_TAG_LINK);
+			cairo_tag_end(o->cr, CAIRO_TAG_LINK);
 	}
 
-	g_object_unref(layout);
-	pango_font_description_free(font_description);
-
-	cairo_destroy(cr);
-	if (cs)
-		cairo_surface_destroy(cs);
+	cairo_restore(o->cr);
 }
 
-void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_hline *hline, double page_width, double page_indent, double page_position, double size) {
+void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_hline *hline, double page_width, double page_indent, double page_position, double size) {
 	double indent, length;
 
 	if (hline->indent && hline->indent->result[o->residx] && hline->indent->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->indent->result[o->residx]->number_initialized)
@@ -405,52 +339,29 @@ void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocr
 	} else
 		length = page_width - indent;
 
-	cairo_surface_t *cs = NULL;
-	cairo_t *cr;
 	ocrpt_color color;
 	char *color_name = NULL;
 
-	if (o && o->current_page)
-		cr = cairo_create((cairo_surface_t *)o->current_page->data);
-	else {
-		cs = ocrpt_layout_new_page(o, o->paper, false);
-		cr = cairo_create(cs);
-	}
+	ocrpt_cairo_create(o);
 
 	if (hline->color && hline->color->result[o->residx] && hline->color->result[o->residx]->type == OCRPT_RESULT_STRING && hline->color->result[o->residx]->string)
 		color_name = hline->color->result[o->residx]->string->str;
 
 	ocrpt_get_color(o, color_name, &color, false);
 
-	cairo_set_source_rgb(cr, color.r, color.g, color.b);
-	cairo_set_line_width(cr, 0.0);
-	cairo_rectangle(cr, page_indent + indent, page_position, length, size);
-	cairo_fill(cr);
-
-	cairo_destroy(cr);
-	if (cs)
-		cairo_surface_destroy(cs);
+	cairo_set_source_rgb(o->cr, color.r, color.g, color.b);
+	cairo_set_line_width(o->cr, 0.0);
+	cairo_rectangle(o->cr, page_indent + indent, page_position, length, size);
+	cairo_fill(o->cr);
 }
 
-void ocrpt_pdf_draw_rectangle(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_color *color, double line_width, double x, double y, double width, double height) {
-	cairo_surface_t *cs = NULL;
-	cairo_t *cr;
+void ocrpt_pdf_draw_rectangle(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_color *color, double line_width, double x, double y, double width, double height) {
+	ocrpt_cairo_create(o);
 
-	if (o && o->current_page)
-		cr = cairo_create((cairo_surface_t *)o->current_page->data);
-	else {
-		cs = ocrpt_layout_new_page(o, o->paper, false);
-		cr = cairo_create(cs);
-	}
-
-	cairo_set_source_rgb(cr, color->r, color->g, color->b);
-	cairo_set_line_width(cr, line_width);
-	cairo_rectangle(cr, x, y, width, height);
-	cairo_stroke(cr);
-
-	cairo_destroy(cr);
-	if (cs)
-		cairo_surface_destroy(cs);
+	cairo_set_source_rgb(o->cr, color->r, color->g, color->b);
+	cairo_set_line_width(o->cr, line_width);
+	cairo_rectangle(o->cr, x, y, width, height);
+	cairo_stroke(o->cr);
 }
 
 void ocrpt_pdf_finalize(opencreport *o) {
@@ -479,8 +390,6 @@ void ocrpt_pdf_finalize(opencreport *o) {
 		cairo_paint(cr);
 		cairo_show_page(cr);
 		cairo_destroy(cr);
-
-		//cairo_surface_destroy(surface);
 	}
 
 	cairo_surface_destroy(pdf);

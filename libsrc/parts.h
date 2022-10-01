@@ -68,6 +68,9 @@ struct ocrpt_report {
 	ocrpt_list *newrow_callbacks;
 	ocrpt_list *precalc_done_callbacks;
 	ocrpt_list *iteration_callbacks;
+
+	ocrpt_output global_output;
+
 	/*
 	 * How many times should this report run
 	 */
@@ -109,6 +112,7 @@ struct ocrpt_part_row_data {
 	double start_page_position;
 	double remaining_height;
 
+	ocrpt_output border;
 	ocrpt_color border_color;
 	ocrpt_list *reports;
 	ocrpt_list *last_report;
@@ -154,6 +158,7 @@ struct ocrpt_part {
 	double right_margin_value;
 
 	/* Common header and footer for all reports in this part */
+	ocrpt_output global_output;
 	ocrpt_output pageheader;
 	ocrpt_output pagefooter;
 

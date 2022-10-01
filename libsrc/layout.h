@@ -1,5 +1,5 @@
 /*
- * Formatting utilities
+ * Layout utilities
  *
  * Copyright (C) 2019-2022 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
@@ -8,6 +8,8 @@
 #ifndef _LAYOUT_H_
 #define _LAYOUT_H_
 
+#include "opencreport.h"
+#include "ocrpt-private.h"
 #include "listutil.h"
 
 /* Margin defaults are in inches. 72.0 is the default DPI for PDF and others in Cairo */
@@ -37,6 +39,10 @@ struct ocrpt_line_element {
 	ocrpt_expr *link;
 	ocrpt_expr *translate;
 
+	ocrpt_list *drawing_page;
+	PangoLayout *layout;
+	PangoFontDescription *font_description;
+
 	/* Shortcuts carried over between get_text_sizes() and draw_text() */
 	const char *font;
 	ocrpt_string *value_str;
@@ -47,19 +53,13 @@ struct ocrpt_line_element {
 	double descent;
 	double width_computed;
 
+	PangoAlignment p_align;
 	int32_t memo_max_lines;
 	int32_t lines;
 	int32_t col;
 	bool memo:1;
 	bool memo_wrap_chars:1;
-	bool bold_computed:1; /* Also a shortcut */
-	bool bold_is_set:1;
-	bool bold_value:1;
-	bool italic_is_set:1;
-	bool italic_value:1;
-	bool value_allocated:1;
 };
-typedef struct ocrpt_line_element ocrpt_line_element;
 
 struct ocrpt_line {
 	ocrpt_output_type type;
@@ -85,7 +85,6 @@ struct ocrpt_line {
 	uint32_t current_line;
 	uint32_t current_line_pushed;
 };
-typedef struct ocrpt_line ocrpt_line;
 
 struct ocrpt_hline {
 	ocrpt_output_type type;
@@ -98,7 +97,6 @@ struct ocrpt_hline {
 	ocrpt_expr *suppress;
 	ocrpt_expr *color;
 };
-typedef struct ocrpt_hline ocrpt_hline;
 
 struct ocrpt_image_file {
 	char *name;
@@ -122,38 +120,14 @@ struct ocrpt_image {
 	ocrpt_expr *height;
 	ocrpt_image_file *img_file;
 };
-typedef struct ocrpt_image ocrpt_image;
 
 struct ocrpt_output_element {
 	ocrpt_output_type type;
 };
 typedef struct ocrpt_output_element ocrpt_output_element;
 
-struct ocrpt_output_functions {
-	void (*draw_hline)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_hline *, double, double, double, double);
-	void (*get_text_sizes)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_line *, ocrpt_line_element *, double);
-	void (*draw_text)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_line *, ocrpt_line_element *, double, double);
-	void (*draw_image)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_image *, double, double, double, double);
-	void (*draw_rectangle)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_row_data *, ocrpt_report *, ocrpt_color *, double, double, double, double, double);
-	void (*finalize)(opencreport *o);
-};
-typedef struct ocrpt_output_functions ocrpt_output_functions;
-
-struct ocrpt_output {
-	double old_page_position;
-	ocrpt_list *output_list;
-	ocrpt_list *iter;
-	ocrpt_expr *suppress;
-	ocrpt_image *current_image;
-	bool suppress_output:1;
-	bool has_memo:1;
-	bool height_exceeded:1;
-	bool pd_height_exceeded:1;
-	bool r_height_exceeded:1;
-};
-
 void *ocrpt_layout_new_page(opencreport *o, const ocrpt_paper *paper, bool landscape);
-void ocrpt_layout_set_font_sizes(opencreport *o, const char *font, double wanted_font_size, bool bold, bool italic, double *result_font_size, double *result_font_width);
+void ocrpt_layout_set_font_sizes(opencreport *o, ocrpt_output *output, const char *font, double wanted_font_size, bool bold, bool italic, double *result_font_size, double *result_font_width);
 void ocrpt_layout_output_resolve(opencreport *o, ocrpt_part *p, ocrpt_report *r, ocrpt_output *output);
 void ocrpt_layout_output_evaluate(opencreport *o, ocrpt_part *p, ocrpt_report *r, ocrpt_output *output);
 
@@ -161,6 +135,54 @@ double ocrpt_layout_top_margin(opencreport *o, ocrpt_part *p);
 double ocrpt_layout_bottom_margin(opencreport *o, ocrpt_part *p);
 double ocrpt_layout_left_margin(opencreport *o, ocrpt_part *p);
 double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p);
+
+static inline void ocrpt_cairo_create(opencreport *o) {
+	if (o->current_page) {
+		if (o->cr) {
+			if (o->drawing_page != o->current_page) {
+				cairo_destroy(o->cr);
+				o->cr = cairo_create((cairo_surface_t *)o->current_page->data);
+				o->drawing_page = o->current_page;
+			}
+		} else
+			o->cr = cairo_create((cairo_surface_t *)o->current_page->data);
+	} else {
+		if (!o->nullpage_cs)
+			o->nullpage_cs = ocrpt_layout_new_page(o, o->paper, false);
+		if (o->cr) {
+			if (o->drawing_page != o->current_page) {
+				cairo_destroy(o->cr);
+				o->cr = cairo_create(o->nullpage_cs);
+				o->drawing_page = o->current_page;
+			}
+		} else
+			o->cr = cairo_create(o->nullpage_cs);
+	}
+}
+
+static inline void ocrpt_pangocairo_free_layout_if_needed(opencreport *o, ocrpt_line_element *le, char *font, double fontsz) {
+	if (o->drawing_page != le->drawing_page) {
+		if (le->layout) {
+			g_object_unref(le->layout);
+			le->layout = NULL;
+		}
+		if (le->font_description) {
+			pango_font_description_free(le->font_description);
+			le->font_description = NULL;
+		}
+	}
+
+	if ((le->font && font && strcmp(le->font, font)) || le->fontsz != fontsz) {
+		if (le->layout) {
+			g_object_unref(le->layout);
+			le->layout = NULL;
+		}
+		if (le->font_description) {
+			pango_font_description_free(le->font_description);
+			le->font_description = NULL;
+		}
+	}
+}
 
 static inline void ocrpt_layout_output_init(ocrpt_output *output) {
 	output->has_memo = false;
@@ -182,11 +204,6 @@ static inline void ocrpt_layout_output_init(ocrpt_output *output) {
 }
 
 static inline void ocrpt_layout_output_position_push(ocrpt_output *output) {
-#if 0
-	if (output->iter)
-		output->iter = output->output_list;
-#endif
-
 	if (output->iter) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)output->iter->data;
 		if (oe->type == OCRPT_OUTPUT_LINE) {
@@ -204,6 +221,14 @@ static inline void ocrpt_layout_output_position_pop(ocrpt_output *output) {
 			l->current_line = l->current_line_pushed;
 		}
 	}
+}
+
+static inline uint32_t ocrpt_layout_get_page_nr(opencreport *o, cairo_surface_t *cs) {
+	uint32_t p = 1;
+	for (ocrpt_list *pl = o->pages; pl; pl = pl->next, p++)
+		if (pl->data == cs)
+			return p;
+	return 0;
 }
 
 void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, double page_width, double page_indent, double *page_position);
