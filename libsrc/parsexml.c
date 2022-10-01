@@ -2121,6 +2121,7 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 	o->size_unit_set = true;
 
 	xmlFree(size_unit);
+	xmlFree(rlib_compat);
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
