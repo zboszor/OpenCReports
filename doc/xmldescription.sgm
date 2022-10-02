@@ -940,20 +940,7 @@ SELECT * FROM some_table
 		</para>
 		<sect2 id="partattribs" xreflabel="Part attributes">
 			<title>Part attributes</title>
-			<sect3>
-				<title>Layout</title>
-				<para>
-					The <literal>layout</literal> attribute exists mainly
-					for RLIB compatibility, it's currently ignored.
-					It accepts two values: <literal>flow</literal> and
-					<literal>fixed</literal>.
-					<programlisting>
-&lt;Part layout="flow"&gt;
-&lt;Part layout="fixed"&gt;
-					</programlisting>
-				</para>
-			</sect3>
-			<sect3>
+			<sect3 id="partfontname" xreflabel="Part font name">
 				<title>Font name</title>
 				<para>
 					The font name attribute specifies the font
@@ -975,7 +962,7 @@ SELECT * FROM some_table
 					Default font name is <literal>Courier</literal>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="partfontsize" xreflabel="Part font size">
 				<title>Font size</title>
 				<para>
 					The font size attribute specifies the font size
@@ -1052,7 +1039,7 @@ SELECT * FROM some_table
 					Default is portrait orientation.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="marginsettings" xreflabel="Margin settings">
 				<title>Margin settings</title>
 				<para>
 					Margin settings for the page for the whole
@@ -1089,7 +1076,7 @@ SELECT * FROM some_table
 					in RLIB.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="papertype" xreflabel="Paper type">
 				<title>Paper type</title>
 				<para>
 					Paper type (implicitly: page size) for the whole
@@ -1156,6 +1143,14 @@ SELECT * FROM some_table
 		</sect2>
 		<sect2>
 			<title>Part subsections</title>
+			<para>
+				As described in <xref linkend="parts"/>,
+				a <literal>&lt;Part&gt;</literal> may contain
+				one or more report rows (<literal>&lt;pr&gt;</literal>)
+				which in turn may contain one or more columns
+				(<literal>&lt;pr&gt;</literal>). See
+				<xref linkend="partrow"/> and <xref linkend="partcol"/>.
+			</para>
 			<sect3 id="pageheader" xreflabel="Page header">
 				<title>Page header</title>
 				<para>
@@ -1188,14 +1183,247 @@ SELECT * FROM some_table
 					</programlisting>					
 				</para>
 			</sect3>
-			<sect3 id="partrow" xreflabel="Part row">
-				<title>Part row</title>
+		</sect2>
+	</sect1>
+	<sect1 id="partrow" xreflabel="Part row">
+		<title>Part row</title>
+		<para>
+			A part row (<literal>&lt;pr&gt;</literal>) may
+			contain one or more <xref linkend="partcol"/>s
+			(<literal>&lt;pd&gt;</literal>) which are layed out
+			side by side horizontally. The longest running column
+			will control the height of the row. The next row will
+			be continuous from that vertical page position.
+		</para>
+		<sect2>
+			<title>Part row attributes</title>
+			<sect3>
+				<title>Layout</title>
 				<para>
-					A part row (<literal>&lt;pr&gt;</literal>) may
-					consist of one or more column (<literal>&lt;pd&gt;</literal>)
-					The longest running column will control the height
-					of the row. The next row will be continuous from
-					that point.
+					The <literal>layout</literal> attribute exists mainly
+					for RLIB compatibility, it's ignored.
+					It accepts two values: <literal>flow</literal> and
+					<literal>fixed</literal>.
+					<programlisting>
+&lt;pr layout="flow"&gt;
+&lt;pr layout="fixed"&gt;
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>New page</title>
+				<para>
+					The <literal>newpage</literal> attribute controls
+					whether the part row starts from the point where
+					the previous row in the same part ended, or it
+					should start on a new page.
+					<programlisting>
+&lt;pr newpage="yes"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is <literal>no</literal>
+				</para>
+			</sect3>
+		</sect2>
+	</sect1>
+	<sect1 id="partcol" xreflabel="Part column">
+		<title>Part column</title>
+		<para>
+			A part column (<literal>&lt;pd&gt;</literal>) may
+			contain one or more <xref linkend="reportsection"/>s
+			(<literal>&lt;Report&gt;</literal>) which are layed
+			out vertically in this column continuously.
+		</para>
+		<para>
+			Such a report may be inlined:
+			<programlisting>
+&lt;Part&gt;
+    &lt;pr&gt;
+        &lt;pd&gt;
+            &lt;Report&gt;
+                ...
+            &lt;/Report&gt;
+        &lt;/pd&gt;
+    &lt;/pr&gt;
+&lt;/Part&gt;
+			</programlisting>
+		</para>
+		<para>
+			A report may also be loaded from a separate file:
+			<programlisting>
+&lt;Part&gt;
+    &lt;pr&gt;
+        &lt;pd&gt;
+            &lt;load ... /&gt;
+        &lt;/pd&gt;
+    &lt;/pr&gt;
+&lt;/Part&gt;
+			</programlisting>
+		</para>
+		<sect2>
+			<title>Part column attributes</title>
+			<sect3>
+				<title>Width</title>
+				<para>
+					Width of the part column.
+			<programlisting>
+&lt;pd width="60"&gt;
+			</programlisting>
+				</para>
+				<para>
+					When <xref linkend="sizeunit"/> is set to
+					<literal>rlib</literal> (the default),
+					the column width is measured in characters,
+					which is controlled by <xref linkend="partfontsize"/>.
+					Note, that the font width and height may differ,
+					depending on the font face controlled by
+					<xref linkend="partfontname"/>. Width is computed
+					from the font width.
+				</para>
+				<para>
+					When <xref linkend="sizeunit"/> is set to
+					<literal>points</literal>, width is measured
+					in points.
+				</para>
+				<para>
+					Columns without explicitly specified width are
+					dynamically sized according to
+					<xref linkend="papertype"/>,
+					<xref linkend="marginsettings"/>
+					and columns with explicitly specified width.
+				</para>
+				<para>
+					Columns that exceed the total page width
+					(according to <xref linkend="papertype"/> and
+					<xref linkend="marginsettings"/>) will be shown
+					partially, or won't be shown at all.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Height</title>
+				<para>
+					Height of the part column.
+			<programlisting>
+&lt;pd height="120"&gt;
+			</programlisting>
+				</para>
+				<para>
+					When <xref linkend="sizeunit"/> is set to
+					<literal>rlib</literal> (the default),
+					the column height is measured in characters,
+					which is controlled by <xref linkend="partfontsize"/>.
+					Note, that the font width and height may differ,
+					depending on the font face controlled by
+					<xref linkend="partfontname"/>. Column height is
+					computed from the font height.
+				</para>
+				<para>
+					When <xref linkend="sizeunit"/> is set to
+					<literal>points</literal>, height is measured
+					in points.
+				</para>
+				<para>
+					Report details in this part column are layed out
+					up to the the specified height.
+				</para>
+				<para>
+					Note, that OpenCReports allows fixed-height
+					columns to break over page boundaries. This is a
+					deviation from RLIB.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Border width</title>
+				<para>
+					Border width around the part column.
+					It is measured in points.
+			<programlisting>
+&lt;pd border_width="2"&gt;
+			</programlisting>
+				</para>
+				<para>
+					When set, a rectangle around the part column
+					will be drawn. The width of outline of the
+					rectangle is measured in points.
+				</para>
+				<para>
+					This is a deviation from RLIB where the width
+					of the outline was a fixed 0.1 points and an
+					inner margin (all of top, bottom, left and right)
+					inside the column border was used.
+				</para>
+				<para>
+					If the column breaks over a page boundary,
+					the border will be drawn the column parts
+					on every page. 
+				</para>
+			</sect3>
+			<sect3>
+				<title>Border color</title>
+				<para>
+					When <literal>border_width</literal> is set,
+					this color is used to draw the border rectangle.
+					<programlisting>
+&lt;pd border_color="'blue'"&gt;
+					</programlisting>
+				</para>
+				<para>
+					See <xref linkend="colorspec"/>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Detail columns</title>
+				<para>
+					Inner <literal>&lt;Report&gt;</literal>s
+					are layed out in one or more columns.
+					<programlisting>
+&lt;pd detail_columns="3"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is 1.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Column padding</title>
+				<para>
+					When <literal>detail_columns</literal>
+					is set to higher than 1, inner padding
+					between the detail columns may be specified.
+					<programlisting>
+&lt;pd column_pad="0.2"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is 0, i.e. no padding.
+				</para>
+				<para>
+					The unit of padding is inches if
+					<xref linkend="sizeunit"/> is set to
+					<literal>rlib</literal> (default), points
+					otherwise.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Suppress</title>
+				<para>
+					Report columns may be suppressed.
+					<programlisting>
+&lt;pd suppress="yes"&gt;
+&lt;pd suppress="val(m.suppress_column)"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is <literal>false</literal>,
+					i.e. no suppression.
+				</para>
+				<para>
+					The expression for <literal>suppress</literal>
+					must be a constant expression. An environment
+					variable (since it can't - or shouldn't change
+					during the report execution) is considered
+					constant. See <xref linkend="expressions"/>.
 				</para>
 			</sect3>
 		</sect2>
@@ -1223,13 +1451,13 @@ SELECT * FROM some_table
 &lt;/OpenCReport&gt;
 
 &lt;Part&gt;
-	&lt;pr&gt;
-		&lt;pd&gt;
-			&lt;Report&gt;
-				...
-			&lt;/Report&gt;
-		&lt;/pd&gt;
-	&lt;/pr&gt;
+    &lt;pr&gt;
+        &lt;pd&gt;
+            &lt;Report&gt;
+                ...
+            &lt;/Report&gt;
+        &lt;/pd&gt;
+    &lt;/pr&gt;
 &lt;/Part&gt;
 
 &lt;Report&gt;
@@ -1238,14 +1466,55 @@ SELECT * FROM some_table
 			</programlisting>
 		</para>
 		<para>
-			When <literal>&lt;Report&gt&gt;</literal> is the
+			When <literal>&lt;Report&gt;</literal> is the
 			toplevel node, parent nodes for
 			<literal>&lt;Part&gt;</literal>, <literal>&lt;pr&gt;</literal>
 			and <literal>&lt;pd&gt;</literal> are implicitly
 			created. Subsections and many attributes specific to
 			these parent nodes can be used as shortcuts in the
-			<literal>&lt;Report&gt&gt;</literal> node.
+			<literal>&lt;Report&gt;</literal> node.
 		</para>
+	</sect1>
+	<sect1 id="loadedreport" xreflabel="Loaded report">
+		<title>Loaded report</title>
+		<para>
+			It is like an inline report, but the complete
+			<xref linkend="reportsection"/> is loaded from
+			a different file.
+		</para>
+		<sect2>
+			<title>Loaded Report attributes</title>
+			<sect3>
+				<title>File name</title>
+				<para>
+					<programlisting>
+&lt;load name="report1.xml" /&gt;
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Query</title>
+				<para>
+					The <literal>query</literal> attribute overrides
+					the same attribute of <literal>&lt;Report&gt;</literal>.
+					This way, the report in the separate file can be reused
+					for a different data set.
+					<programlisting>
+&lt;load query="query1" /&gt;
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Iterations</title>
+				<para>
+					The <literal>iterations</literal> attribute overrides
+					the same attribute of <literal>&lt;Report&gt;</literal>.
+					<programlisting>
+&lt;load iterations="5" /&gt;
+					</programlisting>
+				</para>
+			</sect3>
+		</sect2>
 	</sect1>
 	<sect1 id="outputsection" xreflabel="Output section">
 		<title>Output section</title>
@@ -1253,6 +1522,12 @@ SELECT * FROM some_table
 			The &lt;Output&gt; section is used by many previously
 			mentioned sections. This is the crucial part of
 			describing what's displayed in the report.
+		</para>
+	</sect1>
+	<sect1 id="colorspec" xreflabel="Color specification">
+		<title>Color specification</title>
+		<para>
+			Colors may be specified by name or in HTML notation.
 		</para>
 	</sect1>
 </chapter>

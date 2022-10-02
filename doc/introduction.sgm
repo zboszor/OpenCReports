@@ -194,7 +194,8 @@
 				are also needed.
 			</para>
 			<para>
-				<literal>docbook2pdf</literal> from
+				<literal>docbook2pdf</literal> and
+				<literal>docbook2html</literal> from
 				<ulink url="http://sources.redhat.com/docbook-tools/"><citetitle>Docbook</citetitle></ulink>
 				is used to generate the documentation.
 			</para>
