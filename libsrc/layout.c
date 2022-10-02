@@ -767,7 +767,10 @@ double ocrpt_layout_top_margin(opencreport *o, ocrpt_part *p) {
 	else
 		top_margin = OCRPT_DEFAULT_TOP_MARGIN;
 
-	return top_margin;
+	if (o->size_in_points)
+		return top_margin;
+	else
+		return top_margin * 72.0;
 }
 
 double ocrpt_layout_bottom_margin(opencreport *o, ocrpt_part *p) {
@@ -778,7 +781,10 @@ double ocrpt_layout_bottom_margin(opencreport *o, ocrpt_part *p) {
 	else
 		bottom_margin = OCRPT_DEFAULT_BOTTOM_MARGIN;
 
-	return bottom_margin;
+	if (o->size_in_points)
+		return bottom_margin;
+	else
+		return bottom_margin * 72.0;
 }
 
 double ocrpt_layout_left_margin(opencreport *o, ocrpt_part *p) {
@@ -789,7 +795,10 @@ double ocrpt_layout_left_margin(opencreport *o, ocrpt_part *p) {
 	else
 		left_margin = OCRPT_DEFAULT_LEFT_MARGIN;
 
-	return left_margin;
+	if (o->size_in_points)
+		return left_margin;
+	else
+		return left_margin * 72.0;
 }
 
 double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p) {
@@ -798,9 +807,12 @@ double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p) {
 	if (p->right_margin_set)
 		right_margin = p->right_margin;
 	else
-		right_margin = ocrpt_layout_left_margin(o, p);
+		right_margin = OCRPT_DEFAULT_RIGHT_MARGIN;
 
-	return right_margin;
+	if (o->size_in_points)
+		return right_margin;
+	else
+		return right_margin * 72.0;
 }
 
 void ocrpt_layout_output_highprio_fieldheader(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, unsigned int rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {

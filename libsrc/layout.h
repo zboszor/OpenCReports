@@ -13,9 +13,10 @@
 #include "listutil.h"
 
 /* Margin defaults are in inches. 72.0 is the default DPI for PDF and others in Cairo */
-#define OCRPT_DEFAULT_TOP_MARGIN (0.2 * 72.0)
-#define OCRPT_DEFAULT_BOTTOM_MARGIN (0.2 * 72.0)
-#define OCRPT_DEFAULT_LEFT_MARGIN (0.2 * 72.0)
+#define OCRPT_DEFAULT_TOP_MARGIN (0.2)
+#define OCRPT_DEFAULT_BOTTOM_MARGIN (0.2)
+#define OCRPT_DEFAULT_LEFT_MARGIN (0.2)
+#define OCRPT_DEFAULT_RIGHT_MARGIN (0.2)
 #define OCRPT_DEFAULT_FONT_SIZE (12.0)
 
 enum ocrpt_output_type {

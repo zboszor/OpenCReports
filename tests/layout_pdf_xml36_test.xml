@@ -7,7 +7,7 @@
 	<Queries>
 		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="9" cols="5" />
 	</Queries>
-	<Part fontName="Petaluma Script">
+	<Part fontName="Petaluma Script" leftMargin="0.2*72.0" rightMargin="0.2*72.0" topMargin="0.2*72.0" bottomMargin="0.2*72.0">
 		<pr>
 			<pd detail_columns="2" column_pad="2" border_width="2" border_color="'bobkratz'">
 				<Report fontSize="12" paperType="A4" orientation="landscape">
