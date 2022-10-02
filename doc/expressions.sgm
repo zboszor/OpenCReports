@@ -167,7 +167,7 @@ false
 			Expressions may reference query column names, environment
 			variables, internal variables and user defined variables.
 			These references are called <literal>identifiers</literal>.
-			Their values are evaluated or computed during the report execution.
+			Their values are evaluated during the report execution.
 		</para>
 		<sect2>
 			<title>Valid identifier names</title>

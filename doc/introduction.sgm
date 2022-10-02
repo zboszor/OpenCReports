@@ -96,9 +96,17 @@
 				OpenCReports differentiates between timestamp and
 				time interval data types, with the latter allowing
 				adding or subtracting a custom time period to and from
-				timestamp data. See See <xref linkend="datetimeconstants"/>
+				timestamp data. See <xref linkend="datetimeconstants"/>
 				in
                 the <xref linkend="expressions"/> chapter.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Multi-row fields</title>
+			<para>
+				RLIB called them "memo" fields. Multi-row fields
+				are configurable and can break over column or page
+				boundaries.
 			</para>
 		</sect2>
 		<sect2>
@@ -194,12 +202,6 @@
 	</sect1>
 	<sect1>
 		<title>OpenCReports planned features</title>
-		<sect2>
-			<title>Multi-row fields</title>
-			<para>
-				The so called "memo" fields are not implemented yet.
-			</para>
-		</sect2>
 		<sect2>
 			<title>More output formats</title>
 			<para>
