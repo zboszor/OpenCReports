@@ -118,7 +118,12 @@ AC_CHECK_PROG(IMCOMPARE,[compare],[compare],[false])
 AM_CONDITIONAL(ENABLE_PDF_TESTS, [test x$ac_cv_prog_GHOSTSCRIPT = xghostscript -a x$ac_cv_prog_IMCOMPARE = xcompare])
 
 AC_CHECK_PROG(DOCBOOK2PDF,[docbook2pdf],[docbook2pdf],[false])
-AM_CONDITIONAL(ENABLE_DOCS, [test x$ac_cv_prog_DOCBOOK2PDF = xdocbook2pdf])
+AM_CONDITIONAL(ENABLE_PDF_DOCS, [test x$ac_cv_prog_DOCBOOK2PDF = xdocbook2pdf])
+
+AC_CHECK_PROG(DOCBOOK2HTML,[docbook2html],[docbook2html],[false])
+AM_CONDITIONAL(ENABLE_HTML_DOCS, [test x$ac_cv_prog_DOCBOOK2HTML = xdocbook2html])
+
+AM_CONDITIONAL(ENABLE_DOCS, [test x$ac_cv_prog_DOCBOOK2PDF = xdocbook2pdf -o x$ac_cv_prog_DOCBOOK2HTML = xdocbook2html])
 
 AC_CONFIG_FILES([
 	Makefile
