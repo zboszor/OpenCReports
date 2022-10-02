@@ -1892,14 +1892,13 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 
 	ocrpt_part *p = ocrpt_part_new(o);
 
-	xmlChar *layout, *font_name, *font_size, *size_unit, *rlib_compat, *orientation;
+	xmlChar *font_name, *font_size, *size_unit, *rlib_compat, *orientation;
 	xmlChar *top_margin, *bottom_margin, *left_margin, *right_margin;
 	xmlChar *paper_type, *iterations, *suppress_pageheader_firstpage;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
 	} xmlattrs[] = {
-		{ { "layout" }, &layout },
 		{ { "font_name", "fontName" }, &font_name },
 		{ { "font_size", "fontSize" }, &font_size },
 		{ { "size_unit" }, &size_unit },
@@ -1934,22 +1933,6 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 			o->rlib_compat = !!rlib_compat_i;
 		}
 		o->rlib_compat_set = true;
-	}
-
-	if (layout) {
-		ocrpt_expr *layout_e;
-		char *layout_s;
-
-		ocrpt_xml_const_expr_parse_get_value_with_fallback(o, layout);
-		/* TODO: we only know what "flow" is meant to do */
-		if (strcasecmp(layout_s, "flow") == 0) {
-			p->layout_set = true;
-			p->fixed = false;
-		} else if (strcasecmp(layout_s, "fixed") == 0) {
-			p->layout_set = true;
-			p->fixed = true;
-		}
-		ocrpt_expr_free(o, NULL, layout_e);
 	}
 
 	if (font_name) {

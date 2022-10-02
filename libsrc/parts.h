@@ -183,8 +183,6 @@ struct ocrpt_part {
 	bool allocated:1;
 	bool parsed:1;
 #endif
-	bool layout_set:1;
-	bool fixed:1;
 	bool font_size_set:1;
 	bool orientation_set:1;
 	bool landscape:1;
