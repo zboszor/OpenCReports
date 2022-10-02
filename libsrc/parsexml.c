@@ -1298,7 +1298,7 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 	ocrpt_report *r = ocrpt_report_new(o);
 	ocrpt_part_append_report(o, p, pr, pd, r);
 
-	xmlChar *font_name, *font_size, *size_unit, *orientation;
+	xmlChar *font_name, *font_size, *size_unit, *rlib_compat, *orientation;
 	xmlChar *top_margin, *bottom_margin, *left_margin, *right_margin;
 	xmlChar *paper_type, *iterations, *suppress_pageheader_firstpage, *query;
 	xmlChar *field_header_priority, *detail_columns, *column_pad;
@@ -1310,6 +1310,7 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		{ { "font_name", "fontName" }, &font_name },
 		{ { "font_size", "fontSize" }, &font_size },
 		{ { "size_unit" }, &size_unit },
+		{ { "rlib_compat" }, &rlib_compat },
 		{ { "orientation" }, &orientation },
 		{ { "top_margin", "topMargin" }, &top_margin },
 		{ { "bottom_margin", "bottomMargin" }, &bottom_margin },
@@ -1337,8 +1338,15 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 	}
 
 	if (!o->rlib_compat_set) {
-		o->rlib_compat_set = true;
 		o->rlib_compat = true;
+		if (rlib_compat) {
+			ocrpt_expr *rlib_compat_e;
+			int32_t rlib_compat_i;
+			ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, rlib_compat);
+			ocrpt_expr_free(o, NULL, rlib_compat_e);
+			o->rlib_compat = !!rlib_compat_i;
+		}
+		o->rlib_compat_set = true;
 	}
 
 	if (font_name) {
@@ -1884,7 +1892,7 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 
 	ocrpt_part *p = ocrpt_part_new(o);
 
-	xmlChar *layout, *font_name, *font_size, *size_unit, *orientation;
+	xmlChar *layout, *font_name, *font_size, *size_unit, *rlib_compat, *orientation;
 	xmlChar *top_margin, *bottom_margin, *left_margin, *right_margin;
 	xmlChar *paper_type, *iterations, *suppress_pageheader_firstpage;
 	struct {
@@ -1895,6 +1903,7 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 		{ { "font_name", "fontName" }, &font_name },
 		{ { "font_size", "fontSize" }, &font_size },
 		{ { "size_unit" }, &size_unit },
+		{ { "rlib_compat" }, &rlib_compat },
 		{ { "orientation" }, &orientation },
 		{ { "top_margin", "topMargin" }, &top_margin },
 		{ { "bottom_margin", "bottomMargin" }, &bottom_margin },
@@ -1916,8 +1925,15 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 	}
 
 	if (!o->rlib_compat_set) {
-		o->rlib_compat_set = true;
 		o->rlib_compat = true;
+		if (rlib_compat) {
+			ocrpt_expr *rlib_compat_e;
+			int32_t rlib_compat_i;
+			ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, rlib_compat);
+			ocrpt_expr_free(o, NULL, rlib_compat_e);
+			o->rlib_compat = !!rlib_compat_i;
+		}
+		o->rlib_compat_set = true;
 	}
 
 	if (layout) {
