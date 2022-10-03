@@ -1394,19 +1394,18 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		o->size_unit_set = true;
 	}
 
-	if (orientation) {
+	if (!p->orientation_set && orientation) {
 		ocrpt_expr *orientation_e;
 		char *orientation_s;
 
+		p->landscape = false;
 		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, orientation);
-		if (!p->orientation_set && orientation_s && strcasecmp(orientation_s, "portrait") == 0) {
-			p->orientation_set = true;
+		if (!p->orientation_set && orientation_s && strcasecmp(orientation_s, "portrait") == 0)
 			p->landscape = false;
-		} else if (!p->orientation_set && orientation_s && strcasecmp((char *)orientation, "landscape") == 0) {
-			p->orientation_set = true;
+		else if (!p->orientation_set && orientation_s && strcasecmp((char *)orientation, "landscape") == 0)
 			p->landscape = true;
-		}
 		ocrpt_expr_free(o, NULL, orientation_e);
+		p->orientation_set = true;
 	}
 
 	if (!p->top_margin_set && top_margin) {
