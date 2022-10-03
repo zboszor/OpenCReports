@@ -392,6 +392,9 @@ static void ocrpt_execute_parts(opencreport *o) {
 	for (ocrpt_list *pl = o->parts; pl; pl = pl->next) {
 		ocrpt_part *p = (ocrpt_part *)pl->data;
 
+		if (p->suppress)
+			continue;
+
 		if (!p->paper)
 			p->paper = o->paper;
 
@@ -434,6 +437,9 @@ static void ocrpt_execute_parts(opencreport *o) {
 				ocrpt_part_row *pr = (ocrpt_part_row *)row->data;
 				ocrpt_list *pdl;
 				double page_indent = ocrpt_layout_left_margin(o, p);
+
+				if (pr->suppress)
+					continue;
 
 				newpage = newpage || pr->newpage;
 

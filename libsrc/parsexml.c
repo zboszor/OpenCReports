@@ -1821,13 +1821,14 @@ static void ocrpt_parse_partrow_node(opencreport *o, ocrpt_part *p, xmlTextReade
 
 	ocrpt_part_row *pr = ocrpt_part_new_row(o, p);
 
-	xmlChar *layout, *newpage;
+	xmlChar *layout, *newpage, *suppress;
 	struct {
 		char *attr;
 		xmlChar **attrp;
 	} xmlattrs[] = {
 		{ "layout", &layout },
 		{ "newpage", &newpage },
+		{ "suppress", &suppress },
 		{ NULL, NULL },
 	};
 	int32_t i;
@@ -1859,6 +1860,15 @@ static void ocrpt_parse_partrow_node(opencreport *o, ocrpt_part *p, xmlTextReade
 		pr->newpage_set = true;
 		pr->newpage = !!newpage_i;
 		ocrpt_expr_free(o, NULL, newpage_e);
+	}
+
+	if (suppress) {
+		ocrpt_expr *suppress_e;
+		int32_t suppress_i;
+
+		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, suppress);
+		pr->suppress = !!suppress_i;
+		ocrpt_expr_free(o, NULL, suppress_e);
 	}
 
 	for (i = 0; xmlattrs[i].attrp; i++)
@@ -1894,7 +1904,7 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 
 	xmlChar *font_name, *font_size, *size_unit, *rlib_compat, *orientation;
 	xmlChar *top_margin, *bottom_margin, *left_margin, *right_margin;
-	xmlChar *paper_type, *iterations, *suppress_pageheader_firstpage;
+	xmlChar *paper_type, *iterations, *suppress, *suppress_pageheader_firstpage;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
@@ -1910,6 +1920,7 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 		{ { "right_margin", "rightMargin" }, &right_margin },
 		{ { "paper_type", "paperType" }, &paper_type },
 		{ { "iterations" }, &iterations },
+		{ { "suppress" }, &suppress },
 		{ { "suppressPageHeaderFirstPage" }, &suppress_pageheader_firstpage },
 		{ { NULL }, NULL },
 	};
@@ -2052,6 +2063,15 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 		p->iterations = iterations_i;
 	} else
 		p->iterations = 1;
+
+	if (suppress) {
+		ocrpt_expr *suppress_e;
+		int32_t suppress_i;
+
+		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, suppress);
+		p->suppress = !!suppress_i;
+		ocrpt_expr_free(o, NULL, suppress_e);
+	}
 
 	if (suppress_pageheader_firstpage) {
 		ocrpt_expr *suppress_pageheader_firstpage_e;
