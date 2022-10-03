@@ -48,6 +48,7 @@ libsrc/*.pdf
 
 # Documentation
 doc/*.pdf
+doc/html
 
 # Test results
 tests/expected/*.png
