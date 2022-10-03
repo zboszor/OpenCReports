@@ -1120,6 +1120,27 @@ SELECT * FROM some_table
 				</para>
 			</sect3>
 			<sect3>
+				<title>Suppress</title>
+				<para>
+					Report parts may be suppressed.
+					<programlisting>
+&lt;Part suppress="yes"&gt;
+&lt;Part suppress="val(m.suppress_part)"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is <literal>false</literal>,
+					i.e. no suppression.
+				</para>
+				<para>
+					The expression for <literal>suppress</literal>
+					must be a constant expression. An environment
+					variable (since it can't - or shouldn't change
+					during the report execution) is considered
+					constant. See <xref linkend="expressions"/>.
+				</para>
+			</sect3>
+			<sect3>
 				<title>Suppress page header on the first page</title>
 				<para>
 					The <literal>&lt;PageHeader&gt;</literal> section
@@ -1225,6 +1246,27 @@ SELECT * FROM some_table
 					Default value is <literal>no</literal>
 				</para>
 			</sect3>
+			<sect3>
+				<title>Suppress</title>
+				<para>
+					Report rows may be suppressed.
+					<programlisting>
+&lt;pr suppress="yes"&gt;
+&lt;pr suppress="val(m.suppress_row)"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is <literal>false</literal>,
+					i.e. no suppression.
+				</para>
+				<para>
+					The expression for <literal>suppress</literal>
+					must be a constant expression. An environment
+					variable (since it can't - or shouldn't change
+					during the report execution) is considered
+					constant. See <xref linkend="expressions"/>.
+				</para>
+			</sect3>
 		</sect2>
 	</sect1>
 	<sect1 id="partcol" xreflabel="Part column">
@@ -1250,7 +1292,8 @@ SELECT * FROM some_table
 			</programlisting>
 		</para>
 		<para>
-			A report may also be loaded from a separate file:
+			A report may also be loaded from a separate file.
+			For details, see <xref linkend="loadedreport"/>.
 			<programlisting>
 &lt;Part&gt;
     &lt;pr&gt;
