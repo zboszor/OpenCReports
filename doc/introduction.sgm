@@ -133,8 +133,9 @@
 			<title>Report breaks</title>
 			<para>
 				OpenCReports supports report breaks defined on arbitrary
-				expressions. Breaks occurs on the border of changes in the
-				expression value. See <xref linkend="breaks"/>
+				expressions. Breaks occur when the expression value
+				changes, when stepping from one data set row to the next.
+				See <xref linkend="breaks"/>
 			</para>
 		</sect2>
 		<sect2>

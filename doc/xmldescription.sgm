@@ -1025,7 +1025,7 @@ SELECT * FROM some_table
 					for RLIB.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="partpageorientation" xreflabel="Part page orientation">
 				<title>Orientation</title>
 				<para>
 					Page orientation for the whole
@@ -1140,7 +1140,7 @@ SELECT * FROM some_table
 					constant. See <xref linkend="expressions"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="suppresspageheaderfirstpage" xreflabel="Suppress page header on the first page">
 				<title>Suppress page header on the first page</title>
 				<para>
 					The <literal>&lt;PageHeader&gt;</literal> section
@@ -1273,7 +1273,7 @@ SELECT * FROM some_table
 		<title>Part column</title>
 		<para>
 			A part column (<literal>&lt;pd&gt;</literal>) may
-			contain one or more <xref linkend="reportsection"/>s
+			contain one or more <xref linkend="report"/>s
 			(<literal>&lt;Report&gt;</literal>) which are layed
 			out vertically in this column continuously.
 		</para>
@@ -1376,7 +1376,7 @@ SELECT * FROM some_table
 					deviation from RLIB.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="pdborderwidth" xreflabel="Part column border width">
 				<title>Border width</title>
 				<para>
 					Border width around the part column.
@@ -1402,7 +1402,7 @@ SELECT * FROM some_table
 					on every page. 
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="pdbordercolor" xreflabel="Part column border color">
 				<title>Border color</title>
 				<para>
 					When <literal>border_width</literal> is set,
@@ -1415,7 +1415,7 @@ SELECT * FROM some_table
 					See <xref linkend="colorspec"/>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="detailcolumns" xreflabel="Detail columns">
 				<title>Detail columns</title>
 				<para>
 					Inner <literal>&lt;Report&gt;</literal>s
@@ -1428,7 +1428,7 @@ SELECT * FROM some_table
 					Default value is 1.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="columnpadding" xreflabel="Column padding">
 				<title>Column padding</title>
 				<para>
 					When <literal>detail_columns</literal>
@@ -1471,15 +1471,16 @@ SELECT * FROM some_table
 			</sect3>
 		</sect2>
 	</sect1>
-	<sect1 id="reportsection" xreflabel="Report section">
-		<title>Report section</title>
+	<sect1 id="report" xreflabel="Report">
+		<title>Report</title>
 		<para>
-			This section may occur in a wider context, with
-			either <literal>&lt;OpenCReport&gt;</literal>, or
-			<literal>&lt;Part&gt;</literal> being the toplevel
-			node, or standalone. Examples:
+			This section may occur in a wider context or
+			standalone in an XML description file.
 		</para>
 		<para>
+			Example XML skeleton structure with
+			<literal>&lt;OpenCReport&gt;</literal> as
+			the toplevel node:
 			<programlisting>
 &lt;OpenCReport&gt;
     &lt;Part&gt;
@@ -1492,7 +1493,13 @@ SELECT * FROM some_table
         &lt;/pr&gt;
     &lt;/Part&gt;
 &lt;/OpenCReport&gt;
-
+			</programlisting>
+		</para>
+		<para>
+			Example XML skeleton structure with
+			<literal>&lt;Part&gt;</literal> as
+			the toplevel node:
+			<programlisting>
 &lt;Part&gt;
     &lt;pr&gt;
         &lt;pd&gt;
@@ -1502,9 +1509,14 @@ SELECT * FROM some_table
         &lt;/pd&gt;
     &lt;/pr&gt;
 &lt;/Part&gt;
-
+			</programlisting>
+		</para>
+		<para>
+			Example XML skeleton structure with
+			a standalone <literal>&lt;Report&gt;</literal> node:
+			<programlisting>
 &lt;Report&gt;
-	...
+    ...
 &lt;/Report&gt;
 			</programlisting>
 		</para>
@@ -1517,12 +1529,638 @@ SELECT * FROM some_table
 			these parent nodes can be used as shortcuts in the
 			<literal>&lt;Report&gt;</literal> node.
 		</para>
+		<sect2 id="reportattribs" xreflabel="Report attributes">
+			<title>Report attributes</title>
+			<sect3 id="reportfontname" xreflabel="Report font name">
+				<title>Font name</title>
+				<para>
+					The font name attribute specifies the font
+					for the report's scope. It can be overridden by
+					child nodes for their scope.
+					It may be specified in two forms, the first one
+					is the preferred name, the second is for RLIB
+					compatibility:
+					<programlisting>
+&lt;Report font_name="Arial"&gt;
+&lt;Report fontName="Arial"&gt;
+					</programlisting>
+				</para>
+				<para>
+					If both forms are specified, <literal>font_name</literal>
+					is used.
+				</para>
+				<para>
+					Default font name is <literal>Courier</literal>.
+				</para>
+			</sect3>
+			<sect3 id="reportfontsize" xreflabel="Report font size">
+				<title>Font size</title>
+				<para>
+					The font size attribute specifies the font size
+					for the report's scope. It can be overridden by
+					child nodes for their scope.
+					It may be specified in two forms, the first one
+					is the preferred name, the second is for RLIB
+					compatibility:
+					<programlisting>
+&lt;Report font_size="10"&gt;
+&lt;Report fontSize="10"&gt;
+					</programlisting>
+				</para>
+				<para>
+					If both forms are specified, <literal>font_size</literal>
+					is used.
+				</para>
+				<para>
+					Default font size is 12.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Size unit</title>
+				<para>
+					Shortcut for the <xref linkend="sizeunit"/> in
+					<literal>&lt;OpenCReport&gt;</literal> when
+					<literal>&lt;Report&gt;</literal> is the toplevel node.
+					<programlisting>
+&lt;Report size_unit="default"&gt;
+&lt;Report size_unit="rlib"&gt;
+&lt;Report size_unit="points"&gt;
+					</programlisting>
+				</para>
+				<para>
+					When <literal>&lt;OpenCReport&gt;</literal> or
+					<literal>&lt;Part&gt;</literal> is the toplevel
+					node in the report XML description, this attribute
+					for <literal>&lt;Report&gt;</literal> is ignored.
+				</para>
+			</sect3>
+			<sect3>
+				<title>RLIB compatibility</title>
+				<para>
+					Shortcut for the <xref linkend="rlibcompat"/> in
+					<literal>&lt;OpenCReport&gt;</literal> when
+					<literal>&lt;Report&gt;</literal> is the toplevel node.
+					<programlisting>
+&lt;Report rlib_compat="yes"&gt;
+&lt;Report rlib_compat="no"&gt;
+					</programlisting>
+				</para>
+				<para>
+					When <literal>&lt;OpenCReport&gt;</literal> is the
+					toplevel node in the XML, this attribute for
+					<literal>&lt;Report&gt;</literal> is ignored.
+				</para>
+				<para>
+					When <literal>&lt;Report&gt;</literal> is the toplevel
+					node, the default is <literal>yes</literal>.
+					This helps using OpenCReports as a drop-in replacement
+					for RLIB.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Orientation</title>
+				<para>
+					Shortcut for <xref linkend="partpageorientation"/>
+					for the implicitly created parent
+					<literal>&lt;Part&gt;</literal> node when
+					<literal>&lt;Report&gt;</literal> is standalone.
+					<programlisting>
+&lt;Report orientation="portrait"&gt;
+&lt;Report orientation="landscape"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default is portrait orientation.
+				</para>
+				<para>
+					This setting for <literal>&lt;Report&gt;</literal>
+					is ignored when there is a parent
+					<literal>&lt;Part&gt;</literal> node
+					in the XML description.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Margin settings</title>
+				<para>
+					Shortcuts for <xref linkend="marginsettings"/>
+					for the implicitly created parent
+					<literal>&lt;Part&gt;</literal> node. Individual
+					settings exist for the top, bottom, left and
+					right margins of the page. Every setting
+					exist in two forms: the RLIB compatible
+					"lowerCamelCase" variant and the all lowercase
+					with underscore. The lowecase-with-underscore
+					variants are the preferred ones.
+					<programlisting>
+&lt;Report top_margin="0.2"&gt;
+&lt;Report topMargin="0.2"&gt;
+&lt;Report bottom_margin="0.2"&gt;
+&lt;Report bottomMargin="0.2"&gt;
+&lt;Report left_margin="0.2"&gt;
+&lt;Report leftMargin="0.2"&gt;
+&lt;Report right_margin="0.2"&gt;
+&lt;Report rightMargin="0.2"&gt;
+					</programlisting>
+				</para>
+				<para>
+					When <literal>size_unit="rlib"</literal> is in effect
+					(the default case) the margin unit is inches.
+					The margin unit is points (1/72th inches) when
+					<literal>size_unit="points"</literal> is in effect.
+				</para>
+				<para>
+					Default values for the top, bottom, left and right
+					margins are all 0.2, regardless of the unit.
+				</para>
+				<para>
+					Note that <literal>rightMargin</literal> didn't exist
+					in RLIB.
+				</para>
+				<para>
+					These settings for <literal>&lt;Report&gt;</literal>
+					are ignored when there is a parent
+					<literal>&lt;Part&gt;</literal> node
+					in the XML description.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Paper type</title>
+				<para>
+					Shortcut for <xref linkend="papertype"/>
+					for the implicitly created parent
+					<literal>&lt;Part&gt;</literal> node. It exists in
+					two forms: the RLIB compatible "lowerCamelCase"
+					variant and the all lowercase with underscore.
+					The lowecase-with-underscore variant is preferred.
+					<programlisting>
+&lt;Part paper_type="A4"&gt;
+&lt;Part paperType="A4"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is the current system paper type
+					that <ulink url="http://packages.qa.debian.org/libp/libpaper.html">libpaper</ulink>
+					uses. E.g. if the system is set to US English,
+					the default paper type is implicitly
+					<literal>letter</literal>. In most of Europe,
+					the default paper type is <literal>A4</literal>
+				</para>
+				<para>
+					The paper type can be specified in either lower case
+					or upper case, both are accepted.
+				</para>
+				<para>
+					This setting for <literal>&lt;Report&gt;</literal>
+					is ignored when there is a parent
+					<literal>&lt;Part&gt;</literal> node
+					in the XML description.
+				</para>
+			</sect3>
+			<sect3 id="reportheight" xreflabel="Report height">
+				<title>Height</title>
+				<para>
+					Height of the report.
+			<programlisting>
+&lt;Report height="120"&gt;
+			</programlisting>
+				</para>
+				<para>
+					When <xref linkend="sizeunit"/> is set to
+					<literal>rlib</literal> (the default),
+					the report height is measured in characters,
+					which is controlled by <xref linkend="reportfontsize"/>.
+					Note, that the font width and height may differ,
+					depending on the font face controlled by
+					<xref linkend="reportfontname"/>. Report height is
+					computed from the font height.
+				</para>
+				<para>
+					When <xref linkend="sizeunit"/> is set to
+					<literal>points</literal>, height is measured
+					in points.
+				</para>
+				<para>
+					Report details are layed out up to the the
+					specified height. When the whole report
+					fits in the specified height, the next report's
+					starting point on the page depends on
+					<xref linkend="rlibcompat"/>.
+				</para>
+				<para>
+					When RLIB compatibility is not set, then the height
+					of this report is unconditionally applied, i.e.
+					any subsequent <literal>&lt;Report&gt;</literal>
+					follows with the vertical padding, i.e. the remaining
+					empty space until the fixed height. If the height
+					is not set for the parent <literal>&lt;pd&gt;</literal>
+					node, it is expanded with this vertical padding.
+				</para>
+				<para>
+					When RLIB compatibility is set, the vertical
+					padding is only applied if this 
+					<literal>&lt;Report&gt;</literal> is not the
+					last one in the parent <literal>&lt;pd&gt;</literal>
+					node.
+				</para>
+				<para>
+					In case height for both parent
+					<literal>&lt;pd&gt;</literal> node and the
+					<literal>&lt;Report&gt;</literal> node is set,
+					the smaller height value is applied first.
+				</para>
+				<para>
+					Note, that OpenCReports allows fixed-height
+					reports to break over page boundaries.
+					This is a deviation from RLIB.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Iterations</title>
+				<para>
+					The same <literal>&lt;Report&gt;</literal> may be
+					executed multiple times.
+					<programlisting>
+&lt;Report iterations="3"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is 1.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Suppress</title>
+				<para>
+					Reports may be suppressed.
+					<programlisting>
+&lt;Report suppress="yes"&gt;
+&lt;Report suppress="val(m.suppress_report)"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is <literal>false</literal>,
+					i.e. no suppression.
+				</para>
+				<para>
+					The expression for <literal>suppress</literal>
+					must be a constant expression. An environment
+					variable (since it can't - or shouldn't change
+					during the report execution) is considered
+					constant. See <xref linkend="expressions"/>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Suppress page header on the first page</title>
+				<para>
+					Shortcut for <xref linkend="suppresspageheaderfirstpage"/>
+					in the implicitly created parent
+					<literal>&lt;Part&gt;</literal> node when
+					<literal>&lt;Report&gt;</literal> is the
+					toplevel node.
+					<programlisting>
+&lt;Report suppressPageHeaderFirstPage="yes"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is <literal>no</literal>.
+				</para>
+				<para>
+					This setting for <literal>&lt;Report&gt;</literal>
+					is ignored when there is a parent
+					<literal>&lt;Part&gt;</literal> node
+					in the XML description.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Query</title>
+				<para>
+					Set the primary query name for <literal>&lt;Report&gt;</literal>
+					from the list of <xref linkend="queries"/>.
+					<programlisting>
+&lt;Report query="query1"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is unset, i.e. use the first
+					query from the list of <xref linkend="queries"/>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Field header priority</title>
+				<para>
+					Set the field header priority for the report versus
+					break (header and footer) priority. This setting
+					selects which report detail is encompassing the other.
+					<programlisting>
+&lt;Report field_header_priority="low"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is <literal>high</literal>. In this
+					mode, the field header is printed on the top of every
+					page of the report and break headers and footers are
+					encompassed by it. The default is chosen for RLIB
+					compatibility.
+				</para>
+				<para>
+					When this setting is <literal>low</literal>,
+					field headers are handled with lower priority
+					compared to break headers and footers. In this
+					mode, a break header is followed by the field header,
+					then data rows (field details), followed by the break
+					footer. This brings the field header closer to the field
+					details.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Border width</title>
+				<para>
+					This is a shortcut for <xref linkend="pdborderwidth"/>
+					for the implicitly created <literal>&lt;pd&gt;</literal>
+					node when <literal>&lt;Report&gt;</literal> is standalone.
+					It is measured in points.
+			<programlisting>
+&lt;Report border_width="2"&gt;
+			</programlisting>
+				</para>
+				<para>
+					When set, a rectangle around the part column
+					(in this case, around the single report in the
+					part column) will be drawn. The width of outline
+					of the rectangle is measured in points.
+				</para>
+				<para>
+					This is a deviation from RLIB where the width
+					of the outline was a fixed 0.1 points and an
+					inner margin (all of top, bottom, left and right)
+					inside the column border was used. Also, this shortcut
+					didn't exist in RLIB, the <literal>&lt;pd&gt;</literal>
+					node had to be present.
+				</para>
+				<para>
+					If the report (column) breaks over a page boundary,
+					the border will be drawn the column parts
+					on every page. 
+				</para>
+				<para>
+					This setting for <literal>&lt;Report&gt;</literal>
+					is ignored when there is a parent
+					<literal>&lt;pd&gt;</literal> node.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Border color</title>
+				<para>
+					This is a shortcut for <xref linkend="pdbordercolor"/>
+					for the implicitly created <literal>&lt;pd&gt;</literal>
+					node when <literal>&lt;Report&gt;</literal> is standalone.
+					When <literal>border_width</literal> is set,
+					this color is used to draw the border rectangle.
+					<programlisting>
+&lt;Report border_color="'blue'"&gt;
+					</programlisting>
+				</para>
+				<para>
+					See <xref linkend="colorspec"/>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Detail columns</title>
+				<para>
+					Shortcut for <xref linkend="detailcolumns"/>
+					in the implicitly created parent
+					<literal>&lt;pd&gt;</literal> when
+					<literal>&lt;Parent&gt;</literal> is the
+					toplevel node.
+					<programlisting>
+&lt;Report detail_columns="3"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is 1.
+				</para>
+				<para>
+					This setting for <literal>&lt;Parent&gt;</literal>
+					is ignored when there is a parent
+					<literal>&lt;pd&gt;</literal> node in the report
+					XML description.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Column padding</title>
+				<para>
+					Shortcut for <xref linkend="columnpadding"/>
+					in the implicitly created parent
+					<literal>&lt;pd&gt;</literal> node when
+					<literal>&lt;Parent&gt;</literal> is the
+					toplevel node.
+					<programlisting>
+&lt;Report column_pad="0.2"&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default value is 0, i.e. no padding.
+				</para>
+				<para>
+					The unit of padding is inches if
+					<xref linkend="sizeunit"/> is set to
+					<literal>rlib</literal> (default), points
+					otherwise.
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Report subsections</title>
+			<sect3>
+				<title>Page header</title>
+				<para>
+					This is a shortcut for <xref linkend="pageheader"/>
+					in the implicitly created <literal>&lt;Part&gt;</literal>
+					node when <literal>&lt;Report&gt;</literal> is standalone.
+					It contains an <xref linkend="outputsection"/>.
+					<programlisting>
+&lt;Report&gt;
+    &lt;PageHeader&gt;
+        &lt;Output&gt;
+            ...
+        &lt;/Output&gt;
+    &lt;/PageHeader&gt;
+&lt;/Part&gt;
+					</programlisting>
+				</para>
+				<para>
+					This subsection for <literal>&lt;Report&gt;</literal>
+					is ignored when there is a page footer section
+					defined for the <literal>&lt;Part&gt;</literal> node,
+					either in the <literal>&lt;Part&gt;</literal> node
+					itself or in a previous child <literal>&lt;Report&gt;</literal>
+					node for the same <literal>&lt;Part&gt;</literal>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Page footer</title>
+				<para>
+					This is a shortcut for <xref linkend="pagefooter"/>
+					in the implicitly created <literal>&lt;Part&gt;</literal>
+					node when <literal>&lt;Report&gt;</literal> is standalone.
+					It contains an <xref linkend="outputsection"/>.
+					<programlisting>
+&lt;Report&gt;
+    &lt;PageFooter&gt;
+        &lt;Output&gt;
+            ...
+        &lt;/Output&gt;
+    &lt;/PageFooter&gt;
+&lt;/Part&gt;
+					</programlisting>					
+				</para>
+				<para>
+					This subsection for <literal>&lt;Report&gt;</literal>
+					is ignored when there is a page footer section
+					defined for the <literal>&lt;Part&gt;</literal> node,
+					either in the <literal>&lt;Part&gt;</literal> node
+					itself or in a previous child <literal>&lt;Report&gt;</literal>
+					node for the same <literal>&lt;Part&gt;</literal>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Report header</title>
+				<para>
+					This is the description of the report header that is
+					emitted at the start of the report.
+					It contains an <xref linkend="outputsection"/>.
+					<programlisting>
+&lt;Report&gt;
+    &lt;ReportHeader&gt;
+        &lt;Output&gt;
+            ...
+        &lt;/Output&gt;
+    &lt;/ReportHeader&gt;
+&lt;/Part&gt;
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Report footer</title>
+				<para>
+					This is the description of the report footer that is
+					emitted at the end of the report.
+					It contains an <xref linkend="outputsection"/>.
+					<programlisting>
+&lt;Report&gt;
+    &lt;ReportFooter&gt;
+        &lt;Output&gt;
+            ...
+        &lt;/Output&gt;
+    &lt;/ReportFooter&gt;
+&lt;/Part&gt;
+					</programlisting>					
+				</para>
+			</sect3>
+			<sect3>
+				<title>Variables</title>
+				<para>
+					This section describes the variables in the report.
+					<programlisting>
+&lt;Report&gt;
+    &lt;Variables&gt;
+        &lt;Variable ... /&gt;
+        ...
+    &lt;/Variables&gt;
+&lt;/Part&gt;
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Breaks</title>
+				<para>
+					This section describes the breaks in the report.
+					<programlisting>
+&lt;Report&gt;
+    &lt;Breaks&gt;
+        &lt;Break ... /&gt;
+        ...
+    &lt;/Breaks&gt;
+&lt;/Part&gt;
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Detail</title>
+				<para>
+					This section describes the tabular details of the report.
+					There are two subsections in this node, both contain
+					an <xref linkend="outputsection"/>.
+					<programlisting>
+&lt;Report&gt;
+    &lt;Detail&gt;
+        &lt;FieldHeaders&gt;
+            &lt;Output&gt;
+                ...
+            &lt;/Output&gt;
+        &lt;/FieldHeaders&gt;
+        &lt;FieldDetails&gt;
+            &lt;Output&gt;
+                ...
+            &lt;/Output&gt;
+        &lt;/FieldDetails&gt;
+    &lt;/Detail&gt;
+&lt;/Part&gt;
+					</programlisting>
+				</para>
+				<para>
+					<literal>&lt;FieldHeaders&gt;</literal> is used
+					to describe the header for data rows.
+				</para>
+				<para>
+					<literal>&lt;FieldDetails&gt;</literal> is used
+					to show data that is derived from the current data row
+					produced by the report query.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Alternate output for no data</title>
+				<para>
+					This section describes the alternate output of the report
+					when the query has no data rows, or there is no such
+					query name defined. It contains an
+					<xref linkend="outputsection"/>.
+				</para>
+				<para>
+					This section may be declared in two ways. One way is to
+					spell out the <literal>&lt;Alternate&gt;</literal> node:
+					<programlisting>
+&lt;Report&gt;
+    &lt;Alternate&gt;
+        &lt;NoData&gt;
+            &lt;Output&gt;
+                ...
+            &lt;/Output&gt;
+        &lt;/NoData&gt;
+    &lt;/Alternate&gt;
+&lt;/Part&gt;
+					</programlisting>
+				</para>
+				<para>
+					The other way is without the
+					<literal>&lt;Alternate&gt;</literal> node:
+					<programlisting>
+&lt;Report&gt;
+    &lt;NoData&gt;
+        &lt;Output&gt;
+            ...
+        &lt;/Output&gt;
+    &lt;/NoData&gt;
+&lt;/Part&gt;
+					</programlisting>
+				</para>
+			</sect3>
+		</sect2>
 	</sect1>
 	<sect1 id="loadedreport" xreflabel="Loaded report">
 		<title>Loaded report</title>
 		<para>
-			It is like an inline report, but the complete
-			<xref linkend="reportsection"/> is loaded from
+			It is like an inline report, but the
+			<xref linkend="report"/> is loaded from
 			a different file.
 		</para>
 		<sect2>
