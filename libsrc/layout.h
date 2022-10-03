@@ -43,6 +43,7 @@ struct ocrpt_line_element {
 	ocrpt_list *drawing_page;
 	PangoLayout *layout;
 	PangoFontDescription *font_description;
+	PangoLayoutLine *pline;
 
 	/* Shortcuts carried over between get_text_sizes() and draw_text() */
 	const char *font;
@@ -54,12 +55,16 @@ struct ocrpt_line_element {
 	double descent;
 	double width_computed;
 
+	PangoRectangle p_rect;
 	PangoAlignment p_align;
 	int32_t memo_max_lines;
 	int32_t lines;
 	int32_t col;
+	bool bold_val:1;
+	bool italic_val:1;
 	bool memo:1;
 	bool memo_wrap_chars:1;
+	bool use_bb:1;
 };
 
 struct ocrpt_line {
@@ -158,30 +163,6 @@ static inline void ocrpt_cairo_create(opencreport *o) {
 			}
 		} else
 			o->cr = cairo_create(o->nullpage_cs);
-	}
-}
-
-static inline void ocrpt_pangocairo_free_layout_if_needed(opencreport *o, ocrpt_line_element *le, char *font, double fontsz) {
-	if (o->drawing_page != le->drawing_page) {
-		if (le->layout) {
-			g_object_unref(le->layout);
-			le->layout = NULL;
-		}
-		if (le->font_description) {
-			pango_font_description_free(le->font_description);
-			le->font_description = NULL;
-		}
-	}
-
-	if ((le->font && font && strcmp(le->font, font)) || le->fontsz != fontsz) {
-		if (le->layout) {
-			g_object_unref(le->layout);
-			le->layout = NULL;
-		}
-		if (le->font_description) {
-			pango_font_description_free(le->font_description);
-			le->font_description = NULL;
-		}
 	}
 }
 
