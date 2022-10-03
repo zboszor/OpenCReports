@@ -120,6 +120,7 @@ struct ocrpt_part_row_data {
 	uint32_t current_column;
 	bool width_set:1;
 	bool height_set:1;
+	bool border_width_set_from_pd:1;
 	bool border_width_set:1;
 	bool detail_columns_set:1;
 	bool suppress:1;

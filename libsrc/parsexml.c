@@ -1300,9 +1300,9 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 
 	xmlChar *font_name, *font_size, *size_unit, *rlib_compat, *orientation;
 	xmlChar *top_margin, *bottom_margin, *left_margin, *right_margin;
-	xmlChar *paper_type, *iterations, *suppress_pageheader_firstpage, *query;
-	xmlChar *field_header_priority, *detail_columns, *column_pad;
-	xmlChar *height, *suppress;
+	xmlChar *paper_type, *iterations, *suppress, *suppress_pageheader_firstpage;
+	xmlChar *query, *field_header_priority, *height;
+	xmlChar *border_width, *border_color, *detail_columns, *column_pad;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
@@ -1318,13 +1318,15 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		{ { "right_margin", "rightMargin" }, &right_margin },
 		{ { "paper_type", "paperType" }, &paper_type },
 		{ { "iterations" }, &iterations },
+		{ { "height" }, &height},
+		{ { "suppress" }, &suppress },
 		{ { "suppressPageHeaderFirstPage" }, &suppress_pageheader_firstpage },
 		{ { "query" }, &query },
 		{ { "field_header_priority" }, &field_header_priority },
+		{ { "border_width" }, &border_width },
+		{ { "border_color" }, &border_color },
 		{ { "detail_columns" }, &detail_columns },
 		{ { "column_pad" }, &column_pad },
-		{ { "height" }, &height},
-		{ { "suppress" }, &suppress },
 		{ { NULL }, NULL },
 	};
 	int32_t i, j;
@@ -1518,6 +1520,33 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_expr_free(o, NULL, field_header_priority_e);
 	}
 
+	if (!pd->border_width_set_from_pd) {
+		pd->border_width = 0.0;
+		pd->border_width_set = false;
+		if (border_width) {
+			ocrpt_expr *border_width_e;
+			double border_width_d;
+
+			ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, border_width);
+			ocrpt_expr_free(o, NULL, border_width_e);
+			if (border_width_d > 0.0) {
+				pd->border_width = border_width_d;
+				pd->border_width_set = true;
+			}
+		}
+		pd->border_width_set_from_pd = true;
+
+		if (border_color) {
+			ocrpt_expr *border_color_e;
+			char *border_color_s;
+
+			ocrpt_xml_const_expr_parse_get_value_with_fallback(o, border_color);
+			ocrpt_get_color(o, border_color_s, &pd->border_color, false);
+			ocrpt_expr_free(o, NULL, border_color_e);
+		} else
+			ocrpt_get_color(o, NULL, &pd->border_color, false);
+	}
+
 	if (!pd->detail_columns_set) {
 		pd->detail_columns = 1;
 		if (detail_columns) {
@@ -1572,11 +1601,17 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 				ocrpt_parse_alternate_node(o, r, reader);
 			else if (!strcmp((char *)name, "NoData"))
 				ocrpt_parse_output_parent_node(o, r, "NoData", &r->nodata, reader);
-			else if (!strcmp((char *)name, "PageHeader"))
-				ocrpt_parse_output_parent_node(o, NULL, "PageHeader", &p->pageheader, reader);
-			else if (!strcmp((char *)name, "PageFooter"))
-				ocrpt_parse_output_parent_node(o, NULL, "PageFooter", &p->pagefooter, reader);
-			else if (!strcmp((char *)name, "ReportHeader"))
+			else if (!strcmp((char *)name, "PageHeader")) {
+				if (p->pageheader.output_list)
+					ocrpt_ignore_child_nodes(o, reader, -1, "PageHeader");
+				else
+					ocrpt_parse_output_parent_node(o, NULL, "PageHeader", &p->pageheader, reader);
+			} else if (!strcmp((char *)name, "PageFooter")) {
+				if (p->pagefooter.output_list)
+					ocrpt_ignore_child_nodes(o, reader, -1, "PageFooter");
+				else
+					ocrpt_parse_output_parent_node(o, NULL, "PageFooter", &p->pagefooter, reader);
+			} else if (!strcmp((char *)name, "ReportHeader"))
 				ocrpt_parse_output_parent_node(o, r, "ReportHeader", &r->reportheader, reader);
 			else if (!strcmp((char *)name, "ReportFooter"))
 				ocrpt_parse_output_parent_node(o, r, "ReportFooter", &r->reportfooter, reader);
@@ -1730,15 +1765,20 @@ static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		ocrpt_expr_free(o, NULL, height_e);
 	}
 
+	pd->border_width = 0.0;
+	pd->border_width_set = false;
 	if (border_width) {
 		ocrpt_expr *border_width_e;
 		double border_width_d;
 
 		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, border_width);
-		pd->border_width = border_width_d;
-		pd->border_width_set = true;
 		ocrpt_expr_free(o, NULL, border_width_e);
+		if (border_width_d > 0.0) {
+			pd->border_width = border_width_d;
+			pd->border_width_set = true;
+		}
 	}
+	pd->border_width_set_from_pd = true;
 
 	if (border_color) {
 		ocrpt_expr *border_color_e;
