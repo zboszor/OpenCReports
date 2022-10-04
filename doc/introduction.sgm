@@ -42,7 +42,7 @@
 			</para>
 		</sect2>
 		<sect2>
-			<title>Extensive API for report creation</title>
+			<title>Comprehensive API for report creation</title>
 			<para>
 				The <xref linkend="lowlevelapi"/> allows creating a report purely
 				via program code. The <xref linkend="highlevelapi"/> allows loading
@@ -212,7 +212,7 @@
 			</para>
 		</sect2>
 		<sect2>
-			<title>Graph and chart support in XML and PDF output</title>
+			<title>Graph and chart support in HTML and PDF output</title>
 			<para>
 				Currently Gantt chart and various graph types (like
 				barchart, pie chart and their various subtypes) are

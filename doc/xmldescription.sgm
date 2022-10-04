@@ -1176,7 +1176,7 @@ SELECT * FROM some_table
 				<title>Page header</title>
 				<para>
 					This is the description of the page header.
-					It contains an <xref linkend="outputsection"/>.
+					It contains an <xref linkend="outputnode"/>.
 					<programlisting>
 &lt;Part&gt;
     &lt;PageHeader&gt;
@@ -1192,7 +1192,7 @@ SELECT * FROM some_table
 				<title>Page footer</title>
 				<para>
 					This is the description of the page footer.
-					It contains an <xref linkend="outputsection"/>.
+					It contains an <xref linkend="outputnode"/>.
 					<programlisting>
 &lt;Part&gt;
     &lt;PageFooter&gt;
@@ -1203,6 +1203,30 @@ SELECT * FROM some_table
 &lt;/Part&gt;
 					</programlisting>					
 				</para>
+			</sect3>
+			<sect3>
+				<title>Part row</title>
+				<para>
+					See <xref linkend="partrow"/>.
+					<programlisting>
+&lt;Part&gt;
+    &lt;pr&gt;
+        &lt;pd&gt;
+            ...
+        &lt;/pd&gt;
+    &lt;/pr&gt;
+&lt;/Part&gt;
+					</programlisting>
+				</para>
+				<sect4>
+					<title>Part row subsections</title>
+					<sect5>
+						<title>Part column</title>
+						<para>
+							See <xref linkend="partcol"/>.
+						</para>
+					</sect5>
+				</sect4>
 			</sect3>
 		</sect2>
 	</sect1>
@@ -1368,10 +1392,11 @@ SELECT * FROM some_table
 				</para>
 				<para>
 					Report details in this part column are layed out
-					up to the the specified height.
+					up to the the specified height. See
+					<xref linkend="reportheight"/> for further explanation.
 				</para>
 				<para>
-					Note, that OpenCReports allows fixed-height
+					Note, that OpenCReports allows fixed height
 					columns to break over page boundaries. This is a
 					deviation from RLIB.
 				</para>
@@ -1550,7 +1575,9 @@ SELECT * FROM some_table
 					is used.
 				</para>
 				<para>
-					Default font name is <literal>Courier</literal>.
+					Default font name is what's set for
+					<xref linkend="partfontname"/>, or
+					<literal>Courier</literal> if both are unset.
 				</para>
 			</sect3>
 			<sect3 id="reportfontsize" xreflabel="Report font size">
@@ -1572,7 +1599,9 @@ SELECT * FROM some_table
 					is used.
 				</para>
 				<para>
-					Default font size is 12.
+					Default font name is what's set for
+					<xref linkend="partfontsize"/>, or
+					<literal>12</literal> if both are unset.
 				</para>
 			</sect3>
 			<sect3>
@@ -1751,22 +1780,33 @@ SELECT * FROM some_table
 					of this report is unconditionally applied, i.e.
 					any subsequent <literal>&lt;Report&gt;</literal>
 					follows with the vertical padding, i.e. the remaining
-					empty space until the fixed height. If the height
-					is not set for the parent <literal>&lt;pd&gt;</literal>
-					node, it is expanded with this vertical padding.
+					empty space is added up to the fixed height.
+					If height is unset for the parent
+					<literal>&lt;pd&gt;</literal> node, it is expanded
+					with this vertical padding.
 				</para>
 				<para>
 					When RLIB compatibility is set, the vertical
-					padding is only applied if this 
-					<literal>&lt;Report&gt;</literal> is not the
-					last one in the parent <literal>&lt;pd&gt;</literal>
-					node.
+					padding is only applied between 
+					<literal>&lt;Report&gt;</literal>s in the parent
+					<literal>&lt;pd&gt;</literal> node but not
+					after the last <literal>&lt;Report&gt;</literal>
+					if it is shorter than the specified height.
+					The specified height would still limit the displayed
+					rows for the last <literal>&lt;Report&gt;</literal>
+					if it would run longer than the specified height.
 				</para>
 				<para>
-					In case height for both parent
+					In case height is set for both the parent
 					<literal>&lt;pd&gt;</literal> node and the
-					<literal>&lt;Report&gt;</literal> node is set,
-					the smaller height value is applied first.
+					<literal>&lt;Report&gt;</literal> nodes in it,
+					the height value for <literal>&lt;pd&gt;</literal>
+					is applied first. It would limit the displayed
+					rows in whichever <literal>&lt;Report&gt;</literal> node
+					is terminated by it. Subsequent
+					<literal>&lt;Report&gt;</literal> nodes would
+					no be displayed in that <literal>&lt;pd&gt;</literal>
+					node.
 				</para>
 				<para>
 					Note, that OpenCReports allows fixed-height
@@ -1830,7 +1870,7 @@ SELECT * FROM some_table
 					in the XML description.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportqueryname" xreflabel="Report query name">
 				<title>Query</title>
 				<para>
 					Set the primary query name for <literal>&lt;Report&gt;</literal>
@@ -1976,7 +2016,7 @@ SELECT * FROM some_table
 					This is a shortcut for <xref linkend="pageheader"/>
 					in the implicitly created <literal>&lt;Part&gt;</literal>
 					node when <literal>&lt;Report&gt;</literal> is standalone.
-					It contains an <xref linkend="outputsection"/>.
+					It contains an <xref linkend="outputnode"/>.
 					<programlisting>
 &lt;Report&gt;
     &lt;PageHeader&gt;
@@ -2002,7 +2042,7 @@ SELECT * FROM some_table
 					This is a shortcut for <xref linkend="pagefooter"/>
 					in the implicitly created <literal>&lt;Part&gt;</literal>
 					node when <literal>&lt;Report&gt;</literal> is standalone.
-					It contains an <xref linkend="outputsection"/>.
+					It contains an <xref linkend="outputnode"/>.
 					<programlisting>
 &lt;Report&gt;
     &lt;PageFooter&gt;
@@ -2027,7 +2067,7 @@ SELECT * FROM some_table
 				<para>
 					This is the description of the report header that is
 					emitted at the start of the report.
-					It contains an <xref linkend="outputsection"/>.
+					It contains an <xref linkend="outputnode"/>.
 					<programlisting>
 &lt;Report&gt;
     &lt;ReportHeader&gt;
@@ -2044,7 +2084,7 @@ SELECT * FROM some_table
 				<para>
 					This is the description of the report footer that is
 					emitted at the end of the report.
-					It contains an <xref linkend="outputsection"/>.
+					It contains an <xref linkend="outputnode"/>.
 					<programlisting>
 &lt;Report&gt;
     &lt;ReportFooter&gt;
@@ -2059,7 +2099,8 @@ SELECT * FROM some_table
 			<sect3>
 				<title>Variables</title>
 				<para>
-					This section describes the variables in the report.
+					This section describes the
+					<xref linkend="variablesnode"/> in the report.
 					<programlisting>
 &lt;Report&gt;
     &lt;Variables&gt;
@@ -2073,11 +2114,14 @@ SELECT * FROM some_table
 			<sect3>
 				<title>Breaks</title>
 				<para>
-					This section describes the breaks in the report.
+					This section describes the
+					<xref linkend="breaksnode"/> in the report.
 					<programlisting>
 &lt;Report&gt;
     &lt;Breaks&gt;
-        &lt;Break ... /&gt;
+        &lt;Break ... &gt;
+            ...
+        &lt;/Break&gt;
         ...
     &lt;/Breaks&gt;
 &lt;/Part&gt;
@@ -2089,7 +2133,7 @@ SELECT * FROM some_table
 				<para>
 					This section describes the tabular details of the report.
 					There are two subsections in this node, both contain
-					an <xref linkend="outputsection"/>.
+					an <xref linkend="outputnode"/>.
 					<programlisting>
 &lt;Report&gt;
     &lt;Detail&gt;
@@ -2122,8 +2166,9 @@ SELECT * FROM some_table
 				<para>
 					This section describes the alternate output of the report
 					when the query has no data rows, or there is no such
-					query name defined. It contains an
-					<xref linkend="outputsection"/>.
+					query name defined that's set in
+					<xref linkend="reportqueryname"/>.
+					It contains an <xref linkend="outputnode"/>.
 				</para>
 				<para>
 					This section may be declared in two ways. One way is to
@@ -2152,6 +2197,14 @@ SELECT * FROM some_table
     &lt;/NoData&gt;
 &lt;/Part&gt;
 					</programlisting>
+				</para>
+				<para>
+					When the <xref linkend="reportqueryname"/>
+					does not exist in in the global list of
+					<xref linkend="queries"/> and the
+					<xref linkend="rlibcompat"/> is set, then
+					the <literal>&lt;NoData&gt;</literal> section
+					is not displayed.
 				</para>
 			</sect3>
 		</sect2>
@@ -2184,6 +2237,14 @@ SELECT * FROM some_table
 &lt;load query="query1" /&gt;
 					</programlisting>
 				</para>
+				<para>
+					When <xref linkend="rlibcompat"/> is set and the
+					<xref linkend="reportqueryname"/> is set to
+					a non-existing name in the global list of
+					<xref linkend="queries"/>, the
+					<literal>&lt;NoData&gt;</literal> section
+					is not displayed.
+				</para>
 			</sect3>
 			<sect3>
 				<title>Iterations</title>
@@ -2197,12 +2258,378 @@ SELECT * FROM some_table
 			</sect3>
 		</sect2>
 	</sect1>
-	<sect1 id="outputsection" xreflabel="Output section">
-		<title>Output section</title>
+	<sect1 id="variablesnode" xreflabel="Variables">
+		<title>Variables</title>
 		<para>
-			The &lt;Output&gt; section is used by many previously
-			mentioned sections. This is the crucial part of
-			describing what's displayed in the report.
+			This is the parent node for individual
+			<literal>&lt;Variable&gt;</literal> nodes
+			that describe each variable.
+			<programlisting>
+&lt;Variables&gt;
+    &lt;Variable ... /&gt;
+    ...
+&lt;/Variables&gt;
+			</programlisting>
+		</para>
+	</sect1>
+	<sect1 id="variablenode" xreflabel="Variable node">
+		<title>Variable</title>
+		<para>
+			This node describes one
+			<literal>&lt;Variable&gt;</literal> node.
+			It has no children nodes, only attributes.
+			<programlisting>
+&lt;Variable ... /&gt;
+			</programlisting>
+		</para>
+		<sect2>
+			<title>Variable attributes</title>
+			<sect3>
+				<title>Name</title>
+				<para>
+					The name of the variable. It must be
+					unique in the list of variables for
+					the parent <literal>&lt;Report&gt;</literal> node.
+					<programlisting>
+&lt;Variable name="var1" /&gt;
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Value</title>
+				<para>
+					The "value" of the variable, or rather,
+					the expression from which the value is
+					computed. Variables' values are computed
+					for every data row produced by the report
+					query. The expression may therefore reference
+					field names of queries that are declared
+					in the XML description or in programming code.
+					<programlisting>
+&lt;Variable value="q1.field1 + 2 * q2.field2" /&gt;
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Type</title>
+				<para>
+					The type of the variable. Several variable
+					types exist:
+					<programlisting>
+&lt;Variable value="q1.field" type="expression"/&gt;
+
+&lt;Variable value="q1.field" type="count"/&gt;
+&lt;Variable value="q1.field" type="countall"/&gt;
+
+&lt;Variable value="q1.field" type="sum"/&gt;
+
+&lt;Variable value="q1.field" type="average"/&gt;
+&lt;Variable value="q1.field" type="averageall"/&gt;
+
+&lt;Variable value="q1.field" type="highest"/&gt;
+&lt;Variable value="q1.field" type="lowest"/&gt;
+
+&lt;Variable value="q1.field" type="custom"/&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default type is <literal>expression</literal>,
+					this is just a shortcut for the value expression
+					that saves both typing and time to generate the
+					report.
+				</para>
+				<para>
+					The <literal>count</literal> and
+					<literal>countall</literal> variable
+					types count the the number of expression
+					results for the data set. The former
+					leaves out NULL values, the latter includes them.
+					This is equivalent to COUNT(field) and COUNT(*)
+					in SQL.
+				</para>
+				<para>
+					The <literal>sum</literal> variable type
+					sums the non-NULL values of the expression
+					results for the data set.
+				</para>
+				<para>
+					The <literal>average</literal> and
+					<literal>averageall</literal> variable types
+					are combinations of <literal>sum</literal>
+					and either <literal>count</literal> or
+					<literal>countall</literal>. They take the value
+					computed for each data row, sums them, and
+					divide by the number of values. The result
+					of <literal>average</literal> and
+					<literal>averageall</literal> may differ if
+					there is NULL data in the result set.
+				</para>
+				<para>
+					The <literal>highest</literal> and
+					<literal>lowest</literal> variable types
+					return the highest and the lowest values
+					for the data set, respectively.
+				</para>
+				<para>
+					The <literal>custom</literal> variable type
+					allow arbitrary user variables if the
+					predefined types are not enough.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Attributes to define a Custom variable</title>
+				<para>
+					These attributes below define a custom variable.
+					A base expression, up to two intermediary expressions
+					and one result expression may be defined, together
+					with the expression type.
+					<programlisting>
+&lt;Variable
+    baseexpr="..."
+    intermedexpr="..."
+    intermed2expr="..."
+    resultexpr="..."
+    basetype="..."
+    type="custom"/&gt;
+					</programlisting>
+				</para>
+				<para>
+					<literal>baseexpr</literal>, <literal>intermedexpr</literal>,
+					<literal>intermed2expr</literal> and <literal>resultexpr</literal>
+					are <xref linkend="expressions"/>.
+				</para>
+				<para>
+					Possible values for <literal>basetype</literal> are
+					<literal>number</literal>, <literal>string</literal>
+					or <literal>datetime</literal>.
+				</para>
+				<para>
+					It's the user's responsibility to use expressions
+					valid for the base type. Failing that, the result
+					value will be an apppropriate error message.
+				</para>
+				<para>
+					Note that the <literal>baseexpr</literal> attribute
+					is an alias for <literal>value</literal>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Reset on break</title>
+				<para>
+					A variable may reset on break boundaries to the
+					<literal>baseexpr</literal> value. See
+					<xref linkend="breaknode"/> and <xref linkend="breaks"/>
+					<programlisting>
+&lt;Variable resetonbreak="break1" /&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default is unset, i.e. no reset on a break.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Precalculate (delayed)</title>
+				<para>
+					A variable may work two ways. One is to generate
+					the current value that lead to it up to the current row.
+					Say, for a variable of the <literal>average</literal>
+					type, the value of the variable for the 5th row
+					is the average value of the base expression of the
+					first 5 rows.
+				</para>
+				<para>
+					The other way is to calculate the value for the last
+					data row and provide that value for every data row.
+					The attribute is accepted under two names:
+					<programlisting>
+&lt;Variable precalculate="yes" /&gt;
+&lt;Variable delayed="yes" /&gt;
+					</programlisting>
+				</para>
+				<para>
+					Default is <literal>no</literal>.
+				</para>
+				<para>
+					<literal>precalculate="yes"</literal> (or
+					<literal>delayed="yes"</literal> may be combined
+					with <literal>resetonbreak="..."</literal>.
+					In this case, the "precalculated" value is computed
+					for break periods.
+				</para>
+				<para>
+					Precalculated values may be used to show values in
+					<literal>&lt;ReportHeader&gt;</literal>,
+					<literal>&lt;ReportFooter&gt;</literal>,
+					<literal>&lt;FieldHeaders&gt;</literal>,
+					<literal>&lt;BreakHeader&gt;</literal> and
+					<literal>&lt;BreakFooter&gt;</literal>
+					but not in
+					<literal>&lt;PageHeader&gt;</literal> and
+					<literal>&lt;PageFooter&gt;</literal>.
+					The reason for this is that the former headers and
+					footers are in <literal>&lt;Report&gt;</literal>
+					scope with a query. On the other hand, the latter
+					two are in <literal>&lt;Part&gt;</literal> scope
+					that don't know about queries.
+				</para>
+			</sect3>
+		</sect2>
+	</sect1>
+	<sect1 id="breaksnode" xreflabel="Breaks">
+		<title>Breaks</title>
+		<para>
+			This is the parent node for individual
+			<literal>&lt;Break&gt;</literal> nodes
+			that describe each break. See <xref linkend="breaks"/>
+			<programlisting>
+&lt;Breaks&gt;
+    &lt;Break ... /&gt;
+    ...
+&lt;/Break&gt;
+			</programlisting>
+		</para>
+	</sect1>
+	<sect1 id="breaknode" xreflabel="Break node">
+		<title>Break</title>
+		<para>
+			This node describes one
+			<literal>&lt;Break&gt;</literal>.
+			<programlisting>
+&lt;Break ... &gt;
+    &lt;BreakHeader&gt;
+        &lt;Output&gt;
+            ...
+        &lt;/Output&gt;
+    &lt;/BreakHeader&gt;
+    &lt;BreakFooter&gt;
+        &lt;Output&gt;
+            ...
+        &lt;/Output&gt;
+    &lt;/BreakFooter&gt;
+    &lt;BreakFields&gt;
+        &lt;BreakField /&gt;
+        ...
+    &lt;/BreakFields&gt;
+&lt;/Break&gt;
+			</programlisting>
+		</para>
+		<sect2>
+			<title>Break attributes</title>
+			<sect3>
+				<title>Name</title>
+				<para>
+					The name of the break. It must be
+					unique in the list of breaks for
+					the parent <literal>&lt;Report&gt;</literal> node.
+					<programlisting>
+&lt;Break name="break1" /&gt;
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Newpage</title>
+				<para>
+					Accepted as part of RLIB compatibility.
+					Not implemented.
+					<programlisting>
+&lt;Break newpage="yes" /&gt;
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Header on new page</title>
+				<para>
+					Accepted as part of RLIB compatibility.
+					Not implemented.
+					<programlisting>
+&lt;Break headernewpage="yes" /&gt;
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Suppress blank break contents</title>
+				<para>
+					Accepted as part of RLIB compatibility.
+					Not implemented.
+					<programlisting>
+&lt;Break suppressblank="yes" /&gt;
+					</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Break subsections</title>
+			<sect3>
+				<title>BreakHeader</title>
+				<para>
+					The break header is emitted before the new data row
+					if there's a change for the values in the set of
+					break fields.
+					It contains an <xref linkend="outputnode"/> child node.
+					<programlisting>
+&lt;BreakHeader&gt;
+    &lt;Output&gt;
+        ...
+    &lt;/Output&gt;
+&lt;/BreakHeader&gt;
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>BreakFooter</title>
+				<para>
+					The break header is emitted after the previous data row
+					if there's a change for the values in the set of
+					break fields.
+					It contains an <xref linkend="outputnode"/> child node.
+					<programlisting>
+&lt;BreakHeader&gt;
+    &lt;Output&gt;
+        ...
+    &lt;/Output&gt;
+&lt;/BreakHeader&gt;
+					</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>BreakFields</title>
+				<para>
+					The break fields node contains one or more
+					<xref linkend="breakfield"/> children nodes.
+					<programlisting>
+&lt;BreakFields&gt;
+    &lt;BreakField ... /&gt;
+    ...
+&lt;/BreakFields&gt;
+					</programlisting>
+				</para>
+				<sect4 id="breakfield" xreflabel="BreakField">
+					<title>BreakField</title>
+					<para>
+						The break field node only has one attribute and
+						contains no child nodes.
+						<programlisting>
+&lt;BreakField value="..."/&gt;
+						</programlisting>
+					</para>
+					<para>
+						The sole attribute in
+						<literal>&lt;BreakField&gt;</literal> is
+						<literal>&lt;value&gt;</literal> where the
+						expression watched for changes is declared.
+						See <xref linkend="expressions"/>.
+					</para>
+				</sect4>
+			</sect3>
+		</sect2>
+	</sect1>
+	<sect1 id="outputnode" xreflabel="Output node">
+		<title>Output</title>
+		<para>
+			The <literal>&lt;Output&gt;</literal> section is used
+			by many previously mentioned sections. This is the
+			generic node that described how details are displayed
+			in reports.
 		</para>
 	</sect1>
 	<sect1 id="colorspec" xreflabel="Color specification">
