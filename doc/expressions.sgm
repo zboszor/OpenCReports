@@ -41,19 +41,15 @@
 			<para>
 				String literals in OpenCReports can be either single or double quoted.
 				Some examples:
-				<programlisting>
-"apple"
+				<programlisting>"apple"
 &#8217;apple&#8217;
 "I&#8217;ve eaten an apple"
-&#8217;This an "apple".&#8217;
-				</programlisting>
+&#8217;This an "apple".&#8217;</programlisting>
 				The values of these strings are:
-				<programlisting>
-apple
+				<programlisting>apple
 apple
 I&#8217;ve eaten an apple
-This an "apple".
-				</programlisting>
+This an "apple".</programlisting>
 				We can see how the other quoting character can be used as part
 				of the string value.
 			</para>
@@ -61,38 +57,30 @@ This an "apple".
 				String literals can also use BASIC language style double quoting
 				to embed a single quoting character used for quoting the string
 				itself:
-				<programlisting>
-&#8217;apple&#8217;&#8217;&#8217;
+				<programlisting>&#8217;apple&#8217;&#8217;&#8217;
 &#8217;apple&#8217;&#8217;pear&#8217;
 &#8217;apple&#8217;&#8217;&#8217;&#8217;pear&#8217;
 "apple"""
 "apple""pear"
-"apple""""pear"
-				</programlisting>			
+"apple""""pear"</programlisting>			
 				The values of these strings are:
-				<programlisting>
-apple&#8217;
+				<programlisting>apple&#8217;
 apple&#8217;pear
 apple&#8217;&#8217;pear
 apple"
 apple"pear
-apple""pear
-				</programlisting>
+apple""pear</programlisting>
 			</para>
 			<para>
 				String literals can also use C language string continuation if
 				there's at least one whitespace character (space, TAB or new line)
 				between doubled quoting characters. String continuation can also
 				switch quoting characters without whitespace between quoting.
-				<programlisting>
-"apple" "pear"
+				<programlisting>"apple" "pear"
 "apple" &#8217;pear&#8217;
-"apple"&#8217;pear&#8217;
-				</programlisting>
+"apple"&#8217;pear&#8217;</programlisting>
 				The value of all these strings is:
-				<programlisting>
-applepear
-				</programlisting>
+				<programlisting>applepear</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="numericconstants" xreflabel="Numeric constants">
@@ -108,32 +96,26 @@ applepear
 				Numeric constants can be integer or fractional numbers with or
 				without the so called <emphasis>e-notation</emphasis> or
 				scientific notation. Some examples:
-				<programlisting>
-1
+				<programlisting>1
 1.234
 1e4
 1e-4
-1.234e-5
-				</programlisting>
+1.234e-5</programlisting>
 				E-notation means that that number preceding the letter "e" or
 				"E" is multiplied by ten to the power of the number after the
 				letter "e" or "E", the latter being an integer value. The
 				values of the above examples are:
-				<programlisting>
-1
+				<programlisting>1
 1.234
 10000
 0.0001
-0.00001234
-				</programlisting>
+0.00001234</programlisting>
 			</para>
 			<para>
 				Numbers greater than 0 and less than 1 can be written with
 				or without the leading zero.
-				<programlisting>
-0.123
-.123
-				</programlisting>
+				<programlisting>0.123
+.123</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="boolconstants" xreflabel="Boolean constants">
@@ -142,12 +124,10 @@ applepear
 				Boolean constants evalutate to numeric constans
 				<literal>1</literal> and <literal>0</literal>.
 				The boolean constants are:
-				<programlisting>
-yes
+				<programlisting>yes
 no
 true
-false
-				</programlisting>
+false</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="datetimeconstants" xreflabel="Datetime constants">
@@ -191,13 +171,11 @@ false
 			<para>
 				Any valid identifier is by default a query column
 				reference, with or without the domain name. Examples:
-				<programlisting>
-field_name
+				<programlisting>field_name
 field_name5
 myquery1.field_name
 mező_név
-lekérdezés.mező_név
-				</programlisting>
+lekérdezés.mező_név</programlisting>
 				By the way, in the above example,
 				<literal>mező_név</literal> means
 				<literal>field_name</literal>, and
@@ -232,9 +210,7 @@ lekérdezés.mező_név
 					depend on the languange binding. In C, it's the variables
 					in the operating environment. In PHP, they are simply global
 					PHP variables. Example:
-					<programlisting>
-m.current_date
-					</programlisting>
+					<programlisting>m.current_date</programlisting>
 				</para>
 				<para>
 					Since such a setting is controlled outside the report,
@@ -253,9 +229,7 @@ m.current_date
 				<sect4>
 					<title>Current page number</title>
 					<para>
-						<programlisting>
-r.pageno
-						</programlisting>
+						<programlisting>r.pageno</programlisting>
 						The current page of the report is maintained by
 						the report layout and is intertwined with running
 						a report. For example, if an expression is evaluated
@@ -267,9 +241,7 @@ r.pageno
 				<sect4>
 					<title>Total number of pages</title>
 					<para>
-						<programlisting>
-r.totpages
-						</programlisting>
+						<programlisting>r.totpages</programlisting>
 						This variable carries the total number of pages
 						in the report. Its value is maintained by the
 						report layout and it interwined with running a report.
@@ -285,9 +257,7 @@ r.totpages
 				<sect4>
 					<title>Line number</title>
 					<para>
-						<programlisting>
-r.lineno
-						</programlisting>
+						<programlisting>r.lineno</programlisting>
 						This variable is an alias to the
 						<literal>rownum()</literal> function, i.e.
 						it is the current row (line) number in the data set.
@@ -306,9 +276,7 @@ r.lineno
 				<sect4>
 					<title>Detail count</title>
 					<para>
-						<programlisting>
-r.detailcnt
-						</programlisting>
+						<programlisting>r.detailcnt</programlisting>
 						This variable works similarly to the row number
 						counter, e.g. <literal>rownum()</literal> or
 						<literal>r.lineno</literal>, except it restarts
@@ -332,9 +300,7 @@ r.detailcnt
 				<sect4>
 					<title>Field value</title>
 					<para>
-						<programlisting>
-r.value
-						</programlisting>
+						<programlisting>r.value</programlisting>
 						The report field description has an expression for its
 						value in the  form of
 						<literal>&lt;field value="..."&gt;</literal>.
@@ -365,9 +331,7 @@ r.value
 				<sect4>
 					<title>Format string value</title>
 					<para>
-						<programlisting>
-r.format
-						</programlisting>
+						<programlisting>r.format</programlisting>
 						Similarly to the field value a.k.a.<literal>r.value</literal>,
 						the field description has an an optional expression
 						for its formatting. This expession may be used by
@@ -378,12 +342,10 @@ r.format
 						with RLIB that has this internal variable.
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="exprself" xreflabel="Expression self reference">
 					<title>Expression self reference</title>
 					<para>
-						<programlisting>
-r.self
-						</programlisting>
+						<programlisting>r.self</programlisting>
 						This variable references the previous result of
 						the expression. It is used in iterative expressions,
 						like in internal representations of user-defined
@@ -393,11 +355,9 @@ r.self
 				<sect4>
 					<title>Subexpressions of user-defined variables</title>
 					<para>
-						<programlisting>
-r.baseexpr
+						<programlisting>r.baseexpr
 r.intermedexpr
-r.intermed2expr
-						</programlisting>
+r.intermed2expr</programlisting>
 						These variables are references for the three
 						subexpressions that potentially make up a user
 						defined variable. The expressions in order are:
@@ -409,6 +369,7 @@ r.intermed2expr
 						in every user defined variable, namely the result
 						expression. It's reference is simply the user variable
 						reference, see <xref linkend="uservariables"/>.
+						See also <xref linkend="customvarattrs"/>.
 					</para>
 					<para>
 						For example, a running average over a data series
@@ -429,8 +390,7 @@ r.intermed2expr
 					Domain <literal>v</literal> signifies user defined
 					report variables, which can be used in breaks or
 					to shortcut expressions. Example:
-					<programlisting>
-v.my_variable
+					<programlisting>v.my_variable
 					</programlisting>
 				</para>
 			</sect3>
@@ -441,8 +401,7 @@ v.my_variable
 					names may be quoted or unquoted. Quoting names allow using
 					semi-reserved and reserved words as identifers and also
 					allow special characters in identifier names. Examples:
-					<programlisting>
-query.field_name1
+					<programlisting>query.field_name1
 query."field_name2"
 query."field with space in the name"
 "query2".field_name3
@@ -456,8 +415,7 @@ query."field with space in the name"
 					A dot-prefixed identifier is one where the domain name
 					is not specified, but the identifier name is prefixed
 					with a dot. Examples:
-					<programlisting>
-.field_name
+					<programlisting>.field_name
 ."field_name"
 					</programlisting>
 				</para>
@@ -465,8 +423,7 @@ query."field with space in the name"
 					Semi-reserved words are the boolean constants. They can be used
 					as identifiers with dot-prefixed identifier names without
 					a domain name and without quoting:
-					<programlisting>
-.yes
+					<programlisting>.yes
 .no
 .true
 .false
@@ -474,8 +431,7 @@ yes.no
 					</programlisting>
 					The above unquoted identifiers are equivalent with
 					these quoted ones below:
-					<programlisting>
-."yes"
+					<programlisting>."yes"
 ."no"
 ."true"
 ."false"
@@ -489,8 +445,7 @@ yes.no
 					expression syntax error. But they can be used as quoted
 					identifiers, in case you would want to use such a query name
 					and column name:
-					<programlisting>
-."and"
+					<programlisting>."and"
 ."or"
 "and"."or"
 					</programlisting>
@@ -504,8 +459,7 @@ yes.no
 					Of course, in this case, such a query name must exist and
 					the query must have a field name specified in the identifier.
 					Examples:
-					<programlisting>
-"m".current_date
+					<programlisting>"m".current_date
 "r".totpages
 "v".my_variable
 					</programlisting>
@@ -526,8 +480,7 @@ yes.no
 			<title>Ternary operator</title>
 			<para>
 				The ternary operator is as in the C language:
-				<programlisting>
-expression1 ? expression2 : expression3
+				<programlisting>expression1 ? expression2 : expression3
 				</programlisting>
 				It's evaluated as follows: if the value of numeric
 				<literal>expression1</literal> is <literal>true</literal>
@@ -752,8 +705,7 @@ expression1 ? expression2 : expression3
 			<para>
 				Expression parsing handles precedence and whitespaces.
 				For example, these below do not mean the same thing:
-				<programlisting>
-a++ + ++b
+				<programlisting>a++ + ++b
 a+++++b
 				</programlisting>
 				The former is obvious, but the latter may be a little
@@ -762,8 +714,7 @@ a+++++b
 				match the the longest known token first. In this case,
 				to make the expression unambiguous, whitespace or parenthesis
 				should be used. Another ambiguous example:
-				<programlisting>
-a++b
+				<programlisting>a++b
 				</programlisting>
 				The above may be interpreted as <literal>a + +b</literal>
 				but since no whitespace is used, Flex is free to interpret

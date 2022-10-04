@@ -4,9 +4,7 @@
 		<title>Header file</title>
 		<para>
 			For using OpenCReports, this single header must be used:
-			<programlisting>
-#include &lt;opencreport.h&gt;
-			</programlisting>
+			<programlisting>#include &lt;opencreport.h&gt;</programlisting>
 		</para>
 	</sect1>
 	<sect1 id="highlevelapi" xreflabel="High level C API">
@@ -15,8 +13,7 @@
 			Example code using the high level C API where everything
 			concerning the report (including the data source)
 			is described in the report XML:
-			<programlisting>
-#include &lt;opencreport.h&gt;
+			<programlisting>#include &lt;opencreport.h&gt;
 
 int main(void) {
     opencreport *o = ocrpt_init();
@@ -32,8 +29,7 @@ int main(void) {
     ocrpt_spool(o);
     ocrpt_free(o);
     return 0;
-}
-			</programlisting>
+}</programlisting>
 		</para>
 		<para>
 			The above code will load <literal>report.xml</literal>,
@@ -43,9 +39,7 @@ int main(void) {
 		<sect2>
 		<title>Report handler initialization</title>
 		<para>
-			<programlisting>
-opencreport *ocrpt_init(void);
-			</programlisting>
+			<programlisting>opencreport *ocrpt_init(void);</programlisting>
 		</para>
 		</sect2>
 		<sect2>
@@ -55,16 +49,13 @@ opencreport *ocrpt_init(void);
 				into the report handler. It returns
 				<literal>true</literal> for success,
 				<literal>false</literal> for failure.
-				<programlisting>
-bool ocrpt_parse_xml(opencreport *o, const char *filename);
-				</programlisting>
+				<programlisting>bool ocrpt_parse_xml(opencreport *o, const char *filename);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
 			<title>Set report output format</title>
 			<para>
-				<programlisting>
-enum ocrpt_format_type {
+				<programlisting>enum ocrpt_format_type {
     OCRPT_OUTPUT_UNSET,
     OCRPT_OUTPUT_PDF,
     OCRPT_OUTPUT_HTML,
@@ -75,8 +66,7 @@ enum ocrpt_format_type {
 typedef enum ocrpt_format_type ocrpt_format_type;
 
 void ocrpt_set_output_format(opencreport *o,
-                             ocrpt_format_type format);
-				</programlisting>
+                             ocrpt_format_type format);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -86,9 +76,7 @@ void ocrpt_set_output_format(opencreport *o,
 				the result in memory. It returns <literal>true</literal>
 				for success, <literal>false</literal> for failure.
 				It is a failure if the output format is unset.
-				<programlisting>
-bool ocrpt_execute(opencreport *o);
-				</programlisting>
+				<programlisting>bool ocrpt_execute(opencreport *o);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -96,9 +84,7 @@ bool ocrpt_execute(opencreport *o);
 			<para>
 				Dump the report output on the program's
 				standard output channel.
-				<programlisting>
-void ocrpt_spool(opencreport *o);
-				</programlisting>
+				<programlisting>void ocrpt_spool(opencreport *o);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -107,9 +93,7 @@ void ocrpt_spool(opencreport *o);
 				Calling this function frees up the report handler
 				structure and everything created for it, even
 				the details that were created by the low level API.
-				<programlisting>
-void ocrpt_free(opencreport *o);
-				</programlisting>
+				<programlisting>void ocrpt_free(opencreport *o);</programlisting>
 			</para>
 		</sect2>
 	</sect1>
@@ -128,10 +112,8 @@ void ocrpt_free(opencreport *o);
 				<title><literal>Set numeric precision</literal></title>
 				<para>
 					The default is 256 bits of floating point precision.
-					<programlisting>
-void ocrpt_set_numeric_precision_bits(opencreport *o,
-                                      mpfr_prec_t prec);
-					</programlisting>
+					<programlisting>void ocrpt_set_numeric_precision_bits(opencreport *o,
+                                      mpfr_prec_t prec);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -142,10 +124,8 @@ void ocrpt_set_numeric_precision_bits(opencreport *o,
 					used as is to set the rounding behaviour.
 					The default is <literal>MPFR_RNDN</literal>, round
 					to nearest.
-					<programlisting>
-void ocrpt_set_rounding_mode(opencreport *o,
-                             mpfr_rnd_t rndmode);
-					</programlisting>
+					<programlisting>void ocrpt_set_rounding_mode(opencreport *o,
+                             mpfr_rnd_t rndmode);</programlisting>
 				</para>
 			</sect3>
 		</sect2>
@@ -159,10 +139,8 @@ void ocrpt_set_rounding_mode(opencreport *o,
 					includes the language, the country. The UTF-8 suffix
 					is necessary. E.g.: <literal>en_GB.UTF-8</literal> or
 					<literal>de_DE.UTF-8</literal>
-					<programlisting>
-void ocrpt_set_locale(opencreport *o,
-                      const char *locale);
-					</programlisting>
+					<programlisting>void ocrpt_set_locale(opencreport *o,
+                      const char *locale);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -172,11 +150,9 @@ void ocrpt_set_locale(opencreport *o,
 					for the purposes of the report which MPFR doesn't
 					provide. It is used in OpenCReports both internally
 					and by unit tests.
-					<programlisting>
-ssize_t ocrpt_mpfr_strfmon(opencreport *o,
+					<programlisting>ssize_t ocrpt_mpfr_strfmon(opencreport *o,
                            char *s, size_t maxsize,
-                           const char *format, ...);
-					</programlisting>
+                           const char *format, ...);</programlisting>
 				</para>
 			</sect3>
 		</sect2>
@@ -202,12 +178,10 @@ ssize_t ocrpt_mpfr_strfmon(opencreport *o,
 					The <literal>ocrpt_report</literal> pointer may be
 					valid or NULL. If valid, the expression is bound
 					to this <literal>ocrpt_report</literal>.
-					<programlisting>
-ocrpt_expr *ocrpt_expr_parse(opencreport *o,
+					<programlisting>ocrpt_expr *ocrpt_expr_parse(opencreport *o,
                              ocrpt_report *r,
                              const char *str,
-                             char **err);
-					</programlisting>
+                             char **err);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -216,11 +190,9 @@ ocrpt_expr *ocrpt_expr_parse(opencreport *o,
 					Free an expression parse tree. If it was bound
 					to the passed-in <literal>ocrpt_report</literal>,
 					this association is also deleted.
-					<programlisting>
-void ocrpt_expr_free(opencreport *o,
+					<programlisting>void ocrpt_expr_free(opencreport *o,
                      ocrpt_report *r,
-                     ocrpt_expr *e);
-					</programlisting>
+                     ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -230,11 +202,9 @@ void ocrpt_expr_free(opencreport *o,
 					references in the expression. This is needed
 					to bind query columns to expressions that
 					use them.
-					<programlisting>
-void ocrpt_expr_resolve(opencreport *o,
+					<programlisting>void ocrpt_expr_resolve(opencreport *o,
                         ocrpt_report *r,
-                        ocrpt_expr *e);
-					</programlisting>
+                        ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -243,11 +213,9 @@ void ocrpt_expr_resolve(opencreport *o,
 					This function optimizes an expression so
 					it may needs fewer computation steps during
 					report execution.
-					<programlisting>
-void ocrpt_expr_optimize(opencreport *o,
+					<programlisting>void ocrpt_expr_optimize(opencreport *o,
                          ocrpt_report *r,
-                         ocrpt_expr *e);
-					</programlisting>
+                         ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -265,11 +233,9 @@ void ocrpt_expr_optimize(opencreport *o,
 					this function must be called after
 					<literal>ocrpt_query_navigate_next</literal>
 					otherwise the result is not valid.
-					<programlisting>
-ocrpt_result *ocrpt_expr_eval(opencreport *o,
+					<programlisting>ocrpt_result *ocrpt_expr_eval(opencreport *o,
                               ocrpt_report *r,
-                              ocrpt_expr *e);
-					</programlisting>
+                              ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -281,10 +247,8 @@ ocrpt_result *ocrpt_expr_eval(opencreport *o,
 					<literal>ocrpt_result_free()</literal>.
 					It will be done by <literal>ocrpt_expr_free()</literal>.
 					Used by unit tests.
-					<programlisting>
-ocrpt_result *ocrpt_expr_get_result(opencreport *o,
-                                    ocrpt_expr *e);
-					</programlisting>
+					<programlisting>ocrpt_result *ocrpt_expr_get_result(opencreport *o,
+                                    ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -292,10 +256,8 @@ ocrpt_result *ocrpt_expr_get_result(opencreport *o,
 				<para>
 					Print an expression tree in its processed form on the
 					standard output. Used by unit tests.
-					<programlisting>
-void ocrpt_expr_print(opencreport *o,
-                      ocrpt_expr *e);
-					</programlisting>
+					<programlisting>void ocrpt_expr_print(opencreport *o,
+                      ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -304,10 +266,8 @@ void ocrpt_expr_print(opencreport *o,
 					Print an expression tree with subexpressions
 					and their results in its processed form on the
 					standard output. Used by unit tests.
-					<programlisting>
-void ocrpt_expr_result_deep_print(opencreport *o,
-                                  ocrpt_expr *e);
-					</programlisting>
+					<programlisting>void ocrpt_expr_result_deep_print(opencreport *o,
+                                  ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -315,9 +275,7 @@ void ocrpt_expr_result_deep_print(opencreport *o,
 				<para>
 					This function returns the number of expression nodes.
 					Used by unit tests to validate optimizazion.
-					<programlisting>
-int32_t ocrpt_expr_nodes(ocrpt_expr *e);
-					</programlisting>
+					<programlisting>int32_t ocrpt_expr_nodes(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -328,8 +286,7 @@ int32_t ocrpt_expr_nodes(ocrpt_expr *e);
 					for internal reasons. These functions initialize
 					the type for either the current result or all results
 					of the expression.
-					<programlisting>
-enum ocrpt_result_type {
+					<programlisting>enum ocrpt_result_type {
     OCRPT_RESULT_ERROR,
     OCRPT_RESULT_STRING,
     OCRPT_RESULT_NUMBER,
@@ -342,19 +299,16 @@ bool ocrpt_expr_init_result(opencreport *o,
 
 void ocrpt_expr_init_results(opencreport *o,
                              ocrpt_expr *e,
-                             enum ocrpt_result_type type);
-					</programlisting>
+                             enum ocrpt_result_type type);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
 				<title>Set an error string as expression result</title>
 				<para>
-					<programlisting>
-ocrpt_result *
+					<programlisting>ocrpt_result *
 ocrpt_expr_make_error_result(opencreport *o,
                              ocrpt_expr *e,
-                             const char *format, ...);
-					</programlisting>
+                             const char *format, ...);</programlisting>
 				</para>
 			</sect3>
 		</sect2>
@@ -364,8 +318,7 @@ ocrpt_expr_make_error_result(opencreport *o,
 		<para>
 			The following <literal>enum</literal> and <literal>struct</literal>
 			types are used by OpenCReports.
-			<programlisting>
-enum ocrpt_result_type {
+			<programlisting>enum ocrpt_result_type {
     OCRPT_RESULT_ERROR,
     OCRPT_RESULT_STRING,
     OCRPT_RESULT_NUMBER,
@@ -405,8 +358,7 @@ struct ocrpt_input {
     bool (*isdone)(ocrpt_query *);
     void (*free)(ocrpt_query *);
 };
-typedef struct ocrpt_input ocrpt_input;
-			</programlisting>
+typedef struct ocrpt_input ocrpt_input;</programlisting>
 		</para>
 		<para>
 			Data source handling is implemented via <literal>ocrpt_input</literal>
@@ -416,11 +368,9 @@ typedef struct ocrpt_input ocrpt_input;
 			<title><literal>ocrpt_add_datasource</literal></title>
 			<para>
 				Add a (custom) data source to the report handler.
-				<programlisting>
-ocrpt_datasource *ocrpt_add_datasource(opencreport *o,
+				<programlisting>ocrpt_datasource *ocrpt_add_datasource(opencreport *o,
                                        const char *source_name,
-                                       const ocrpt_input *input);
-				</programlisting>
+                                       const ocrpt_input *input);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -428,10 +378,8 @@ ocrpt_datasource *ocrpt_add_datasource(opencreport *o,
 			<para>
 				Find the data source using its name. It returns NULL
 				if the named data source is not found.
-				<programlisting>
-ocrpt_datasource *ocrpt_datasource_get(opencreport *o,
-                                        const char *source_name);
-				</programlisting>
+				<programlisting>ocrpt_datasource *ocrpt_datasource_get(opencreport *o,
+                                        const char *source_name);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -439,10 +387,8 @@ ocrpt_datasource *ocrpt_datasource_get(opencreport *o,
 			<para>
 				Check that the provided <literal>source</literal> pointer
 				is valid for the <literal>o</literal> report handler.
-				<programlisting>
-ocrpt_datasource *ocrpt_validate_datasource(opencreport *o,
-                                            ocrpt_datasource *source);
-				</programlisting>
+				<programlisting>ocrpt_datasource *ocrpt_validate_datasource(opencreport *o,
+                                            ocrpt_datasource *source);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -451,10 +397,8 @@ ocrpt_datasource *ocrpt_validate_datasource(opencreport *o,
 				Add a named array data source. It is optional, as a array
 				data source called <literal>array</literal> is added to the
 				report handler implicitly.
-				<programlisting>
-ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o,
-                                             const char *source_name);
-				</programlisting>
+				<programlisting>ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o,
+                                             const char *source_name);</programlisting>
 			</para>
 		</sect2>
 	</sect1>
@@ -476,12 +420,10 @@ ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o,
 				array contains <literal>cols</literal> number of
 				<literal>enum ocrpt_result_type</literal> elements to
 				indicate the column data type.
-				<programlisting>
-ocrpt_query *ocrpt_add_array_query(opencreport *o, ocrpt_datasource *source,
+				<programlisting>ocrpt_query *ocrpt_add_array_query(opencreport *o, ocrpt_datasource *source,
                                     const char *name, void *array,
                                     int32_t rows, int32_t cols,
-                                    const enum ocrpt_result_type *types);
-				</programlisting>
+                                    const enum ocrpt_result_type *types);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -489,12 +431,10 @@ ocrpt_query *ocrpt_add_array_query(opencreport *o, ocrpt_datasource *source,
 			<para>
 				Add a named query of the array type using the data source name.
 				For the other parameters, see the previous function.
-				<programlisting>
-ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name,
+				<programlisting>ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name,
                                     const char *name, void *array,
                                     int32_t rows, int32_t cols,
-                                    const enum ocrpt_result_type *types);
-				</programlisting>
+                                    const enum ocrpt_result_type *types);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -505,9 +445,7 @@ ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name,
 				returns the number of columns in the result array. It must
                 be (re-)run after ocrpt_navigate_next() since the previously
                 returned pointer becomes invalid.
-				<programlisting>
-ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_t *cols);
-				</programlisting>
+				<programlisting>ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_t *cols);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -519,11 +457,9 @@ ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_t *cols);
 				the leader runs out of rows. In case the leader has more
 				rows than the follower, then for rows in the leader where
 				there are no follower rows, the follower fields are set to NULL.
-				<programlisting>
-bool ocrpt_add_query_follower(opencreport *o,
+				<programlisting>bool ocrpt_add_query_follower(opencreport *o,
                               ocrpt_query *leader,
-                              ocrpt_query *follower);
-				</programlisting>
+                              ocrpt_query *follower);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -540,21 +476,17 @@ bool ocrpt_add_query_follower(opencreport *o,
 				JOIN</literal> in SQL databases. For creating an
 				<literal>ocrpt_expr</literal> expression pointer, see the
 				next section.
-				<programlisting>
-bool ocrpt_add_query_follower_n_to_1(opencreport *o,
+				<programlisting>bool ocrpt_add_query_follower_n_to_1(opencreport *o,
                                      ocrpt_query *leader,
                                      ocrpt_query *follower,
-                                     ocrpt_expr *match);
-				</programlisting>
+                                     ocrpt_expr *match);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
 			<title><literal>ocrpt_free_query</literal></title>
 			<para>
 				Free a query and remove it from the report handler.
-				<programlisting>
-void ocrpt_free_query(opencreport *o, ocrpt_query *q);
-				</programlisting>
+				<programlisting>void ocrpt_free_query(opencreport *o, ocrpt_query *q);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -562,9 +494,7 @@ void ocrpt_free_query(opencreport *o, ocrpt_query *q);
 			<para>
 				Start query or query set navigation. <literal>q</literal>
 				should be the primary query of the report.
-				<programlisting>
-void ocrpt_navigate_start(opencreport *o, ocrpt_query *q);
-				</programlisting>
+				<programlisting>void ocrpt_navigate_start(opencreport *o, ocrpt_query *q);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -576,9 +506,7 @@ void ocrpt_navigate_start(opencreport *o, ocrpt_query *q);
 				arrays for all queries in the query set (returned by
 				previous <literal>ocrpt_query_get_result()</literal>
 				calls contain invalid data.
-				<programlisting>
-bool ocrpt_navigate_next(opencreport *o, ocrpt_query *q);
-				</programlisting>
+				<programlisting>bool ocrpt_navigate_next(opencreport *o, ocrpt_query *q);</programlisting>
 			</para>
 		</sect2>
 	</sect1>
@@ -591,31 +519,25 @@ bool ocrpt_navigate_next(opencreport *o, ocrpt_query *q);
 		<para>
 			This structure is used in OpenCReports to represent
 			paper name and size:
-			<programlisting>
-struct ocrpt_paper {
+			<programlisting>struct ocrpt_paper {
     const char *name;
     double width;
     double height;
 };
-typedef struct ocrpt_paper ocrpt_paper;
-			</programlisting>
+typedef struct ocrpt_paper ocrpt_paper;</programlisting>
 		</para>
 		<sect2>
 			<title><literal>ocrpt_get_system_paper</literal></title>
 			<para>
 				Get the system default <literal>ocrpt_paper</literal>.
-				<programlisting>
-const ocrpt_paper *ocrpt_get_system_paper(void);
-				</programlisting>
+				<programlisting>const ocrpt_paper *ocrpt_get_system_paper(void);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
 			<title><literal>ocrpt_get_paper_by_name</literal></title>
 			<para>
 				Get paper size of the specified paper name.
-				<programlisting>
-const ocrpt_paper *ocrpt_get_paper_by_name(const char *paper);
-				</programlisting>
+				<programlisting>const ocrpt_paper *ocrpt_get_paper_by_name(const char *paper);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -623,9 +545,7 @@ const ocrpt_paper *ocrpt_get_paper_by_name(const char *paper);
 			<para>
 				Set paper for the report using an <literal>ocrpt_paper</literal> structure.
 				The contents of the structure is copied.
-				<programlisting>
-void ocrpt_set_paper(opencreport *o, const ocrpt_paper *paper);
-				</programlisting>
+				<programlisting>void ocrpt_set_paper(opencreport *o, const ocrpt_paper *paper);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -633,18 +553,14 @@ void ocrpt_set_paper(opencreport *o, const ocrpt_paper *paper);
 			<para>
 				Set paper for the report using a paper name.
 				If the paper name is unknown, the system default paper is set.
-				<programlisting>
-void ocrpt_set_paper_by_name(opencreport *o, const char *paper);
-				</programlisting>
+				<programlisting>void ocrpt_set_paper_by_name(opencreport *o, const char *paper);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
 			<title><literal>ocrpt_get_paper</literal></title>
 			<para>
 				Get the report's currently set paper.
-				<programlisting>
-const ocrpt_paper *ocrpt_get_paper(opencreport *o);
-				</programlisting>
+				<programlisting>const ocrpt_paper *ocrpt_get_paper(opencreport *o);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -654,9 +570,7 @@ const ocrpt_paper *ocrpt_get_paper(opencreport *o);
 				The returned paper structures are library-global but
 				the iterator is per report handler. Only one iterator
 				per report handler can be run at a time.
-				<programlisting>
-const ocrpt_paper *ocrpt_paper_first(opencreport *o);
-				</programlisting>
+				<programlisting>const ocrpt_paper *ocrpt_paper_first(opencreport *o);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
@@ -665,9 +579,7 @@ const ocrpt_paper *ocrpt_paper_first(opencreport *o);
 				Get the next <literal>ocrpt_paper</literal> structure
 				in the iterator. It returns NULL when there is no more
 				paper known to the system.
-				<programlisting>
-const ocrpt_paper *ocrpt_paper_next(opencreport *o);
-				</programlisting>
+				<programlisting>const ocrpt_paper *ocrpt_paper_next(opencreport *o);</programlisting>
 			</para>
 		</sect2>
 	</sect1>

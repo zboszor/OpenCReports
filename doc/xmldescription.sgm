@@ -3,8 +3,10 @@
 	<sect1>
 		<title>XML description structure</title>
 		<para>
-			OpenCReports uses an RLIB-compatible report description
-			with extensions.
+			<ulink url="https://github.com/zboszor/OpenCReports"><citetitle>OpenCReports</citetitle></ulink>
+			uses an
+			<ulink url="https://github.com/SICOM/rlib"><citetitle>RLIB</citetitle></ulink>-compatible
+			report description with extensions.
 		</para>
 		<para>
 			The report XML description, like all XML files start with
@@ -12,18 +14,16 @@
 			of the Document Type Definition that the XML file can be
 			checked against. For an OpenCReports report description,
 			the first two lines are:
-			<programlisting>
-&lt;?xml version="1.0"?&gt;
-&lt;!DOCTYPE OpenCReport SYSTEM "opencreport.dtd"&gt;
-			</programlisting>
+			<programlisting>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE OpenCReport SYSTEM "opencreport.dtd"&gt;</programlisting>
 			The DTD file <literal>opencreport.dtd</literal> can be
-			found in the sources of OpenCReports.
+			found in the sources of OpenCReports
+			<ulink url="https://github.com/zboszor/OpenCReports/blob/main/opencreport.dtd"><citetitle>here</citetitle></ulink>.
 		</para>
 		<para>
 			After the XML header lines, a fully specified report
 			description looks like this:
-			<programlisting>
-&lt;OpenCReport&gt;
+			<programlisting>&lt;OpenCReport&gt;
     &lt;Datasources&gt;
         ...
     &lt;/Datasources&gt;
@@ -39,11 +39,9 @@
             &lt;/pd&gt;
         &lt;/pr&gt;
     &lt;/Part&gt;
-&lt;/OpenCReport&gt;
-			</programlisting>
+&lt;/OpenCReport&gt;</programlisting>
 			or like this:
-			<programlisting>
-&lt;OpenCReport&gt;
+			<programlisting>&lt;OpenCReport&gt;
     &lt;Datasources&gt;
         ...
     &lt;/Datasources&gt;
@@ -53,16 +51,14 @@
     &lt;Report&gt;
         ...
     &lt;/Report&gt;
-&lt;/OpenCReport&gt;
-			</programlisting>
+&lt;/OpenCReport&gt;</programlisting>
 		</para>
 		<para>
-			The XML sections <literal>&lt;Datasources&gt;</literal>
-			and <literal>&lt;Queries&gt;</literal> are optional
-			in the report XML description. They can be substituted
-			by program code using the datasource and query related
-			calls in the <xref linkend="lowlevelapi"/>, similarly
-			to RLIB.
+			The XML sections <xref linkend="datasources"/>
+			and <xref linkend="queries"/> are optional in the XML
+			description. They can be substituted by program code
+			using the datasource and query related calls in the
+			<xref linkend="lowlevelapi"/>, similarly to RLIB.
 		</para>
 		<para>
 			For RLIB compatibility, a report description may start
@@ -71,6 +67,19 @@
 			In this case, there's no other way to add datasources
 			and queries, but through program code, like the
 			<xref linkend="lowlevelapi"/>.
+		</para>
+		<para>
+			Since XML files are hierarchical with a single toplevel
+			node with child nodes, multiple
+			<literal>&lt;Report&gt;</literal>s were only possible
+			if using <literal>&lt;Part&gt;</literal> as the
+			toplevel node with all the nodes having to be spelled
+			out between <literal>&lt;Part&gt;</literal> and
+			<literal>&lt;Report&gt;</literal>. With
+			<literal>&lt;OpenCReport&gt;</literal> being the
+			toplevel node, multiple <literal>&lt;Report&gt;</literal>
+			child nodes can be used without the parent
+			<literal>&lt;Part&gt;</literal> node.
 		</para>
 		<sect2>
 			<title>Notes about XML syntax and attributes</title>
@@ -83,18 +92,12 @@
 			</para>
 			<para>
 				For example, the datasource name may be declared this way:
-				<programlisting>
-&lt;Datasource name="mysource" ... /&gt;
-				</programlisting>
+				<programlisting>&lt;Datasource name="mysource" ... /&gt;</programlisting>
 				where the name is a literal string. Or this way:
-				<programlisting>
-&lt;Datasource name="'mysource'" ... /&gt;
-				</programlisting>
+				<programlisting>&lt;Datasource name="'mysource'" ... /&gt;</programlisting>
 				where the name is a string expression. (Note the
 				extra quotes.) Or even this way:
-				<programlisting>
-&lt;Datasource name="&amp;quot;mysource&amp;quot;" ... /&gt;
-				</programlisting>
+				<programlisting>&lt;Datasource name="&amp;quot;mysource&amp;quot;" ... /&gt;</programlisting>
 				where name is a string expression which uses the
 				<literal>"</literal> double quote character which
 				must be "escaped" according to XML rules. This last
@@ -122,6 +125,9 @@
 				<literal>&amp;quot;</literal> because they are
 				reserved for quoting the attribute values.
 				The parsed string constant's value is used.
+				(This substitution is called "string escaping"
+				and various other formats require some kind of
+				substutition for reserved characters.)
 			</para>
 			<para>
 				To make the XML easier to read, the second form
@@ -147,11 +153,9 @@
 		<sect2 id="sizeunit" xreflabel="Size unit attribute">
 			<title>Size unit attribute</title>
 			<para>
-				<programlisting>
-size_unit="default"
+				<programlisting>size_unit="default"
 size_unit="rlib"
-size_unit="points"
-				</programlisting>
+size_unit="points"</programlisting>
 				The <literal>size_unit</literal> attribute
 				specifies whether all size related settings
 				in the report are in points, a.k.a. 1/72th inch.
@@ -162,11 +166,12 @@ size_unit="points"
 				to some inconsistency in size related settings.
 				For example, width for <literal>field</literal>
 				and <literal>literal</literal> (see later in the
-				Output section) are in number of characters.
-				This is influenced by the font size set for these
-				text fields. On the other hand, width of horizontal
-				lines and border width around some reports are
-				specified in points.
+				<xref linkend="outputnode"/> section) are in number
+				of characters. This is influenced by the font size
+				set for these text fields. On the other hand, width
+				of horizontal lines and border width around some
+				reports are specified in points. Gaps between columns
+				of multi-column reports is measured in inches.
 			</para>
 			<para>
 			</para>
@@ -174,16 +179,15 @@ size_unit="points"
 		<sect2 id="rlibcompat" xreflabel="RLIB compatibility attribute">
 			<title>RLIB compatibility attribute</title>
 			<para>
-				<programlisting>
-rlib_compat="yes"
-				</programlisting>
+				<programlisting>rlib_compat="yes"</programlisting>
 				The <literal>rlib_compat</literal> attribute
 				specifies whether RLIB compatibility is switched on.
 			</para>
 			<para>
 				It controls two subtle behavioural details
 				in tabular report rendering with PDF output.
-				See TODO.
+				See <xref linkend="reportheight"/> and
+				<xref linkend="nodatanode"/>.
 			</para>
 		</sect2>
 	</sect1>
@@ -196,11 +200,9 @@ rlib_compat="yes"
 		</para>
 		<para>
 			Datasource descriptions are in the following format:
-			<programlisting>
-&lt;Datasources&gt;
+			<programlisting>&lt;Datasources&gt;
     &lt;Datasource name="mysource" type="..." ... /&gt;
-&lt;/Datasources&gt;
-			</programlisting>
+&lt;/Datasources&gt;</programlisting>
 		</para>
 		<para>
 			A report may have multiple datasources, i.e.
@@ -209,7 +211,7 @@ rlib_compat="yes"
 		</para>
 		<para>
 			Datasources must have unique names in a report and
-			their type may be: <literal>mariadb</literal>,
+			their type may be:
 			<literal>mariadb</literal> (or <literal>mysql</literal>),
 			<literal>postgresql</literal>, <literal>odbc</literal>,
 			<literal>csv</literal>, <literal>json</literal>,
@@ -219,45 +221,37 @@ rlib_compat="yes"
 			<title>MariaDB (MySQL) database connection</title>
 			<para>
 				A MariaDB database connection may be declared in three
-				ways. Either by using the database host and port
-				database name, user name and password directly:
-				<programlisting>
-&lt;Datasource
+				ways. Either by using the database host and port,
+				the database name, user name and password directly:
+				<programlisting>&lt;Datasource
     name="mysource" type="mariadb"
     host="..." port="..."
-    dbname="..." user="..." password="..." /&gt;
-				</programlisting>
+    dbname="..." user="..." password="..." /&gt;</programlisting>
 				or alternatively, instead of the host and port,
-				specifying the the UNIX Domain Socket file for
+				specifying the UNIX Domain Socket file for
 				a local connection if it's not in the standard
 				location:
-				<programlisting>
-&lt;Datasource
+				<programlisting>&lt;Datasource
     name="mysource" type="mariadb"
     unix_socket="..."
-    dbname="..." user="..." password="..." /&gt;
-				</programlisting>
+    dbname="..." user="..." password="..." /&gt;</programlisting>
 				or moving these details out to an external
 				configuration file in an INI file format:
-				<programlisting>
-&lt;Datasource
+				<programlisting>&lt;Datasource
     name="mysource" type="mariadb"
-    optionfile="myconn.cnf" group="myconn" /&gt;
-				</programlisting>
+    optionfile="myconn.cnf" group="myconn" /&gt;</programlisting>
 			</para>
 			<para>
 				In the second case, the configuration file <literal>myconn.cnf</literal>
 				would contain something like this:
-				<programlisting>
-[myconn]
+				<programlisting>[myconn]
 !include /etc/my.cnf
 database=mydb
 user=myuser
 #password=
 #host=
 #port=
-#unix_socket=
-				</programlisting>
+#unix_socket=</programlisting>
 				Please note that the INI group name <literal>[myconn]</literal>
 				matches <literal>group="myconn"</literal> in the above
 				datasource declaration.
@@ -270,37 +264,34 @@ user=myuser
 			<para>
 				The database host and port, or the socket file location
 				are all optional. Without these, a local connection is
-				attempted using the default settings.
+				attempted using the default settings. If the host name
+				is specified but the port isn't, the remote host is
+				used on the default port (as known by the local MariaDB
+				database client library).
 			</para>
 		</sect2>
 		<sect2>
 			<title>PostgreSQL database connection</title>
 			<para>
 				A PostgreSQL database connection may be declared in three
-				ways. Either by using the database host and port
-				database name, user name and password directly:
-				<programlisting>
-&lt;Datasource
+				ways. Either by using the database host and port,
+				the database name, user name and password directly:
+				<programlisting>&lt;Datasource
     name="mysource" type="postgresql"
     host="..." port="..."
-    dbname="..." user="..." password="..." /&gt;
-				</programlisting>
+    dbname="..." user="..." password="..." /&gt;</programlisting>
 				or alternatively, instead of the host and port,
-				specifying the the UNIX Domain Socket file for
+				specifying the UNIX Domain Socket file for
 				a local connection if it's not in the standard
 				location:
-				<programlisting>
-&lt;Datasource
+				<programlisting>&lt;Datasource
     name="mysource" type="postgresql"
     unix_socket="..."
-    dbname="..." user="..." password="..." /&gt;
-				</programlisting>
+    dbname="..." user="..." password="..." /&gt;</programlisting>
 				or using a so called connection string:
-				<programlisting>
-&lt;Datasource
+				<programlisting>&lt;Datasource
     name="mysource" type="postgresql"
-    connstr="..." /&gt;
-				</programlisting>
+    connstr="..." /&gt;</programlisting>
 			</para>
 			<para>
 				For the connection string format, see the
@@ -314,7 +305,10 @@ user=myuser
 			<para>
 				The database host and port, or the socket file location
 				are all optional. Without these, a local connection is
-				attempted using the default settings.
+				attempted using the default settings. If the host name
+				is specified but the port isn't, the remote host is
+				used on the default port (as known by the local PostgreSQL
+				database client library).
 			</para>
 		</sect2>
 		<sect2>
@@ -353,11 +347,9 @@ user=myuser
 				Thus, an ODBC database connection may be declared in two
 				ways. The first way is by using the DSN name, and
 				optionally the user name and password:
-				<programlisting>
-&lt;Datasource
+				<programlisting>&lt;Datasource
     name="mysource" type="odbc"
-    dbname="..." user="..." password="..." /&gt;
-				</programlisting>
+    dbname="..." user="..." password="..." /&gt;</programlisting>
 				In this case, the <literal>dbname</literal> attribute
 				is not the low level database name, but the ODBC
 				abstract DSN name.
@@ -365,11 +357,9 @@ user=myuser
 			<para>
 				There's also a way to use the so called connection string
 				which contain the same connection information:
-				<programlisting>
-&lt;Datasource
+				<programlisting>&lt;Datasource
     name="mysource" type="odbc"
-    connstr="..." /&gt;
-				</programlisting>
+    connstr="..." /&gt;</programlisting>
 			</para>
 			<para>
 				For the connection string format, see the
@@ -386,9 +376,7 @@ user=myuser
 			</para>
 			<para>
 				A CSV file datasource is declared very simply:
-				<programlisting>
-&lt;Datasource name="mysource" type="'csv'" /&gt;
-				</programlisting>
+				<programlisting>&lt;Datasource name="mysource" type="'csv'" /&gt;</programlisting>
 				In this case, the actual CSV file is not declared,
 				only that a "query" using a CSV file will be listed
 				later under <literal>&lt;Queries&gt;</literal>.
@@ -408,25 +396,21 @@ user=myuser
 			<para>
 				Similarly to CSV, the JSON file datasource is also declared
 				very simply:
-				<programlisting>
-&lt;Datasource name="mysource" type="'json'" /&gt;
-				</programlisting>
+				<programlisting>&lt;Datasource name="mysource" type="'json'" /&gt;</programlisting>
 				In this case, the actual JSON file is not declared,
 				only that a "query" using a JSON file will be listed
 				later under <literal>&lt;Queries&gt;</literal>.
 			</para>
 			<para>
 				A JSON file datasource is expected in this format:
-				<programlisting>
-{
+				<programlisting>{
     "columns": ["colname1", ... ],
     "coltypes": ["type", ... ],
     "rows": [
 	    { "colname1": value1, ...  },
         ...
     ]
-}
-				</programlisting>
+}</programlisting>
 			</para>
 			<para>
 				The JSON file is expected to list the column
@@ -456,35 +440,31 @@ user=myuser
 			<para>
 				Similarly to CSV and JSON, the XML file datasource is also declared
 				very simply:
-				<programlisting>
-&lt;Datasource name="mysource" type="'xml'" /&gt;
-				</programlisting>
+				<programlisting>&lt;Datasource name="mysource" type="'xml'" /&gt;</programlisting>
 				In this case, the actual XML file is not declared,
 				only that a "query" using an XML file will be listed
 				later under <literal>&lt;Queries&gt;</literal>.
 			</para>
 			<para>
 				An XML file datasource is expected in this format:
-				<programlisting>
-&lt;?xml version="1.0"?&gt;
+				<programlisting>&lt;?xml version="1.0"?&gt;
 &lt;data&gt;
-	&lt;rows&gt;
-		&lt;row&gt;
-			&lt;col&gt;value&lt;/col&gt;
+    &lt;rows&gt;
+        &lt;row&gt;
+            &lt;col&gt;value&lt;/col&gt;
             ...
-		&lt;/row&gt;
+        &lt;/row&gt;
         ...
-	&lt;/rows&gt;
-	&lt;fields&gt;
-		&lt;field&gt;column1&lt;/field&gt;
+    &lt;/rows&gt;
+    &lt;fields&gt;
+        &lt;field&gt;column1&lt;/field&gt;
         ...
-	&lt;/fields&gt;
-	&lt;coltypes&gt;
-		&lt;col&gt;type1&lt;/col&gt;
+    &lt;/fields&gt;
+    &lt;coltypes&gt;
+        &lt;col&gt;type1&lt;/col&gt;
         ...
-	&lt;/coltypes&gt;
-&lt;/data&gt;
-				</programlisting>
+    &lt;/coltypes&gt;
+&lt;/data&gt;</programlisting>
 				The XML section names <literal>&lt;data&gt;</literal>,
 				<literal>&lt;rows&gt;</literal> and
 				<literal>&lt;fields&gt;</literal>
@@ -521,22 +501,18 @@ user=myuser
 			<para>
 				Similarly to file based datasources, the array
 				datasource is declared very simply:
-				<programlisting>
-&lt;Datasource name="mysource" type="'array'" /&gt;
-				</programlisting>
+				<programlisting>&lt;Datasource name="mysource" type="'array'" /&gt;</programlisting>
 				In this case, the actual array is not declared,
 				only that a "query" using an array will be listed
 				later under <literal>&lt;Queries&gt;</literal>.
 			</para>
 			<para>
 				A C array is declared in this format:
-				<programlisting>
-const char *array[ROWS + 1][COLUMNS] = {
+				<programlisting>const char *array[ROWS + 1][COLUMNS] = {
     { "column1", ... },
     { "value1",  ... },
     ...
-};
-				</programlisting>
+};</programlisting>
 				The array is declared as a two-dimensional array of
 				C strings. The first row of the array is the column
 				names, <literal>[ROWS + 1]</literal> in the array
@@ -550,13 +526,11 @@ const char *array[ROWS + 1][COLUMNS] = {
 			<para>
 				Optionally, a column types array is declared
 				separately:
-				<programlisting>
-#include &lt;opencreport.h&gt;
+				<programlisting>#include &lt;opencreport.h&gt;
 
 const enum ocrpt_result_type coltypes[COLUMNS] = {
     ...
-};
-				</programlisting>
+};</programlisting>
 				If this array is present, it must have the same number
 				of <literal>COLUMNS</literal> as the matching data
 				array. The <literal>enum ocrpt_result_type</literal>
@@ -573,12 +547,10 @@ const enum ocrpt_result_type coltypes[COLUMNS] = {
 			Queries in OpenCReports are SQL queries for database
 			connections, or data files files in certain formats.
 			The queries are declared like this:
-			<programlisting>
-&lt;Queries&gt;
+			<programlisting>&lt;Queries&gt;
     &lt;Query name="..." ... /&gt;
     ...
-&lt;/Queries&gt;
-			</programlisting>
+&lt;/Queries&gt;</programlisting>
 		</para>
 		<sect2>
 			<title>SQL queries for SQL datasources</title>
@@ -586,20 +558,16 @@ const enum ocrpt_result_type coltypes[COLUMNS] = {
 				SQL queries for MariaDB, PostgreSQL and ODBC
 				datasources may be declared two ways, either
 				as the XML value for <literal>&lt;Query&gt;</literal>:
-				<programlisting>
-&lt;Query
+				<programlisting>&lt;Query
     name="myquery"
     datasource="mysource"&gt;
 SELECT * FROM some_table
-&lt;/Query&gt;
-				</programlisting>
+&lt;/Query&gt;</programlisting>
 				or as the <literal>value</literal> attribute:
-				<programlisting>
-&lt;Query
+				<programlisting>&lt;Query
     name="myquery"
     datasource="mysource"
-    value="SELECT * FROM some_table" /&gt;
-				</programlisting>
+    value="SELECT * FROM some_table" /&gt;</programlisting>
 			</para>
 			<para>
 				Note, that the XML attribute <literal>datasource="..."</literal>
@@ -647,19 +615,15 @@ SELECT * FROM some_table
 				Queries for CSV, XML and JSON datasources may
 				be declared two ways. Either as the XML value for
 				<literal>&lt;Query&gt;</literal>:
-				<programlisting>
-&lt;Query
+				<programlisting>&lt;Query
     name="myquery"
     datasource="mysource"
-&gt;xmldata.xml&lt;/Query&gt;
-					</programlisting>
+&gt;xmldata.xml&lt;/Query&gt;</programlisting>
 					or as the <literal>value</literal> attribute:
-					<programlisting>
-&lt;Query
+					<programlisting>&lt;Query
     name="myquery"
     datasource="mysource"
-    value="'xmldata.xml'" /&gt;
-				</programlisting>
+    value="'xmldata.xml'" /&gt;</programlisting>
 			</para>
 			<para>
 				Notes:
@@ -706,25 +670,21 @@ SELECT * FROM some_table
 				Queries for array datasources may be declared two ways.
 				Either as the XML value for
 				<literal>&lt;Query&gt;</literal>:
-				<programlisting>
-&lt;Query
+				<programlisting>&lt;Query
     name="myquery"
     datasource="mysource"
     coltypes="'coltypes'"
     rows="30"
     cols="6"
-&gt;array&lt;/Query&gt;
-					</programlisting>
+&gt;array&lt;/Query&gt;</programlisting>
 					or as the <literal>value</literal> attribute:
-					<programlisting>
-&lt;Query
+					<programlisting>&lt;Query
     name="myquery"
     datasource="mysource"
     value="'array'"
     coltypes="'coltypes'"
     rows="30"
-    cols="6" /&gt;
-				</programlisting>
+    cols="6" /&gt;</programlisting>
 			</para>
 			<para>
 				Notes:
@@ -831,8 +791,7 @@ SELECT * FROM some_table
 					The value for <literal>follower_for="..."</literal>
 					is the <literal>name</literal> of a previously
 					declared query. Example:
-					<programlisting>
-&lt;Query
+					<programlisting>&lt;Query
     name="myquery1"
     datasource="mysource1"
     value="'SELECT * FROM table1'" /&gt;
@@ -841,8 +800,7 @@ SELECT * FROM some_table
     name="myquery2"
     datasource="mysource2"
     value="'SELECT * FROM table1'"
-    follower_for="myquery1" /&gt;
-					</programlisting>
+    follower_for="myquery1" /&gt;</programlisting>
 				</para>
 				<para>
 					In this example, two queries of two different
@@ -864,8 +822,7 @@ SELECT * FROM some_table
 					according to the boolean expression specified
 					with the <literal>follower_expr="..."</literal>
 					attribute. Example:
-					<programlisting>
-&lt;Query
+					<programlisting>&lt;Query
     name="myquery1"
     datasource="mysource1"
     value="'SELECT * FROM table1'" /&gt;
@@ -875,8 +832,7 @@ SELECT * FROM some_table
     datasource="mysource2"
     value="'SELECT * FROM table1'"
     follower_for="myquery1"
-    follower_expr="myquery1.id = myquery2.id" /&gt;
-					</programlisting>
+    follower_expr="myquery1.id = myquery2.id" /&gt;</programlisting>
 				</para>
 			</sect3>
 		</sect2>
@@ -891,8 +847,7 @@ SELECT * FROM some_table
 			in the same XML, or it may be the toplevel node of
 			the XML. In the latter case, only a single
 			<literal>&lt;Part&gt;</literal>	may exist in the XML.
-			<programlisting>
-&lt;Part&gt;
+			<programlisting>&lt;Part&gt;
     &lt;pr&gt;
         &lt;pd&gt;
             &lt;Report&gt;
@@ -903,8 +858,7 @@ SELECT * FROM some_table
         ...
     &lt;/pr&gt;
     ...
-&lt;/Part&gt;
-			</programlisting>
+&lt;/Part&gt;</programlisting>
 		</para>
 		<para>
 			A report <literal>&lt;Part&gt;</literal> may consist
@@ -949,10 +903,8 @@ SELECT * FROM some_table
 					It may be specified in two forms, the first one
 					is the preferred name, the second is for RLIB
 					compatibility:
-					<programlisting>
-&lt;Part font_name="Arial"&gt;
-&lt;Part fontName="Arial"&gt;
-					</programlisting>
+					<programlisting>&lt;Part font_name="Arial"&gt;
+&lt;Part fontName="Arial"&gt;</programlisting>
 				</para>
 				<para>
 					If both forms are specified, <literal>font_name</literal>
@@ -971,10 +923,8 @@ SELECT * FROM some_table
 					It may be specified in two forms, the first one
 					is the preferred name, the second is for RLIB
 					compatibility:
-					<programlisting>
-&lt;Part font_size="10"&gt;
-&lt;Part fontSize="10"&gt;
-					</programlisting>
+					<programlisting>&lt;Part font_size="10"&gt;
+&lt;Part fontSize="10"&gt;</programlisting>
 				</para>
 				<para>
 					If both forms are specified, <literal>font_size</literal>
@@ -990,11 +940,9 @@ SELECT * FROM some_table
 					Shortcut for the <xref linkend="sizeunit"/> in
 					<literal>&lt;OpenCReport&gt;</literal> when
 					<literal>&lt;Part&gt;</literal> is the toplevel node.
-					<programlisting>
-&lt;Part size_unit="default"&gt;
+					<programlisting>&lt;Part size_unit="default"&gt;
 &lt;Part size_unit="rlib"&gt;
-&lt;Part size_unit="points"&gt;
-					</programlisting>
+&lt;Part size_unit="points"&gt;</programlisting>
 				</para>
 				<para>
 					When <literal>&lt;OpenCReport&gt;</literal> is the
@@ -1008,10 +956,8 @@ SELECT * FROM some_table
 					Shortcut for the <xref linkend="rlibcompat"/> in
 					<literal>&lt;OpenCReport&gt;</literal> when
 					<literal>&lt;Part&gt;</literal> is the toplevel node.
-					<programlisting>
-&lt;Part rlib_compat="yes"&gt;
-&lt;Part rlib_compat="no"&gt;
-					</programlisting>
+					<programlisting>&lt;Part rlib_compat="yes"&gt;
+&lt;Part rlib_compat="no"&gt;</programlisting>
 				</para>
 				<para>
 					When <literal>&lt;OpenCReport&gt;</literal> is the
@@ -1030,10 +976,8 @@ SELECT * FROM some_table
 				<para>
 					Page orientation for the whole
 					<literal>&lt;Part&gt;</literal>.
-					<programlisting>
-&lt;Part orientation="portrait"&gt;
-&lt;Part orientation="landscape"&gt;
-					</programlisting>
+					<programlisting>&lt;Part orientation="portrait"&gt;
+&lt;Part orientation="landscape"&gt;</programlisting>
 				</para>
 				<para>
 					Default is portrait orientation.
@@ -1050,16 +994,14 @@ SELECT * FROM some_table
 					"lowerCamelCase" variant and the all lowercase
 					with underscore. The lowecase-with-underscore
 					variants are the preferred ones.
-					<programlisting>
-&lt;Part top_margin="0.2"&gt;
+					<programlisting>&lt;Part top_margin="0.2"&gt;
 &lt;Part topMargin="0.2"&gt;
 &lt;Part bottom_margin="0.2"&gt;
 &lt;Part bottomMargin="0.2"&gt;
 &lt;Part left_margin="0.2"&gt;
 &lt;Part leftMargin="0.2"&gt;
 &lt;Part right_margin="0.2"&gt;
-&lt;Part rightMargin="0.2"&gt;
-					</programlisting>
+&lt;Part rightMargin="0.2"&gt;</programlisting>
 				</para>
 				<para>
 					When <literal>size_unit="rlib"</literal> is in effect
@@ -1084,10 +1026,8 @@ SELECT * FROM some_table
 					two forms: the RLIB compatible "lowerCamelCase"
 					variant and the all lowercase with underscore.
 					The lowecase-with-underscore variant is preferred.
-					<programlisting>
-&lt;Part paper_type="A4"&gt;
-&lt;Part paperType="A4"&gt;
-					</programlisting>
+					<programlisting>&lt;Part paper_type="A4"&gt;
+&lt;Part paperType="A4"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is the current system paper type
@@ -1107,9 +1047,7 @@ SELECT * FROM some_table
 				<para>
 					The same <literal>&lt;Part&gt;</literal> may be
 					executed multiple times.
-					<programlisting>
-&lt;Part iterations="3"&gt;
-					</programlisting>
+					<programlisting>&lt;Part iterations="3"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is 1.
@@ -1123,10 +1061,8 @@ SELECT * FROM some_table
 				<title>Suppress</title>
 				<para>
 					Report parts may be suppressed.
-					<programlisting>
-&lt;Part suppress="yes"&gt;
-&lt;Part suppress="val(m.suppress_part)"&gt;
-					</programlisting>
+					<programlisting>&lt;Part suppress="yes"&gt;
+&lt;Part suppress="val(m.suppress_part)"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>false</literal>,
@@ -1135,7 +1071,7 @@ SELECT * FROM some_table
 				<para>
 					The expression for <literal>suppress</literal>
 					must be a constant expression. An environment
-					variable (since it can't - or shouldn't change
+					variable (since it can't - or shouldn't - change
 					during the report execution) is considered
 					constant. See <xref linkend="expressions"/>.
 				</para>
@@ -1147,9 +1083,7 @@ SELECT * FROM some_table
 					(see <xref linkend="pageheader"/> below)
 					for <literal>&lt;Part&gt;</literal> may be
 					suppressed on the first page.
-					<programlisting>
-&lt;Part suppressPageHeaderFirstPage="yes"&gt;
-					</programlisting>
+					<programlisting>&lt;Part suppressPageHeaderFirstPage="yes"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>no</literal>.
@@ -1177,15 +1111,13 @@ SELECT * FROM some_table
 				<para>
 					This is the description of the page header.
 					It contains an <xref linkend="outputnode"/>.
-					<programlisting>
-&lt;Part&gt;
+					<programlisting>&lt;Part&gt;
     &lt;PageHeader&gt;
         &lt;Output&gt;
             ...
         &lt;/Output&gt;
     &lt;/PageHeader&gt;
-&lt;/Part&gt;
-					</programlisting>					
+&lt;/Part&gt;</programlisting>					
 				</para>
 			</sect3>
 			<sect3 id="pagefooter" xreflabel="Page footer">
@@ -1193,30 +1125,26 @@ SELECT * FROM some_table
 				<para>
 					This is the description of the page footer.
 					It contains an <xref linkend="outputnode"/>.
-					<programlisting>
-&lt;Part&gt;
+					<programlisting>&lt;Part&gt;
     &lt;PageFooter&gt;
         &lt;Output&gt;
             ...
         &lt;/Output&gt;
     &lt;/PageFooter&gt;
-&lt;/Part&gt;
-					</programlisting>					
+&lt;/Part&gt;</programlisting>					
 				</para>
 			</sect3>
 			<sect3>
 				<title>Part row</title>
 				<para>
 					See <xref linkend="partrow"/>.
-					<programlisting>
-&lt;Part&gt;
+					<programlisting>&lt;Part&gt;
     &lt;pr&gt;
         &lt;pd&gt;
             ...
         &lt;/pd&gt;
     &lt;/pr&gt;
-&lt;/Part&gt;
-					</programlisting>
+&lt;/Part&gt;</programlisting>
 				</para>
 				<sect4>
 					<title>Part row subsections</title>
@@ -1249,10 +1177,8 @@ SELECT * FROM some_table
 					for RLIB compatibility, it's ignored.
 					It accepts two values: <literal>flow</literal> and
 					<literal>fixed</literal>.
-					<programlisting>
-&lt;pr layout="flow"&gt;
-&lt;pr layout="fixed"&gt;
-					</programlisting>
+					<programlisting>&lt;pr layout="flow"&gt;
+&lt;pr layout="fixed"&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -1262,9 +1188,7 @@ SELECT * FROM some_table
 					whether the part row starts from the point where
 					the previous row in the same part ended, or it
 					should start on a new page.
-					<programlisting>
-&lt;pr newpage="yes"&gt;
-					</programlisting>
+					<programlisting>&lt;pr newpage="yes"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>no</literal>
@@ -1274,10 +1198,8 @@ SELECT * FROM some_table
 				<title>Suppress</title>
 				<para>
 					Report rows may be suppressed.
-					<programlisting>
-&lt;pr suppress="yes"&gt;
-&lt;pr suppress="val(m.suppress_row)"&gt;
-					</programlisting>
+					<programlisting>&lt;pr suppress="yes"&gt;
+&lt;pr suppress="val(m.suppress_row)"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>false</literal>,
@@ -1286,7 +1208,7 @@ SELECT * FROM some_table
 				<para>
 					The expression for <literal>suppress</literal>
 					must be a constant expression. An environment
-					variable (since it can't - or shouldn't change
+					variable (since it can't - or shouldn't - change
 					during the report execution) is considered
 					constant. See <xref linkend="expressions"/>.
 				</para>
@@ -1303,8 +1225,7 @@ SELECT * FROM some_table
 		</para>
 		<para>
 			Such a report may be inlined:
-			<programlisting>
-&lt;Part&gt;
+			<programlisting>&lt;Part&gt;
     &lt;pr&gt;
         &lt;pd&gt;
             &lt;Report&gt;
@@ -1312,21 +1233,18 @@ SELECT * FROM some_table
             &lt;/Report&gt;
         &lt;/pd&gt;
     &lt;/pr&gt;
-&lt;/Part&gt;
-			</programlisting>
+&lt;/Part&gt;</programlisting>
 		</para>
 		<para>
 			A report may also be loaded from a separate file.
 			For details, see <xref linkend="loadedreport"/>.
-			<programlisting>
-&lt;Part&gt;
+			<programlisting>&lt;Part&gt;
     &lt;pr&gt;
         &lt;pd&gt;
             &lt;load ... /&gt;
         &lt;/pd&gt;
     &lt;/pr&gt;
-&lt;/Part&gt;
-			</programlisting>
+&lt;/Part&gt;</programlisting>
 		</para>
 		<sect2>
 			<title>Part column attributes</title>
@@ -1334,9 +1252,7 @@ SELECT * FROM some_table
 				<title>Width</title>
 				<para>
 					Width of the part column.
-			<programlisting>
-&lt;pd width="60"&gt;
-			</programlisting>
+			<programlisting>&lt;pd width="60"&gt;</programlisting>
 				</para>
 				<para>
 					When <xref linkend="sizeunit"/> is set to
@@ -1371,9 +1287,7 @@ SELECT * FROM some_table
 				<title>Height</title>
 				<para>
 					Height of the part column.
-			<programlisting>
-&lt;pd height="120"&gt;
-			</programlisting>
+			<programlisting>&lt;pd height="120"&gt;</programlisting>
 				</para>
 				<para>
 					When <xref linkend="sizeunit"/> is set to
@@ -1392,7 +1306,7 @@ SELECT * FROM some_table
 				</para>
 				<para>
 					Report details in this part column are layed out
-					up to the the specified height. See
+					up to the specified height. See
 					<xref linkend="reportheight"/> for further explanation.
 				</para>
 				<para>
@@ -1406,9 +1320,7 @@ SELECT * FROM some_table
 				<para>
 					Border width around the part column.
 					It is measured in points.
-			<programlisting>
-&lt;pd border_width="2"&gt;
-			</programlisting>
+					<programlisting>&lt;pd border_width="2"&gt;</programlisting>
 				</para>
 				<para>
 					When set, a rectangle around the part column
@@ -1432,9 +1344,7 @@ SELECT * FROM some_table
 				<para>
 					When <literal>border_width</literal> is set,
 					this color is used to draw the border rectangle.
-					<programlisting>
-&lt;pd border_color="'blue'"&gt;
-					</programlisting>
+					<programlisting>&lt;pd border_color="'blue'"&gt;</programlisting>
 				</para>
 				<para>
 					See <xref linkend="colorspec"/>
@@ -1445,9 +1355,7 @@ SELECT * FROM some_table
 				<para>
 					Inner <literal>&lt;Report&gt;</literal>s
 					are layed out in one or more columns.
-					<programlisting>
-&lt;pd detail_columns="3"&gt;
-					</programlisting>
+					<programlisting>&lt;pd detail_columns="3"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is 1.
@@ -1459,9 +1367,7 @@ SELECT * FROM some_table
 					When <literal>detail_columns</literal>
 					is set to higher than 1, inner padding
 					between the detail columns may be specified.
-					<programlisting>
-&lt;pd column_pad="0.2"&gt;
-					</programlisting>
+					<programlisting>&lt;pd column_pad="0.2"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is 0, i.e. no padding.
@@ -1477,10 +1383,8 @@ SELECT * FROM some_table
 				<title>Suppress</title>
 				<para>
 					Report columns may be suppressed.
-					<programlisting>
-&lt;pd suppress="yes"&gt;
-&lt;pd suppress="val(m.suppress_column)"&gt;
-					</programlisting>
+					<programlisting>&lt;pd suppress="yes"&gt;
+&lt;pd suppress="val(m.suppress_column)"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>false</literal>,
@@ -1489,7 +1393,7 @@ SELECT * FROM some_table
 				<para>
 					The expression for <literal>suppress</literal>
 					must be a constant expression. An environment
-					variable (since it can't - or shouldn't change
+					variable (since it can't - or shouldn't - change
 					during the report execution) is considered
 					constant. See <xref linkend="expressions"/>.
 				</para>
@@ -1506,8 +1410,7 @@ SELECT * FROM some_table
 			Example XML skeleton structure with
 			<literal>&lt;OpenCReport&gt;</literal> as
 			the toplevel node:
-			<programlisting>
-&lt;OpenCReport&gt;
+			<programlisting>&lt;OpenCReport&gt;
     &lt;Part&gt;
         &lt;pr&gt;
             &lt;pd&gt;
@@ -1517,15 +1420,13 @@ SELECT * FROM some_table
             &lt;/pd&gt;
         &lt;/pr&gt;
     &lt;/Part&gt;
-&lt;/OpenCReport&gt;
-			</programlisting>
+&lt;/OpenCReport&gt;</programlisting>
 		</para>
 		<para>
 			Example XML skeleton structure with
 			<literal>&lt;Part&gt;</literal> as
 			the toplevel node:
-			<programlisting>
-&lt;Part&gt;
+			<programlisting>&lt;Part&gt;
     &lt;pr&gt;
         &lt;pd&gt;
             &lt;Report&gt;
@@ -1533,17 +1434,14 @@ SELECT * FROM some_table
             &lt;/Report&gt;
         &lt;/pd&gt;
     &lt;/pr&gt;
-&lt;/Part&gt;
-			</programlisting>
+&lt;/Part&gt;</programlisting>
 		</para>
 		<para>
 			Example XML skeleton structure with
 			a standalone <literal>&lt;Report&gt;</literal> node:
-			<programlisting>
-&lt;Report&gt;
+			<programlisting>&lt;Report&gt;
     ...
-&lt;/Report&gt;
-			</programlisting>
+&lt;/Report&gt;</programlisting>
 		</para>
 		<para>
 			When <literal>&lt;Report&gt;</literal> is the
@@ -1565,10 +1463,8 @@ SELECT * FROM some_table
 					It may be specified in two forms, the first one
 					is the preferred name, the second is for RLIB
 					compatibility:
-					<programlisting>
-&lt;Report font_name="Arial"&gt;
-&lt;Report fontName="Arial"&gt;
-					</programlisting>
+					<programlisting>&lt;Report font_name="Arial"&gt;
+&lt;Report fontName="Arial"&gt;</programlisting>
 				</para>
 				<para>
 					If both forms are specified, <literal>font_name</literal>
@@ -1589,10 +1485,8 @@ SELECT * FROM some_table
 					It may be specified in two forms, the first one
 					is the preferred name, the second is for RLIB
 					compatibility:
-					<programlisting>
-&lt;Report font_size="10"&gt;
-&lt;Report fontSize="10"&gt;
-					</programlisting>
+					<programlisting>&lt;Report font_size="10"&gt;
+&lt;Report fontSize="10"&gt;</programlisting>
 				</para>
 				<para>
 					If both forms are specified, <literal>font_size</literal>
@@ -1610,11 +1504,9 @@ SELECT * FROM some_table
 					Shortcut for the <xref linkend="sizeunit"/> in
 					<literal>&lt;OpenCReport&gt;</literal> when
 					<literal>&lt;Report&gt;</literal> is the toplevel node.
-					<programlisting>
-&lt;Report size_unit="default"&gt;
+					<programlisting>&lt;Report size_unit="default"&gt;
 &lt;Report size_unit="rlib"&gt;
-&lt;Report size_unit="points"&gt;
-					</programlisting>
+&lt;Report size_unit="points"&gt;</programlisting>
 				</para>
 				<para>
 					When <literal>&lt;OpenCReport&gt;</literal> or
@@ -1629,10 +1521,8 @@ SELECT * FROM some_table
 					Shortcut for the <xref linkend="rlibcompat"/> in
 					<literal>&lt;OpenCReport&gt;</literal> when
 					<literal>&lt;Report&gt;</literal> is the toplevel node.
-					<programlisting>
-&lt;Report rlib_compat="yes"&gt;
-&lt;Report rlib_compat="no"&gt;
-					</programlisting>
+					<programlisting>&lt;Report rlib_compat="yes"&gt;
+&lt;Report rlib_compat="no"&gt;</programlisting>
 				</para>
 				<para>
 					When <literal>&lt;OpenCReport&gt;</literal> is the
@@ -1653,10 +1543,8 @@ SELECT * FROM some_table
 					for the implicitly created parent
 					<literal>&lt;Part&gt;</literal> node when
 					<literal>&lt;Report&gt;</literal> is standalone.
-					<programlisting>
-&lt;Report orientation="portrait"&gt;
-&lt;Report orientation="landscape"&gt;
-					</programlisting>
+					<programlisting>&lt;Report orientation="portrait"&gt;
+&lt;Report orientation="landscape"&gt;</programlisting>
 				</para>
 				<para>
 					Default is portrait orientation.
@@ -1680,16 +1568,14 @@ SELECT * FROM some_table
 					"lowerCamelCase" variant and the all lowercase
 					with underscore. The lowecase-with-underscore
 					variants are the preferred ones.
-					<programlisting>
-&lt;Report top_margin="0.2"&gt;
+					<programlisting>&lt;Report top_margin="0.2"&gt;
 &lt;Report topMargin="0.2"&gt;
 &lt;Report bottom_margin="0.2"&gt;
 &lt;Report bottomMargin="0.2"&gt;
 &lt;Report left_margin="0.2"&gt;
 &lt;Report leftMargin="0.2"&gt;
 &lt;Report right_margin="0.2"&gt;
-&lt;Report rightMargin="0.2"&gt;
-					</programlisting>
+&lt;Report rightMargin="0.2"&gt;</programlisting>
 				</para>
 				<para>
 					When <literal>size_unit="rlib"</literal> is in effect
@@ -1721,10 +1607,8 @@ SELECT * FROM some_table
 					two forms: the RLIB compatible "lowerCamelCase"
 					variant and the all lowercase with underscore.
 					The lowecase-with-underscore variant is preferred.
-					<programlisting>
-&lt;Part paper_type="A4"&gt;
-&lt;Part paperType="A4"&gt;
-					</programlisting>
+					<programlisting>&lt;Part paper_type="A4"&gt;
+&lt;Part paperType="A4"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is the current system paper type
@@ -1749,9 +1633,7 @@ SELECT * FROM some_table
 				<title>Height</title>
 				<para>
 					Height of the report.
-			<programlisting>
-&lt;Report height="120"&gt;
-			</programlisting>
+					<programlisting>&lt;Report height="120"&gt;</programlisting>
 				</para>
 				<para>
 					When <xref linkend="sizeunit"/> is set to
@@ -1769,7 +1651,7 @@ SELECT * FROM some_table
 					in points.
 				</para>
 				<para>
-					Report details are layed out up to the the
+					Report details are layed out up to the
 					specified height. When the whole report
 					fits in the specified height, the next report's
 					starting point on the page depends on
@@ -1819,9 +1701,7 @@ SELECT * FROM some_table
 				<para>
 					The same <literal>&lt;Report&gt;</literal> may be
 					executed multiple times.
-					<programlisting>
-&lt;Report iterations="3"&gt;
-					</programlisting>
+					<programlisting>&lt;Report iterations="3"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is 1.
@@ -1831,10 +1711,8 @@ SELECT * FROM some_table
 				<title>Suppress</title>
 				<para>
 					Reports may be suppressed.
-					<programlisting>
-&lt;Report suppress="yes"&gt;
-&lt;Report suppress="val(m.suppress_report)"&gt;
-					</programlisting>
+					<programlisting>&lt;Report suppress="yes"&gt;
+&lt;Report suppress="val(m.suppress_report)"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>false</literal>,
@@ -1843,7 +1721,7 @@ SELECT * FROM some_table
 				<para>
 					The expression for <literal>suppress</literal>
 					must be a constant expression. An environment
-					variable (since it can't - or shouldn't change
+					variable (since it can't - or shouldn't - change
 					during the report execution) is considered
 					constant. See <xref linkend="expressions"/>.
 				</para>
@@ -1856,9 +1734,7 @@ SELECT * FROM some_table
 					<literal>&lt;Part&gt;</literal> node when
 					<literal>&lt;Report&gt;</literal> is the
 					toplevel node.
-					<programlisting>
-&lt;Report suppressPageHeaderFirstPage="yes"&gt;
-					</programlisting>
+					<programlisting>&lt;Report suppressPageHeaderFirstPage="yes"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>no</literal>.
@@ -1875,9 +1751,7 @@ SELECT * FROM some_table
 				<para>
 					Set the primary query name for <literal>&lt;Report&gt;</literal>
 					from the list of <xref linkend="queries"/>.
-					<programlisting>
-&lt;Report query="query1"&gt;
-					</programlisting>
+					<programlisting>&lt;Report query="query1"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is unset, i.e. use the first
@@ -1890,9 +1764,7 @@ SELECT * FROM some_table
 					Set the field header priority for the report versus
 					break (header and footer) priority. This setting
 					selects which report detail is encompassing the other.
-					<programlisting>
-&lt;Report field_header_priority="low"&gt;
-					</programlisting>
+					<programlisting>&lt;Report field_header_priority="low"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>high</literal>. In this
@@ -1918,9 +1790,7 @@ SELECT * FROM some_table
 					for the implicitly created <literal>&lt;pd&gt;</literal>
 					node when <literal>&lt;Report&gt;</literal> is standalone.
 					It is measured in points.
-			<programlisting>
-&lt;Report border_width="2"&gt;
-			</programlisting>
+					<programlisting>&lt;Report border_width="2"&gt;</programlisting>
 				</para>
 				<para>
 					When set, a rectangle around the part column
@@ -1955,9 +1825,7 @@ SELECT * FROM some_table
 					node when <literal>&lt;Report&gt;</literal> is standalone.
 					When <literal>border_width</literal> is set,
 					this color is used to draw the border rectangle.
-					<programlisting>
-&lt;Report border_color="'blue'"&gt;
-					</programlisting>
+					<programlisting>&lt;Report border_color="'blue'"&gt;</programlisting>
 				</para>
 				<para>
 					See <xref linkend="colorspec"/>
@@ -1971,9 +1839,7 @@ SELECT * FROM some_table
 					<literal>&lt;pd&gt;</literal> when
 					<literal>&lt;Parent&gt;</literal> is the
 					toplevel node.
-					<programlisting>
-&lt;Report detail_columns="3"&gt;
-					</programlisting>
+					<programlisting>&lt;Report detail_columns="3"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is 1.
@@ -1993,9 +1859,7 @@ SELECT * FROM some_table
 					<literal>&lt;pd&gt;</literal> node when
 					<literal>&lt;Parent&gt;</literal> is the
 					toplevel node.
-					<programlisting>
-&lt;Report column_pad="0.2"&gt;
-					</programlisting>
+					<programlisting>&lt;Report column_pad="0.2"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is 0, i.e. no padding.
@@ -2017,15 +1881,13 @@ SELECT * FROM some_table
 					in the implicitly created <literal>&lt;Part&gt;</literal>
 					node when <literal>&lt;Report&gt;</literal> is standalone.
 					It contains an <xref linkend="outputnode"/>.
-					<programlisting>
-&lt;Report&gt;
+					<programlisting>&lt;Report&gt;
     &lt;PageHeader&gt;
         &lt;Output&gt;
             ...
         &lt;/Output&gt;
     &lt;/PageHeader&gt;
-&lt;/Part&gt;
-					</programlisting>
+&lt;/Part&gt;</programlisting>
 				</para>
 				<para>
 					This subsection for <literal>&lt;Report&gt;</literal>
@@ -2043,15 +1905,13 @@ SELECT * FROM some_table
 					in the implicitly created <literal>&lt;Part&gt;</literal>
 					node when <literal>&lt;Report&gt;</literal> is standalone.
 					It contains an <xref linkend="outputnode"/>.
-					<programlisting>
-&lt;Report&gt;
+					<programlisting>&lt;Report&gt;
     &lt;PageFooter&gt;
         &lt;Output&gt;
             ...
         &lt;/Output&gt;
     &lt;/PageFooter&gt;
-&lt;/Part&gt;
-					</programlisting>					
+&lt;/Part&gt;</programlisting>					
 				</para>
 				<para>
 					This subsection for <literal>&lt;Report&gt;</literal>
@@ -2068,15 +1928,13 @@ SELECT * FROM some_table
 					This is the description of the report header that is
 					emitted at the start of the report.
 					It contains an <xref linkend="outputnode"/>.
-					<programlisting>
-&lt;Report&gt;
+					<programlisting>&lt;Report&gt;
     &lt;ReportHeader&gt;
         &lt;Output&gt;
             ...
         &lt;/Output&gt;
     &lt;/ReportHeader&gt;
-&lt;/Part&gt;
-					</programlisting>
+&lt;/Part&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -2085,15 +1943,13 @@ SELECT * FROM some_table
 					This is the description of the report footer that is
 					emitted at the end of the report.
 					It contains an <xref linkend="outputnode"/>.
-					<programlisting>
-&lt;Report&gt;
+					<programlisting>&lt;Report&gt;
     &lt;ReportFooter&gt;
         &lt;Output&gt;
             ...
         &lt;/Output&gt;
     &lt;/ReportFooter&gt;
-&lt;/Part&gt;
-					</programlisting>					
+&lt;/Part&gt;</programlisting>					
 				</para>
 			</sect3>
 			<sect3>
@@ -2101,14 +1957,12 @@ SELECT * FROM some_table
 				<para>
 					This section describes the
 					<xref linkend="variablesnode"/> in the report.
-					<programlisting>
-&lt;Report&gt;
+					<programlisting>&lt;Report&gt;
     &lt;Variables&gt;
         &lt;Variable ... /&gt;
         ...
     &lt;/Variables&gt;
-&lt;/Part&gt;
-					</programlisting>
+&lt;/Part&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -2116,16 +1970,14 @@ SELECT * FROM some_table
 				<para>
 					This section describes the
 					<xref linkend="breaksnode"/> in the report.
-					<programlisting>
-&lt;Report&gt;
+					<programlisting>&lt;Report&gt;
     &lt;Breaks&gt;
         &lt;Break ... &gt;
             ...
         &lt;/Break&gt;
         ...
     &lt;/Breaks&gt;
-&lt;/Part&gt;
-					</programlisting>
+&lt;/Part&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -2134,8 +1986,7 @@ SELECT * FROM some_table
 					This section describes the tabular details of the report.
 					There are two subsections in this node, both contain
 					an <xref linkend="outputnode"/>.
-					<programlisting>
-&lt;Report&gt;
+					<programlisting>&lt;Report&gt;
     &lt;Detail&gt;
         &lt;FieldHeaders&gt;
             &lt;Output&gt;
@@ -2148,8 +1999,7 @@ SELECT * FROM some_table
             &lt;/Output&gt;
         &lt;/FieldDetails&gt;
     &lt;/Detail&gt;
-&lt;/Part&gt;
-					</programlisting>
+&lt;/Part&gt;</programlisting>
 				</para>
 				<para>
 					<literal>&lt;FieldHeaders&gt;</literal> is used
@@ -2161,7 +2011,7 @@ SELECT * FROM some_table
 					produced by the report query.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="nodatanode" xreflabel="NoData node">
 				<title>Alternate output for no data</title>
 				<para>
 					This section describes the alternate output of the report
@@ -2173,8 +2023,7 @@ SELECT * FROM some_table
 				<para>
 					This section may be declared in two ways. One way is to
 					spell out the <literal>&lt;Alternate&gt;</literal> node:
-					<programlisting>
-&lt;Report&gt;
+					<programlisting>&lt;Report&gt;
     &lt;Alternate&gt;
         &lt;NoData&gt;
             &lt;Output&gt;
@@ -2182,21 +2031,18 @@ SELECT * FROM some_table
             &lt;/Output&gt;
         &lt;/NoData&gt;
     &lt;/Alternate&gt;
-&lt;/Part&gt;
-					</programlisting>
+&lt;/Part&gt;</programlisting>
 				</para>
 				<para>
 					The other way is without the
 					<literal>&lt;Alternate&gt;</literal> node:
-					<programlisting>
-&lt;Report&gt;
+					<programlisting>&lt;Report&gt;
     &lt;NoData&gt;
         &lt;Output&gt;
             ...
         &lt;/Output&gt;
     &lt;/NoData&gt;
-&lt;/Part&gt;
-					</programlisting>
+&lt;/Part&gt;</programlisting>
 				</para>
 				<para>
 					When the <xref linkend="reportqueryname"/>
@@ -2221,9 +2067,7 @@ SELECT * FROM some_table
 			<sect3>
 				<title>File name</title>
 				<para>
-					<programlisting>
-&lt;load name="report1.xml" /&gt;
-					</programlisting>
+					<programlisting>&lt;load name="report1.xml" /&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -2233,9 +2077,7 @@ SELECT * FROM some_table
 					the same attribute of <literal>&lt;Report&gt;</literal>.
 					This way, the report in the separate file can be reused
 					for a different data set.
-					<programlisting>
-&lt;load query="query1" /&gt;
-					</programlisting>
+					<programlisting>&lt;load query="query1" /&gt;</programlisting>
 				</para>
 				<para>
 					When <xref linkend="rlibcompat"/> is set and the
@@ -2251,9 +2093,7 @@ SELECT * FROM some_table
 				<para>
 					The <literal>iterations</literal> attribute overrides
 					the same attribute of <literal>&lt;Report&gt;</literal>.
-					<programlisting>
-&lt;load iterations="5" /&gt;
-					</programlisting>
+					<programlisting>&lt;load iterations="5" /&gt;</programlisting>
 				</para>
 			</sect3>
 		</sect2>
@@ -2264,12 +2104,10 @@ SELECT * FROM some_table
 			This is the parent node for individual
 			<literal>&lt;Variable&gt;</literal> nodes
 			that describe each variable.
-			<programlisting>
-&lt;Variables&gt;
+			<programlisting>&lt;Variables&gt;
     &lt;Variable ... /&gt;
     ...
-&lt;/Variables&gt;
-			</programlisting>
+&lt;/Variables&gt;</programlisting>
 		</para>
 	</sect1>
 	<sect1 id="variablenode" xreflabel="Variable node">
@@ -2278,9 +2116,7 @@ SELECT * FROM some_table
 			This node describes one
 			<literal>&lt;Variable&gt;</literal> node.
 			It has no children nodes, only attributes.
-			<programlisting>
-&lt;Variable ... /&gt;
-			</programlisting>
+			<programlisting>&lt;Variable ... /&gt;</programlisting>
 		</para>
 		<sect2>
 			<title>Variable attributes</title>
@@ -2290,9 +2126,7 @@ SELECT * FROM some_table
 					The name of the variable. It must be
 					unique in the list of variables for
 					the parent <literal>&lt;Report&gt;</literal> node.
-					<programlisting>
-&lt;Variable name="var1" /&gt;
-					</programlisting>
+					<programlisting>&lt;Variable name="var1" /&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -2305,9 +2139,7 @@ SELECT * FROM some_table
 					query. The expression may therefore reference
 					field names of queries that are declared
 					in the XML description or in programming code.
-					<programlisting>
-&lt;Variable value="q1.field1 + 2 * q2.field2" /&gt;
-					</programlisting>
+					<programlisting>&lt;Variable value="q1.field1 + 2 * q2.field2" /&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -2315,8 +2147,7 @@ SELECT * FROM some_table
 				<para>
 					The type of the variable. Several variable
 					types exist:
-					<programlisting>
-&lt;Variable value="q1.field" type="expression"/&gt;
+					<programlisting>&lt;Variable value="q1.field" type="expression"/&gt;
 
 &lt;Variable value="q1.field" type="count"/&gt;
 &lt;Variable value="q1.field" type="countall"/&gt;
@@ -2329,8 +2160,7 @@ SELECT * FROM some_table
 &lt;Variable value="q1.field" type="highest"/&gt;
 &lt;Variable value="q1.field" type="lowest"/&gt;
 
-&lt;Variable value="q1.field" type="custom"/&gt;
-					</programlisting>
+&lt;Variable value="q1.field" type="custom"/&gt;</programlisting>
 				</para>
 				<para>
 					Default type is <literal>expression</literal>,
@@ -2341,7 +2171,7 @@ SELECT * FROM some_table
 				<para>
 					The <literal>count</literal> and
 					<literal>countall</literal> variable
-					types count the the number of expression
+					types count the number of expression
 					results for the data set. The former
 					leaves out NULL values, the latter includes them.
 					This is equivalent to COUNT(field) and COUNT(*)
@@ -2358,8 +2188,8 @@ SELECT * FROM some_table
 					are combinations of <literal>sum</literal>
 					and either <literal>count</literal> or
 					<literal>countall</literal>. They take the value
-					computed for each data row, sums them, and
-					divide by the number of values. The result
+					computed for each data row, add them together,
+					and divide by the number of values. The result
 					of <literal>average</literal> and
 					<literal>averageall</literal> may differ if
 					there is NULL data in the result set.
@@ -2371,32 +2201,40 @@ SELECT * FROM some_table
 					for the data set, respectively.
 				</para>
 				<para>
+					All of the above pre-defined variables types
+					work on numeric data.
+				</para>
+				<para>
 					The <literal>custom</literal> variable type
 					allow arbitrary user variables if the
-					predefined types are not enough.
+					predefined types are not enough, for example,
+					when the base type needs to be something else
+					then a number. See below.
 				</para>
 			</sect3>
-			<sect3>
-				<title>Attributes to define a Custom variable</title>
+			<sect3 id="customvarattrs" xreflabel="Custom variable attributes">
+				<title>Custom variable attributes</title>
 				<para>
 					These attributes below define a custom variable.
 					A base expression, up to two intermediary expressions
 					and one result expression may be defined, together
 					with the expression type.
-					<programlisting>
-&lt;Variable
+					<programlisting>&lt;Variable
     baseexpr="..."
     intermedexpr="..."
     intermed2expr="..."
     resultexpr="..."
     basetype="..."
-    type="custom"/&gt;
-					</programlisting>
+    type="custom"/&gt;</programlisting>
 				</para>
 				<para>
 					<literal>baseexpr</literal>, <literal>intermedexpr</literal>,
 					<literal>intermed2expr</literal> and <literal>resultexpr</literal>
 					are <xref linkend="expressions"/>.
+				</para>
+				<para>
+					Iterative or recursive variables can use
+					<xref linkend="exprself"/>.
 				</para>
 				<para>
 					Possible values for <literal>basetype</literal> are
@@ -2413,15 +2251,13 @@ SELECT * FROM some_table
 					is an alias for <literal>value</literal>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="resetonbreak" xreflabel="Reset on break attribute">
 				<title>Reset on break</title>
 				<para>
 					A variable may reset on break boundaries to the
 					<literal>baseexpr</literal> value. See
 					<xref linkend="breaknode"/> and <xref linkend="breaks"/>
-					<programlisting>
-&lt;Variable resetonbreak="break1" /&gt;
-					</programlisting>
+					<programlisting>&lt;Variable resetonbreak="break1" /&gt;</programlisting>
 				</para>
 				<para>
 					Default is unset, i.e. no reset on a break.
@@ -2441,10 +2277,8 @@ SELECT * FROM some_table
 					The other way is to calculate the value for the last
 					data row and provide that value for every data row.
 					The attribute is accepted under two names:
-					<programlisting>
-&lt;Variable precalculate="yes" /&gt;
-&lt;Variable delayed="yes" /&gt;
-					</programlisting>
+					<programlisting>&lt;Variable precalculate="yes" /&gt;
+&lt;Variable delayed="yes" /&gt;</programlisting>
 				</para>
 				<para>
 					Default is <literal>no</literal>.
@@ -2453,8 +2287,8 @@ SELECT * FROM some_table
 					<literal>precalculate="yes"</literal> (or
 					<literal>delayed="yes"</literal> may be combined
 					with <literal>resetonbreak="..."</literal>.
-					In this case, the "precalculated" value is computed
-					for break periods.
+					In this case, multiple precalculateds values are computed
+					for the break periods.
 				</para>
 				<para>
 					Precalculated values may be used to show values in
@@ -2481,12 +2315,10 @@ SELECT * FROM some_table
 			This is the parent node for individual
 			<literal>&lt;Break&gt;</literal> nodes
 			that describe each break. See <xref linkend="breaks"/>
-			<programlisting>
-&lt;Breaks&gt;
+			<programlisting>&lt;Breaks&gt;
     &lt;Break ... /&gt;
     ...
-&lt;/Break&gt;
-			</programlisting>
+&lt;/Break&gt;</programlisting>
 		</para>
 	</sect1>
 	<sect1 id="breaknode" xreflabel="Break node">
@@ -2494,8 +2326,7 @@ SELECT * FROM some_table
 		<para>
 			This node describes one
 			<literal>&lt;Break&gt;</literal>.
-			<programlisting>
-&lt;Break ... &gt;
+			<programlisting>&lt;Break ... &gt;
     &lt;BreakHeader&gt;
         &lt;Output&gt;
             ...
@@ -2510,8 +2341,7 @@ SELECT * FROM some_table
         &lt;BreakField /&gt;
         ...
     &lt;/BreakFields&gt;
-&lt;/Break&gt;
-			</programlisting>
+&lt;/Break&gt;</programlisting>
 		</para>
 		<sect2>
 			<title>Break attributes</title>
@@ -2521,9 +2351,7 @@ SELECT * FROM some_table
 					The name of the break. It must be
 					unique in the list of breaks for
 					the parent <literal>&lt;Report&gt;</literal> node.
-					<programlisting>
-&lt;Break name="break1" /&gt;
-					</programlisting>
+					<programlisting>&lt;Break name="break1" /&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -2531,9 +2359,7 @@ SELECT * FROM some_table
 				<para>
 					Accepted as part of RLIB compatibility.
 					Not implemented.
-					<programlisting>
-&lt;Break newpage="yes" /&gt;
-					</programlisting>
+					<programlisting>&lt;Break newpage="yes" /&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -2541,9 +2367,7 @@ SELECT * FROM some_table
 				<para>
 					Accepted as part of RLIB compatibility.
 					Not implemented.
-					<programlisting>
-&lt;Break headernewpage="yes" /&gt;
-					</programlisting>
+					<programlisting>&lt;Break headernewpage="yes" /&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -2551,9 +2375,7 @@ SELECT * FROM some_table
 				<para>
 					Accepted as part of RLIB compatibility.
 					Not implemented.
-					<programlisting>
-&lt;Break suppressblank="yes" /&gt;
-					</programlisting>
+					<programlisting>&lt;Break suppressblank="yes" /&gt;</programlisting>
 				</para>
 			</sect3>
 		</sect2>
@@ -2566,13 +2388,11 @@ SELECT * FROM some_table
 					if there's a change for the values in the set of
 					break fields.
 					It contains an <xref linkend="outputnode"/> child node.
-					<programlisting>
-&lt;BreakHeader&gt;
+					<programlisting>&lt;BreakHeader&gt;
     &lt;Output&gt;
         ...
     &lt;/Output&gt;
-&lt;/BreakHeader&gt;
-					</programlisting>
+&lt;/BreakHeader&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -2582,13 +2402,11 @@ SELECT * FROM some_table
 					if there's a change for the values in the set of
 					break fields.
 					It contains an <xref linkend="outputnode"/> child node.
-					<programlisting>
-&lt;BreakHeader&gt;
+					<programlisting>&lt;BreakHeader&gt;
     &lt;Output&gt;
         ...
     &lt;/Output&gt;
-&lt;/BreakHeader&gt;
-					</programlisting>
+&lt;/BreakHeader&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -2596,21 +2414,17 @@ SELECT * FROM some_table
 				<para>
 					The break fields node contains one or more
 					<xref linkend="breakfield"/> children nodes.
-					<programlisting>
-&lt;BreakFields&gt;
+					<programlisting>&lt;BreakFields&gt;
     &lt;BreakField ... /&gt;
     ...
-&lt;/BreakFields&gt;
-					</programlisting>
+&lt;/BreakFields&gt;</programlisting>
 				</para>
 				<sect4 id="breakfield" xreflabel="BreakField">
 					<title>BreakField</title>
 					<para>
 						The break field node only has one attribute and
 						contains no child nodes.
-						<programlisting>
-&lt;BreakField value="..."/&gt;
-						</programlisting>
+						<programlisting>&lt;BreakField value="..."/&gt;</programlisting>
 					</para>
 					<para>
 						The sole attribute in

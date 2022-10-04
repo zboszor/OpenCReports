@@ -16,8 +16,8 @@
 			as a kind of shortcut. A variable calculates the
 			value of a long or often used expression, and the variable
 			result may in turn be used in other expressions.
-			This can save both typing (in the report XML) and runtime
-			cost during the report generation.
+			This can save both typing (in the report XML) and report
+			execution time during the report generation.
 		</para>
 		<para>
 			Iterative variables use both the values of the current row
@@ -29,7 +29,7 @@
 		</para>
 		<para>
 			Variables may be reset at break boundaries.
-			See <xref linkend="breaks"/>.
+			See <xref linkend="breaks"/> and the <xref linkend="resetonbreak"/>.
 		</para>
 		<para>
 			Custom variables may be defined that use any supported
