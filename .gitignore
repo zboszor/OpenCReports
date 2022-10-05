@@ -47,6 +47,7 @@ libsrc/cairotest
 libsrc/*.pdf
 
 # Documentation
+doc/OpenCReports.sgm
 doc/*.pdf
 doc/html
 

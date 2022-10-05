@@ -129,6 +129,7 @@ AC_CONFIG_FILES([
 	Makefile
 	opencreports.pc
 	doc/Makefile
+	doc/OpenCReports.sgm
 	include/Makefile
 	libsrc/Makefile
 	tests/Makefile
