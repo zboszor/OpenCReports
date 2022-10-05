@@ -573,12 +573,12 @@ static void ocrpt_execute_parts(opencreport *o) {
 								}
 							} else {
 								ocrpt_print_reportheader(o, p, pr, pd, r, 0, &newpage, &page_indent, &page_position, &old_page_position);
-								if (!o->rlib_compat)
+								if (o->noquery_show_nodata)
 									ocrpt_layout_output(o, p, pr, pd, r, &r->nodata, 0, &newpage, &page_indent, &page_position, &old_page_position);
 							}
 
 							if (r->height_set) {
-								if ((o->rlib_compat && rl->next) || !o->rlib_compat) {
+								if (rl->next || o->report_height_after_last) {
 									page_position += r->remaining_height;
 
 									if (pd->max_page_position < page_position)

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE report>
-<OpenCReport size_unit="points" rlib_compat="yes">
+<OpenCReport size_unit="points" noquery_show_nodata="no">
   <Part layout="'fixed'" fontSize="14" fontName="Arial" orientation="landscape" leftMargin="0.2*72.0" rightMargin="0.2*72.0" topMargin="0.2*72.0" bottomMargin="0.2*72.0" iterations="2">
     <PageHeader>
       <Output>
