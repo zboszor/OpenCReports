@@ -153,41 +153,116 @@
 		<sect2 id="sizeunit" xreflabel="Size unit attribute">
 			<title>Size unit attribute</title>
 			<para>
-				<programlisting>size_unit="default"
-size_unit="rlib"
-size_unit="points"</programlisting>
 				The <literal>size_unit</literal> attribute
-				specifies whether all size related settings
-				in the report are in points, a.k.a. 1/72th inch.
+				specifies report behaviour for size related
+				settings:
+				<programlisting>&lt;OpenCReport size_unit="rlib"&gt;
+&lt;OpenCReport size_unit="points"&gt;</programlisting>
 			</para>
 			<para>
-				The <literal>default</literal> is <literal>rlib</literal>
-				which is the legacy RLIB behavior, leading
-				to some inconsistency in size related settings.
-				For example, width for <literal>field</literal>
-				and <literal>literal</literal> (see later in the
-				<xref linkend="outputnode"/> section) are in number
-				of characters. This is influenced by the font size
-				set for these text fields. On the other hand, width
-				of horizontal lines and border width around some
-				reports are specified in points. Gaps between columns
-				of multi-column reports is measured in inches.
+				Default is <literal>rlib</literal>
+				which is the legacy RLIB behavior, with the
+				known inconsistency in size related settings:
+				<itemizedlist>
+					<listitem override="bullet">
+						<para>
+							width for <literal>field</literal> and
+							<literal>literal</literal> (see
+							<xref linkend="outputnode"/>) are in
+							number of characters. This is influenced
+							by the font size set in either
+							<xref linkend="partfontsize"/>,
+							<xref linkend="reportfontsize"/> or
+							TODO:linefontsize
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							height for <xref linkend="partcol"/>
+							is measured in number of characters
+							influenced by <xref linkend="partfontsize"/>
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							height for <xref linkend="report"/>
+							is measured in number of characters
+							influenced by <xref linkend="partfontsize"/>
+							and <xref linkend="reportfontsize"/>
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							width of horizontal lines and the
+							optional border width around reports
+							are specified in points
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							gaps between columns of multi-column
+							reports is measured in inches
+						</para>
+					</listitem>
+				</itemizedlist>
 			</para>
 			<para>
+				Note that the default setting (as in RLIB)
+				only ever expected monospace fonts that have the
+				same width for every character. It also expected that
+				the character height is identical to the character
+				width. The latter detail is false for many monospace
+				fonts, i.e. their height is usually greater than
+				their width.
+			</para>
+			<para>
+				With proportional fonts (where the width of
+				characters depend on their image, i.e. an "i" is
+				thinner than an "m") width of text fields cannot
+				reliably be set in "number of characters" because
+				it's not an exact value. There is a workaround for
+				this in <literal>OpenCReports</literal> but it's
+				an over-engineered solution and isn't available
+				in RLIB so it's not backward compatible either.
+				But it's there if someone wants to port reports
+				from RLIB and only make superficial changes.
+			</para>
+			<para>
+				When <literal>size_unit</literal> is set to
+				<literal>points</literal>, all size related
+				settings in the report are in points,
+				a.k.a. 1/72th inch. Straightforward and consistent.
 			</para>
 		</sect2>
-		<sect2 id="rlibcompat" xreflabel="RLIB compatibility attribute">
-			<title>RLIB compatibility attribute</title>
+		<sect2 id="noqueryshownodata" xreflabel="No query show NoData attribute">
+			<title>No query show NoData</title>
 			<para>
-				<programlisting>rlib_compat="yes"</programlisting>
-				The <literal>rlib_compat</literal> attribute
-				specifies whether RLIB compatibility is switched on.
+				This controls whether <xref linkend="nodatanode"/>
+				is shown when the report's <xref linkend="queryattr"/>
+				is set to a non-existing query name.
+				<programlisting>&lt;OpenCReport noquery_show_nodata="yes"&gt;
+&lt;OpenCReport noquery_show_nodata="no"&gt;</programlisting>
 			</para>
 			<para>
-				It controls two subtle behavioural details
-				in tabular report rendering with PDF output.
-				See <xref linkend="reportheight"/> and
-				<xref linkend="nodatanode"/>.
+				Default is <literal>true</literal> when
+				<literal>OpenCReport</literal> is the toplevel node,
+				<literal>false</literal> when either
+				<literal>&lt;Part&gt;</literal> or <literal>&lt;Report&gt;</literal>
+				is the toplevel node for RLIB compatibility.
+				See <xref linkend="nodatanode"/>.
+			</para>
+		</sect2>
+		<sect2 id="reportheightafterlast" xreflabel="Report height after last attribute">
+			<title>Report height after last</title>
+			<para>
+				It controls whether report height is applied
+				after the last <literal>&lt;Report&gt;</literal>
+				in the <literal>&lt;pd&gt;</literal> node.
+				<programlisting>&lt;OpenCReport report_height_after_last="yes"&gt;
+&lt;OpenCReport report_height_after_last="no"&gt;</programlisting>
+			</para>
+			<para>
+				Default is <literal>false</literal>.
 			</para>
 		</sect2>
 	</sect1>
@@ -951,24 +1026,31 @@ SELECT * FROM some_table
 				</para>
 			</sect3>
 			<sect3>
-				<title>RLIB compatibility</title>
+				<title>No query show NoData attribute</title>
 				<para>
-					Shortcut for the <xref linkend="rlibcompat"/> in
+					Shortcut for <xref linkend="noqueryshownodata"/> in
+					<literal>&lt;OpenCReport&gt;</literal> when
+                    <literal>&lt;Part&gt;</literal> is the toplevel node.
+					<programlisting>noquery_show_nodata="yes"
+noquery_show_nodata="no"</programlisting>
+				</para>
+				<para>
+					See default in <xref linkend="noqueryshownodata"/>
+					See also <xref linkend="nodatanode"/>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Report height after last attribute</title>
+				<para>
+					Shortcut for <xref linkend="reportheightafterlast"/> in
 					<literal>&lt;OpenCReport&gt;</literal> when
 					<literal>&lt;Part&gt;</literal> is the toplevel node.
-					<programlisting>&lt;Part rlib_compat="yes"&gt;
-&lt;Part rlib_compat="no"&gt;</programlisting>
+					<programlisting>report_height_after_last="yes"
+report_height_after_last="no"</programlisting>
 				</para>
 				<para>
-					When <literal>&lt;OpenCReport&gt;</literal> is the
-					toplevel node in the XML, this attribute for
-					<literal>&lt;Part&gt;</literal> is ignored.
-				</para>
-				<para>
-					When <literal>&lt;Part&gt;</literal> is the toplevel
-					node, the default is <literal>yes</literal>.
-					This helps using OpenCReports as a drop-in replacement
-					for RLIB.
+					See default in <xref linkend="reportheightafterlast"/>
+					See also <xref linkend="nodatanode"/>.
 				</para>
 			</sect3>
 			<sect3 id="partpageorientation" xreflabel="Part page orientation">
@@ -1516,24 +1598,31 @@ SELECT * FROM some_table
 				</para>
 			</sect3>
 			<sect3>
-				<title>RLIB compatibility</title>
+				<title>No query show NoData attribute</title>
 				<para>
-					Shortcut for the <xref linkend="rlibcompat"/> in
+					Shortcut for <xref linkend="noqueryshownodata"/> in
 					<literal>&lt;OpenCReport&gt;</literal> when
-					<literal>&lt;Report&gt;</literal> is the toplevel node.
-					<programlisting>&lt;Report rlib_compat="yes"&gt;
-&lt;Report rlib_compat="no"&gt;</programlisting>
+                    <literal>&lt;Report&gt;</literal> is the toplevel node.
+					<programlisting>&lt;Report noquery_show_nodata="yes"&gt;
+&lt;Report noquery_show_nodata="no&gt;</programlisting>
 				</para>
 				<para>
-					When <literal>&lt;OpenCReport&gt;</literal> is the
-					toplevel node in the XML, this attribute for
-					<literal>&lt;Report&gt;</literal> is ignored.
+					See default in <xref linkend="noqueryshownodata"/>
+					See also <xref linkend="nodatanode"/>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Report height after last attribute</title>
+				<para>
+					Shortcut for <xref linkend="reportheightafterlast"/> in
+					<literal>&lt;OpenCReport&gt;</literal> when
+					<literal>&lt;Part&gt;</literal> is the toplevel node.
+					<programlisting>&lt;Report report_height_after_last="yes"&gt;
+&lt;Report report_height_after_last="no"&gt;</programlisting>
 				</para>
 				<para>
-					When <literal>&lt;Report&gt;</literal> is the toplevel
-					node, the default is <literal>yes</literal>.
-					This helps using OpenCReports as a drop-in replacement
-					for RLIB.
+					See default in <xref linkend="reportheightafterlast"/>
+					See also <xref linkend="nodatanode"/>.
 				</para>
 			</sect3>
 			<sect3>
@@ -1652,31 +1741,23 @@ SELECT * FROM some_table
 				</para>
 				<para>
 					Report details are layed out up to the
-					specified height. When the whole report
-					fits in the specified height, the next report's
-					starting point on the page depends on
-					<xref linkend="rlibcompat"/>.
+					specified height. If the report would run longer
+					than the specified height, it gets truncated.
+					When the report fits in the specified height,
+					the next report's starts with the remaining height
+					added as padding before it.
 				</para>
 				<para>
-					When RLIB compatibility is not set, then the height
-					of this report is unconditionally applied, i.e.
-					any subsequent <literal>&lt;Report&gt;</literal>
-					follows with the vertical padding, i.e. the remaining
-					empty space is added up to the fixed height.
+					If the <literal>&lt;Report&gt;</literal> is the last
+					one in the <literal>&lt;pd&gt;</literal> node, then
+					the report may or may not be padded with the remaining
+					height, depending on the
+					<xref linkend="reportheightafterlast"/>.
+				</para>
+				<para>
 					If height is unset for the parent
 					<literal>&lt;pd&gt;</literal> node, it is expanded
 					with this vertical padding.
-				</para>
-				<para>
-					When RLIB compatibility is set, the vertical
-					padding is only applied between 
-					<literal>&lt;Report&gt;</literal>s in the parent
-					<literal>&lt;pd&gt;</literal> node but not
-					after the last <literal>&lt;Report&gt;</literal>
-					if it is shorter than the specified height.
-					The specified height would still limit the displayed
-					rows for the last <literal>&lt;Report&gt;</literal>
-					if it would run longer than the specified height.
 				</para>
 				<para>
 					In case height is set for both the parent
@@ -2048,7 +2129,7 @@ SELECT * FROM some_table
 					When the <xref linkend="reportqueryname"/>
 					does not exist in in the global list of
 					<xref linkend="queries"/> and the
-					<xref linkend="rlibcompat"/> is set, then
+					<xref linkend="noqueryshownodata"/> is set, then
 					the <literal>&lt;NoData&gt;</literal> section
 					is not displayed.
 				</para>
@@ -2070,7 +2151,7 @@ SELECT * FROM some_table
 					<programlisting>&lt;load name="report1.xml" /&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="queryattr" xreflabel="Query attribute">
 				<title>Query</title>
 				<para>
 					The <literal>query</literal> attribute overrides
@@ -2080,7 +2161,7 @@ SELECT * FROM some_table
 					<programlisting>&lt;load query="query1" /&gt;</programlisting>
 				</para>
 				<para>
-					When <xref linkend="rlibcompat"/> is set and the
+					When the <xref linkend="noqueryshownodata"/> is set and the
 					<xref linkend="reportqueryname"/> is set to
 					a non-existing name in the global list of
 					<xref linkend="queries"/>, the
@@ -2381,7 +2462,7 @@ SELECT * FROM some_table
 		</sect2>
 		<sect2>
 			<title>Break subsections</title>
-			<sect3>
+			<sect3 id="breakheadernode" xreflabel="BreakHeader">
 				<title>BreakHeader</title>
 				<para>
 					The break header is emitted before the new data row
@@ -2395,7 +2476,7 @@ SELECT * FROM some_table
 &lt;/BreakHeader&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breakfooternode" xreflabel="BreakFooter">
 				<title>BreakFooter</title>
 				<para>
 					The break header is emitted after the previous data row
@@ -2433,6 +2514,33 @@ SELECT * FROM some_table
 						expression watched for changes is declared.
 						See <xref linkend="expressions"/>.
 					</para>
+					<para>
+						There must be at least one
+						<literal>&lt;BreakField&gt;</literal> node
+						listed. When mode than one break fields
+						are listed, then all of them are watched
+						for changes.
+					</para>
+					<para>
+						The order in which they are listed matters
+						for two reasons.
+					</para>
+					<para>
+						The primary reason is that break fields are
+						hierarchical. The break fields listed earlier
+						are higher in the hierarchy. If a break field
+						earlier in the list triggers, all subsequent
+						break fields also trigger implicitly.
+					</para>
+					<para>
+						The second reason is a consequence of the
+						previous one: emitting the
+						<xref linkend="breakheadernode"/>s
+						occur in the order of the list.
+						For logical reasons,
+						<xref linkend="breakfooternode"/>s
+						are in reverse order.
+					</para>
 				</sect4>
 			</sect3>
 		</sect2>
@@ -2440,7 +2548,7 @@ SELECT * FROM some_table
 	<sect1 id="outputnode" xreflabel="Output node">
 		<title>Output</title>
 		<para>
-			The <literal>&lt;Output&gt;</literal> section is used
+			The <literal>&lt;Output&gt;</literal> node is used
 			by many previously mentioned sections. This is the
 			generic node that described how details are displayed
 			in reports.
