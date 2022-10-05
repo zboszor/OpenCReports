@@ -173,7 +173,7 @@
 							by the font size set in either
 							<xref linkend="partfontsize"/>,
 							<xref linkend="reportfontsize"/> or
-							TODO:linefontsize
+							<xref linkend="linefontsize"/>.
 						</para>
 					</listitem>
 					<listitem override="bullet">
@@ -226,6 +226,7 @@
 				in RLIB so it's not backward compatible either.
 				But it's there if someone wants to port reports
 				from RLIB and only make superficial changes.
+				See <xref linkend="textelemwidth"/>.
 			</para>
 			<para>
 				When <literal>size_unit</literal> is set to
@@ -1429,7 +1430,7 @@ report_height_after_last="no"</programlisting>
 					<programlisting>&lt;pd border_color="'blue'"&gt;</programlisting>
 				</para>
 				<para>
-					See <xref linkend="colorspec"/>
+					See <xref linkend="colorspec"/>.
 				</para>
 			</sect3>
 			<sect3 id="detailcolumns" xreflabel="Detail columns">
@@ -1909,7 +1910,7 @@ report_height_after_last="no"</programlisting>
 					<programlisting>&lt;Report border_color="'blue'"&gt;</programlisting>
 				</para>
 				<para>
-					See <xref linkend="colorspec"/>
+					See <xref linkend="colorspec"/>.
 				</para>
 			</sect3>
 			<sect3>
@@ -2061,7 +2062,7 @@ report_height_after_last="no"</programlisting>
 &lt;/Part&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="detailnode" xreflabel="Detail node">
 				<title>Detail</title>
 				<para>
 					This section describes the tabular details of the report.
@@ -2552,6 +2553,779 @@ report_height_after_last="no"</programlisting>
 			by many previously mentioned sections. This is the
 			generic node that described how details are displayed
 			in reports.
+		</para>
+		<sect2>
+			<title>Output attributes</title>
+			<sect3>
+				<title>Suppress</title>
+				<para>
+					Output nodes may be suppressed as a whole.
+					<programlisting>&lt;Output suppress="yes"&gt;
+&lt;Output suppress="val(m.suppress_output)"&gt;</programlisting>
+				</para>
+				<para>
+					If it's in a report's
+					<literal>&lt;FieldDetails&gt;</literal> node,
+					the suppression may depend on query data.
+					See <xref linkend="detailnode"/> and
+					<xref linkend="expressions"/>.
+					<programlisting>&lt;Output suppress="query1.suppress_row"&gt;</programlisting>
+				</para>
+				<para>
+					Default value is <literal>false</literal>,
+					i.e. no suppression.
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Output subsections</title>
+			<sect3>
+				<title>Line</title>
+				<para>
+					A line containing text elements of varying widths.
+					See <xref linkend="linenode"/>.
+					<programlisting>&lt;Output&gt;
+    &lt;Line&gt;
+        ...
+    &lt;/Line&gt;
+&lt;/Output</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>HorizontalLine</title>
+				<para>
+					A horizontal line.
+					See <xref linkend="hlinenode"/>.
+					<programlisting>&lt;Output&gt;
+    &lt;HorizontalLine ... /&gt;
+&lt;/Output</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Image</title>
+				<para>
+					An image.
+					See <xref linkend="imagenode"/>.
+					<programlisting>&lt;Output&gt;
+    &lt;Image ... /&gt;
+&lt;/Output</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Image end</title>
+				<para>
+					Terminator for a previous image.
+					See <xref linkend="imageendnode"/>.
+					<programlisting>&lt;Output&gt;
+    &lt;ImageEnd/&gt;
+&lt;/Output</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+	</sect1>
+	<sect1 id="linenode" xreflabel="Line node">
+		<title>Line</title>
+		<para>
+			A line containing text elements of varying widths.
+			<programlisting>&lt;Output&gt;
+    &lt;Line&gt;
+        ...
+    &lt;/Line&gt;
+&lt;/Output</programlisting>
+		</para>
+		<sect2>
+			<title>Line attributes</title>
+			<sect3 id="linefontname" xreflabel="Line font name">
+				<title>Font name</title>
+				<para>
+					The font name attribute specifies the font
+					for the line's scope. It can be overridden
+					by child nodes for their scope.
+					It may be specified in two forms, the first one
+					is the preferred name, the second is for RLIB
+					compatibility:
+					<programlisting>&lt;Line font_name="Arial"&gt;
+&lt;Line fontName="Arial"&gt;</programlisting>
+				</para>
+				<para>
+					If both forms are specified, <literal>font_name</literal>
+					is used.
+				</para>
+				<para>
+					Default font name is what's set (in decreasing priority)
+					in <xref linkend="reportfontname"/> or
+					<xref linkend="partfontname"/>. If none of them is set,
+					it's <literal>Courier</literal>.
+				</para>
+			</sect3>
+			<sect3 id="linefontsize" xreflabel="Line font size">
+				<title>Font size</title>
+				<para>
+					The font size attribute specifies the font size
+					for the line's scope. It can be overridden by
+					child nodes for their scope. It may be specified
+					in two forms, the first one is the preferred name,
+					the second is for RLIB compatibility:
+					<programlisting>&lt;Line font_size="10"&gt;
+&lt;Line fontSize="10"&gt;</programlisting>
+				</para>
+				<para>
+					If both forms are specified, <literal>font_size</literal>
+					is used.
+				</para>
+				<para>
+					Default font name is what's set (in decreasing priority)
+					in <xref linkend="reportfontsize"/> or
+					<xref linkend="partfontsize"/>. If none of them is set,
+					it's <literal>12</literal>.
+				</para>
+			</sect3>
+			<sect3 id="lineboldattr" xreflabel="Line bold attribute">
+				<title>Bold font</title>
+				<para>
+					Whether the line elements use bold font.
+					<programlisting>&lt;Line bold="yes"&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>false</literal>.
+				</para>
+			</sect3>
+			<sect3 id="lineitalicattr" xreflabel="Line italic attribute">
+				<title>Italic font</title>
+				<para>
+					Whether the line elements use italic font.
+					It is accepted in two forms:
+					<programlisting>&lt;Line italic="yes"&gt;
+&lt;Line italics="yes"&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>false</literal>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Suppress</title>
+				<para>
+					Text lines may be suppressed. If the parent
+					<literal>&lt;Output&gt;</literal> node is in
+					<literal>&lt;FieldDetails&gt;</literal>, the
+					expression may be derived from a query field.
+					<programlisting>&lt;Line suppress="yes"&gt;
+&lt;Line suppress="val(m.suppress_line)"&gt;
+&lt;Line suppress="query1.suppress_line"&gt;</programlisting>
+				</para>
+				<para>
+					Default value is <literal>false</literal>,
+					i.e. no suppression.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Text color</title>
+				<para>
+					This color is used to render text. It's accepted
+					with both American and  British spelling.
+					<programlisting>&lt;Line color="'blue'"&gt;
+&lt;Line colour="'blue'"&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>black</literal>.
+					See <xref linkend="colorspec"/>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Background color</title>
+				<para>
+					This color is used to render the background
+					rectangle under the text. It's accepted
+					with both American and  British spelling.
+					<programlisting>&lt;Line bgcolor="'blue'"&gt;
+&lt;Line bgcolour="'blue'"&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>white</literal>.
+					See <xref linkend="colorspec"/>.
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Line subsections</title>
+			<sect3>
+				<title>Text element</title>
+				<para>
+					Two variants are accepted.
+					<programlisting>&lt;Line&gt;
+    &lt;field value="expression..." ... /&gt;
+&lt;/Line&gt;</programlisting> and
+					<programlisting>&lt;Line&gt;
+    &lt;literal ... &gt;Literal text&lt;/literal&gt;
+&lt;/Line&gt;</programlisting>
+				</para>
+				<para>
+					See the <xref linkend="textelemnode"/> below.
+				</para>
+			</sect3>
+		</sect2>
+	</sect1>
+	<sect1 id="textelemnode" xreflabel="Text element node">
+		<title>Text element</title>
+		<para>
+			Two variants are accepted.
+			<programlisting>&lt;Line&gt;
+    &lt;field value="expression..." ... /&gt;
+&lt;/Line&gt;</programlisting> and
+			<programlisting>&lt;Line&gt;
+    &lt;literal ... &gt;Literal text&lt;/literal&gt;
+&lt;/Line&gt;</programlisting>
+		</para>
+		<para>
+			Neither <literal>field</literal> nor
+			<literal>literal</literal> have child nodes,
+			only attributes or XML values.
+		</para>
+		<para>
+			The two variants are interchangeable, see
+			<xref linkend="elemvalueattr"/> below.
+		</para>
+		<sect2>
+			<title>Text element attributes</title>
+			<sect3 id="elemvalueattr" xreflabel="Text element value">
+				<title>Value</title>
+				<para>
+					The value of the text element. It's accepted in two
+					ways: in the <literal>value</literal> attribute or as
+					the XML value for the <literal>field</literal> and
+					<literal>literal</literal> nodes.
+					<programlisting>&lt;Line&gt;
+    &lt;field value="'This text'" /&gt;
+    &lt;field&gt;This text&lt;/field&gt;
+    &lt;literal value="'This text'" /&gt;
+    &lt;literal&gt;This text&lt;/literal&gt;
+&lt;/Line&gt;</programlisting>
+				</para>
+				<para>
+					The value is parsed as an expression
+					from the <literal>value</literal> attribute.
+					See <xref linkend="expressions"/>.
+				</para>
+				<para>
+					On the other hand, the value is taken as a literal
+					string from the XML value in the second and fourth
+					examples above.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Delayed (precalculated) value</title>
+				<para>
+					This setting indicates whether the value is
+					"precalculated", i.e. the value for the last
+					row in the data set is used, or it would be
+					the actual value for the current row in the
+					data set.
+					<programlisting>&lt;field delayed="yes"&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>false</literal>.
+				</para>
+				<para>
+					This setting is only relevant for the
+					<xref linkend="outputnode"/> node in
+					<literal>&lt;FieldDetails&gt;</literal>.
+				</para>
+				<para>
+					Note that in <literal>OpenCReports</literal>,
+					an expression may mix references to precalculated
+					variables with non-precalculated variables and
+					query field references. The result will use the
+					precalculated value only for the precalculated
+					variables. Other references will use values derived
+					from the current row in the data set.
+					This is an extension over RLIB.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Format string</title>
+				<para>
+					The format string is used to format the
+					<literal>value</literal> to be displayed
+					in the generated output. For example, to
+					print a number with two decimal places:
+					<programlisting>&lt;field value="3" format="'%.2d'"&gt;</programlisting>
+				</para>
+				<para>
+					The format string is expected to be a string
+					so quoting around it is needed.
+				</para>
+				<para>
+					See TODO:formatting for comprehensive details.
+				</para>
+			</sect3>
+			<sect3 id="textelemwidth" xreflabel="Text element width">
+				<title>Width</title>
+				<para>
+					The field width.
+					<programlisting>&lt;field value="3" format="'%.2d'" width="6"&gt;</programlisting>
+				</para>
+				<para>
+					The width unit depends on the <xref linkend="sizeunit"/>.
+				</para>
+				<para>
+					When the <xref linkend="sizeunit"/> is set to
+					<literal>rlib</literal>, the field width is measured
+					in number of characters.
+				</para>
+				<para>
+					The character width is queried from the font set by
+					<xref linkend="linefontname"/> and
+					<xref linkend="linefontsize"/>,
+					<xref linkend="reportfontname"/> and
+					<xref linkend="reportfontsize"/>, or
+					<xref linkend="partfontname"/> and
+					<xref linkend="partfontsize"/>
+					in decreasing order of precedence.
+				</para>
+				<para>
+					<xref linkend="textelemfontname"/> and
+					<xref linkend="textelemfontsize"/> DO NOT influence
+					the font width used to determine the field width.
+				</para>
+				<para>
+					This allows using uniquely set font name and size for
+					individual text elements, including proportional
+					fonts.
+				</para>
+				<para>
+					When using different font names or font sizes for
+					different text elements in the same
+					<literal>&lt;Line&gt;</literal>, the text elements
+					are aligned vertically so all text elements are
+					rendered on the same base line.
+				</para>
+			</sect3>
+			<sect3 id="textelemalign" xreflabel="Text element alignment">
+				<title>Alignment</title>
+				<para>
+					It specifies the alignment for the text element.
+					It works in accordance with the
+					<xref linkend="textelemwidth"/>.
+					<programlisting>&lt;field value="3" format="'%.2d'"
+      width="6" align="'center'"&gt;</programlisting>
+				</para>
+				<para>
+					The alignment values may be
+					<literal>left</literal>,
+					<literal>right</literal> or
+					<literal>center</literal>.
+				</para>
+				<para>
+					Default is <literal>left</literal>.
+				</para>
+				<para>
+					<literal>OpenCReports</literal> decoupled
+					the data from displaying it. For example,
+					with the PDF output, the text element is not
+					truncated to the element width. Instead,
+					pixel perfect alignment is used together
+					with masking the parts of the value with
+					a bounding box. This is a deviation from
+					RLIB where data was approximately truncated,
+					because it was designed with monospace fonts
+					in mind, and widths were specified in number
+					of characters.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Text color</title>
+				<para>
+					This color is used to render text. It's accepted
+					with both American and  British spelling.
+					<programlisting>&lt;Line color="'blue'"&gt;
+&lt;Line colour="'blue'"&gt;</programlisting>
+				</para>
+				<para>
+					Default is what's set for <xref linkend="linenode"/>,
+					otherwise <literal>black</literal>.
+					See <xref linkend="colorspec"/>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Background color</title>
+				<para>
+					This color is used to render the background
+					rectangle under the text. It's accepted
+					with both American and  British spelling.
+					<programlisting>&lt;Line bgcolor="'blue'"&gt;
+&lt;Line bgcolour="'blue'"&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>white</literal>.
+					See <xref linkend="colorspec"/>.
+				</para>
+			</sect3>
+			<sect3 id="textelemfontname" xreflabel="Text element font name">
+				<title>Font name</title>
+				<para>
+					The font name attribute specifies the font
+					for the text element's scope.
+					It may be specified in two forms, the first one
+					is the preferred name, the second is for RLIB
+					compatibility:
+					<programlisting>&lt;Part font_name="Arial"&gt;
+&lt;Part fontName="Arial"&gt;</programlisting>
+				</para>
+				<para>
+					If both forms are specified, <literal>font_name</literal>
+					is used.
+				</para>
+				<para>
+					Default font name is <literal>Courier</literal>.
+				</para>
+			</sect3>
+			<sect3 id="textelemfontsize" xreflabel="Text element font size">
+				<title>Font size</title>
+				<para>
+					The font size attribute specifies the font size
+					for the text element's scope.
+					It may be specified in two forms, the first one
+					is the preferred name, the second is for RLIB
+					compatibility:
+					<programlisting>&lt;Part font_size="10"&gt;
+&lt;Part fontSize="10"&gt;</programlisting>
+				</para>
+				<para>
+					If both forms are specified, <literal>font_size</literal>
+					is used.
+				</para>
+				<para>
+					Default font size is 12.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Bold font</title>
+				<para>
+					Whether the text element uses bold font.
+					It overrides the <xref linkend="lineboldattr"/>
+					for this text element.
+					<programlisting>&lt;field bold="yes"&gt;</programlisting>
+				</para>
+				<para>
+					Default is what's set for
+					<xref linkend="lineboldattr"/>.
+					<literal>false</literal> if both are unset.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Italic font</title>
+				<para>
+					Whether the text element uses italic font.
+					It overrides the <xref linkend="lineitalicattr"/>
+					for this text element.
+					It is accepted in two forms:
+					<programlisting>&lt;field italic="yes"&gt;
+&lt;field italics="yes"&gt;</programlisting>
+				</para>
+				<para>
+					Default is what's set for
+					<xref linkend="lineitalicattr"/>.
+					<literal>false</literal> if both are unset.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Web link</title>
+				<para>
+					This attribute adds a weblink to the text element.
+					E.g. clicking on this text element in the generated
+					PDF will open a browser with the website.
+					<programlisting>&lt;field value="'This is my website'"
+       link="'https://github.com/zboszor/OpenCReports'" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is no weblink.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Multi-line (memo) field</title>
+				<para>
+					This attribute allows breaking long text fields
+					to multiple lines according to the 
+					<xref linkend="textelemwidth"/>.
+					<programlisting>&lt;field value="'This is a long text...'"
+       width="12" memo="yes" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>false</literal>, i.e. the field
+					is rendered on a single line.
+				</para>
+				<para>
+					Every line of the text element (regardless if it's a memo
+					field or not) is aligned according to
+					<xref linkend="textelemalign"/>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Multi-line field wrapping</title>
+				<para>
+					This attribute allows wrapping multi-line
+					text at characters as opposed to words.
+					<programlisting>&lt;field value="'This is a long text...'"
+       width="12" memo="yes" memo_wrap_chars="yes" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>false</literal>, i.e. the field
+					is wrapped at word boundaries.
+				</para>
+				<para>
+					In <literal>OpenCReports</literal>, character
+					wrapping adds hyphenation, thanks to Pango rendering.
+					This is a deviation from RLIB.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Multi-line field row limit</title>
+				<para>
+					This attribute allows limiting multi-line
+					text with a maximum row number.
+					<programlisting>&lt;field value="'This is a long text...'"
+       width="12" memo="yes" memo_max_lines="20" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is no limit.
+				</para>
+				<para>
+					In <literal>OpenCReports</literal>, character
+					wrapping adds hyphenation, thanks to Pango rendering.
+					This is a deviation from RLIB.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Column number</title>
+				<para>
+					This attribute is accepted for RLIB compatibility,
+					but it's unused.
+					text with a maximum row number.
+					<programlisting>&lt;field value="'This is a long text...'"
+       col="3" /&gt;</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+	</sect1>
+	<sect1 id="hlinenode" xreflabel="HorizontalLine node">
+		<title>HorizontalLine</title>
+		<para>
+			A horizontally drawn line.
+			<programlisting>&lt;Output&gt;
+    &lt;HorizontalLine ... /&gt;
+&lt;/Output</programlisting>
+		</para>
+		<sect2>
+			<title>HorizontalLine attributes</title>
+			<sect3>
+				<title>Line width</title>
+				<para>
+					The line width is measured in points,
+					regardless of the <xref linkend="sizeunit"/>.
+					<programlisting>&lt;HorizontalLine size="3" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>1.0</literal>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Indentation</title>
+				<para>
+					Extra indentation for the line.
+					It is measured in points,
+					regardless of the <xref linkend="sizeunit"/>.
+					<programlisting>&lt;HorizontalLine indent="15" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>0.0</literal>
+				</para>
+			</sect3>
+			<sect3 id="hlinelength" xreflabel="HorizontalLine length">
+				<title>Length</title>
+				<para>
+					The line length.
+					<programlisting>&lt;HorizontalLine length="150" /&gt;</programlisting>
+				</para>
+				<para>
+					The line length unit depends on the
+					<xref linkend="sizeunit"/>.
+					When set to <literal>rlib</literal>,
+					it is measured in number of characters.
+					The is influenced by <xref linkend="hlinefontsize"/>,
+					<xref linkend="reportfontsize"/> and
+					<xref linkend="partfontsize"/> in decreasing order,
+					which in turn is influenced by
+					<xref linkend="reportfontname"/> and
+					<xref linkend="partfontname"/> in decreasing order.
+				</para>
+				<para>
+					When <xref linkend="sizeunit"/> is set to
+					<literal>points</literal>, the line length
+					is measured in points.
+				</para>
+				<para>
+					Default is unset, i.e. the line is drawn across
+					the page width.
+				</para>
+			</sect3>
+			<sect3 id="hlinefontsize" xreflabel="HorizontalLine font size">
+				<title>Font size</title>
+				<para>
+					An extra knob to influence line length computation.
+					See <xref linkend="hlinelength"/>.
+					It is accepted in two forms, <literal>font_size</literal>
+					is the preferred one, the other is accepted for
+					RLIB compatibility:
+					<programlisting>&lt;HorizontalLine font_size="14" /&gt;
+&lt;HorizontalLine fontSize="14" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is unset, i.e. only
+					<xref linkend="reportfontsize"/> and
+                    <xref linkend="partfontsize"/> would contribute
+					to the horizontal line width computation.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Suppress</title>
+				<para>
+					Horizontal lines may be suppressed. If the parent
+					<literal>&lt;Output&gt;</literal> node is in
+					<literal>&lt;FieldDetails&gt;</literal>, the
+					expression may be derived from a query field.
+					<programlisting>&lt;HorizontalLine suppress="yes /"&gt;
+&lt;HorizontalLine suppress="val(m.suppress_hline)" /&gt;
+&lt;HorizontalLine suppress="query1.suppress_hline" /&gt;</programlisting>
+				</para>
+				<para>
+					Default value is <literal>false</literal>,
+					i.e. no suppression.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Line color</title>
+				<para>
+					This color is used to render text. It's accepted
+					with both American and  British spelling.
+					For RLIB compatibility, it is also accepted
+					as <literal>bgcolor</literal>, with both
+					American and  British spelling.
+					<programlisting>&lt;HorizontalLine color="'blue'" /&gt;
+&lt;HorizontalLine colour="'blue'" /&gt;
+&lt;HorizontalLine bgcolor="'blue'" /&gt;
+&lt;HorizontalLine bgcolour="'blue'" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>black</literal>.
+					See <xref linkend="colorspec"/>.
+				</para>
+			</sect3>
+		</sect2>
+	</sect1>
+	<sect1 id="imagenode" xreflabel="Image node">
+		<title>Image</title>
+		<para>
+			An image to draw on the page.
+			<programlisting>&lt;Output&gt;
+    &lt;Image ... /&gt;
+&lt;/Output</programlisting>
+		</para>
+		<para>
+			After a valid image specification, subsequent
+			<xref linkend="linenode"/>s and
+			<xref linkend="hlinenode"/>s are indented
+			by the image width in the same
+			<literal>&lt;Output&gt;</literal> node,
+			or until an <literal>&lt;ImageEnd&gt;</literal>
+			node is encountered in that
+			<literal>&lt;Output&gt;</literal> node.
+		</para>
+		<sect2>
+			<title>Image attributes</title>
+			<sect3>
+				<title>File name</title>
+				<para>
+					The file name of the image.
+
+					<programlisting>&lt;Image value="'filename.jpg'" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is unset. It makes the
+					<literal>Image</literal> not shown.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Suppress</title>
+				<para>
+					The image may be suppressed.
+					<programlisting>&lt;Image value="'filename.jpg'"
+       suppress="yes" /&gt;
+&lt;Image value="'filename.jpg'"
+       suppress="m.suppress_image" /&gt;
+&lt;Image value="'filename.jpg'"
+       suppress="query1.suppress_image" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>false</literal>,
+					i.e. no suppression.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Type</title>
+				<para>
+					Accepted for RLIB compatibility.
+					<programlisting>&lt;Image value="'filename.jpg'"
+       type="'jpg'" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is unset, i.e. autodetect.
+				</para>
+				<para>
+					Various image formats are supported
+					with autodetection via <literal>gdk-pixbuf</literal>.
+					SVG (Scalable Vector Graphics) is supported
+					via <literal>librsvg</literal>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Width</title>
+				<para>
+					Image width, measured in points regardless of
+					the <xref linkend="sizeunit"/>.
+					<programlisting>&lt;Image value="'filename.jpg'"
+       width="100" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is unset. The image would not be shown,
+					unless both width and height are set.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Height</title>
+				<para>
+					Image height, measured in points regardless of
+					the <xref linkend="sizeunit"/>.
+					<programlisting>&lt;Image value="'filename.jpg'"
+       height="100" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is unset. The image would not be shown,
+					unless both width and height are set.
+				</para>
+			</sect3>
+		</sect2>
+	</sect1>
+	<sect1 id="imageendnode" xreflabel="ImageEnd node">
+		<title>Image end</title>
+		<para>
+			Terminator for a previous image.
+			This node doesn't have any attributes or
+			child nodes. Its purpose is to reset
+			indentation caused by a previous
+			<xref linkend="imagenode"/>.
+			<programlisting>&lt;Output&gt;
+    &lt;ImageEnd/&gt;
+&lt;/Output</programlisting>
 		</para>
 	</sect1>
 	<sect1 id="colorspec" xreflabel="Color specification">
