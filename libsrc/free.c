@@ -174,6 +174,7 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 			}
 			break;
 		case OCRPT_OUTPUT_IMAGE:
+		case OCRPT_OUTPUT_IMAGEEND:
 			break;
 		}
 

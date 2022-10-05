@@ -364,6 +364,7 @@ void ocrpt_layout_output_resolve(opencreport *o, ocrpt_part *p, ocrpt_report *r,
 
 			break;
 		case OCRPT_OUTPUT_IMAGE:
+		case OCRPT_OUTPUT_IMAGEEND:
 			break;
 		}
 	}
@@ -414,6 +415,7 @@ void ocrpt_layout_output_evaluate(opencreport *o, ocrpt_part *p, ocrpt_report *r
 			ocrpt_expr_eval(o, r, hline->color);
 			break;
 		case OCRPT_OUTPUT_IMAGE:
+		case OCRPT_OUTPUT_IMAGEEND:
 			break;
 		}
 	}
@@ -507,6 +509,8 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 
 			ocrpt_layout_image_setup(o, p, pr, pd, r, output, img, page_width, page_indent, page_position);
 			break;
+		case OCRPT_OUTPUT_IMAGEEND:
+			break;
 		}
 	}
 }
@@ -576,6 +580,12 @@ bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 				break;
 
 			ocrpt_layout_image(draw, o, p, pr, pd, r, output, img, page_width, page_indent, page_position);
+			break;
+		case OCRPT_OUTPUT_IMAGEEND:
+			if (output->current_image)
+				*page_position = output->old_page_position + output->current_image->image_height;
+
+			output->current_image = NULL;
 			break;
 		}
 	}

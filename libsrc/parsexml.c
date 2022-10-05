@@ -996,6 +996,15 @@ static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt
 	ocrpt_ignore_child_nodes(o, reader, -1, "Image");
 }
 
+static void ocrpt_parse_output_imageend_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
+	ocrpt_output_element *elem = ocrpt_mem_malloc(sizeof(ocrpt_output_element));
+
+	elem->type = OCRPT_OUTPUT_IMAGEEND;
+	output->output_list = ocrpt_list_append(output->output_list, elem);
+
+	ocrpt_ignore_child_nodes(o, reader, -1, "ImageEnd");
+}
+
 static void ocrpt_parse_output_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
 	xmlChar *suppress;
 	struct {
@@ -1039,6 +1048,8 @@ static void ocrpt_parse_output_node(opencreport *o, ocrpt_report *r, ocrpt_outpu
 				ocrpt_parse_output_hline_node(o, r, output, reader);
 			else if (!strcmp((char *)name, "Image"))
 				ocrpt_parse_output_image_node(o, r, output, reader);
+			else if (!strcmp((char *)name, "ImageEnd"))
+				ocrpt_parse_output_imageend_node(o, r, output, reader);
 		}
 
 		xmlFree(name);

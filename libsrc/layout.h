@@ -22,7 +22,8 @@
 enum ocrpt_output_type {
 	OCRPT_OUTPUT_LINE,
 	OCRPT_OUTPUT_HLINE,
-	OCRPT_OUTPUT_IMAGE
+	OCRPT_OUTPUT_IMAGE,
+	OCRPT_OUTPUT_IMAGEEND
 };
 typedef enum ocrpt_output_type ocrpt_output_type;
 
