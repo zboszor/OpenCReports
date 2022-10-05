@@ -3331,7 +3331,34 @@ report_height_after_last="no"</programlisting>
 	<sect1 id="colorspec" xreflabel="Color specification">
 		<title>Color specification</title>
 		<para>
-			Colors may be specified by name or in HTML notation.
+			Colors may be specified by HTML notation.
+			This contains six hexadecimal digits, representing
+			RGB (red, green, blue) values between 0 and 255
+			for each color component, prefixed by the
+			<literal>#</literal> character.
+			<programlisting>&lt;Line bgcolor="'#ffff00'" ... &gt;
+&lt;HorizontalLine color="'#ff00ff'" ... &gt;</programlisting>
+		</para>
+		<para>
+			Colors may also be specified by hexadecimal notation.
+			This contains six hexadecimal digits, representing
+			RGB (red, green, blue) values between 0 and 255
+			for each color component, prefixed by
+			<literal>0x</literal>.
+			<programlisting>&lt;Line bgcolor="'0xffff00'" ... &gt;
+&lt;HorizontalLine color="'0xff00ff'" ... &gt;</programlisting>
+		</para>
+		<para>
+			Color names may also be specified by name.
+			The following color names are supported for RLIB compatibility.
+			Color names are matched in a case-insensitive way.
+		</para>
+		<para>
+			<inlinemediaobject>
+				<imageobject>
+					<imagedata fileref="images/namedcolors.png" align="center" />
+				</imageobject>
+			</inlinemediaobject>
 		</para>
 	</sect1>
 </chapter>
