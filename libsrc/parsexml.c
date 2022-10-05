@@ -1388,10 +1388,9 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_expr *size_unit_e;
 		char *size_unit_s;
 		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, size_unit);
+		o->size_in_points = false;
 		if (size_unit_s && strcasecmp(size_unit_s, "points") == 0)
 			o->size_in_points = true;
-		else if (size_unit_s && (strcasecmp(size_unit_s, "default") == 0 || strcasecmp(size_unit_s, "rlib") == 0))
-			o->size_in_points = false;
 		ocrpt_expr_free(o, NULL, size_unit_e);
 		o->size_unit_set = true;
 	}
@@ -2010,10 +2009,9 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 		ocrpt_expr *size_unit_e;
 		char *size_unit_s;
 		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, size_unit);
+		o->size_in_points = false;
 		if (size_unit_s && strcasecmp(size_unit_s, "points") == 0)
 			o->size_in_points = true;
-		else if (size_unit_s && (strcasecmp(size_unit_s, "default") == 0 || strcasecmp(size_unit_s, "rlib") == 0))
-			o->size_in_points = false;
 		ocrpt_expr_free(o, NULL, size_unit_e);
 	}
 	o->size_unit_set = true;
@@ -2165,15 +2163,14 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 	}
 	o->rlib_compat_set = true;
 
+	o->size_in_points = false;
 	if (size_unit) {
 		ocrpt_expr *size_unit_e;
 		char *size_unit_s;
 		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, size_unit);
+
 		if (size_unit_s && strcasecmp(size_unit_s, "points") == 0)
 			o->size_in_points = true;
-		else if (size_unit_s && (strcasecmp(size_unit_s, "default") == 0 || strcasecmp(size_unit_s, "rlib") == 0))
-			o->size_in_points = false;
-
 		ocrpt_expr_free(o, NULL, size_unit_e);
 	}
 	o->size_unit_set = true;
