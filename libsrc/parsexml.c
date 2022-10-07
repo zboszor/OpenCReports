@@ -743,7 +743,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	if (elem->width)
 		elem->width->rvalue = elem->value;
 
-	if (align && (strcasecmp((char *)align, "left") == 0 || strcasecmp((char *)align, "right") == 0 || strcasecmp((char *)align, "center") == 0))
+	if (align && (strcasecmp((char *)align, "left") == 0 || strcasecmp((char *)align, "right") == 0 || strcasecmp((char *)align, "center") == 0 || strcasecmp((char *)align, "justified") == 0))
 		elem->align = ocrpt_newstring(o, r, (char *)align);
 	else
 		elem->align = ocrpt_xml_expr_parse(o, r, align, true, false);

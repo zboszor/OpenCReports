@@ -113,7 +113,8 @@ PDF_TESTS = \
 	layout_pdf_xml36_test \
 	layout_pdf_xml37_test \
 	layout_pdf_xml38_test \
-	layout_pdf_xml39_test
+	layout_pdf_xml39_test \
+	layout_pdf_xml40_test
 
 # Unstable tests by nature:
 # random_test produces a random number which is different every time

@@ -58,7 +58,7 @@ static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_line_element *le, double total_width) {
 	char *font;
 	double size, w;
-	bool bold = false, italic = false, newfont = false;
+	bool bold = false, italic = false, newfont = false, justified = false;
 	PangoAlignment align;
 
 	ocrpt_cairo_create(o);
@@ -96,6 +96,20 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 		else if (l->italic && l->italic->result[o->residx] && l->italic->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->italic->result[o->residx]->number_initialized)
 			italic = !!mpfr_get_ui(l->italic->result[o->residx]->number, o->rndmode);
 
+		if (le->align && le->align->result[o->residx] && le->align->result[o->residx]->type == OCRPT_RESULT_STRING && le->align->result[o->residx]->string) {
+			const char *alignment = le->align->result[o->residx]->string->str;
+			if (strcasecmp(alignment, "right") == 0)
+				align = PANGO_ALIGN_RIGHT;
+			else if (strcasecmp(alignment, "center") == 0)
+				align = PANGO_ALIGN_CENTER;
+			else if (strcasecmp(alignment, "justified") == 0) {
+				align = PANGO_ALIGN_LEFT;
+				justified = true;
+			} else
+				align = PANGO_ALIGN_LEFT;
+		} else
+			align = PANGO_ALIGN_LEFT;
+
 		if (!le->font)
 			newfont = true;
 		else if (le->font && strcmp(le->font, font))
@@ -105,6 +119,8 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 		else if (le->bold_val != bold)
 			newfont = true;
 		else if (le->italic_val != italic)
+			newfont = true;
+		else if (le->p_align != align || le->justified != justified)
 			newfont = true;
 
 		if (newfont) {
@@ -121,6 +137,8 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 			le->fontsz = size;
 			le->bold_val = bold;
 			le->italic_val = italic;
+			le->p_align = align;
+			le->justified = justified;
 		}
 
 		if (!le->layout) {
@@ -148,27 +166,17 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 			pango_attr_list_insert(alist, nohyph);
 			pango_layout_set_attributes(le->layout, alist);
 
+			pango_layout_set_alignment(le->layout, le->p_align);
+			if (le->justified) {
+				pango_layout_set_justify(le->layout, true);
+				pango_layout_set_justify_last_line(le->layout, false);
+			}
+
 			int char_width = pango_font_metrics_get_approximate_char_width(metrics);
 			le->font_width = (double)char_width / PANGO_SCALE;
 
 			le->ascent = pango_font_metrics_get_ascent(metrics) / PANGO_SCALE;
 			le->descent = pango_font_metrics_get_descent(metrics) / PANGO_SCALE;
-		}
-
-		if (le->align && le->align->result[o->residx] && le->align->result[o->residx]->type == OCRPT_RESULT_STRING && le->align->result[o->residx]->string) {
-			const char *alignment = le->align->result[o->residx]->string->str;
-			if (strcasecmp(alignment, "right") == 0)
-				align = PANGO_ALIGN_RIGHT;
-			else if (strcasecmp(alignment, "center") == 0)
-				align = PANGO_ALIGN_CENTER;
-			else
-				align = PANGO_ALIGN_LEFT;
-		} else
-			align = PANGO_ALIGN_LEFT;
-
-		if (newfont || (le->p_align != align)) {
-			le->p_align = align;
-			pango_layout_set_alignment(le->layout, le->p_align);
 		}
 
 		bool has_format = false;

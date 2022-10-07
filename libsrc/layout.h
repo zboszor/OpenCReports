@@ -66,6 +66,7 @@ struct ocrpt_line_element {
 	bool memo:1;
 	bool memo_wrap_chars:1;
 	bool use_bb:1;
+	bool justified:1;
 };
 
 struct ocrpt_line {
