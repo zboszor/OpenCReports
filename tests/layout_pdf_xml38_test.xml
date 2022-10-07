@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="0" cols="5" />
+	</Queries>
+	<Report fontSize="100">
+		<NoData>
+			<Output>
+				<HorizontalLine size="1" color="'Black'" />
+				<Line>
+					<field fontName="'Arial'" fontSize="20" value="'ABCqwpfgjyb'" color="'Red'" bgcolor="'Blue'" bold="yes" italic="no" />
+					<field fontName="'Courier'" fontSize="12" value="'byjgfpwqCBA'" color="'Green'" bgcolor="'BobKratz'" bold="yes" italic="yes" />
+					<field fontName="'Pentaluma Script'" fontSize="8" value="'ABCqwpfgjyb'" color="'White'" bgcolor="'Black'" bold="no" italic="yes" />
+					<field fontName="'Times New Roman'" fontSize="8" value="'byjgfpwqCBA'" color="'Blue'" bgcolor="'Teal'" bold="no" italic="no" />
+				</Line>
+				<HorizontalLine size="1" length="1000" color="'Purple'" />
+			</Output>
+		</NoData>
+	</Report>
+</OpenCReport>

@@ -569,12 +569,17 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 								if (!r->data_rows) {
 									ocrpt_print_reportheader(o, p, pr, pd, r, 0, &newpage, &page_indent, &page_position, &old_page_position);
+									ocrpt_layout_output_resolve(o, p, r, &r->nodata);
+									ocrpt_layout_output_evaluate(o, p, r, &r->nodata);
 									ocrpt_layout_output(o, p, pr, pd, r, &r->nodata, 0, &newpage, &page_indent, &page_position, &old_page_position);
 								}
 							} else {
 								ocrpt_print_reportheader(o, p, pr, pd, r, 0, &newpage, &page_indent, &page_position, &old_page_position);
-								if (o->noquery_show_nodata)
+								if (o->noquery_show_nodata) {
+									ocrpt_layout_output_resolve(o, p, r, &r->nodata);
+									ocrpt_layout_output_evaluate(o, p, r, &r->nodata);
 									ocrpt_layout_output(o, p, pr, pd, r, &r->nodata, 0, &newpage, &page_indent, &page_position, &old_page_position);
+								}
 							}
 
 							if (r->height_set) {

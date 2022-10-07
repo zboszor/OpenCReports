@@ -547,33 +547,35 @@ static void ocrpt_parse_datasources_node(opencreport *o, xmlTextReaderPtr reader
 }
 
 static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr reader) {
-	xmlChar *name, *value;
-	xmlChar *baseexpr, *intermedexpr, *intermed2expr, *resultexpr;
-	xmlChar *type, *basetype, *resetonbreak, *precalculate, *delayed;
+	xmlChar *name, *baseexpr, *intermedexpr, *intermed2expr, *resultexpr;
+	xmlChar *type, *basetype, *resetonbreak, *precalculate;
 	ocrpt_var_type vtype = OCRPT_VARIABLE_EXPRESSION; /* default if left out */
 	enum ocrpt_result_type rtype = OCRPT_RESULT_NUMBER;
-	int32_t i;
+	int32_t i, j;
 
 	struct {
-		char *attrs;
+		char *attrs[3];
 		xmlChar **attrp;
 	} xmlattrs[] = {
-		{ "name", &name },
-		{ "value", &value },
-		{ "baseexpr", &baseexpr },
-		{ "intermedexpr", &intermedexpr },
-		{ "intermed2expr", &intermed2expr },
-		{ "resultexpr", &resultexpr },
-		{ "type", &type },
-		{ "basetype", &basetype },
-		{ "resetonbreak", &resetonbreak },
-		{ "precalculate", &precalculate },
-		{ "delayed", &delayed },
-		{ NULL, NULL },
+		{ { "name" }, &name },
+		{ { "baseexpr", "value" }, &baseexpr },
+		{ { "intermedexpr" }, &intermedexpr },
+		{ { "intermed2expr" }, &intermed2expr },
+		{ { "resultexpr" }, &resultexpr },
+		{ { "type" }, &type },
+		{ { "basetype" }, &basetype },
+		{ { "resetonbreak" }, &resetonbreak },
+		{ { "precalculate", "delayed" }, &precalculate },
+		{ { NULL }, NULL },
 	};
 
-	for (i = 0; xmlattrs[i].attrp; i++)
-		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
+	for (i = 0; xmlattrs[i].attrp; i++) {
+		for (j = 0; xmlattrs[i].attrs[j]; j++) {
+			*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs[j]);
+			if (*xmlattrs[i].attrp)
+				break;
+		}
+	}
 
 	if (type) {
 		if (strcasecmp((char *)type, "count") == 0)
@@ -609,11 +611,6 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 			fprintf(stderr, "invalid result type for custom variable declaration for v.'%s'\n", name);
 	}
 
-	if (!baseexpr && value) {
-		baseexpr = value;
-		value = NULL;
-	}
-
 	if (baseexpr) {
 		ocrpt_var *v;
 
@@ -625,21 +622,13 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 		else
 			v = ocrpt_variable_new(o, r, vtype, (char *)name, (char *)baseexpr, (char *)resetonbreak);
 
-		if (precalculate || delayed) {
-			xmlChar *p;
-			ocrpt_expr *p_e;
-			int32_t p_i = 0;
+		if (precalculate) {
+			ocrpt_expr *precalculate_e;
+			int32_t precalculate_i = 0;
 
-			if (precalculate) {
-				p = precalculate;
-				if (delayed)
-					fprintf(stderr, "\"precalculate\" and \"delayed\" are set for for variable declaration for v.'%s', using \"precalculate\"\n", name);
-			} else
-				p = delayed;
-
-			ocrpt_xml_const_expr_parse_get_int_value_with_fallback(o, p);
-			ocrpt_variable_set_precalculate(v, !!p_i);
-			ocrpt_expr_free(o, r, p_e);
+			ocrpt_xml_const_expr_parse_get_int_value_with_fallback(o, precalculate);
+			ocrpt_variable_set_precalculate(v, !!precalculate_i);
+			ocrpt_expr_free(o, r, precalculate_e);
 		}
 	}
 
@@ -773,7 +762,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	if (elem->font_name)
 		elem->font_name->rvalue = elem->value;
 
-	elem->font_size = ocrpt_xml_expr_parse(o, r, font_name, true, false);
+	elem->font_size = ocrpt_xml_expr_parse(o, r, font_size, true, false);
 	if (elem->font_size)
 		elem->font_size->rvalue = elem->value;
 

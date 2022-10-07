@@ -100,6 +100,8 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 			newfont = true;
 		else if (le->font && strcmp(le->font, font))
 			newfont = true;
+		else if (le->fontsz != size)
+			newfont = true;
 		else if (le->bold_val != bold)
 			newfont = true;
 		else if (le->italic_val != italic)
