@@ -601,7 +601,7 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 	}
 
 	if (basetype) {
-		if (strcasecmp((char *)basetype, "number") == 0)
+		if (strcasecmp((char *)basetype, "number") == 0 || strcasecmp((char *)basetype, "numeric") == 0)
 			rtype = OCRPT_RESULT_NUMBER;
 		else if (strcasecmp((char *)basetype, "string") == 0)
 			rtype = OCRPT_RESULT_STRING;
