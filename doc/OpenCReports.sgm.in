@@ -6,6 +6,7 @@
 <!ENTITY xmldescription SYSTEM "xmldescription.sgm">
 <!ENTITY breaks SYSTEM "breaks.sgm">
 <!ENTITY variables SYSTEM "variables.sgm">
+<!ENTITY formatting SYSTEM "formatting.sgm">
 <!ENTITY c-api-reference SYSTEM "c-api-reference.sgm">
 <!ENTITY license SYSTEM "license.sgm">
 ]>
@@ -34,6 +35,7 @@
 	&expressions;
 	&breaks;
 	&variables;
+	&formatting;
 	&c-api-reference;
 	&license;
 </book>

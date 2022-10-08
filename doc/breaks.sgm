@@ -1,7 +1,12 @@
 <chapter id="breaks" xreflabel="Report breaks">
 	<title>Report breaks</title>
 	<sect1>
-		<title>Introduction to report breaks</title>
+		<title>Grouping data</title>
+		<para>
+			<literal>OpenCReports</literal>, being a report generator,
+			works on tabular data: the data consists of ordered (named)
+			columns and ordered or unordered rows.
+		</para>
 		<para>
 			It is often necessary to group data by certain properties.
 			Imagine a list of employees of a company, grouped by their
@@ -10,26 +15,211 @@
 			according to any of these properties.
 		</para>
 		<para>
-			Such grouping (properties of distinction) may co-exist in
-			a report with prioritization: first by department, then
-			in each department, subgrouping would separate employees
-			according to the pay grade, etc.
+			Multiple groupings may be prioritized (nested):
+			<orderedlist>
+				<listitem>
+					<para>
+						by department
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						by pay grade
+					</para>
+				</listitem>
+			</orderedlist>
+			With the above, in each department, subgrouping would separate
+			employees according to the pay grade in that department.
+		</para>
+		<para>
+			For this to work, the rows of data must be fed to
+			the report generator in a certain order. For example,
+			in SQL the ordering can be done by:
+			<programlisting>SELECT ...
+ORDER BY department,paygrade,employee;</programlisting>
+		</para>
+		<para>
+			This grouping of data is called a <emphasis>break</emphasis>
+			in a report generator.
 		</para>
 	</sect1>
 	<sect1>
 		<title>Report breaks in OpenCReports</title>
 		<para>
-			OpenCReports supports report breaks defined on arbitrary
-			expressions. Breaks occurs on the border of changes in the
+			<xref linkend="expressions"/> can reference data via the
+			column names of a row. Arbitrary expressions may be used
+			to watch for changes in the value of the expression data
+			breaks. Breaks occurs on the boundary of changes in the
 			expression value.
 		</para>
 		<para>
-			The prioritization of breaks is done according their order
-			of declaration.
+			Prioritization (nesting) of breaks is done according their order
+			of declaration. See the <xref linkend="breaksnode"/> and
+			<xref linkend="breaknode"/> nodes.
 		</para>
 		<para>
 			Visual separation is optionally helped with break headers
-			and footers.
+			and footers. See <xref linkend="breakheadernode"/> and
+			<xref linkend="breakfooternode"/>.
 		</para>
+		<sect2>
+			<title>Example</title>
+			<para>
+				This XML part below shows a complete example of
+				nested breaks based on the above mentioned real life
+				example.
+				<programlisting>&lt;Report&gt;
+
+    &lt;Breaks&gt;
+
+        &lt;Break&gt;
+
+            &lt;BreakHeader&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;field value="query1.department" /&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/BreakHeader&gt;
+
+            &lt;BreakFooter&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;literal&gt;End of &lt;/literal&gt;
+                        &lt;field value="query1.department" /&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/BreakFooter&gt;
+
+            &lt;BreakFields&gt;
+                &lt;BreakField value="query1.department" /&gt;
+            &lt;/BreakFields&gt;
+
+        &lt;/Break&gt;
+
+        &lt;Break&gt;
+
+            &lt;BreakHeader&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;literal width="30" /&gt;
+                        &lt;field value="query1.paygrade" /&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/BreakHeader&gt;
+
+            &lt;BreakFooter&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;literal width="30" /&gt;
+                        &lt;literal&gt;End of &lt;/literal&gt;
+                        &lt;field value="query1.paygrade" /&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/BreakFooter&gt;
+
+            &lt;BreakFields&gt;
+                &lt;BreakField value="query1.paygrade" /&gt;
+            &lt;/BreakFields&gt;
+
+        &lt;/Break&gt;
+
+    &lt;/Breaks&gt;
+
+    &lt;Detail&gt;
+
+        &lt;FieldHeaders&gt;
+            &lt;Output&gt;
+                &lt;Line&gt;
+                    &lt;literal width="60" /&gt;
+                    &lt;literal&gt;Employee name&lt;/literal&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/FieldHeaders&gt;
+
+        &lt;FieldDetails&gt;
+            &lt;Output&gt;
+                &lt;Line&gt;
+                    &lt;literal width="60" /&gt;
+                    &lt;field value="query1.employee" /&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/FieldDetails&gt;
+
+    &lt;Detail&gt;
+
+&lt;/Report&gt;</programlisting>
+			</para>
+			<para>
+				Assuming that <xref linkend="sizeunit"/> is set to
+				<literal>points</literal>, the indentation would be
+				30 and 60 points for certain elements (see the empty
+				<literal>&lt;literal&gt;</literal>s) and the result
+				would look like this:
+				<orderedlist>
+					<listitem>
+						<para>
+							Before the first row on every page, the contents
+							of <literal>&lt;FieldHeaders&gt;</literal> is
+							printed.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Before the first row, the contents of
+							<literal>&lt;BreakHeader&gt;</literal>
+							is printed for every break declared in
+							the <literal>&lt;Report&gt;</literal> in
+							the order of their declaration.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							The contents of
+							<literal>&lt;FieldDetails&gt;</literal>
+							is printed for the current row. Repeat until
+							a value change is observed between
+                            adjacent rows for a break's expression.
+							In this case, the employees are printed
+							in one block that are in the current paygrade
+							category and working at the current department.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							When a value change happened between
+							adjacent rows for a break's expression,
+							then this break and every break declared after
+							it triggers. For every triggering breaks,
+							their <literal>&lt;BreakFooter&gt;</literal>
+							is printed in the reverse order of their
+							declaration. This is done using the
+							<emphasis>previous row</emphasis>, so if any data
+							used from the row or derived from it (e.g. a
+							variable) and is to be displayed in the footer,
+							it will be valid for the break period that just
+							ended.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Before the new row, the contents of
+							<literal>&lt;BreakHeader&gt;</literal>
+							is printed for every break that just triggered.
+							For example, the department's name is not
+							printed if only the paygrade category changed
+							in the same department from the one row to
+							the next.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Repeat from step 3 until there are no more
+							data rows.
+						</para>
+					</listitem>
+				</orderedlist>
+			</para>
+		</sect2>
 	</sect1>
 </chapter>

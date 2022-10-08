@@ -664,9 +664,11 @@ SELECT * FROM some_table
 				</para>
 				<para>
 					The report needs to traverse the query result twice
-					to pre-compute "delayed" values, so it needs to
-					be able to rewind the data set once it was read
-					to the end.
+					to pre-compute "delayed" values (see
+					<xref linkend="precalcexpr"/> and
+					<xref linkend="precalcvar"/>),
+					so it needs to be able to rewind the data set
+					once it was read to the end.
 				</para>
 				<para>
 					The alternative API in MariaDB to load the rows one by
@@ -2345,19 +2347,21 @@ report_height_after_last="no"</programlisting>
 					Default is unset, i.e. no reset on a break.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="precalcvarattr" xreflabel="Precalculate attribute">
 				<title>Precalculate (delayed)</title>
 				<para>
-					A variable may work two ways. One is to generate
-					the current value that lead to it up to the current row.
+					A variable may work two ways. One is to generate an
+					immediate value that is either derived from the current
+					row, or derived from the current and previous rows.
 					Say, for a variable of the <literal>average</literal>
 					type, the value of the variable for the 5th row
 					is the average value of the base expression of the
 					first 5 rows.
 				</para>
 				<para>
-					The other way is to calculate the value for the last
-					data row and provide that value for every data row.
+					The other way is <xref linkend="precalcvar"/>,
+					that are derived from either the last data row or
+					all rows, and supply that value for every data row.
 					The attribute is accepted under two names:
 					<programlisting>&lt;Variable precalculate="yes" /&gt;
 &lt;Variable delayed="yes" /&gt;</programlisting>
@@ -2369,24 +2373,26 @@ report_height_after_last="no"</programlisting>
 					<literal>precalculate="yes"</literal> (or
 					<literal>delayed="yes"</literal> may be combined
 					with <literal>resetonbreak="..."</literal>.
-					In this case, multiple precalculateds values are computed
-					for the break periods.
+					In this case, a precalculated value is
+					computed for the break periods separately.
 				</para>
 				<para>
-					Precalculated values may be used to show values in
+					Precalculated variables may be used to show values in
 					<literal>&lt;ReportHeader&gt;</literal>,
 					<literal>&lt;ReportFooter&gt;</literal>,
 					<literal>&lt;FieldHeaders&gt;</literal>,
+					<literal>&lt;FieldDetails&gt;</literal>,
 					<literal>&lt;BreakHeader&gt;</literal> and
 					<literal>&lt;BreakFooter&gt;</literal>
 					but not in
 					<literal>&lt;PageHeader&gt;</literal> and
 					<literal>&lt;PageFooter&gt;</literal>.
-					The reason for this is that the former headers and
-					footers are in <literal>&lt;Report&gt;</literal>
-					scope with a query. On the other hand, the latter
-					two are in <literal>&lt;Part&gt;</literal> scope
-					that don't know about queries.
+					The reason for this is that the former headers,
+					footers and details are in
+					<literal>&lt;Report&gt;</literal> scope with a query.
+					On the other hand, the latter two are in
+					<literal>&lt;Part&gt;</literal> scope that don't know
+					about queries.
 				</para>
 			</sect3>
 		</sect2>
@@ -2820,15 +2826,23 @@ report_height_after_last="no"</programlisting>
 					row in the data set is used, or it would be
 					the actual value for the current row in the
 					data set.
-					<programlisting>&lt;field delayed="yes"&gt;</programlisting>
+					<programlisting>&lt;field delayed="yes" /&gt;
+&lt;field precalculate="yes" /&gt;</programlisting>
 				</para>
 				<para>
 					Default is <literal>false</literal>.
 				</para>
 				<para>
-					This setting is only relevant for the
+					This setting is only applicable for
+					line elements in the
 					<xref linkend="outputnode"/> node in
-					<literal>&lt;FieldDetails&gt;</literal>.
+					<literal>&lt;ReportHeader&gt;</literal>,
+					<literal>&lt;ReportFooter&gt;</literal>,
+					<literal>&lt;Fieldheaders&gt;</literal>
+					<literal>&lt;FieldDetails&gt;</literal>,
+					since they are the ones under the
+					<literal>&lt;Report&gt;</literal> scope
+					with a query.
 				</para>
 				<para>
 					Note that in <literal>OpenCReports</literal>,
@@ -2841,31 +2855,38 @@ report_height_after_last="no"</programlisting>
 					This is an extension over RLIB.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="formatattr" xreflabel="Text element format attribute">
 				<title>Format string</title>
 				<para>
 					The format string is used to format the
 					<literal>value</literal> to be displayed
 					in the generated output. For example, to
 					print a number with two decimal places:
-					<programlisting>&lt;field value="3" format="'%.2d'"&gt;</programlisting>
+					<programlisting>&lt;field value="3" format="'%.2d'" /&gt;</programlisting>
 				</para>
 				<para>
 					The format string is expected to be a string
 					so quoting around it is needed.
 				</para>
 				<para>
-					See TODO:formatting for comprehensive details.
+					See <xref linkend="formatting"/> for details.
 				</para>
 			</sect3>
 			<sect3 id="textelemwidth" xreflabel="Text element width">
 				<title>Width</title>
 				<para>
 					The field width.
-					<programlisting>&lt;field value="3" format="'%.2d'" width="6"&gt;</programlisting>
+					<programlisting>&lt;field value="3" format="'%.2d'" width="6" /&gt;</programlisting>
 				</para>
 				<para>
-					The width unit depends on the <xref linkend="sizeunit"/>.
+					Default is unset, i.e. the field width
+					is implicitly set to the rendered width (in points)
+					of the field's formatted value as text, using the
+					font name and font size of the field.
+				</para>
+				<para>
+					If set, the width's unit depends on the
+					<xref linkend="sizeunit"/>.
 				</para>
 				<para>
 					When the <xref linkend="sizeunit"/> is set to
@@ -2897,7 +2918,7 @@ report_height_after_last="no"</programlisting>
 					different text elements in the same
 					<literal>&lt;Line&gt;</literal>, the text elements
 					are aligned vertically so all text elements are
-					rendered on the same base line.
+					rendered on the same typographic baseline.
 				</para>
 			</sect3>
 			<sect3 id="textelemalign" xreflabel="Text element alignment">
@@ -2905,15 +2926,28 @@ report_height_after_last="no"</programlisting>
 				<para>
 					It specifies the alignment for the text element.
 					It works in accordance with the
-					<xref linkend="textelemwidth"/>.
+					<xref linkend="textelemwidth"/>, i.e. the field's
+					formatted value (as text) is aligned inside the
+					specified field width.
 					<programlisting>&lt;field value="3" format="'%.2d'"
-      width="6" align="'center'"&gt;</programlisting>
+      width="6" align="'center' /"&gt;</programlisting>
 				</para>
 				<para>
 					The alignment values may be
 					<literal>left</literal>,
-					<literal>right</literal> or
-					<literal>center</literal>.
+					<literal>right</literal>,
+					<literal>center</literal> or
+					<literal>justified</literal>.
+				</para>
+				<para>
+					Justified alignment is like left alignment,
+					but for a multi-line field all lines but the
+					last are justified. This is best used With
+					the default word wrapping. In this case,
+					the spacing between words is enlarged.
+					<literal>justified</literal> and
+					<literal>left</literal> behave the same
+					for regular single-line fields.
 				</para>
 				<para>
 					Default is <literal>left</literal>.
@@ -3004,7 +3038,7 @@ report_height_after_last="no"</programlisting>
 					Whether the text element uses bold font.
 					It overrides the <xref linkend="lineboldattr"/>
 					for this text element.
-					<programlisting>&lt;field bold="yes"&gt;</programlisting>
+					<programlisting>&lt;field bold="yes" /&gt;</programlisting>
 				</para>
 				<para>
 					Default is what's set for
@@ -3019,8 +3053,8 @@ report_height_after_last="no"</programlisting>
 					It overrides the <xref linkend="lineitalicattr"/>
 					for this text element.
 					It is accepted in two forms:
-					<programlisting>&lt;field italic="yes"&gt;
-&lt;field italics="yes"&gt;</programlisting>
+					<programlisting>&lt;field italic="yes" /&gt;
+&lt;field italics="yes" /&gt;</programlisting>
 				</para>
 				<para>
 					Default is what's set for

@@ -3,21 +3,20 @@
 	<sect1>
 		<title>Introduction</title>
 		<para>
-			Expressions in OpenCReports are based on Flex lexer and Bison grammar
-			that provide a solid and extensible basis for report expressions.
-		</para>
-		<para>
 			There are four data types in OpenCReports:
 			<literal>numeric</literal>, <literal>string</literal>,
 			<literal>datetime</literal> and <literal>error</literal>.
+			Expressions can return any of these types.
 		</para>
 		<para>
-			A <literal>numeric</literal> expression stores a high precision
-			number. Most functions and operators deal with numbers.
+			A <literal>numeric</literal> expression's result is
+			a number. It uses high numeric precision. Most functions
+			and operators deal with numbers.
 		</para>
 		<para>
-			A <literal>string</literal> expression stores a string literal.
-			String can be concatenated or processed by string functions.
+			A <literal>string</literal> expression's result is a
+			string. Strings can be concatenated or otherwise processed
+			by string functions.
 		</para>
 		<para>
 			A <literal>datetime</literal> expression may store a date,
@@ -28,10 +27,10 @@
 		</para>
 		<para>
 			An <literal>error</literal> expression is a special case of
-			<literal>string</literal>: it stores a string literal (which
-			is an error message) but it cannot be further processed by
-			functions or operators. Instead, an error is propagated up
-			from subexpressions to the final result of the expression.
+			strings: it stores a string literal (which is an error message)
+			but it cannot be further processed by functions or operators.
+			Instead, an error is propagated up from subexpressions to
+			the final result of the expression.
 		</para>
 	</sect1>
 	<sect1 id="constants" xreflabel="Constants">
@@ -140,19 +139,44 @@ false</programlisting>
 				constants through expression optimization.
 			</para>
 		</sect2>
+		<sect2 id="constexpr" xreflabel="Constant expressions">
+			<title>Constant expressions</title>
+			<para>
+				Constant expressions are ones that contain
+				constant values (of any type) and operators
+				or functions.
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="precalcexpr" xreflabel="precalculated">
+		<title>Precalculated expressions</title>
+		<para>
+			Due to the possibility of precalculated variables
+			expressions, reports are actually run (and layed out)
+			twice. The second run uses the precalculated values
+			from the first run. Because of this,
+			<literal>OpenCReports</literal> allows mixing precalculated
+			<xref linkend="variables"/> and non-precalculated
+			variables and subexpressions in the same expression.
+			The result is intuitively expected.
+		</para>
+		<para>
+			The actual report output is generated in the second run.
+		</para>
 	</sect1>
 	<sect1 id="identifiers" xreflabel="Identifiers">
 		<title>Identifiers</title>
 		<para>
 			Expressions may reference query column names, environment
-			variables, internal variables and user defined variables.
-			These references are called <literal>identifiers</literal>.
+			variables, internal variables and user defined
+			<xref linkend="variables"/>.
+			These references are called <emphasis>identifiers</emphasis>.
 			Their values are evaluated during the report execution.
 		</para>
 		<sect2>
-			<title>Valid identifier names</title>
+			<title>Identifier names</title>
 			<para>
-				Identifiers are in the format <literal>[[domain].]identifier</literal>
+				Identifiers are in the format <literal>domain.identifier</literal>
 				where the domain name or the dot are optional.
 			</para>
 			<para>
@@ -193,31 +217,42 @@ lekérdezés.mező_név</programlisting>
 				queries are matched with the expression.
 			</para>
 			<para>
-				For exceptions and exceptions from under the exceptions,
+				For exceptions (and exceptions from under the exceptions!),
 				see below.
 			</para>
 		</sect2>
 		<sect2 id="speciddomains" xreflabel="Special purpose identifier domains">
 			<title>Special purpose identifier domains</title>
 			<para>
-				Some identifier domain names carry special meaning for the report.
+				Some domain names carry special meaning for the report.
 			</para>
 			<sect3>
 				<title>Environment variables</title>
 				<para>
 					Domain <literal>m</literal> indicates the domain
-					of environment variables. The list of environment variables
-					depend on the languange binding. In C, it's the variables
-					in the operating environment. In PHP, they are simply global
-					PHP variables. Example:
+					of environment variables. The nature of environment
+					variables depend on the languange binding. In C,
+					it's the variables in the operating environment.
+					In PHP, they are simply global PHP variables. Example:
 					<programlisting>m.current_date</programlisting>
 				</para>
 				<para>
 					Since such a setting is controlled outside the report,
 					and for the duration of running the report, its value
-					cannot change, environment variable references are treated
-					as constants and are resolved into constant values
-					for the expression result evaluation.
+					cannot (or <emphasis>shouldn't</emphasis>) change,
+					environment variable references are treated as constants
+					and are optimized as constant at the start of the report
+					execution.
+				</para>
+				<para>
+					Environment variables can't change during report
+					execution in single threaded applications,
+					<emphasis>but they can in multi-threaded ones</emphasis>.
+					By optimizing environment variables into constants
+					in expressions instead of querying the environment
+					every time the same expression is evaluated,
+					potential data races (that may result in inconsistent
+					results) are eliminated or reduced.
 				</para>
 			</sect3>
 			<sect3>
@@ -238,20 +273,14 @@ lekérdezés.mező_név</programlisting>
 						will have the value 4 in the result.
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="totpages" xreflabel="r.totpages">
 					<title>Total number of pages</title>
 					<para>
 						<programlisting>r.totpages</programlisting>
 						This variable carries the total number of pages
 						in the report. Its value is maintained by the
-						report layout and it interwined with running a report.
-						This variable is inherently precalculated.
-						This means that the report is actually run twice.
-						The first run computes the final values for
-						<literal>precalculated</literal> variables and
-						<literal>delayed</literal> expressions. The actual
-						report output in the second run will use the
-						pre-computed values.
+						report. This variable is inherently
+						<xref linkend="precalcexpr"/>.
 					</para>
 				</sect4>
 				<sect4>
@@ -303,43 +332,48 @@ lekérdezés.mező_név</programlisting>
 						<programlisting>r.value</programlisting>
 						The report field description has an expression for its
 						value in the  form of
-						<literal>&lt;field value="..."&gt;</literal>.
+						<literal>&lt;field value="..." /&gt;</literal>.
 						It also has supplementary expressions, like the
 						foreground and background colors, the format string,
 						and others.
 					</para>
 					<para>
 						The supplementary expressions may reference the field
-						value to make their own result
-						depend on its result, without having to
-						type out the field expression multiple times.
+						value, without having to type out the field expression
+						multiple times.
 					</para>
 					<para>
 						Using <literal>r.value</literal> also helps reducing
-						the report runtime because the value expression
-						is not computed multiple times.
+						the report runtime because the value expression is not
+						computed multiple times. This is a manual
+						optimization.
 					</para>
 					<para>
-						Referencing <literal>r.value</literal> is only valid
+						Referencing <literal>r.value</literal> is only possible
 						for supplementary expressions for the same field
 						description, i.e. other XML attributes for a
 						<literal>&lt;field value="..." .../&gt;</literal>
 						line. This variable cannot cross-reference other
 						field descriptions, or anything not in the same scope.
+						For this purpose, there are user
+						<xref linkend="variables"/>.
 					</para>
 				</sect4>
 				<sect4>
 					<title>Format string value</title>
 					<para>
 						<programlisting>r.format</programlisting>
-						Similarly to the field value a.k.a.<literal>r.value</literal>,
-						the field description has an an optional expression
-						for its formatting. This expession may be used by
-						other expressions in the form of
-						<literal>&lt;field format="..."&gt;</literal>,
-						possible to format their values. It has very few
-						use cases, if any. It only exists for compatibility
-						with RLIB that has this internal variable.
+						Similarly to the field value a.k.a.
+						<literal>r.value</literal>, the field description
+						has an an optional expression for its formatting
+						in the form of
+						<literal>&lt;field format="..." /&gt;</literal>.
+					</para>
+					<para>
+						This internal variable may be used by other
+						expressions. It has very few use cases, if any.
+						It only exists for compatibility with RLIB that
+						has this internal variable.
 					</para>
 				</sect4>
 				<sect4 id="exprself" xreflabel="Expression self reference">
@@ -348,8 +382,8 @@ lekérdezés.mező_név</programlisting>
 						<programlisting>r.self</programlisting>
 						This variable references the previous result of
 						the expression. It is used in iterative expressions,
-						like in internal representations of user-defined
-						variables.
+						like in user-defined <xref linkend="variables"/>.
+						It can be used in any user defined expression.
 					</para>
 				</sect4>
 				<sect4>
@@ -359,10 +393,11 @@ lekérdezés.mező_név</programlisting>
 r.intermedexpr
 r.intermed2expr</programlisting>
 						These variables are references for the three
-						subexpressions that potentially make up a user
-						defined variable. The expressions in order are:
-						base expression, intermediary expressions one and
-						two.
+						subexpressions that potentially make up a
+						user-defined custom variable. The expressions in
+						order are: base expression, intermediary expressions
+						one and two. Their evaluation order is the same
+						as in the order they are mentioned here.
 					</para>
 					<para>
 						Actually, there's a fourth subexpression that exists
@@ -399,7 +434,7 @@ r.intermed2expr</programlisting>
 				<para>
 					Both <literal>domain</literal> and <literal>identifier</literal>
 					names may be quoted or unquoted. Quoting names allow using
-					semi-reserved and reserved words as identifers and also
+					semi-reserved and reserved words as identifiers and also
 					allow special characters in identifier names. Examples:
 					<programlisting>query.field_name1
 query."field_name2"
@@ -603,6 +638,7 @@ yes.no
 						<para>
 							A numeric constant juxtaposed with an identifier,
 							the numeric constant is the on the left side.
+							<programlisting>2x</programlisting>
 						</para>
 					</listitem>
 					<listitem>
@@ -610,13 +646,19 @@ yes.no
 							A numeric constant juxtaposed with an expression inside
 							parentheses. The constant can be on either side of the
 							expression.
+							<programlisting>2(a+b)
+(a+b)2</programlisting>
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							An identifier juxtaposed with an expression inside
 							parentheses, the identifier is on the left side of the
-							expression. This is only treated as implicit
+							expression.
+							<programlisting>x(a+b)</programlisting>
+						</para>
+						<para>
+							This is only treated as implicit
 							multiplication if the identifier name is not known as
 							a function name at the time of parsing and there is
 							a single expression inside the parentheses.
@@ -636,11 +678,13 @@ yes.no
 						<para>
 							An expression inside parentheses juxtaposed with an identifier
 							on the right side.
+							<programlisting>(a+b)a</programlisting>
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							Two expressions inside parentheses juxtaposed with each other.
+							<programlisting>(a+b)(c+d)</programlisting>
 						</para>
 					</listitem>
 				</itemizedlist>
@@ -653,7 +697,10 @@ yes.no
 						<para>
 							An identifier juxtaposed with a numeric constant,
 							the numeric constant is the on the right side.
-							Since an identifier name can include digits as the
+							<programlisting>x2</programlisting>
+						</para>
+						<para>
+							Since an identifier name may include digits as the
 							second and subsequent characters, the numeric
 							constant, or at least its integer part is simply
 							recognized as part of the identifier name itself
@@ -664,6 +711,9 @@ yes.no
 					<listitem>
 						<para>
 							An identifier juxtaposed with another identifier.
+							<programlisting>ab</programlisting>
+						</para>
+						<para>
 							The reason is the same as in the preceding case:
 							there is only a single identifier according to
 							token matching.
@@ -817,11 +867,12 @@ a+++++b
 				Arc-tangent function. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="brrownumfunc" xreflabel="Break row number function">
 			<title>brrownum()</title>
 			<para>
-				Current row number of a break since its last reset.
-				It takes one string operand.
+				Current row number of a break since it was last triggered.
+				It takes one string operand which is the name of the break.
+				The row number restarts from 1 at every break boundary.
 			</para>
 		</sect2>
 		<sect2>
@@ -1006,17 +1057,19 @@ a+++++b
 				It takes two numeric operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="formatfunc" xreflabel="format function">
 			<title>format()</title>
 			<para>
-				It takes two operands, one string and one other operand of
-				any type. This function formats the second value according
-				to the first operand as a format string.
-				If the second operand doesn't match the expected type of
-				the format string, an error is returned.
+				It takes two operands, the first operand is of any type,
+				the second operand is a string. This function formats
+				the first value according to the second operand as a
+				format string. If the first operand doesn't match the
+				expected type in the format string, an error is returned.
 			</para>
 			<para>
-				It is a special case of the <literal>printf()</literal> function.
+				It an RLIB compatibility function and is a special case
+				of the <literal>printf()</literal> function.
+				See also <xref linkend="formatting"/>
 			</para>
 		</sect2>
 		<sect2>
@@ -1286,7 +1339,7 @@ a+++++b
 				this function.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="printffunc" xreflabel="printf function">
 			<title>printf()</title>
 			<para>
 				This function takes one or more operands. The first
