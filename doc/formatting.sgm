@@ -178,7 +178,7 @@ field value="query1.field1"
 		<para>
 			This format string style builds upon the original
 			new style format strings, with the addition of brackets
-			that embed the actual format strings.
+			that embed the underlying format strings.
 		</para>
 		<sect2>
 			<title>2nd gen new style format string for strings</title>
@@ -223,7 +223,7 @@ field value="query1.field1"
 			</para>
 		</sect2>
 		<sect2>
-			<title>Swiss army knife of formatting</title>
+			<title>The swiss army knife of formatting</title>
 			<para>
 				The <xref linkend="printffunc"/> is the most versatile
 				formatting function in OpenCReports. It does not exist
