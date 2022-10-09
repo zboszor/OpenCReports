@@ -3,14 +3,14 @@
 	<sect1>
 		<title>The predecessor: RLIB</title>
 		<para>
-			The idea to write <ulink url="https://github.com/zboszor/OpenCReports"><citetitle>OpenCReports</citetitle></ulink>
-			started with my getting acqauinted with <ulink url="https://github.com/SICOM/rlib"><citetitle>RLIB</citetitle></ulink>
+			The idea to write <ulink url="https://github.com/zboszor/OpenCReports">OpenCReports</ulink>
+			started with my getting acqauinted with <ulink url="https://github.com/SICOM/rlib">RLIB</ulink>
 			in 2005 and working with it (and on it) for a very long time,
 			with the original implementors finally losing interest in
 			developing RLIB further. This was around 2018. Even the
 			original documentation site for RLIB was retired. But
 			thanks to the Internet Archive,
-			<ulink url="https://web.archive.org/web/20131116192438/http://newrlib.sicom.com/~rlib/index.php/Main_Page"><citetitle>it can still be read</citetitle></ulink>
+			<ulink url="https://web.archive.org/web/20131116192438/http://newrlib.sicom.com/~rlib/index.php/Main_Page">it can still be read</ulink>
 		</para>
 		<para>
 			To overcome some of the shortcomings seen in RLIB,
@@ -52,7 +52,7 @@
 			<para>
 				OpenCReports uses an RLIB-compatible report description
 				with extensions. See <xref linkend="xmldescriptor"/> and the
-				<ulink url="https://web.archive.org/web/20131116192438/http://newrlib.sicom.com/~rlib/index.php/Main_Page"><citetitle>RLIB documentation</citetitle></ulink>
+				<ulink url="https://web.archive.org/web/20131116192438/http://newrlib.sicom.com/~rlib/index.php/Main_Page">RLIB documentation</ulink>
 			</para>
 		</sect2>
 		<sect2>
@@ -171,7 +171,7 @@
 				by default. This allows storing very large and very small
 				numbers. E.g. this allows computations even with late
 				stage
-				<ulink url="https://en.wikipedia.org/wiki/Hyperinflation"><citetitle>hyperinflation</citetitle></ulink>
+				<ulink url="https://en.wikipedia.org/wiki/Hyperinflation">hyperinflation</ulink>
 				prices.
 				See <xref linkend="numericconstants"/> in
 				the <xref linkend="expressions"/> chapter and the
@@ -364,32 +364,32 @@
 			<title>Standard Linux dependencies</title>
 			<para>
 				OpenCReports uses
-				<ulink url="https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home"><citetitle>LibXML2</citetitle></ulink>,
-				<ulink url="https://juliastrings.github.io/utf8proc/"><citetitle>utf8proc</citetitle></ulink>,
-				<ulink url="https://www.mpfr.org"><citetitle>MPFR</citetitle></ulink>,
-				<ulink url="http://packages.qa.debian.org/libp/libpaper.html"><citetitle>libpaper</citetitle></ulink>,
-				<ulink url="https://github.com/rgamble/libcsv"><citetitle>libcsv</citetitle></ulink>,
-				<ulink url="http://lloyd.github.com/yajl/"><citetitle>yajl</citetitle></ulink>,
-				<ulink url="https://www.cairographics.org"><citetitle>Cairo</citetitle></ulink>,
-				<ulink url="https://pango.gnome.org"><citetitle>Pango</citetitle></ulink>,
-				<ulink url="https://wiki.gnome.org/Projects/LibRsvg"><citetitle>librsvg2</citetitle></ulink>,
-				<ulink url="https://gitlab.gnome.org/GNOME/gdk-pixbuf"><citetitle>gdk-pixbuf2</citetitle></ulink>,
-				<ulink url="https://www.postgresql.org"><citetitle>PostgreSQL</citetitle></ulink>,
-				<ulink url="https://mariadb.com"><citetitle>MariaDB</citetitle></ulink>
+				<ulink url="https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home">LibXML2</ulink>,
+				<ulink url="https://juliastrings.github.io/utf8proc/">utf8proc</ulink>,
+				<ulink url="https://www.mpfr.org">MPFR</ulink>,
+				<ulink url="http://packages.qa.debian.org/libp/libpaper.html">libpaper</ulink>,
+				<ulink url="https://github.com/rgamble/libcsv">libcsv</ulink>,
+				<ulink url="http://lloyd.github.com/yajl/">yajl</ulink>,
+				<ulink url="https://www.cairographics.org">Cairo</ulink>,
+				<ulink url="https://pango.gnome.org">Pango</ulink>,
+				<ulink url="https://wiki.gnome.org/Projects/LibRsvg">librsvg2</ulink>,
+				<ulink url="https://gitlab.gnome.org/GNOME/gdk-pixbuf">gdk-pixbuf2</ulink>,
+				<ulink url="https://www.postgresql.org">PostgreSQL</ulink>,
+				<ulink url="https://mariadb.com">MariaDB</ulink>
 				and
-				<ulink url="http://www.unixodbc.org"><citetitle>unixODBC</citetitle></ulink>.
+				<ulink url="http://www.unixodbc.org">unixODBC</ulink>.
 			</para>
 			<para>
 				For running the unit tests,
-				<ulink url="https://www.ghostscript.com"><citetitle>Ghostscript</citetitle></ulink>
+				<ulink url="https://www.ghostscript.com">Ghostscript</ulink>
 				and <literal>compare</literal> from
-				<ulink url="https://imagemagick.org"><citetitle>Imagemagick</citetitle></ulink>
+				<ulink url="https://imagemagick.org">Imagemagick</ulink>
 				are also needed.
 			</para>
 			<para>
 				<literal>docbook2pdf</literal> and
 				<literal>docbook2html</literal> from
-				<ulink url="http://sources.redhat.com/docbook-tools/"><citetitle>Docbook</citetitle></ulink>
+				<ulink url="http://sources.redhat.com/docbook-tools/">Docbook</ulink>
 				is used to generate the documentation.
 			</para>
 		</sect2>

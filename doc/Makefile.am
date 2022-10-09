@@ -5,7 +5,9 @@ SGMLFILES = \
 	breaks.sgm \
 	variables.sgm \
 	expressions.sgm \
+	formatting.sgm \
 	c-api-reference.sgm \
+	license.sgm \
 	jadetex.cfg
 
 if ENABLE_PDF_DOCS

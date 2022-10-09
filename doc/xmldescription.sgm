@@ -3,9 +3,9 @@
 	<sect1>
 		<title>XML description structure</title>
 		<para>
-			<ulink url="https://github.com/zboszor/OpenCReports"><citetitle>OpenCReports</citetitle></ulink>
+			<ulink url="https://github.com/zboszor/OpenCReports">OpenCReports</ulink>
 			uses an
-			<ulink url="https://github.com/SICOM/rlib"><citetitle>RLIB</citetitle></ulink>-compatible
+			<ulink url="https://github.com/SICOM/rlib">RLIB</ulink>-compatible
 			report description with extensions.
 		</para>
 		<para>
@@ -18,7 +18,7 @@
 &lt;!DOCTYPE OpenCReport SYSTEM "opencreport.dtd"&gt;</programlisting>
 			The DTD file <literal>opencreport.dtd</literal> can be
 			found in the sources of OpenCReports
-			<ulink url="https://github.com/zboszor/OpenCReports/blob/main/opencreport.dtd"><citetitle>here</citetitle></ulink>.
+			<ulink url="https://github.com/zboszor/OpenCReports/blob/main/opencreport.dtd">here</ulink>.
 		</para>
 		<para>
 			After the XML header lines, a fully specified report
@@ -139,7 +139,7 @@
 				be used because it is harder to read. For all
 				special characters that should be escaped in
 				XML, see
-				<ulink url="https://stackoverflow.com/a/46637835/290085"><citetitle>Simplified XML Escaping</citetitle></ulink>.
+				<ulink url="https://stackoverflow.com/a/46637835/290085">Simplified XML Escaping</ulink>.
 			</para>
 		</sect2>
 	</sect1>
@@ -371,7 +371,7 @@ user=myuser
 			</para>
 			<para>
 				For the connection string format, see the
-				<ulink url="https://www.postgresql.org/docs"><citetitle>PostgreSQL documentation</citetitle></ulink>.
+				<ulink url="https://www.postgresql.org/docs">PostgreSQL documentation</ulink>.
 			</para>
 			<para>
 				The database name and user name are mandatory. The
@@ -395,16 +395,16 @@ user=myuser
 				libraries. There is a more generic way, i.e. ODBC.
 				ODBC was invented by Microsoft in the 1990s for Windows.
 				See
-				<ulink url="https://docs.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc"><citetitle>Microsoft Open Database Connectivity (ODBC)</citetitle></ulink>
+				<ulink url="https://docs.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc">Microsoft Open Database Connectivity (ODBC)</ulink>
 				In their solution, there's an abstract client library
 				and individual database drivers adhere to the APIs
 				offered by ODBC toplevel library. Since then, UNIX and
 				UNIX-like systems also gained their ODBC client libraries
 				in two different implementations, both of which are
 				supported by OpenCReports:
-				<ulink url="https://www.unixodbc.org"><citetitle>unixODBC</citetitle></ulink>
+				<ulink url="https://www.unixodbc.org">unixODBC</ulink>
 				and
-				<ulink url="https://www.iodbc.org"><citetitle>iODBC</citetitle></ulink>.
+				<ulink url="https://www.iodbc.org">iODBC</ulink>.
 			</para>
 			<para>
 				An ODBC database setup is done a differently. There are
@@ -439,7 +439,7 @@ user=myuser
 			</para>
 			<para>
 				For the connection string format, see the
-				<ulink url="https://www.connectionstrings.com/"><citetitle>public examples</citetitle></ulink>.
+				<ulink url="https://www.connectionstrings.com/">public examples</ulink>.
 			</para>
 		</sect2>
 		<sect2>
