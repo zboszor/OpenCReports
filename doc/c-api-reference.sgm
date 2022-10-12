@@ -156,6 +156,635 @@ void ocrpt_set_output_format(opencreport *o,
 				</para>
 			</sect3>
 		</sect2>
+		<sect2>
+			<title>Data source and query related functions</title>
+			<para>
+				The following <literal>enum</literal> and
+				<literal>struct</literal> types are used by
+				OpenCReports for datasources and queries.
+				<programlisting>enum ocrpt_result_type {
+    OCRPT_RESULT_ERROR,
+    OCRPT_RESULT_STRING,
+    OCRPT_RESULT_NUMBER,
+    OCRPT_RESULT_DATETIME
+};
+
+struct ocrpt_datasource;
+typedef struct ocrpt_datasource ocrpt_datasource;
+
+struct ocrpt_query;
+typedef struct ocrpt_query ocrpt_query;
+
+struct ocrpt_query_result;
+typedef struct ocrpt_query_result ocrpt_query_result;
+
+struct ocrpt_input {
+    void (*describe)(ocrpt_query *,
+                     ocrpt_query_result **,
+                     int32_t *);
+    void (*rewind)(ocrpt_query *);
+    bool (*next)(ocrpt_query *);
+    bool (*populate_result)(ocrpt_query *);
+    bool (*isdone)(ocrpt_query *);
+    void (*free)(ocrpt_query *);
+    bool (*set_encoding)(ocrpt_datasource *,
+                         const char *);
+    void (*close)(const ocrpt_datasource *);
+};
+typedef struct ocrpt_input ocrpt_input;</programlisting>
+			</para>
+			<para>
+				Data sources in this context are "mini drivers".
+				Data source handling is implemented via
+				<literal>ocrpt_input</literal> functions.
+			</para>
+			<para>
+				Queries are data providers over data sources. They are
+				the actual sources of data using a specific data source.
+				Multiple queries may use the same data source.
+			</para>
+			<sect3>
+				<title>Add an array datasource</title>
+				<para>
+					Add an array datasource to the report handler.
+					It's optional, as an array datasource called
+					"array" is automatically added to an opencreport
+					structure.
+					<programlisting>ocrpt_datasource *
+ocrpt_datasource_add_array(opencreport *o,
+                           const char *source_name);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add an array query</title>
+				<para>
+					Add an "array query" to the report handler.
+					This adds the array pointer and parameters, so
+					the array datasource input driver can use it.
+					The provided <literal>array</literal> array pointer
+					contains <literal>(rows + 1) * cols</literal> number of
+					<literal>char *</literal> pointers, with the first row
+					being the column (field) names. The
+					<literal>types</literal> array contains
+					<literal>cols</literal> number of
+					<literal>enum ocrpt_result_type</literal> elements to
+					indicate the column data type.
+					<programlisting>ocrpt_query *
+ocrpt_query_add_array(opencreport *o,
+                      ocrpt_datasource *source,
+                      const char *name,
+                      const char **array,
+                      int32_t rows, int32_t cols,
+                      const enum ocrpt_result_type *types);</programlisting>
+				</para>
+				<para>
+					If the <literal>types</literal> pointer is
+					<literal>NULL</literal>, the column values are treated
+					as strings. This is how RLIB operated.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a CSV datasource</title>
+				<para>
+					Add a CSV datasource to the report handler.
+					<programlisting>ocrpt_datasource *
+ocrpt_datasource_add_csv(opencreport *o,
+                         const char *source_name);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a CSV query</title>
+				<para>
+					Add a "CSV query" to the report handler.
+					This specifies the file name, so
+					the CSV datasource input driver can load it.
+					<programlisting>ocrpt_query *
+ocrpt_query_add_csv(opencreport *o,
+                    ocrpt_datasource *source,
+                    const char *name,
+                    const char *filename,
+                    const enum ocrpt_result_type *types);</programlisting>
+				</para>
+				<para>
+					The <literal>types</literal> array pointer is optional.
+					If it is <literal>NULL</literal>, the column values are
+					treated as strings. This is how RLIB operated.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a JSON datasource</title>
+				<para>
+					Add a JSON datasource to the report handler.
+					<programlisting>ocrpt_datasource *
+ocrpt_datasource_add_json(opencreport *o,
+                          const char *source_name);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a JSON query</title>
+				<para>
+					Add a "JSON query" to the report handler.
+					This specifies the file name, so
+					the JSON datasource input driver can load it.
+					<programlisting>ocrpt_query *
+ocrpt_query_add_json(opencreport *o,
+                     ocrpt_datasource *source,
+                     const char *name,
+                     const char *filename,
+                     const enum ocrpt_result_type *types);</programlisting>
+				</para>
+				<para>
+					The JSON file format defined in <xref linkend="jsonds"/>
+					contains the way to describe the column data types,
+					which is optional in a JSON file.
+					The <literal>types</literal> array pointer may
+					optionally supplement (or override) the column types.
+					It is only meaningful if the JSON file itself doesn't
+					contain the type description for the columns. If it is
+					<literal>NULL</literal> (and the JSON file doesn't
+					contain type specifiers), the column values are
+					treated as strings. RLIB didn't have JSON input.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add an XML datasource</title>
+				<para>
+					Add an XML datasource to the report handler.
+					<programlisting>ocrpt_datasource *
+ocrpt_datasource_add_xml(opencreport *o,
+                         const char *source_name);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add an XML query</title>
+				<para>
+					Add an "XML query" to the report handler.
+					This specifies the file name, so
+					the XML datasource input driver can load it.
+					<programlisting>ocrpt_query *
+ocrpt_query_add_xml(opencreport *o,
+                    ocrpt_datasource *source,
+                    const char *name,
+                    const char *filename,
+                    const enum ocrpt_result_type *types);</programlisting>
+				</para>
+				<para>
+					The XML file format defined in <xref linkend="xmlds"/>
+					contains the way to describe the column data types,
+					which is optional in an XML file.
+					The <literal>types</literal> array pointer may
+					optionally supplement (or override) the column types.
+					It is only meaningful if the XML file itself doesn't
+					contain the type description for the columns. If it is
+					<literal>NULL</literal> (and the XML file doesn't
+					contain type specifiers), the column values are
+					treated as strings. This is how RLIB operated.
+					The OpenCReports XML input file format is RLIB
+					compatible without the type specification part.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a PostgreSQL datasource</title>
+				<para>
+					Add a PostgreSQL datasource to the report handler.
+					<programlisting>ocrpt_datasource *
+ocrpt_datasource_add_postgresql(opencreport *o,
+                                const char *source_name,
+                                const char *host,
+                                const char *port,
+                                const char *dbname,
+                                const char *user,
+                                const char *password);
+
+ocrpt_datasource *
+ocrpt_datasource_add_postgresql2(opencreport *o,
+                                 const char *source_name,
+                                 const char *conninfo);</programlisting>
+				</para>
+				<para>
+					For the parameters, see <xref linkend="postgresqlds"/>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a PostgreSQL query</title>
+				<para>
+					Add a SQL query using the PostgreSQL datasource
+					to the report handler.
+					<programlisting>ocrpt_query *
+ocrpt_query_add_postgresql(opencreport *o,
+                           ocrpt_datasource *source,
+                           const char *name,
+                           const char *querystr);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a MariaDB datasource</title>
+				<para>
+					Add a MariaDB datasource to the report handler.
+					<programlisting>ocrpt_datasource *
+ocrpt_datasource_add_mariadb(opencreport *o,
+                             const char *source_name,
+                             const char *host,
+                             const char *port,
+                             const char *dbname,
+                             const char *user,
+                             const char *password,
+                             const char *unix_socket);
+
+ocrpt_datasource *
+ocrpt_datasource_add_mariadb2(opencreport *o,
+                              const char *source_name,
+                              const char *optionfile,
+                              const char *group);</programlisting>
+				</para>
+				<para>
+					For the parameters, see <xref linkend="mariadbds"/>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a MariaDB query</title>
+				<para>
+					Add an SQL query using the MariaDB datasource
+					to the report handler.
+					<programlisting>ocrpt_query *
+ocrpt_query_add_mariadb(opencreport *o,
+                        ocrpt_datasource *source,
+                        const char *name,
+                        const char *querystr);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add an ODBC datasource</title>
+				<para>
+					Add an ODBC datasource to the report handler.
+					<programlisting>ocrpt_datasource *
+ocrpt_datasource_add_odbc(opencreport *o,
+                          const char *source_name,
+                          const char *dbname,
+                          const char *user, const char *password);
+
+ocrpt_datasource *
+ocrpt_datasource_add_odbc2(opencreport *o,
+                           const char *source_name,
+                           const char *conninfo);</programlisting>
+				</para>
+				<para>
+					For the parameters, see <xref linkend="odbcds"/>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add an ODBC query</title>
+				<para>
+					Add an SQL query using the ODBC datasource
+					to the report handler.
+					<programlisting>ocrpt_query *
+ocrpt_query_add_odbc(opencreport *o,
+                     ocrpt_datasource *source,
+                     const char *name,
+                     const char *querystr);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Find a datasource</title>
+				<para>
+					Find the data source using its name.
+					It returns NULL if the named data source
+					is not found.
+					<programlisting>ocrpt_datasource *
+ocrpt_datasource_get(opencreport *o,
+                     const char *source_name);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Add a custom datasource</literal></title>
+				<para>
+					Add a custom data source to the report handler.
+					<programlisting>ocrpt_datasource *
+ocrpt_add_datasource(opencreport *o,
+                     const char *source_name,
+                     const ocrpt_input *input);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Set the encoding of a datasource</literal></title>
+				<para>
+					Set the encoding of a datasource in case
+					if it's not already UTF-8, so data provided by
+					it is automatically converted.
+					<programlisting>void
+ocrpt_datasource_set_encoding(opencreport *o,
+                              ocrpt_datasource *source,
+                              const char *encoding);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Free a datasource</literal></title>
+				<para>
+					Free a datasource from the opencreport structure
+					it was added to. It's not needed to be called,
+					all datasources are automatically free with
+					<literal>ocrpt_free()</literal>
+					<programlisting>void
+ocrpt_datasource_free(opencreport *o,
+                      ocrpt_datasource *source);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Find a query</literal></title>
+				<para>
+					Find a query using its name.
+					<programlisting>ocrpt_query *
+ocrpt_query_get(opencreport *o,
+                const char *name);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Get the current data row from a query</literal></title>
+				<para>
+					Create (first call) or get the <literal>ocrpt_query_result</literal>
+					array from a query. Output parameter <literal>cols</literal>
+					returns the number of columns in the result array. It must
+					be re-run after ocrpt_navigate_next() since the previously
+					returned pointer becomes invalid.
+					<programlisting>ocrpt_query_result *
+ocrpt_query_get_result(ocrpt_query *q,
+                       int32_t *cols);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Get column name</literal></title>
+				<para>
+					Using the <literal>ocrpt_query_result *</literal> result
+					from <literal>ocrpt_query_get_result()</literal>,
+					the column names can be discovered from a query.
+					<programlisting>const char *
+ocrpt_query_result_column_name(ocrpt_query_result *qr,
+                               int32_t col);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Get column data</literal></title>
+				<para>
+					Using the <literal>ocrpt_query_result *</literal>
+					result from
+					<literal>ocrpt_query_get_result()</literal>, get a
+					pointer to the column data in its internal (hidden)
+					representation.
+					<programlisting>ocrpt_result *
+ocrpt_query_result_column_result(ocrpt_query_result *qr,
+                                 int32_t col);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Detect whether a column result is NULL</literal></title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from
+					<literal>ocrpt_query_result_column_result()</literal>,
+					detect whether the column value is NULL.
+					<programlisting>bool
+ocrpt_result_isnull(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Detect whether a column result is numeric</literal></title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from
+					<literal>ocrpt_query_result_column_result()</literal>,
+					detect whether the column value is numeric.
+					<programlisting>bool
+ocrpt_result_isnumber(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Get the numeric value of a column result</literal></title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from
+					<literal>ocrpt_query_result_column_result()</literal>,
+					get the numeric column value. It returns  NULL
+					if the column is:
+					<itemizedlist>
+						<listitem override="bullet">
+							<para>
+								not a numeric result
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								NULL
+							</para>
+						</listitem>
+					</itemizedlist>
+					<programlisting>mpfr_ptr
+ocrpt_result_get_number(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Detect whether a column result is string</literal></title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from
+					<literal>ocrpt_query_result_column_result()</literal>,
+					detect whether the column value is string.
+					<programlisting>bool
+ocrpt_result_isstring(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Get the string value of a column result</literal></title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from
+					<literal>ocrpt_query_result_column_result()</literal>,
+					get the string column value. It returns  NULL
+					if the column is
+					<itemizedlist>
+						<listitem override="bullet">
+							<para>
+								not a string result
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								NULL
+							</para>
+						</listitem>
+					</itemizedlist>
+					<programlisting>ocrpt_string *
+ocrpt_result_get_string(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Detect whether a column result is datetime</literal></title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from
+					<literal>ocrpt_query_result_column_result()</literal>,
+					detect whether the column value is datetime.
+					<programlisting>bool
+ocrpt_result_isdatetime(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Get the datetime value of a column result</literal></title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from
+					<literal>ocrpt_query_result_column_result()</literal>,
+					get the datetime column value. It returns  NULL
+					if the column is
+					<itemizedlist>
+						<listitem override="bullet">
+							<para>
+								not a datetime result
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								NULL
+							</para>
+						</listitem>
+					</itemizedlist>
+					<programlisting>const struct tm *
+ocrpt_result_get_datetime(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Detect whether a datetime column result is interval</literal></title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from
+					<literal>ocrpt_query_result_column_result()</literal>,
+					detect whether the datetime column value is interval.
+					<programlisting>bool
+ocrpt_result_datetime_is_interval(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Detect whether a datetime column result has valid date</literal></title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from
+					<literal>ocrpt_query_result_column_result()</literal>,
+					detect whether the datetime column value has valid date.
+					<programlisting>bool
+ocrpt_result_datetime_is_date_valid(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Detect whether a datetime column result has valid time</literal></title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from
+					<literal>ocrpt_query_result_column_result()</literal>,
+					detect whether the datetime column value has valid time.
+					<programlisting>bool
+ocrpt_result_datetime_is_time_valid(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Add a follower query</literal></title>
+				<para>
+					Add a <literal>follower</literal> query to the
+					<literal>leader</literal> query. The leader is the primary
+					query and the follower will run in parallel with it until
+					the leader runs out of rows. In case the leader has more
+					rows than the follower, then for rows in the leader where
+					there are no follower rows, the follower fields are set to NULL.
+					<programlisting>bool
+ocrpt_add_query_follower(opencreport *o,
+                         ocrpt_query *leader,
+                         ocrpt_query *follower);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Add an N:1 follower query</literal></title>
+				<para>
+					Add an N:1 <literal>follower</literal> query to the
+					<literal>leader</literal> query. The leader is the primary
+					query and rows from the follower will be matched using the
+					<literal>match</literal> expression. If there are multiple
+					rows in the follower matching the leader row, then the leader
+					row will be listed that many times. For rows in the leader
+					where there are no matching rows in the follower, the follower
+					fields are set to NULL. It is similar to <literal>LEFT OUTER
+					JOIN</literal> in SQL databases. For creating an
+					<literal>ocrpt_expr</literal> expression pointer, see the
+					next section.
+					<programlisting>bool
+ocrpt_add_query_follower_n_to_1(opencreport *o,
+                                ocrpt_query *leader,
+                                ocrpt_query *follower,
+                                ocrpt_expr *match);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Free a query</literal></title>
+				<para>
+					Free a query and remove it from the report handler.
+					It's optional. <literal>ocrpt_free()</literal> frees
+					the queries added to the <literal>opencreport</literal>
+					structure.
+					<programlisting>void
+ocrpt_query_free(opencreport *o,
+                 ocrpt_query *q);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Start the main query</literal></title>
+				<para>
+					Start query (or query set) navigation.
+					<literal>q</literal> should be the primary query
+					of the report.
+					<programlisting>void
+ocrpt_query_navigate_start(opencreport *o,
+                           ocrpt_query *q);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>Navigate to the next query row</literal></title>
+				<para>
+					Navigate the query (or query set) to the next row. Returns
+					<literal>false</literal> if there was no more rows.
+					in which case the <literal>ocrpt_query_result</literal>
+					arrays for all queries in the query set (returned by
+					previous <literal>ocrpt_query_get_result()</literal>
+					calls contain invalid data.
+					<programlisting>bool
+ocrpt_query_navigate_next(opencreport *o,
+                          ocrpt_query *q);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title><literal>API specific array discovery function</literal></title>
+				<para>
+					For array data sources and queries, OpenCReports
+					needs a way to to find the data array and the
+					supplementary type identifier array.
+					These are language specific. The below ones
+					are the C specific ones. The override function
+					is also provided to set a new discovery function.
+					<programlisting>typedef void
+(*ocrpt_query_discover_func)(const char *,
+                             void **,
+                             const char *,
+                             void **);
+
+void
+ocrpt_query_set_discover_func(ocrpt_query_discover_func func);
+
+extern ocrpt_query_discover_func ocrpt_query_discover_array;
+
+void
+ocrpt_query_discover_array_c(const char *arrayname,
+                             void **array,
+                             const char *typesname,
+                             void **types);</programlisting>
+				</para>
+			</sect3>
+		</sect2>
 		<sect2 id="exprfunc" xreflabel="Expression related functions">
 			<title>Expression related functions</title>
 			<para>
@@ -177,7 +806,9 @@ void ocrpt_set_output_format(opencreport *o,
 				<para>
 					The <literal>ocrpt_report</literal> pointer may be
 					valid or NULL. If valid, the expression is bound
-					to this <literal>ocrpt_report</literal>.
+					to this <literal>ocrpt_report</literal>, i.e.
+					it will be freed automatically with
+					<literal>ocrpt_free()</literal>.
 					<programlisting>ocrpt_expr *ocrpt_expr_parse(opencreport *o,
                              ocrpt_report *r,
                              const char *str,
@@ -189,7 +820,11 @@ void ocrpt_set_output_format(opencreport *o,
 				<para>
 					Free an expression parse tree. If it was bound
 					to the passed-in <literal>ocrpt_report</literal>,
-					this association is also deleted.
+					this association is also deleted. Alternatively,
+					the expression doesn't need to be free if it was
+					bound to a report when it was parsed, as it will be
+					automatically freed when freeing either the report,
+					or the global <literal>opencreport</literal> structure.
 					<programlisting>void ocrpt_expr_free(opencreport *o,
                      ocrpt_report *r,
                      ocrpt_expr *e);</programlisting>
@@ -311,203 +946,6 @@ ocrpt_expr_make_error_result(opencreport *o,
                              const char *format, ...);</programlisting>
 				</para>
 			</sect3>
-		</sect2>
-	</sect1>
-	<sect1>
-		<title>Data source related functions</title>
-		<para>
-			The following <literal>enum</literal> and <literal>struct</literal>
-			types are used by OpenCReports.
-			<programlisting>enum ocrpt_result_type {
-    OCRPT_RESULT_ERROR,
-    OCRPT_RESULT_STRING,
-    OCRPT_RESULT_NUMBER,
-    OCRPT_RESULT_DATETIME
-};
-
-struct ocrpt_string {
-    char *str;
-    size_t allocated_len;
-    size_t len;
-};
-typedef struct ocrpt_string ocrpt_string;
-
-struct ocrpt_result {
-    enum ocrpt_result_type type;
-    ocrpt_string *string;
-    mpfr_t number;
-    bool number_initialized;
-    bool string_owned;
-    bool isnull;
-    struct tm datetime;
-};
-typedef struct ocrpt_result ocrpt_result;
-
-struct ocrpt_query_result {
-    const char *name;
-    bool name_allocated;
-    ocrpt_result result;
-};
-typedef struct ocrpt_query_result ocrpt_query_result;
-
-struct ocrpt_input {
-    void (*describe)(ocrpt_query *, ocrpt_query_result **, int32_t *);
-    void (*rewind)(ocrpt_query *);
-    bool (*next)(ocrpt_query *);
-    bool (*populate_result)(ocrpt_query *);
-    bool (*isdone)(ocrpt_query *);
-    void (*free)(ocrpt_query *);
-};
-typedef struct ocrpt_input ocrpt_input;</programlisting>
-		</para>
-		<para>
-			Data source handling is implemented via <literal>ocrpt_input</literal>
-			functions.
-		</para>
-		<sect2>
-			<title><literal>ocrpt_add_datasource</literal></title>
-			<para>
-				Add a (custom) data source to the report handler.
-				<programlisting>ocrpt_datasource *ocrpt_add_datasource(opencreport *o,
-                                       const char *source_name,
-                                       const ocrpt_input *input);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_datasource_get</literal></title>
-			<para>
-				Find the data source using its name. It returns NULL
-				if the named data source is not found.
-				<programlisting>ocrpt_datasource *ocrpt_datasource_get(opencreport *o,
-                                        const char *source_name);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_validate_datasource</literal></title>
-			<para>
-				Check that the provided <literal>source</literal> pointer
-				is valid for the <literal>o</literal> report handler.
-				<programlisting>ocrpt_datasource *ocrpt_validate_datasource(opencreport *o,
-                                            ocrpt_datasource *source);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_add_array_datasource</literal></title>
-			<para>
-				Add a named array data source. It is optional, as a array
-				data source called <literal>array</literal> is added to the
-				report handler implicitly.
-				<programlisting>ocrpt_datasource *ocrpt_add_array_datasource(opencreport *o,
-                                             const char *source_name);</programlisting>
-			</para>
-		</sect2>
-	</sect1>
-	<sect1>
-		<title>Query related functions</title>
-		<para>
-			Queries are super-entities over data sources. They are
-			the actual sources of data using a specific data source.
-			Multiple queries may use the same data source.
-		</para>
-		<sect2>
-			<title><literal>ocrpt_add_array_query</literal></title>
-			<para>
-				Add a named query of the array type. The provided
-				<literal>array</literal> array contains
-				<literal>(rows + 1) * cols</literal> number of
-				<literal>char *</literal> pointers, with the first row
-				being the column (or field) names. The <literal>types</literal>
-				array contains <literal>cols</literal> number of
-				<literal>enum ocrpt_result_type</literal> elements to
-				indicate the column data type.
-				<programlisting>ocrpt_query *ocrpt_add_array_query(opencreport *o, ocrpt_datasource *source,
-                                    const char *name, void *array,
-                                    int32_t rows, int32_t cols,
-                                    const enum ocrpt_result_type *types);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_add_array_query_as</literal></title>
-			<para>
-				Add a named query of the array type using the data source name.
-				For the other parameters, see the previous function.
-				<programlisting>ocrpt_query *ocrpt_add_array_query_as(opencreport *o, const char *source_name,
-                                    const char *name, void *array,
-                                    int32_t rows, int32_t cols,
-                                    const enum ocrpt_result_type *types);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_query_get_result</literal></title>
-			<para>
-				Create and get the <literal>ocrpt_query_result</literal>
-				array from a query. Output parameter <literal>cols</literal>
-				returns the number of columns in the result array. It must
-                be (re-)run after ocrpt_navigate_next() since the previously
-                returned pointer becomes invalid.
-				<programlisting>ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_t *cols);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_add_query_follower</literal></title>
-			<para>
-				Add a <literal>follower</literal> query to the
-				<literal>leader</literal> query. The leader is the primary
-				query and the follower will run in parallel with it until
-				the leader runs out of rows. In case the leader has more
-				rows than the follower, then for rows in the leader where
-				there are no follower rows, the follower fields are set to NULL.
-				<programlisting>bool ocrpt_add_query_follower(opencreport *o,
-                              ocrpt_query *leader,
-                              ocrpt_query *follower);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_add_query_follower_n_to_1</literal></title>
-			<para>
-				Add an N:1 <literal>follower</literal> query to the
-				<literal>leader</literal> query. The leader is the primary
-				query and rows from the follower will be matched using the
-				<literal>match</literal> expression. If there are multiple
-				rows in the follower matching the leader row, then the leader
-				row will be listed that many times. For rows in the leader
-				where there are no matching rows in the follower, the follower
-				fields are set to NULL. It is similar to <literal>LEFT OUTER
-				JOIN</literal> in SQL databases. For creating an
-				<literal>ocrpt_expr</literal> expression pointer, see the
-				next section.
-				<programlisting>bool ocrpt_add_query_follower_n_to_1(opencreport *o,
-                                     ocrpt_query *leader,
-                                     ocrpt_query *follower,
-                                     ocrpt_expr *match);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_free_query</literal></title>
-			<para>
-				Free a query and remove it from the report handler.
-				<programlisting>void ocrpt_free_query(opencreport *o, ocrpt_query *q);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			 <title><literal>ocrpt_navigate_start</literal></title>
-			<para>
-				Start query or query set navigation. <literal>q</literal>
-				should be the primary query of the report.
-				<programlisting>void ocrpt_navigate_start(opencreport *o, ocrpt_query *q);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_navigate_next</literal></title>
-			<para>
-				Navigate the query set to the next row. Returns
-				<literal>false</literal> if there was no more rows.
-				in which case the <literal>ocrpt_query_result</literal>
-				arrays for all queries in the query set (returned by
-				previous <literal>ocrpt_query_get_result()</literal>
-				calls contain invalid data.
-				<programlisting>bool ocrpt_navigate_next(opencreport *o, ocrpt_query *q);</programlisting>
-			</para>
 		</sect2>
 	</sect1>
 	<sect1>

@@ -293,7 +293,7 @@
 			<literal>csv</literal>, <literal>json</literal>,
 			<literal>xml</literal> or <literal>array</literal>.
 		</para>
-		<sect2>
+		<sect2 id="mariadbds" xreflabel="MariaDB database connection">
 			<title>MariaDB (MySQL) database connection</title>
 			<para>
 				A MariaDB database connection may be declared in three
@@ -346,7 +346,7 @@ user=myuser
 				database client library).
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="postgresqlds" xreflabel="PostgreSQL database connection">
 			<title>PostgreSQL database connection</title>
 			<para>
 				A PostgreSQL database connection may be declared in three
@@ -387,7 +387,7 @@ user=myuser
 				database client library).
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="odbcds" xreflabel="ODBC database connection">
 			<title>ODBC database connection</title>
 			<para>
 				The above described MariaDB and PostgreSQL database
@@ -467,7 +467,7 @@ user=myuser
 				or <literal>interval()</literal>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="jsonds" xreflabel="JSON file datasource">
 			<title>JSON file datasource</title>
 			<para>
 				Similarly to CSV, the JSON file datasource is also declared
@@ -511,7 +511,7 @@ user=myuser
 				data types from the <literal>coltypes</literal> arrays.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="xmlds" xreflabel="XML file datasource">
 			<title>XML file datasource</title>
 			<para>
 				Similarly to CSV and JSON, the XML file datasource is also declared
