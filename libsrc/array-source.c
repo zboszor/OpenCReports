@@ -167,8 +167,7 @@ void ocrpt_array_close(const ocrpt_datasource *ds) {
 		iconv_close(c);
 }
 
-static const ocrpt_input ocrpt_array_input = {
-	.type = OCRPT_INPUT_ARRAY,
+const ocrpt_input ocrpt_array_input = {
 	.describe = ocrpt_array_describe,
 	.rewind = ocrpt_array_rewind,
 	.next = ocrpt_array_next,
@@ -227,7 +226,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(opencreport *o, ocrpt_datasour
 		return NULL;
 	}
 
-	if (source->input->type != OCRPT_INPUT_ARRAY) {
+	if (source->input != &ocrpt_array_input) {
 		fprintf(stderr, "%s:%d: datasource is not array\n", __func__, __LINE__);
 		return NULL;
 	}
@@ -279,8 +278,7 @@ static void ocrpt_file_free(ocrpt_query *query) {
 	query->priv = NULL;
 }
 
-static const ocrpt_input ocrpt_csv_input = {
-	.type = OCRPT_INPUT_CSV,
+const ocrpt_input ocrpt_csv_input = {
 	.describe = ocrpt_array_describe,
 	.rewind = ocrpt_array_rewind,
 	.next = ocrpt_array_next,
@@ -405,7 +403,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource
 		return NULL;
 	}
 
-	if (source->input->type != OCRPT_INPUT_CSV) {
+	if (source->input != &ocrpt_csv_input) {
 		fprintf(stderr, "%s:%d: datasource is not csv\n", __func__, __LINE__);
 		return NULL;
 	}
@@ -485,8 +483,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource
 	return retval;
 }
 
-static const ocrpt_input ocrpt_json_input = {
-	.type = OCRPT_INPUT_JSON,
+const ocrpt_input ocrpt_json_input = {
 	.describe = ocrpt_array_describe,
 	.rewind = ocrpt_array_rewind,
 	.next = ocrpt_array_next,
@@ -737,7 +734,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(opencreport *o, ocrpt_datasourc
 		return NULL;
 	}
 
-	if (source->input->type != OCRPT_INPUT_JSON) {
+	if (source->input != &ocrpt_json_input) {
 		fprintf(stderr, "%s:%d: datasource is not json\n", __func__, __LINE__);
 		return NULL;
 	}
@@ -813,8 +810,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(opencreport *o, ocrpt_datasourc
 	return retval;
 }
 
-static const ocrpt_input ocrpt_xml_input = {
-	.type = OCRPT_INPUT_XML,
+const ocrpt_input ocrpt_xml_input = {
 	.describe = ocrpt_array_describe,
 	.rewind = ocrpt_array_rewind,
 	.next = ocrpt_array_next,
@@ -1136,7 +1132,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(opencreport *o, ocrpt_datasource
 		return NULL;
 	}
 
-	if (source->input->type != OCRPT_INPUT_XML) {
+	if (source->input != &ocrpt_xml_input) {
 		fprintf(stderr, "%s:%d: datasource is not json\n", __func__, __LINE__);
 		return NULL;
 	}

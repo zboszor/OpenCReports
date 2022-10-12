@@ -65,10 +65,8 @@ static bool ocrpt_navigate_n_to_1_check_ended(opencreport *o, ocrpt_query *q) {
 		ocrpt_query_follower *fo = (ocrpt_query_follower *)fw->data;
 		ocrpt_query *f = fo->follower;
 
-		if (!f->source || !f->source->input || !f->source->input->isdone) {
-			/* TODO: report that the input source is not OK? */
+		if (!f->source || !f->source->input || !f->source->input->isdone)
 			continue;
-		}
 
 		if (!f->source->input->isdone(f)) {
 			ended = false;
@@ -99,10 +97,8 @@ static bool ocrpt_navigate_next_n_to_1(opencreport *o, ocrpt_query *q) {
 
 			ocrpt_navigate_next_private(o, f);
 
-			if (!f->source || !f->source->input || !f->source->input->isdone) {
-				/* TODO: report that the input source is not OK? */
+			if (!f->source || !f->source->input || !f->source->input->isdone)
 				continue;
-			}
 
 			if (f->source->input->isdone(f))
 				f->n_to_1_empty = true;
@@ -143,10 +139,8 @@ static bool ocrpt_navigate_next_n_to_1(opencreport *o, ocrpt_query *q) {
 			if (f->n_to_1_empty)
 				continue;
 
-			if (!f->source || !f->source->input || !f->source->input->isdone) {
-				/* TODO: report that the input source is not OK? */
+			if (!f->source || !f->source->input || !f->source->input->isdone)
 				continue;
-			}
 
 			if (f->source->input->isdone(f)) {
 				for (fw1 = q->followers_n_to_1; fw1 && fw1 != fw; fw1 = fw1->next) {

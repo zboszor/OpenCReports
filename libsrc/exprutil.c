@@ -955,7 +955,6 @@ void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrp
 				}
 			}
 		}
-		/* TODO: implement generally usable global report variables */
 		break;
 
 	default:
@@ -1165,9 +1164,6 @@ static bool ocrpt_expr_get_precalculate_worker(opencreport *o, ocrpt_expr *e, in
 		return precalculate;
 
 	switch (e->type) {
-	case OCRPT_EXPR_RVAR:
-		/* TODO: check whether internal variables are precalculated or not */
-		break;
 	case OCRPT_EXPR_VVAR:
 		if (e->var && e->var->precalculate)
 			precalculate = true;
@@ -1240,21 +1236,63 @@ DLL_EXPORT_SYM bool ocrpt_result_isnumber(ocrpt_result *result) {
 	if (!result)
 		return false;
 
-	return result->number_initialized && result->type == OCRPT_RESULT_NUMBER;
+	return result->type == OCRPT_RESULT_NUMBER && result->number_initialized;
 }
 
 DLL_EXPORT_SYM mpfr_ptr ocrpt_result_get_number(ocrpt_result *result) {
-	if (!result)
+	if (!result || result->isnull || result->type != OCRPT_RESULT_NUMBER || !result->number_initialized)
 		return NULL;
 
 	return result->number;
 }
 
-DLL_EXPORT_SYM ocrpt_string *ocrpt_result_get_string(ocrpt_result *result) {
+DLL_EXPORT_SYM bool ocrpt_result_isstring(ocrpt_result *result) {
 	if (!result)
+		return false;
+
+	return result->type == OCRPT_RESULT_STRING && result->string;
+}
+
+DLL_EXPORT_SYM ocrpt_string *ocrpt_result_get_string(ocrpt_result *result) {
+	if (!result || result->isnull || result->type != OCRPT_RESULT_STRING)
 		return NULL;
 
 	return result->string;
+}
+
+DLL_EXPORT_SYM bool ocrpt_result_isdatetime(ocrpt_result *result) {
+	if (!result)
+		return false;
+
+	return result->type == OCRPT_RESULT_DATETIME;
+}
+
+DLL_EXPORT_SYM const struct tm *ocrpt_result_get_datetime(ocrpt_result *result) {
+	if (!result && result->isnull && result->type != OCRPT_RESULT_DATETIME)
+		return NULL;
+
+	return &result->datetime;
+}
+
+DLL_EXPORT_SYM bool ocrpt_result_datetime_is_interval(ocrpt_result *result) {
+	if (!result || result->isnull || result->type != OCRPT_RESULT_DATETIME)
+		return false;
+
+	return result->interval;
+}
+
+DLL_EXPORT_SYM bool ocrpt_result_datetime_is_date_valid(ocrpt_result *result) {
+	if (!result || result->isnull || result->type != OCRPT_RESULT_DATETIME)
+		return false;
+
+	return result->date_valid;
+}
+
+DLL_EXPORT_SYM bool ocrpt_result_datetime_is_time_valid(ocrpt_result *result) {
+	if (!result || result->isnull || result->type != OCRPT_RESULT_DATETIME)
+		return false;
+
+	return result->time_valid;
 }
 
 void ocrpt_expr_init_iterative_results(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type) {

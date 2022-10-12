@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <mpfr.h>
+#include <time.h>
 
 struct opencreport;
 typedef struct opencreport opencreport;
@@ -25,19 +26,7 @@ typedef struct ocrpt_datasource ocrpt_datasource;
 struct ocrpt_query_result;
 typedef struct ocrpt_query_result ocrpt_query_result;
 
-enum ocrpt_input_type {
-	OCRPT_INPUT_ARRAY,
-	OCRPT_INPUT_CSV,
-	OCRPT_INPUT_JSON,
-	OCRPT_INPUT_XML,
-	OCRPT_INPUT_POSTGRESQL,
-	OCRPT_INPUT_MARIADB,
-	OCRPT_INPUT_ODBC
-};
-typedef enum ocrpt_input_type ocrpt_input_type;
-
 struct ocrpt_input {
-	ocrpt_input_type type;
 	void (*describe)(ocrpt_query *, ocrpt_query_result **, int32_t *);
 	void (*rewind)(ocrpt_query *);
 	bool (*next)(ocrpt_query *);
@@ -223,6 +212,195 @@ locale_t ocrpt_get_locale(opencreport *o);
  */
 ssize_t ocrpt_mpfr_strfmon(opencreport *o, char * __restrict s, size_t maxsize, const char * __restrict format, ...);
 
+/******************************************
+ * Datasource and query related functions *
+ ******************************************/
+
+/*
+ * Add an array datasource
+ *
+ * Calling this is optional, as an array datasource called
+ * "array" is automatically added to an opencreport structure.
+ */
+ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, const char *source_name);
+/*
+ * Add an array query using the datasource pointer
+ *
+ * The array's first row contains the header names
+ * and the number of rows is the number of data rows,
+ * i.e. it's one less than the actual number of rows
+ * in array.
+ */
+ocrpt_query *ocrpt_query_add_array(opencreport *o, ocrpt_datasource *source,
+									const char *name, const char **array,
+									int32_t rows, int32_t cols,
+									const enum ocrpt_result_type *types);
+/*
+ * Add a CSV datasource
+ */
+ocrpt_datasource *ocrpt_datasource_add_csv(opencreport *o, const char *source_name);
+/*
+ * Add a CSV query
+ */
+ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource *source,
+									const char *name, const char *filename,
+									const enum ocrpt_result_type *types);
+/*
+ * Add a JSON datasource
+ */
+ocrpt_datasource *ocrpt_datasource_add_json(opencreport *o, const char *source_name);
+/*
+ * Add a JSON query
+ */
+ocrpt_query *ocrpt_query_add_json(opencreport *o, ocrpt_datasource *source,
+									const char *name, const char *filename,
+									const enum ocrpt_result_type *types);
+/*
+ * Add an XML datasource
+ */
+ocrpt_datasource *ocrpt_datasource_add_xml(opencreport *o, const char *source_name);
+/*
+ * Add a XML query
+ */
+ocrpt_query *ocrpt_query_add_xml(opencreport *o, ocrpt_datasource *source,
+									const char *name, const char *filename,
+									const enum ocrpt_result_type *types);
+/*
+ * Add a PostgreSQL datasource using separate connection parameters
+ */
+ocrpt_datasource *ocrpt_datasource_add_postgresql(opencreport *o, const char *source_name,
+												const char *host, const char *port, const char *dbname,
+												const char *user, const char *password);
+/*
+ * Add a PostgreSQL datasource using a connection info string
+ */
+ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o, const char *source_name, const char *conninfo);
+/*
+ * Add a PostgreSQL query
+ */
+ocrpt_query *ocrpt_query_add_postgresql(opencreport *o, ocrpt_datasource *source, const char *name, const char *querystr);
+/*
+ * Add a MariaDB/MySQL datasource using separate connection parameters
+ */
+ocrpt_datasource *ocrpt_datasource_add_mariadb(opencreport *o, const char *source_name,
+												const char *host, const char *port, const char *dbname,
+												const char *user, const char *password, const char *unix_socket);
+/*
+ * Add a MariaDB/MySQL datasource using an option file and group settings
+ * If the option file is NULL, the default option files are used.
+ */
+ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, const char *source_name, const char *optionfile, const char *group);
+/*
+ * Add a MariaDB/MySQL query
+ */
+ocrpt_query *ocrpt_query_add_mariadb(opencreport *o, ocrpt_datasource *source, const char *name, const char *querystr);
+/*
+ * Add an ODBC datasource using separate connection parameters
+ */
+ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const char *source_name,
+											const char *dbname, const char *user, const char *password);
+/*
+ * Add an ODBC datasource using a connection info string
+ */
+ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, const char *source_name, const char *conninfo);
+/*
+ * Add an ODBC query
+ */
+ocrpt_query *ocrpt_query_add_odbc(opencreport *o, ocrpt_datasource *source, const char *name, const char *querystr);
+/*
+ * Find the datasource using its name
+ */
+ocrpt_datasource *ocrpt_datasource_get(opencreport *o, const char *source_name);
+/*
+ * Add a custom datasource not covered by
+ * the currently implemented sources.
+ */
+ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const ocrpt_input *input);
+/*
+ * Set the input encoding for a datasource
+ */
+void ocrpt_datasource_set_encoding(opencreport *o, ocrpt_datasource *source, const char *encoding);
+/*
+ * Free a datasource from the opencreport structure it was added to
+ */
+void ocrpt_datasource_free(opencreport *o, ocrpt_datasource *source);
+/*
+ * Find a query using its name
+ */
+ocrpt_query *ocrpt_query_get(opencreport *o, const char *name);
+/*
+ * Return the query result array and the number of columns in it
+ *
+ * It must be re-run for every new data source row since
+ * the pointer is invalidated after ocrpt_query_navigate_next()
+ */
+ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_t *cols);
+/*
+ * Get query result column name
+ */
+const char *ocrpt_query_result_column_name(ocrpt_query_result *qr, int32_t col);
+/*
+ * Get the query result column data
+ */
+ocrpt_result *ocrpt_query_result_column_result(ocrpt_query_result *qr, int32_t col);
+/*
+ * Get the column's NULL-ness, * discover its type and
+ * get its underlying value * depending on its type
+ * from ocrpt_result
+ */
+bool ocrpt_result_isnull(ocrpt_result *result);
+
+bool ocrpt_result_isnumber(ocrpt_result *result);
+mpfr_ptr ocrpt_result_get_number(ocrpt_result *result);
+
+bool ocrpt_result_isstring(ocrpt_result *result);
+ocrpt_string *ocrpt_result_get_string(ocrpt_result *result);
+
+bool ocrpt_result_isdatetime(ocrpt_result *result);
+const struct tm *ocrpt_result_get_datetime(ocrpt_result *result);
+bool ocrpt_result_datetime_is_interval(ocrpt_result *result);
+bool ocrpt_result_datetime_is_date_valid(ocrpt_result *result);
+bool ocrpt_result_datetime_is_time_valid(ocrpt_result *result);
+/*
+ * Add follower query (runs side-by-side with "leader")
+ */
+bool ocrpt_query_add_follower(opencreport *o,
+									ocrpt_query *leader,
+									ocrpt_query *follower);
+/*
+ * Add follower query with a match function
+ */
+bool ocrpt_query_add_follower_n_to_1(opencreport *o,
+									ocrpt_query *leader,
+									ocrpt_query *follower,
+									ocrpt_expr *match);
+/*
+ * Free a query and remove it from follower references
+ */
+void ocrpt_query_free(opencreport *o, ocrpt_query *q);
+/*
+ * Start query navigation from the beginning of the resultset
+ */
+void ocrpt_query_navigate_start(opencreport *o, ocrpt_query *q);
+/*
+ * Move to next row in the query resultset
+ */
+bool ocrpt_query_navigate_next(opencreport *o, ocrpt_query *q);
+/*
+ * Set the global function pointer to resolve array and type array
+ */
+typedef void (*ocrpt_query_discover_func)(const char *, void **, const char *, void **);
+void ocrpt_query_set_discover_func(ocrpt_query_discover_func func);
+/*
+ * Default discovery function for data and type arrays
+ */
+extern ocrpt_query_discover_func ocrpt_query_discover_array;
+/*
+ * Discovery function for data and type arrays
+ */
+void ocrpt_query_discover_array_c(const char *arrayname, void **array, const char *typesname, void **types);
+
+///////////////////////// XXXXXXXXXXXXXXXXXXXXXX
 /********************************
  * Expression related functions *
  ********************************/
@@ -283,7 +461,6 @@ void ocrpt_expr_init_results(opencreport *o, ocrpt_expr *e, enum ocrpt_result_ty
  */
 ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_expr *e, const char *format, ...);
 
-///////////////////////// XXXXXXXXXXXXXXXXXXXXXX
 /*
  * Set whether the start value for iterative expressions
  * is the initial value or computed
@@ -301,13 +478,6 @@ void ocrpt_expr_set_nth_result_long_value(opencreport *o, ocrpt_expr *e, int whi
 double ocrpt_expr_get_double_value(opencreport *o, ocrpt_expr *e);
 void ocrpt_expr_set_double_value(opencreport *o, ocrpt_expr *e, double d);
 void ocrpt_expr_set_nth_result_double_value(opencreport *o, ocrpt_expr *e, int which, double d);
-/*
- * Get the basic data type for ocrpt_result
- */
-bool ocrpt_result_isnull(ocrpt_result *result);
-bool ocrpt_result_isnumber(ocrpt_result *result);
-ocrpt_string *ocrpt_result_get_string(ocrpt_result *result);
-mpfr_ptr ocrpt_result_get_number(ocrpt_result *result);
 /*
  * Compare two subsequent row data in the expression,
  * return true if they are identical.
@@ -595,178 +765,6 @@ const ocrpt_paper *ocrpt_get_paper(opencreport *o);
  */
 const ocrpt_paper *ocrpt_paper_first(opencreport *o);
 const ocrpt_paper *ocrpt_paper_next(opencreport *o);
-
-/******************************************
- * Datasource and query related functions *
- ******************************************/
-
-/*
- * Add a custom datasource not covered by
- * the currently implemented sources.
- */
-ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const ocrpt_input *input);
-/*
- * Free a datasource from the opencreport structure it was added to
- */
-void ocrpt_datasource_free(opencreport *o, ocrpt_datasource *source);
-/*
- * Find the datasource using its name
- */
-ocrpt_datasource *ocrpt_datasource_get(opencreport *o, const char *source_name);
-/*
- * Validate the datasource pointer against the report structure
- */
-ocrpt_datasource *ocrpt_datasource_validate(opencreport *o, ocrpt_datasource *source);
-/*
- * Set the input encoding for a datasource
- */
-void ocrpt_datasource_set_encoding(opencreport *o, ocrpt_datasource *source, const char *encoding);
-/*
- * Add an array datasource
- *
- * Calling this is optional, as an array datasource called
- * "array" is automatically added to an opencreport structure.
- */
-ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, const char *source_name);
-/*
- * Set the global function pointer to resolve array and type array
- */
-typedef void (*ocrpt_query_discover_func)(const char *, void **, const char *, void **);
-void ocrpt_query_set_discover_func(ocrpt_query_discover_func func);
-/*
- * Default discovery function for data and type arrays
- */
-extern ocrpt_query_discover_func ocrpt_query_discover_array;
-/*
- * Discovery function for data and type arrays
- */
-void ocrpt_query_discover_array_c(const char *arrayname, void **array, const char *typesname, void **types);
-/*
- * Add an array query using the datasource pointer
- *
- * The array's first row contains the header names
- * and the number of rows is the number of data rows,
- * i.e. it's one less than the actual number of rows
- * in array.
- */
-ocrpt_query *ocrpt_query_add_array(opencreport *o, ocrpt_datasource *source,
-									const char *name, const char **array,
-									int32_t rows, int32_t cols,
-									const enum ocrpt_result_type *types);
-/*
- * Add a CSV datasource
- */
-ocrpt_datasource *ocrpt_datasource_add_csv(opencreport *o, const char *source_name);
-/*
- * Add a CSV query
- */
-ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource *source,
-									const char *name, const char *filename,
-									const enum ocrpt_result_type *types);
-/*
- * Add a JSON datasource
- */
-ocrpt_datasource *ocrpt_datasource_add_json(opencreport *o, const char *source_name);
-/*
- * Add a JSON query
- */
-ocrpt_query *ocrpt_query_add_json(opencreport *o, ocrpt_datasource *source,
-									const char *name, const char *filename,
-									const enum ocrpt_result_type *types);
-/*
- * Add an XML datasource
- */
-ocrpt_datasource *ocrpt_datasource_add_xml(opencreport *o, const char *source_name);
-/*
- * Add a XML query
- */
-ocrpt_query *ocrpt_query_add_xml(opencreport *o, ocrpt_datasource *source,
-									const char *name, const char *filename,
-									const enum ocrpt_result_type *types);
-/*
- * Add a PostgreSQL datasource using separate connection parameters
- */
-ocrpt_datasource *ocrpt_datasource_add_postgresql(opencreport *o, const char *source_name,
-												const char *host, const char *port, const char *dbname,
-												const char *user, const char *password);
-/*
- * Add a PostgreSQL datasource using a connection info string
- */
-ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o, const char *source_name, const char *conninfo);
-/*
- * Add a PostgreSQL query
- */
-ocrpt_query *ocrpt_query_add_postgresql(opencreport *o, ocrpt_datasource *source, const char *name, const char *querystr);
-/*
- * Add a MariaDB/MySQL datasource using separate connection parameters
- */
-ocrpt_datasource *ocrpt_datasource_add_mariadb(opencreport *o, const char *source_name,
-												const char *host, const char *port, const char *dbname,
-												const char *user, const char *password, const char *unix_socket);
-/*
- * Add a MariaDB/MySQL datasource using an option file and group settings
- * If the option file is NULL, the default option files are used.
- */
-ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, const char *source_name, const char *optionfile, const char *group);
-/*
- * Add a MariaDB/MySQL query
- */
-ocrpt_query *ocrpt_query_add_mariadb(opencreport *o, ocrpt_datasource *source, const char *name, const char *querystr);
-/*
- * Add an ODBC datasource using separate connection parameters
- */
-ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const char *source_name,
-											const char *dbname, const char *user, const char *password);
-/*
- * Add an ODBC datasource using a connection info string
- */
-ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, const char *source_name, const char *conninfo);
-/*
- * Add an ODBC query
- */
-ocrpt_query *ocrpt_query_add_odbc(opencreport *o, ocrpt_datasource *source, const char *name, const char *querystr);
-/*
- * Find a query using its name
- */
-ocrpt_query *ocrpt_query_get(opencreport *o, const char *name);
-/*
- * Return the query result array and the number of columns in it
- *
- * It must be re-run for every new data source row since
- * the pointer is invalidated after ocrpt_query_navigate_next()
- */
-ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_t *cols);
-/*
- * Get query result name, data and isnull
- */
-const char *ocrpt_query_result_column_name(ocrpt_query_result *qr, int32_t col);
-ocrpt_result *ocrpt_query_result_column_result(ocrpt_query_result *qr, int32_t col);
-
-/*
- * Add follower query with a match function
- */
-bool ocrpt_query_add_follower_n_to_1(opencreport *o,
-									ocrpt_query *leader,
-									ocrpt_query *follower,
-									ocrpt_expr *match);
-/*
- * Add follower query (runs side-by-side with "leader")
- */
-bool ocrpt_query_add_follower(opencreport *o,
-									ocrpt_query *leader,
-									ocrpt_query *follower);
-/*
- * Free a query and remove it from follower references
- */
-void ocrpt_query_free(opencreport *o, ocrpt_query *q);
-/*
- * Start query navigation from the beginning of the resultset
- */
-void ocrpt_query_navigate_start(opencreport *o, ocrpt_query *q);
-/*
- * Move to next row in the query resultset
- */
-bool ocrpt_query_navigate_next(opencreport *o, ocrpt_query *q);
 
 /********************************************************
  * Functions related to report and report part handling *

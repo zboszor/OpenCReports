@@ -324,37 +324,29 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 
 	ds = ocrpt_datasource_get(o, datasource_s);
 	if (ds) {
-		switch (ds->input->type) {
-		case OCRPT_INPUT_ARRAY:
+		if (ds->input == &ocrpt_array_input) {
 			ocrpt_query_discover_array(value_s, &arrayptr, coltypes_s, &coltypesptr);
 			if (arrayptr)
 				q = ocrpt_query_add_array(o, ds, name_s, arrayptr, rows_i, cols_i, coltypesptr);
 			else
 				fprintf(stderr, "Cannot determine array pointer for array query\n");
-			break;
-		case OCRPT_INPUT_CSV:
+		} else if (ds->input == &ocrpt_csv_input) {
 			ocrpt_query_discover_array(NULL, NULL, coltypes_s, &coltypesptr);
 			q = ocrpt_query_add_csv(o, ds, name_s, value_s, coltypesptr);
-			break;
-		case OCRPT_INPUT_JSON:
+		} else if (ds->input == &ocrpt_json_input) {
 			ocrpt_query_discover_array(NULL, NULL, coltypes_s, &coltypesptr);
 			q = ocrpt_query_add_json(o, ds, name_s, value_s, coltypesptr);
-			break;
-		case OCRPT_INPUT_XML:
+		} else if (ds->input == &ocrpt_xml_input) {
 			ocrpt_query_discover_array(NULL, NULL, coltypes_s, &coltypesptr);
 			q = ocrpt_query_add_xml(o, ds, name_s, value_s, coltypesptr);
-			break;
-		case OCRPT_INPUT_POSTGRESQL:
+		} else if (ds->input == &ocrpt_postgresql_input)
 			q = ocrpt_query_add_postgresql(o, ds, name_s, value_s);
-			break;
-		case OCRPT_INPUT_MARIADB:
+		else if (ds->input == &ocrpt_mariadb_input)
 			q = ocrpt_query_add_mariadb(o, ds, name_s, value_s);
-			break;
-		case OCRPT_INPUT_ODBC:
+		else if (ds->input == &ocrpt_odbc_input)
 			q = ocrpt_query_add_odbc(o, ds, name_s, value_s);
-			break;
-		default:
-			break;
+		else {
+			/* TODO: externally defined  input driver */
 		}
 	}
 

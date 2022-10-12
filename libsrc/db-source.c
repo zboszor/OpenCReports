@@ -101,7 +101,6 @@ static void ocrpt_postgresql_describe(ocrpt_query *query, ocrpt_query_result **q
 		for (i = 0; i < result->cols; i++) {
 			enum ocrpt_result_type type;
 
-			/* TODO: Handle date/time/interval types */
 			switch (PQftype(res, i)) {
 			case 16: /* bool */
 			case 20: /* int8 */
@@ -284,8 +283,7 @@ static void ocrpt_postgresql_close(const ocrpt_datasource *ds) {
 	PQfinish(conn);
 }
 
-static const ocrpt_input ocrpt_postgresql_input = {
-	.type = OCRPT_INPUT_POSTGRESQL,
+const ocrpt_input ocrpt_postgresql_input = {
 	.describe = ocrpt_postgresql_describe,
 	.rewind = ocrpt_postgresql_rewind,
 	.next = ocrpt_postgresql_next,
@@ -365,7 +363,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_postgresql(opencreport *o, ocrpt_dat
 		return NULL;
 	}
 
-	if (source->input->type != OCRPT_INPUT_POSTGRESQL) {
+	if (source->input != &ocrpt_postgresql_input) {
 		fprintf(stderr, "%s: datasource is not a PostgreSQL source\n", __func__);
 		return NULL;
 	}
@@ -569,8 +567,7 @@ static void ocrpt_mariadb_close(const ocrpt_datasource *ds) {
 	mysql_close(mysql);
 }
 
-static const ocrpt_input ocrpt_mariadb_input = {
-	.type = OCRPT_INPUT_MARIADB,
+const ocrpt_input ocrpt_mariadb_input = {
 	.describe = ocrpt_mariadb_describe,
 	.rewind = ocrpt_mariadb_rewind,
 	.next = ocrpt_mariadb_next,
@@ -654,7 +651,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_mariadb(opencreport *o, ocrpt_dataso
 		return NULL;
 	}
 
-	if (source->input->type != OCRPT_INPUT_MARIADB) {
+	if (source->input != &ocrpt_mariadb_input) {
 		fprintf(stderr, "%s:%d: datasource is not a MariaDB source\n", __func__, __LINE__);
 		return NULL;
 	}
@@ -785,7 +782,6 @@ static ocrpt_query_result *ocrpt_odbc_describe_early(ocrpt_query *query) {
 				result->coldata = string;
 		}
 
-		/* TODO: Handle date/time/interval types */
 		switch (col_type) {
 		case SQL_TINYINT:
 		case SQL_SMALLINT:
@@ -982,8 +978,7 @@ static void ocrpt_odbc_close(const ocrpt_datasource *ds) {
 	ocrpt_mem_free(priv);
 }
 
-static const ocrpt_input ocrpt_odbc_input = {
-	.type = OCRPT_INPUT_ODBC,
+const ocrpt_input ocrpt_odbc_input = {
 	.describe = ocrpt_odbc_describe,
 	.rewind = ocrpt_odbc_rewind,
 	.next = ocrpt_odbc_next,
@@ -1129,7 +1124,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_odbc(opencreport *o, ocrpt_datasourc
 		return NULL;
 	}
 
-	if (source->input->type != OCRPT_INPUT_ODBC) {
+	if (source->input != &ocrpt_odbc_input) {
 		fprintf(stderr, "%s:%d: datasource is not an ODBC source\n", __func__, __LINE__);
 		return NULL;
 	}

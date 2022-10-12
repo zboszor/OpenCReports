@@ -13,6 +13,14 @@
 
 #include "opencreport.h"
 
+extern const ocrpt_input ocrpt_postgresql_input;
+extern const ocrpt_input ocrpt_mariadb_input;
+extern const ocrpt_input ocrpt_odbc_input;
+extern const ocrpt_input ocrpt_array_input;
+extern const ocrpt_input ocrpt_csv_input;
+extern const ocrpt_input ocrpt_json_input;
+extern const ocrpt_input ocrpt_xml_input;
+
 struct ocrpt_datasource {
 	opencreport *o;
 	const ocrpt_input *input;
@@ -44,13 +52,13 @@ struct ocrpt_query {
 	bool navigation_failed;
 };
 
-typedef struct ocrpt_query ocrpt_query;
-
 struct ocrpt_query_follower {
 	ocrpt_query *follower;
 	ocrpt_expr *expr;
 };
 typedef struct ocrpt_query_follower ocrpt_query_follower;
+
+ocrpt_datasource *ocrpt_datasource_validate(opencreport *o, ocrpt_datasource *source);
 
 ocrpt_query *ocrpt_query_alloc(opencreport *o, const ocrpt_datasource *source, const char *name);
 
