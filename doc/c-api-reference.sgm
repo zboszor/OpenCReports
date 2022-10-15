@@ -536,155 +536,6 @@ ocrpt_query_result_column_result(ocrpt_query_result *qr,
 				</para>
 			</sect3>
 			<sect3>
-				<title><literal>Detect whether a column result is NULL</literal></title>
-				<para>
-					Using the <literal>ocrpt_result *</literal>
-					result from
-					<literal>ocrpt_query_result_column_result()</literal>,
-					detect whether the column value is NULL.
-					<programlisting>bool
-ocrpt_result_isnull(ocrpt_result *result);</programlisting>
-				</para>
-			</sect3>
-			<sect3>
-				<title><literal>Detect whether a column result is numeric</literal></title>
-				<para>
-					Using the <literal>ocrpt_result *</literal>
-					result from
-					<literal>ocrpt_query_result_column_result()</literal>,
-					detect whether the column value is numeric.
-					<programlisting>bool
-ocrpt_result_isnumber(ocrpt_result *result);</programlisting>
-				</para>
-			</sect3>
-			<sect3>
-				<title><literal>Get the numeric value of a column result</literal></title>
-				<para>
-					Using the <literal>ocrpt_result *</literal>
-					result from
-					<literal>ocrpt_query_result_column_result()</literal>,
-					get the numeric column value. It returns  NULL
-					if the column is:
-					<itemizedlist>
-						<listitem override="bullet">
-							<para>
-								not a numeric result
-							</para>
-						</listitem>
-						<listitem override="bullet">
-							<para>
-								NULL
-							</para>
-						</listitem>
-					</itemizedlist>
-					<programlisting>mpfr_ptr
-ocrpt_result_get_number(ocrpt_result *result);</programlisting>
-				</para>
-			</sect3>
-			<sect3>
-				<title><literal>Detect whether a column result is string</literal></title>
-				<para>
-					Using the <literal>ocrpt_result *</literal>
-					result from
-					<literal>ocrpt_query_result_column_result()</literal>,
-					detect whether the column value is string.
-					<programlisting>bool
-ocrpt_result_isstring(ocrpt_result *result);</programlisting>
-				</para>
-			</sect3>
-			<sect3>
-				<title><literal>Get the string value of a column result</literal></title>
-				<para>
-					Using the <literal>ocrpt_result *</literal>
-					result from
-					<literal>ocrpt_query_result_column_result()</literal>,
-					get the string column value. It returns  NULL
-					if the column is
-					<itemizedlist>
-						<listitem override="bullet">
-							<para>
-								not a string result
-							</para>
-						</listitem>
-						<listitem override="bullet">
-							<para>
-								NULL
-							</para>
-						</listitem>
-					</itemizedlist>
-					<programlisting>ocrpt_string *
-ocrpt_result_get_string(ocrpt_result *result);</programlisting>
-				</para>
-			</sect3>
-			<sect3>
-				<title><literal>Detect whether a column result is datetime</literal></title>
-				<para>
-					Using the <literal>ocrpt_result *</literal>
-					result from
-					<literal>ocrpt_query_result_column_result()</literal>,
-					detect whether the column value is datetime.
-					<programlisting>bool
-ocrpt_result_isdatetime(ocrpt_result *result);</programlisting>
-				</para>
-			</sect3>
-			<sect3>
-				<title><literal>Get the datetime value of a column result</literal></title>
-				<para>
-					Using the <literal>ocrpt_result *</literal>
-					result from
-					<literal>ocrpt_query_result_column_result()</literal>,
-					get the datetime column value. It returns  NULL
-					if the column is
-					<itemizedlist>
-						<listitem override="bullet">
-							<para>
-								not a datetime result
-							</para>
-						</listitem>
-						<listitem override="bullet">
-							<para>
-								NULL
-							</para>
-						</listitem>
-					</itemizedlist>
-					<programlisting>const struct tm *
-ocrpt_result_get_datetime(ocrpt_result *result);</programlisting>
-				</para>
-			</sect3>
-			<sect3>
-				<title><literal>Detect whether a datetime column result is interval</literal></title>
-				<para>
-					Using the <literal>ocrpt_result *</literal>
-					result from
-					<literal>ocrpt_query_result_column_result()</literal>,
-					detect whether the datetime column value is interval.
-					<programlisting>bool
-ocrpt_result_datetime_is_interval(ocrpt_result *result);</programlisting>
-				</para>
-			</sect3>
-			<sect3>
-				<title><literal>Detect whether a datetime column result has valid date</literal></title>
-				<para>
-					Using the <literal>ocrpt_result *</literal>
-					result from
-					<literal>ocrpt_query_result_column_result()</literal>,
-					detect whether the datetime column value has valid date.
-					<programlisting>bool
-ocrpt_result_datetime_is_date_valid(ocrpt_result *result);</programlisting>
-				</para>
-			</sect3>
-			<sect3>
-				<title><literal>Detect whether a datetime column result has valid time</literal></title>
-				<para>
-					Using the <literal>ocrpt_result *</literal>
-					result from
-					<literal>ocrpt_query_result_column_result()</literal>,
-					detect whether the datetime column value has valid time.
-					<programlisting>bool
-ocrpt_result_datetime_is_time_valid(ocrpt_result *result);</programlisting>
-				</para>
-			</sect3>
-			<sect3>
 				<title><literal>Add a follower query</literal></title>
 				<para>
 					Add a <literal>follower</literal> query to the
@@ -809,10 +660,11 @@ ocrpt_query_discover_array_c(const char *arrayname,
 					to this <literal>ocrpt_report</literal>, i.e.
 					it will be freed automatically with
 					<literal>ocrpt_free()</literal>.
-					<programlisting>ocrpt_expr *ocrpt_expr_parse(opencreport *o,
-                             ocrpt_report *r,
-                             const char *str,
-                             char **err);</programlisting>
+					<programlisting>ocrpt_expr *
+ocrpt_expr_parse(opencreport *o,
+                 ocrpt_report *r,
+                 const char *str,
+                 char **err);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -825,9 +677,10 @@ ocrpt_query_discover_array_c(const char *arrayname,
 					bound to a report when it was parsed, as it will be
 					automatically freed when freeing either the report,
 					or the global <literal>opencreport</literal> structure.
-					<programlisting>void ocrpt_expr_free(opencreport *o,
-                     ocrpt_report *r,
-                     ocrpt_expr *e);</programlisting>
+					<programlisting>void
+ocrpt_expr_free(opencreport *o,
+                ocrpt_report *r,
+                ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -837,9 +690,10 @@ ocrpt_query_discover_array_c(const char *arrayname,
 					references in the expression. This is needed
 					to bind query columns to expressions that
 					use them.
-					<programlisting>void ocrpt_expr_resolve(opencreport *o,
-                        ocrpt_report *r,
-                        ocrpt_expr *e);</programlisting>
+					<programlisting>void
+ocrpt_expr_resolve(opencreport *o,
+                   ocrpt_report *r,
+                   ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -848,9 +702,10 @@ ocrpt_query_discover_array_c(const char *arrayname,
 					This function optimizes an expression so
 					it may needs fewer computation steps during
 					report execution.
-					<programlisting>void ocrpt_expr_optimize(opencreport *o,
-                         ocrpt_report *r,
-                         ocrpt_expr *e);</programlisting>
+					<programlisting>void
+ocrpt_expr_optimize(opencreport *o,
+                    ocrpt_report *r,
+                    ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -868,9 +723,10 @@ ocrpt_query_discover_array_c(const char *arrayname,
 					this function must be called after
 					<literal>ocrpt_query_navigate_next</literal>
 					otherwise the result is not valid.
-					<programlisting>ocrpt_result *ocrpt_expr_eval(opencreport *o,
-                              ocrpt_report *r,
-                              ocrpt_expr *e);</programlisting>
+					<programlisting>ocrpt_result *
+ocrpt_expr_eval(opencreport *o,
+                ocrpt_report *r,
+                ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -882,8 +738,9 @@ ocrpt_query_discover_array_c(const char *arrayname,
 					<literal>ocrpt_result_free()</literal>.
 					It will be done by <literal>ocrpt_expr_free()</literal>.
 					Used by unit tests.
-					<programlisting>ocrpt_result *ocrpt_expr_get_result(opencreport *o,
-                                    ocrpt_expr *e);</programlisting>
+					<programlisting>ocrpt_result *
+ocrpt_expr_get_result(opencreport *o,
+                      ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -891,8 +748,9 @@ ocrpt_query_discover_array_c(const char *arrayname,
 				<para>
 					Print an expression tree in its processed form on the
 					standard output. Used by unit tests.
-					<programlisting>void ocrpt_expr_print(opencreport *o,
-                      ocrpt_expr *e);</programlisting>
+					<programlisting>void
+ocrpt_expr_print(opencreport *o,
+                 ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -901,8 +759,9 @@ ocrpt_query_discover_array_c(const char *arrayname,
 					Print an expression tree with subexpressions
 					and their results in its processed form on the
 					standard output. Used by unit tests.
-					<programlisting>void ocrpt_expr_result_deep_print(opencreport *o,
-                                  ocrpt_expr *e);</programlisting>
+					<programlisting>void
+ocrpt_expr_result_deep_print(opencreport *o,
+                             ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -910,7 +769,8 @@ ocrpt_query_discover_array_c(const char *arrayname,
 				<para>
 					This function returns the number of expression nodes.
 					Used by unit tests to validate optimizazion.
-					<programlisting>int32_t ocrpt_expr_nodes(ocrpt_expr *e);</programlisting>
+					<programlisting>int32_t
+ocrpt_expr_nodes(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -946,79 +806,568 @@ ocrpt_expr_make_error_result(opencreport *o,
                              const char *format, ...);</programlisting>
 				</para>
 			</sect3>
+			<sect3>
+				<title>Set start value flag for an iterative expression</title>
+				<para>
+					Set whether the iterative expression's first
+					value is computed from its base expression
+					or from its result expression.
+					<programlisting>void
+ocrpt_expr_set_iterative_start_value(ocrpt_expr *e,
+                                     bool start_with_init);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get current value of an expression in base type</title>
+				<para>
+					Get the current value of an expression in a C base
+					type. Used by parsing report description XML files
+					and unit tests.
+					<programlisting>const char *
+ocrpt_expr_get_string_value(opencreport *o,
+                            ocrpt_expr *e);
+
+long
+ocrpt_expr_get_long_value(opencreport *o,
+                          ocrpt_expr *e);
+
+double
+ocrpt_expr_get_double_value(opencreport *o,
+                            ocrpt_expr *e);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set current value of an expression in a base type</title>
+				<para>
+					Used by unit tests.
+					<programlisting>void
+ocrpt_expr_set_string_value(opencreport *o,
+                            ocrpt_expr *e,
+                            const char *s);
+
+void
+ocrpt_expr_set_long_value(opencreport *o,
+                          ocrpt_expr *e,
+                          long l);
+
+void
+ocrpt_expr_set_double_value(opencreport *o,
+                            ocrpt_expr *e,
+                            double d);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set nth value of an expression in a base type</title>
+				<para>
+					Expressions use <literal>OCRPT_EXPR_RESULTS</literal>
+					number of values. With these functions, any of them
+					can be set. Used by unit tests.
+					<programlisting>void
+ocrpt_expr_set_nth_result_string_value(opencreport *o,
+                                       ocrpt_expr *e,
+                                       int which,
+                                       const char *s);
+
+void
+ocrpt_expr_set_nth_result_long_value(opencreport *o,
+                                     ocrpt_expr *e,
+                                     int which,
+                                     long l);
+
+void
+ocrpt_expr_set_nth_result_double_value(opencreport *o,
+                                       ocrpt_expr *e,
+                                       int which,
+                                       double d);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Compare current and previous values of and expression</title>
+				<para>
+					Compare current and previous values of and expression
+					and return <literal>true</literal> if they are equal.
+					It's used to implement <xref linkend="breaks"/>.
+					<programlisting>bool
+ocrpt_expr_cmp_results(opencreport *o,
+                       ocrpt_expr *e);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set delayed flag of an expression</title>
+				<para>
+					<programlisting>void
+ocrpt_expr_set_delayed(opencreport *o,
+                       ocrpt_expr *e,
+                       bool delayed);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set field expression reference for an expression</title>
+				<para>
+					If <literal>e</literal> contains <literal>r.value</literal>,
+					the expression <literal>rvalue</literal> will be used to
+					resolve this reference.
+					<programlisting>void
+ocrpt_expr_set_field_expr(opencreport *o,
+                          ocrpt_expr *e,
+                          ocrpt_expr *rvalue);</programlisting>
+				</para>
+			</sect3>
 		</sect2>
-	</sect1>
-	<sect1>
-		<title>Paper size related functions</title>
-		<para>
-			Paper size in OpenCReports is handled via
-			<ulink url="http://packages.qa.debian.org/libp/libpaper.html">libpaper</ulink>.
-		</para>
-		<para>
-			This structure is used in OpenCReports to represent
-			paper name and size:
-			<programlisting>struct ocrpt_paper {
+		<sect2>
+			<title>Column data or expression result related functions</title>
+			<para>
+				The internal type <literal>ocrpt_result</literal> holds
+				values either for query columns or expression results.
+			</para>
+			<sect3>
+				<title>Create an expression result</title>
+				<para>
+					The returned pointer must be freed with
+					<literal>ocrpt_result_free()</literal>.
+					<programlisting>ocrpt_result *
+ocrpt_result_new(void);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get expression result type</title>
+				<para>
+					<programlisting>enum ocrpt_result_type
+ocrpt_result_get_type(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Copy an expression result</title>
+				<para>
+					Some internal data is specific to the
+					<literal>opencreport</literal> structure.
+					<programlisting>void
+ocrpt_result_copy(opencreport *o,
+                  ocrpt_result *dst,
+                  ocrpt_result *src);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Print an expression result</title>
+				<para>
+					Used by unit tests.
+					<programlisting>void
+ocrpt_result_print(ocrpt_result *r);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Free an expression result</title>
+				<para>
+					<programlisting>void
+ocrpt_result_free(ocrpt_result *r);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Detect whether a column result is NULL</title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from a query column or an expression,
+					detect whether the column value is NULL.
+					<programlisting>bool
+ocrpt_result_isnull(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Detect whether a column result is numeric</title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from a query column or an expression,
+					detect whether the column value is numeric.
+					<programlisting>bool
+ocrpt_result_isnumber(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get the numeric value of a column result</title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from a query column or an expression,
+					get the numeric column value. It returns  NULL
+					if the column is:
+					<itemizedlist>
+						<listitem override="bullet">
+							<para>
+								not a numeric result
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								NULL
+							</para>
+						</listitem>
+					</itemizedlist>
+					<programlisting>mpfr_ptr
+ocrpt_result_get_number(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Detect whether a column result is string</title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from a query column or an expression,
+					detect whether the column value is string.
+					<programlisting>bool
+ocrpt_result_isstring(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get the string value of a column result</title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from a query column or an expression,
+					get the string column value. It returns  NULL
+					if the column is
+					<itemizedlist>
+						<listitem override="bullet">
+							<para>
+								not a string result
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								NULL
+							</para>
+						</listitem>
+					</itemizedlist>
+					<programlisting>ocrpt_string *
+ocrpt_result_get_string(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Detect whether a column result is datetime</title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from a query column or an expression,
+					detect whether the column value is datetime.
+					<programlisting>bool
+ocrpt_result_isdatetime(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get the datetime value of a column result</title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from a query column or an expression,
+					get the datetime column value. It returns  NULL
+					if the column is
+					<itemizedlist>
+						<listitem override="bullet">
+							<para>
+								not a datetime result
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								NULL
+							</para>
+						</listitem>
+					</itemizedlist>
+					<programlisting>const struct tm *
+ocrpt_result_get_datetime(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Detect whether a datetime column result is interval</title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from a query column or an expression,
+					detect whether the datetime column value is interval.
+					<programlisting>bool
+ocrpt_result_datetime_is_interval(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Detect whether a datetime column result has valid date</title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from a query column or an expression,
+					detect whether the datetime column value has valid date.
+					<programlisting>bool
+ocrpt_result_datetime_is_date_valid(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Detect whether a datetime column result has valid time</title>
+				<para>
+					Using the <literal>ocrpt_result *</literal>
+					result from a query column or an expression,
+					detect whether the datetime column value has valid time.
+					<programlisting>bool
+ocrpt_result_datetime_is_time_valid(ocrpt_result *result);</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Variable related functions</title>
+			<para>
+				Variables can be created for a report using
+				the API.
+			</para>
+			<sect3>
+				<title>Create a basic variable</title>
+				<para>
+					Using this function, any variable type except
+					<literal>OCRPT_VARIABLE_CUSTOM</literal>
+					may be created. For a custom variable,
+					see the next function.
+					<programlisting>enum ocrpt_var_type {
+    OCRPT_VARIABLE_EXPRESSION,
+    OCRPT_VARIABLE_COUNT,
+    OCRPT_VARIABLE_COUNTALL,
+    OCRPT_VARIABLE_SUM,
+    OCRPT_VARIABLE_AVERAGE,
+    OCRPT_VARIABLE_AVERAGEALL,
+    OCRPT_VARIABLE_LOWEST,
+    OCRPT_VARIABLE_HIGHEST,
+    OCRPT_VARIABLE_CUSTOM
+};
+typedef enum ocrpt_var_type ocrpt_var_type;
+
+ocrpt_var *
+ocrpt_variable_new(opencreport *o,
+                   ocrpt_report *r,
+                   ocrpt_var_type type,
+                   const char *name,
+                   const char *expr,
+                   const char *reset_on_break_name);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Create a custom variable</title>
+				<para>
+					Create a custom variable of the specified type
+					with the specified subexpressions.
+					<programlisting>ocrpt_var *
+ocrpt_variable_new_full(opencreport *o,
+                        ocrpt_report *r,
+                        enum ocrpt_result_type type,
+                        const char *name,
+                        const char *baseexpr,
+                        const char *intermedexpr,
+                        const char *intermed2expr,
+                        const char *resultexpr,
+                        const char *reset_on_break_name);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get subexpressions of a variable</title>
+				<para>
+					Get subexpressions of a previously created
+					basic or custom variable.
+					<programlisting>ocrpt_expr *
+ocrpt_variable_baseexpr(ocrpt_var *v);
+
+ocrpt_expr *
+ocrpt_variable_intermedexpr(ocrpt_var *v);
+
+ocrpt_expr *
+ocrpt_variable_intermed2expr(ocrpt_var *v);
+
+ocrpt_expr *
+ocrpt_variable_resultexpr(ocrpt_var *v);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set precalculate flag for a variable</title>
+				<para>
+					<programlisting>void
+ocrpt_variable_set_precalculate(ocrpt_var *var, 
+                                bool value);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Resolve a variable</title>
+				<para>
+					Resolve subexpressions of a variable
+					so it can be evaluated correctly.
+					<programlisting>void
+ocrpt_variable_resolve(opencreport *o,
+                       ocrpt_report *r,
+                       ocrpt_var *v);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Evaluate a variable</title>
+				<para>
+					After evaluation, the result is in the
+					expression returned by
+					<literal>ocrpt_variable_resultexpr()</literal>.
+					<programlisting>void
+ocrpt_variable_evaluate(opencreport *o,
+                        ocrpt_report *r, ocrpt_var *v);</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Function related functions</title>
+			<sect3>
+				<title>Add a user defined function</title>
+				<para>
+					Add a user defined function by specifying
+					the name, the function pointer that contains
+					the implementation, the number of operands
+					(0 or greater for fixed number or operands,
+					-1 is varying number of operands) and
+					the function mathematical properties
+					that help optimizing it.
+					<programlisting>bool
+ocrpt_function_add(opencreport *o,
+                   const char *fname,
+                   ocrpt_function_call func,
+                   int32_t n_ops,
+                   bool commutative,
+                   bool associative,
+                   bool left_associative,
+                   bool dont_optimize);</programlisting>
+				</para>
+				<para>
+					Adding a user defined function with
+					a name of a pre-existing function will
+					override it.
+				</para>
+				<para>
+					OpenCReports functions are called with the
+					parameters as declared below.
+					<programlisting>#define OCRPT_FUNCTION_PARAMS \
+    opencreport *o, \
+    ocrpt_report *r OCRPT_UNUSED_PARAM, \
+    ocrpt_expr *e</programlisting>
+				</para>
+				<para>
+					OpenCReports functions may be declared
+					with these convenience symbols below.
+					<programlisting>#define OCRPT_FUNCTION(name) \
+    void name(OCRPT_FUNCTION_PARAMS)
+
+#define OCRPT_STATIC_FUNCTION(name) \
+    static void name(OCRPT_FUNCTION_PARAMS)</programlisting>
+				</para>
+				<para>
+					The above function
+					(<literal>ocrpt_function_add()</literal>)
+					is called with a function pointer which has
+					this type:
+					<programlisting>typedef void
+(*ocrpt_function_call)(OCRPT_FUNCTION_PARAMS);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Find a named function</title>
+				<para>
+					<programlisting>const ocrpt_function *
+ocrpt_function_get(opencreport *o,
+                   const char *fname);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get number of operands for an expression (function)</title>
+				<para>
+					In an expression tree, functions
+					are represented as subexpressions with
+					operands. This call may be used by OpenCReports
+					functions to inspect whether the number of
+					operands is in the expected range.
+					<programlisting>int32_t
+ocrpt_expr_get_num_operands(ocrpt_expr *e);
+</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get current value of a function operand</title>
+				<para>
+					This function is used by OpenCReports functions
+					internally to compute the result from its
+					operands.
+					<programlisting>ocrpt_result *
+ocrpt_expr_operand_get_result(opencreport *o,
+                              ocrpt_expr *e,
+                              int32_t opnum);</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Paper size related functions</title>
+			<para>
+				Paper size in OpenCReports is handled via
+				<ulink url="http://packages.qa.debian.org/libp/libpaper.html">libpaper</ulink>.
+			</para>
+			<para>
+				This structure is used in OpenCReports to represent
+				paper name and size:
+				<programlisting>struct ocrpt_paper {
     const char *name;
     double width;
     double height;
 };
 typedef struct ocrpt_paper ocrpt_paper;</programlisting>
-		</para>
-		<sect2>
-			<title><literal>ocrpt_get_system_paper</literal></title>
-			<para>
-				Get the system default <literal>ocrpt_paper</literal>.
-				<programlisting>const ocrpt_paper *ocrpt_get_system_paper(void);</programlisting>
 			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_get_paper_by_name</literal></title>
-			<para>
-				Get paper size of the specified paper name.
-				<programlisting>const ocrpt_paper *ocrpt_get_paper_by_name(const char *paper);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_set_paper</literal></title>
-			<para>
-				Set paper for the report using an <literal>ocrpt_paper</literal> structure.
-				The contents of the structure is copied.
-				<programlisting>void ocrpt_set_paper(opencreport *o, const ocrpt_paper *paper);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_set_paper_by_name</literal></title>
-			<para>
-				Set paper for the report using a paper name.
-				If the paper name is unknown, the system default paper is set.
-				<programlisting>void ocrpt_set_paper_by_name(opencreport *o, const char *paper);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_get_paper</literal></title>
-			<para>
-				Get the report's currently set paper.
-				<programlisting>const ocrpt_paper *ocrpt_get_paper(opencreport *o);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_paper_first</literal></title>
-			<para>
-				Start an iterator for supported paper names and sizes.
-				The returned paper structures are library-global but
-				the iterator is per report handler. Only one iterator
-				per report handler can be run at a time.
-				<programlisting>const ocrpt_paper *ocrpt_paper_first(opencreport *o);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
-			<title><literal>ocrpt_paper_next</literal></title>
-			<para>
-				Get the next <literal>ocrpt_paper</literal> structure
-				in the iterator. It returns NULL when there is no more
-				paper known to the system.
-				<programlisting>const ocrpt_paper *ocrpt_paper_next(opencreport *o);</programlisting>
-			</para>
+			<sect3>
+				<title>Get the system default paper</title>
+				<para>
+					<programlisting>const ocrpt_paper *
+ocrpt_get_system_paper(void);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get the paper specified by name</title>
+				<para>
+					<programlisting>const ocrpt_paper *
+ocrpt_get_paper_by_name(const char *paper);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set the global paper</title>
+				<para>
+					Set global paper using an
+					<literal>ocrpt_paper</literal> structure.
+					The contents of the structure is copied.
+					<programlisting>void
+ocrpt_set_paper(opencreport *o,
+                const ocrpt_paper *paper);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set global paper specified by name</title>
+				<para>
+					Set paper for the report using a paper name.
+					If the paper name is unknown, the system default paper is set.
+					<programlisting>void
+ocrpt_set_paper_by_name(opencreport *o,
+                        const char *paper);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get currently set global paper</title>
+				<para>
+					<programlisting>const ocrpt_paper *
+ocrpt_get_paper(opencreport *o);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Start iterator for paper sizes</title>
+				<para>
+					Start an iterator for supported paper names and sizes.
+					The returned paper structures are library-global but
+					the iterator is per report handler. Only one iterator
+					per report handler can be run at a time.
+					<programlisting>const ocrpt_paper *
+ocrpt_paper_first(opencreport *o);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get the next paper from the iterator</title>
+				<para>
+					Get the next <literal>ocrpt_paper</literal> structure
+					in the iterator. It returns NULL when there are no more
+					papers known to the system.
+					<programlisting>const ocrpt_paper *ocrpt_paper_next(opencreport *o);</programlisting>
+				</para>
+			</sect3>
 		</sect2>
 	</sect1>
 </chapter>
