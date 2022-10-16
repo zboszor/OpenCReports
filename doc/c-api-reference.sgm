@@ -1204,6 +1204,116 @@ ocrpt_variable_evaluate(opencreport *o,
 			</sect3>
 		</sect2>
 		<sect2>
+			<title>Break related functions</title>
+			<sect3>
+				<title>Create a break</title>
+				<para>
+					Create a break. No need to free it,
+					<literal>ocrpt_free()</literal> does it.
+					<programlisting>ocrpt_break *
+ocrpt_break_new(opencreport *o,
+                ocrpt_report *r,
+                const char *name);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set attribute flags for a break</title>
+				<para>
+					Set boolean attribute flags for a break,
+					either via explicit boolean value, or from
+					an expression. The flags are not actually used,
+					they are for RLIB compatibility.
+					<programlisting>enum ocrpt_break_attr_type {
+    OCRPT_BREAK_ATTR_NEWPAGE,
+    OCRPT_BREAK_ATTR_HEADERNEWPAGE,
+    OCRPT_BREAK_ATTR_SUPPRESSBLANK,
+    OCRPT_BREAK_ATTRS_COUNT
+};
+typedef enum ocrpt_break_attr_type ocrpt_break_attr_type;
+
+bool
+ocrpt_break_set_attribute(opencreport *o,
+                          ocrpt_report *r,
+                          ocrpt_break *br,
+                          const ocrpt_break_attr_type attr_type,
+                          bool value);
+
+bool
+ocrpt_break_set_attribute_from_expr(opencreport *o,
+                                    ocrpt_report *r,
+                                    ocrpt_break *br,
+                                    const ocrpt_break_attr_type attr_type,
+                                    ocrpt_expr *expr);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get break using its name</title>
+				<para>
+					Get the pointer to the break using its name.
+					<programlisting>ocrpt_break *
+ocrpt_break_get(opencreport *o,
+                ocrpt_report *r,
+                const char *name);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get the name of a break</title>
+				<para>
+					Get the name of the break using its structure
+					pointer.
+					<programlisting>const char *
+ocrpt_break_get_name(ocrpt_break *br);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a watched expression to a break</title>
+				<para>
+					<programlisting>bool
+ocrpt_break_add_breakfield(opencreport *o,
+                           ocrpt_report *r,
+                           ocrpt_break *br,
+                           ocrpt_expr *bf);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Iterate over breaks of a report</title>
+				<para>
+					Iterate over breaks of a report. The first call
+					needs the iterator list pointer to be set to NULL.
+					<programlisting>ocrpt_break *
+ocrpt_break_get_next(ocrpt_report *r,
+                     ocrpt_list **list);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Resolve and optimize break fields</title>
+				<para>
+					<programlisting>void
+ocrpt_break_resolve_fields(opencreport *o,
+                           ocrpt_report *r,
+                           ocrpt_break *br);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Check whether the break triggers</title>
+				<para>
+					<programlisting>bool
+ocrpt_break_check_fields(opencreport *o,
+                         ocrpt_report *r,
+                         ocrpt_break *br);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Reset variables for the break</title>
+				<para>
+					<programlisting>void
+ocrpt_break_reset_vars(opencreport *o,
+                       ocrpt_report *r,
+                       ocrpt_break *br);</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
 			<title>Function related functions</title>
 			<sect3>
 				<title>Add a user defined function</title>
@@ -1291,6 +1401,365 @@ ocrpt_expr_operand_get_result(opencreport *o,
 			</sect3>
 		</sect2>
 		<sect2>
+			<title>Report part and report related functions</title>
+			<sect3>
+				<title>Create a report part</title>
+				<para>
+					<programlisting>ocrpt_part *
+ocrpt_part_new(opencreport *o);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Create a row in a report part</title>
+				<para>
+					<programlisting>ocrpt_part_row *
+ocrpt_part_new_row(opencreport *o,
+                   ocrpt_part *p);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Create a column in report part row</title>
+				<para>
+					<programlisting>ocrpt_part_row_data *
+ocrpt_part_row_new_data(opencreport *o,
+                        ocrpt_part *p,
+                        ocrpt_part_row *pr);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Create a new report</title>
+				<para>
+					<programlisting>ocrpt_report *
+ocrpt_report_new(opencreport *o);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Append the new report to a column</title>
+				<para>
+					<programlisting>ocrpt_part *
+ocrpt_part_append_report(opencreport *o,
+                         ocrpt_part *p,
+                         ocrpt_part_row *pr,
+                         ocrpt_part_row_data *pd,
+                         ocrpt_report *r);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Report part related iterators</title>
+				<para>
+					Iterators for getting report parts, part rows,
+					columns in rows and reports in columns.
+					Every iterator function must be called
+					the first time with the list pointer set to NULL.
+					<programlisting>ocrpt_part *
+ocrpt_part_get_next(opencreport *o,
+                    ocrpt_list **list);
+
+ocrpt_part_row *
+ocrpt_part_row_get_next(ocrpt_part *p,
+                        ocrpt_list **list);
+
+ocrpt_part_row_data *
+ocrpt_part_row_data_get_next(ocrpt_part_row *pr,
+                             ocrpt_list **list);
+
+ocrpt_report *
+ocrpt_report_get_next(ocrpt_part_row_data *pd,
+                      ocrpt_list **list);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set the main query for a report</title>
+				<para>
+					Set the main query for a report either by
+					the query structure pointer, or by name.
+					<programlisting>void
+ocrpt_report_set_main_query(opencreport *o,
+                            ocrpt_report *r,
+                            const ocrpt_query *query);
+
+void
+ocrpt_report_set_main_query_by_name(opencreport *o,
+                                    ocrpt_report *r,
+                                    const char *query);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get the current row number of the main query</title>
+				<para>
+					The row number starts from 1.
+					<programlisting>long
+ocrpt_report_get_query_rownum(opencreport *o,
+                              ocrpt_report *r);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Resolve all report variables</title>
+				<para>
+					<programlisting>void
+ocrpt_report_resolve_variables(opencreport *o,
+                               ocrpt_report *r);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Evaluate all report variables</title>
+				<para>
+					<programlisting>void
+ocrpt_report_evaluate_variables(opencreport *o,
+                                ocrpt_report *r);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Resolve all report breaks</title>
+				<para>
+					<programlisting>void
+ocrpt_report_resolve_breaks(opencreport *o,
+                            ocrpt_report *r);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Resolve all report expressions</title>
+				<para>
+					<programlisting>void
+ocrpt_report_resolve_expressions(opencreport *o,
+                                 ocrpt_report *r);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Evaluate all report expressions</title>
+				<para>
+					<programlisting>void
+ocrpt_report_evaluate_expressions(opencreport *o,
+                                  ocrpt_report *r);</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Callback related functions</title>
+			<para>
+				Certain stages of the report execution can
+				notify the application about the stage
+				being executed or finished.
+			</para>
+			<para>
+				Every "add a callback" function below return
+				<literal>true</literal> for success,
+				<literal>false</literal> for failure.
+			</para>
+			<sect3>
+				<title>Add a "part added" callback</title>
+				<para>
+					<programlisting>typedef void
+(*ocrpt_part_cb)(opencreport *,
+                 ocrpt_part *,
+                 void *data);
+
+bool
+ocrpt_add_part_added_cb(opencreport *o,
+                        ocrpt_part_cb func,
+                        void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a "report added" callback</title>
+				<para>
+					<programlisting>typedef void
+(*ocrpt_report_cb)(opencreport *,
+                   ocrpt_report *,
+                   void *data);
+
+bool
+ocrpt_add_report_added_cb(opencreport *o,
+                          ocrpt_report_cb func,
+                          void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a "part iteration" callback</title>
+				<para>
+					<programlisting>bool
+ocrpt_add_part_iteration_cb(opencreport *o,
+                            ocrpt_part_cb func,
+                            void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add an "all precalculations done" callback</title>
+				<para>
+					<programlisting>typedef void
+(*ocrpt_cb)(opencreport *,
+            void *data);
+
+bool
+ocrpt_add_precalculation_done_cb(opencreport *o,
+                                 ocrpt_cb func,
+                                 void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a "report started" callback</title>
+				<para>
+					<programlisting>bool
+ocrpt_report_add_start_cb(opencreport *o,
+                          ocrpt_report *r,
+                          ocrpt_report_cb func,
+                          void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a "report done" callback</title>
+				<para>
+					<programlisting>bool
+ocrpt_report_add_done_cb(opencreport *o,
+                         ocrpt_report *r,
+                         ocrpt_report_cb func,
+                         void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a "new row" callback</title>
+				<para>
+					<programlisting>bool
+ocrpt_report_add_new_row_cb(opencreport *o,
+                            ocrpt_report *r,
+                            ocrpt_report_cb func,
+                            void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a "report iteration done" callback</title>
+				<para>
+					<programlisting>bool
+ocrpt_report_add_iteration_cb(opencreport *o,
+                              ocrpt_report *r,
+                              ocrpt_report_cb func,
+                              void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a "report precalculation done" callback</title>
+				<para>
+					<programlisting>bool
+ocrpt_report_add_precalculation_done_cb(opencreport *o,
+                                        ocrpt_report *r,
+                                        ocrpt_report_cb func,
+                                        void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a "break triggers" callback</title>
+				<para>
+					<programlisting>typedef void
+(*ocrpt_break_trigger_cb)(opencreport *,
+                          ocrpt_report *,
+                          ocrpt_break *,
+                          void *);
+
+bool
+ocrpt_break_add_trigger_cb(opencreport *o,
+                           ocrpt_report *r,
+                           ocrpt_break *br,
+                           ocrpt_break_trigger_cb func,
+                           void *data);</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Environment related functions</title>
+			<sect3>
+				<title>Indirect function to get an environment variable</title>
+				<para>
+					<programlisting>typedef ocrpt_result *
+(*ocrpt_environment_query_func)(const char *);
+
+extern ocrpt_environment_query_func
+ocrpt_environment_get;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set the environment query function</title>
+				<para>
+					<programlisting>void
+ocrpt_environment_set_query_func(ocrpt_environment_query_func func);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>C API environment query function</title>
+				<para>
+					<programlisting>ocrpt_result *
+ocrpt_environment_get_c(const char *env);</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>File handling related functions</title>
+			<sect3>
+				<title>Return a canonical file path</title>
+				<para>
+					The returned path contains only single
+					directory separators and doesn't contains
+					symlinks.
+					<programlisting>char *
+ocrpt_canonicalize_path(const char *path);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add search path</title>
+				<para>
+					Add a new directory path to the list of
+					search paths. It's useful to find files
+					referenced with relative path.
+					<programlisting>void
+ocrpt_add_search_path(opencreport *o,
+                      const char *path);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Find a file</title>
+				<para>
+					Find a file and return the canonicalized path to it.
+					This function takes the search paths into account.
+					<programlisting>char *
+ocrpt_find_file(opencreport *o,
+                const char *filename);</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Color related functions</title>
+			<sect3>
+				<title>Find a color by its name</title>
+				<para>
+					The function fills in the
+					<literal>ocrpt_color</literal> structure with
+					RGB values in Cairo values (0.0 ... 1.0).
+				</para>
+				<para>
+					If the color name starts with
+					<literal>#</literal> or <literal>0x</literal> or
+					<literal>0X</literal> then it must be in HTML
+					notation.
+				</para>
+				<para>
+					Otherwise, the color name is looked up in the
+					color name database in a case insensitive way.
+					If found, the passed-in ocrpt_color structure is
+					filled with the RGB color value of that name.
+				</para>
+				<para>
+					If not found or the passed-in color name is NULL,
+					depending on the the expected usage (foreground
+					or background color), the <literal>ocrpt_color</literal>
+					structure is filled with either white or black.
+					<programlisting>void
+ocrpt_get_color(opencreport *o,
+                const char *cname,
+                ocrpt_color *color,
+                bool bgcolor);</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
 			<title>Paper size related functions</title>
 			<para>
 				Paper size in OpenCReports is handled via
@@ -1349,23 +1818,343 @@ ocrpt_get_paper(opencreport *o);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
-				<title>Start iterator for paper sizes</title>
+				<title>Iterate over paper sizes</title>
 				<para>
-					Start an iterator for supported paper names and sizes.
-					The returned paper structures are library-global but
-					the iterator is per report handler. Only one iterator
-					per report handler can be run at a time.
+					Get the next <literal>ocrpt_paper</literal> structure
+					in the iterator. For the first call, the iterator
+					pointer must be NULL. It returns NULL when there are
+					no more papers known to the system.
 					<programlisting>const ocrpt_paper *
-ocrpt_paper_first(opencreport *o);</programlisting>
+ocrpt_paper_next(opencreport *o,
+                 void **iter);</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Memory handling related functions</title>
+			<para>
+				Memory handling is done through an indirection,
+				to help with bindings (that may do their own memory
+				handling) override the default.
+			</para>
+			<sect3>
+				<title>Indirect function pointers</title>
+				<para>
+					<programlisting>typedef void *
+(*ocrpt_mem_malloc_t)(size_t);
+
+typedef void *
+(*ocrpt_mem_realloc_t)(void *,
+                       size_t);
+
+typedef void *
+(*ocrpt_mem_reallocarray_t)(void *,
+                            size_t,
+                            size_t);
+
+typedef void
+(*ocrpt_mem_free_t)(const void *);
+
+typedef char *
+(*ocrpt_mem_strdup_t)(const char *);
+
+typedef char *
+(*ocrpt_mem_strndup_t)(const char *,
+                       size_t);
+
+typedef void
+(*ocrpt_mem_free_size_t)(void *,
+                         size_t);
+
+extern ocrpt_mem_malloc_t ocrpt_mem_malloc0;
+extern ocrpt_mem_realloc_t ocrpt_mem_realloc0;
+extern ocrpt_mem_reallocarray_t ocrpt_mem_reallocarray0;
+extern ocrpt_mem_free_t ocrpt_mem_free0;
+extern ocrpt_mem_strdup_t ocrpt_mem_strdup0;
+extern ocrpt_mem_strndup_t ocrpt_mem_strndup0;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
-				<title>Get the next paper from the iterator</title>
+				<title>Allocate memory</title>
 				<para>
-					Get the next <literal>ocrpt_paper</literal> structure
-					in the iterator. It returns NULL when there are no more
-					papers known to the system.
-					<programlisting>const ocrpt_paper *ocrpt_paper_next(opencreport *o);</programlisting>
+					<programlisting>void *
+ocrpt_mem_malloc(size_t sz);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Reallocate memory</title>
+				<para>
+					<programlisting>void *
+ocrpt_mem_realloc(void *ptr,
+                  size_t sz);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Reallocate array of memory</title>
+				<para>
+					<programlisting>void *
+ocrpt_mem_reallocarray(void *ptr,
+                       size_t nmemb,
+                       size_t sz);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Free memory</title>
+				<para>
+					<programlisting>void
+ocrpt_mem_free(const void *ptr);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Duplicate C string</title>
+				<para>
+					<programlisting>void *
+ocrpt_mem_strdup(const char *ptr);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Duplicate C string up to the specified length</title>
+				<para>
+					<programlisting>void *
+ocrpt_mem_strndup(const char *ptr,
+                  size_t sz);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Free a C string</title>
+				<para>
+					It'a convenience alias for
+					<literal>ocrpt_mem_free()</literal>.
+					<programlisting>void
+ocrpt_strfree(const char *s);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set indirect allocation functions</title>
+				<para>
+					<programlisting>void
+ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc,
+                          ocrpt_mem_realloc_t rrealloc,
+                          ocrpt_mem_reallocarray_t rreallocarray,
+                          ocrpt_mem_free_t rfree,
+                          ocrpt_mem_strdup_t rstrdup,
+                          ocrpt_mem_strndup_t rstrndup);</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>List related functions</title>
+			<para>
+				These functions implement a single linked list.
+				The list element structure is hidden:
+				<programlisting>struct ocrpt_list;
+typedef struct ocrpt_list ocrpt_list;</programlisting>
+			</para>
+			<sect3>
+				<title>Get the list length</title>
+				<para>
+					<programlisting>size_t
+ocrpt_list_length(ocrpt_list *l);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Make a list from one element</title>
+				<para>
+					<programlisting>ocrpt_list *
+ocrpt_makelist1(const void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Make a list from multiple elements</title>
+				<para>
+					This function can be used with variable
+					number of arguments.
+					<programlisting>ocrpt_list *
+ocrpt_makelist(const void *data1, ...);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get the last element of a list</title>
+				<para>
+					<programlisting>ocrpt_list *
+ocrpt_list_last(const ocrpt_list *l);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get the nth element of a list</title>
+				<para>
+					<programlisting>ocrpt_list *
+ocrpt_list_nth(const ocrpt_list *l, uint32_t n);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Append a new element to a list</title>
+				<para>
+					<programlisting>ocrpt_list *
+ocrpt_list_append(ocrpt_list *l,
+                  const void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Append to list using the last element</title>
+				<para>
+					This function make appending to the list work
+					<emphasis>O(1)</emphasis> instead of
+					<emphasis>O(n)</emphasis>.
+					<programlisting>ocrpt_list *
+ocrpt_list_end_append(ocrpt_list *l,
+                      ocrpt_list **e,
+                      const void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Prepend a new element to a list</title>
+				<para>
+					<programlisting>ocrpt_list *
+ocrpt_list_prepend(ocrpt_list *l,
+                   const void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Remove a data element from a list</title>
+				<para>
+					<programlisting>ocrpt_list *
+ocrpt_list_remove(ocrpt_list *l,
+                  const void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get the data element from a list</title>
+				<para>
+					<programlisting>void *
+ocrpt_list_get_data(ocrpt_list *l);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Free a list</title>
+				<para>
+					<programlisting>void
+ocrpt_list_free(ocrpt_list *l);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Free a list and its data elements</title>
+				<para>
+					<programlisting>void
+ocrpt_list_free_deep(ocrpt_list *l,
+                     ocrpt_mem_free_t freefunc);</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>String related functions</title>
+			<para>
+				For memory safety and higher performance, a wrapper
+				structure is used over C functions.
+				<programlisting>struct ocrpt_string {
+    char *str;
+    size_t allocated_len;
+    size_t len;
+};
+typedef struct ocrpt_string ocrpt_string;</programlisting>
+			</para>
+			<sect3>
+				<title>Create a new string</title>
+				<para>
+					Create a new string from a C string.
+					The ownership of the input string may be
+					taken over, or the original string's contents
+					are copied.
+					<programlisting>ocrpt_string *
+ocrpt_mem_string_new(const char *str,
+                     bool copy);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Create a new string with specified allocated length</title>
+				<para>
+					Create a new string with specified allocated length
+					so future growth can be done without reallocation.
+					The input string is always copied.
+					<programlisting>ocrpt_string *
+ocrpt_mem_string_new_with_len(const char *str,
+                              size_t len);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Create a string from a formatted string with maximum length</title>
+				<para>
+					<programlisting>ocrpt_string *
+ocrpt_mem_string_new_vnprintf(size_t len,
+                              const char *format,
+                              va_list va);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Create a string from a formatted string</title>
+				<para>
+					<programlisting>ocrpt_string *
+ocrpt_mem_string_new_printf(const char *format, ...);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Resize a string</title>
+				<para>
+					Resize the string to the specified allocated
+					length.
+					<programlisting>ocrpt_string *
+ocrpt_mem_string_resize(ocrpt_string *string,
+                        size_t len);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Free a string</title>
+				<para>
+					<programlisting>char *
+ocrpt_mem_string_free(ocrpt_string *string,
+                      bool free_str);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Append a C string of the specified length to a string</title>
+				<para>
+					<programlisting>void
+ocrpt_mem_string_append_len(ocrpt_string *string,
+                            const char *str,
+                            const size_t len);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Append a binary string of the specified length to a string</title>
+				<para>
+					<programlisting>void
+ocrpt_mem_string_append_len_binary(ocrpt_string *string,
+                                   const char *str,
+                                   const size_t len);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Append a C string of unspecified length to a string</title>
+				<para>
+					<programlisting>void
+ocrpt_mem_string_append(ocrpt_string *string,
+                        const char *str);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Append a byte to a string</title>
+				<para>
+					<programlisting>void
+ocrpt_mem_string_append_c(ocrpt_string *string,
+                          const char c);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Append a formatted string to a string</title>
+				<para>
+					<programlisting>void
+ocrpt_mem_string_append_printf(ocrpt_string *string,
+                               const char *format, ...);</programlisting>
 				</para>
 			</sect3>
 		</sect2>
