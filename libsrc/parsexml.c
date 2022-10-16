@@ -33,6 +33,8 @@
 
 extern char cwdpath[PATH_MAX];
 
+static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, xmlTextReaderPtr reader);
+
 int32_t ocrpt_add_report_from_buffer_internal(opencreport *o, const char *buffer, bool allocated, const char *report_path) {
 	struct ocrpt_part *part = ocrpt_mem_malloc(sizeof(struct ocrpt_part));
 	int partsold;
@@ -661,6 +663,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 
 	elem = ocrpt_mem_malloc(sizeof(ocrpt_line_element));
 	memset(elem, 0, sizeof(ocrpt_line_element));
+	elem->le_type = OCRPT_OUTPUT_LE_TEXT;
 	line->elements = ocrpt_list_append(line->elements, elem);
 
 	xmlChar *value, *delayed, *format, *width, *align, *color, *bgcolor, *font_name, *font_size;
@@ -881,6 +884,8 @@ static void ocrpt_parse_output_line_node(opencreport *o, ocrpt_report *r, ocrpt_
 				ocrpt_parse_output_line_element_node(o, r, line, false, reader);
 			else if (!strcmp((char *)name, "literal"))
 				ocrpt_parse_output_line_element_node(o, r, line, true, reader);
+			else if (!strcmp((char *)name, "Image"))
+				ocrpt_parse_output_image_node(o, r, output, line, reader);
 		}
 
 		xmlFree(name);
@@ -937,28 +942,42 @@ static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt
 	ocrpt_ignore_child_nodes(o, reader, -1, "HorizontalLine");
 }
 
-static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
+static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, xmlTextReaderPtr reader) {
 	ocrpt_image *img = ocrpt_mem_malloc(sizeof(ocrpt_image));
-	xmlChar *value, *suppress, *type, *width, *height;
+	xmlChar *value, *suppress, *type, *width, *height, *align, *bgcolor, *text_width;
 	struct {
-		char *attrs;
+		char *attrs[3];
 		xmlChar **attrp;
 	} xmlattrs[] = {
-		{ "value", &value },
-		{ "suppress", &suppress },
-		{ "type", &type },
-		{ "width", &width },
-		{ "height", &height },
-		{ NULL, NULL },
+		{ { "value" }, &value },
+		{ { "suppress" }, &suppress },
+		{ { "type" }, &type },
+		{ { "width" }, &width },
+		{ { "height" }, &height },
+		{ { "align" }, &align },
+		{ { "bgcolor" }, &bgcolor },
+		{ { "text_width", "textWidth" }, &text_width },
+		{ { NULL }, NULL },
 	};
-	int32_t i;
+	int32_t i, j;
 
-	for (i = 0; xmlattrs[i].attrp; i++)
-		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
+	for (i = 0; xmlattrs[i].attrp; i++) {
+		for (j = 0; xmlattrs[i].attrs[j]; j++) {
+			*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs[j]);
+			if (*xmlattrs[i].attrp)
+				break;
+		}
+	}
 
 	memset(img, 0, sizeof(ocrpt_image));
-	img->type = OCRPT_OUTPUT_IMAGE;
-	output->output_list = ocrpt_list_append(output->output_list, img);
+	if (line) {
+		img->le_type = OCRPT_OUTPUT_LE_IMAGE;
+		img->in_line = true;
+		line->elements = ocrpt_list_append(line->elements, img);
+	} else {
+		img->type = OCRPT_OUTPUT_IMAGE;
+		output->output_list = ocrpt_list_append(output->output_list, img);
+	}
 
 	if (value)
 		img->value = ocrpt_xml_expr_parse(o, r, value, true, false);
@@ -970,6 +989,12 @@ static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt
 		img->width = ocrpt_xml_expr_parse(o, r, width, true, false);
 	if (height)
 		img->height = ocrpt_xml_expr_parse(o, r, height, true, false);
+	if (align)
+		img->align = ocrpt_xml_expr_parse(o, r, align, true, false);
+	if (bgcolor)
+		img->bgcolor = ocrpt_xml_expr_parse(o, r, bgcolor, true, false);
+	if (text_width)
+		img->text_width = ocrpt_xml_expr_parse(o, r, text_width, true, false);
 
 	for (i = 0; xmlattrs[i].attrp; i++)
 		xmlFree(*xmlattrs[i].attrp);
@@ -1028,7 +1053,7 @@ static void ocrpt_parse_output_node(opencreport *o, ocrpt_report *r, ocrpt_outpu
 			else if (!strcmp((char *)name, "HorizontalLine"))
 				ocrpt_parse_output_hline_node(o, r, output, reader);
 			else if (!strcmp((char *)name, "Image"))
-				ocrpt_parse_output_image_node(o, r, output, reader);
+				ocrpt_parse_output_image_node(o, r, output, NULL, reader);
 			else if (!strcmp((char *)name, "ImageEnd"))
 				ocrpt_parse_output_imageend_node(o, r, output, reader);
 		}

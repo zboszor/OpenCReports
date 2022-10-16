@@ -30,7 +30,7 @@ static cairo_status_t ocrpt_write_pdf(void *closure, const unsigned char *data, 
 	return CAIRO_STATUS_SUCCESS;
 }
 
-static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_image *img, double x, double y, double w, double h) {
+static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_indent, double x, double y, double w, double h) {
 	ocrpt_image_file *img_file = img->img_file;
 
 	if (!img_file)
@@ -40,17 +40,65 @@ static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 
 	cairo_save(o->cr);
 
-	cairo_translate(o->cr, x, y);
-	cairo_scale(o->cr, w / img->img_file->width, h / img->img_file->height);
-
-	cairo_set_source_surface(o->cr, img_file->surface, 0.0, 0.0);
-
-	if (img->img_file->rsvg) {
-		RsvgRectangle rect = { .x = 0.0, .y = 0.0, .width = img_file->width, .height = img_file->height };
-		rsvg_handle_render_document(img_file->rsvg, o->cr, &rect, NULL);
+	if (pd && (page_indent + pd->column_width < x + w)) {
+		cairo_rectangle(o->cr, x, y, x + w - page_indent - pd->column_width, h);
+		cairo_clip(o->cr);
 	}
 
-	cairo_paint(o->cr);
+	cairo_save(o->cr);
+
+	/*
+	 * The background filler is 0.1 points wider.
+	 * This way, there's no lines between the line elements.
+	 */
+	cairo_set_source_rgb(o->cr, img->bg.r, img->bg.g, img->bg.b);
+	cairo_set_line_width(o->cr, 0.0);
+	cairo_rectangle(o->cr, x, y, w + 0.1, h);
+	cairo_fill(o->cr);
+
+	cairo_restore(o->cr);
+
+	if (!line || !line->current_line) {
+		cairo_save(o->cr);
+
+		if (!line) {
+			cairo_translate(o->cr, x, y);
+			cairo_scale(o->cr, w / img->img_file->width, h / img->img_file->height);
+		} else {
+			double w1 = h * img->img_file->width / img->img_file->height;
+
+			if (img->align && img->align->result[o->residx] && img->align->result[o->residx]->type == OCRPT_RESULT_STRING && img->align->result[o->residx]->string) {
+				const char *alignment = img->align->result[o->residx]->string->str;
+				fprintf(stderr, "ocrpt_pdf_draw_image: alignment: '%s'\n", alignment);
+				if (strcasecmp(alignment, "right") == 0) {
+					cairo_translate(o->cr, x + w - w1, y);
+					fprintf(stderr, "ocrpt_pdf_draw_image: right\n");
+				} else if (strcasecmp(alignment, "center") == 0) {
+					fprintf(stderr, "ocrpt_pdf_draw_image: center\n");
+					cairo_translate(o->cr, x + (w - w1) / 2.0, y);
+				} else {
+					cairo_translate(o->cr, x, y);
+					fprintf(stderr, "ocrpt_pdf_draw_image: left (1)\n");
+				}
+			} else {
+				cairo_translate(o->cr, x, y);
+				fprintf(stderr, "ocrpt_pdf_draw_image: left (2)\n");
+			}
+
+			cairo_scale(o->cr, w1 / img->img_file->width, h / img->img_file->height);
+		}
+
+		cairo_set_source_surface(o->cr, img_file->surface, 0.0, 0.0);
+
+		if (img->img_file->rsvg) {
+			RsvgRectangle rect = { .x = 0.0, .y = 0.0, .width = img_file->width, .height = img_file->height };
+			rsvg_handle_render_document(img_file->rsvg, o->cr, &rect, NULL);
+		}
+
+		cairo_paint(o->cr);
+
+		cairo_restore(o->cr);
+	}
 
 	cairo_restore(o->cr);
 }

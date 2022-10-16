@@ -27,7 +27,15 @@ enum ocrpt_output_type {
 };
 typedef enum ocrpt_output_type ocrpt_output_type;
 
+enum ocrpt_output_line_element_type {
+	OCRPT_OUTPUT_LE_TEXT,
+	OCRPT_OUTPUT_LE_IMAGE,
+	OCRPT_OUTPUT_LE_BARCODE
+};
+typedef enum ocrpt_output_line_element_type ocrpt_output_line_element_type;
+
 struct ocrpt_line_element {
+	ocrpt_output_line_element_type le_type;
 	ocrpt_expr *value;
 	ocrpt_expr *format;
 	ocrpt_expr *width;
@@ -117,15 +125,25 @@ struct ocrpt_image_file {
 typedef struct ocrpt_image_file ocrpt_image_file;
 
 struct ocrpt_image {
-	ocrpt_output_type type;
+	union {
+		ocrpt_output_type type;
+		ocrpt_output_line_element_type le_type;
+	};
+	bool in_line:1;
 	bool suppress_image:1;
+	double start;
+	double image_text_width;
 	double image_width;
 	double image_height;
+	ocrpt_color bg;
 	ocrpt_expr *suppress;
 	ocrpt_expr *value; /* name of the image file */
 	ocrpt_expr *imgtype; /* 'png', 'jpg', 'raster', or 'svg' */
 	ocrpt_expr *width;
 	ocrpt_expr *height;
+	ocrpt_expr *align;
+	ocrpt_expr *bgcolor;
+	ocrpt_expr *text_width;
 	ocrpt_image_file *img_file;
 };
 

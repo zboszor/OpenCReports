@@ -2769,6 +2769,19 @@ report_height_after_last="no"</programlisting>
 					See the <xref linkend="textelemnode"/> below.
 				</para>
 			</sect3>
+			<sect3>
+				<title>Image element</title>
+				<para>
+					An <literal>&lt;Image&gt;</literal> is accepted
+					as a line element.
+					<programlisting>&lt;Line&gt;
+    &lt;Image value="expression..." ... /&gt;
+&lt;/Line&gt;</programlisting>
+				</para>
+				<para>
+					See the <xref linkend="imagenode"/> below.
+				</para>
+			</sect3>
 		</sect2>
 	</sect1>
 	<sect1 id="textelemnode" xreflabel="Text element node">
@@ -3259,14 +3272,21 @@ report_height_after_last="no"</programlisting>
 	<sect1 id="imagenode" xreflabel="Image node">
 		<title>Image</title>
 		<para>
-			An image to draw on the page.
+			An image to draw on the page, either on its own
+			which controls indentation for subsequent elements:
 			<programlisting>&lt;Output&gt;
     &lt;Image ... /&gt;
 &lt;/Output</programlisting>
+			or as a line element:
+			<programlisting>&lt;Output&gt;
+    &lt;Line ... &gt;
+        &lt;Image ... /&gt;
+    &lt;Line/&gt;
+&lt;/Output</programlisting>
 		</para>
 		<para>
-			After a valid image specification, subsequent
-			<xref linkend="linenode"/>s and
+			After a valid (standalone) image specification,
+			subsequent <xref linkend="linenode"/>s and
 			<xref linkend="hlinenode"/>s are indented
 			by the image width in the same
 			<literal>&lt;Output&gt;</literal> node,
@@ -3333,6 +3353,12 @@ report_height_after_last="no"</programlisting>
 					Default is unset. The image would not be shown,
 					unless both width and height are set.
 				</para>
+				<para>
+					When the image is used as a line element,
+					this setting is ignored. Instead, the
+					image is automatically scaled according to
+					the line height.
+				</para>
 			</sect3>
 			<sect3>
 				<title>Height</title>
@@ -3345,6 +3371,75 @@ report_height_after_last="no"</programlisting>
 				<para>
 					Default is unset. The image would not be shown,
 					unless both width and height are set.
+				</para>
+				<para>
+					When the image is used as a line element,
+					this setting is ignored. Instead, the
+					image is automatically scaled according to
+					the line height.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Text width</title>
+				<para>
+					When the image is used as a line element, this
+					is the width in which the image is shown.
+					Its unit subject to the <xref linkend="sizeunit"/>,
+					by default it's measured in text character
+					width for the parent <literal>&lt;Line&gt;</literal>.
+					This setting is only used when the image is a
+					line element. Two variants are accepted:
+					<programlisting>&lt;Image value="'filename.jpg'"
+       text_width="8" /&gt;
+
+&lt;Image value="'filename.jpg'"
+       textWidth="8" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is 0. As a result, the image would be
+					0 points wide, i.e. not shown.
+				</para>
+				<para>
+					This setting is ignored when the image is used
+					as an output subsection.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Background color</title>
+				<para>
+					Image background color. When the image is a line
+					element, then the width in which it's shown may
+					be wider than the scaled image width. Or possibly,
+					the image is vector graphics (SVG) and there is no
+					background defined in the image file. Or the image
+					file contains transparency (i.e. PNG). The color
+					background will be shown around the image or where
+					there are transparent pixels.
+					<programlisting>&lt;Image value="'filename.jpg'"
+       bgcolor="'red'" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is unset, i.e. white.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Alignment</title>
+				<para>
+					Image alignment. When the image is a line
+					element, then the width in which it's shown may
+					be wider than the scaled image width. The image
+					then may be aligned. <literal>left</literal>,
+					<literal>right</literal> and <literal>center</literal>
+					are accepted.
+					<programlisting>&lt;Image value="'filename.jpg'"
+       align="'center'" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is left alignment.
+				</para>
+				<para>
+					This setting is ignored when the image is used
+					as an output subsection.
 				</para>
 			</sect3>
 		</sect2>

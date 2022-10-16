@@ -104,7 +104,7 @@
 <!ELEMENT Output (Line | HorizontalLine | Image)* >
 <!ATTLIST Output
     suppress CDATA #IMPLIED >
-<!ELEMENT Line (field | literal)* >
+<!ELEMENT Line (field | literal | Image)* >
 <!ATTLIST Line
 	fontName CDATA #IMPLIED
 	font_name CDATA #IMPLIED
@@ -170,7 +170,11 @@
 	suppress CDATA #IMPLIED
 	type CDATA #REQUIRED
 	width CDATA #REQUIRED
-	height CDATA #REQUIRED >
+	height CDATA #REQUIRED
+	align CDATA #IMPLIED
+	bgcolor CDATA #IMPLIED
+	text_width CDATA #REQUIRED
+	textWidth CDATA #REQUIRED >
 <!ELEMENT Detail (FieldHeaders?, FieldDetails?) >
 <!ELEMENT FieldHeaders (Output)* >
 <!ELEMENT FieldDetails (Output)* >
