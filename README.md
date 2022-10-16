@@ -8,6 +8,11 @@ under verbal consent from the original authors:
 * Bobby Doan <bdoan@sicom.com>
 * Christian Betz <cbetz@sicom.com>
 
+## Documentation
+
+[OpenCReports documentation](https://zboszor.github.io/OpenCReports-docs/book1.html)
+[OpenCReports documentation as PDF](https://zboszor.github.io/OpenCReports.pdf)
+
 ## Licensing
 
 OpenCReports (the library part) is free software, with "free" as in speech.
