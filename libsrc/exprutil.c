@@ -1025,7 +1025,7 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(opencreport *o, ocrpt_
 	result->type = OCRPT_RESULT_ERROR;
 
 	va_start(va, format);
-	len = ocrpt_mem_vnprintf_size_from_string(format, va);
+	len = vsnprintf(NULL, 0, format, va);
 	va_end(va);
 
 	ocrpt_mem_string_free(result->string, result->string_owned);

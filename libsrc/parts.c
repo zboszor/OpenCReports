@@ -14,6 +14,7 @@
 
 #include "opencreport.h"
 #include "ocrpt-private.h"
+#include "breaks.h"
 #include "listutil.h"
 #include "exprutil.h"
 #include "variables.h"
@@ -76,7 +77,7 @@ DLL_EXPORT_SYM ocrpt_part *ocrpt_part_append_report(opencreport *o, ocrpt_part *
 	return p;
 }
 
-DLL_EXPORT_SYM void ocrpt_part_free(opencreport *o, ocrpt_part *p) {
+void ocrpt_part_free(opencreport *o, ocrpt_part *p) {
 	ocrpt_list *row;
 
 	for (row = p->rows; row; row = row->next) {
@@ -112,7 +113,7 @@ DLL_EXPORT_SYM void ocrpt_part_free(opencreport *o, ocrpt_part *p) {
 	ocrpt_mem_free(p);
 }
 
-DLL_EXPORT_SYM void ocrpt_parts_free(opencreport *o) {
+void ocrpt_parts_free(opencreport *o) {
 	ocrpt_list *parts = o->parts;
 
 	o->parts = NULL;
@@ -136,7 +137,7 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_report_new(opencreport *o) {
 	return r;
 }
 
-DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
+void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_variables_free(o, r);
 	ocrpt_breaks_free(o, r);
 	r->executing = true;
@@ -161,7 +162,7 @@ DLL_EXPORT_SYM void ocrpt_report_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_mem_free(r);
 }
 
-DLL_EXPORT_SYM bool ocrpt_report_validate(opencreport *o, ocrpt_report *r) {
+bool ocrpt_report_validate(opencreport *o, ocrpt_report *r) {
 	if (!o || !r)
 		return false;
 
@@ -184,7 +185,17 @@ DLL_EXPORT_SYM bool ocrpt_report_validate(opencreport *o, ocrpt_report *r) {
 	return false;
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_main_query(opencreport *o, ocrpt_report *r, const char *query) {
+DLL_EXPORT_SYM void ocrpt_report_set_main_query(opencreport *o, ocrpt_report *r, const ocrpt_query *query) {
+	if (!ocrpt_report_validate(o, r))
+		return;
+
+	r->query = (ocrpt_query *)query;
+}
+
+DLL_EXPORT_SYM void ocrpt_report_set_main_query_by_name(opencreport *o, ocrpt_report *r, const char *query) {
+	if (!ocrpt_report_validate(o, r))
+		return;
+
 	r->query = ocrpt_query_get(o, query);
 }
 

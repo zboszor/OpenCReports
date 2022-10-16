@@ -3,6 +3,7 @@
 
 int main(void) {
 	const ocrpt_paper *p;
+	void *p_iter;
 	opencreport *o = ocrpt_init();
 
 	p = ocrpt_get_paper_by_name("A4");
@@ -19,7 +20,7 @@ int main(void) {
 	printf("set paper size: %s w %.3lf h %.3lf\n", p->name, p->width, p->height);
 
 	printf("supported paper sizes:\n");
-	for (p = ocrpt_paper_first(o); p; p = ocrpt_paper_next(o)) {
+	for (p_iter = NULL, p = ocrpt_paper_next(o, &p_iter); p; p = ocrpt_paper_next(o, &p_iter)) {
 		printf("\tpaper size: %s w %.3lf h %.3lf\n", p->name, p->width, p->height);
 	}
 

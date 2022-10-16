@@ -199,4 +199,9 @@ struct ocrpt_part {
 
 void ocrpt_report_evaluate_detailcnt_dependees(opencreport *o, ocrpt_report *r);
 
+void ocrpt_part_free(opencreport *o, struct ocrpt_part *p);
+void ocrpt_parts_free(opencreport *o);
+void ocrpt_report_free(opencreport *o, ocrpt_report *r);
+bool ocrpt_report_validate(opencreport *o, ocrpt_report *r);
+
 #endif

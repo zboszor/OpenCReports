@@ -40,7 +40,6 @@ struct opencreport {
 	/* Paper name and size */
 	const ocrpt_paper *paper;
 	ocrpt_paper paper0;
-	int32_t paper_iterator_idx;
 
 	ocrpt_function **functions;
 	int32_t n_functions;

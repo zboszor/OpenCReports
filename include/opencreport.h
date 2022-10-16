@@ -559,6 +559,52 @@ void ocrpt_variable_resolve(opencreport *o, ocrpt_report *r, ocrpt_var *v);
  */
 void ocrpt_variable_evaluate(opencreport *o, ocrpt_report *r, ocrpt_var *v);
 
+/***************************
+ * Break related functions *
+ ***************************/
+
+/*
+ * Add a named report break
+ */
+ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, const char *name);
+/*
+ * Set the break attribute from bool value
+ */
+bool ocrpt_break_set_attribute(opencreport *o, ocrpt_report *r, ocrpt_break *br, const ocrpt_break_attr_type attr_type, bool value);
+/*
+ * Set the break attribute from numeric constant expression
+ */
+bool ocrpt_break_set_attribute_from_expr(opencreport *o, ocrpt_report *r, ocrpt_break *br, const ocrpt_break_attr_type attr_type, ocrpt_expr *expr);
+/*
+ * Find a report break using its name
+ */
+ocrpt_break *ocrpt_break_get(opencreport *o, ocrpt_report *r, const char *name);
+/*
+ * Get break name
+ */
+const char *ocrpt_break_get_name(ocrpt_break *br);
+/*
+ * Add a break field to a break
+ * This function takes over ownership of the breakfield expression
+ */
+bool ocrpt_break_add_breakfield(opencreport *o, ocrpt_report *r, ocrpt_break *br, ocrpt_expr *bf);
+/*
+ * Iterate through the report's breaks
+ */
+ocrpt_break *ocrpt_break_get_next(ocrpt_report *r, ocrpt_list **list);
+/*
+ * Resolve and optimize break fields
+ */
+void ocrpt_break_resolve_fields(opencreport *o, ocrpt_report *r, ocrpt_break *br);
+/*
+ * Check whether the report break triggers
+ */
+bool ocrpt_break_check_fields(opencreport *o, ocrpt_report *r, ocrpt_break *br);
+/*
+ * Reset variables for the break
+ */
+void ocrpt_break_reset_vars(opencreport *o, ocrpt_report *r, ocrpt_break *br);
+
 /******************************
  * Function related functions *
  ******************************/
@@ -588,69 +634,6 @@ int32_t ocrpt_expr_get_num_operands(ocrpt_expr *e);
  */
 ocrpt_result *ocrpt_expr_operand_get_result(opencreport *o, ocrpt_expr *e, int32_t opnum);
 
-/***************************
- * Break related functions *
- ***************************/
-
-///////////////////////// XXXXXXXXXXXXXXXXXXXXXX
-/*
- * Add a named report break
- */
-ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, const char *name);
-/*
- * Free a report break
- */
-void ocrpt_break_free(opencreport *o, ocrpt_report *r, ocrpt_break *br);
-/*
- * Free all report breaks
- */
-void ocrpt_breaks_free(opencreport *o, ocrpt_report *r);
-/*
- * Validate a break pointer for o and r
- */
-bool ocrpt_break_validate(opencreport *o, ocrpt_report *r, ocrpt_break *br);
-/*
- * Set the break attribute from bool value
- */
-bool ocrpt_break_set_attribute(ocrpt_break *br, const ocrpt_break_attr_type attr_type, bool value);
-/*
- * Set the break attribute from numeric constant expression
- */
-bool ocrpt_break_set_attribute_from_expr(opencreport *o, ocrpt_report *r, ocrpt_break *br, const ocrpt_break_attr_type attr_type, ocrpt_expr *expr);
-/*
- * Find a report break using its name
- */
-ocrpt_break *ocrpt_break_get(opencreport *o, ocrpt_report *r, const char *name);
-/*
- * Get break name
- */
-const char *ocrpt_break_get_name(ocrpt_break *br);
-/*
- * Iterate through the report's breaks
- */
-ocrpt_break *ocrpt_break_get_next(ocrpt_report *r, ocrpt_list **list);
-/*
- * Add a break field to a break
- * This function takes over ownership of the breakfield expression
- */
-bool ocrpt_break_add_breakfield(opencreport *o, ocrpt_report *r, ocrpt_break *br, ocrpt_expr *bf);
-/*
- * Resolve and optimize break fields
- */
-void ocrpt_break_resolve_fields(opencreport *o, ocrpt_report *r, ocrpt_break *br);
-/*
- * Check whether the report break triggers
- */
-bool ocrpt_break_check_fields(opencreport *o, ocrpt_report *r, ocrpt_break *br);
-/*
- * Reset variables for the break
- */
-void ocrpt_break_reset_vars(opencreport *o, ocrpt_report *r, ocrpt_break *br);
-/*
- * Add break trigger callback
- */
-bool ocrpt_break_add_trigger_cb(opencreport *o, ocrpt_report *r, ocrpt_break *br, ocrpt_break_trigger_cb func, void *data);
-
 /********************************************************
  * Functions related to report and report part handling *
  ********************************************************/
@@ -668,6 +651,12 @@ ocrpt_part_row *ocrpt_part_new_row(opencreport *o, ocrpt_part *p);
  */
 ocrpt_part_row_data *ocrpt_part_row_new_data(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr);
 /*
+ * Create a new ocrpt_report structure
+ * It will have to be appended with ocrpt_part_append_report()
+ * or to be used standalone for unit tests
+ */
+ocrpt_report *ocrpt_report_new(opencreport *o);
+/*
  * Append an ocrpt_report to the last column data of the last row in ocrpt_part
  *
  * "p" may be NULL, in which case a new part, a new row and
@@ -679,14 +668,6 @@ ocrpt_part_row_data *ocrpt_part_row_new_data(opencreport *o, ocrpt_part *p, ocrp
  */
 ocrpt_part *ocrpt_part_append_report(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r);
 /*
- * Free a report part and remove it from the parts list
- */
-void ocrpt_part_free(opencreport *o, struct ocrpt_part *p);
-/*
- * Free all report parts and remove them from the parts list
- */
-void ocrpt_parts_free(opencreport *o);
-/*
  * Layout (part/part row/part row column/report) related iterators
  */
 ocrpt_part *ocrpt_part_get_next(opencreport *o, ocrpt_list **list);
@@ -695,24 +676,11 @@ ocrpt_part_row_data *ocrpt_part_row_data_get_next(ocrpt_part_row *pr, ocrpt_list
 ocrpt_report *ocrpt_report_get_next(ocrpt_part_row_data *pd, ocrpt_list **list);
 
 /*
- * Create a new ocrpt_report structure
- * It will have to be appended with ocrpt_part_append_report()
- * or to be used standalone for unit tests
- */
-ocrpt_report *ocrpt_report_new(opencreport *o);
-/*
- * Free an ocrpt_report structure
- * and optionally remove it from the parts list
- */
-void ocrpt_report_free(opencreport *o, ocrpt_report *r);
-/*
- * Validate a report against "o"
- */
-bool ocrpt_report_validate(opencreport *o, ocrpt_report *r);
-/*
  * Set the main query of an ocrpt_report
  */
-void ocrpt_report_set_main_query(opencreport *o, ocrpt_report *r, const char *query);
+void ocrpt_report_set_main_query(opencreport *o, ocrpt_report *r, const ocrpt_query *query);
+
+void ocrpt_report_set_main_query_by_name(opencreport *o, ocrpt_report *r, const char *query);
 /*
  * Get the current row number of the main query
  */
@@ -737,26 +705,6 @@ void ocrpt_report_resolve_expressions(opencreport *o, ocrpt_report *r);
  * Evaluate report expressions
  */
 void ocrpt_report_evaluate_expressions(opencreport *o, ocrpt_report *r);
-/*
- * Add "report started" callback
- */
-bool ocrpt_report_add_start_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
-/*
- * Add "report done" callback
- */
-bool ocrpt_report_add_done_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
-/*
- * Add "new row" callback
- */
-bool ocrpt_report_add_new_row_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
-/*
- * Add "report iteration" callback
- */
-bool ocrpt_report_add_iteration_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
-/*
- * Add "precalculation done" callback
- */
-bool ocrpt_report_add_precalculation_done_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
 
 /******************************
  * Callback related functions *
@@ -765,19 +713,43 @@ bool ocrpt_report_add_precalculation_done_cb(opencreport *o, ocrpt_report *r, oc
 /*
  * Add a "part added" callback
  */
-void ocrpt_add_part_added_cb(opencreport *o, ocrpt_part_cb func, void *data);
+bool ocrpt_add_part_added_cb(opencreport *o, ocrpt_part_cb func, void *data);
 /*
  * Add a "report added" callback
  */
-void ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb func, void *data);
+bool ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb func, void *data);
 /*
- * All "part iteration" callback
+ * Add a "part iteration" callback
  */
 bool ocrpt_add_part_iteration_cb(opencreport *o, ocrpt_part_cb func, void *data);
 /*
- * All "all precalculations done" callback (one callback after all reports are precalculated)
+ * Add an "all precalculations done" callback (one callback after all reports are precalculated)
  */
 bool ocrpt_add_precalculation_done_cb(opencreport *o, ocrpt_cb func, void *data);
+/*
+ * Add a "report started" callback
+ */
+bool ocrpt_report_add_start_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
+/*
+ * Add "report done" callback
+ */
+bool ocrpt_report_add_done_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
+/*
+ * Add a "new row" callback
+ */
+bool ocrpt_report_add_new_row_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
+/*
+ * Add a "report iteration" callback
+ */
+bool ocrpt_report_add_iteration_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
+/*
+ * Add a "report precalculation done" callback
+ */
+bool ocrpt_report_add_precalculation_done_cb(opencreport *o, ocrpt_report *r, ocrpt_report_cb func, void *data);
+/*
+ * Add break trigger callback
+ */
+bool ocrpt_break_add_trigger_cb(opencreport *o, ocrpt_report *r, ocrpt_break *br, ocrpt_break_trigger_cb func, void *data);
 
 /*********************************
  * Environment related functions *
@@ -874,11 +846,10 @@ void ocrpt_set_paper_by_name(opencreport *o, const char *paper);
 const ocrpt_paper *ocrpt_get_paper(opencreport *o);
 /*
  * Iterator for supported paper names and sizes
- * The returned paper structures are library-global
- * but the iterator is per report.
+ * The returned paper structures are library-global.
+ * The iterator is caller specified.
  */
-const ocrpt_paper *ocrpt_paper_first(opencreport *o);
-const ocrpt_paper *ocrpt_paper_next(opencreport *o);
+const ocrpt_paper *ocrpt_paper_next(opencreport *o, void **iter);
 
 /****************************
  * Memory handling wrappers *
@@ -906,15 +877,14 @@ static inline void *ocrpt_mem_malloc(size_t sz) { return ocrpt_mem_malloc0(sz); 
 static inline void *ocrpt_mem_realloc(void *ptr, size_t sz) __attribute__((alloc_size(2)));
 static inline void *ocrpt_mem_realloc(void *ptr, size_t sz) { return ocrpt_mem_realloc0(ptr, sz); }
 
-static inline void *ocrpt_mem_reallocarray(void *ptr, size_t sz, size_t) __attribute__((alloc_size(2)));
+static inline void *ocrpt_mem_reallocarray(void *ptr, size_t nmemb, size_t sz) __attribute__((alloc_size(2)));
 static inline void *ocrpt_mem_reallocarray(void *ptr, size_t nmemb, size_t sz) { return ocrpt_mem_reallocarray0(ptr, nmemb, sz); }
 
 static inline void ocrpt_mem_free(const void *ptr) { ocrpt_mem_free0(ptr); }
-static inline void ocrpt_strfree(const char *s) { ocrpt_mem_free0((const void *)s); }
 
 static inline void *ocrpt_mem_strdup(const char *ptr) { return (ptr ? ocrpt_mem_strdup0(ptr) : NULL); }
-
 static inline void *ocrpt_mem_strndup(const char *ptr, size_t sz) { return (ptr ? ocrpt_mem_strndup0(ptr, sz) : NULL); }
+static inline void ocrpt_strfree(const char *s) { ocrpt_mem_free0((const void *)s); }
 
 void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc,
 								ocrpt_mem_realloc_t rrealloc,
@@ -926,7 +896,7 @@ void ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc,
 /*
  * List related functions
  */
-#define ocrpt_list_length(l) ((l) ? (l)->len : 0)
+size_t ocrpt_list_length(ocrpt_list *l);
 ocrpt_list *ocrpt_makelist1(const void *data);
 ocrpt_list *ocrpt_makelist(const void *data1, ...);
 ocrpt_list *ocrpt_list_last(const ocrpt_list *l);
@@ -935,6 +905,7 @@ ocrpt_list *ocrpt_list_end_append(ocrpt_list *l, ocrpt_list **e, const void *dat
 ocrpt_list *ocrpt_list_append(ocrpt_list *l, const void *data);
 ocrpt_list *ocrpt_list_prepend(ocrpt_list *l, const void *data);
 ocrpt_list *ocrpt_list_remove(ocrpt_list *l, const void *data);
+void *ocrpt_list_get_data(ocrpt_list *l);
 void ocrpt_list_free(ocrpt_list *l);
 void ocrpt_list_free_deep(ocrpt_list *l, ocrpt_mem_free_t freefunc);
 
@@ -943,9 +914,6 @@ void ocrpt_list_free_deep(ocrpt_list *l, ocrpt_mem_free_t freefunc);
  */
 ocrpt_string *ocrpt_mem_string_new(const char *str, bool copy);
 ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, size_t len);
-static inline size_t ocrpt_mem_vnprintf_size_from_string(const char *format, va_list va) {
-	return vsnprintf(NULL, 0, format, va);
-}
 ocrpt_string *ocrpt_mem_string_new_vnprintf(size_t len, const char *format, va_list va);
 ocrpt_string *ocrpt_mem_string_new_printf(const char *format, ...) __attribute__ ((format(printf, 1, 2)));
 ocrpt_string *ocrpt_mem_string_resize(ocrpt_string *string, size_t len);

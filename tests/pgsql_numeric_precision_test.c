@@ -49,7 +49,13 @@ int main(void) {
 	r = ocrpt_report_new(o);
 	ocrpt_part_append_report(o, NULL, NULL, NULL, r);
 
-	ocrpt_report_add_new_row_cb(o, r, test_newrow_cb, &rd);
+	ocrpt_report_set_main_query(o, r, q);
+
+	if (!ocrpt_report_add_new_row_cb(o, r, test_newrow_cb, &rd)) {
+		fprintf(stderr, "Failed to add new row callback.\n");
+		ocrpt_free(o);
+		return  1;
+	}
 
 	ocrpt_variable_new(o, r, OCRPT_VARIABLE_SUM, "var1", "a.num", NULL);
 

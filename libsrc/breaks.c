@@ -57,7 +57,10 @@ DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(opencreport *o, ocrpt_report *r, con
 	return br;
 }
 
-DLL_EXPORT_SYM bool ocrpt_break_set_attribute(ocrpt_break *br, const ocrpt_break_attr_type attr_type, bool value) {
+DLL_EXPORT_SYM bool ocrpt_break_set_attribute(opencreport *o, ocrpt_report *r, ocrpt_break *br, const ocrpt_break_attr_type attr_type, bool value) {
+	if (!ocrpt_break_validate(o, r, br))
+		return false;
+
 	br->attrs[attr_type] = value;
 	return true;
 }
@@ -84,7 +87,7 @@ DLL_EXPORT_SYM bool ocrpt_break_set_attribute_from_expr(opencreport *o, ocrpt_re
 	return true;
 }
 
-DLL_EXPORT_SYM void ocrpt_break_free(opencreport *o, ocrpt_report *r, ocrpt_break *br) {
+void ocrpt_break_free(opencreport *o, ocrpt_report *r, ocrpt_break *br) {
 	ocrpt_list *ptr;
 
 	for (ptr = br->breakfields; ptr; ptr = ptr->next) {
@@ -100,7 +103,7 @@ DLL_EXPORT_SYM void ocrpt_break_free(opencreport *o, ocrpt_report *r, ocrpt_brea
 	ocrpt_mem_free(br);
 }
 
-DLL_EXPORT_SYM void ocrpt_breaks_free(opencreport *o, ocrpt_report *r) {
+void ocrpt_breaks_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_list *ptr;
 
 	for (ptr = r->breaks; ptr; ptr = ptr->next) {
@@ -132,7 +135,7 @@ DLL_EXPORT_SYM const char *ocrpt_break_get_name(ocrpt_break *br) {
 	return br ? br->name : NULL;
 }
 
-DLL_EXPORT_SYM bool ocrpt_break_validate(opencreport *o, ocrpt_report *r, ocrpt_break *br) {
+bool ocrpt_break_validate(opencreport *o, ocrpt_report *r, ocrpt_break *br) {
 	ocrpt_list *ptr;
 
 	if (!ocrpt_report_validate(o, r))

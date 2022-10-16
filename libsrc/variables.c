@@ -251,7 +251,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 	return var;
 }
 
-DLL_EXPORT_SYM void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_var *var) {
+void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_var *var) {
 	ocrpt_list_free_deep(var->precalc_results, (ocrpt_mem_free_t)ocrpt_result_free);
 	ocrpt_expr_free(o, r, var->baseexpr);
 	ocrpt_expr_free(o, r, var->intermedexpr);
@@ -262,7 +262,7 @@ DLL_EXPORT_SYM void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_v
 	ocrpt_mem_free(var);
 }
 
-DLL_EXPORT_SYM void ocrpt_variables_free(opencreport *o, ocrpt_report *r) {
+void ocrpt_variables_free(opencreport *o, ocrpt_report *r) {
 	ocrpt_list *ptr;
 
 	for (ptr = r->variables; ptr; ptr = ptr->next)

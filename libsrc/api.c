@@ -179,30 +179,33 @@ DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode) 
 	o->rndmode = rndmode;
 }
 
-DLL_EXPORT_SYM void ocrpt_add_part_added_cb(opencreport *o, ocrpt_part_cb func, void *data) {
+DLL_EXPORT_SYM bool ocrpt_add_part_added_cb(opencreport *o, ocrpt_part_cb func, void *data) {
 	ocrpt_part_cb_data *ptr;
 
 	if (!o || !func)
-		return;
+		return false;
 
 	ptr = ocrpt_mem_malloc(sizeof(ocrpt_part_cb_data));
 	ptr->func = func;
 	ptr->data = data;
 
 	o->part_added_callbacks = ocrpt_list_append(o->part_added_callbacks, ptr);
+
+	return true;
 }
 
-DLL_EXPORT_SYM void ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb func, void *data) {
+DLL_EXPORT_SYM bool ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb func, void *data) {
 	ocrpt_report_cb_data *ptr;
 
 	if (!o || !func)
-		return;
+		return false;
 
 	ptr = ocrpt_mem_malloc(sizeof(ocrpt_report_cb_data));
 	ptr->func = func;
 	ptr->data = data;
 
 	o->report_added_callbacks = ocrpt_list_append(o->report_added_callbacks, ptr);
+	return true;
 }
 
 static void ocrpt_print_reportheader(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, uint32_t rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
@@ -1046,22 +1049,15 @@ DLL_EXPORT_SYM void ocrpt_set_paper_by_name(opencreport *o, const char *papernam
 	o->paper = paper;
 }
 
-DLL_EXPORT_SYM const ocrpt_paper *ocrpt_paper_first(opencreport *o) {
-	if (!o)
-		return NULL;
-	o->paper_iterator_idx = 0;
-	return &papersizes[o->paper_iterator_idx];
-}
-
-DLL_EXPORT_SYM const ocrpt_paper *ocrpt_paper_next(opencreport *o) {
-	if (!o)
+DLL_EXPORT_SYM const ocrpt_paper *ocrpt_paper_next(opencreport *o, void **iter) {
+	if (!o || !iter)
 		return NULL;
 
-	if (o->paper_iterator_idx >= n_papersizes)
-		return NULL;
+	size_t idx = (size_t)*iter;
+	ocrpt_paper *p = (idx >= n_papersizes ? NULL : &papersizes[idx]);
+	*iter = (void *)(idx + 1);
 
-	o->paper_iterator_idx++;
-	return (o->paper_iterator_idx >= n_papersizes ? NULL : &papersizes[o->paper_iterator_idx]);
+	return p;
 }
 
 DLL_EXPORT_SYM void ocrpt_set_locale(opencreport *o, const char *locale) {

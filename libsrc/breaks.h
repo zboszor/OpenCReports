@@ -26,4 +26,8 @@ struct ocrpt_break_trigger_cb_data {
 };
 typedef struct ocrpt_break_trigger_cb_data ocrpt_break_trigger_cb_data;
 
+void ocrpt_break_free(opencreport *o, ocrpt_report *r, ocrpt_break *br);
+void ocrpt_breaks_free(opencreport *o, ocrpt_report *r);
+bool ocrpt_break_validate(opencreport *o, ocrpt_report *r, ocrpt_break *br);
+
 #endif

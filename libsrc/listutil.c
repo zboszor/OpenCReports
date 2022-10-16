@@ -13,6 +13,10 @@
 #include "opencreport.h"
 #include "listutil.h"
 
+DLL_EXPORT_SYM size_t ocrpt_list_length(ocrpt_list *l) {
+	return l ? l->len : 0;
+}
+
 DLL_EXPORT_SYM ocrpt_list *ocrpt_makelist1(const void *data) {
 	ocrpt_list *l = ocrpt_mem_malloc(sizeof(ocrpt_list));
 
@@ -141,6 +145,13 @@ DLL_EXPORT_SYM ocrpt_list *ocrpt_list_remove(ocrpt_list *l, const void *data) {
 	ocrpt_mem_free(e);
 
 	return l;
+}
+
+DLL_EXPORT_SYM void *ocrpt_list_get_data(ocrpt_list *l) {
+	if (!l)
+		return NULL;
+
+	return (void *)l->data;
 }
 
 DLL_EXPORT_SYM void ocrpt_list_free(ocrpt_list *l) {
