@@ -69,20 +69,14 @@ static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 
 			if (img->align && img->align->result[o->residx] && img->align->result[o->residx]->type == OCRPT_RESULT_STRING && img->align->result[o->residx]->string) {
 				const char *alignment = img->align->result[o->residx]->string->str;
-				fprintf(stderr, "ocrpt_pdf_draw_image: alignment: '%s'\n", alignment);
-				if (strcasecmp(alignment, "right") == 0) {
+				if (strcasecmp(alignment, "right") == 0)
 					cairo_translate(o->cr, x + w - w1, y);
-					fprintf(stderr, "ocrpt_pdf_draw_image: right\n");
-				} else if (strcasecmp(alignment, "center") == 0) {
-					fprintf(stderr, "ocrpt_pdf_draw_image: center\n");
+				else if (strcasecmp(alignment, "center") == 0)
 					cairo_translate(o->cr, x + (w - w1) / 2.0, y);
-				} else {
+				else
 					cairo_translate(o->cr, x, y);
-					fprintf(stderr, "ocrpt_pdf_draw_image: left (1)\n");
-				}
 			} else {
 				cairo_translate(o->cr, x, y);
-				fprintf(stderr, "ocrpt_pdf_draw_image: left (2)\n");
 			}
 
 			cairo_scale(o->cr, w1 / img->img_file->width, h / img->img_file->height);
