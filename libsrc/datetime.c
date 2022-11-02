@@ -452,12 +452,12 @@ bool ocrpt_datetime_result_add_number(opencreport *o, ocrpt_result *dst, ocrpt_r
 
 void ocrpt_datetime_add_number(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_number) {
 	if (!ocrpt_datetime_result_add_number(o, dst->result[o->residx], src_datetime, mpfr_get_si(src_number->number, o->rndmode)))
-		ocrpt_expr_make_error_result(o, dst, "invalid operand(s)");
+		ocrpt_expr_make_error_result(dst, "invalid operand(s)");
 }
 
 void ocrpt_datetime_sub_number(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_number) {
 	if (!ocrpt_datetime_result_add_number(o, dst->result[o->residx], src_datetime, -mpfr_get_si(src_number->number, o->rndmode)))
-		ocrpt_expr_make_error_result(o, dst, "invalid operand(s)");
+		ocrpt_expr_make_error_result(dst, "invalid operand(s)");
 }
 
 void ocrpt_datetime_add_interval(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_interval) {

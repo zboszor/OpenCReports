@@ -44,19 +44,19 @@ int main(void) {
 	ocrpt_report *r = get_first_report(o);
 
 	err = NULL;
-	e = ocrpt_expr_parse(o, r, "v.var1", &err);
+	e = ocrpt_report_expr_parse(r, "v.var1", &err);
 	ocrpt_strfree(err);
 	printf("Variable expression reprinted: ");
-	ocrpt_expr_print(o, e);
+	ocrpt_expr_print(e);
 	printf("\n");
 
-	ocrpt_expr_resolve(o, r, e);
+	ocrpt_expr_resolve(e);
 
 	row = 0;
-	ocrpt_query_navigate_start(o, q);
-	ocrpt_report_resolve_variables(o, r);
+	ocrpt_query_navigate_start(q);
+	ocrpt_report_resolve_variables(r);
 
-	while (ocrpt_query_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(q)) {
 		ocrpt_result *rs;
 
 		qr = ocrpt_query_get_result(q, &cols);
@@ -66,18 +66,18 @@ int main(void) {
 
 		printf("\n");
 
-		ocrpt_report_evaluate_variables(o, r);
+		ocrpt_report_evaluate_variables(r);
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, e);
-		rs = ocrpt_expr_eval(o, r, e);
+		ocrpt_expr_print(e);
+		rs = ocrpt_expr_eval(e);
 		printf("Evaluated: ");
 		ocrpt_result_print(rs);
 
 		printf("\n");
 	}
 
-	ocrpt_expr_free(o, r, e);
+	ocrpt_expr_free(e);
 
 	ocrpt_free(o);
 

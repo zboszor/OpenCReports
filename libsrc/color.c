@@ -69,6 +69,9 @@ void ocrpt_init_color(void) {
 }
 
 DLL_EXPORT_SYM void ocrpt_get_color(opencreport *o, const char *cname, ocrpt_color *color, bool bgcolor) {
+	if (!o || !color)
+		return;
+
 	ocrpt_named_color nc;
 
 	if (!cname || *cname == 0)

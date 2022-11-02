@@ -13,8 +13,8 @@ int main(void) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add_odbc(o, "odbc", "ocrpttest2", "ocrpt", NULL);
 	ocrpt_datasource *ds2 = ocrpt_datasource_add_odbc(o, "odbc2", "ocrpttest2", "ocrpt", NULL);
-	ocrpt_query *q = ocrpt_query_add_odbc(o, ds, "a", "SELECT * FROM flintstones");
-	ocrpt_query *q2 = ocrpt_query_add_odbc(o, ds2, "b", "SELECT * FROM rubbles");
+	ocrpt_query *q = ocrpt_query_add_odbc(ds, "a", "SELECT * FROM flintstones");
+	ocrpt_query *q2 = ocrpt_query_add_odbc(ds2, "b", "SELECT * FROM rubbles");
 	int32_t cols, cols2, i, row;
 	ocrpt_query_result *qr = ocrpt_query_get_result(q, &cols);
 	ocrpt_query_result *qr2;
@@ -32,15 +32,15 @@ int main(void) {
 		printf("%d: '%s'\n", i, ocrpt_query_result_column_name(qr2, i));
 
 	err = NULL;
-	match = ocrpt_expr_parse(o, NULL, "a.id = b.id", &err);
+	match = ocrpt_expr_parse(o, "a.id = b.id", &err);
 	ocrpt_strfree(err);
 
-	ocrpt_query_add_follower_n_to_1(o, q, q2, match);
+	ocrpt_query_add_follower_n_to_1(q, q2, match);
 
 	row = 0;
-	ocrpt_query_navigate_start(o, q);
+	ocrpt_query_navigate_start(q);
 
-	while (ocrpt_query_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(q)) {
 		qr = ocrpt_query_get_result(q, &cols);
 		qr2 = ocrpt_query_get_result(q2, &cols);
 

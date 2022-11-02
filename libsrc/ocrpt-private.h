@@ -64,13 +64,11 @@ struct opencreport {
 	ocrpt_list *part_added_callbacks;
 	ocrpt_list *report_added_callbacks;
 	ocrpt_list *precalc_done_callbacks;
-	ocrpt_list *part_iteration_callbacks;
 
 	/* Output buffer for spooling */
 	ocrpt_string *output_buffer;
 
 	/* Page handling for PDF output, lists of cairo_surface_t pointers */
-	ocrpt_output global_output;
 	ocrpt_output_functions output_functions;
 	ocrpt_list *images;
 	ocrpt_list *pages;

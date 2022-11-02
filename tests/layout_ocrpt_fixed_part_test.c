@@ -77,13 +77,13 @@ int main(void) {
 	/* For m.sillypants in the report */
 	setenv("sillypants", "5", 1);
 
-	ocrpt_query_add_array(o, ds, "yields", (const char **)yields, 3, 3, NULL);
-	ocrpt_query_add_array(o, ds, "coupons", (const char **)coupons, 4, 5, NULL);
-	ocrpt_query_add_array(o, ds, "deposits", (const char **)deposits, 2, 4, NULL);
-	ocrpt_query_add_array(o, ds, "petty_cash", (const char **)petty_cash, 2, 3, NULL);
-	ocrpt_query_add_array(o, ds, "misc_income", (const char **)misc_income, 1, 3, NULL);
-	ocrpt_query_add_array(o, ds, "inv_transfer", (const char **)inv_transfer, 2, 4, NULL);
-	ocrpt_query_add_array(o, ds, "inventory", (const char **)inventory, 2, 11, NULL);
+	ocrpt_query_add_array(ds, "yields", (const char **)yields, 3, 3, NULL);
+	ocrpt_query_add_array(ds, "coupons", (const char **)coupons, 4, 5, NULL);
+	ocrpt_query_add_array(ds, "deposits", (const char **)deposits, 2, 4, NULL);
+	ocrpt_query_add_array(ds, "petty_cash", (const char **)petty_cash, 2, 3, NULL);
+	ocrpt_query_add_array(ds, "misc_income", (const char **)misc_income, 1, 3, NULL);
+	ocrpt_query_add_array(ds, "inv_transfer", (const char **)inv_transfer, 2, 4, NULL);
+	ocrpt_query_add_array(ds, "inventory", (const char **)inventory, 2, 11, NULL);
 
 	if (!ocrpt_parse_xml(o, "layout_ocrpt_fixed_part_test.xml")) {
 		printf("XML parse error\n");
@@ -91,7 +91,11 @@ int main(void) {
 		return 0;
 	}
 
-	ocrpt_add_part_iteration_cb(o, part_iter_cb, NULL);
+	ocrpt_list *l = NULL;
+	ocrpt_part *p = ocrpt_part_get_next(o, &l);
+
+	ocrpt_part_add_iteration_cb(p, part_iter_cb, NULL);
+
 	ocrpt_add_precalculation_done_cb(o, precalc_done_cb, NULL);
 
 	ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);

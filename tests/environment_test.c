@@ -13,14 +13,14 @@ int main(void) {
 	ocrpt_result *r;
 
 	setenv("OCRPTENV", "This is a test string", 1);
-	r = ocrpt_environment_get("OCRPTENV");
+	r = ocrpt_env_get("OCRPTENV");
 	printf("OCRPTENV is set. Value is: ");
 	ocrpt_result_print(r);
 	ocrpt_result_free(r);
 
 	unsetenv("OCRPTENV");
 	printf("OCRPTENV is unset. Value is: ");
-	r = ocrpt_environment_get("OCRPTENV");
+	r = ocrpt_env_get("OCRPTENV");
 	ocrpt_result_print(r);
 	ocrpt_result_free(r);
 

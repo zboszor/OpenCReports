@@ -27,29 +27,28 @@ int main(void) {
 	ocrpt_report *r;
 	ocrpt_var *v;
 
-	r = ocrpt_report_new(o);
-	ocrpt_part_append_report(o, NULL, NULL, NULL, r);
+	r = ocrpt_part_column_new_report(ocrpt_part_row_new_column(ocrpt_part_new_row(ocrpt_part_new(o))));
 
-	q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 3, 5, coltypes);
+	q = ocrpt_query_add_array(ds, "a", (const char **)array, 3, 5, coltypes);
 
-	ocrpt_variable_new(o, r, OCRPT_VARIABLE_EXPRESSION, "var1", "id + 1", NULL);
+	ocrpt_variable_new(r, OCRPT_VARIABLE_EXPRESSION, "var1", "id + 1", NULL);
 
 	/* Exercise duplicate variable name */
-	ocrpt_variable_new(o, r, OCRPT_VARIABLE_EXPRESSION, "var1", "id + 1", NULL);
+	ocrpt_variable_new(r, OCRPT_VARIABLE_EXPRESSION, "var1", "id + 1", NULL);
 
 	/* Exercise expression variable containing another (known) expression variable */
-	v = ocrpt_variable_new(o, r, OCRPT_VARIABLE_EXPRESSION, "var2", "v.var1", NULL);
+	v = ocrpt_variable_new(r, OCRPT_VARIABLE_EXPRESSION, "var2", "v.var1", NULL);
 	printf("adding 'var2' %s\n", v ? "succeeded" : "failed");
 
 	/* Exercise other variable containing expression variable */
-	v = ocrpt_variable_new(o, r, OCRPT_VARIABLE_SUM, "var3", "v.var1", NULL);
+	v = ocrpt_variable_new(r, OCRPT_VARIABLE_SUM, "var3", "v.var1", NULL);
 	printf("adding 'var3' %s\n", v ? "succeeded" : "failed");
 
 	/* Exercise another variable type containing non-expression-type variable */
-	ocrpt_variable_new(o, r, OCRPT_VARIABLE_HIGHEST, "var4", "v.var3", NULL);
+	ocrpt_variable_new(r, OCRPT_VARIABLE_HIGHEST, "var4", "v.var3", NULL);
 
 	/* Exercise another variable type containing unknown variable */
-	ocrpt_variable_new(o, r, OCRPT_VARIABLE_HIGHEST, "var5", "v.varX", NULL);
+	ocrpt_variable_new(r, OCRPT_VARIABLE_HIGHEST, "var5", "v.varX", NULL);
 
 	ocrpt_free(o);
 

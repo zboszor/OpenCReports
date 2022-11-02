@@ -25,24 +25,16 @@
  *
  * Returns ocrpt_var pointer or NULL in case of an error.
  */
-DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(opencreport *o, ocrpt_report *r, enum ocrpt_result_type type, const char *name, const char *baseexpr, const char *intermedexpr, const char *intermed2expr, const char *resultexpr, const char *reset_on_break_name) {
+DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r, enum ocrpt_result_type type, const char *name, const char *baseexpr, const char *intermedexpr, const char *intermed2expr, const char *resultexpr, const char *reset_on_break_name) {
 	ocrpt_list *ptr;
 	ocrpt_var *var = NULL;
 
-	if (!o) {
-		fprintf(stderr, "invalid variable definitition: valid opencreport pointer expected\n");
-		return NULL;
-	}
 	if (!r) {
 		fprintf(stderr, "invalid variable definitition: valid ocrpt_report pointer expected\n");
 		return NULL;
 	}
 	if (!name) {
 		fprintf(stderr, "invalid variable definitition: valid name expected\n");
-		return NULL;
-	}
-
-	if (!ocrpt_report_validate(o, r)) {
 		return NULL;
 	}
 
@@ -61,6 +53,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(opencreport *o, ocrpt_report *
 	}
 
 	memset(var, 0, sizeof(ocrpt_var));
+	var->r = r;
 	var->name = ocrpt_mem_strdup(name);
 	var->break_index = SHRT_MAX;
 	var->type = OCRPT_VARIABLE_CUSTOM;
@@ -87,33 +80,33 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(opencreport *o, ocrpt_report *
 		bool free_err = false;
 
 		if (exprs[i].expr) {
-			e = ocrpt_expr_parse(o, r, exprs[i].expr, &err);
+			e = ocrpt_report_expr_parse(r, exprs[i].expr, &err);
 			free_err = true;
 		} else
 			err = exprs[i].error;
 		if (e) {
 			uint32_t vartypes;
 
-			if (e && ocrpt_expr_references(o, r, e, OCRPT_VARREF_VVAR, &vartypes)) {
+			if (e && ocrpt_expr_references(e, OCRPT_VARREF_VVAR, &vartypes)) {
 				if ((vartypes & OCRPT_VARIABLE_UNKNOWN_BIT)) {
 					fprintf(stderr, "variable '%s': references an unknown variable name\n", name);
-					ocrpt_expr_free(o, r, e);
-					ocrpt_variable_free(o, r, var);
+					ocrpt_expr_free(e);
+					ocrpt_variable_free(var);
 					return NULL;
 				}
 				if ((vartypes & ~OCRPT_VARIABLE_EXPRESSION_BIT) != 0) {
 					fprintf(stderr, "variable '%s': may only reference expression variables\n", name);
-					ocrpt_expr_free(o, r, e);
-					ocrpt_variable_free(o, r, var);
+					ocrpt_expr_free(e);
+					ocrpt_variable_free(var);
 					return NULL;
 				}
 			}
 		} else
-			e = ocrpt_expr_parse(o, r, "1", NULL);
+			e = ocrpt_report_expr_parse(r, "1", NULL);
 		if (i)
-			ocrpt_expr_init_iterative_results(o, e, type);
+			ocrpt_expr_init_iterative_results(e, type);
 		if (err) {
-			ocrpt_expr_make_error_result(o, e, err);
+			ocrpt_expr_make_error_result(e, err);
 			if (free_err)
 				ocrpt_strfree(err);
 		}
@@ -142,7 +135,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(opencreport *o, ocrpt_report *
  * When returning NULL, the expression is freed so the caller
  * doesn't have to distinguish between different types of error.
  */
-DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, ocrpt_var_type type, const char *name, const char *expr, const char *reset_on_break_name) {
+DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type type, const char *name, const char *expr, const char *reset_on_break_name) {
 	ocrpt_expr *e = NULL;
 	ocrpt_string *exprstr, *expr1str;
 	ocrpt_var *var = NULL;
@@ -163,19 +156,19 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 		break;
 	default:
 		fprintf(stderr, "invalid type for variable '%s': %d\n", name, type);
-		ocrpt_expr_free(o, r, e);
+		ocrpt_expr_free(e);
 		return NULL;
 	}
 
 	switch (type) {
 	case OCRPT_VARIABLE_EXPRESSION:
-		var = ocrpt_variable_new_full(o, r, OCRPT_RESULT_NUMBER, name, NULL, NULL, NULL, expr, reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, NULL, NULL, NULL, expr, reset_on_break_name);
 		break;
 	case OCRPT_VARIABLE_COUNT:
-		var = ocrpt_variable_new_full(o, r, OCRPT_RESULT_NUMBER, name, expr ? expr : "1", NULL, NULL, "r.self + (isnull(r.baseexpr) ? 0 : 1)", reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr ? expr : "1", NULL, NULL, "r.self + (isnull(r.baseexpr) ? 0 : 1)", reset_on_break_name);
 		break;
 	case OCRPT_VARIABLE_COUNTALL:
-		var = ocrpt_variable_new_full(o, r, OCRPT_RESULT_NUMBER, name, NULL, NULL, NULL, "r.self + 1", reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, NULL, NULL, NULL, "r.self + 1", reset_on_break_name);
 		break;
 	case OCRPT_VARIABLE_SUM:
 		exprstr = ocrpt_mem_string_new_printf("(%s%s%s == 1 ? 0 : r.self) + (isnull(r.baseexpr) ? 0 : r.baseexpr)",
@@ -183,7 +176,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 						reset_on_break_name ? reset_on_break_name : "",
 						reset_on_break_name ? "')" : ")");
 
-		var = ocrpt_variable_new_full(o, r, OCRPT_RESULT_NUMBER, name, expr, NULL, NULL, exprstr->str, reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, NULL, NULL, exprstr->str, reset_on_break_name);
 		ocrpt_mem_string_free(exprstr, true);
 		break;
 	case OCRPT_VARIABLE_AVERAGE:
@@ -191,7 +184,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 						reset_on_break_name ? "brrownum('" : "rownum(",
 						reset_on_break_name ? reset_on_break_name : "",
 						reset_on_break_name ? "')" : ")");
-		var = ocrpt_variable_new_full(o, r, OCRPT_RESULT_NUMBER, name, expr, exprstr->str, "r.self + (isnull(r.baseexpr) ? 0 : 1)", "r.intermedexpr / r.intermed2expr", reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, exprstr->str, "r.self + (isnull(r.baseexpr) ? 0 : 1)", "r.intermedexpr / r.intermed2expr", reset_on_break_name);
 		ocrpt_mem_string_free(exprstr, true);
 		break;
 	case OCRPT_VARIABLE_AVERAGEALL:
@@ -203,7 +196,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 						reset_on_break_name ? "brrownum('" : "rownum(",
 						reset_on_break_name ? reset_on_break_name : "",
 						reset_on_break_name ? "')" : ")");
-		var = ocrpt_variable_new_full(o, r, OCRPT_RESULT_NUMBER, name, expr, exprstr->str, NULL, expr1str->str, reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, exprstr->str, NULL, expr1str->str, reset_on_break_name);
 		ocrpt_mem_string_free(exprstr, true);
 		ocrpt_mem_string_free(expr1str, true);
 		break;
@@ -221,7 +214,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 						reset_on_break_name ? "brrownum('" : "rownum(",
 						reset_on_break_name ? reset_on_break_name : "",
 						reset_on_break_name ? "')" : ")");
-		var = ocrpt_variable_new_full(o, r, OCRPT_RESULT_NUMBER, name, expr, NULL, NULL, exprstr->str, reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, NULL, NULL, exprstr->str, reset_on_break_name);
 		ocrpt_mem_string_free(exprstr, true);
 		break;
 	case OCRPT_VARIABLE_HIGHEST:
@@ -238,7 +231,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 						reset_on_break_name ? "brrownum('" : "rownum(",
 						reset_on_break_name ? reset_on_break_name : "",
 						reset_on_break_name ? "')" : ")");
-		var = ocrpt_variable_new_full(o, r, OCRPT_RESULT_NUMBER, name, expr, NULL, NULL, exprstr->str, reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, NULL, NULL, exprstr->str, reset_on_break_name);
 		ocrpt_mem_string_free(exprstr, true);
 		break;
 	default:
@@ -251,93 +244,101 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(opencreport *o, ocrpt_report *r, oc
 	return var;
 }
 
-void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_var *var) {
+void ocrpt_variable_free(ocrpt_var *var) {
 	ocrpt_list_free_deep(var->precalc_results, (ocrpt_mem_free_t)ocrpt_result_free);
-	ocrpt_expr_free(o, r, var->baseexpr);
-	ocrpt_expr_free(o, r, var->intermedexpr);
-	ocrpt_expr_free(o, r, var->intermed2expr);
-	ocrpt_expr_free(o, r, var->resultexpr);
+	ocrpt_expr_free(var->baseexpr);
+	ocrpt_expr_free(var->intermedexpr);
+	ocrpt_expr_free(var->intermed2expr);
+	ocrpt_expr_free(var->resultexpr);
 	ocrpt_mem_free(var->name);
 	ocrpt_mem_free(var->br_name);
 	ocrpt_mem_free(var);
 }
 
-void ocrpt_variables_free(opencreport *o, ocrpt_report *r) {
-	ocrpt_list *ptr;
+void ocrpt_variables_free(ocrpt_report *r) {
+	if (!r)
+		return;
 
-	for (ptr = r->variables; ptr; ptr = ptr->next)
-		ocrpt_variable_free(o, r, (ocrpt_var *)ptr->data);
+	for (ocrpt_list *ptr = r->variables; ptr; ptr = ptr->next)
+		ocrpt_variable_free((ocrpt_var *)ptr->data);
 
 	ocrpt_list_free(r->variables);
 	r->variables = NULL;
 }
 
 DLL_EXPORT_SYM void ocrpt_variable_set_precalculate(ocrpt_var *var, bool value) {
+	if (!var)
+		return;
+
 	var->precalculate = value;
 }
 
-DLL_EXPORT_SYM void ocrpt_variable_resolve(opencreport *o, ocrpt_report *r, ocrpt_var *v) {
+DLL_EXPORT_SYM void ocrpt_variable_resolve(ocrpt_var *v) {
+	if (!v)
+		return;
+
 	if (v->baseexpr) {
-		ocrpt_expr_resolve_worker(o, r, v->baseexpr, v->baseexpr, v, 0);
-		ocrpt_expr_optimize(o, r, v->baseexpr);
+		ocrpt_expr_resolve_worker(v->baseexpr, v->baseexpr, v, 0);
+		ocrpt_expr_optimize(v->baseexpr);
 	}
 	if (v->intermedexpr) {
-		ocrpt_expr_resolve_worker(o, r, v->intermedexpr, v->intermedexpr, v, 0);
-		ocrpt_expr_optimize(o, r, v->intermedexpr);
+		ocrpt_expr_resolve_worker(v->intermedexpr, v->intermedexpr, v, 0);
+		ocrpt_expr_optimize(v->intermedexpr);
 	}
 	if (v->intermed2expr) {
-		ocrpt_expr_resolve_worker(o, r, v->intermed2expr, v->intermed2expr, v, 0);
-		ocrpt_expr_optimize(o, r, v->intermed2expr);
+		ocrpt_expr_resolve_worker(v->intermed2expr, v->intermed2expr, v, 0);
+		ocrpt_expr_optimize(v->intermed2expr);
 	}
 
-	ocrpt_expr_resolve_worker(o, r, v->resultexpr, v->resultexpr, v, 0);
-	ocrpt_expr_optimize(o, r, v->resultexpr);
+	ocrpt_expr_resolve_worker(v->resultexpr, v->resultexpr, v, 0);
+	ocrpt_expr_optimize(v->resultexpr);
 
 	if (v->br_name && !v->br) {
-		ocrpt_break *br = ocrpt_break_get(o, r, v->br_name);
+		ocrpt_break *br = ocrpt_break_get(v->r, v->br_name);
 
 		if (br) {
 			v->br = br;
 			v->break_index = br->index;
 		} else {
-			fprintf(stderr, "%s: break '%s' not found, disabling resetonbreak for v.'%s'\n", __func__, v->br_name, v->name);
+			fprintf(stderr, "break '%s' not found, disabling resetonbreak for v.'%s'\n", v->br_name, v->name);
 			ocrpt_mem_free(v->br_name);
 			v->br_name = NULL;
 		}
     }
 }
 
-DLL_EXPORT_SYM void ocrpt_variable_evaluate(opencreport *o, ocrpt_report *r, ocrpt_var *v) {
-	if (!o || !r || !v)
+DLL_EXPORT_SYM void ocrpt_variable_evaluate(ocrpt_var *v) {
+	if (!v)
 		return;
 
-	if (o->precalculate || !v->precalculate) {
+	if (v->r->o->precalculate || !v->precalculate) {
 		if (v->baseexpr)
-			ocrpt_expr_eval_worker(o, r, v->baseexpr, v->baseexpr, v);
+			ocrpt_expr_eval_worker(v->baseexpr, v->baseexpr, v);
 		if (v->intermedexpr)
-			ocrpt_expr_eval_worker(o, r, v->intermedexpr, v->intermedexpr, v);
+			ocrpt_expr_eval_worker(v->intermedexpr, v->intermedexpr, v);
 		if (v->intermed2expr)
-			ocrpt_expr_eval_worker(o, r, v->intermed2expr, v->intermed2expr, v);
-		ocrpt_expr_eval_worker(o, r, v->resultexpr, v->resultexpr, v);
+			ocrpt_expr_eval_worker(v->intermed2expr, v->intermed2expr, v);
+		ocrpt_expr_eval_worker(v->resultexpr, v->resultexpr, v);
 	}
 }
 
-void ocrpt_variable_reset(opencreport *o, ocrpt_var *v) {
+void ocrpt_variable_reset(ocrpt_var *v) {
 	if (!v)
 		return;
 
 	/* Don't initialize ocrpt_result pointers on baseexpr */
 	if (v->intermedexpr)
-		ocrpt_expr_init_iterative_results(o, v->intermedexpr, v->basetype);
+		ocrpt_expr_init_iterative_results(v->intermedexpr, v->basetype);
 	if (v->intermed2expr)
-		ocrpt_expr_init_iterative_results(o, v->intermed2expr, v->basetype);
-	ocrpt_expr_init_iterative_results(o, v->resultexpr, v->basetype);
+		ocrpt_expr_init_iterative_results(v->intermed2expr, v->basetype);
+	ocrpt_expr_init_iterative_results(v->resultexpr, v->basetype);
 }
 
-void ocrpt_variables_add_precalculated_results(opencreport *o, ocrpt_report *r, ocrpt_list *brl_start, bool last_row) {
-	ocrpt_list *l;
+void ocrpt_variables_add_precalculated_results(ocrpt_report *r, ocrpt_list *brl_start, bool last_row) {
+	if (!r)
+		return;
 
-	for (l = r->variables; l; l = l->next) {
+	for (ocrpt_list *l = r->variables; l; l = l->next) {
 		ocrpt_var *var = (ocrpt_var *)l->data;
 		if (var->precalculate) {
 			ocrpt_list *brl;
@@ -356,17 +357,18 @@ void ocrpt_variables_add_precalculated_results(opencreport *o, ocrpt_report *r, 
 			if (var_br_triggered) {
 				ocrpt_result *dst = ocrpt_mem_malloc(sizeof(ocrpt_result));
 				memset(dst, 0, sizeof(ocrpt_result));
-				ocrpt_result_copy(o, dst, var->resultexpr->result[o->residx]);
+				ocrpt_result_copy(r->o, dst, var->resultexpr->result[r->o->residx]);
 				var->precalc_results = ocrpt_list_append(var->precalc_results, dst);
 			}
 		}
 	}
 }
 
-void ocrpt_variables_advance_precalculated_results(opencreport *o, ocrpt_report *r, ocrpt_list *brl_start) {
-	ocrpt_list *l;
+void ocrpt_variables_advance_precalculated_results(ocrpt_report *r, ocrpt_list *brl_start) {
+	if (!r)
+		return;
 
-	for (l = r->variables; l; l = l->next) {
+	for (ocrpt_list *l = r->variables; l; l = l->next) {
 		ocrpt_var *var = (ocrpt_var *)l->data;
 		if (var->precalculate) {
 			if (!var->precalc_rptr)

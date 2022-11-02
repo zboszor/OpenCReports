@@ -58,9 +58,7 @@ struct ocrpt_query_follower {
 };
 typedef struct ocrpt_query_follower ocrpt_query_follower;
 
-ocrpt_datasource *ocrpt_datasource_validate(opencreport *o, ocrpt_datasource *source);
-
-ocrpt_query *ocrpt_query_alloc(opencreport *o, const ocrpt_datasource *source, const char *name);
+ocrpt_query *ocrpt_query_alloc(const ocrpt_datasource *source, const char *name);
 
 void ocrpt_query_result_set_values_null(ocrpt_query *q);
 void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_t conv, const char *str, size_t len);

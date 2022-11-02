@@ -44,6 +44,9 @@ struct ocrpt_report {
 	ocrpt_output fieldheader;
 	ocrpt_output fielddetails;
 
+	/* Parent structure */
+	opencreport *o;
+
 	/* For r.detailcnt */
 	ocrpt_expr *detailcnt;
 	ocrpt_list *detailcnt_dependees;
@@ -68,8 +71,6 @@ struct ocrpt_report {
 	ocrpt_list *newrow_callbacks;
 	ocrpt_list *precalc_done_callbacks;
 	ocrpt_list *iteration_callbacks;
-
-	ocrpt_output global_output;
 
 	/*
 	 * How many times should this report run
@@ -96,7 +97,7 @@ struct ocrpt_report {
 	bool finished:1;
 };
 
-struct ocrpt_part_row_data {
+struct ocrpt_part_column {
 	double width;
 	double real_width;
 	double height;
@@ -112,17 +113,21 @@ struct ocrpt_part_row_data {
 	double start_page_position;
 	double remaining_height;
 
-	ocrpt_output border;
 	ocrpt_color border_color;
+
+	/* Parent structure */
+	opencreport *o;
+
 	ocrpt_list *reports;
 	ocrpt_list *last_report;
 	uint32_t detail_columns;
 	uint32_t current_column;
 	bool width_set:1;
 	bool height_set:1;
-	bool border_width_set_from_pd:1;
 	bool border_width_set:1;
+	bool border_color_set:1;
 	bool detail_columns_set:1;
+	bool column_pad_set:1;
 	bool suppress:1;
 	bool finished:1;
 };
@@ -130,6 +135,10 @@ struct ocrpt_part_row_data {
 struct ocrpt_part_row {
 	double start_page_position;
 	double end_page_position;
+
+	/* Parent structure */
+	opencreport *o;
+
 	ocrpt_list *start_page;
 	ocrpt_list *end_page;
 	ocrpt_list *pd_list;
@@ -160,9 +169,14 @@ struct ocrpt_part {
 	double right_margin_value;
 
 	/* Common header and footer for all reports in this part */
-	ocrpt_output global_output;
 	ocrpt_output pageheader;
 	ocrpt_output pagefooter;
+
+	/* Parent structure */
+	opencreport *o;
+
+	/* Part iteration callback */
+	ocrpt_list *iteration_callbacks;
 
 	/* Paper */
 	const ocrpt_paper *paper;
@@ -197,11 +211,10 @@ struct ocrpt_part {
 	bool suppress_pageheader_firstpage:1;
 };
 
-void ocrpt_report_evaluate_detailcnt_dependees(opencreport *o, ocrpt_report *r);
+void ocrpt_report_evaluate_detailcnt_dependees(ocrpt_report *r);
 
-void ocrpt_part_free(opencreport *o, struct ocrpt_part *p);
+void ocrpt_part_free(struct ocrpt_part *p);
 void ocrpt_parts_free(opencreport *o);
-void ocrpt_report_free(opencreport *o, ocrpt_report *r);
-bool ocrpt_report_validate(opencreport *o, ocrpt_report *r);
+void ocrpt_report_free(ocrpt_report *r);
 
 #endif

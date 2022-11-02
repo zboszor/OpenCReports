@@ -36,38 +36,38 @@ int main(void) {
 	int32_t cols, cols2, row, i;
 
 	err = NULL;
-	id = ocrpt_expr_parse(o, NULL, "id", &err);
+	id = ocrpt_expr_parse(o, "id", &err);
 	ocrpt_strfree(err);
-	ocrpt_expr_print(o, id);
+	ocrpt_expr_print(id);
 
 	err = NULL;
-	name = ocrpt_expr_parse(o, NULL, "name", &err);
+	name = ocrpt_expr_parse(o, "name", &err);
 	ocrpt_strfree(err);
-	ocrpt_expr_print(o, name);
+	ocrpt_expr_print(name);
 
 	err = NULL;
-	age = ocrpt_expr_parse(o, NULL, "age * 2", &err);
+	age = ocrpt_expr_parse(o, "age * 2", &err);
 	ocrpt_strfree(err);
-	ocrpt_expr_print(o, age);
+	ocrpt_expr_print(age);
 
 	err = NULL;
-	adult = ocrpt_expr_parse(o, NULL, "a.adult", &err);
+	adult = ocrpt_expr_parse(o, "a.adult", &err);
 
-	q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 3, 5, coltypes);
+	q = ocrpt_query_add_array(ds, "a", (const char **)array, 3, 5, coltypes);
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)
 		printf("%d: '%s'\n", i, ocrpt_query_result_column_name(qr, i));
 
-	ocrpt_expr_resolve(o, NULL, id);
-	ocrpt_expr_resolve(o, NULL, name);
-	ocrpt_expr_resolve(o, NULL, age);
-	ocrpt_expr_resolve(o, NULL, adult);
+	ocrpt_expr_resolve(id);
+	ocrpt_expr_resolve(name);
+	ocrpt_expr_resolve(age);
+	ocrpt_expr_resolve(adult);
 
 	row = 0;
-	ocrpt_query_navigate_start(o, q);
+	ocrpt_query_navigate_start(q);
 
-	while (ocrpt_query_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(q)) {
 		ocrpt_result *r;
 
 		qr = ocrpt_query_get_result(q, &cols);
@@ -78,42 +78,42 @@ int main(void) {
 		printf("\n");
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, id);
-		r = ocrpt_expr_eval(o, NULL, id);
+		ocrpt_expr_print(id);
+		r = ocrpt_expr_eval(id);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, name);
-		r = ocrpt_expr_eval(o, NULL, name);
+		ocrpt_expr_print(name);
+		r = ocrpt_expr_eval(name);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, age);
-		r = ocrpt_expr_eval(o, NULL, age);
+		ocrpt_expr_print(age);
+		r = ocrpt_expr_eval(age);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, adult);
-		r = ocrpt_expr_eval(o, NULL, adult);
+		ocrpt_expr_print(adult);
+		r = ocrpt_expr_eval(adult);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
-		printf("Expression is %s previous row\n", ocrpt_expr_cmp_results(o, adult) ? "identical to" : "different from");
+		printf("Expression is %s previous row\n", ocrpt_expr_cmp_results(adult) ? "identical to" : "different from");
 
 		printf("\n");
 	}
 
 	printf("--- TESTING FOLLOWER ---\n\n");
 
-	q2 = ocrpt_query_add_array(o, ds, "b", (const char **)array2, 2, 5, coltypes);
-	ocrpt_query_add_follower(o, q, q2);
+	q2 = ocrpt_query_add_array(ds, "b", (const char **)array2, 2, 5, coltypes);
+	ocrpt_query_add_follower(q, q2);
 
 	row = 0;
-	ocrpt_query_navigate_start(o, q);
+	ocrpt_query_navigate_start(q);
 
-	while (ocrpt_query_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(q)) {
 		ocrpt_result *r;
 
 		qr = ocrpt_query_get_result(q, &cols);
@@ -126,42 +126,42 @@ int main(void) {
 		printf("\n");
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, id);
-		r = ocrpt_expr_eval(o, NULL, id);
+		ocrpt_expr_print(id);
+		r = ocrpt_expr_eval(id);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, name);
-		r = ocrpt_expr_eval(o, NULL, name);
+		ocrpt_expr_print(name);
+		r = ocrpt_expr_eval(name);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, age);
-		r = ocrpt_expr_eval(o, NULL, age);
+		ocrpt_expr_print(age);
+		r = ocrpt_expr_eval(age);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("\n");
 	}
 
-	ocrpt_query_free(o, q2);
+	ocrpt_query_free(q2);
 
 	printf("--- TESTING FOLLOWER N:1 ---\n\n");
 
-	q2 = ocrpt_query_add_array(o, ds, "b", (const char **)array2, 2, 5, coltypes);
+	q2 = ocrpt_query_add_array(ds, "b", (const char **)array2, 2, 5, coltypes);
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	err = NULL;
-	match = ocrpt_expr_parse(o, NULL, "a.id = b.id", &err);
+	match = ocrpt_expr_parse(o, "a.id = b.id", &err);
 	ocrpt_strfree(err);
 
-	ocrpt_query_add_follower_n_to_1(o, q, q2, match);
+	ocrpt_query_add_follower_n_to_1(q, q2, match);
 
 	row = 0;
-	ocrpt_query_navigate_start(o, q);
+	ocrpt_query_navigate_start(q);
 
-	while (ocrpt_query_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(q)) {
 		ocrpt_result *r;
 
 		qr = ocrpt_query_get_result(q, &cols);
@@ -174,20 +174,20 @@ int main(void) {
 		printf("\n");
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, id);
-		r = ocrpt_expr_eval(o, NULL, id);
+		ocrpt_expr_print(id);
+		r = ocrpt_expr_eval(id);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, name);
-		r = ocrpt_expr_eval(o, NULL, name);
+		ocrpt_expr_print(name);
+		r = ocrpt_expr_eval(name);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, age);
-		r = ocrpt_expr_eval(o, NULL, age);
+		ocrpt_expr_print(age);
+		r = ocrpt_expr_eval(age);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 
@@ -199,10 +199,10 @@ int main(void) {
 
 	printf("--- END ---\n");
 
-	ocrpt_expr_free(o, NULL, id);
-	ocrpt_expr_free(o, NULL, name);
-	ocrpt_expr_free(o, NULL, age);
-	ocrpt_expr_free(o, NULL, adult);
+	ocrpt_expr_free(id);
+	ocrpt_expr_free(name);
+	ocrpt_expr_free(age);
+	ocrpt_expr_free(adult);
 
 	/* ocrpt_free() will free it */
 	//ocrpt_free_query(o, q);

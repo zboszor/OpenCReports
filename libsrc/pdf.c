@@ -30,7 +30,7 @@ static cairo_status_t ocrpt_write_pdf(void *closure, const unsigned char *data, 
 	return CAIRO_STATUS_SUCCESS;
 }
 
-static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_indent, double x, double y, double w, double h) {
+static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_indent, double x, double y, double w, double h) {
 	ocrpt_image_file *img_file = img->img_file;
 
 	if (!img_file)
@@ -97,7 +97,7 @@ static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	cairo_restore(o->cr);
 }
 
-void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_line_element *le, double total_width) {
+void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double total_width) {
 	char *font;
 	double size, w;
 	bool bold = false, italic = false, newfont = false, justified = false;
@@ -317,7 +317,7 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 	}
 }
 
-void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_line_element *le, double page_indent, double y) {
+void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double page_indent, double y) {
 	ocrpt_cairo_create(o);
 
 	cairo_save(o->cr);
@@ -400,7 +400,7 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		le->pline = NULL;
 }
 
-void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_hline *hline, double page_width, double page_indent, double page_position, double size) {
+void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_hline *hline, double page_width, double page_indent, double page_position, double size) {
 	double indent, length;
 
 	if (hline->indent && hline->indent->result[o->residx] && hline->indent->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->indent->result[o->residx]->number_initialized)
@@ -438,7 +438,7 @@ void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocr
 	cairo_fill(o->cr);
 }
 
-void ocrpt_pdf_draw_rectangle(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_color *color, double line_width, double x, double y, double width, double height) {
+void ocrpt_pdf_draw_rectangle(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_color *color, double line_width, double x, double y, double width, double height) {
 	ocrpt_cairo_create(o);
 
 	cairo_set_source_rgb(o->cr, color->r, color->g, color->b);

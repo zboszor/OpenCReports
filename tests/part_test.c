@@ -12,14 +12,12 @@
 
 int main(void) {
 	opencreport *o = ocrpt_init();
-	ocrpt_part *p1 UNUSED;
-	ocrpt_part *p2 UNUSED;
-	ocrpt_part_row *pr1 UNUSED;
-	ocrpt_part_row *pr2 UNUSED;
-	ocrpt_part_row_data *pd1 UNUSED;
-	ocrpt_part_row_data *pd2 UNUSED;
-	ocrpt_report *r1 UNUSED;
-	ocrpt_report *r2 UNUSED;
+	ocrpt_part *p1;
+	ocrpt_part *p2;
+	ocrpt_part_row *pr1;
+	ocrpt_part_row *pr2;
+	ocrpt_part_column *pd1;
+	ocrpt_part_column *pd2;
 
 	p1 = ocrpt_part_new(o);
 	p2 = ocrpt_part_new(o);
@@ -34,12 +32,14 @@ int main(void) {
 	o = ocrpt_init();
 
 	p1 = ocrpt_part_new(o);
-	r1 = ocrpt_report_new(o);
-	ocrpt_part_append_report(o, p1, NULL, NULL, r1);
+	pr1 = ocrpt_part_new_row(p1);
+	pd1 = ocrpt_part_row_new_column(pr1);
+	ocrpt_part_column_new_report(pd1);
 
 	p2 = ocrpt_part_new(o);
-	r2 = ocrpt_report_new(o);
-	ocrpt_part_append_report(o, p2, NULL, NULL, r2);
+	pr2 = ocrpt_part_new_row(p2);
+	pd2 = ocrpt_part_row_new_column(pr2);
+	ocrpt_part_column_new_report(pd2);
 
 	printf("Allocated two parts and one report for each part\n");
 
@@ -55,13 +55,10 @@ int main(void) {
 	p1 = ocrpt_part_new(o);
 
 	p2 = ocrpt_part_new(o);
-	pr2 = ocrpt_part_new_row(o, p2);
-	pd2 = ocrpt_part_row_new_data(o, p2, pr2);
-	r1 = ocrpt_report_new(o);
-	ocrpt_part_append_report(o, p2, pr2, pd2, r1);
-
-	r2 = ocrpt_report_new(o);
-	ocrpt_part_append_report(o, p2, pr2, pd2, r2);
+	pr2 = ocrpt_part_new_row(p2);
+	pd2 = ocrpt_part_row_new_column(pr2);
+	ocrpt_part_column_new_report(pd2);
+	ocrpt_part_column_new_report(pd2);
 
 	printf("Allocated two parts and two reports for the second part\n");
 

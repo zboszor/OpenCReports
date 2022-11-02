@@ -186,13 +186,13 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, cons
 	return ds;
 }
 
-static ocrpt_query *array_query_add(opencreport *o, const ocrpt_datasource *source, const char *name,
+static ocrpt_query *array_query_add(const ocrpt_datasource *source, const char *name,
 									const char **array, int32_t rows, int32_t cols,
 									const enum ocrpt_result_type *types, bool free_types) {
 	ocrpt_query *query;
 	struct ocrpt_array_results *priv;
 
-	query = ocrpt_query_alloc(o, source, name);
+	query = ocrpt_query_alloc(source, name);
 	if (!query)
 		return NULL;
 
@@ -200,7 +200,7 @@ static ocrpt_query *array_query_add(opencreport *o, const ocrpt_datasource *sour
 
 	priv = ocrpt_mem_malloc(sizeof(struct ocrpt_array_results));
 	if (!priv) {
-		ocrpt_query_free(o, query);
+		ocrpt_query_free(query);
 		return NULL;
 	}
 
@@ -215,23 +215,18 @@ static ocrpt_query *array_query_add(opencreport *o, const ocrpt_datasource *sour
 	priv->free_types = free_types;
 	query->priv = priv;
 
-	query->rownum = ocrpt_expr_parse(o, NULL, "r.rownum", NULL);
+	query->rownum = ocrpt_expr_parse(source->o, "r.rownum", NULL);
 
 	return query;
 }
 
-DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(opencreport *o, ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
-	if (!ocrpt_datasource_validate(o, source)) {
-		fprintf(stderr, "%s:%d: datasource is not for this opencreport structure\n", __func__, __LINE__);
-		return NULL;
-	}
-
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
 	if (source->input != &ocrpt_array_input) {
-		fprintf(stderr, "%s:%d: datasource is not array\n", __func__, __LINE__);
+		fprintf(stderr, "datasource is not array\n");
 		return NULL;
 	}
 
-	return array_query_add(o, source, name, array, rows, cols, types, false);
+	return array_query_add(source, name, array, rows, cols, types, false);
 }
 
 DLL_EXPORT_SYM ocrpt_query_discover_func ocrpt_query_discover_array = ocrpt_query_discover_array_c;
@@ -385,7 +380,7 @@ static void ocrpt_file_query_free(ocrpt_file_query *fq, bool in_error) {
 		ocrpt_list_free_deep(fq->rowlist, (ocrpt_mem_free_t)ocrpt_list_free);
 }
 
-DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource *source,
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
 												const char *name, const char *filename,
 												const enum ocrpt_result_type *types) {
 	struct stat st;
@@ -398,38 +393,33 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource
 	size_t parser_retval;
 	int32_t fd, row;
 
-	if (!ocrpt_datasource_validate(o, source)) {
-		fprintf(stderr, "%s:%d: datasource is not for this opencreport structure\n", __func__, __LINE__);
-		return NULL;
-	}
-
 	if (source->input != &ocrpt_csv_input) {
-		fprintf(stderr, "%s:%d: datasource is not csv\n", __func__, __LINE__);
+		fprintf(stderr, "datasource is not csv\n");
 		return NULL;
 	}
 
 	if (stat(filename, &st) != 0) {
-		fprintf(stderr, "%s: error opening file\n", __func__);
+		fprintf(stderr, "error opening file\n");
 		return NULL;
 	}
 
 	fd = open(filename, O_RDONLY);
 	if (fd < 0) {
-		fprintf(stderr, "%s: error opening file\n", __func__);
+		fprintf(stderr, "error opening file\n");
 		return NULL;
 	}
 
 	buf = ocrpt_mem_malloc(st.st_size);
 	if (!buf) {
 		close(fd);
-		fprintf(stderr, "%s: out of memory\n", __func__);
+		fprintf(stderr, "out of memory\n");
 		return NULL;
 	}
 
 	if (read(fd, buf, st.st_size) != st.st_size) {
 		close(fd);
 		ocrpt_mem_free(buf);
-		fprintf(stderr, "%s: error reading file\n", __func__);
+		fprintf(stderr, "error reading file\n");
 		return NULL;
 	}
 
@@ -437,7 +427,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource
 
 	if (csv_init(&csv, CSV_STRICT | CSV_REPALL_NL | CSV_STRICT_FINI | CSV_APPEND_NULL | CSV_EMPTY_IS_NULL) != 0) {
 		ocrpt_mem_free(buf);
-		fprintf(stderr, "%s: error initializing CSV parser\n", __func__);
+		fprintf(stderr, "error initializing CSV parser\n");
 		return NULL;
 	}
 
@@ -450,7 +440,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource
 		ocrpt_mem_free(buf);
 		csv_free(&csv);
 		ocrpt_file_query_free(&fq, true);
-		fprintf(stderr, "%s: parsing CSV file \"%s\" failed\n", __func__, filename);
+		fprintf(stderr, "parsing CSV file \"%s\" failed\n", filename);
 		return NULL;
 	}
 
@@ -461,7 +451,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource
 	array = ocrpt_mem_malloc(fq.rows * fq.cols * sizeof(char *));
 	if (!array) {
 		ocrpt_file_query_free(&fq, true);
-		fprintf(stderr, "%s: out of memory\n", __func__);
+		fprintf(stderr, "out of memory\n");
 		return NULL;
 	}
 
@@ -476,7 +466,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(opencreport *o, ocrpt_datasource
 			array[row * fq.cols + col] = NULL;
 	}
 
-	retval = array_query_add(o, source, name, array, fq.rows - 1, fq.cols, types, false);
+	retval = array_query_add(source, name, array, fq.rows - 1, fq.cols, types, false);
 
 	ocrpt_file_query_free(&fq, false);
 
@@ -716,7 +706,7 @@ static yajl_callbacks ocrpt_yajl_cb = {
 	ocrpt_yajl_end_array
 };
 
-DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(opencreport *o, ocrpt_datasource *source,
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(ocrpt_datasource *source,
 												const char *name, const char *filename,
 												const enum ocrpt_result_type *types) {
 	struct stat st;
@@ -729,38 +719,33 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(opencreport *o, ocrpt_datasourc
 	ocrpt_list *rowptr;
 	int32_t fd, row;
 
-	if (!ocrpt_datasource_validate(o, source)) {
-		fprintf(stderr, "%s:%d: datasource is not for this opencreport structure\n", __func__, __LINE__);
-		return NULL;
-	}
-
 	if (source->input != &ocrpt_json_input) {
-		fprintf(stderr, "%s:%d: datasource is not json\n", __func__, __LINE__);
+		fprintf(stderr, "datasource is not json\n");
 		return NULL;
 	}
 
 	if (stat(filename, &st) != 0) {
-		fprintf(stderr, "%s: error opening file\n", __func__);
+		fprintf(stderr, "error opening file\n");
 		return NULL;
 	}
 
 	fd = open(filename, O_RDONLY);
 	if (fd < 0) {
-		fprintf(stderr, "%s: error opening file\n", __func__);
+		fprintf(stderr, "error opening file\n");
 		return NULL;
 	}
 
 	buf = ocrpt_mem_malloc(st.st_size);
 	if (!buf) {
 		close(fd);
-		fprintf(stderr, "%s: out of memory\n", __func__);
+		fprintf(stderr, "out of memory\n");
 		return NULL;
 	}
 
 	if (read(fd, buf, st.st_size) != st.st_size) {
 		close(fd);
 		ocrpt_mem_free(buf);
-		fprintf(stderr, "%s: error reading file\n", __func__);
+		fprintf(stderr, "error reading file\n");
 		return NULL;
 	}
 
@@ -786,7 +771,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(opencreport *o, ocrpt_datasourc
 	array = ocrpt_mem_malloc(fq.rows * fq.cols * sizeof(char *));
 	if (!array) {
 		ocrpt_file_query_free(&fq, true);
-		fprintf(stderr, "%s: out of memory\n", __func__);
+		fprintf(stderr, "out of memory\n");
 		return NULL;
 	}
 
@@ -801,7 +786,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(opencreport *o, ocrpt_datasourc
 			array[row * fq.cols + col] = NULL;
 	}
 
-	retval = array_query_add(o, source, name, array, fq.rows - 1, fq.cols, (fq.coltypesset ? fq.types : types), fq.coltypesset);
+	retval = array_query_add(source, name, array, fq.rows - 1, fq.cols, (fq.coltypesset ? fq.types : types), fq.coltypesset);
 
 	ocrpt_file_query_free(&fq, false);
 	if (fq.types && !fq.coltypesset)
@@ -1117,7 +1102,7 @@ static int32_t ocrpt_parse_data_node(opencreport *o, xmlTextReaderPtr reader, oc
 	return !err;
 }
 
-DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(opencreport *o, ocrpt_datasource *source,
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(ocrpt_datasource *source,
 												const char *name, const char *filename,
 												const enum ocrpt_result_type *types) {
 	const char **array;
@@ -1127,13 +1112,8 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(opencreport *o, ocrpt_datasource
 	ocrpt_list *rowptr;
 	int32_t ret, err, row;
 
-	if (!ocrpt_datasource_validate(o, source)) {
-		fprintf(stderr, "%s:%d: datasource is not for this opencreport structure\n", __func__, __LINE__);
-		return NULL;
-	}
-
 	if (source->input != &ocrpt_xml_input) {
-		fprintf(stderr, "%s:%d: datasource is not json\n", __func__, __LINE__);
+		fprintf(stderr, "datasource is not json\n");
 		return NULL;
 	}
 
@@ -1158,7 +1138,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(opencreport *o, ocrpt_datasource
 			/* ignore - xmllint validation is enough */
 		} else if (nodetype == XML_READER_TYPE_ELEMENT && depth == 0) {
 			if (!strcmp((char *)name, "data"))
-				ret = ocrpt_parse_data_node(o, reader, &fq);
+				ret = ocrpt_parse_data_node(source->o, reader, &fq);
 			else {
 				err = 1;
 				ret = 0;
@@ -1183,7 +1163,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(opencreport *o, ocrpt_datasource
 	array = ocrpt_mem_malloc((fq.rows + 1) * fq.cols * sizeof(char *));
 	if (!array) {
 		ocrpt_file_query_free(&fq, true);
-		fprintf(stderr, "%s: out of memory\n", __func__);
+		fprintf(stderr, "out of memory\n");
 		return NULL;
 	}
 
@@ -1218,7 +1198,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(opencreport *o, ocrpt_datasource
 		}
 	}
 
-	retval = array_query_add(o, source, name, array, fq.rows, fq.cols, (fq.coltypesset ? fq.types : types), fq.coltypesset);
+	retval = array_query_add(source, name, array, fq.rows, fq.cols, (fq.coltypesset ? fq.types : types), fq.coltypesset);
 
 	ocrpt_file_query_free(&fq, false);
 	if (fq.types && !fq.coltypesset)

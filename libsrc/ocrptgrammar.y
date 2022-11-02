@@ -120,7 +120,9 @@ exp:
 
 								$1->name = NULL;
 								extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, $1);
-								ocrpt_expr_free(extra->o, extra->r, $1);
+								ocrpt_expr_free($1);
+								if ($1 == extra->last_expr)
+									extra->last_expr = NULL;
 								$$ = newexpr(yyscanner, fname, $3);
 							}
 	| '(' exp ')'			{
@@ -250,7 +252,9 @@ exp:
 
 											$1->name = NULL;
 											extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, $1);
-											ocrpt_expr_free(extra->o, extra->r, $1);
+											ocrpt_expr_free($1);
+											if ($1 == extra->last_expr)
+												extra->last_expr = NULL;
 											$$ = newexpr(yyscanner, fname, $4);
 										} else {
 											ocrpt_list *list = $4;
@@ -271,7 +275,9 @@ exp:
 
 									$1->name = NULL;
 									extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, $1);
-									ocrpt_expr_free(extra->o, extra->r, $1);
+									ocrpt_expr_free($1);
+									if ($1 == extra->last_expr)
+										extra->last_expr = NULL;
 									$$ = newexpr(yyscanner, fname, $4);
 								}
 							}
@@ -410,7 +416,7 @@ static void ocrpt_grammar_free_token(ocrpt_string *token) {
 	ocrpt_mem_string_free(token, true);
 }
 
-DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, const char *str, char **err) {
+static ocrpt_expr *ocrpt_expr_parse_internal(opencreport *o, ocrpt_report *r, const char *expr_string, char **err) {
 	yyscan_t yyscanner;
 	base_yy_extra_type yyextra;
 	int yyresult = 1;
@@ -426,7 +432,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, con
 #endif
 
 		/* initialize the flex scanner */
-		yyscanner = scanner_init(str, &yyextra.core_yy_extra);
+		yyscanner = scanner_init(expr_string, &yyextra.core_yy_extra);
 
 #if YYDEBUG
 		/*
@@ -456,12 +462,12 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, con
 			ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 			if (yyextra.last_expr == e)
 				found_last_expr = true;
-			ocrpt_expr_free(o, r, e);
+			ocrpt_expr_free(e);
 		}
 		ocrpt_list_free(yyextra.parsed_exprs);
 
 		if (!found_last_expr)
-			ocrpt_expr_free(o, r, yyextra.last_expr);
+			ocrpt_expr_free(yyextra.last_expr);
 
 		if (err)
 			*err = yyextra.err;
@@ -481,7 +487,23 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, ocrpt_report *r, con
 	} else
 		yyextra.last_expr->result_index = -1;
 
+	yyextra.last_expr->o = o;
+	yyextra.last_expr->r = r;
 	return yyextra.last_expr;
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_expr_parse(opencreport *o, const char *expr_string, char **err) {
+	if (!o || !expr_string)
+		return NULL;
+
+	return ocrpt_expr_parse_internal(o, NULL, expr_string, err);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_expr_parse(ocrpt_report *r, const char *expr_string, char **err) {
+	if (!r || !expr_string)
+		return NULL;
+
+	return ocrpt_expr_parse_internal(r->o, r, expr_string, err);
 }
 
 /*
@@ -513,6 +535,9 @@ static ocrpt_expr *newblankexpr1(yyscan_t yyscanner, enum ocrpt_expr_type type, 
 	if (!e)
 		parser_yyerror("out of memory");
 
+	e->o = extra->o;
+	e->r = extra->r;
+
 	extra->last_expr = e;
 	extra->parsed_exprs = ocrpt_list_prepend(extra->parsed_exprs, e);
 
@@ -525,7 +550,7 @@ static ocrpt_expr *newstring(yyscan_t yyscanner, ocrpt_string *s) {
 	opencreport *o = extra->o;
 
 	extra->tokens = ocrpt_list_remove(extra->tokens, s);
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_STRING);
+	ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
 	if (e->result[o->residx]->string_owned)
 		ocrpt_mem_string_free(e->result[o->residx]->string, true);
 	e->result[o->residx]->string = s;
@@ -542,7 +567,7 @@ static ocrpt_expr *newnumber(yyscan_t yyscanner, ocrpt_string *n) {
 	opencreport *o = extra->o;
 
 	extra->tokens = ocrpt_list_remove(extra->tokens, n);
-	ocrpt_expr_init_result(o, e, OCRPT_RESULT_NUMBER);
+	ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
 	mpfr_set_str(e->result[o->residx]->number, n->str, 10, o->rndmode);
 	e->result[ocrpt_expr_next_residx(o->residx)] = e->result[o->residx];
 	e->result[ocrpt_expr_next_residx(ocrpt_expr_next_residx(o->residx))] = e->result[o->residx];

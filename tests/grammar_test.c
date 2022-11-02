@@ -453,16 +453,16 @@ int main(void) {
 		char *err = NULL;
 
 		printf("string: %s\n", str[i]);
-		e = ocrpt_expr_parse(o, NULL, str[i], &err);
+		e = ocrpt_expr_parse(o, str[i], &err);
 		if (e) {
 			printf("expr reprinted: ");
-			ocrpt_expr_print(o, e);
+			ocrpt_expr_print(e);
 			printf("expr nodes: %d\n", ocrpt_expr_nodes(e));
 		} else {
 			printf("%s\n", err);
 			ocrpt_strfree(err);
 		}
-		ocrpt_expr_free(o, NULL, e);
+		ocrpt_expr_free(e);
 		printf("\n");
 	}
 

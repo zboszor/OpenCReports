@@ -29,12 +29,11 @@ int main(void) {
 	ocrpt_expr *e;
 	char *err;
 
-	q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 3, 5, coltypes);
+	q = ocrpt_query_add_array(ds, "a", (const char **)array, 3, 5, coltypes);
 
-	r = ocrpt_report_new(o);
-	ocrpt_part_append_report(o, NULL, NULL, NULL, r);
+	r = ocrpt_part_column_new_report(ocrpt_part_row_new_column(ocrpt_part_new_row(ocrpt_part_new(o))));
 
-	br = ocrpt_break_new(o, r, "age");
+	br = ocrpt_break_new(r, "age");
 	if (!br) {
 		fprintf(stderr, "adding break failed\n");
 		ocrpt_free(o);
@@ -42,10 +41,10 @@ int main(void) {
 	}
 
 	err = NULL;
-	e = ocrpt_expr_parse(o, r, "age > 18", &err);
+	e = ocrpt_report_expr_parse(r, "age > 18", &err);
 	ocrpt_strfree(err);
 
-	if (!ocrpt_break_add_breakfield(o, r, br, e)) {
+	if (!ocrpt_break_add_breakfield(br, e)) {
 		fprintf(stderr, "adding breakfield failed\n");
 		ocrpt_free(o);
 		return 0;

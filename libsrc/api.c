@@ -93,9 +93,11 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	return o;
 }
 
-DLL_EXPORT_SYM void ocrpt_datasource_free(opencreport *o, ocrpt_datasource *source) {
-	if (!ocrpt_datasource_validate(o, source))
+DLL_EXPORT_SYM void ocrpt_datasource_free(ocrpt_datasource *source) {
+	if (!source)
 		return;
+
+	opencreport *o = source->o;
 
 	if (source->input && source->input->close)
 		source->input->close(source);
@@ -127,12 +129,12 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	 */
 	while (o->queries) {
 		ocrpt_query *q = (ocrpt_query *)o->queries->data;
-		ocrpt_query_free(o, q);
+		ocrpt_query_free(q);
 	}
 
 	while (o->datasources) {
 		ocrpt_datasource *ds = (ocrpt_datasource *)o->datasources->data;
-		ocrpt_datasource_free(o, ds);
+		ocrpt_datasource_free(ds);
 	}
 
 	ocrpt_parts_free(o);
@@ -142,7 +144,6 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	ocrpt_list_free_deep(o->part_added_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(o->report_added_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(o->precalc_done_callbacks, ocrpt_mem_free);
-	ocrpt_list_free_deep(o->part_iteration_callbacks, ocrpt_mem_free);
 
 	ocrpt_list_free_deep(o->search_paths, ocrpt_mem_free);
 	ocrpt_list_free_deep(o->images, ocrpt_image_free);
@@ -158,7 +159,6 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 
 	ocrpt_mem_string_free(o->output_buffer, true);
 
-	ocrpt_output_free(o, &o->global_output, true);
 	cairo_destroy(o->cr);
 	cairo_surface_destroy(o->nullpage_cs);
 
@@ -208,7 +208,7 @@ DLL_EXPORT_SYM bool ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb fu
 	return true;
 }
 
-static void ocrpt_print_reportheader(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, uint32_t rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
+static void ocrpt_print_reportheader(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, uint32_t rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
 	if (!pr->start_page && !r->current_iteration) {
 		pr->start_page = o->current_page;
 		pr->start_page_position = *page_position;
@@ -220,19 +220,19 @@ static void ocrpt_print_reportheader(opencreport *o, ocrpt_part *p, ocrpt_part_r
 	ocrpt_layout_output(o, p, pr, pd, r, &r->reportheader, rows, newpage, page_indent, page_position, old_page_position);
 }
 
-static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_row_data *pd, ocrpt_report *r, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
+static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
 	ocrpt_list *brl_start = NULL;
 	unsigned int rows = 0;
 	bool have_row;
 
-	ocrpt_query_navigate_start(o, r->query);
-	have_row = ocrpt_query_navigate_next(o, r->query);
+	ocrpt_query_navigate_start(r->query);
+	have_row = ocrpt_query_navigate_next(r->query);
 
-	ocrpt_expr_init_iterative_results(o, r->detailcnt, OCRPT_RESULT_NUMBER);
+	ocrpt_expr_init_iterative_results(r->detailcnt, OCRPT_RESULT_NUMBER);
 
 	while (have_row) {
 		ocrpt_list *brl;
-		bool last_row = !ocrpt_query_navigate_next(o, r->query);
+		bool last_row = !ocrpt_query_navigate_next(r->query);
 
 		o->residx = ocrpt_expr_prev_residx(o->residx);
 
@@ -244,7 +244,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 
 			br->cb_triggered = false;
 
-			if (ocrpt_break_check_fields(o, r, br)) {
+			if (ocrpt_break_check_fields(br)) {
 				if (!brl_start)
 					brl_start = brl;
 			}
@@ -256,21 +256,21 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 				o->residx = ocrpt_expr_prev_residx(o->residx);
 
 				if (o->precalculate && !last_row)
-					ocrpt_variables_add_precalculated_results(o, r, brl_start, last_row);
+					ocrpt_variables_add_precalculated_results(r, brl_start, last_row);
 
 				/* Switch back to the current row data */
 				o->residx = ocrpt_expr_next_residx(o->residx);
 
 				for (brl = brl_start; brl; brl = brl->next)
-					ocrpt_break_reset_vars(o, r, (ocrpt_break *)brl->data);
+					ocrpt_break_reset_vars((ocrpt_break *)brl->data);
 
 				if (!o->precalculate && !last_row)
-					ocrpt_variables_advance_precalculated_results(o, r, brl_start);
+					ocrpt_variables_advance_precalculated_results(r, brl_start);
 			}
 		}
 
-		ocrpt_report_evaluate_variables(o, r);
-		ocrpt_report_evaluate_expressions(o, r);
+		ocrpt_report_evaluate_variables(r);
+		ocrpt_report_evaluate_expressions(r);
 
 		for (brl = last_row ? r->breaks : brl_start; brl; brl = brl->next) {
 			ocrpt_break *br = (ocrpt_break *)brl->data;
@@ -345,9 +345,9 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			 * with the default "high" value.
 			 */
 			if (rows > 1) {
-				ocrpt_expr_init_iterative_results(o, r->detailcnt, OCRPT_RESULT_NUMBER);
-				ocrpt_expr_eval(o, r, r->detailcnt);
-				ocrpt_report_evaluate_detailcnt_dependees(o, r);
+				ocrpt_expr_init_iterative_results(r->detailcnt, OCRPT_RESULT_NUMBER);
+				ocrpt_expr_eval(r->detailcnt);
+				ocrpt_report_evaluate_detailcnt_dependees(r);
 			}
 			ocrpt_layout_output_init(&r->fieldheader);
 			ocrpt_layout_output(o, p, pr, pd, r, &r->fieldheader, rows, newpage, page_indent, page_position, old_page_position);
@@ -356,8 +356,8 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_layout_output(o, p, pr, pd, r, &r->fielddetails, rows, newpage, page_indent, page_position, old_page_position);
 
 		if (o->precalculate && last_row) {
-			ocrpt_variables_add_precalculated_results(o, r, r->breaks, last_row);
-			ocrpt_report_expressions_add_delayed_results(o, r);
+			ocrpt_variables_add_precalculated_results(r, r->breaks, last_row);
+			ocrpt_report_expressions_add_delayed_results(r);
 		}
 
 		have_row = !last_row;
@@ -413,7 +413,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 		ocrpt_layout_output_resolve(o, p, NULL, &p->pagefooter);
 
 		if (p->font_size_set)
-			ocrpt_layout_set_font_sizes(o, &p->global_output, p->font_name ? p->font_name : "Courier", p->font_size, false, false, NULL, &p->font_width);
+			ocrpt_layout_set_font_sizes(o, p->font_name ? p->font_name : "Courier", p->font_size, false, false, NULL, &p->font_width);
 		else {
 			p->font_size = o->font_size;
 			p->font_width = o->font_width;
@@ -458,7 +458,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 				double pds_total_width = 0;
 
 				for (pdl = pr->pd_list; pdl; pdl = pdl->next) {
-					ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pdl->data;
+					ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
 
 					pd->finished = false;
 					if (pd->width_set) {
@@ -477,7 +477,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 						double pdw = (p->page_width - pds_total_width) / (double)pds_without_width;
 
 						for (pdl = pr->pd_list; pdl; pdl = pdl->next) {
-							ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pdl->data;
+							ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
 
 							if (!pd->width_set) {
 								pd->width = pdw;
@@ -489,7 +489,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 							"ocrpt_execute_parts: <pd> sections with width set exceed page width.\n"
 							"ocrpt_execute_parts: Suppressing <pd> sections with no widths set.\n");
 						for (pdl = pr->pd_list; pdl; pdl = pdl->next) {
-							ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pdl->data;
+							ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
 
 							if (!pd->width_set)
 								pd->suppress = true;
@@ -498,7 +498,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 				}
 
 				for (pdl = pr->pd_list; pdl; pdl = pdl->next) {
-					ocrpt_part_row_data *pd = (ocrpt_part_row_data *)pdl->data;
+					ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
 
 					if (pd->suppress)
 						continue;
@@ -529,7 +529,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 						ocrpt_list *cbl;
 
 						if (r->font_size_set)
-							ocrpt_layout_set_font_sizes(o, &r->global_output, r->font_name ? r->font_name : (p->font_name ? p->font_name : "Courier"), r->font_size, false, false, NULL, &r->font_width);
+							ocrpt_layout_set_font_sizes(o, r->font_name ? r->font_name : (p->font_name ? p->font_name : "Courier"), r->font_size, false, false, NULL, &r->font_width);
 						else {
 							r->font_size = p->font_size;
 							r->font_width = p->font_width;
@@ -550,24 +550,24 @@ static void ocrpt_execute_parts(opencreport *o) {
 							if (r->height_set)
 								r->remaining_height = r->height * (o->size_in_points ? 1.0 : (r->font_size_set ? r->font_size : p->font_size));
 
-							ocrpt_query_navigate_start(o, r->query);
+							ocrpt_query_navigate_start(r->query);
 
 							if (o->precalculate) {
-								ocrpt_report_resolve_breaks(o, r);
-								ocrpt_report_resolve_variables(o, r);
-								ocrpt_report_resolve_expressions(o, r);
+								ocrpt_report_resolve_breaks(r);
+								ocrpt_report_resolve_variables(r);
+								ocrpt_report_resolve_expressions(r);
 							}
 
 							if (r->query) {
 								r->data_rows = ocrpt_execute_one_report(o, p, pr, pd, r, &newpage, &page_indent, &page_position, &old_page_position);
 
 								if (o->precalculate) {
-									ocrpt_variables_advance_precalculated_results(o, r, NULL);
+									ocrpt_variables_advance_precalculated_results(r, NULL);
 
 									/* Reset queries and breaks */
-									ocrpt_query_navigate_start(o, r->query);
+									ocrpt_query_navigate_start(r->query);
 									for (ocrpt_list *brl = r->breaks; brl; brl = brl->next)
-										ocrpt_break_reset_vars(o, r, (ocrpt_break *)brl->data);
+										ocrpt_break_reset_vars((ocrpt_break *)brl->data);
 								}
 
 								if (!r->data_rows) {
@@ -635,7 +635,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 							 */
 							double max_end_position = 0.0;
 							for (ocrpt_list *pdl1 = pr->pd_list; pdl1; pdl1 = pdl1->next) {
-								ocrpt_part_row_data *pd1 = (ocrpt_part_row_data *)pdl1->data;
+								ocrpt_part_column *pd1 = (ocrpt_part_column *)pdl1->data;
 
 								if (max_end_position < pd1->max_page_position)
 									max_end_position = pd1->max_page_position;
@@ -659,7 +659,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 							bw -= pd->border_width;
 						}
 
-						o->output_functions.draw_rectangle(o, p, pr, pd, NULL, &pd->border,
+						o->output_functions.draw_rectangle(o, p, pr, pd, NULL,
 														&pd->border_color, pd->border_width,
 														bx, by, bw, bh);
 					}
@@ -704,7 +704,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 			}
 
 			if (!o->precalculate) {
-				for (ocrpt_list *cbl = o->part_iteration_callbacks; cbl; cbl = cbl->next) {
+				for (ocrpt_list *cbl = p->iteration_callbacks; cbl; cbl = cbl->next) {
 					ocrpt_part_cb_data *cbd = (ocrpt_part_cb_data *)cbl->data;
 
 					cbd->func(o, p, cbd->data);
@@ -755,7 +755,7 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	o->current_timestamp->time_valid = true;
 
 	/* Set global default font sizes */
-	ocrpt_layout_set_font_sizes(o, &o->global_output, "Courier", OCRPT_DEFAULT_FONT_SIZE, false, false, &o->font_size, &o->font_width);
+	ocrpt_layout_set_font_sizes(o, "Courier", OCRPT_DEFAULT_FONT_SIZE, false, false, &o->font_size, &o->font_width);
 
 	/* Run all reports in precalculate mode if needed */
 	o->precalculate = true;

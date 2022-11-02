@@ -30,25 +30,25 @@ int main(void) {
 	ocrpt_result *rs = ocrpt_result_new();
 	int32_t cols, row;
 
-	id = ocrpt_expr_parse(o, NULL, "id", NULL);
-	ocrpt_expr_print(o, id);
+	id = ocrpt_expr_parse(o, "id", NULL);
+	ocrpt_expr_print(id);
 
-	name = ocrpt_expr_parse(o, NULL, "name", NULL);
-	ocrpt_expr_print(o, name);
+	name = ocrpt_expr_parse(o, "name", NULL);
+	ocrpt_expr_print(name);
 
-	err = ocrpt_expr_parse(o, NULL, "error('Error')", NULL);
-	ocrpt_expr_print(o, err);
+	err = ocrpt_expr_parse(o, "error('Error')", NULL);
+	ocrpt_expr_print(err);
 
-	q = ocrpt_query_add_array(o, ds, "a", (const char **)array, 3, 5, coltypes);
+	q = ocrpt_query_add_array(ds, "a", (const char **)array, 3, 5, coltypes);
 
-	ocrpt_expr_resolve(o, NULL, id);
-	ocrpt_expr_resolve(o, NULL, name);
-	ocrpt_expr_resolve(o, NULL, err);
+	ocrpt_expr_resolve(id);
+	ocrpt_expr_resolve(name);
+	ocrpt_expr_resolve(err);
 
 	row = 0;
-	ocrpt_query_navigate_start(o, q);
+	ocrpt_query_navigate_start(q);
 
-	while (ocrpt_query_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(q)) {
 		ocrpt_result *r;
 
 		qr = ocrpt_query_get_result(q, &cols);
@@ -59,38 +59,38 @@ int main(void) {
 		printf("\n");
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, id);
-		r = ocrpt_expr_eval(o, NULL, id);
+		ocrpt_expr_print(id);
+		r = ocrpt_expr_eval(id);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 		printf("Copied: ");
-		ocrpt_result_copy(o, rs, ocrpt_expr_get_result(o, id));
+		ocrpt_result_copy(o, rs, ocrpt_expr_get_result(id));
 		ocrpt_result_print(rs);
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, name);
-		r = ocrpt_expr_eval(o, NULL, name);
+		ocrpt_expr_print(name);
+		r = ocrpt_expr_eval(name);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 		printf("Copied: ");
-		ocrpt_result_copy(o, rs, ocrpt_expr_get_result(o, name));
+		ocrpt_result_copy(o, rs, ocrpt_expr_get_result(name));
 		ocrpt_result_print(rs);
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, err);
-		r = ocrpt_expr_eval(o, NULL, err);
+		ocrpt_expr_print(err);
+		r = ocrpt_expr_eval(err);
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 		printf("Copied: ");
-		ocrpt_result_copy(o, rs, ocrpt_expr_get_result(o, err));
+		ocrpt_result_copy(o, rs, ocrpt_expr_get_result(err));
 		ocrpt_result_print(rs);
 
 		printf("\n");
 	}
 
-	ocrpt_expr_free(o, NULL, id);
-	ocrpt_expr_free(o, NULL, name);
-	ocrpt_expr_free(o, NULL, err);
+	ocrpt_expr_free(id);
+	ocrpt_expr_free(name);
+	ocrpt_expr_free(err);
 	ocrpt_result_free(rs);
 
 	/* ocrpt_free() will free it */

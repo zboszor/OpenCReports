@@ -56,16 +56,16 @@ int main(void) {
 	/* There is only one ocrpt_report pointer in o->parts, extract it. */
 	ocrpt_report *r = get_first_report(o);
 
-	ocrpt_report_add_new_row_cb(o, r, test_newrow_cb, q);
+	ocrpt_report_add_new_row_cb(r, test_newrow_cb, q);
 
-	br = ocrpt_break_get(o, r, "id");
-	ocrpt_break_add_trigger_cb(o, r, br, test_break_trigger_cb, NULL);
+	br = ocrpt_break_get(r, "id");
+	ocrpt_break_add_trigger_cb(br, test_break_trigger_cb, NULL);
 
-	br = ocrpt_break_get(o, r, "male");
-	ocrpt_break_add_trigger_cb(o, r, br, test_break_trigger_cb, NULL);
+	br = ocrpt_break_get(r, "male");
+	ocrpt_break_add_trigger_cb(br, test_break_trigger_cb, NULL);
 
-	br = ocrpt_break_get(o, r, "adult");
-	ocrpt_break_add_trigger_cb(o, r, br, test_break_trigger_cb, NULL);
+	br = ocrpt_break_get(r, "adult");
+	ocrpt_break_add_trigger_cb(br, test_break_trigger_cb, NULL);
 
 	ocrpt_execute(o);
 

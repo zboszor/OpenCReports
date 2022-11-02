@@ -61,15 +61,15 @@ DLL_EXPORT_SYM void ocrpt_result_free(ocrpt_result *r) {
 	ocrpt_mem_free(r);
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_free(opencreport *o, ocrpt_report *r, ocrpt_expr *e) {
+DLL_EXPORT_SYM void ocrpt_expr_free(ocrpt_expr *e) {
 	uint32_t i;
 
 	if (!e)
 		return;
 
-	if (r && !r->executing) {
-		r->exprs = ocrpt_list_remove(r->exprs, e);
-		r->exprs_last = NULL;
+	if (e->r && !e->r->executing) {
+		e->r->exprs = ocrpt_list_remove(e->r->exprs, e);
+		e->r->exprs_last = NULL;
 	}
 
 	switch (e->type) {
@@ -98,7 +98,7 @@ DLL_EXPORT_SYM void ocrpt_expr_free(opencreport *o, ocrpt_report *r, ocrpt_expr 
 			if (ocrpt_expr_get_result_owned(e, i))
 				ocrpt_result_free_data(e->result[i]);
 		for (i = 0; i < e->n_ops; i++)
-			ocrpt_expr_free(o, r, e->ops[i]);
+			ocrpt_expr_free(e->ops[i]);
 		ocrpt_mem_free(e->ops);
 		break;
 	}
@@ -129,7 +129,7 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 		case OCRPT_OUTPUT_LINE:
 			ocrpt_line *line = (ocrpt_line *)oe;
 			for (ocrpt_list *l = line->elements; l; l = l->next) {
-				ocrpt_line_element *le = (ocrpt_line_element *)l->data;
+				ocrpt_text *le = (ocrpt_text *)l->data;
 
 				switch (le->le_type) {
 				case OCRPT_OUTPUT_LE_TEXT:
@@ -137,32 +137,32 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 					 * Only if "r" is NULL we need to free the individual expressions
 					 */
 					if (free_subexprs) {
-						ocrpt_expr_free(o, NULL, le->value);
-						ocrpt_expr_free(o, NULL, le->format);
-						ocrpt_expr_free(o, NULL, le->width);
-						ocrpt_expr_free(o, NULL, le->align);
-						ocrpt_expr_free(o, NULL, le->color);
-						ocrpt_expr_free(o, NULL, le->bgcolor);
-						ocrpt_expr_free(o, NULL, le->font_name);
-						ocrpt_expr_free(o, NULL, le->font_size);
-						ocrpt_expr_free(o, NULL, le->bold);
-						ocrpt_expr_free(o, NULL, le->italic);
-						ocrpt_expr_free(o, NULL, le->link);
-						ocrpt_expr_free(o, NULL, le->translate);
+						ocrpt_expr_free(le->value);
+						ocrpt_expr_free(le->format);
+						ocrpt_expr_free(le->width);
+						ocrpt_expr_free(le->align);
+						ocrpt_expr_free(le->color);
+						ocrpt_expr_free(le->bgcolor);
+						ocrpt_expr_free(le->font_name);
+						ocrpt_expr_free(le->font_size);
+						ocrpt_expr_free(le->bold);
+						ocrpt_expr_free(le->italic);
+						ocrpt_expr_free(le->link);
+						ocrpt_expr_free(le->translate);
 					}
 					ocrpt_mem_string_free(le->value_str, true);
 					break;
 				case OCRPT_OUTPUT_LE_IMAGE:
 					ocrpt_image *img = (ocrpt_image *)le;
 					if (free_subexprs) {
-						ocrpt_expr_free(o, NULL, img->suppress);
-						ocrpt_expr_free(o, NULL, img->value);
-						ocrpt_expr_free(o, NULL, img->imgtype);
-						ocrpt_expr_free(o, NULL, img->width);
-						ocrpt_expr_free(o, NULL, img->height);
-						ocrpt_expr_free(o, NULL, img->align);
-						ocrpt_expr_free(o, NULL, img->bgcolor);
-						ocrpt_expr_free(o, NULL, img->text_width);
+						ocrpt_expr_free(img->suppress);
+						ocrpt_expr_free(img->value);
+						ocrpt_expr_free(img->imgtype);
+						ocrpt_expr_free(img->width);
+						ocrpt_expr_free(img->height);
+						ocrpt_expr_free(img->align);
+						ocrpt_expr_free(img->bgcolor);
+						ocrpt_expr_free(img->text_width);
 					}
 					break;
 				case OCRPT_OUTPUT_LE_BARCODE:
@@ -172,13 +172,13 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 				ocrpt_mem_free(l->data);
 			}
 			if (free_subexprs) {
-				ocrpt_expr_free(o, NULL, line->font_name);
-				ocrpt_expr_free(o, NULL, line->font_size);
-				ocrpt_expr_free(o, NULL, line->color);
-				ocrpt_expr_free(o, NULL, line->bgcolor);
-				ocrpt_expr_free(o, NULL, line->bold);
-				ocrpt_expr_free(o, NULL, line->italic);
-				ocrpt_expr_free(o, NULL, line->suppress);
+				ocrpt_expr_free(line->font_name);
+				ocrpt_expr_free(line->font_size);
+				ocrpt_expr_free(line->color);
+				ocrpt_expr_free(line->bgcolor);
+				ocrpt_expr_free(line->bold);
+				ocrpt_expr_free(line->italic);
+				ocrpt_expr_free(line->suppress);
 			}
 			ocrpt_list_free(line->elements);
 			break;
@@ -186,26 +186,26 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 			if (free_subexprs) {
 				ocrpt_hline *hline = (ocrpt_hline *)oe;
 
-				ocrpt_expr_free(o, NULL, hline->size);
-				ocrpt_expr_free(o, NULL, hline->indent);
-				ocrpt_expr_free(o, NULL, hline->length);
-				ocrpt_expr_free(o, NULL, hline->font_size);
-				ocrpt_expr_free(o, NULL, hline->suppress);
-				ocrpt_expr_free(o, NULL, hline->color);
+				ocrpt_expr_free(hline->size);
+				ocrpt_expr_free(hline->indent);
+				ocrpt_expr_free(hline->length);
+				ocrpt_expr_free(hline->font_size);
+				ocrpt_expr_free(hline->suppress);
+				ocrpt_expr_free(hline->color);
 			}
 			break;
 		case OCRPT_OUTPUT_IMAGE:
 			if (free_subexprs) {
 				ocrpt_image *img = (ocrpt_image *)oe;
 
-				ocrpt_expr_free(o, NULL, img->suppress);
-				ocrpt_expr_free(o, NULL, img->value);
-				ocrpt_expr_free(o, NULL, img->imgtype);
-				ocrpt_expr_free(o, NULL, img->width);
-				ocrpt_expr_free(o, NULL, img->height);
-				ocrpt_expr_free(o, NULL, img->align);
-				ocrpt_expr_free(o, NULL, img->bgcolor);
-				ocrpt_expr_free(o, NULL, img->text_width);
+				ocrpt_expr_free(img->suppress);
+				ocrpt_expr_free(img->value);
+				ocrpt_expr_free(img->imgtype);
+				ocrpt_expr_free(img->width);
+				ocrpt_expr_free(img->height);
+				ocrpt_expr_free(img->align);
+				ocrpt_expr_free(img->bgcolor);
+				ocrpt_expr_free(img->text_width);
 			}
 			break;
 		case OCRPT_OUTPUT_IMAGEEND:
@@ -219,5 +219,5 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 	output->output_list = NULL;
 
 	if (free_subexprs)
-		ocrpt_expr_free(o, NULL, output->suppress);
+		ocrpt_expr_free(output->suppress);
 }

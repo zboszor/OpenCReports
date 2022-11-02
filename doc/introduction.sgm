@@ -10,7 +10,7 @@
 			developing RLIB further. This was around 2018. Even the
 			original documentation site for RLIB was retired. But
 			thanks to the Internet Archive,
-			<ulink url="https://web.archive.org/web/20131116192438/http://newrlib.sicom.com/~rlib/index.php/Main_Page">it can still be read</ulink>
+			<ulink url="https://web.archive.org/web/20131116192438/http://newrlib.sicom.com/~rlib/index.php/Main_Page">it may still be read</ulink>
 		</para>
 		<para>
 			To overcome some of the shortcomings seen in RLIB,
@@ -25,8 +25,8 @@
 		</para>
 		<para>
 			The name OpenCReports came from the fact that it's
-			implemented in the C programming language and in an
-			open way and using a free software license.
+			implemented in the C programming language in an
+			open way, and using a free software license.
 		</para>
 	</sect1>
 	<sect1>
@@ -34,12 +34,14 @@
 		<sect2>
 			<title>What is a report generator?</title>
 			<para>
-				A report generator uses a tabular data source (for example an
-				array of data with labels for the column names, or an SQL query)
-				and a description file that specifies how to display the data.
-				The input data is transformed into various output formats,
-				some for human viewing, some for further machine processing.
-				Such output formats may be PDF, HTML, XML, plain text or CSV.
+				A report generator uses a tabular data source, which contains
+				rows and columns of data. The columns have labels or names.
+				(An SQL database query is such a tabular data source.)
+				It also uses some kind of description that specifies how
+				to display the data. The input data is transformed into
+				various output formats, some for human viewing, some for
+				further machine processing. Such output formats may be PDF,
+				HTML, XML, plain text or CSV.
 			</para>
 		</sect2>
 		<sect2>
@@ -61,14 +63,14 @@
 				The <xref linkend="lowlevelapi"/> allows creating a report purely
 				via program code. The <xref linkend="highlevelapi"/> allows loading
 				an XML report description that contains all details
-				about the report including database access. Mixing
+				about the report, including database access. Mixing
 				the high and low level APIs allows a balance anywhere
-				between the two extremes, e.g. loading the report
-				description but passing database access details via
-				program code. RLIB's API and report description allowed
-				neither extremes, it relied on the report description
-				to provide the layout look, with the data access added
-				from programming code.
+				between the two extremes. For example, load the report
+				description, which contains the complete layout, and pass
+				database access details via program code. RLIB's API and
+				report description allowed neither extremes, it relied on
+				the report description to provide the layout, with the
+				data access added from programming code.
 			</para>
 		</sect2>
 		<sect2>
@@ -90,7 +92,7 @@
 			<para>
 				OpenCReports does some expression optimization
 				to reduce runtime cost of computing expression
-				values. For example, in <literal>a * 2/3</literal>
+				values. For example, in <literal>a*2/3</literal>
 				the part <literal>2/3</literal> is two constants
 				in a division. This is precomputed into a single
 				constant as an optimization.
@@ -104,7 +106,7 @@
 		<sect2>
 			<title>Report variables</title>
 			<para>
-				OpenCReports supports using standard report variables
+				OpenCReports supports standard report variables
 				for calculating sums, minimum, maximum and average values
 				or custom defined ones. See <xref linkend="variables"/>
 			</para>
@@ -122,7 +124,7 @@
 			</para>
 			<para>
 				Custom functions can also be added to a report by
-				programming. Custom functions may override stock
+				programming code. Custom functions may override stock
 				functions.
 			</para>
 		</sect2>
@@ -134,7 +136,7 @@
 				also use UTF-8.
 			</para>
 			<para>
-				RLIB could have been built with or without UTF-8 suppport.
+				RLIB could have been built with or without UTF-8 support.
 				The build that disabled UTF-8 support relied on
 				single byte character set encodings and conversion
 				between them. That wasn't always reliable. Since that
@@ -256,7 +258,7 @@
 				used for multi-line fields. This is also thanks to
 				Pango. When <literal>justified</literal> alignment is
 				used, all lines but the last are justified. Therefore,
-				<literal>justified</literal> alignment equivalent to
+				<literal>justified</literal> alignment is equivalent to
 				<literal>left</literal> alignment for single line fields.
 			</para>
 		</sect2>
@@ -285,7 +287,7 @@
 			<title>PDF output format, fonts, layout details</title>
 			<para>
 				By using the excellent drawing possibilities of
-				Cairo or later, OpenCReports supports generating
+				Cairo, OpenCReports supports generating
 				the report in PDF format. RLIB relied on an
 				internal PDF generator in earlier versions called
 				RPDF, and used libHaru in later versions.

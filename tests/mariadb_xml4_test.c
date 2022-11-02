@@ -42,9 +42,9 @@ int main(void) {
 			printf("%d: '%s'\n", i, ocrpt_query_result_column_name(qr2, i));
 
 	row = 0;
-	ocrpt_query_navigate_start(o, q);
+	ocrpt_query_navigate_start(q);
 
-	while (ocrpt_query_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(q)) {
 		qr = ocrpt_query_get_result(q, &cols);
 		qr2 = ocrpt_query_get_result(q2, &cols);
 

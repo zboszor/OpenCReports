@@ -43,13 +43,13 @@ int main(void) {
 	ocrpt_break *br = ocrpt_break_get_next(r, &brl);
 
 	row = 0;
-	ocrpt_query_navigate_start(o, q);
-	ocrpt_report_resolve_breaks(o, r);
+	ocrpt_query_navigate_start(q);
+	ocrpt_report_resolve_breaks(r);
 
-	while (ocrpt_query_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(q)) {
 		qr = ocrpt_query_get_result(q, &cols);
 
-		if (ocrpt_break_check_fields(o, r, br))
+		if (ocrpt_break_check_fields(br))
 			printf("Break triggers\n");
 
 		printf("\n");

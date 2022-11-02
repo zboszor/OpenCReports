@@ -45,18 +45,18 @@ int main(void) {
 	ocrpt_list *brl = NULL;
 	ocrpt_break *br = ocrpt_break_get_next(r, &brl);
 
-	e = ocrpt_expr_parse(o, r, "brrownum('adult')", NULL);
+	e = ocrpt_report_expr_parse(r, "brrownum('adult')", NULL);
 
 	row = 0;
-	ocrpt_query_navigate_start(o, q);
-	ocrpt_report_resolve_breaks(o, r);
+	ocrpt_query_navigate_start(q);
+	ocrpt_report_resolve_breaks(r);
 
-	while (ocrpt_query_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(q)) {
 		ocrpt_result *rs;
 
 		qr = ocrpt_query_get_result(q, &cols);
 
-		if (ocrpt_break_check_fields(o, r, br))
+		if (ocrpt_break_check_fields(br))
 			printf("Break triggers\n");
 
 		printf("\n");
@@ -65,15 +65,15 @@ int main(void) {
 		print_result_row("a", qr, cols);
 
 		printf("Expression: ");
-		ocrpt_expr_print(o, e);
-		rs = ocrpt_expr_eval(o, r, e);
+		ocrpt_expr_print(e);
+		rs = ocrpt_expr_eval(e);
 		printf("Evaluated: ");
 		ocrpt_result_print(rs);
 
 		printf("\n");
 	}
 
-	ocrpt_expr_free(o, r, e);
+	ocrpt_expr_free(e);
 
 	ocrpt_free(o);
 

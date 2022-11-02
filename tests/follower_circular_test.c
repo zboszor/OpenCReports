@@ -33,85 +33,85 @@ int main(void) {
 	bool retval;
 
 	printf("added query a\n\n");
-	a = ocrpt_query_add_array(o, ds, "a", (const char **)array, 3, 5, coltypes);
+	a = ocrpt_query_add_array(ds, "a", (const char **)array, 3, 5, coltypes);
 	printf("added query b\n\n");
-	b = ocrpt_query_add_array(o, ds, "b", (const char **)array2, 2, 5, coltypes);
+	b = ocrpt_query_add_array(ds, "b", (const char **)array2, 2, 5, coltypes);
 
 	printf("adding N:1 follower a -> b, should succeed\n");
-	match_ab = ocrpt_expr_parse(o, NULL, "a.id = b.id", NULL);
-	retval = ocrpt_query_add_follower_n_to_1(o, a, b, match_ab);
+	match_ab = ocrpt_expr_parse(o, "a.id = b.id", NULL);
+	retval = ocrpt_query_add_follower_n_to_1(a, b, match_ab);
 	printf("added N:1 follower a -> b, retval %d\n\n", retval);
 
 	printf("adding N:1 follower a -> b (duplicate), should fail\n");
-	match_ab = ocrpt_expr_parse(o, NULL, "a.id = b.id", NULL);
-	retval = ocrpt_query_add_follower_n_to_1(o, a, b, match_ab);
+	match_ab = ocrpt_expr_parse(o, "a.id = b.id", NULL);
+	retval = ocrpt_query_add_follower_n_to_1(a, b, match_ab);
 	printf("added N:1 follower a -> b, retval %d\n\n", retval);
 
 	printf("adding follower a -> b (N:1 exists), should fail\n");
-	retval = ocrpt_query_add_follower(o, a, b);
+	retval = ocrpt_query_add_follower(a, b);
 	printf("added follower a -> b, retval %d\n\n", retval);
 
 	printf("adding N:1 follower b -> a (reverse N:1 exists), should fail\n");
-	match_ab = ocrpt_expr_parse(o, NULL, "a.id = b.id", NULL);
-	retval = ocrpt_query_add_follower_n_to_1(o, b, a, match_ab);
+	match_ab = ocrpt_expr_parse(o, "a.id = b.id", NULL);
+	retval = ocrpt_query_add_follower_n_to_1(b, a, match_ab);
 	printf("added N:1 follower b -> a, retval %d\n\n", retval);
 
 	printf("adding follower b -> a (reverse N:1 exists), should fail\n");
-	retval = ocrpt_query_add_follower(o, b, a);
+	retval = ocrpt_query_add_follower(b, a);
 	printf("added follower b -> a, retval %d\n\n", retval);
 
 	c = NULL;
 
 	printf("adding N:1 follower b -> c (query c does not exist), should fail\n");
-	match_bc = ocrpt_expr_parse(o, NULL, "b.id = c.id", NULL);
-	retval = ocrpt_query_add_follower_n_to_1(o, b, c, match_bc);
+	match_bc = ocrpt_expr_parse(o, "b.id = c.id", NULL);
+	retval = ocrpt_query_add_follower_n_to_1(b, c, match_bc);
 	printf("added N:1 follower b -> c, retval %d\n\n", retval);
 
 	printf("adding follower b -> c (query c does not exist), should fail\n");
-	retval = ocrpt_query_add_follower(o, b, c);
+	retval = ocrpt_query_add_follower(b, c);
 	printf("added follower b -> c, retval %d\n\n", retval);
 
-	c = ocrpt_query_add_array(o, ds, "c", (const char **)array2, 2, 5, coltypes);
+	c = ocrpt_query_add_array(ds, "c", (const char **)array2, 2, 5, coltypes);
 	printf("added query c\n\n");
 
 	printf("adding N:1 follower b -> c, should succeed\n");
-	match_bc = ocrpt_expr_parse(o, NULL, "b.id = c.id", NULL);
-	retval = ocrpt_query_add_follower_n_to_1(o, b, c, match_bc);
+	match_bc = ocrpt_expr_parse(o, "b.id = c.id", NULL);
+	retval = ocrpt_query_add_follower_n_to_1(b, c, match_bc);
 	printf("added N:1 follower b -> c, retval %d\n\n", retval);
 
 	printf("adding follower b -> c (N:1 follower exists), should fail\n");
-	retval = ocrpt_query_add_follower(o, b, c);
+	retval = ocrpt_query_add_follower(b, c);
 	printf("added follower b -> c, retval %d\n\n", retval);
 
 	printf("adding N:1 follower c -> a (circular followers), should fail\n");
-	match_ac = ocrpt_expr_parse(o, NULL, "a.id = c.id", NULL);
-	retval = ocrpt_query_add_follower_n_to_1(o, c, a, match_ac);
+	match_ac = ocrpt_expr_parse(o, "a.id = c.id", NULL);
+	retval = ocrpt_query_add_follower_n_to_1(c, a, match_ac);
 	printf("added N:1 follower c -> a, retval %d\n\n", retval);
 
 	printf("adding follower c -> a (a->b->c exists), should fail\n");
-	retval = ocrpt_query_add_follower(o, c, a);
+	retval = ocrpt_query_add_follower(c, a);
 	printf("added N:1 follower c -> a, retval %d\n\n", retval);
 
 	printf("adding N:1 follower a -> c (c would be a follower on two paths), should fail\n");
-	match_ac = ocrpt_expr_parse(o, NULL, "a.id = c.id", NULL);
-	retval = ocrpt_query_add_follower_n_to_1(o, a, c, match_ac);
+	match_ac = ocrpt_expr_parse(o, "a.id = c.id", NULL);
+	retval = ocrpt_query_add_follower_n_to_1(a, c, match_ac);
 	printf("added N:1 follower a -> c, retval %d\n\n", retval);
 
 	printf("adding follower a -> c (c would be a follower on two paths), should fail\n");
-	retval = ocrpt_query_add_follower(o, a, c);
+	retval = ocrpt_query_add_follower(a, c);
 	printf("added follower a -> c, retval %d\n\n", retval);
 
-	d = ocrpt_query_add_array(o, ds, "d", (const char **)array2, 2, 5, coltypes);
+	d = ocrpt_query_add_array(ds, "d", (const char **)array2, 2, 5, coltypes);
 	printf("added query d\n\n");
 
 	printf("adding follower c -> d, should succeed\n");
-	match_cd = ocrpt_expr_parse(o, NULL, "c.id = d.id", NULL);
-	retval = ocrpt_query_add_follower_n_to_1(o, c, d, match_cd);
+	match_cd = ocrpt_expr_parse(o, "c.id = d.id", NULL);
+	retval = ocrpt_query_add_follower_n_to_1(c, d, match_cd);
 	printf("added follower c -> d, retval %d\n\n", retval);
 
 	printf("adding follower d -> a, should fail\n");
-	match_cd = ocrpt_expr_parse(o, NULL, "c.id = d.id", NULL);
-	retval = ocrpt_query_add_follower_n_to_1(o, d, a, match_cd);
+	match_cd = ocrpt_expr_parse(o, "c.id = d.id", NULL);
+	retval = ocrpt_query_add_follower_n_to_1(d, a, match_cd);
 	printf("added follower d -> a, retval %d\n\n", retval);
 
 	ocrpt_free(o);

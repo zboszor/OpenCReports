@@ -1127,7 +1127,7 @@ report_height_after_last="no"</programlisting>
 					or upper case, both are accepted.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="partiter" xreflabel="Part iterations attribute">
 				<title>Iterations</title>
 				<para>
 					The same <literal>&lt;Part&gt;</literal> may be
@@ -1142,7 +1142,7 @@ report_height_after_last="no"</programlisting>
 					every iteration of one starts on a new page.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="partsuppress" xreflabel="Part suppress attribute">
 				<title>Suppress</title>
 				<para>
 					Report parts may be suppressed.
@@ -1255,7 +1255,7 @@ report_height_after_last="no"</programlisting>
 		</para>
 		<sect2>
 			<title>Part row attributes</title>
-			<sect3>
+			<sect3 id="partrowlayout" xreflabel="Part row layout attribute">
 				<title>Layout</title>
 				<para>
 					The <literal>layout</literal> attribute exists mainly
@@ -1266,7 +1266,7 @@ report_height_after_last="no"</programlisting>
 &lt;pr layout="fixed"&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="partrownewpage" xreflabel="Part row new page attribute">
 				<title>New page</title>
 				<para>
 					The <literal>newpage</literal> attribute controls
@@ -1279,7 +1279,7 @@ report_height_after_last="no"</programlisting>
 					Default value is <literal>no</literal>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="partrowsuppress" xreflabel="Part row suppress attribute">
 				<title>Suppress</title>
 				<para>
 					Report rows may be suppressed.
@@ -1333,11 +1333,11 @@ report_height_after_last="no"</programlisting>
 		</para>
 		<sect2>
 			<title>Part column attributes</title>
-			<sect3>
+			<sect3 id="partcolwidth" xreflabel="Part column width attribute">
 				<title>Width</title>
 				<para>
 					Width of the part column.
-			<programlisting>&lt;pd width="60"&gt;</programlisting>
+					<programlisting>&lt;pd width="60"&gt;</programlisting>
 				</para>
 				<para>
 					When <xref linkend="sizeunit"/> is set to
@@ -1368,11 +1368,11 @@ report_height_after_last="no"</programlisting>
 					partially, or won't be shown at all.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="partcolheight" xreflabel="Part column height attribute">
 				<title>Height</title>
 				<para>
 					Height of the part column.
-			<programlisting>&lt;pd height="120"&gt;</programlisting>
+					<programlisting>&lt;pd height="120"&gt;</programlisting>
 				</para>
 				<para>
 					When <xref linkend="sizeunit"/> is set to
@@ -1464,7 +1464,7 @@ report_height_after_last="no"</programlisting>
 					otherwise.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="partcolsuppress" xreflabel="Part column suppress attribute">
 				<title>Suppress</title>
 				<para>
 					Report columns may be suppressed.
@@ -1780,7 +1780,7 @@ report_height_after_last="no"</programlisting>
 					This is a deviation from RLIB.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportiter" xreflabel="Report iterations attribute">
 				<title>Iterations</title>
 				<para>
 					The same <literal>&lt;Report&gt;</literal> may be
@@ -1791,7 +1791,7 @@ report_height_after_last="no"</programlisting>
 					Default value is 1.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportsuppress" xreflabel="Report suppress attribute">
 				<title>Suppress</title>
 				<para>
 					Reports may be suppressed.
@@ -1842,7 +1842,7 @@ report_height_after_last="no"</programlisting>
 					query from the list of <xref linkend="queries"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportfhpriority" xreflabel="Report field header priority attribute">
 				<title>Field header priority</title>
 				<para>
 					Set the field header priority for the report versus
@@ -2328,7 +2328,7 @@ report_height_after_last="no"</programlisting>
 				<para>
 					It's the user's responsibility to use expressions
 					valid for the base type. Failing that, the result
-					value will be an apppropriate error message.
+					value will be an appropriate error message.
 				</para>
 				<para>
 					Note that the <literal>baseexpr</literal> attribute

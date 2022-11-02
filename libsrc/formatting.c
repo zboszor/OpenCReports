@@ -397,7 +397,7 @@ static void ocrpt_formatstring_money_length_prec(const char *fmt, int32_t *lengt
 						return str; \
 					} while (0)
 
-static ocrpt_string *ocrpt_get_next_format_string(opencreport *o, const char *fmt, enum ocrpt_formatstring_type expected_type, enum ocrpt_formatstring_type *out_type, int32_t *advance, bool *error, int32_t *out_length, bool *lpadded) {
+static ocrpt_string *ocrpt_get_next_format_string(const char *fmt, enum ocrpt_formatstring_type expected_type, enum ocrpt_formatstring_type *out_type, int32_t *advance, bool *error, int32_t *out_length, bool *lpadded) {
 	ocrpt_string *str;
 	enum ocrpt_formatstring_type type = OCRPT_FORMAT_NONE;
 	int32_t adv = 0;
@@ -532,7 +532,7 @@ static ocrpt_string *ocrpt_get_next_format_string(opencreport *o, const char *fm
 							int32_t adv1;
 							bool error1;
 
-							str1 = ocrpt_get_next_format_string(o, str->str, OCRPT_FORMAT_NUMBER, &type1, &adv1, &error1, out_length, lpadded);
+							str1 = ocrpt_get_next_format_string(str->str, OCRPT_FORMAT_NUMBER, &type1, &adv1, &error1, out_length, lpadded);
 							ocrpt_mem_string_free(str, true);
 							*advance = adv1 + 4;
 							return str1;
@@ -586,7 +586,7 @@ static ocrpt_string *ocrpt_get_next_format_string(opencreport *o, const char *fm
 							int32_t adv1;
 							bool error1;
 
-							str1 = ocrpt_get_next_format_string(o, str->str, OCRPT_FORMAT_STRING, &type1, &adv1, &error1, out_length, lpadded);
+							str1 = ocrpt_get_next_format_string(str->str, OCRPT_FORMAT_STRING, &type1, &adv1, &error1, out_length, lpadded);
 							ocrpt_mem_string_free(str, true);
 							*advance = adv1 + 4;
 							return str1;
@@ -735,7 +735,7 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, ocrpt_string *string0, c
 			break;
 		case OCRPT_RESULT_ERROR:
 			if (e)
-				ocrpt_expr_make_error_result(o, e, data->string->str);
+				ocrpt_expr_make_error_result(e, data->string->str);
 			else {
 				string->len = 0;
 				ocrpt_mem_string_append(string, data->string->str);
@@ -755,11 +755,11 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, ocrpt_string *string0, c
 			length = -1;
 			lpadded = 0;
 			assert(type_idx < 2);
-			tmp = ocrpt_get_next_format_string(o, formatstring + advance, types[type_idx], &type, &adv, &error, &length, &lpadded);
+			tmp = ocrpt_get_next_format_string(formatstring + advance, types[type_idx], &type, &adv, &error, &length, &lpadded);
 
 			if (error) {
 				if (e)
-					ocrpt_expr_make_error_result(o, e, tmp->str);
+					ocrpt_expr_make_error_result(e, tmp->str);
 				else {
 					string->len = 0;
 					ocrpt_mem_string_append(string, tmp->str);

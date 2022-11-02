@@ -46,6 +46,8 @@ enum ocrpt_expr_type {
 };
 
 struct ocrpt_expr {
+	opencreport *o;
+	ocrpt_report *r;
 	struct ocrpt_result *result[OCRPT_EXPR_RESULTS];
 	struct ocrpt_result *delayed_result;
 	union {
@@ -104,15 +106,15 @@ struct ocrpt_expr {
 ocrpt_expr *newblankexpr(opencreport *o, ocrpt_report *r, enum ocrpt_expr_type type, uint32_t n_ops);
 ocrpt_expr *ocrpt_newstring(opencreport *o, ocrpt_report *r, const char *string);
 
-void ocrpt_expr_print_internal(opencreport *o, ocrpt_expr *e, FILE *stream);
-void ocrpt_expr_result_deep_print_worker(opencreport *o, ocrpt_expr *e, FILE *stream);
-void ocrpt_expr_resolve_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask);
-void ocrpt_expr_resolve_exclude(opencreport *o, ocrpt_report *r, ocrpt_expr *e, int32_t varref_exclude_mask);
-bool ocrpt_expr_references(opencreport *o, ocrpt_report *r, ocrpt_expr *e, int32_t varref_include_mask, uint32_t *varref_vartype_mask);
-void ocrpt_expr_eval_worker(opencreport *o, ocrpt_report *r, ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var);
-bool ocrpt_expr_get_precalculate(opencreport *o, ocrpt_expr *e);
-void ocrpt_report_expressions_add_delayed_results(opencreport *o, ocrpt_report *r);
-void ocrpt_expr_init_iterative_results(opencreport *o, ocrpt_expr *e, enum ocrpt_result_type type);
+void ocrpt_expr_print_internal(ocrpt_expr *e, FILE *stream);
+void ocrpt_expr_result_deep_print_worker(ocrpt_expr *e, FILE *stream);
+void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask);
+void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exclude_mask);
+bool ocrpt_expr_references(ocrpt_expr *e, int32_t varref_include_mask, uint32_t *varref_vartype_mask);
+void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var);
+bool ocrpt_expr_get_precalculate(ocrpt_expr *e);
+void ocrpt_report_expressions_add_delayed_results(ocrpt_report *r);
+void ocrpt_expr_init_iterative_results(ocrpt_expr *e, enum ocrpt_result_type type);
 
 static inline void ocrpt_expr_set_result_owned(ocrpt_expr *e, unsigned int which, bool owned) {
 	switch (which) {

@@ -71,35 +71,35 @@ int main(void) {
 	ocrpt_break *br = ocrpt_break_get_next(r, &brl);
 
 	for (i = 0; i < N_TEST_VARS; i++)
-		e[i] = ocrpt_expr_parse(o, r, test_vars[i], NULL);
+		e[i] = ocrpt_report_expr_parse(r, test_vars[i], NULL);
 
 	printf("First run of the query\n\n");
 
 	row = 0;
-	ocrpt_query_navigate_start(o, q);
-	ocrpt_report_resolve_breaks(o, r);
-	ocrpt_report_resolve_variables(o, r);
+	ocrpt_query_navigate_start(q);
+	ocrpt_report_resolve_breaks(r);
+	ocrpt_report_resolve_variables(r);
 
 	for (i = 0; i < N_TEST_VARS; i++) {
-		ocrpt_expr_resolve(o, r, e[i]);
-		ocrpt_expr_optimize(o, r, e[i]);
+		ocrpt_expr_resolve(e[i]);
+		ocrpt_expr_optimize(e[i]);
 	}
 
-	while (ocrpt_query_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(q)) {
 		ocrpt_result *rs;
 
 		qr = ocrpt_query_get_result(q, &cols);
 
-		if (ocrpt_break_check_fields(o, r, br)) {
+		if (ocrpt_break_check_fields(br)) {
 			long rownum;
 			printf("Break triggers\n");
 
-			rownum = ocrpt_report_get_query_rownum(o, r);
+			rownum = ocrpt_report_get_query_rownum(r);
 			if (rownum > 1)
-				ocrpt_break_reset_vars(o, r, br);
+				ocrpt_break_reset_vars(br);
 		}
 
-		ocrpt_report_evaluate_variables(o, r);
+		ocrpt_report_evaluate_variables(r);
 
 		printf("Row #%d\n", row++);
 		print_result_row("a", qr, cols);
@@ -108,8 +108,8 @@ int main(void) {
 
 		for (i = 0; i < N_TEST_VARS; i++) {
 			printf("Expression: ");
-			ocrpt_expr_print(o, e[i]);
-			rs = ocrpt_expr_eval(o, r, e[i]);
+			ocrpt_expr_print(e[i]);
+			rs = ocrpt_expr_eval(e[i]);
 #if 0
 			printf("Deep print: ");
 			ocrpt_expr_result_deep_print(o, e[i]);
@@ -125,24 +125,24 @@ int main(void) {
 	printf("Second run of the query\n\n");
 
 	row = 0;
-	ocrpt_query_navigate_start(o, q);
-	ocrpt_report_resolve_breaks(o, r);
-	ocrpt_report_resolve_variables(o, r);
+	ocrpt_query_navigate_start(q);
+	ocrpt_report_resolve_breaks(r);
+	ocrpt_report_resolve_variables(r);
 
 	for (i = 0; i < N_TEST_VARS; i++) {
-		ocrpt_expr_resolve(o, r, e[i]);
-		ocrpt_expr_optimize(o, r, e[i]);
+		ocrpt_expr_resolve(e[i]);
+		ocrpt_expr_optimize(e[i]);
 	}
 
-	while (ocrpt_query_navigate_next(o, q)) {
+	while (ocrpt_query_navigate_next(q)) {
 		ocrpt_result *rs;
 
 		qr = ocrpt_query_get_result(q, &cols);
 
-		if (ocrpt_break_check_fields(o, r, br))
+		if (ocrpt_break_check_fields(br))
 			printf("Break triggers\n");
 
-		ocrpt_report_evaluate_variables(o, r);
+		ocrpt_report_evaluate_variables(r);
 
 		printf("Row #%d\n", row++);
 		print_result_row("a", qr, cols);
@@ -151,8 +151,8 @@ int main(void) {
 
 		for (i = 0; i < N_TEST_VARS; i++) {
 			printf("Expression: ");
-			ocrpt_expr_print(o, e[i]);
-			rs = ocrpt_expr_eval(o, r, e[i]);
+			ocrpt_expr_print(e[i]);
+			rs = ocrpt_expr_eval(e[i]);
 			printf("Evaluated: ");
 			ocrpt_result_print(rs);
 		}
@@ -162,7 +162,7 @@ int main(void) {
 #endif
 
 	for (i = 0; i < N_TEST_VARS; i++)
-		ocrpt_expr_free(o, r, e[i]);
+		ocrpt_expr_free(e[i]);
 
 	ocrpt_free(o);
 

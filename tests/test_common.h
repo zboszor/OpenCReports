@@ -45,7 +45,7 @@ static void print_part_reports(char *name, ocrpt_part *p) {
 
 		printf("row %d reports:", i);
 		j = 0;
-		for (ocrpt_part_row_data *pd = ocrpt_part_row_data_get_next(pr, &pdl); pd; pd = ocrpt_part_row_data_get_next(pr, &pdl)) {
+		for (ocrpt_part_column *pd = ocrpt_part_column_get_next(pr, &pdl); pd; pd = ocrpt_part_column_get_next(pr, &pdl)) {
 			ocrpt_list *rl = NULL;
 
 			for (ocrpt_report *r = ocrpt_report_get_next(pd, &rl); r; r = ocrpt_report_get_next(pd, &rl), j++)
@@ -66,7 +66,7 @@ static ocrpt_report *get_first_report(opencreport *o) {
 	ocrpt_part_row *pr = ocrpt_part_row_get_next(p, &l);
 
 	l = NULL;
-	ocrpt_part_row_data *pd = ocrpt_part_row_data_get_next(pr, &l);
+	ocrpt_part_column *pd = ocrpt_part_column_get_next(pr, &l);
 
 	l = NULL;
 	ocrpt_report *r = ocrpt_report_get_next(pd, &l);

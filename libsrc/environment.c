@@ -15,13 +15,13 @@
 #include "ocrpt-private.h"
 #include "datasource.h"
 
-DLL_EXPORT_SYM ocrpt_environment_query_func ocrpt_environment_get = ocrpt_environment_get_c;
+DLL_EXPORT_SYM ocrpt_env_query_func ocrpt_env_get = ocrpt_env_get_c;
 
-DLL_EXPORT_SYM void ocrpt_environment_set_query_func(ocrpt_environment_query_func func) {
-	ocrpt_environment_get = func;
+DLL_EXPORT_SYM void ocrpt_env_set_query_func(ocrpt_env_query_func func) {
+	ocrpt_env_get = func;
 }
 
-DLL_EXPORT_SYM ocrpt_result *ocrpt_environment_get_c(const char *env) {
+DLL_EXPORT_SYM ocrpt_result *ocrpt_env_get_c(const char *env) {
 	ocrpt_result *result = ocrpt_mem_malloc(sizeof(ocrpt_result));
 	char *value;
 

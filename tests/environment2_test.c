@@ -18,15 +18,15 @@ int main(void) {
 	printf("OCRPTENV is set.\n");
 
 	err = NULL;
-	e = ocrpt_expr_parse(o, NULL, "m.OCRPTENV", &err);
+	e = ocrpt_expr_parse(o, "m.OCRPTENV", &err);
 	if (e) {
 		printf("Before resolving: ");
-		ocrpt_expr_print(o, e);
-		ocrpt_expr_resolve(o, NULL, e);
-		ocrpt_expr_optimize(o, NULL, e);
+		ocrpt_expr_print(e);
+		ocrpt_expr_resolve(e);
+		ocrpt_expr_optimize(e);
 		printf("After resolving: ");
-		ocrpt_expr_print(o, e);
-		ocrpt_expr_free(o, NULL, e);
+		ocrpt_expr_print(e);
+		ocrpt_expr_free(e);
 	} else {
 		printf("expr failed to parse: %s\n", err);
 		ocrpt_strfree(err);
@@ -36,15 +36,15 @@ int main(void) {
 	printf("OCRPTENV is unset.\n");
 
 	err = NULL;
-	e = ocrpt_expr_parse(o, NULL, "m.OCRPTENV", &err);
+	e = ocrpt_expr_parse(o, "m.OCRPTENV", &err);
 	if (e) {
 		printf("Before resolving: ");
-		ocrpt_expr_print(o, e);
-		ocrpt_expr_resolve(o, NULL, e);
-		ocrpt_expr_optimize(o, NULL, e);
+		ocrpt_expr_print(e);
+		ocrpt_expr_resolve(e);
+		ocrpt_expr_optimize(e);
 		printf("After resolving: ");
-		ocrpt_expr_print(o, e);
-		ocrpt_expr_free(o, NULL, e);
+		ocrpt_expr_print(e);
+		ocrpt_expr_free(e);
 	} else {
 		printf("expr failed to parse: %s\n", err);
 		ocrpt_strfree(err);

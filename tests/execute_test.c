@@ -78,10 +78,10 @@ static void test_report_added_cb(opencreport *o, ocrpt_report *r, void *dummy UN
 
 	printf("appended report %d\n", nreports - 1);
 
-	ocrpt_report_add_start_cb(o, r, test_report_start_cb, NULL);
-	ocrpt_report_add_done_cb(o, r, test_report_done_cb, NULL);
-	ocrpt_report_add_iteration_cb(o, r, test_report_iteration_cb, NULL);
-	ocrpt_report_add_precalculation_done_cb(o, r, test_report_precalc_done_cb, NULL);
+	ocrpt_report_add_start_cb(r, test_report_start_cb, NULL);
+	ocrpt_report_add_done_cb(r, test_report_done_cb, NULL);
+	ocrpt_report_add_iteration_cb(r, test_report_iteration_cb, NULL);
+	ocrpt_report_add_precalculation_done_cb(r, test_report_precalc_done_cb, NULL);
 }
 
 int main(void) {
@@ -89,7 +89,6 @@ int main(void) {
 
 	ocrpt_add_precalculation_done_cb(o, test_precalc_done_cb, NULL);
 	ocrpt_add_part_added_cb(o, test_part_added_cb, NULL);
-	ocrpt_add_part_iteration_cb(o, test_part_iteration_cb, NULL);
 	ocrpt_add_report_added_cb(o, test_report_added_cb, NULL);
 
 	if (!ocrpt_parse_xml(o, "part_xml_test.xml")) {
@@ -97,6 +96,12 @@ int main(void) {
 		ocrpt_free(o);
 		return 0;
 	}
+
+	ocrpt_list *l = NULL;
+	ocrpt_part *p;
+
+	while ((p = ocrpt_part_get_next(o, &l)))
+		ocrpt_part_add_iteration_cb(p, test_part_iteration_cb, NULL);
 
 	ocrpt_execute(o);
 

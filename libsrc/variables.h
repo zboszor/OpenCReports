@@ -9,6 +9,7 @@
 #include <opencreport.h>
 
 struct ocrpt_var {
+	ocrpt_report *r;
 	const char *name;
 	char *br_name;
 	ocrpt_break *br;
@@ -24,10 +25,10 @@ struct ocrpt_var {
 	bool precalculate:1;
 };
 
-void ocrpt_variable_reset(opencreport *o, ocrpt_var *v);
-void ocrpt_variables_add_precalculated_results(opencreport *o, ocrpt_report *r, ocrpt_list *brl_start, bool last_row);
-void ocrpt_variables_advance_precalculated_results(opencreport *o, ocrpt_report *r, ocrpt_list *brl_start);
-void ocrpt_variable_free(opencreport *o, ocrpt_report *r, ocrpt_var *var);
-void ocrpt_variables_free(opencreport *o, ocrpt_report *r);
+void ocrpt_variable_reset(ocrpt_var *v);
+void ocrpt_variables_add_precalculated_results(ocrpt_report *r, ocrpt_list *brl_start, bool last_row);
+void ocrpt_variables_advance_precalculated_results(ocrpt_report *r, ocrpt_list *brl_start);
+void ocrpt_variable_free(ocrpt_var *var);
+void ocrpt_variables_free(ocrpt_report *r);
 
 #endif

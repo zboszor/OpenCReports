@@ -38,8 +38,8 @@ static void test_newrow_cb(opencreport *o, ocrpt_report *r, void *ptr) {
 		printf("\n");
 	printf("Row #%d\n", row++);
 
-	rs = ocrpt_expr_get_result(o, rd->e);
-	ocrpt_expr_print(o, rd->e);
+	rs = ocrpt_expr_get_result(rd->e);
+	ocrpt_expr_print(rd->e);
 	ocrpt_result_print(rs);
 }
 
@@ -64,20 +64,20 @@ int main(void) {
 	ocrpt_report *r = get_first_report(o);
 
 	/* This is a precalculate="yes" variable, resulting in delayed expression calculation */
-	rd.e = ocrpt_expr_parse(o, r, "v.age_avg", NULL);
-	ocrpt_expr_set_delayed(o, rd.e, true);
+	rd.e = ocrpt_report_expr_parse(r, "v.age_avg", NULL);
+	ocrpt_expr_set_delayed(rd.e, true);
 
-	ocrpt_report_add_new_row_cb(o, r, test_newrow_cb, &rd);
+	ocrpt_report_add_new_row_cb(r, test_newrow_cb, &rd);
 
-	br = ocrpt_break_get(o, r, "male");
-	ocrpt_break_add_trigger_cb(o, r, br, test_break_trigger_cb, NULL);
+	br = ocrpt_break_get(r, "male");
+	ocrpt_break_add_trigger_cb(br, test_break_trigger_cb, NULL);
 
-	br = ocrpt_break_get(o, r, "adult");
-	ocrpt_break_add_trigger_cb(o, r, br, test_break_trigger_cb, NULL);
+	br = ocrpt_break_get(r, "adult");
+	ocrpt_break_add_trigger_cb(br, test_break_trigger_cb, NULL);
 
 	ocrpt_execute(o);
 
-	ocrpt_expr_free(o, r, rd.e);
+	ocrpt_expr_free(rd.e);
 
 	ocrpt_free(o);
 
