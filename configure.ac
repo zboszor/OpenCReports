@@ -11,7 +11,7 @@ dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
 dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 dnl GNU Lesser General Public License for more details.
 
-AC_INIT([OpenCReports],[0.5],[https://github.com/zboszor/OpenCReports])
+AC_INIT([OpenCReports],[0.6],[https://github.com/zboszor/OpenCReports])
 
 AC_CANONICAL_TARGET
 AC_CONFIG_SRCDIR(include/opencreport.h)
