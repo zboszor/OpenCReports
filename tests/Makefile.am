@@ -140,6 +140,10 @@ if ENABLE_PDF_TESTS
 pdf-test: $(PDF_TESTS) execute_pdf_test.sh
 	$(foreach TEST,$(PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_pdf_test.sh $(TEST) &&) true
 
+else
+
+.PHONY: pdf-test
+
 endif
 
 test: basic-test pdf-test
