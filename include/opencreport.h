@@ -177,6 +177,10 @@ bool ocrpt_parse_xml(opencreport *o, const char *filename);
  */
 bool ocrpt_execute(opencreport *o);
 /*
+ * Get output data and length
+ */
+char *ocrpt_get_output(opencreport *o, size_t *length);
+/*
  * Send the output to stdout
  */
 void ocrpt_spool(opencreport *o);

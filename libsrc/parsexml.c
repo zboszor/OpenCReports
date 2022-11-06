@@ -274,14 +274,15 @@ static void ocrpt_parse_queries_node(opencreport *o, xmlTextReaderPtr reader) {
 static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader) {
 	xmlChar *name, *type, *host, *unix_socket;
 	xmlChar *port, *dbname, *user, *password;
-	xmlChar *connstr, *optionfile, *group;
+	xmlChar *connstr, *optionfile, *group, *encoding;
 	ocrpt_expr *name_e, *type_e, *host_e, *unix_socket_e;
 	ocrpt_expr *port_e, *dbname_e, *user_e, *password_e;
-	ocrpt_expr *connstr_e, *optionfile_e, *group_e;
+	ocrpt_expr *connstr_e, *optionfile_e, *group_e, *encoding_e;
 	char *name_s, *type_s, *host_s, *unix_socket_s;
 	char *port_s, *dbname_s, *user_s, *password_s;
-	char *connstr_s, *optionfile_s, *group_s;
+	char *connstr_s, *optionfile_s, *group_s, *encoding_s;
 	int32_t port_i, i;
+	ocrpt_datasource *ds = NULL;
 
 	struct {
 		char *attrs;
@@ -298,6 +299,7 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 		{ "connstr", &connstr },
 		{ "optionfile", &optionfile },
 		{ "group", &group },
+		{ "encoding", &encoding },
 		{ NULL, NULL },
 	};
 
@@ -327,33 +329,37 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, connstr);
 	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, optionfile);
 	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, group);
+	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, encoding);
 
 	if (name_s && type_s) {
 		if (!strcmp(type_s, "array"))
-			ocrpt_datasource_add_array(o, name_s);
+			ds = ocrpt_datasource_add_array(o, name_s);
 		else if (!strcmp(type_s, "csv"))
-			ocrpt_datasource_add_csv(o, name_s);
+			ds = ocrpt_datasource_add_csv(o, name_s);
 		else if (!strcmp(type_s, "json"))
-			ocrpt_datasource_add_json(o, name_s);
+			ds = ocrpt_datasource_add_json(o, name_s);
 		else if (!strcmp(type_s, "xml"))
-			ocrpt_datasource_add_xml(o, name_s);
+			ds = ocrpt_datasource_add_xml(o, name_s);
 		else if (!strcmp(type_s, "postgresql")) {
 			if (connstr_s)
-				ocrpt_datasource_add_postgresql2(o, name_s, connstr_s);
+				ds = ocrpt_datasource_add_postgresql2(o, name_s, connstr_s);
 			else
-				ocrpt_datasource_add_postgresql(o, name_s, unix_socket_s ? unix_socket_s : host_s, port_s, dbname_s, user_s, password_s);
+				ds = ocrpt_datasource_add_postgresql(o, name_s, unix_socket_s ? unix_socket_s : host_s, port_s, dbname_s, user_s, password_s);
 		} else if (!strcmp(type_s, "mariadb") || !strcmp(type_s, "mysql")) {
 			if (group_s)
-				ocrpt_datasource_add_mariadb2(o, name_s, optionfile_s, group_s);
+				ds = ocrpt_datasource_add_mariadb2(o, name_s, optionfile_s, group_s);
 			else
-				ocrpt_datasource_add_mariadb(o, name_s, host_s, port_s, dbname_s, user_s, password_s, unix_socket_s);
+				ds = ocrpt_datasource_add_mariadb(o, name_s, host_s, port_s, dbname_s, user_s, password_s, unix_socket_s);
 		} else if (!strcmp(type_s, "odbc")) {
 			if (connstr_s)
-				ocrpt_datasource_add_odbc2(o, name_s, connstr_s);
+				ds = ocrpt_datasource_add_odbc2(o, name_s, connstr_s);
 			else
-				ocrpt_datasource_add_odbc(o, name_s, dbname_s, user_s, password_s);
+				ds = ocrpt_datasource_add_odbc(o, name_s, dbname_s, user_s, password_s);
 		}
 	}
+
+	if (encoding && encoding_s && ds)
+		ocrpt_datasource_set_encoding(ds, encoding_s);
 
 	for (i = 0; xmlattrs[i].attrp; i++)
 		xmlFree(*xmlattrs[i].attrp);
@@ -369,6 +375,7 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	ocrpt_expr_free(connstr_e);
 	ocrpt_expr_free(optionfile_e);
 	ocrpt_expr_free(group_e);
+	ocrpt_expr_free(encoding_e);
 
 	ocrpt_ignore_child_nodes(o, reader, -1, "Datasource");
 }
@@ -1865,46 +1872,157 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 	}
 }
 
-static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader) {
-	xmlChar *size_unit = xmlTextReaderGetAttribute(reader, (const xmlChar *)"size_unit");
-	xmlChar *noquery_show_nodata = xmlTextReaderGetAttribute(reader, (const xmlChar *)"noquery_show_nodata");
-	xmlChar *report_height_after_last = xmlTextReaderGetAttribute(reader, (const xmlChar *)"report_height_after_last");
+static void ocrpt_parse_path_node(opencreport *o, xmlTextReaderPtr reader) {
+	xmlChar *value = NULL;
 
-	o->noquery_show_nodata = true;
-	if (noquery_show_nodata) {
-		ocrpt_expr *noquery_show_nodata_e;
-		int32_t noquery_show_nodata_i;
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, noquery_show_nodata);
-		ocrpt_expr_free(noquery_show_nodata_e);
-		o->noquery_show_nodata = !!noquery_show_nodata_i;
+	struct {
+		char *attrs;
+		xmlChar **attrp;
+	} xmlattrs[] = {
+		{ "value", &value },
+		{ NULL, NULL },
+	};
+	int32_t i;
+
+	for (i = 0; xmlattrs[i].attrp; i++)
+		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
+
+	if (value) {
+		ocrpt_expr *value_e;
+		char *value_s;
+
+		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, value);
+		ocrpt_add_search_path(o, value_s);
+		ocrpt_expr_free(value_e);
 	}
-	o->noquery_show_nodata_set = true;
 
-	o->report_height_after_last = true;
-	if (report_height_after_last) {
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
+
+	ocrpt_ignore_child_nodes(o, reader, -1, "Path");
+}
+
+static void ocrpt_parse_paths_node(opencreport *o, xmlTextReaderPtr reader) {
+	if (xmlTextReaderIsEmptyElement(reader))
+		return;
+
+	int depth = xmlTextReaderDepth(reader);
+	while (xmlTextReaderRead(reader) == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+
+		//processNode(reader);
+
+		int nodetype = xmlTextReaderNodeType(reader);
+
+		if (nodetype == XML_READER_TYPE_END_ELEMENT && depth == xmlTextReaderDepth(reader) && !strcmp((char *)name, "Paths")) {
+			xmlFree(name);
+			break;
+		}
+
+		if (nodetype == XML_READER_TYPE_ELEMENT) {
+			if (!strcmp((char *)name, "Path"))
+				ocrpt_parse_path_node(o, reader);
+		}
+
+		xmlFree(name);
+	}
+}
+
+static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader) {
+	xmlChar *size_unit, *noquery_show_nodata, *report_height_after_last;
+	xmlChar *precision_bits, *rounding_mode, *locale;
+
+	struct {
+		char *attrs;
+		xmlChar **attrp;
+	} xmlattrs[] = {
+		{ "size_unit", &size_unit },
+		{ "noquery_show_nodata", &noquery_show_nodata },
+		{ "report_height_after_last", &report_height_after_last },
+		{ "precision_bits", &precision_bits },
+		{ "rounding_mode", &rounding_mode },
+		{ "locale", &locale },
+		{ NULL, NULL },
+	};
+	int32_t i;
+
+	for (i = 0; xmlattrs[i].attrp; i++)
+		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
+
+	if (!o->noquery_show_nodata_set) {
+		int32_t noquery_show_nodata_i = 1;
+
+		if (noquery_show_nodata) {
+			ocrpt_expr *noquery_show_nodata_e;
+			ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, noquery_show_nodata);
+			ocrpt_expr_free(noquery_show_nodata_e);
+		}
+
+		ocrpt_set_noquery_show_nodata(o, !!noquery_show_nodata_i);
+	}
+
+	if (!o->report_height_after_last_set && report_height_after_last) {
 		ocrpt_expr *report_height_after_last_e;
 		int32_t report_height_after_last_i;
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, report_height_after_last);
-		ocrpt_expr_free(report_height_after_last_e);
-		o->report_height_after_last = !!report_height_after_last_i;
-	}
-	o->report_height_after_last_set = true;
 
-	o->size_in_points = false;
-	if (size_unit) {
+		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, report_height_after_last);
+		ocrpt_set_report_height_after_last(o, !!report_height_after_last_i);
+		ocrpt_expr_free(report_height_after_last_e);
+	}
+
+	if (!o->size_unit_set && size_unit) {
 		ocrpt_expr *size_unit_e;
 		char *size_unit_s;
-		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, size_unit);
 
-		if (size_unit_s && strcasecmp(size_unit_s, "points") == 0)
-			o->size_in_points = true;
+		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, size_unit);
+		ocrpt_set_size_unit_points(o, size_unit_s && strcasecmp(size_unit_s, "points") == 0);
 		ocrpt_expr_free(size_unit_e);
 	}
-	o->size_unit_set = true;
 
-	xmlFree(size_unit);
-	xmlFree(noquery_show_nodata);
-	xmlFree(report_height_after_last);
+	if (!o->precision_set && precision_bits) {
+		ocrpt_expr *precision_bits_e;
+		int32_t precision_bits_i;
+
+		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, precision_bits);
+		ocrpt_set_numeric_precision_bits(o, precision_bits_i);
+		ocrpt_expr_free(precision_bits_e);
+	}
+
+	if (!o->rounding_mode_set && rounding_mode) {
+		ocrpt_expr *rounding_mode_e;
+		char *rounding_mode_s;
+		mpfr_rnd_t rndmode;
+
+		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, rounding_mode);
+		if (strcasecmp(rounding_mode_s, "nearest") == 0)
+			rndmode = MPFR_RNDN;
+		else if (strcasecmp(rounding_mode_s, "to_minus_inf") == 0)
+			rndmode = MPFR_RNDD;
+		else if (strcasecmp(rounding_mode_s, "to_inf") == 0)
+			rndmode = MPFR_RNDU;
+		else if (strcasecmp(rounding_mode_s, "to_zero") == 0)
+			rndmode = MPFR_RNDZ;
+		else if (strcasecmp(rounding_mode_s, "away_from_zero") == 0)
+			rndmode = MPFR_RNDA;
+		else if (strcasecmp(rounding_mode_s, "faithful") == 0)
+			rndmode = MPFR_RNDF;
+		else /* default "nearest" */
+			rndmode = MPFR_RNDN;
+		ocrpt_set_rounding_mode(o, rndmode);
+		ocrpt_expr_free(rounding_mode_e);
+	}
+
+	if (!o->locale_set && locale) {
+		ocrpt_expr *locale_e;
+		char *locale_s;
+
+		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, locale);
+		ocrpt_set_locale(o, locale_s);
+		ocrpt_expr_free(locale_e);
+	}
+
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
 
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
@@ -1924,7 +2042,9 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 		}
 
 		if (nodetype == XML_READER_TYPE_ELEMENT) {
-			if (!strcmp((char *)name, "Datasources"))
+			if (!strcmp((char *)name, "Paths"))
+				ocrpt_parse_paths_node(o, reader);
+			else if (!strcmp((char *)name, "Datasources"))
 				ocrpt_parse_datasources_node(o, reader);
 			else if (!strcmp((char *)name, "Queries"))
 				ocrpt_parse_queries_node(o, reader);
@@ -1961,6 +2081,8 @@ DLL_EXPORT_SYM bool ocrpt_parse_xml(opencreport *o, const char *filename) {
 		} else if (nodeType == XML_READER_TYPE_ELEMENT && depth == 0) {
 			if (!strcmp((char *)name, "OpenCReport"))
 				ocrpt_parse_opencreport_node(o, reader);
+			else if (!strcmp((char *)name, "Paths"))
+				ocrpt_parse_paths_node(o, reader);
 			else if (!strcmp((char *)name, "Datasources"))
 				ocrpt_parse_datasources_node(o, reader);
 			else if (!strcmp((char *)name, "Datasource"))

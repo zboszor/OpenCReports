@@ -94,6 +94,15 @@ ocrpt_spool(opencreport *o);</programlisting>
 			</para>
 		</sect2>
 		<sect2>
+			<title>Get report result</title>
+			<para>
+				Get the report output. The application
+				then can save it as a file.
+				<programlisting>char *
+ocrpt_get_output(opencreport *o, size_t *length);</programlisting>
+			</para>
+		</sect2>
+		<sect2>
 			<title>Report handler destruction</title>
 			<para>
 				Calling this function frees up the report handler

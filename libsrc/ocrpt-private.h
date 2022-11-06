@@ -107,6 +107,9 @@ struct opencreport {
 	bool noquery_show_nodata:1;
 	bool report_height_after_last_set:1;
 	bool report_height_after_last:1;
+	bool precision_set:1;
+	bool rounding_mode_set:1;
+	bool locale_set:1;
 };
 
 struct ocrpt_result {

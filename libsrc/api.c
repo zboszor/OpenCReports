@@ -66,7 +66,8 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	o->rndmode = MPFR_RNDN;
 	gmp_randinit_default(o->randstate);
 	gmp_randseed_ui(o->randstate, seed);
-	ocrpt_set_locale(o, "C");
+	o->locale = newlocale(LC_ALL_MASK, "C", (locale_t)0);
+	o->noquery_show_nodata = true;
 
 	o->current_date = ocrpt_mem_malloc(sizeof(ocrpt_result));
 	memset(o->current_date, 0, sizeof(ocrpt_result));
@@ -170,6 +171,7 @@ DLL_EXPORT_SYM void ocrpt_set_numeric_precision_bits(opencreport *o, mpfr_prec_t
 		return;
 
 	o->prec = prec;
+	o->precision_set = true;
 }
 
 DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode) {
@@ -177,6 +179,7 @@ DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode) 
 		return;
 
 	o->rndmode = rndmode;
+	o->rounding_mode_set = true;
 }
 
 DLL_EXPORT_SYM bool ocrpt_add_part_added_cb(opencreport *o, ocrpt_part_cb func, void *data) {
@@ -777,8 +780,21 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	return true;
 }
 
+DLL_EXPORT_SYM char *ocrpt_get_output(opencreport *o, size_t *length) {
+	if (!o || !o->output_buffer) {
+		if (length)
+			*length = 0;
+		return NULL;
+	}
+
+	if (length)
+		*length = o->output_buffer->len;
+
+	return o->output_buffer->str;
+}
+
 DLL_EXPORT_SYM void ocrpt_spool(opencreport *o) {
-	if (!o->output_buffer)
+	if (!o || !o->output_buffer)
 		return;
 
 	ssize_t ret = write(fileno(stdout), o->output_buffer->str, o->output_buffer->len);
@@ -1064,6 +1080,7 @@ DLL_EXPORT_SYM void ocrpt_set_locale(opencreport *o, const char *locale) {
 	o->locale = newlocale(LC_ALL_MASK, locale, o->locale);
 	if (o->locale == (locale_t)0)
 		o->locale = newlocale(LC_ALL_MASK, "C", o->locale);
+	o->locale_set = true;
 }
 
 DLL_EXPORT_SYM locale_t ocrpt_get_locale(opencreport *o) {

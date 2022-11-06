@@ -1,7 +1,15 @@
-<!ELEMENT OpenCReport (Datasources?,Queries?,(Part|Report)*)>
+<!ELEMENT OpenCReport (Paths?,Datasources?,Queries?,(Part|Report)*)>
 <!ATTLIST OpenCReport
 	size_unit CDATA #IMPLIED
-	rlib_compat CDATA #IMPLIED >
+	noquery_show_nodata CDATA #IMPLIED
+	report_height_after_last CDATA #IMPLIED
+	precision_bits CDATA #IMPLIED
+	rounding_mode (nearest|to_minus_inf|to_inf|to_zero|away_from_zero|faithful) "nearest"
+	locale CDATA #IMPLIED >
+<!ELEMENT Paths (Path+)>
+<!ELEMENT Path EMPTY>
+<!ATTLIST Path
+    value CDATA #REQUIRED>
 <!ELEMENT Datasources (Datasource+)>
 <!ELEMENT Datasource EMPTY>
 <!ATTLIST Datasource
@@ -15,7 +23,8 @@
 	password CDATA #IMPLIED
 	connstr CDATA #IMPLIED
 	optionfile CDATA #IMPLIED
-	group CDATA #IMPLIED >
+	group CDATA #IMPLIED
+	encoding CDATA #IMPLIED >
 <!ELEMENT Queries (Query)+>
 <!ELEMENT Query (#PCDATA)>
 <!ATTLIST Query

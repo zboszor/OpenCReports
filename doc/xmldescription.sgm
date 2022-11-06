@@ -266,6 +266,70 @@
 				Default is <literal>false</literal>.
 			</para>
 		</sect2>
+		<sect2>
+			<title>Precision bits</title>
+			<para>
+				This controls the precision for numeric computations.
+				<programlisting>&lt;OpenCReport precision_bits="256"&gt;</programlisting>
+			</para>
+			<para>
+				Default is <literal>256</literal>.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Rounding mode</title>
+			<para>
+				This controls the rounding mode for numeric computations.
+				Possible values are:
+				<literal>nearest</literal>,
+				<literal>to_minus_inf</literal>,
+				<literal>to_inf</literal>,
+				<literal>to_zero</literal>,
+				<literal>away_from_zero</literal>, or
+				<literal>faithful</literal>.
+				<programlisting>&lt;OpenCReport rounding_mode="nearest"&gt;
+&lt;OpenCReport rounding_mode="to_minus_inf"&gt;
+&lt;OpenCReport rounding_mode="to_inf"&gt;
+&lt;OpenCReport rounding_mode="to_zero"&gt;
+&lt;OpenCReport rounding_mode="away_from_zero"&gt;
+&lt;OpenCReport rounding_mode="faithful"&gt;</programlisting>
+			</para>
+			<para>
+				Default is <literal>nearest</literal>.
+				According to the MPFR documentation,
+				<literal>faithful</literal> is experimental.
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="searchpaths" xreflabel="Search paths">
+		<title>Paths</title>
+		<para>
+			Some report descriptiom elements (like
+			<literal>&lt;load&gt;</literal> and
+			<literal>&lt;Image&gt;</literal>, see
+			<xref linkend="loadedreport"/> and <xref linkend="imagenode"/>)
+			reference files. By default, these files must
+			be in the same directory as the report XML
+			description file, or in the current working
+			directory for the application using OpenCReports.
+			To lift this limitation, and allow organizing files
+			in a more logical manner, a search path or
+			multiple search paths may be added.
+			For files referenced with relative paths, the
+			search paths will be used in their order of
+			declaration. Search paths and the relative file
+			path are concatenated together to form an absolute
+			path. The first successful absolute file path
+			match will be used in the element referencing
+			the file.
+		</para>
+		<para>
+			Search paths are in the following format:
+			<programlisting>&lt;Paths&gt;
+    &lt;Path value="/absolute/path" /&gt;
+    ...
+&lt;/Paths&gt;</programlisting>
+		</para>
 	</sect1>
 	<sect1 id="datasources" xreflabel="Datasources">
 		<title>Datasources</title>
@@ -615,6 +679,24 @@ const enum ocrpt_result_type coltypes[COLUMNS] = {
 				<literal>OCRPT_RESULT_NUMBER</literal> and
 				<literal>OCRPT_RESULT_DATETIME</literal>. 
 			</para>
+		</sect2>
+		<sect2>
+			<title>Common datasource properties</title>
+			<sect3>
+				<title>Encoding</title>
+				<para>
+					OpenCReports expects strings in UTF-8 encoding.
+					However, some datasources may use a different
+					encoding. To use and display strings from the
+					datasource, an internal conversion to UTF-8 is
+					needed. To perform this correctly, the datasource
+					encoding must be set.
+					<programlisting>&lt;Datasource
+    name="mysource"
+    ...
+    encoding="ISO-8859-2" /&gt;</programlisting>
+				</para>
+			</sect3>
 		</sect2>
 	</sect1>
 	<sect1 id="queries" xreflabel="Queries">
