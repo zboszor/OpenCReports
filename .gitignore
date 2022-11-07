@@ -61,6 +61,7 @@ tests/results/*.asanout.*
 
 # Test binaries
 tests/*_test
+tests/locale/*/*/*.mo
 
 # Misc
 README.md.new

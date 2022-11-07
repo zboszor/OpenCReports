@@ -1,0 +1,31 @@
+#: first_test:1
+msgid "Happy birthday, %s!"
+msgstr "Boldog születésnapot, %s!"
+
+#: first_test:2
+msgid "yes"
+msgstr "igen"
+
+#: first_test:3
+msgid "no"
+msgstr "nem"
+
+#: first_test:4
+msgid "Greetings"
+msgstr "Üdvözlet"
+
+#: first_test:5
+msgid "Age"
+msgstr "Életkor"
+
+#: first_test:6
+msgid "Adult"
+msgstr "Felnőtt"
+
+#: first_test:7
+msgid "Page header: %d / %d"
+msgstr "Lap fejléc: %d / %d"
+
+#: first_test:8
+msgid "Page footer: %d / %d"
+msgstr "Lap lábléc: %d / %d"

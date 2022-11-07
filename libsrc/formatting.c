@@ -700,7 +700,7 @@ void ocrpt_utf8backward(const char *s, int l, int *l2, int blen, int *blen2) {
 		*blen2 = i;
 }
 
-void ocrpt_format_string(opencreport *o, ocrpt_expr *e, ocrpt_string *string0, const char *formatstring, int32_t formatlen, ocrpt_expr **expr, int32_t n_expr) {
+void ocrpt_format_string(opencreport *o, ocrpt_expr *e, ocrpt_string *string0, ocrpt_string *formatstring, ocrpt_expr **expr, int32_t n_expr) {
 	int32_t i, advance;
 	locale_t locale;
 
@@ -744,7 +744,7 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, ocrpt_string *string0, c
 		}
 
 		type_idx = 0;
-		while (advance < formatlen && formatstring[advance]) {
+		while (advance < formatstring->len && formatstring->str[advance]) {
 			ocrpt_string *tmp;
 			char *result;
 			enum ocrpt_formatstring_type type;
@@ -755,7 +755,7 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, ocrpt_string *string0, c
 			length = -1;
 			lpadded = 0;
 			assert(type_idx < 2);
-			tmp = ocrpt_get_next_format_string(formatstring + advance, types[type_idx], &type, &adv, &error, &length, &lpadded);
+			tmp = ocrpt_get_next_format_string(formatstring->str + advance, types[type_idx], &type, &adv, &error, &length, &lpadded);
 
 			if (error) {
 				if (e)
@@ -845,6 +845,111 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, ocrpt_string *string0, c
 			if (data_handled && i != (n_expr - 1))
 				break;
 		}
+	}
+
+	uselocale(locale);
+}
+
+void ocrpt_format_string_literal(opencreport *o, ocrpt_expr *e, ocrpt_string *string0, ocrpt_string *formatstring, ocrpt_string *literal) {
+	int32_t advance;
+	locale_t locale;
+
+	/* Use the specified locale, so that thousand separators, etc. work. */
+	locale = uselocale(o->locale);
+
+	ocrpt_string *string = ocrpt_mem_string_resize(string0, 16);
+	if (string) {
+		if (e && !e->result[o->residx]->string) {
+			e->result[o->residx]->string = string;
+			e->result[o->residx]->string_owned = true;
+		}
+		string->len = 0;
+	}
+
+	advance = 0;
+
+	enum ocrpt_formatstring_type types[2] = { OCRPT_FORMAT_STRING, OCRPT_FORMAT_LITERAL };
+	int32_t type_idx;
+	bool data_handled = false;
+
+	type_idx = 0;
+	while (advance < formatstring->len && formatstring->str[advance]) {
+		ocrpt_string *tmp;
+		enum ocrpt_formatstring_type type;
+		int32_t adv, length;
+		bool error, lpadded;
+
+		length = -1;
+		lpadded = 0;
+		assert(type_idx < 2);
+		tmp = ocrpt_get_next_format_string(formatstring->str + advance, types[type_idx], &type, &adv, &error, &length, &lpadded);
+
+		if (error) {
+			if (e)
+				ocrpt_expr_make_error_result(e, tmp->str);
+			else {
+				string->len = 0;
+				ocrpt_mem_string_append(string, tmp->str);
+			}
+			ocrpt_mem_string_free(tmp, true);
+			return;
+		}
+
+		if (types[type_idx] == type || (types[type_idx] == OCRPT_FORMAT_NUMBER && type == OCRPT_FORMAT_MONEY)) {
+			type_idx++;
+			data_handled = true;
+		}
+
+		switch (type) {
+		case OCRPT_FORMAT_LITERAL:
+			if (!data_handled)
+				ocrpt_mem_string_append(string, tmp->str);
+			else
+				goto end_inner_loop;
+			break;
+		case OCRPT_FORMAT_NUMBER:
+			break;
+		case OCRPT_FORMAT_MONEY:
+			break;
+		case OCRPT_FORMAT_DATETIME:
+			break;
+		case OCRPT_FORMAT_STRING:
+			int32_t blen = literal->len;
+
+			if (length > 0) {
+				int32_t slen;
+				ocrpt_utf8forward(literal->str, length, &slen, literal->len, &blen);
+
+				if (lpadded) {
+					char *padstr;
+					int32_t padlen;
+
+					padlen = length - slen;
+					padstr = ocrpt_mem_malloc(padlen + 1);
+					memset(padstr, ' ', padlen);
+					padstr[padlen] = 0;
+
+					ocrpt_mem_string_append(string, padstr);
+
+					ocrpt_mem_free(padstr);
+				}
+			}
+
+			ocrpt_mem_string_append_len(string, literal->str, blen);
+
+			data_handled = true;
+			break;
+		case OCRPT_FORMAT_NONE:
+			break;
+		}
+
+		end_inner_loop:
+		ocrpt_mem_string_free(tmp, true);
+
+		advance += adv;
+
+		if (data_handled)
+			break;
 	}
 
 	uselocale(locale);

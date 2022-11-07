@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libintl.h>
 #include <langinfo.h>
 #include <utf8proc.h>
 
@@ -3621,43 +3622,42 @@ OCRPT_STATIC_FUNCTION(ocrpt_format) {
 
 	ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
 
-	char *formatstring = NULL;
-	int32_t formatlen = 0;
+	ocrpt_string formatstring;
 
-	switch (e->ops[0]->result[e->o->residx]->type) {
-	case OCRPT_RESULT_NUMBER:
-		if (e->ops[1]->result[e->o->residx]->isnull || e->ops[1]->result[e->o->residx]->string->len == 0)
-			formatstring = "%d";
-		break;
-	case OCRPT_RESULT_STRING:
-		if (e->ops[1]->result[e->o->residx]->isnull || e->ops[1]->result[e->o->residx]->string->len == 0)
-			formatstring = "%s";
-		break;
-	case OCRPT_RESULT_DATETIME:
-		/*
-		 * Result would be garbage for intervals.
-		 * Let's return an empty string.
-		 */
-		if (e->ops[0]->result[e->o->residx]->interval) {
-			e->result[e->o->residx]->string->str[0] = 0;
-			e->result[e->o->residx]->string->len = 0;
+	if (!e->ops[1]->result[e->o->residx]->isnull && e->ops[1]->result[e->o->residx]->string->len) {
+		formatstring.str = e->ops[1]->result[e->o->residx]->string->str;
+		formatstring.len = e->ops[1]->result[e->o->residx]->string->len;
+	} else {
+		switch (e->ops[0]->result[e->o->residx]->type) {
+		case OCRPT_RESULT_NUMBER:
+			formatstring.str = "%d";
+			formatstring.len = 2;
+			break;
+		case OCRPT_RESULT_STRING:
+			formatstring.str = "%s";
+			formatstring.len = 2;
+			break;
+		case OCRPT_RESULT_DATETIME:
+			/*
+			 * Result would be garbage for intervals.
+			 * Let's return an empty string.
+			 */
+			if (e->ops[0]->result[e->o->residx]->interval) {
+				e->result[e->o->residx]->string->str[0] = 0;
+				e->result[e->o->residx]->string->len = 0;
+				return;
+			}
+
+			formatstring.str = nl_langinfo_l(D_FMT, e->o->locale);
+			formatstring.len = strlen(formatstring.str);
+			break;
+		case OCRPT_RESULT_ERROR:
+			/* This case is caught earlier */
 			return;
 		}
-		if (e->ops[1]->result[e->o->residx]->isnull || e->ops[1]->result[e->o->residx]->string->len == 0)
-			formatstring = nl_langinfo_l(D_FMT, e->o->locale);
-		break;
-	case OCRPT_RESULT_ERROR:
-		/* This case is caught earlier */
-		return;
 	}
 
-	if (!formatstring) {
-		formatstring = e->ops[1]->result[e->o->residx]->string->str;
-		formatlen = e->ops[1]->result[e->o->residx]->string->len;
-	} else
-		formatlen = strlen(formatstring);
-
-	ocrpt_format_string(e->o, e, e->result[e->o->residx]->string, formatstring, formatlen, e->ops, 1);
+	ocrpt_format_string(e->o, e, e->result[e->o->residx]->string, &formatstring, e->ops, 1);
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_dtosf) {
@@ -3704,19 +3704,17 @@ OCRPT_STATIC_FUNCTION(ocrpt_dtosf) {
 		return;
 	}
 
-	char *formatstring = NULL;
-	int32_t formatlen = 0;
+	ocrpt_string formatstring;
 
-	if (e->ops[1]->result[e->o->residx]->isnull || e->ops[1]->result[e->o->residx]->string->len == 0)
-		formatstring = nl_langinfo_l(D_FMT, e->o->locale);
+	if (!e->ops[1]->result[e->o->residx]->isnull && e->ops[1]->result[e->o->residx]->string->len) {
+		formatstring.str = e->ops[1]->result[e->o->residx]->string->str;
+		formatstring.len = e->ops[1]->result[e->o->residx]->string->len;
+	} else {
+		formatstring.str = nl_langinfo_l(D_FMT, e->o->locale);
+		formatstring.len = strlen(formatstring.str);
+	}
 
-	if (!formatstring) {
-		formatstring = e->ops[1]->result[e->o->residx]->string->str;
-		formatlen = e->ops[1]->result[e->o->residx]->string->len;
-	} else
-		formatlen = strlen(formatstring);
-
-	ocrpt_format_string(e->o, e, e->result[e->o->residx]->string, formatstring, formatlen, e->ops, 1);
+	ocrpt_format_string(e->o, e, e->result[e->o->residx]->string, &formatstring, e->ops, 1);
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_printf) {
@@ -3748,7 +3746,30 @@ OCRPT_STATIC_FUNCTION(ocrpt_printf) {
 
 	ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
 
-	ocrpt_format_string(e->o, e, e->result[e->o->residx]->string, e->ops[0]->result[e->o->residx]->string->str, e->ops[0]->result[e->o->residx]->string->len, &e->ops[1], e->n_ops - 1);
+	ocrpt_format_string(e->o, e, e->result[e->o->residx]->string, e->ops[0]->result[e->o->residx]->string, &e->ops[1], e->n_ops - 1);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_xlate) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[e->o->residx]->type != OCRPT_RESULT_STRING) {
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
+
+	e->result[e->o->residx]->string->len = 0;
+
+	if (e->o->textdomain) {
+		locale_t locale = uselocale(e->o->locale);
+		ocrpt_mem_string_append(e->result[e->o->residx]->string, dgettext(e->o->textdomain, e->ops[0]->result[e->o->residx]->string->str));
+		uselocale(locale);
+	} else
+		ocrpt_mem_string_append_len(e->result[e->o->residx]->string, e->ops[0]->result[e->o->residx]->string->str, e->ops[0]->result[e->o->residx]->string->len);
 }
 
 /*
@@ -3842,6 +3863,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "sub",		ocrpt_sub,	-1,	false,	false,	false,	false },
 	{ "tan",		ocrpt_tan,	1,	false,	false,	false,	false },
 	{ "timeof",		ocrpt_timeof,	1,	false,	false,	false,	false },
+	{ "translate",	ocrpt_xlate,	1,	false,	false,	false,	false },
 	{ "trunc",		ocrpt_trunc,	1,	false,	false,	false,	false },
 	{ "tstod",		ocrpt_stodt,	1,	false,	false,	false,	false },
 	{ "uminus",		ocrpt_uminus,	1,	false,	false,	false,	false },

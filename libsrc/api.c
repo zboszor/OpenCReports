@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <limits.h>
+#include <libintl.h>
 #include <locale.h>
 #include <langinfo.h>
 #include <pthread.h>
@@ -159,6 +160,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	ocrpt_result_free(o->totpages);
 
 	ocrpt_mem_string_free(o->output_buffer, true);
+	ocrpt_mem_free(o->textdomain);
 
 	cairo_destroy(o->cr);
 	cairo_surface_destroy(o->nullpage_cs);
@@ -1076,7 +1078,19 @@ DLL_EXPORT_SYM const ocrpt_paper *ocrpt_paper_next(opencreport *o, void **iter) 
 	return p;
 }
 
+DLL_EXPORT_SYM void ocrpt_bindtextdomain(opencreport *o, const char *domainname, const char *dirname) {
+	if (!o)
+		return;
+
+	bindtextdomain(domainname, dirname);
+	bind_textdomain_codeset(domainname, "UTF-8");
+	o->textdomain = ocrpt_mem_strdup(domainname);
+}
+
 DLL_EXPORT_SYM void ocrpt_set_locale(opencreport *o, const char *locale) {
+	if (!o)
+		return;
+
 	o->locale = newlocale(LC_ALL_MASK, locale, o->locale);
 	if (o->locale == (locale_t)0)
 		o->locale = newlocale(LC_ALL_MASK, "C", o->locale);

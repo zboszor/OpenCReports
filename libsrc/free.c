@@ -150,7 +150,9 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 						ocrpt_expr_free(le->link);
 						ocrpt_expr_free(le->translate);
 					}
+					ocrpt_mem_string_free(le->format_str, true);
 					ocrpt_mem_string_free(le->value_str, true);
+					ocrpt_mem_string_free(le->result_str, true);
 					break;
 				case OCRPT_OUTPUT_LE_IMAGE:
 					ocrpt_image *img = (ocrpt_image *)le;

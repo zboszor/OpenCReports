@@ -150,6 +150,19 @@ ocrpt_set_rounding_mode(opencreport *o,
 		<sect2>
 			<title>Locale related functions</title>
 			<sect3>
+				<title>Set up translation</title>
+				<para>
+					Setting up the translation needs two parameters:
+					the so called <emphasis>translation domain</emphasis>
+					and the toplevel directory for the translations.
+					It relies on GNU Gettext.
+					<programlisting>void
+ocrpt_bindtextdomain(opencreport *o,
+                     const char *domainname,
+                     const char *dirname);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
 				<title>Set report locale</title>
 				<para>
 					Setting the locale for the report does not affect
@@ -1983,6 +1996,21 @@ ocrpt_text_set_value_expr(ocrpt_text *text,
 						<programlisting>void
 ocrpt_text_set_format(ocrpt_text *text,
                       const char *expr_string);</programlisting>
+					</para>
+				</sect4>
+				<sect4>
+					<title>Set text element translation</title>
+					<para>
+						Set the text element's translation from
+						an expression string.
+						<programlisting>void
+ocrpt_text_set_translate(ocrpt_text *text,
+                         const char *expr_string);</programlisting>
+					</para>
+					<para>
+						OpenCReports will attempt to translate
+						both the format string and the text element's
+						value.
 					</para>
 				</sect4>
 				<sect4>

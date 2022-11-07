@@ -1528,6 +1528,13 @@ a+++++b
 			</para>
 		</sect2>
 		<sect2>
+			<title>translate()</title>
+			<para>
+				Translates its operand according to the translation
+				and locale settings. It takes one string operand.
+			</para>
+		</sect2>
+		<sect2>
 			<title>trunc()</title>
 			<para>
 				Rounds its operand to the next representable integer toward

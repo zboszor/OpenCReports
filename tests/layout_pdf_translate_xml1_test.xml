@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport locale="'hu_HU'" translation_domain="translate_test" translation_directory="m.abs_builddir + '/locale'" >
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="9" cols="4" />
+	</Queries>
+	<Part fontSize="10">
+		<pr>
+			<pd border_width="2" border_color="'bobkratz'">
+				<Report fontSize="12" paperType="A4" orientation="landscape">
+					<PageHeader>
+						<Output>
+							<HorizontalLine size="2" color="'Black'"/>
+							<Line fontSize="14">
+								<field value="printf(translate('Page header: %d / %d'), r.pageno, r.totpages)" align="right" translate="yes" />
+							</Line>
+							<HorizontalLine size="2" color="'Black'"/>
+						</Output>
+					</PageHeader>
+
+					<PageFooter>
+						<Output>
+							<HorizontalLine size="2" color="'Black'"/>
+							<Line fontSize="14">
+								<field value="printf(translate('Page footer: %d / %d'), r.pageno, r.totpages)" align="right" translate="yes" />
+							</Line>
+							<HorizontalLine size="2" color="'Black'"/>
+						</Output>
+					</PageFooter>
+
+					<Detail>
+						<FieldHeaders>
+							<Output>
+								<HorizontalLine size="1" bgcolor="'black'"/>
+								<Line bgcolor="'0xe5e5e5'">
+									<literal width="4" col="1">ID</literal>
+									<literal width="1"/>
+									<literal width="50" translate="yes" col="2">Greetings</literal>
+									<literal width="1"/>
+									<literal width="7" translate="yes" col="4">Age</literal>
+									<literal width="1"/>
+									<literal width="7" translate="yes" col="5" align="'center'">Adult</literal>
+								</Line>
+								<HorizontalLine size="1" bgcolor="'black'"/>
+							</Output>
+						</FieldHeaders>
+
+						<FieldDetails>
+							<Output>
+								<Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+									<field value="id" width="4" align="right" col="1"/>
+									<literal width="1"/>
+									<field value="name" format="'Happy birthday, %s!'" width="50" align="justified" col="2" memo="yes" translate="yes" />
+									<literal width="1"/>
+									<field value="age" width="7" format="'%.2d'" align="'right'" col="4"/>
+									<literal width="1"/>
+									<field value="adult ? 'yes' : 'no'" width="7" align="'center'" translate="yes" col="5"/>
+								</Line>
+							</Output>
+						</FieldDetails>
+					</Detail>
+				</Report>
+			</pd>
+		</pr>
+	</Part>
+</OpenCReport>

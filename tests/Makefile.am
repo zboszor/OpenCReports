@@ -119,6 +119,16 @@ PDF_TESTS = \
 	layout_pdf41_test \
 	layout_pdf_xml42_test
 
+XLATE_DEPS = \
+	locale/hu_HU/LC_MESSAGES/translate_test.mo
+
+.po.mo:
+	$(MSGFMT) -o $@ $(srcdir)/$<
+
+XLATE_PDF_TESTS = \
+	layout_pdf_translate1_test \
+	layout_pdf_translate_xml1_test
+
 # Unstable tests by nature:
 # random_test produces a random number which is different every time
 # paper_test prints paper sizes and defaults which depends on language settings
@@ -138,8 +148,19 @@ basic-test: $(TESTS) execute_test.sh
 
 if ENABLE_PDF_TESTS
 
+if ENABLE_XLATE_TESTS
+
+PDF_TESTS += $(XLATE_PDF_TESTS)
+
+pdf-test: $(PDF_TESTS) $(XLATE_DEPS) execute_pdf_test.sh
+	$(foreach TEST,$(PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_pdf_test.sh $(TEST) &&) true
+
+else
+
 pdf-test: $(PDF_TESTS) execute_pdf_test.sh
 	$(foreach TEST,$(PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_pdf_test.sh $(TEST) &&) true
+
+endif
 
 else
 
@@ -157,4 +178,4 @@ unstable-test: $(UNSTABLE_TESTS) execute_test.sh
 
 all-test: test slow-test unstable-test
 
-CLEANFILES = results/*
+CLEANFILES = results/* locale/*/*/*.mo

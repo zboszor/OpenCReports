@@ -57,7 +57,9 @@ struct ocrpt_text {
 
 	/* Shortcuts carried over between get_text_sizes() and draw_text() */
 	const char *font;
+	ocrpt_string *format_str;
 	ocrpt_string *value_str;
+	ocrpt_string *result_str;
 	double fontsz;
 	double font_width;
 	double start;

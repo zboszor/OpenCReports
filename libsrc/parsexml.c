@@ -526,8 +526,10 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	ocrpt_text *elem = ocrpt_line_add_text(line);
 	int ret;
 
-	xmlChar *value, *delayed, *format, *width, *align, *color, *bgcolor, *font_name, *font_size;
-	xmlChar *bold, *italic, *link, *memo, *memo_wrap_chars, *memo_max_lines, *col;
+	xmlChar *value, *delayed, *format, *width, *align;
+	xmlChar *color, *bgcolor, *font_name, *font_size;
+	xmlChar *bold, *italic, *link, *memo, *memo_wrap_chars, *memo_max_lines;
+	xmlChar *translate, *col;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
@@ -547,6 +549,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 		{ { "memo" }, &memo },
 		{ { "memo_wrap_chars" }, &memo_wrap_chars },
 		{ { "memo_max_lines" }, &memo_max_lines },
+		{ { "translate" }, &translate },
 		{ { "col" }, &col },
 		{ { NULL }, NULL },
 	};
@@ -599,6 +602,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	ocrpt_text_set_bold(elem, (char *)bold);
 	ocrpt_text_set_italic(elem, (char *)italic);
 	ocrpt_text_set_link(elem, (char *)link);
+	ocrpt_text_set_translate(elem, (char *)translate);
 
 	int32_t memo_i = 0, memo_wrap_chars_i = 0, memo_max_lines_i = 0;
 
@@ -1930,7 +1934,8 @@ static void ocrpt_parse_paths_node(opencreport *o, xmlTextReaderPtr reader) {
 
 static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader) {
 	xmlChar *size_unit, *noquery_show_nodata, *report_height_after_last;
-	xmlChar *precision_bits, *rounding_mode, *locale;
+	xmlChar *precision_bits, *rounding_mode;
+	xmlChar *locale, *xlate_domain, *xlate_dir;
 
 	struct {
 		char *attrs;
@@ -1942,6 +1947,8 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 		{ "precision_bits", &precision_bits },
 		{ "rounding_mode", &rounding_mode },
 		{ "locale", &locale },
+		{ "translation_domain", &xlate_domain },
+		{ "translation_directory", &xlate_dir },
 		{ NULL, NULL },
 	};
 	int32_t i;
@@ -2019,6 +2026,17 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, locale);
 		ocrpt_set_locale(o, locale_s);
 		ocrpt_expr_free(locale_e);
+	}
+
+	if (xlate_domain && xlate_dir) {
+		ocrpt_expr *xlate_domain_e, *xlate_dir_e;
+		char *xlate_domain_s, *xlate_dir_s;
+
+		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, xlate_domain);
+		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, xlate_dir);
+		ocrpt_bindtextdomain(o, xlate_domain_s, xlate_dir_s);
+		ocrpt_expr_free(xlate_domain_e);
+		ocrpt_expr_free(xlate_dir_e);
 	}
 
 	for (i = 0; xmlattrs[i].attrp; i++)

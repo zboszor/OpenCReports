@@ -86,6 +86,7 @@ struct opencreport {
 	ocrpt_result *totpages;
 
 	/* Locale specific data */
+	char *textdomain;
 	locale_t locale;
 
 	/* Internal math defaults and states */

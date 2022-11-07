@@ -5,7 +5,9 @@
 	report_height_after_last CDATA #IMPLIED
 	precision_bits CDATA #IMPLIED
 	rounding_mode (nearest|to_minus_inf|to_inf|to_zero|away_from_zero|faithful) "nearest"
-	locale CDATA #IMPLIED >
+	locale CDATA #IMPLIED
+	translation_domain CDATA #IMPLIED
+	translation_directory CDATA #IMPLIED >
 <!ELEMENT Paths (Path+)>
 <!ELEMENT Path EMPTY>
 <!ATTLIST Path
@@ -146,9 +148,14 @@
 	memo CDATA #IMPLIED
 	memo_wrap_chars CDATA #IMPLIED
 	memo_max_lines CDATA #IMPLIED
+	translate CDATA #IMPLIED
 	col CDATA #IMPLIED >
 <!ELEMENT literal (#PCDATA) >
 <!ATTLIST literal
+	value CDATA #REQUIRED
+	delayed CDATA #IMPLIED
+	precalculate CDATA #IMPLIED
+	format CDATA #IMPLIED
 	width CDATA #IMPLIED
 	align CDATA #IMPLIED
 	color CDATA #IMPLIED
@@ -161,6 +168,9 @@
 	italic CDATA #IMPLIED
 	italics CDATA #IMPLIED
 	link CDATA #IMPLIED
+	memo CDATA #IMPLIED
+	memo_wrap_chars CDATA #IMPLIED
+	memo_max_lines CDATA #IMPLIED
 	translate CDATA #IMPLIED
 	col CDATA #IMPLIED >
 <!ELEMENT HorizontalLine EMPTY>

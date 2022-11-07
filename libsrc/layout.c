@@ -1405,6 +1405,8 @@ DLL_EXPORT_SYM void ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr
 		text->italic->rvalue = text->value;
 	if (text->link)
 		text->link->rvalue = text->value;
+	if (text->translate)
+		text->translate->rvalue = text->value;
 }
 
 DLL_EXPORT_SYM void ocrpt_text_set_format(ocrpt_text *text, const char *expr_string) {
@@ -1417,6 +1419,18 @@ DLL_EXPORT_SYM void ocrpt_text_set_format(ocrpt_text *text, const char *expr_str
 	text->format = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
 	if (text->format)
 		text->format->rvalue = text->value;
+}
+
+DLL_EXPORT_SYM void ocrpt_text_set_translate(ocrpt_text *text, const char *expr_string) {
+	if (!text)
+		return;
+
+	if (text->translate)
+		ocrpt_expr_free(text->translate);
+
+	text->translate = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
+	if (text->translate)
+		text->translate->rvalue = text->value;
 }
 
 DLL_EXPORT_SYM void ocrpt_text_set_width(ocrpt_text *text, const char *expr_string) {

@@ -216,6 +216,10 @@ void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode);
  ****************************/
 
 /*
+ * Bind text domain for translating strings
+ */
+void ocrpt_bindtextdomain(opencreport *o, const char *domainname, const char *dirname);
+/*
  * Set locale for the report
  * It does not affect the main program.
  */
@@ -825,6 +829,7 @@ ocrpt_text *ocrpt_line_add_text(ocrpt_line *line);
 void ocrpt_text_set_value_string(ocrpt_text *text, const char *string);
 void ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr_string, bool delayed);
 void ocrpt_text_set_format(ocrpt_text *text, const char *expr_string);
+void ocrpt_text_set_translate(ocrpt_text *text, const char *expr_string);
 void ocrpt_text_set_width(ocrpt_text *text, const char *expr_string);
 void ocrpt_text_set_alignment(ocrpt_text *text, const char *expr_string);
 void ocrpt_text_set_color(ocrpt_text *text, const char *expr_string);

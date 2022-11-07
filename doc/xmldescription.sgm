@@ -300,6 +300,38 @@
 				<literal>faithful</literal> is experimental.
 			</para>
 		</sect2>
+		<sect2>
+			<title>Locale</title>
+			<para>
+				This controls the language settings, like the decimal
+				separator, weekday names, month names and similar.
+				This setting is also used as the language of translation.
+				<programlisting>&lt;OpenCReport locale="de_DE"&gt;</programlisting>
+			</para>
+			<para>
+				Default is <literal>C</literal> locale which
+				approximates US English.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Translation settings</title>
+			<para>
+				These two settings control the translation.
+				<programlisting>&lt;OpenCReport
+    translation_domain="mydomain"
+    translation_directory="/path/to/translation/files"&gt;</programlisting>
+			</para>
+			<para>
+				Translation is based on GNU Gettext.
+				A subdirectory tree is expected under the specified
+				translation directory in the form of
+				<literal>locale/LC_MESSAGES</literal> (e.g.:
+				<literal>de_DE/LC_MESSAGES</literal>) with
+				<literal>mydomain.mo</literal> files in them.
+				These <literal>.mo</literal> files contain translated
+				messages for a given language.
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="searchpaths" xreflabel="Search paths">
 		<title>Paths</title>
@@ -3222,6 +3254,36 @@ report_height_after_last="no"</programlisting>
 					In <literal>OpenCReports</literal>, character
 					wrapping adds hyphenation, thanks to Pango rendering.
 					This is a deviation from RLIB.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Translation</title>
+				<para>
+					This attribute allows the text element to
+					be translated to a different language.
+					<programlisting>&lt;field value="'This is a field'"
+       translate="yes" /&gt;</programlisting>
+				</para>
+				<para>
+					The expression result for <literal>translate</literal>
+					must be numeric (boolean).
+				</para>
+				<para>
+					For translations to work, the translation settings
+					and the language (locale) must be correctly set up.
+				</para>
+				<para>
+					OpenCReports will attempt to translate
+					both the format string and the text element's
+					value. For example, if the format string
+					has a translated variant in the translations,
+					then this formatted result will be translated:
+					<programlisting>&lt;field value="q.apples"
+       format="'You have %d apples.'"
+       translate="yes" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>no</literal>.
 				</para>
 			</sect3>
 			<sect3>
