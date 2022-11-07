@@ -3760,6 +3760,11 @@ OCRPT_STATIC_FUNCTION(ocrpt_xlate) {
 		return;
 	}
 
+	if (e->ops[0]->result[e->o->residx]->isnull) {
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+		return;
+	}
+
 	ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
 
 	e->result[e->o->residx]->string->len = 0;
@@ -3767,6 +3772,56 @@ OCRPT_STATIC_FUNCTION(ocrpt_xlate) {
 	if (e->o->textdomain) {
 		locale_t locale = uselocale(e->o->locale);
 		ocrpt_mem_string_append(e->result[e->o->residx]->string, dgettext(e->o->textdomain, e->ops[0]->result[e->o->residx]->string->str));
+		uselocale(locale);
+	} else
+		ocrpt_mem_string_append_len(e->result[e->o->residx]->string, e->ops[0]->result[e->o->residx]->string->str, e->ops[0]->result[e->o->residx]->string->len);
+}
+
+OCRPT_STATIC_FUNCTION(ocrpt_xlate2) {
+	int32_t i;
+
+	if (e->n_ops != 3) {
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+		return;
+	}
+
+	for (i = 0; i < e->n_ops; i++) {
+		if (!e->ops[i]->result[e->o->residx] || e->ops[i]->result[e->o->residx]->isnull) {
+			ocrpt_expr_make_error_result(e, "invalid operand(s)");
+			return;
+		}
+	}
+
+	for (i = 0; i < e->n_ops; i++) {
+		if (e->ops[i]->result[e->o->residx]->type == OCRPT_RESULT_ERROR) {
+			ocrpt_expr_make_error_result(e, e->ops[i]->result[e->o->residx]->string->str);
+			return;
+		}
+	}
+
+	for (i = 0; i < 2; i++) {
+		if (e->ops[i]->result[e->o->residx]->type != OCRPT_RESULT_STRING) {
+			ocrpt_expr_make_error_result(e, "invalid operand(s)");
+			return;
+		}
+	}
+
+	if (e->ops[2]->result[e->o->residx]->type != OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
+
+	e->result[e->o->residx]->string->len = 0;
+
+	if (e->o->textdomain) {
+		locale_t locale = uselocale(e->o->locale);
+		ocrpt_mem_string_append(e->result[e->o->residx]->string,
+								dngettext(e->o->textdomain,
+										e->ops[0]->result[e->o->residx]->string->str,
+										e->ops[1]->result[e->o->residx]->string->str,
+										mpfr_get_si(e->ops[2]->result[e->o->residx]->number, e->o->rndmode)));
 		uselocale(locale);
 	} else
 		ocrpt_mem_string_append_len(e->result[e->o->residx]->string, e->ops[0]->result[e->o->residx]->string->str, e->ops[0]->result[e->o->residx]->string->len);
@@ -3864,6 +3919,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "tan",		ocrpt_tan,	1,	false,	false,	false,	false },
 	{ "timeof",		ocrpt_timeof,	1,	false,	false,	false,	false },
 	{ "translate",	ocrpt_xlate,	1,	false,	false,	false,	false },
+	{ "translate2",	ocrpt_xlate2,	1,	false,	false,	false,	false },
 	{ "trunc",		ocrpt_trunc,	1,	false,	false,	false,	false },
 	{ "tstod",		ocrpt_stodt,	1,	false,	false,	false,	false },
 	{ "uminus",		ocrpt_uminus,	1,	false,	false,	false,	false },

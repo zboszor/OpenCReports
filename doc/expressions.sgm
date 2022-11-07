@@ -1531,7 +1531,19 @@ a+++++b
 			<title>translate()</title>
 			<para>
 				Translates its operand according to the translation
-				and locale settings. It takes one string operand.
+				and locale settings using <literal>dgettext()</literal>
+				from Gettext. It takes one string operand.
+			</para>
+		</sect2>
+		<sect2>
+			<title>translate2()</title>
+			<para>
+				Translates its operands according to the translation
+				and locale settings using <literal>dngettext()</literal>
+				from Gettext. It takes three operands.
+				The first two operands are strings, for the singular
+				and plural strings. The third operand is the number
+				that determines which translation form is used.
 			</para>
 		</sect2>
 		<sect2>
