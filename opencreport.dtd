@@ -127,7 +127,7 @@
 	suppress CDATA #IMPLIED
 	color CDATA #IMPLIED
 	bgcolor CDATA #IMPLIED >
-<!ELEMENT field EMPTY>
+<!ELEMENT field (#PCDATA) >
 <!ATTLIST field
 	value CDATA #REQUIRED
 	delayed CDATA #IMPLIED
