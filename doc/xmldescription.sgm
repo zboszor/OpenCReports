@@ -3285,6 +3285,14 @@ report_height_after_last="no"</programlisting>
 				<para>
 					Default is <literal>no</literal>.
 				</para>
+				<para>
+					And alternative way is to use the translation
+					functions directly in the field expression.
+					See <xref linkend="translatefunc"/>
+					and <xref linkend="translate2func"/>.
+					When using them, the <literal>translate="yes"</literal>
+					attribute is not needed.
+				</para>
 			</sect3>
 			<sect3>
 				<title>Column number</title>

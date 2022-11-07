@@ -1527,7 +1527,7 @@ a+++++b
 				It returns time part of the datetime operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="translatefunc" xreflabel="translate()">
 			<title>translate()</title>
 			<para>
 				Translates its operand according to the translation
@@ -1535,7 +1535,7 @@ a+++++b
 				from Gettext. It takes one string operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="translate2func" xreflabel="translate2()">
 			<title>translate2()</title>
 			<para>
 				Translates its operands according to the translation
