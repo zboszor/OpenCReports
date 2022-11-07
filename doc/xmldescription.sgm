@@ -3299,7 +3299,6 @@ report_height_after_last="no"</programlisting>
 				<para>
 					This attribute is accepted for RLIB compatibility,
 					but it's unused.
-					text with a maximum row number.
 					<programlisting>&lt;field value="'This is a long text...'"
        col="3" /&gt;</programlisting>
 				</para>
