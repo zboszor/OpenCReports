@@ -24,12 +24,10 @@
 #include "fallthrough.h"
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const ocrpt_input *input) {
-	ocrpt_datasource *s = NULL;
-
 	if (!o || !source_name || !*source_name || !input)
 		return NULL;
 
-	s = ocrpt_datasource_get(o, source_name);
+	ocrpt_datasource *s = ocrpt_datasource_get(o, source_name);
 	if (s) {
 		if (s->input == input)
 			return s;
@@ -52,12 +50,10 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char
 }
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_get(opencreport *o, const char *source_name) {
-	ocrpt_list *ptr;
-
 	if (!o || !source_name)
 		return NULL;
 
-	for (ptr = o->datasources; ptr; ptr = ptr->next) {
+	for (ocrpt_list *ptr = o->datasources; ptr; ptr = ptr->next) {
 		ocrpt_datasource *s = (ocrpt_datasource *)ptr->data;
 		if (!strcmp(s->name, source_name))
 			return s;
@@ -112,12 +108,10 @@ ocrpt_query *ocrpt_query_alloc(const ocrpt_datasource *source, const char *name)
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_get(opencreport *o, const char *name) {
-	ocrpt_list *ptr;
-
-	if (!o)
+	if (!o || !name)
 		return NULL;
 
-	for (ptr = o->queries; ptr; ptr = ptr->next) {
+	for (ocrpt_list *ptr = o->queries; ptr; ptr = ptr->next) {
 		ocrpt_query *q = (ocrpt_query *)ptr->data;
 		if (!strcmp(q->name, name))
 			return q;
@@ -425,11 +419,6 @@ static bool ocrpt_query_follower_validity(ocrpt_query *leader, ocrpt_query *foll
 }
 
 DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(ocrpt_query *leader, ocrpt_query *follower, ocrpt_expr *match) {
-	ocrpt_query_follower *fo;
-	int32_t len;
-	uint32_t mask;
-	bool ret;
-
 	if (!ocrpt_query_follower_validity(leader, follower)) {
 		ocrpt_expr_free(match);
 		return false;
@@ -441,7 +430,7 @@ DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(ocrpt_query *leader, ocrpt_q
 		return false;
 	}
 
-	mask = 0;
+	uint32_t mask = 0;
 	if (ocrpt_expr_references(match, OCRPT_VARREF_IDENT, &mask)) {
 		if ((mask & OCRPT_IDENT_UNKNOWN_BIT) == OCRPT_IDENT_UNKNOWN_BIT) {
 			fprintf(stderr, "invalid expression for follower query\n");
@@ -450,7 +439,7 @@ DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(ocrpt_query *leader, ocrpt_q
 		}
 	}
 
-	fo = ocrpt_mem_malloc(sizeof(ocrpt_query_follower));
+	ocrpt_query_follower *fo = ocrpt_mem_malloc(sizeof(ocrpt_query_follower));
 	if (!fo) {
 		ocrpt_expr_free(match);
 		return false;
@@ -459,9 +448,9 @@ DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(ocrpt_query *leader, ocrpt_q
 	fo->follower = follower;
 	fo->expr = match;
 
-	len = ocrpt_list_length(leader->followers_n_to_1);
+	int32_t len = ocrpt_list_length(leader->followers_n_to_1);
 	leader->followers_n_to_1 = ocrpt_list_append(leader->followers_n_to_1, fo);
-	ret = (len < ocrpt_list_length(leader->followers_n_to_1));
+	bool ret = (len < ocrpt_list_length(leader->followers_n_to_1));
 
 	if (!ret) {
 		ocrpt_expr_free(match);
@@ -475,12 +464,10 @@ DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(ocrpt_query *leader, ocrpt_q
 }
 
 DLL_EXPORT_SYM bool ocrpt_query_add_follower(ocrpt_query *leader, ocrpt_query *follower) {
-	int32_t len;
-
 	if (!ocrpt_query_follower_validity(leader, follower))
 		return false;
 
-	len = ocrpt_list_length(leader->followers);
+	int32_t len = ocrpt_list_length(leader->followers);
 	leader->followers = ocrpt_list_append(leader->followers, follower);
 	return (len < ocrpt_list_length(leader->followers));
 }

@@ -18,17 +18,21 @@
 DLL_EXPORT_SYM ocrpt_env_query_func ocrpt_env_get = ocrpt_env_get_c;
 
 DLL_EXPORT_SYM void ocrpt_env_set_query_func(ocrpt_env_query_func func) {
+	if (!func)
+		return;
+
 	ocrpt_env_get = func;
 }
 
 DLL_EXPORT_SYM ocrpt_result *ocrpt_env_get_c(const char *env) {
-	ocrpt_result *result = ocrpt_mem_malloc(sizeof(ocrpt_result));
-	char *value;
+	if (!env)
+		return NULL;
 
+	ocrpt_result *result = ocrpt_mem_malloc(sizeof(ocrpt_result));
 	if (!result)
 		return NULL;
 
-	value = getenv(env);
+	char *value = getenv(env);
 	memset(result, 0, sizeof(ocrpt_result));
 	result->type = OCRPT_RESULT_STRING;
 	if (value) {

@@ -57,13 +57,14 @@ void ocrpt_result_free_data(ocrpt_result *r) {
 }
 
 DLL_EXPORT_SYM void ocrpt_result_free(ocrpt_result *r) {
+	if (!r)
+		return;
+
 	ocrpt_result_free_data(r);
 	ocrpt_mem_free(r);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_free(ocrpt_expr *e) {
-	uint32_t i;
-
 	if (!e)
 		return;
 
@@ -71,6 +72,8 @@ DLL_EXPORT_SYM void ocrpt_expr_free(ocrpt_expr *e) {
 		e->r->exprs = ocrpt_list_remove(e->r->exprs, e);
 		e->r->exprs_last = NULL;
 	}
+
+	uint32_t i;
 
 	switch (e->type) {
 	case OCRPT_EXPR_NUMBER:

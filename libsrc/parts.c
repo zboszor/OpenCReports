@@ -191,7 +191,7 @@ DLL_EXPORT_SYM void ocrpt_report_set_main_query(ocrpt_report *r, const ocrpt_que
 }
 
 DLL_EXPORT_SYM void ocrpt_report_set_main_query_by_name(ocrpt_report *r, const char *query) {
-	if (!r)
+	if (!r || !query || !*query)
 		return;
 
 	r->query = ocrpt_query_get(r->o, query);
@@ -282,7 +282,7 @@ DLL_EXPORT_SYM bool ocrpt_report_add_start_cb(ocrpt_report *r, ocrpt_report_cb f
 }
 
 DLL_EXPORT_SYM bool ocrpt_report_add_done_cb(ocrpt_report *r, ocrpt_report_cb func, void *data) {
-	if (!func)
+	if (!r || !func)
 		return false;
 
 	ocrpt_report_cb_data *ptr = ocrpt_mem_malloc(sizeof(ocrpt_report_cb_data));
@@ -298,7 +298,7 @@ DLL_EXPORT_SYM bool ocrpt_report_add_done_cb(ocrpt_report *r, ocrpt_report_cb fu
 }
 
 DLL_EXPORT_SYM bool ocrpt_report_add_new_row_cb(ocrpt_report *r, ocrpt_report_cb func, void *data) {
-	if (!func)
+	if (!r || !func)
 		return false;
 
 	ocrpt_report_cb_data *ptr = ocrpt_mem_malloc(sizeof(ocrpt_report_cb_data));
@@ -314,7 +314,7 @@ DLL_EXPORT_SYM bool ocrpt_report_add_new_row_cb(ocrpt_report *r, ocrpt_report_cb
 }
 
 DLL_EXPORT_SYM bool ocrpt_report_add_precalculation_done_cb(ocrpt_report *r, ocrpt_report_cb func, void *data) {
-	if (!func)
+	if (!r || !func)
 		return false;
 
 	ocrpt_report_cb_data *ptr = ocrpt_mem_malloc(sizeof(ocrpt_report_cb_data));
@@ -330,7 +330,7 @@ DLL_EXPORT_SYM bool ocrpt_report_add_precalculation_done_cb(ocrpt_report *r, ocr
 }
 
 DLL_EXPORT_SYM bool ocrpt_report_add_iteration_cb(ocrpt_report *r, ocrpt_report_cb func, void *data) {
-	if (!func)
+	if (!r || !func)
 		return false;
 
 	ocrpt_report_cb_data *ptr = ocrpt_mem_malloc(sizeof(ocrpt_report_cb_data));
@@ -346,10 +346,7 @@ DLL_EXPORT_SYM bool ocrpt_report_add_iteration_cb(ocrpt_report *r, ocrpt_report_
 }
 
 DLL_EXPORT_SYM bool ocrpt_part_add_iteration_cb(ocrpt_part *p, ocrpt_part_cb func, void *data) {
-	if (!p)
-		return false;
-
-	if (!func)
+	if (!p || !func)
 		return false;
 
 	ocrpt_part_cb_data *ptr = ocrpt_mem_malloc(sizeof(ocrpt_part_cb_data));
@@ -365,15 +362,10 @@ DLL_EXPORT_SYM bool ocrpt_part_add_iteration_cb(ocrpt_part *p, ocrpt_part_cb fun
 }
 
 DLL_EXPORT_SYM bool ocrpt_add_precalculation_done_cb(opencreport *o, ocrpt_cb func, void *data) {
-	ocrpt_cb_data *ptr;
-
-	if (!o)
+	if (!o || !func)
 		return false;
 
-	if (!func)
-		return false;
-
-	ptr = ocrpt_mem_malloc(sizeof(ocrpt_cb_data));
+	ocrpt_cb_data *ptr = ocrpt_mem_malloc(sizeof(ocrpt_cb_data));
 	if (!ptr)
 		return false;
 

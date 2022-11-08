@@ -26,9 +26,6 @@
  * Returns ocrpt_var pointer or NULL in case of an error.
  */
 DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r, enum ocrpt_result_type type, const char *name, const char *baseexpr, const char *intermedexpr, const char *intermed2expr, const char *resultexpr, const char *reset_on_break_name) {
-	ocrpt_list *ptr;
-	ocrpt_var *var = NULL;
-
 	if (!r) {
 		fprintf(stderr, "invalid variable definitition: valid ocrpt_report pointer expected\n");
 		return NULL;
@@ -38,7 +35,9 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r, enum ocrpt_re
 		return NULL;
 	}
 
-	for (ptr = r->variables; ptr; ptr = ptr->next) {
+	ocrpt_var *var = NULL;
+
+	for (ocrpt_list *ptr = r->variables; ptr; ptr = ptr->next) {
 		var = (ocrpt_var *)ptr->data;
 		if (strcmp(var->name, name) == 0) {
 			fprintf(stderr, "variable '%s': duplicate variable name\n", name);

@@ -167,6 +167,9 @@ static void ocrpt_expr_print_worker(ocrpt_expr *e, int depth, const char *delimi
 }
 
 void ocrpt_expr_print_internal(ocrpt_expr *e, FILE *stream) {
+	if (!e || !stream)
+		return;
+
 	ocrpt_string *str = ocrpt_mem_string_new_with_len(NULL, 256);
 	ocrpt_expr_print_worker(e, 0, "\n", str);
 	fprintf(stream, "%s", str->str);
@@ -178,7 +181,7 @@ DLL_EXPORT_SYM void ocrpt_expr_print(ocrpt_expr *e) {
 }
 
 void ocrpt_expr_result_deep_print_worker(ocrpt_expr *e, FILE *stream) {
-	if (!e)
+	if (!e || !stream)
 		return;
 
 	ocrpt_string *str = ocrpt_mem_string_new_with_len(NULL, 256);
@@ -214,7 +217,7 @@ DLL_EXPORT_SYM void ocrpt_expr_result_deep_print(ocrpt_expr *e) {
 }
 
 DLL_EXPORT_SYM void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_result *src) {
-	if (!src || !dst)
+	if (!o || !src || !dst)
 		return;
 
 	dst->type = src->type;
@@ -258,10 +261,8 @@ DLL_EXPORT_SYM void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_r
 }
 
 void ocrpt_result_print_internal(ocrpt_result *r, FILE *stream) {
-	if (!r) {
-		fprintf(stream, "ERROR: ocrpt_result is NULL\n");
+	if (!r || !stream)
 		return;
-	}
 
 	switch (r->type) {
 	case OCRPT_RESULT_ERROR:
@@ -315,22 +316,24 @@ DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
 	ocrpt_result_print_internal(r, stdout);
 }
 
-static void ocrpt_expr_nodes_worker(ocrpt_expr *e, int *nodes) {
+static void ocrpt_expr_nodes_worker(ocrpt_expr *e, int32_t *nodes) {
 	(*nodes)++;
 
 	if (e->type == OCRPT_EXPR) {
-		int i;
+		int32_t i;
 
 		for (i = 0; i < e->n_ops; i++)
 			ocrpt_expr_nodes_worker(e->ops[i], nodes);
 	}
 }
 
-DLL_EXPORT_SYM int ocrpt_expr_nodes(ocrpt_expr *e) {
-	int nodes = 0;
+DLL_EXPORT_SYM int32_t ocrpt_expr_nodes(ocrpt_expr *e) {
+	if (!e)
+		return 0;
 
-	if (e)
-		ocrpt_expr_nodes_worker(e, &nodes);
+	int32_t nodes = 0;
+	ocrpt_expr_nodes_worker(e, &nodes);
+
 	return nodes;
 }
 
@@ -358,14 +361,14 @@ DLL_EXPORT_SYM int ocrpt_expr_nodes(ocrpt_expr *e) {
  *    Example: (a/b)/c is the same as a/b/c but a/(b/c) is not.
  */
 static void ocrpt_expr_optimize_worker(ocrpt_expr *e) {
-	int32_t i, nconst, dconst, sconst, dtconst;
-	bool try_pullup = true;
-
 	if (!e)
 		return;
 
 	if (e->type != OCRPT_EXPR)
 		return;
+
+	int32_t i, nconst, dconst, sconst, dtconst;
+	bool try_pullup = true;
 
 	again:
 
@@ -759,15 +762,23 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_resolve(ocrpt_expr *e) {
+	if (!e)
+		return;
+
 	ocrpt_expr_resolve_worker(e, e, NULL, 0);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exclude_mask) {
+	if (!e)
+		return;
+
 	ocrpt_expr_resolve_worker(e, e, NULL, varref_exclude_mask);
 }
 
 static bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask) {
-	int32_t i;
+	if (!e)
+		return false;
+
 	bool found = false;
 
 	switch (e->type) {
@@ -829,7 +840,7 @@ static bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_m
 				qr = q->result;
 				cols = (q->result ? q->cols : 0);
 
-				for (i = 0; i < cols; i++) {
+				for (int32_t i = 0; i < cols; i++) {
 					if (!strcmp(e->name->str, qr[i].name)) {
 						for (int j = 0; j < OCRPT_EXPR_RESULTS; j++)
 							if (!e->result[j])
@@ -846,7 +857,7 @@ static bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_m
 		}
 		break;
 	case OCRPT_EXPR:
-		for (i = 0; i < e->n_ops; i++) {
+		for (int32_t i = 0; i < e->n_ops; i++) {
 			bool found1 = ocrpt_expr_reference_worker(e->ops[i], varref_include_mask, varref_vartype_mask);
 			found = found || found1;
 		}
@@ -865,9 +876,7 @@ DLL_EXPORT_SYM bool ocrpt_expr_references(ocrpt_expr *e, int32_t varref_include_
 }
 
 void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
-	int i;
-
-	if (!e)
+	if (!e || !orig_e)
 		return;
 
 	/* If:
@@ -880,6 +889,8 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 		e->iterative_init = false;
 		return;
 	}
+
+	int32_t i;
 
 	switch (e->type) {
 	case OCRPT_EXPR:
@@ -961,7 +972,9 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_eval(ocrpt_expr *e) {
 	if (!e)
 		return NULL;
+
 	ocrpt_expr_eval_worker(e, e, NULL);
+
 	if (e->o->precalculate || !e->delayed)
 		return e->result[e->o->residx];
 	else
@@ -998,6 +1011,9 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_operand_get_result(ocrpt_expr *e, int32_
 }
 
 DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(ocrpt_expr *e, const char *format, ...) {
+	if (!e)
+		return NULL;
+
 	ocrpt_result *result = e->result[e->o->residx];
 	va_list va;
 	size_t len;
@@ -1035,6 +1051,9 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(ocrpt_expr *e, const c
  * in the expression are the same
  */
 DLL_EXPORT_SYM bool ocrpt_expr_cmp_results(ocrpt_expr *e) {
+	if (!e)
+		return NULL;
+
 	ocrpt_result *cur = e->result[e->o->residx];
 	ocrpt_result *prev = e->result[ocrpt_expr_prev_residx(e->o->residx)];
 
@@ -1072,17 +1091,18 @@ DLL_EXPORT_SYM bool ocrpt_expr_cmp_results(ocrpt_expr *e) {
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_set_iterative_start_value(ocrpt_expr *e, bool start_with_init) {
+	if (!e)
+		return;
+
 	e->iterative_init = true;
 	e->iterative_start_with_init = start_with_init;
 }
 
 DLL_EXPORT_SYM const char *ocrpt_expr_get_string_value(ocrpt_expr *e) {
-	ocrpt_result *r;
-
 	if (!e)
 		return NULL;
 
-	r = ocrpt_expr_eval(e);
+	ocrpt_result *r = ocrpt_expr_eval(e);
 
 	if (r && r->type == OCRPT_RESULT_STRING)
 		return r->string->str;
@@ -1091,12 +1111,10 @@ DLL_EXPORT_SYM const char *ocrpt_expr_get_string_value(ocrpt_expr *e) {
 }
 
 DLL_EXPORT_SYM long ocrpt_expr_get_long_value(ocrpt_expr *e) {
-	ocrpt_result *r;
-
 	if (!e)
 		return 0;
 
-	r = ocrpt_expr_eval(e);
+	ocrpt_result *r = ocrpt_expr_eval(e);
 
 	if (r && r->type == OCRPT_RESULT_NUMBER)
 		return mpfr_get_si(r->number, e->o->rndmode);
@@ -1121,12 +1139,10 @@ DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_long_value(ocrpt_expr *e, int whic
 }
 
 DLL_EXPORT_SYM double ocrpt_expr_get_double_value(ocrpt_expr *e) {
-	ocrpt_result *r;
-
 	if (!e)
 		return 0.0;
 
-	r = ocrpt_expr_eval(e);
+	ocrpt_result *r = ocrpt_expr_eval(e);
 
 	if (r && r->type == OCRPT_RESULT_NUMBER)
 		return mpfr_get_d(r->number, e->o->rndmode);
@@ -1151,7 +1167,6 @@ DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_double_value(ocrpt_expr *e, int wh
 }
 
 static bool ocrpt_expr_get_precalculate_worker(ocrpt_expr *e, int32_t depth) {
-	int i;
 	bool precalculate = false;
 
 	if (!e)
@@ -1163,7 +1178,7 @@ static bool ocrpt_expr_get_precalculate_worker(ocrpt_expr *e, int32_t depth) {
 			precalculate = true;
 		break;
 	case OCRPT_EXPR:
-		for (i = 0; i < e->n_ops; i++) {
+		for (int32_t i = 0; i < e->n_ops; i++) {
 			precalculate |= ocrpt_expr_get_precalculate_worker(e->ops[i], depth + 1);
 		}
 		break;
@@ -1292,6 +1307,9 @@ DLL_EXPORT_SYM bool ocrpt_result_datetime_is_time_valid(ocrpt_result *result) {
 }
 
 void ocrpt_expr_init_iterative_results(ocrpt_expr *e, enum ocrpt_result_type type) {
+	if (!e)
+		return;
+
 	ocrpt_expr_set_iterative_start_value(e, false);
 	ocrpt_expr_init_results(e, type);
 	for (int i = 0; i < OCRPT_EXPR_RESULTS; i++) {

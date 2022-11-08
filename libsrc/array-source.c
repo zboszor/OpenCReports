@@ -179,6 +179,9 @@ const ocrpt_input ocrpt_array_input = {
 };
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, const char *source_name) {
+	if (!o || !source_name)
+		return NULL;
+
 	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_array_input);
 
 	if (ds)
@@ -189,16 +192,21 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, cons
 static ocrpt_query *array_query_add(const ocrpt_datasource *source, const char *name,
 									const char **array, int32_t rows, int32_t cols,
 									const enum ocrpt_result_type *types, bool free_types) {
-	ocrpt_query *query;
-	struct ocrpt_array_results *priv;
+	if (!source || !name || !array)
+		return NULL;
 
-	query = ocrpt_query_alloc(source, name);
+	/* The field names must not be NULL */
+	for (int32_t i = 0; i < cols; i++)
+		if (!array[i])
+			return NULL;
+
+	ocrpt_query *query = ocrpt_query_alloc(source, name);
 	if (!query)
 		return NULL;
 
 	query->cols = cols;
 
-	priv = ocrpt_mem_malloc(sizeof(struct ocrpt_array_results));
+	struct ocrpt_array_results *priv = ocrpt_mem_malloc(sizeof(struct ocrpt_array_results));
 	if (!priv) {
 		ocrpt_query_free(query);
 		return NULL;
@@ -221,6 +229,9 @@ static ocrpt_query *array_query_add(const ocrpt_datasource *source, const char *
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
+	if (!source || !name || !array)
+		return NULL;
+
 	if (source->input != &ocrpt_array_input) {
 		fprintf(stderr, "datasource is not array\n");
 		return NULL;
@@ -232,6 +243,9 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source, cons
 DLL_EXPORT_SYM ocrpt_query_discover_func ocrpt_query_discover_array = ocrpt_query_discover_array_c;
 
 DLL_EXPORT_SYM void ocrpt_query_set_discover_func(ocrpt_query_discover_func func) {
+	if (!func)
+		return;
+
 	ocrpt_query_discover_array = func;
 }
 
@@ -259,6 +273,9 @@ DLL_EXPORT_SYM void ocrpt_query_discover_array_c(const char *arrayname, void **a
 }
 
 static void ocrpt_file_free(ocrpt_query *query) {
+	if (!query)
+		return;
+
 	struct ocrpt_array_results *result = query->priv;
 	int32_t i;
 	int32_t max = (result->rows + 1) * result->cols;
@@ -285,6 +302,9 @@ const ocrpt_input ocrpt_csv_input = {
 };
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_csv(opencreport *o, const char *source_name) {
+	if (!o || !source_name)
+		return NULL;
+
 	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_csv_input);
 
 	if (ds)
@@ -383,6 +403,14 @@ static void ocrpt_file_query_free(ocrpt_file_query *fq, bool in_error) {
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
 												const char *name, const char *filename,
 												const enum ocrpt_result_type *types) {
+	if (!source || !name || !filename)
+		return NULL;
+
+	if (source->input != &ocrpt_csv_input) {
+		fprintf(stderr, "datasource is not csv\n");
+		return NULL;
+	}
+
 	struct stat st;
 	struct csv_parser csv;
 	char *buf;
@@ -392,11 +420,6 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
 	ocrpt_list *rowptr;
 	size_t parser_retval;
 	int32_t fd, row;
-
-	if (source->input != &ocrpt_csv_input) {
-		fprintf(stderr, "datasource is not csv\n");
-		return NULL;
-	}
 
 	if (stat(filename, &st) != 0) {
 		fprintf(stderr, "error opening file\n");
@@ -485,6 +508,9 @@ const ocrpt_input ocrpt_json_input = {
 };
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_json(opencreport *o, const char *source_name) {
+	if (!o || !source_name)
+		return NULL;
+
 	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_json_input);
 
 	if (ds)
@@ -709,6 +735,14 @@ static yajl_callbacks ocrpt_yajl_cb = {
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(ocrpt_datasource *source,
 												const char *name, const char *filename,
 												const enum ocrpt_result_type *types) {
+	if (!source || !name || !filename)
+		return NULL;
+
+	if (source->input != &ocrpt_json_input) {
+		fprintf(stderr, "datasource is not json\n");
+		return NULL;
+	}
+
 	struct stat st;
 	char *buf;
 	const char **array;
@@ -718,11 +752,6 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(ocrpt_datasource *source,
 	yajl_handle yhandler;
 	ocrpt_list *rowptr;
 	int32_t fd, row;
-
-	if (source->input != &ocrpt_json_input) {
-		fprintf(stderr, "datasource is not json\n");
-		return NULL;
-	}
 
 	if (stat(filename, &st) != 0) {
 		fprintf(stderr, "error opening file\n");
@@ -807,6 +836,9 @@ const ocrpt_input ocrpt_xml_input = {
 };
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_xml(opencreport *o, const char *source_name) {
+	if (!o || !source_name)
+		return NULL;
+
 	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_xml_input);
 
 	if (ds)
@@ -1105,17 +1137,20 @@ static int32_t ocrpt_parse_data_node(opencreport *o, xmlTextReaderPtr reader, oc
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(ocrpt_datasource *source,
 												const char *name, const char *filename,
 												const enum ocrpt_result_type *types) {
+	if (!source || !name || !filename)
+		return NULL;
+
+	if (source->input != &ocrpt_xml_input) {
+		fprintf(stderr, "datasource is not json\n");
+		return NULL;
+	}
+
 	const char **array;
 	ocrpt_query *retval;
 	ocrpt_file_query fq;
 	xmlTextReaderPtr reader;
 	ocrpt_list *rowptr;
 	int32_t ret, err, row;
-
-	if (source->input != &ocrpt_xml_input) {
-		fprintf(stderr, "datasource is not json\n");
-		return NULL;
-	}
 
 	reader = xmlReaderForFile(filename, NULL, XML_PARSE_RECOVER |
 								XML_PARSE_NOENT | XML_PARSE_NOBLANKS |

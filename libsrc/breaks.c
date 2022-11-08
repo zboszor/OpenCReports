@@ -22,12 +22,10 @@
 #include "layout.h"
 
 DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(ocrpt_report *r, const char *name) {
-	ocrpt_break *br;
-
 	if (!r || !name)
 		return NULL;
 
-	br = ocrpt_mem_malloc(sizeof(ocrpt_break));
+	ocrpt_break *br = ocrpt_mem_malloc(sizeof(ocrpt_break));
 
 	if (!br)
 		return NULL;
@@ -68,12 +66,8 @@ DLL_EXPORT_SYM bool ocrpt_break_set_attribute(ocrpt_break *br, const ocrpt_break
 }
 
 DLL_EXPORT_SYM bool ocrpt_break_set_attribute_from_expr(ocrpt_break *br, const ocrpt_break_attr_type attr_type, ocrpt_expr *expr) {
-	long tmp;
-
-	if (!expr) {
-		fprintf(stderr, "invalid expression\n");
+	if (!br || !expr)
 		return false;
-	}
 
 	ocrpt_expr_optimize(expr);
 	if (!ocrpt_expr_is_const(expr) || !ocrpt_expr_is_dconst(expr)) {
@@ -81,15 +75,16 @@ DLL_EXPORT_SYM bool ocrpt_break_set_attribute_from_expr(ocrpt_break *br, const o
 		return false;
 	}
 
-	tmp = mpfr_get_si(expr->ops[0]->result[br->r->o->residx]->number, br->r->o->rndmode);
+	long tmp = mpfr_get_si(expr->ops[0]->result[br->r->o->residx]->number, br->r->o->rndmode);
 	br->attrs[attr_type] = !!tmp;
 	return true;
 }
 
 void ocrpt_break_free(ocrpt_break *br) {
-	ocrpt_list *ptr;
+	if (!br)
+		return;
 
-	for (ptr = br->breakfields; ptr; ptr = ptr->next) {
+	for (ocrpt_list *ptr = br->breakfields; ptr; ptr = ptr->next) {
 		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 		ocrpt_expr_free(e);
 	}
@@ -103,9 +98,10 @@ void ocrpt_break_free(ocrpt_break *br) {
 }
 
 void ocrpt_breaks_free(ocrpt_report *r) {
-	ocrpt_list *ptr;
+	if (!r)
+		return;
 
-	for (ptr = r->breaks; ptr; ptr = ptr->next) {
+	for (ocrpt_list *ptr = r->breaks; ptr; ptr = ptr->next) {
 		ocrpt_break *br = (ocrpt_break *)ptr->data;
 
 		ocrpt_break_free(br);
@@ -136,10 +132,10 @@ DLL_EXPORT_SYM const char *ocrpt_break_get_name(ocrpt_break *br) {
 }
 
 DLL_EXPORT_SYM bool ocrpt_break_add_breakfield(ocrpt_break *br, ocrpt_expr *bf) {
-	uint32_t vartypes;
-
-	if (!bf || br->r != bf->r)
+	if (!br || !bf || br->r != bf->r)
 		return false;
+
+	uint32_t vartypes;
 
 	if (ocrpt_expr_references(bf, OCRPT_VARREF_VVAR, &vartypes)) {
 		if ((vartypes & OCRPT_VARIABLE_UNKNOWN_BIT)) {
@@ -159,9 +155,10 @@ DLL_EXPORT_SYM bool ocrpt_break_add_breakfield(ocrpt_break *br, ocrpt_expr *bf) 
 }
 
 DLL_EXPORT_SYM void ocrpt_break_resolve_fields(ocrpt_break *br) {
-	ocrpt_list *ptr;
+	if (!br)
+		return;
 
-	for (ptr = br->breakfields; ptr; ptr = ptr->next) {
+	for (ocrpt_list *ptr = br->breakfields; ptr; ptr = ptr->next) {
 		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 
 		ocrpt_expr_resolve(e);
@@ -170,15 +167,12 @@ DLL_EXPORT_SYM void ocrpt_break_resolve_fields(ocrpt_break *br) {
 }
 
 DLL_EXPORT_SYM bool ocrpt_break_check_fields(ocrpt_break *br) {
-	ocrpt_query *q = NULL;
-	ocrpt_list *ptr;
-	bool match = true;
-	bool retval;
-
 	if (!br)
 		return false;
 
-	for (ptr = br->breakfields; ptr; ptr = ptr->next) {
+	bool match = true;
+
+	for (ocrpt_list *ptr = br->breakfields; ptr; ptr = ptr->next) {
 		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 
 		ocrpt_expr_eval(e);
@@ -189,13 +183,15 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(ocrpt_break *br) {
 		}
 	}
 
+	ocrpt_query *q = NULL;
+
 	if (br->r && br->r->query)
 		q = br->r->query;
 	if (!q && br->r && br->r->o->queries)
 		q = (ocrpt_query *)br->r->o->queries->data;
 
 	/* Return true if any of the breakfield expressions don't match */
-	retval = !match || (q && q->current_row == 0);
+	bool retval = !match || (q && q->current_row == 0);
 
 	if (retval) {
 		mpfr_set_ui(br->rownum->result[br->r->o->residx]->number, 1, br->r->o->rndmode);
@@ -207,12 +203,10 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(ocrpt_break *br) {
 }
 
 DLL_EXPORT_SYM void ocrpt_break_reset_vars(ocrpt_break *br) {
-	ocrpt_list *ptr;
-
 	if (!br)
 		return;
 
-	for (ptr = br->r->variables; ptr; ptr = ptr->next) {
+	for (ocrpt_list *ptr = br->r->variables; ptr; ptr = ptr->next) {
 		ocrpt_var *v = (ocrpt_var *)ptr->data;
 		bool match = false;
 
@@ -235,7 +229,7 @@ DLL_EXPORT_SYM void ocrpt_break_reset_vars(ocrpt_break *br) {
 }
 
 DLL_EXPORT_SYM bool ocrpt_break_add_trigger_cb(ocrpt_break *br, ocrpt_break_trigger_cb func, void *data) {
-	if (!func)
+	if (!br || !func)
 		return false;
 
 	ocrpt_break_trigger_cb_data *ptr = ocrpt_mem_malloc(sizeof(ocrpt_break_trigger_cb_data));

@@ -296,13 +296,14 @@ const ocrpt_input ocrpt_postgresql_input = {
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql(opencreport *o, const char *source_name,
 																const char *host, const char *port, const char *dbname,
 																const char *user, const char *password) {
-	ocrpt_datasource *ds;
+	if (!o || !source_name)
+		return NULL;
+
 	const char *keywords[8] = { "host", "port" , "dbname", "user", "password", "client_encoding", "application_name", NULL };
 	const char *values[8] = { host, port, dbname, user, password, "UTF-8", NULL, NULL };
 	char *appname;
-	int32_t len;
 
-	len = snprintf(NULL, 0, PACKAGE_STRING " datasource %s", source_name);
+	int32_t len = snprintf(NULL, 0, PACKAGE_STRING " datasource %s", source_name);
 	appname = alloca(len + 1);
 	snprintf(appname, len + 1, PACKAGE_STRING " datasource %s", source_name);
 	values[6] = appname;
@@ -313,7 +314,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql(opencreport *o,
 		return NULL;
 	}
 
-	ds = ocrpt_datasource_add(o, source_name, &ocrpt_postgresql_input);
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_postgresql_input);
 	if (!ds) {
 		PQfinish(conn);
 		return NULL;
@@ -324,7 +325,9 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql(opencreport *o,
 }
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o, const char *source_name, const char *conninfo) {
-	ocrpt_datasource *ds;
+	if (!o || !source_name)
+		return NULL;
+
 	const char *keywords[4] = { "dbname", "client_encoding", "application_name", NULL };
 	const char *values[4] = { conninfo, "UTF-8", NULL, NULL };
 	char *appname;
@@ -341,7 +344,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o
 		return NULL;
 	}
 
-	ds = ocrpt_datasource_add(o, source_name, &ocrpt_postgresql_input);
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_postgresql_input);
 	if (!ds) {
 		PQfinish(conn);
 		return NULL;
@@ -352,23 +355,20 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_postgresql(ocrpt_datasource *source, const char *name, const char *querystr) {
-	PGresult *res;
-	ocrpt_query *query;
-	struct ocrpt_postgresql_results *result;
-	char *cursor;
-	int len;
+	if (!source || !name || !*name || !querystr || !*querystr)
+		return NULL;
 
 	if (source->input != &ocrpt_postgresql_input) {
 		fprintf(stderr, "datasource is not a PostgreSQL source\n");
 		return NULL;
 	}
 
-	len = snprintf(NULL, 0, "DECLARE \"%s\" SCROLL CURSOR WITH HOLD FOR %s", name, querystr);
-	cursor = alloca(len + 1);
+	int32_t len = snprintf(NULL, 0, "DECLARE \"%s\" SCROLL CURSOR WITH HOLD FOR %s", name, querystr);
+	char *cursor = alloca(len + 1);
 	snprintf(cursor, len + 1, "DECLARE \"%s\" SCROLL CURSOR WITH HOLD FOR %s", name, querystr);
 	cursor[len] = 0;
 
-	res = PQexec(source->priv, cursor);
+	PGresult *res = PQexec(source->priv, cursor);
 	switch (PQresultStatus(res)) {
 	case PGRES_COMMAND_OK:
 	case PGRES_NONFATAL_ERROR:
@@ -380,11 +380,11 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_postgresql(ocrpt_datasource *source,
 	}
 	PQclear(res);
 
-	query = ocrpt_query_alloc(source, name);
+	ocrpt_query *query = ocrpt_query_alloc(source, name);
 	if (!query)
 		goto out_error;
 
-	result = ocrpt_mem_malloc(sizeof(struct ocrpt_postgresql_results));
+	struct ocrpt_postgresql_results *result = ocrpt_mem_malloc(sizeof(struct ocrpt_postgresql_results));
 	if (!result) {
 		ocrpt_query_free(query);
 		goto out_error;
@@ -575,27 +575,27 @@ const ocrpt_input ocrpt_mariadb_input = {
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_mariadb(opencreport *o, const char *source_name,
 																const char *host, const char *port, const char *dbname,
 																const char *user, const char *password, const char *unix_socket) {
-	ocrpt_datasource *ds;
-	MYSQL *mysql0 = mysql_init(NULL);
-	MYSQL *mysql;
-	int32_t port_i = -1;
+	if (!o || !source_name || !*source_name)
+		return NULL;
 
+	MYSQL *mysql0 = mysql_init(NULL);
 	if (mysql0 == NULL)
 		return NULL;
 
 	mysql_optionsv(mysql0, MYSQL_READ_DEFAULT_FILE, "/etc/my.cnf");
 	mysql_optionsv(mysql0, MYSQL_SET_CHARSET_NAME, "utf8");
 
+	int32_t port_i = -1;
 	if (port)
 		port_i = atoi(port);
 
-	mysql = mysql_real_connect(mysql0, host, user, password, dbname, port_i, unix_socket, 0);
+	MYSQL *mysql = mysql_real_connect(mysql0, host, user, password, dbname, port_i, unix_socket, 0);
 	if (!mysql) {
 		mysql_close(mysql0);
 		return NULL;
 	}
 
-	ds = ocrpt_datasource_add(o, source_name, &ocrpt_mariadb_input);
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_mariadb_input);
 	if (!ds) {
 		mysql_close(mysql);
 		return NULL;
@@ -606,10 +606,10 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_mariadb(opencreport *o, co
 }
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, const char *source_name, const char *optionfile, const char *group) {
-	ocrpt_datasource *ds;
-	MYSQL *mysql0 = mysql_init(NULL);
-	MYSQL *mysql;
+	if (!o || !source_name || !*source_name)
+		return NULL;
 
+	MYSQL *mysql0 = mysql_init(NULL);
 	if (mysql0 == NULL)
 		return NULL;
 
@@ -619,13 +619,13 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, c
 	mysql_optionsv(mysql0, MYSQL_READ_DEFAULT_GROUP, group);
 	mysql_optionsv(mysql0, MYSQL_SET_CHARSET_NAME, "utf8");
 
-	mysql = mysql_real_connect(mysql0, NULL, NULL, NULL, NULL, -1, NULL, 0);
+	MYSQL *mysql = mysql_real_connect(mysql0, NULL, NULL, NULL, NULL, -1, NULL, 0);
 	if (!mysql) {
 		mysql_close(mysql0);
 		return NULL;
 	}
 
-	ds = ocrpt_datasource_add(o, source_name, &ocrpt_mariadb_input);
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_mariadb_input);
 	if (!ds) {
 		mysql_close(mysql);
 		return NULL;
@@ -636,31 +636,29 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, c
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_mariadb(ocrpt_datasource *source, const char *name, const char *querystr) {
-	MYSQL_RES *res;
-	ocrpt_query *query;
-	struct ocrpt_mariadb_results *result;
-	int32_t ret;
+	if (!source || !name || !*name || !querystr || !*querystr)
+		return NULL;
 
 	if (source->input != &ocrpt_mariadb_input) {
 		fprintf(stderr, "datasource is not a MariaDB source\n");
 		return NULL;
 	}
 
-	ret = mysql_query(source->priv, querystr);
+	int32_t ret = mysql_query(source->priv, querystr);
 	if (ret)
 		return NULL;
 
-	res = mysql_store_result(source->priv);
+	MYSQL_RES *res = mysql_store_result(source->priv);
 	if (!res)
 		return NULL;
 
-	query = ocrpt_query_alloc(source, name);
+	ocrpt_query *query = ocrpt_query_alloc(source, name);
 	if (!query) {
 		mysql_free_result(res);
 		return NULL;
 	}
 
-	result = ocrpt_mem_malloc(sizeof(struct ocrpt_mariadb_results));
+	struct ocrpt_mariadb_results *result = ocrpt_mem_malloc(sizeof(struct ocrpt_mariadb_results));
 	if (!result) {
 		mysql_free_result(res);
 		ocrpt_query_free(query);
@@ -1037,16 +1035,16 @@ static ocrpt_odbc_private *ocrpt_odbc_setup(void) {
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const char *source_name,
 															const char *dbname, const char *user, const char *password) {
-	ocrpt_datasource *ds;
-	ocrpt_odbc_private *priv = ocrpt_odbc_setup();
-	SQLRETURN ret;
+	if (!o || !source_name || !*source_name)
+		return NULL;
 
+	ocrpt_odbc_private *priv = ocrpt_odbc_setup();
 	if (!priv) {
 		fprintf(stderr, "ODBC private data setup failed\n");
 		return NULL;
 	}
 
-	ret = SQLConnect(priv->dbc, (SQLCHAR *)dbname, SQL_NTS, (SQLCHAR *)user, SQL_NTS, (SQLCHAR *)password, SQL_NTS);
+	SQLRETURN ret = SQLConnect(priv->dbc, (SQLCHAR *)dbname, SQL_NTS, (SQLCHAR *)user, SQL_NTS, (SQLCHAR *)password, SQL_NTS);
 	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
 		fprintf(stderr, "SQLConnect failed\n");
 		SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
@@ -1055,7 +1053,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const
 		return NULL;
 	}
 
-	ds = ocrpt_datasource_add(o, source_name, &ocrpt_odbc_input);
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_odbc_input);
 	if (!ds) {
 		fprintf(stderr, "ocrpt_datasource_add failed\n");
 		SQLDisconnect(priv->dbc);
@@ -1070,16 +1068,16 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const
 }
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, const char *source_name, const char *conninfo) {
-	ocrpt_datasource *ds;
-	ocrpt_odbc_private *priv = ocrpt_odbc_setup();
-	SQLRETURN ret;
+	if (!o || !source_name || !*source_name)
+		return NULL;
 
+	ocrpt_odbc_private *priv = ocrpt_odbc_setup();
 	if (!priv) {
 		fprintf(stderr, "ODBC private data setup failed\n");
 		return NULL;
 	}
 
-	ret = SQLDriverConnect(priv->dbc, NULL, (SQLCHAR *)conninfo, SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+	SQLRETURN ret = SQLDriverConnect(priv->dbc, NULL, (SQLCHAR *)conninfo, SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
 	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
 		fprintf(stderr, "SQLDriverConnect failed\n");
 		SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
@@ -1088,7 +1086,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, cons
 		return NULL;
 	}
 
-	ds = ocrpt_datasource_add(o, source_name, &ocrpt_odbc_input);
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_odbc_input);
 	if (!ds) {
 		fprintf(stderr, "ocrpt_datasource_add failed\n");
 		SQLDisconnect(priv->dbc);
@@ -1103,20 +1101,18 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, cons
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_odbc(ocrpt_datasource *source, const char *name, const char *querystr) {
-	ocrpt_query *query;
-	ocrpt_odbc_private *priv;
-	ocrpt_odbc_results *result;
-	SQLHSTMT stmt;
-	SQLRETURN ret;
+	if (!source || !name || !*name || !querystr || !*querystr)
+		return NULL;
 
 	if (source->input != &ocrpt_odbc_input) {
 		fprintf(stderr, "datasource is not an ODBC source\n");
 		return NULL;
 	}
 
-	priv = source->priv;
+	ocrpt_odbc_private *priv = source->priv;
 
-	ret = SQLAllocHandle(SQL_HANDLE_STMT, priv->dbc, &stmt);
+	SQLHSTMT stmt;
+	SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_STMT, priv->dbc, &stmt);
 	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
 		fprintf(stderr, "allocation statement handle failed\n");
 		return NULL;
@@ -1129,13 +1125,13 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_odbc(ocrpt_datasource *source, const
 		return NULL;
 	}
 
-	query = ocrpt_query_alloc(source, name);
+	ocrpt_query *query = ocrpt_query_alloc(source, name);
 	if (!query) {
 		SQLFreeHandle(SQL_HANDLE_STMT, stmt);
 		return NULL;
 	}
 
-	result = ocrpt_mem_malloc(sizeof(struct ocrpt_odbc_results));
+	ocrpt_odbc_results *result = ocrpt_mem_malloc(sizeof(struct ocrpt_odbc_results));
 	if (!result) {
 		ocrpt_query_free(query);
 		SQLFreeHandle(SQL_HANDLE_STMT, stmt);

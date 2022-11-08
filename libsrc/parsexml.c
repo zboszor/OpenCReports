@@ -2077,6 +2077,9 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 }
 
 DLL_EXPORT_SYM bool ocrpt_parse_xml(opencreport *o, const char *filename) {
+	if (!o || !filename)
+		return false;
+
 	xmlTextReaderPtr reader;
 	bool retval = true;
 

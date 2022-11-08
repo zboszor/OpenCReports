@@ -112,6 +112,9 @@ static int __calc_left_pad(opencreport *, int, char *);
 static char *__format_grouped_mpfr(opencreport *, mpfr_t, int *, int, int, int);
 
 DLL_EXPORT_SYM ssize_t ocrpt_mpfr_strfmon(opencreport *o, char * __restrict s, size_t maxsize, const char * __restrict format, ...) {
+	if (!o || !format)
+		return -1;
+
 	va_list		ap;
 	char 		*dst;		/* output destination pointer */
 	const char 	*fmt;		/* current format poistion pointer */

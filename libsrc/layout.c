@@ -1344,47 +1344,7 @@ DLL_EXPORT_SYM void ocrpt_image_set_text_width(ocrpt_image *image, const char *e
 	image->text_width = expr_string ? ocrpt_layout_expr_parse(image->output->o, image->output->r, expr_string, true, false) : NULL;
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_value_string(ocrpt_text *text, const char *string) {
-	if (!text)
-		return;
-
-	if (text->value)
-		ocrpt_expr_free(text->value);
-
-	text->value = string ? ocrpt_newstring(text->output->o, text->output->r, string) : NULL;
-
-	if (text->format)
-		text->format->rvalue = text->value;
-	if (text->width)
-		text->width->rvalue = text->value;
-	if (text->align)
-		text->align->rvalue = text->value;
-	if (text->color)
-		text->color->rvalue = text->value;
-	if (text->bgcolor)
-		text->bgcolor->rvalue = text->value;
-	if (text->font_name)
-		text->font_name->rvalue = text->value;
-	if (text->font_size)
-		text->font_size->rvalue = text->value;
-	if (text->bold)
-		text->bold->rvalue = text->value;
-	if (text->italic)
-		text->italic->rvalue = text->value;
-	if (text->link)
-		text->link->rvalue = text->value;
-}
-
-DLL_EXPORT_SYM void ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr_string, bool delayed) {
-	if (!text)
-		return;
-
-	if (text->value)
-		ocrpt_expr_free(text->value);
-
-	text->value = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
-	ocrpt_expr_set_delayed(text->value, delayed);
-
+static void ocrpt_text_set_rvalue_internal(ocrpt_text *text) {
 	if (text->format)
 		text->format->rvalue = text->value;
 	if (text->width)
@@ -1407,6 +1367,31 @@ DLL_EXPORT_SYM void ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr
 		text->link->rvalue = text->value;
 	if (text->translate)
 		text->translate->rvalue = text->value;
+}
+
+DLL_EXPORT_SYM void ocrpt_text_set_value_string(ocrpt_text *text, const char *string) {
+	if (!text)
+		return;
+
+	if (text->value)
+		ocrpt_expr_free(text->value);
+
+	text->value = string ? ocrpt_newstring(text->output->o, text->output->r, string) : NULL;
+
+	ocrpt_text_set_rvalue_internal(text);
+}
+
+DLL_EXPORT_SYM void ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr_string, bool delayed) {
+	if (!text)
+		return;
+
+	if (text->value)
+		ocrpt_expr_free(text->value);
+
+	text->value = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
+	ocrpt_expr_set_delayed(text->value, delayed);
+
+	ocrpt_text_set_rvalue_internal(text);
 }
 
 DLL_EXPORT_SYM void ocrpt_text_set_format(ocrpt_text *text, const char *expr_string) {

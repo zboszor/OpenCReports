@@ -74,10 +74,16 @@ static bool ocrpt_expr_init_result_internal(ocrpt_expr *e, enum ocrpt_result_typ
 }
 
 DLL_EXPORT_SYM bool ocrpt_expr_init_result(ocrpt_expr *e, enum ocrpt_result_type type) {
+	if (!e)
+		return false;
+
 	return ocrpt_expr_init_result_internal(e, type, e->o->residx);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_init_results(ocrpt_expr *e, enum ocrpt_result_type type) {
+	if (!e)
+		return;
+
 	for (uint32_t i = 0; i < OCRPT_EXPR_RESULTS; i++)
 		ocrpt_expr_init_result_internal(e, type, i);
 }
@@ -3949,11 +3955,11 @@ static int funcsortind(const void *key1, const void *key2) {
 DLL_EXPORT_SYM bool ocrpt_function_add(opencreport *o, const char *fname, ocrpt_function_call func,
 										int32_t n_ops, bool commutative, bool associative,
 										bool left_associative, bool dont_optimize) {
+	if (!o || !fname || !*fname || !func)
+		return false;
+
 	ocrpt_function *new_func;
 	ocrpt_function **f_array;
-
-	if (!fname || !*fname || !func)
-		return false;
 
 	new_func = ocrpt_mem_malloc(sizeof(ocrpt_function));
 	if (!new_func)
@@ -3987,13 +3993,11 @@ DLL_EXPORT_SYM bool ocrpt_function_add(opencreport *o, const char *fname, ocrpt_
 }
 
 DLL_EXPORT_SYM const ocrpt_function *ocrpt_function_get(opencreport *o, const char *fname) {
-	ocrpt_function **ret;
-
 	if (!o || !fname)
 		return NULL;
 
 	if (o->functions) {
-		ret = bsearch(fname, o->functions, o->n_functions, sizeof(ocrpt_function *), funccmpind);
+		ocrpt_function **ret = bsearch(fname, o->functions, o->n_functions, sizeof(ocrpt_function *), funccmpind);
 		if (ret)
 			return *ret;
 	}
