@@ -14,7 +14,7 @@
 				<Line>
 					<field fontName="'Arial'" fontSize="20" value="'ABCqwpfgjyb'" color="'Red'" bgcolor="'Blue'" bold="yes" italic="no" />
 					<field fontName="'Courier'" fontSize="12" value="'byjgfpwqCBA'" color="'Green'" bgcolor="'BobKratz'" bold="yes" italic="yes" />
-					<field fontName="'Pentaluma Script'" fontSize="8" value="'ABCqwpfgjyb'" color="'White'" bgcolor="'Black'" bold="no" italic="yes" />
+					<field fontName="'Petaluma Script'" fontSize="8" value="'ABCqwpfgjyb'" color="'White'" bgcolor="'Black'" bold="no" italic="yes" />
 					<field fontName="'Times New Roman'" fontSize="8" value="'byjgfpwqCBA'" color="'Blue'" bgcolor="'Teal'" bold="no" italic="no" />
 				</Line>
 				<HorizontalLine size="1" length="1000" color="'Purple'" />
