@@ -17,6 +17,7 @@ ocrptpatterns.yy.c: ocrptpatterns.l ocrptgrammar.tab.h
 
 libopencreport_grammar_la_CFLAGS = \
 	-Wall -O2 -g -I$(top_srcdir)/include \
+	-D_GNU_SOURCE \
 	$(CFLAG_VISIBILITY) $(PDFGEN_CFLAGS)
 
 libopencreport_grammar_la_LDFLAGS = -static

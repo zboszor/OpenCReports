@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -Wall -Werror -O2 -g -I$(top_srcdir)/include
+AM_CPPFLAGS = -Wall -Werror -O2 -g -I$(top_srcdir)/include -D_GNU_SOURCE
 
 AM_CFLAGS = -rdynamic
 
