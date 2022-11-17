@@ -47,7 +47,8 @@ dnl Detect whether -D_BSD_SOURCE works
 AC_MSG_CHECKING([whether -D_BSD_SOURCE provides strcasecmp])
 old_CFLAGS="$CFLAGS"
 CFLAGS="-Werror -D_BSD_SOURCE $CFLAGS"
-AC_TRY_COMPILE([#include <string.h>],[return strcasecmp("a", "a");],
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM([[#include <string.h>]],[[return strcasecmp("a", "a");]])],
 	[_bsd_source_works=yes],
 	[_bsd_source_works=no])
 CFLAGS="$old_CFLAGS"
@@ -56,7 +57,8 @@ AC_MSG_RESULT([$_bsd_source_works])
 AC_MSG_CHECKING([whether -D_DEFAULT_SOURCE provides strcasecmp])
 old_CFLAGS="$CFLAGS"
 CFLAGS="-Werror -D_DEFAULT_SOURCE $CFLAGS"
-AC_TRY_COMPILE([#include <string.h>],[return strcasecmp("a", "a");],
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM([[#include <string.h>]],[[return strcasecmp("a", "a");]])],
 	[_default_source_works=yes],
 	[_default_source_works=no])
 CFLAGS="$old_CFLAGS"
@@ -65,7 +67,8 @@ AC_MSG_RESULT([$_default_source_works])
 AC_MSG_CHECKING([whether -D_GNU_SOURCE provides strcasecmp])
 old_CFLAGS="$CFLAGS"
 CFLAGS="-Werror -D_GNU_SOURCE $CFLAGS"
-AC_TRY_COMPILE([#include <string.h>],[return strcasecmp("a", "a");],
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM([[#include <string.h>]],[[return strcasecmp("a", "a");]])],
 	[_gnu_source_works=yes],
 	[_gnu_source_works=no])
 CFLAGS="$old_CFLAGS"
