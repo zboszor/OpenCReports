@@ -43,6 +43,44 @@ LT_INIT([disable-static win32-dll])
 
 AC_CHECK_FUNCS([localtime_r strfmon])
 
+dnl Detect whether -D_BSD_SOURCE works
+AC_MSG_CHECKING([whether -D_BSD_SOURCE provides strcasecmp])
+old_CFLAGS="$CFLAGS"
+CFLAGS="-Werror -D_BSD_SOURCE $CFLAGS"
+AC_TRY_COMPILE([#include <string.h>],[return strcasecmp("a", "a");],
+	[_bsd_source_works=yes],
+	[_bsd_source_works=no])
+CFLAGS="$old_CFLAGS"
+AC_MSG_RESULT([$_bsd_source_works])
+
+AC_MSG_CHECKING([whether -D_DEFAULT_SOURCE provides strcasecmp])
+old_CFLAGS="$CFLAGS"
+CFLAGS="-Werror -D_DEFAULT_SOURCE $CFLAGS"
+AC_TRY_COMPILE([#include <string.h>],[return strcasecmp("a", "a");],
+	[_default_source_works=yes],
+	[_default_source_works=no])
+CFLAGS="$old_CFLAGS"
+AC_MSG_RESULT([$_default_source_works])
+
+AC_MSG_CHECKING([whether -D_GNU_SOURCE provides strcasecmp])
+old_CFLAGS="$CFLAGS"
+CFLAGS="-Werror -D_GNU_SOURCE $CFLAGS"
+AC_TRY_COMPILE([#include <string.h>],[return strcasecmp("a", "a");],
+	[_gnu_source_works=yes],
+	[_gnu_source_works=no])
+CFLAGS="$old_CFLAGS"
+AC_MSG_RESULT([$_gnu_source_works])
+
+AS_IF(
+	[test x$_bsd_source_works = xyes],
+	[COMPILE_SYMBOL=-D_BSD_SOURCE],
+	[test x$_default_source_works = xyes],
+	[COMPILE_SYMBOL=-D_DEFAULT_SOURCE],
+	[test x$_gnu_source_works = xyes],
+	[COMPILE_SYMBOL=-D_GNU_SOURCE],
+	[AC_MSG_WARN([Using strcasecmp may fail to compile!])])
+AC_SUBST(COMPILE_SYMBOL)
+
 gl_VISIBILITY
 AS_IF([test x$gl_cv_cc_visibility = xyes],
 	[AC_DEFINE(DLL_EXPORT_SYM,[__attribute__((visibility("default")))],[Explicitly export global symbols])],

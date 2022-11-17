@@ -17,7 +17,7 @@ ocrptpatterns.yy.c: ocrptpatterns.l ocrptgrammar.tab.h
 
 libopencreport_grammar_la_CFLAGS = \
 	-Wall -O2 -g -I$(top_srcdir)/include \
-	-D_GNU_SOURCE \
+	-D_XOPEN_SOURCE=700 @COMPILE_SYMBOL@ \
 	$(CFLAG_VISIBILITY) $(PDFGEN_CFLAGS)
 
 libopencreport_grammar_la_LDFLAGS = -static
@@ -29,7 +29,7 @@ libopencreport_la_DEPENDENCIES = libopencreport_grammar.la
 
 libopencreport_la_CFLAGS = \
 	-Wall -Werror -O2 -g -I$(top_srcdir)/include \
-	-D_GNU_SOURCE \
+	-D_XOPEN_SOURCE=700 @COMPILE_SYMBOL@ \
 	$(CFLAG_VISIBILITY) \
 	$(MPFR_CFLAGS) $(PAPER_CFLAGS) $(UTF8PROC_CFLAGS) \
 	$(LIBXML_CFLAGS) $(YAJL_CFLAGS) $(POSTGRESQL_CFLAGS) \
