@@ -4,7 +4,8 @@ cairotest_SOURCES = cairotest.c
 cairotest_CFLAGS = $(PDFGEN_CFLAGS)
 cairotest_LDADD = $(PDFGEN_LIBS) libopencreport.la
 
-lib_LTLIBRARIES = libopencreport_grammar.la libopencreport.la
+noinst_LTLIBRARIES = libopencreport_grammar.la
+lib_LTLIBRARIES = libopencreport.la
 
 ocrptgrammar.tab.c: ocrptgrammar.y
 	bison -d -Wprecedence $<
