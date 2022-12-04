@@ -25,6 +25,8 @@ Currently missing features
 OpenCReports (the library part) is free software, with "free" as in speech.
 It is licensed under LGPLv3.
 
+About commercial licensing and billing, contact me at the email address at the end of this page.
+
 ## Build and installation
 
 The dependencies to build OpenCReports are:
