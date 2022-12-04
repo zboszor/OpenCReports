@@ -1,0 +1,8 @@
+Makefile.fragments
+Makefile.objects
+build/
+config.nice
+configure.ac
+modules/
+opencreport.dep
+run-tests.php
