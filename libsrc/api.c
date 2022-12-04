@@ -45,6 +45,10 @@ static ocrpt_paper *papersizes;
 static const ocrpt_paper *system_paper;
 int n_papersizes;
 
+DLL_EXPORT_SYM const char *ocrpt_version(void) {
+	return VERSION;
+}
+
 DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	opencreport *o = (opencreport *)ocrpt_mem_malloc(sizeof(struct opencreport));
 	unsigned long seed;

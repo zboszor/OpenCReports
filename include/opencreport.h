@@ -161,6 +161,10 @@ typedef struct ocrpt_color ocrpt_color;
  ***********************************/
 
 /*
+ * Get library version
+ */
+const char *ocrpt_version(void);
+/*
  * Create a new empty OpenCReports structure
  */
 opencreport *ocrpt_init(void);
