@@ -37,15 +37,6 @@ int main(void) {
 			it output on <literal>stdout</literal>.
 		</para>
 		<sect2>
-			<title>Get library version</title>
-			<para>
-				This function reports the OpenCReports
-				library version.
-				<programlisting>const char *
-ocrpt_version(void);</programlisting>
-			</para>
-		</sect2>
-		<sect2>
 			<title>Report handler initialization</title>
 			<para>
 				<programlisting>opencreport *
@@ -119,6 +110,15 @@ ocrpt_get_output(opencreport *o, size_t *length);</programlisting>
 				the details that were created by the low level API.
 				<programlisting>void
 ocrpt_free(opencreport *o);</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Get library version</title>
+			<para>
+				This function reports the OpenCReports
+				library version.
+				<programlisting>const char *
+ocrpt_version(void);</programlisting>
 			</para>
 		</sect2>
 	</sect1>
