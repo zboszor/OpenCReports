@@ -240,9 +240,6 @@ typedef struct ocrpt_input ocrpt_input;</programlisting>
 				<title>Add an array datasource</title>
 				<para>
 					Add an array datasource to the report handler.
-					It's optional, as an array datasource called
-					"array" is automatically added to an opencreport
-					structure.
 					<programlisting>ocrpt_datasource *
 ocrpt_datasource_add_array(opencreport *o,
                            const char *source_name);</programlisting>
