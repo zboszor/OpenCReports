@@ -4,12 +4,26 @@
  * See COPYING.PHP in the toplevel directory.
  */
 
-#ifndef PHP_OCRPT_H
-#define PHP_OCRPT_H
+#ifndef PHP_OPENCREPORT_H
+#define PHP_OPENCREPORT_H
+
+#include <opencreport.h>
 
 extern zend_module_entry ocrpt_module_entry;
 #define phpext_ocrpt_ptr &ocrpt_module_entry
 
-#define PHP_OCRPT_VERSION "1.0.0"
+#define PHP_OPENCREPORT_VERSION "0.0.1"
 
-#endif /* PHP_OCRPT_H */
+/* Structure for main OpenCReport object. */
+typedef struct _php_opencreport_object  {
+	opencreport *o;
+	zend_object zo;
+} php_opencreport_object;
+
+static inline php_opencreport_object *php_opencreport_from_obj(zend_object *obj) {
+	return (php_opencreport_object *)((char *)(obj) - XtOffsetOf(php_opencreport_object, zo));
+}
+
+#define Z_OPENCREPORT_P(zv) php_opencreport_from_obj(Z_OBJ_P((zv)))
+
+#endif /* PHP_OPENCREPORT_H */
