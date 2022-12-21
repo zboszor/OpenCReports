@@ -12,7 +12,9 @@
 
 #define LOREMIPSUM "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
-const char *array[10][5] = {
+#define ROWS 9
+#define COLS 5
+const char *array[ROWS + 1][COLS] = {
 	{ "id", "name", "image", "age", "adult" },
 	{ "1", "Fred Flintstone", "images/images/matplotlib.svg", "31", "yes" },
 	{ "2", "Wilma Flintstone " LOREMIPSUM, "images/images/matplotlib.svg", "28", "yes" },
@@ -25,7 +27,8 @@ const char *array[10][5] = {
 	{ "9", "The Great Gazoo " LOREMIPSUM, "images/images/matplotlib.svg", "1200", "yes" },
 };
 
-const enum ocrpt_result_type coltypes[6] = {
+#define COLS1 6
+const int32_t coltypes[COLS1] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 
@@ -40,7 +43,7 @@ int main(void) {
 	ocrpt_add_search_path(o, csrcdir);
 
 	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "myarray");
-	ocrpt_query *q = ocrpt_query_add_array(ds, "a", (const char **)array, 9, 5, coltypes);
+	ocrpt_query *q = ocrpt_query_add_array(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS1);
 
 	ocrpt_part *p = ocrpt_part_new(o);
 	ocrpt_part_set_paper_by_name(p, "A4");

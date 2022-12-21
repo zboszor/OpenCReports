@@ -9,7 +9,8 @@
 #include <opencreport.h>
 #include "test_common.h"
 
-static const enum ocrpt_result_type coltypes[5] = {
+#define COLS 5
+static const int32_t coltypes[5] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 
@@ -40,7 +41,7 @@ int main(void) {
 	err = NULL;
 	adult = ocrpt_expr_parse(o, "a.adult", &err);
 
-	q = ocrpt_query_add_xml(ds, "a", "xmldata2.xml", coltypes);
+	q = ocrpt_query_add_xml(ds, "a", "xmldata2.xml", coltypes, COLS);
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)

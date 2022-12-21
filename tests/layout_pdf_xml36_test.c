@@ -47,7 +47,7 @@ const char *array[10][5] = {
 		"hostile alien", "1200", "yes" },
 };
 
-const enum ocrpt_result_type coltypes[6] = {
+const int32_t coltypes[6] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 

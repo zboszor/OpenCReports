@@ -184,21 +184,23 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 
 	ds = ocrpt_datasource_get(o, datasource_s);
 	if (ds) {
+		int32_t ct_cols_i = cols_i;
+
 		if (ds->input == &ocrpt_array_input) {
-			ocrpt_query_discover_array(value_s, &arrayptr, coltypes_s, &coltypesptr);
+			ocrpt_query_discover_array(value_s, &arrayptr, &rows_i, &cols_i, coltypes_s, &coltypesptr, &ct_cols_i);
 			if (arrayptr)
-				q = ocrpt_query_add_array(ds, name_s, arrayptr, rows_i, cols_i, coltypesptr);
+				q = ocrpt_query_add_array(ds, name_s, arrayptr, rows_i, cols_i, coltypesptr, ct_cols_i);
 			else
 				fprintf(stderr, "Cannot determine array pointer for array query\n");
 		} else if (ds->input == &ocrpt_csv_input) {
-			ocrpt_query_discover_array(NULL, NULL, coltypes_s, &coltypesptr);
-			q = ocrpt_query_add_csv(ds, name_s, value_s, coltypesptr);
+			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, coltypes_s, &coltypesptr, &ct_cols_i);
+			q = ocrpt_query_add_csv(ds, name_s, value_s, coltypesptr, ct_cols_i);
 		} else if (ds->input == &ocrpt_json_input) {
-			ocrpt_query_discover_array(NULL, NULL, coltypes_s, &coltypesptr);
-			q = ocrpt_query_add_json(ds, name_s, value_s, coltypesptr);
+			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, coltypes_s, &coltypesptr, &ct_cols_i);
+			q = ocrpt_query_add_json(ds, name_s, value_s, coltypesptr, ct_cols_i);
 		} else if (ds->input == &ocrpt_xml_input) {
-			ocrpt_query_discover_array(NULL, NULL, coltypes_s, &coltypesptr);
-			q = ocrpt_query_add_xml(ds, name_s, value_s, coltypesptr);
+			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, coltypes_s, &coltypesptr, &ct_cols_i);
+			q = ocrpt_query_add_xml(ds, name_s, value_s, coltypesptr, ct_cols_i);
 		} else if (ds->input == &ocrpt_postgresql_input)
 			q = ocrpt_query_add_postgresql(ds, name_s, value_s);
 		else if (ds->input == &ocrpt_mariadb_input)

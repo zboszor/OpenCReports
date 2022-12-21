@@ -34,7 +34,7 @@ int main(void) {
 		<para>
 			The above code will load <literal>report.xml</literal>,
 			set the output format to PDF, runs the report and prints
-			it output on <literal>stdout</literal>.
+			its output on <literal>stdout</literal>.
 		</para>
 		<sect2>
 			<title>Report handler initialization</title>
@@ -273,7 +273,7 @@ ocrpt_query_add_array(ocrpt_datasource *source,
                       const char *name,
                       const char **array,
                       int32_t rows, int32_t cols,
-                      const enum ocrpt_result_type *types);</programlisting>
+                      const int32_t *types);</programlisting>
 				</para>
 				<para>
 					If the <literal>types</literal> pointer is
@@ -300,7 +300,7 @@ ocrpt_datasource_add_csv(opencreport *o,
 ocrpt_query_add_csv(ocrpt_datasource *source,
                     const char *name,
                     const char *filename,
-                    const enum ocrpt_result_type *types);</programlisting>
+                    const int32_t *types);</programlisting>
 				</para>
 				<para>
 					The <literal>types</literal> array pointer is optional.
@@ -327,7 +327,7 @@ ocrpt_datasource_add_json(opencreport *o,
 ocrpt_query_add_json(ocrpt_datasource *source,
                      const char *name,
                      const char *filename,
-                     const enum ocrpt_result_type *types);</programlisting>
+                     const int32_t *types);</programlisting>
 				</para>
 				<para>
 					The JSON file format defined in <xref linkend="jsonds"/>
@@ -361,7 +361,7 @@ ocrpt_datasource_add_xml(opencreport *o,
 ocrpt_query_add_xml(ocrpt_datasource *source,
                     const char *name,
                     const char *filename,
-                    const enum ocrpt_result_type *types);</programlisting>
+                    const int32_t *types);</programlisting>
 				</para>
 				<para>
 					The XML file format defined in <xref linkend="xmlds"/>
@@ -634,7 +634,7 @@ ocrpt_query_navigate_start(ocrpt_query *q);</programlisting>
 ocrpt_query_navigate_next(ocrpt_query *q);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="arraydiscoveryfunc" xreflabel="Array discovery function">
 				<title><literal>API specific array discovery function</literal></title>
 				<para>
 					For array data sources and queries, OpenCReports
@@ -643,11 +643,18 @@ ocrpt_query_navigate_next(ocrpt_query *q);</programlisting>
 					These are language specific. The below ones
 					are the C specific ones. The override function
 					is also provided to set a new discovery function.
+					The discovery function <emphasis>should</emphasis>
+					return the dimensions for both the 2D
+					<literal>array</literal> and the 1D
+					<literal>coltypes</literal> arrays.
 					<programlisting>typedef void
 (*ocrpt_query_discover_func)(const char *,
                              void **,
+                             int32_t *,
+                             int32_t *,
                              const char *,
-                             void **);
+                             void **,
+                             int32_t *);
 
 void
 ocrpt_query_set_discover_func(ocrpt_query_discover_func func);
@@ -657,8 +664,27 @@ extern ocrpt_query_discover_func ocrpt_query_discover_array;
 void
 ocrpt_query_discover_array_c(const char *arrayname,
                              void **array,
+                             int32_t *rows,
+                             int32_t *cols,
                              const char *typesname,
-                             void **types);</programlisting>
+                             void **types,
+                             int32_t *types_cols);</programlisting>
+				</para>
+				<para>
+					Note that the C specific generic discovery function
+					does not and cannot return the array dimensions,
+					since there is no official API related to
+					<literal>dlsym()</literal> that would return
+					the size associated with a symbol.
+					It's up to the application writers to come up
+					with a smarter (application specific) discovery
+					function that also returns the array dimensions.
+					With such a smart discovery function, one can specify
+					the array and the column types array name without
+					the related dimensions, i.e. the <literal>rows</literal>
+					and <literal>cols</literal> specifiers in
+					<xref linkend="arrayqueries"/> and
+					<xref linkend="filequeries"/>.
 				</para>
 			</sect3>
 		</sect2>

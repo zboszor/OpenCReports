@@ -9,7 +9,9 @@
 #include <opencreport.h>
 #include "test_common.h"
 
-static const char *array[9][1] = {
+#define ROWS 8
+#define COLS 1
+static const char *array[ROWS + 1][COLS] = {
 	{ "text" },
 	{ "bad-tempered" },
 	{ "old" },
@@ -21,7 +23,7 @@ static const char *array[9][1] = {
 	{ "sink" },
 };
 
-static const enum ocrpt_result_type coltypes[1] = { OCRPT_RESULT_STRING };
+static const int32_t coltypes[COLS] = { OCRPT_RESULT_STRING };
 
 int main(void) {
 	opencreport *o = ocrpt_init();
@@ -36,7 +38,7 @@ int main(void) {
 
 	r = ocrpt_part_column_new_report(ocrpt_part_row_new_column(ocrpt_part_new_row(ocrpt_part_new(o))));
 
-	q = ocrpt_query_add_array(ds, "a", (const char **)array, 8, 1, coltypes);
+	q = ocrpt_query_add_array(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 	qr = ocrpt_query_get_result(q, &cols);
 
 	v = ocrpt_variable_new_full(r, OCRPT_RESULT_STRING, "var1", "upper(left(a.text, 1))", NULL, NULL, "r.self + r.baseexpr", NULL);

@@ -77,13 +77,13 @@ int main(void) {
 	/* For m.sillypants in the report */
 	setenv("sillypants", "5", 1);
 
-	ocrpt_query_add_array(ds, "yields", (const char **)yields, 3, 3, NULL);
-	ocrpt_query_add_array(ds, "coupons", (const char **)coupons, 4, 5, NULL);
-	ocrpt_query_add_array(ds, "deposits", (const char **)deposits, 2, 4, NULL);
-	ocrpt_query_add_array(ds, "petty_cash", (const char **)petty_cash, 2, 3, NULL);
-	ocrpt_query_add_array(ds, "misc_income", (const char **)misc_income, 1, 3, NULL);
-	ocrpt_query_add_array(ds, "inv_transfer", (const char **)inv_transfer, 2, 4, NULL);
-	ocrpt_query_add_array(ds, "inventory", (const char **)inventory, 2, 11, NULL);
+	ocrpt_query_add_array(ds, "yields", (const char **)yields, 3, 3, NULL, 0);
+	ocrpt_query_add_array(ds, "coupons", (const char **)coupons, 4, 5, NULL, 0);
+	ocrpt_query_add_array(ds, "deposits", (const char **)deposits, 2, 4, NULL, 0);
+	ocrpt_query_add_array(ds, "petty_cash", (const char **)petty_cash, 2, 3, NULL, 0);
+	ocrpt_query_add_array(ds, "misc_income", (const char **)misc_income, 1, 3, NULL, 0);
+	ocrpt_query_add_array(ds, "inv_transfer", (const char **)inv_transfer, 2, 4, NULL, 0);
+	ocrpt_query_add_array(ds, "inventory", (const char **)inventory, 2, 11, NULL, 0);
 
 	if (!ocrpt_parse_xml(o, "layout_rlib_fixed_part_test.xml")) {
 		printf("XML parse error\n");

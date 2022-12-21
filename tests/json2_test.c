@@ -9,7 +9,8 @@
 #include <opencreport.h>
 #include "test_common.h"
 
-static const enum ocrpt_result_type coltypes[5] = {
+#define COLS 5
+static const int32_t coltypes[COLS] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 
@@ -56,7 +57,7 @@ int main(void) {
 	ocrpt_query_result *qr;
 	int32_t cols, row, i;
 
-	q = ocrpt_query_add_json(ds, "a", "jsonquery2.json", coltypes);
+	q = ocrpt_query_add_json(ds, "a", "jsonquery2.json", coltypes, COLS);
 	if (!q) {
 		ocrpt_free(o);
 		return 0;

@@ -9,7 +9,8 @@
 #include <opencreport.h>
 #include "test_common.h"
 
-const enum ocrpt_result_type coltypes[5] = {
+#define COLS 5
+const int32_t coltypes[COLS] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 

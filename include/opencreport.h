@@ -260,7 +260,8 @@ ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, const char *source_
 ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source,
 									const char *name, const char **array,
 									int32_t rows, int32_t cols,
-									const enum ocrpt_result_type *types);
+									const int32_t *types,
+									int32_t types_cols);
 /*
  * Add a CSV datasource
  */
@@ -270,7 +271,8 @@ ocrpt_datasource *ocrpt_datasource_add_csv(opencreport *o, const char *source_na
  */
 ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
 									const char *name, const char *filename,
-									const enum ocrpt_result_type *types);
+									const int32_t *types,
+									int32_t types_cols);
 /*
  * Add a JSON datasource
  */
@@ -280,7 +282,8 @@ ocrpt_datasource *ocrpt_datasource_add_json(opencreport *o, const char *source_n
  */
 ocrpt_query *ocrpt_query_add_json(ocrpt_datasource *source,
 									const char *name, const char *filename,
-									const enum ocrpt_result_type *types);
+									const int32_t *types,
+									int32_t types_cols);
 /*
  * Add an XML datasource
  */
@@ -290,7 +293,8 @@ ocrpt_datasource *ocrpt_datasource_add_xml(opencreport *o, const char *source_na
  */
 ocrpt_query *ocrpt_query_add_xml(ocrpt_datasource *source,
 									const char *name, const char *filename,
-									const enum ocrpt_result_type *types);
+									const int32_t *types,
+									int32_t types_cols);
 /*
  * Add a PostgreSQL datasource using separate connection parameters
  */
@@ -392,7 +396,7 @@ bool ocrpt_query_navigate_next(ocrpt_query *q);
 /*
  * Set the global function pointer to resolve array and type array
  */
-typedef void (*ocrpt_query_discover_func)(const char *, void **, const char *, void **);
+typedef void (*ocrpt_query_discover_func)(const char *, void **, int32_t *, int32_t *, const char *, void **, int32_t *);
 void ocrpt_query_set_discover_func(ocrpt_query_discover_func func);
 /*
  * Default discovery function for data and type arrays
@@ -401,7 +405,7 @@ extern ocrpt_query_discover_func ocrpt_query_discover_array;
 /*
  * Discovery function for data and type arrays
  */
-void ocrpt_query_discover_array_c(const char *arrayname, void **array, const char *typesname, void **types);
+void ocrpt_query_discover_array_c(const char *arrayname, void **array, int32_t *rows, int32_t *cols, const char *typesname, void **types, int32_t *types_cols);
 
 /********************************
  * Expression related functions *

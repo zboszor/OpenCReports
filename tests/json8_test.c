@@ -15,7 +15,7 @@ int main(void) {
 	ocrpt_datasource *ds = ocrpt_datasource_add_json(o, "json");
 	ocrpt_query *q;
 
-	q = ocrpt_query_add_json(ds, "a", JSONFILE, NULL);
+	q = ocrpt_query_add_json(ds, "a", JSONFILE, NULL, 0);
 	if (!q) {
 		printf(JSONFILE " parsing failed (good, it's intentional)\n");
 		ocrpt_free(o);

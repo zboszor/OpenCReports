@@ -18,7 +18,7 @@
 	{ "5", "Barney Rubble", "small", "29", "yes" }
 };
 
-/* NOT static */ const enum ocrpt_result_type coltypes[5] = {
+/* NOT static */ const int32_t coltypes[5] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 

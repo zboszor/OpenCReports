@@ -21,7 +21,7 @@
 	{ "sink" },
 };
 
-/* NOT static */ const enum ocrpt_result_type coltypes[1] = { OCRPT_RESULT_STRING };
+/* NOT static */ const int32_t coltypes[1] = { OCRPT_RESULT_STRING };
 
 int main(void) {
 	opencreport *o = ocrpt_init();

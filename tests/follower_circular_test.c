@@ -8,18 +8,21 @@
 
 #include <opencreport.h>
 
-static const char *array[4][5] = {
+#define ROWS 3
+#define COLS 5
+static const char *array[ROWS + 1][COLS] = {
 	{ "id", "name", "property", "age", "adult" },
 	{ "1", "Fred Flintstone", "strong", "31", "yes" },
 	{ "2", "Wilma Flintstone", "charming", "28", "yes" },
 	{ "3", "Pebbles Flintstone", "young", "5e-1", "no" }
 };
 
-static const enum ocrpt_result_type coltypes[5] = {
+static const int32_t coltypes[COLS] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 
-static const char *array2[3][5] = {
+#define ROWS1 2
+static const char *array2[ROWS1 + 1][COLS] = {
 	{ "id", "name", "property", "age", "adult" },
 	{ "2", "Betty Rubble", "beautiful", "27", "yes" },
 	{ "1", "Barney Rubble", "small", "29", "yes" },
@@ -33,9 +36,9 @@ int main(void) {
 	bool retval;
 
 	printf("added query a\n\n");
-	a = ocrpt_query_add_array(ds, "a", (const char **)array, 3, 5, coltypes);
+	a = ocrpt_query_add_array(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 	printf("added query b\n\n");
-	b = ocrpt_query_add_array(ds, "b", (const char **)array2, 2, 5, coltypes);
+	b = ocrpt_query_add_array(ds, "b", (const char **)array2, ROWS1, COLS, coltypes, COLS);
 
 	printf("adding N:1 follower a -> b, should succeed\n");
 	match_ab = ocrpt_expr_parse(o, "a.id = b.id", NULL);
@@ -71,7 +74,7 @@ int main(void) {
 	retval = ocrpt_query_add_follower(b, c);
 	printf("added follower b -> c, retval %d\n\n", retval);
 
-	c = ocrpt_query_add_array(ds, "c", (const char **)array2, 2, 5, coltypes);
+	c = ocrpt_query_add_array(ds, "c", (const char **)array2, ROWS1, COLS, coltypes, COLS);
 	printf("added query c\n\n");
 
 	printf("adding N:1 follower b -> c, should succeed\n");
@@ -101,7 +104,7 @@ int main(void) {
 	retval = ocrpt_query_add_follower(a, c);
 	printf("added follower a -> c, retval %d\n\n", retval);
 
-	d = ocrpt_query_add_array(ds, "d", (const char **)array2, 2, 5, coltypes);
+	d = ocrpt_query_add_array(ds, "d", (const char **)array2, ROWS1, COLS, coltypes, COLS);
 	printf("added query d\n\n");
 
 	printf("adding follower c -> d, should succeed\n");

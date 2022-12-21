@@ -15,7 +15,7 @@ const char *array[1][5] = {
 	{ "id", "name", "property", "age", "adult" },
 };
 
-const enum ocrpt_result_type coltypes[5] = {
+const int32_t coltypes[5] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 

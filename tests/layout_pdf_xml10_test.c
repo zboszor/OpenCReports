@@ -43,7 +43,7 @@ const char *array[31][6] = {
 	{ "30", "Pebbles Flintstone", "young", "5e-1", "no", "no" },
 };
 
-const enum ocrpt_result_type coltypes[6] = {
+const int32_t coltypes[6] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 

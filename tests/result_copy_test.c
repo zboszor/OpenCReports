@@ -10,14 +10,16 @@
 #include <opencreport.h>
 #include "test_common.h"
 
-static const char *array[4][5] = {
+#define ROWS 3
+#define COLS 5
+static const char *array[ROWS + 1][COLS] = {
 	{ "id", "name", "property", "age", "adult" },
 	{ "1", "Fred Flintstone", "strong", "31", "yes" },
 	{ NULL, "Wilma Flintstone", "charming", "28", "yes" },
 	{ "3", "Pebbles Flintstone", "young", "5e-1", "no" }
 };
 
-static const enum ocrpt_result_type coltypes[5] = {
+static const int32_t coltypes[COLS] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 
@@ -39,7 +41,7 @@ int main(void) {
 	err = ocrpt_expr_parse(o, "error('Error')", NULL);
 	ocrpt_expr_print(err);
 
-	q = ocrpt_query_add_array(ds, "a", (const char **)array, 3, 5, coltypes);
+	q = ocrpt_query_add_array(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 
 	ocrpt_expr_resolve(id);
 	ocrpt_expr_resolve(name);

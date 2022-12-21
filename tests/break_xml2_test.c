@@ -16,7 +16,7 @@
 	{ "3", "Pebbles Flintstone", "young", "5e-1", "no" }
 };
 
-/* NOT static */ const enum ocrpt_result_type coltypes[5] = {
+/* NOT static */ const int32_t coltypes[5] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 

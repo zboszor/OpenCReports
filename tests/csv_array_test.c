@@ -9,11 +9,13 @@
 #include <opencreport.h>
 #include "test_common.h"
 
-static const enum ocrpt_result_type coltypes[5] = {
+#define ROWS 2
+#define COLS 5
+static const int32_t coltypes[COLS] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 
-static const char *array2[3][5] = {
+static const char *array2[ROWS + 1][COLS] = {
 	{ "id", "name", "property", "age", "adult" },
 	{ "2", "Betty Rubble", "beautiful", "27", "yes" },
 	{ "1", "Barney Rubble", "small", "29", "yes" },
@@ -47,7 +49,7 @@ int main(void) {
 	err = NULL;
 	adult = ocrpt_expr_parse(o, "a.adult", &err);
 
-	q = ocrpt_query_add_csv(ds, "a", "csvquery.csv", coltypes);
+	q = ocrpt_query_add_csv(ds, "a", "csvquery.csv", coltypes, COLS);
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)
@@ -101,7 +103,7 @@ int main(void) {
 
 	printf("--- TESTING FOLLOWER ---\n\n");
 
-	q2 = ocrpt_query_add_array(ds2, "b", (const char **)array2, 2, 5, coltypes);
+	q2 = ocrpt_query_add_array(ds2, "b", (const char **)array2, ROWS, COLS, coltypes, COLS);
 	printf("ocrpt_query_add_array q2: %s\n", q2 == NULL ? "failed" : "successfull");
 	ocrpt_query_add_follower(q, q2);
 
@@ -145,7 +147,7 @@ int main(void) {
 
 	printf("--- TESTING FOLLOWER N:1 ---\n\n");
 
-	q2 = ocrpt_query_add_array(ds2, "b", (const char **)array2, 2, 5, coltypes);
+	q2 = ocrpt_query_add_array(ds2, "b", (const char **)array2, ROWS, COLS, coltypes, COLS);
 	printf("ocrpt_query_add_array q2: %s\n", q2 == NULL ? "failed" : "successful");
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	err = NULL;

@@ -801,7 +801,7 @@ SELECT * FROM some_table
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="filequeries" xreflabel="File based queries">
 			<title>Queries for file based datasources</title>
 			<para>
 				Queries for CSV, XML and JSON datasources may
@@ -849,7 +849,8 @@ SELECT * FROM some_table
 							in the XML and JSON file formats, or for CSV,
 							the complete lack of it can be supplemented
 							with a memory array using the optional
-							<literal>coltypes="..."</literal> attribute.
+							<literal>coltypes="..."</literal> and
+							<literal>cols="..."</literal> attributes.
 							For details, see the <xref linkend="arrayqueries"/>.
 						</para>
 					</listitem>
@@ -896,8 +897,10 @@ SELECT * FROM some_table
 							is "beautified". The symbol name that the
 							OpenCReports library receives must be correct
 							in order to use it. The array name must match
-							the correct global symbol name. It will be
-							looked up via <literal>dlsym()</literal>.
+							the correct global symbol name. The library
+							discovers this symbol using the
+							<xref linkend="arraydiscoveryfunc"/>, by
+							default via <literal>dlsym()</literal>.
 						</para>
 					</listitem>
 					<listitem override="bullet">
@@ -905,22 +908,31 @@ SELECT * FROM some_table
 							Similarly to the array symbol name, the
 							<literal>coltypes="..."</literal> array name
 							must match the correct global symbol name.
-							It will be looked up via <literal>dlsym()</literal>.
+							The library discovers this symbol using the
+							<xref linkend="arraydiscoveryfunc"/>, by
+							default via <literal>dlsym()</literal>.
 						</para>
 					</listitem>
 					<listitem override="bullet">
 						<para>
 							The value for <literal>cols</literal>
 							must match the second dimension of the
-							data array.
+							data array. It may be omitted if the
+							<xref linkend="arraydiscoveryfunc"/> is smarter
+							than the default implementation and returns
+							the arrays' dimensions.
 						</para>
 					</listitem>
 					<listitem override="bullet">
 						<para>
 							The value for <literal>rows</literal>
-							must be one less than the first dimension
-							of the C data array. (The title row is not
-							counted in the XML description.)
+							must match the number of data rows in the array,
+							excluding the title row. I.e. it must be one less
+							than the first dimension of the array. It may be
+							omitted if the
+							<xref linkend="arraydiscoveryfunc"/> is smarter
+							than the default implementation and returns the
+							arrays' dimensions.
 						</para>
 					</listitem>
 				</itemizedlist>

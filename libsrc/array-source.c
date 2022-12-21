@@ -34,11 +34,12 @@
 
 struct ocrpt_array_results {
 	const char **data;
-	const enum ocrpt_result_type *types;
+	const int32_t *types; /* for enum ocrpt_result_type elements */
 	ocrpt_query_result *result;
 	ocrpt_string *converted;
 	int32_t rows;
 	int32_t cols;
+	int32_t types_cols;
 	int32_t current_row;
 	bool atstart:1;
 	bool isdone:1;
@@ -66,7 +67,7 @@ static void ocrpt_array_describe(ocrpt_query *query, ocrpt_query_result **qresul
 			for (int j = 0; j < OCRPT_EXPR_RESULTS; j++) {
 				qr[j * result->cols + i].name = result->data[i];
 
-				if (result->types)
+				if (result->types && i < result->types_cols)
 					qr[j * result->cols + i].result.type = result->types[i];
 				else
 					qr[j * result->cols + i].result.type = OCRPT_RESULT_STRING;
@@ -191,7 +192,8 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, cons
 
 static ocrpt_query *array_query_add(const ocrpt_datasource *source, const char *name,
 									const char **array, int32_t rows, int32_t cols,
-									const enum ocrpt_result_type *types, bool free_types) {
+									const int32_t *types, int32_t types_cols,
+									bool free_types) {
 	if (!source || !name || !array)
 		return NULL;
 
@@ -217,6 +219,7 @@ static ocrpt_query *array_query_add(const ocrpt_datasource *source, const char *
 	priv->cols = cols;
 	priv->data = array;
 	priv->types = types;
+	priv->types_cols = (types ? (types_cols > 0 ? types_cols : cols) : 0);
 	priv->current_row = 0;
 	priv->atstart = true;
 	priv->isdone = false;
@@ -228,7 +231,7 @@ static ocrpt_query *array_query_add(const ocrpt_datasource *source, const char *
 	return query;
 }
 
-DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const enum ocrpt_result_type *types) {
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const int32_t *types, int32_t types_cols) {
 	if (!source || !name || !array)
 		return NULL;
 
@@ -237,7 +240,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source, cons
 		return NULL;
 	}
 
-	return array_query_add(source, name, array, rows, cols, types, false);
+	return array_query_add(source, name, array, rows, cols, types, types_cols, false);
 }
 
 DLL_EXPORT_SYM ocrpt_query_discover_func ocrpt_query_discover_array = ocrpt_query_discover_array_c;
@@ -249,7 +252,7 @@ DLL_EXPORT_SYM void ocrpt_query_set_discover_func(ocrpt_query_discover_func func
 	ocrpt_query_discover_array = func;
 }
 
-DLL_EXPORT_SYM void ocrpt_query_discover_array_c(const char *arrayname, void **array, const char *typesname, void **types) {
+DLL_EXPORT_SYM void ocrpt_query_discover_array_c(const char *arrayname, void **array, int32_t *rows UNUSED, int32_t *cols UNUSED, const char *typesname, void **types, int32_t *types_cols UNUSED) {
 	void *handle = dlopen(NULL, RTLD_NOW);
 
 	if (array) {
@@ -328,7 +331,7 @@ struct ocrpt_file_query {
 	ocrpt_list *col_last;
 	const char **names;
 	const char **fields;
-	enum ocrpt_result_type *types;
+	int32_t *types;
 	int32_t rows;
 	int32_t cols;
 	int32_t depth;
@@ -402,7 +405,7 @@ static void ocrpt_file_query_free(ocrpt_file_query *fq, bool in_error) {
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
 												const char *name, const char *filename,
-												const enum ocrpt_result_type *types) {
+												const int32_t *types, int32_t types_cols) {
 	if (!source || !name || !filename)
 		return NULL;
 
@@ -489,7 +492,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
 			array[row * fq.cols + col] = NULL;
 	}
 
-	retval = array_query_add(source, name, array, fq.rows - 1, fq.cols, types, false);
+	retval = array_query_add(source, name, array, fq.rows - 1, fq.cols, types, types_cols, false);
 
 	ocrpt_file_query_free(&fq, false);
 
@@ -691,7 +694,7 @@ static int ocrpt_yajl_end_array(void *ctx) {
 				fq->fields[i] = NULL;
 			}
 
-			fq->types = ocrpt_mem_malloc(fq->cols * sizeof(enum ocrpt_result_type));
+			fq->types = ocrpt_mem_malloc(fq->cols * sizeof(int32_t));
 			for (i = 0; i < fq->cols; i++)
 				fq->types[i] = OCRPT_RESULT_STRING;
 
@@ -734,7 +737,8 @@ static yajl_callbacks ocrpt_yajl_cb = {
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(ocrpt_datasource *source,
 												const char *name, const char *filename,
-												const enum ocrpt_result_type *types) {
+												const int32_t *types,
+												int32_t types_cols) {
 	if (!source || !name || !filename)
 		return NULL;
 
@@ -815,7 +819,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(ocrpt_datasource *source,
 			array[row * fq.cols + col] = NULL;
 	}
 
-	retval = array_query_add(source, name, array, fq.rows - 1, fq.cols, (fq.coltypesset ? fq.types : types), fq.coltypesset);
+	retval = array_query_add(source, name, array, fq.rows - 1, fq.cols, (fq.coltypesset ? fq.types : types), (fq.coltypesset ? fq.cols : types_cols), fq.coltypesset);
 
 	ocrpt_file_query_free(&fq, false);
 	if (fq.types && !fq.coltypesset)
@@ -879,7 +883,7 @@ static int32_t ocrpt_parse_col_node(opencreport *o, xmlTextReaderPtr reader, ocr
 			fq->collist = ocrpt_list_end_append(fq->collist, &fq->col_last, field);
 		}
 	} else if (fq->incoltypes) {
-		enum ocrpt_result_type type;
+		int32_t type;
 
 		if (!value) {
 			xmlFree(value);
@@ -896,7 +900,7 @@ static int32_t ocrpt_parse_col_node(opencreport *o, xmlTextReaderPtr reader, ocr
 			xmlFree(value);
 			return 0;
 		}
-		fq->coltypeslist = ocrpt_list_end_append(fq->coltypeslist, &fq->coltypes_last, (void *)type);
+		fq->coltypeslist = ocrpt_list_end_append(fq->coltypeslist, &fq->coltypes_last, (void *)(long)type);
 	}
 
 	fq->firstcol = false;
@@ -1136,7 +1140,8 @@ static int32_t ocrpt_parse_data_node(opencreport *o, xmlTextReaderPtr reader, oc
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(ocrpt_datasource *source,
 												const char *name, const char *filename,
-												const enum ocrpt_result_type *types) {
+												const int32_t *types,
+												int32_t types_cols) {
 	if (!source || !name || !filename)
 		return NULL;
 
@@ -1206,10 +1211,10 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(ocrpt_datasource *source,
 		ocrpt_list *colptr;
 		int32_t col;
 
-		fq.types = ocrpt_mem_malloc(fq.cols * sizeof(enum ocrpt_result_type));
+		fq.types = ocrpt_mem_malloc(fq.cols * sizeof(int32_t));
 
 		for (colptr = fq.coltypeslist, col = 0; colptr && col < fq.cols; colptr = colptr->next, col++)
-			fq.types[col] = (enum ocrpt_result_type)colptr->data;
+			fq.types[col] = (int32_t)(long)colptr->data;
 
 		for (; col < fq.cols; col++)
 			fq.types[col] = OCRPT_RESULT_STRING;
@@ -1233,7 +1238,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(ocrpt_datasource *source,
 		}
 	}
 
-	retval = array_query_add(source, name, array, fq.rows, fq.cols, (fq.coltypesset ? fq.types : types), fq.coltypesset);
+	retval = array_query_add(source, name, array, fq.rows, fq.cols, (fq.coltypesset ? fq.types : types), (fq.coltypesset ? fq.cols : types_cols), fq.coltypesset);
 
 	ocrpt_file_query_free(&fq, false);
 	if (fq.types && !fq.coltypesset)

@@ -9,14 +9,16 @@
 #include <opencreport.h>
 #include "test_common.h"
 
-const char *array[4][5] = {
+#define ROWS 3
+#define COLS 5
+const char *array[ROWS + 1][COLS] = {
 	{ "id", "name", "property", "age", "adult" },
 	{ "1", "Fred Flintstone", "strong", "31", "yes" },
 	{ "2", "Wilma Flintstone", "charming", "28", "yes" },
 	{ "3", "Pebbles Flintstone", "young", "5e-1", "no" }
 };
 
-const enum ocrpt_result_type coltypes[5] = {
+const int32_t coltypes[COLS] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 
@@ -30,7 +32,7 @@ int main(void) {
 	char *err;
 	int32_t cols, row, i;
 
-	ocrpt_query_discover_array("array", &arrayptr, "coltypes", &coltypesptr);
+	ocrpt_query_discover_array("array", &arrayptr, NULL, NULL, "coltypes", &coltypesptr, NULL);
 	printf("Discovered array pointer: %sidentical\n", arrayptr == array ? "" : "NOT ");
 	printf("Discovered coltypes pointer: %sidentical\n", coltypesptr == coltypes ? "" : "NOT ");
 
@@ -58,7 +60,7 @@ int main(void) {
 	err = NULL;
 	adult = ocrpt_expr_parse(o, "a.adult", &err);
 
-	q = ocrpt_query_add_array(ds, "a", (const char **)arrayptr, 3, 5, coltypesptr);
+	q = ocrpt_query_add_array(ds, "a", (const char **)arrayptr, ROWS, COLS, coltypesptr, COLS);
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)
