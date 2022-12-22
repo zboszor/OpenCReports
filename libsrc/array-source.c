@@ -571,15 +571,15 @@ static int ocrpt_yajl_string(void *ctx, const unsigned char *str, size_t len) {
 		/* Ignore excess elements in "coltypes" */
 		if (fq->current_col >= fq->cols)
 			return true;
-		if (!strncmp((char *)str, "string", len)) {
+		if (!strncasecmp((char *)str, "string", len)) {
 			fq->types[fq->current_col++] = OCRPT_RESULT_STRING;
 			return true;
 		}
-		if (!strncmp((char *)str, "number", len)) {
+		if (!strncasecmp((char *)str, "number", len) || !strncasecmp((char *)str, "numeric", len)) {
 			fq->types[fq->current_col++] = OCRPT_RESULT_NUMBER;
 			return true;
 		}
-		if (!strncmp((char *)str, "datetime", len)) {
+		if (!strncasecmp((char *)str, "datetime", len)) {
 			fq->types[fq->current_col++] = OCRPT_RESULT_DATETIME;
 			return true;
 		}
@@ -890,11 +890,11 @@ static int32_t ocrpt_parse_col_node(opencreport *o, xmlTextReaderPtr reader, ocr
 			return 0;
 		}
 
-		if (!strcmp((char *)value, "string"))
+		if (!strcasecmp((char *)value, "string"))
 			type = OCRPT_RESULT_STRING;
-		else if (!strcmp((char *)value, "number"))
+		else if (!strcasecmp((char *)value, "number") || !strcasecmp((char *)value, "numeric"))
 			type = OCRPT_RESULT_NUMBER;
-		else if (!strcmp((char *)value, "datetime"))
+		else if (!strcasecmp((char *)value, "datetime"))
 			type = OCRPT_RESULT_DATETIME;
 		else {
 			xmlFree(value);
