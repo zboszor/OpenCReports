@@ -122,6 +122,11 @@ PDF_TESTS = \
 	layout_pdf41_test \
 	layout_pdf_xml42_test
 
+PHP_PDF_TESTS = \
+	layout_pdf_xml37_test
+
+if ENABLE_XLATE_TESTS
+
 XLATE_DEPS = \
 	locale/hu_HU/LC_MESSAGES/translate_test.mo
 
@@ -131,6 +136,8 @@ XLATE_DEPS = \
 XLATE_PDF_TESTS = \
 	layout_pdf_translate1_test \
 	layout_pdf_translate_xml1_test
+
+endif
 
 # Unstable tests by nature:
 # random_test produces a random number which is different every time
@@ -151,23 +158,15 @@ basic-test: $(TESTS) execute_test.sh
 
 if ENABLE_PDF_TESTS
 
-if ENABLE_XLATE_TESTS
-
-PDF_TESTS += $(XLATE_PDF_TESTS)
-
 pdf-test: $(PDF_TESTS) $(XLATE_DEPS) execute_pdf_test.sh
 	$(foreach TEST,$(PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_pdf_test.sh $(TEST) &&) true
 
-else
-
-pdf-test: $(PDF_TESTS) execute_pdf_test.sh
-	$(foreach TEST,$(PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_pdf_test.sh $(TEST) &&) true
-
-endif
+php-pdf-test: $(PHP_PDF_TESTS) $(XLATE_DEPS) execute_php_pdf_test.sh
+	$(foreach TEST,$(PHP_PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_php_pdf_test.sh $(TEST) &&) true
 
 else
 
-.PHONY: pdf-test
+.PHONY: pdf-test php-pdf-test
 
 endif
 
