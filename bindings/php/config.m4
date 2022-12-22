@@ -1,7 +1,7 @@
-PHP_ARG_ENABLE([opencreport],[whether to enable opencreport module],
-[  --enable-opencreport      Enable opencreport module],[shared],[yes])
+PHP_ARG_ENABLE([opencreports],[whether to enable opencreport module],
+[  --enable-opencreports     Enable opencreports module],[shared],[yes])
 
-if test "$PHP_OPENCREPORT" != "no"; then
+if test "$PHP_OPENCREPORTS" != "no"; then
 	AC_MSG_CHECKING(for pkg-config)
 	if test ! -f "$PKG_CONFIG"; then
 		PKG_CONFIG=`which pkg-config`
@@ -33,7 +33,7 @@ if test "$PHP_OPENCREPORT" != "no"; then
 	CFLAGS="-Wall -Werror $CFLAGS"
 	LDFLAGS="$OPENCREPORT_LIBS $LDFLAGS"
 
-	PHP_NEW_EXTENSION(opencreport, [opencreport.c], $ext_shared)
+	PHP_NEW_EXTENSION(opencreports, [opencreport.c], $ext_shared)
 	PHP_EVAL_INCLINE($CFLAGS)
-	PHP_EVAL_LIBLINE($LDFLAGS, OPENCREPORT_SHARED_LIBADD)
+	PHP_EVAL_LIBLINE($LDFLAGS, OPENCREPORTS_SHARED_LIBADD)
 fi
