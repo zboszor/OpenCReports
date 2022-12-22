@@ -27,11 +27,11 @@ if test "$PHP_OPENCREPORTS" != "no"; then
 		AC_MSG_RESULT(not found)
 		AC_MSG_ERROR(opencreport is not found)
 	fi
-	OPENCREPORT_CFLAGS="`$PKG_CONFIG --cflags opencreports`"
-	OPENCREPORT_LIBS="`$PKG_CONFIG --libs opencreports`"
+	OPENCREPORTS_CFLAGS="`$PKG_CONFIG --cflags opencreports`"
+	OPENCREPORTS_LIBS="`$PKG_CONFIG --libs opencreports`"
 
 	CFLAGS="-Wall -Werror $CFLAGS"
-	LDFLAGS="$OPENCREPORT_LIBS $LDFLAGS"
+	LDFLAGS="$OPENCREPORTS_LIBS $LDFLAGS"
 
 	PHP_NEW_EXTENSION(opencreports, [opencreport.c], $ext_shared)
 	PHP_EVAL_INCLINE($CFLAGS)
