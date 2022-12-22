@@ -145,7 +145,7 @@ ocrpt_set_numeric_precision_bits(opencreport *o,
 			<sect3>
 				<title>Set rounding mode</title>
 				<para>
-					OpenCReports uses GNU MPFR under the hood and does't
+					OpenCReports uses GNU MPFR under the hood and doesn't
 					hide this fact. The MPFR rounding mode constants are
 					used as is to set the rounding behaviour.
 					The default is <literal>MPFR_RNDN</literal>, round
