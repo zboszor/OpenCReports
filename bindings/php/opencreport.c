@@ -134,22 +134,6 @@ PHP_METHOD(opencreport, __destruct) {
 	oo->o = NULL;
 }
 
-PHP_METHOD(opencreport, version) {
-	ZEND_PARSE_PARAMETERS_NONE();
-
-	RETURN_STRING(ocrpt_version());
-}
-
-PHP_METHOD(opencreport, canonicalize_path) {
-	zend_string *path;
-
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_STR(path);
-	ZEND_PARSE_PARAMETERS_END();
-
-	RETURN_STRING(ocrpt_canonicalize_path(path->val));
-}
-
 PHP_METHOD(opencreport, parse_xml) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
@@ -159,7 +143,19 @@ PHP_METHOD(opencreport, parse_xml) {
 		Z_PARAM_STR(filename);
 	ZEND_PARSE_PARAMETERS_END();
 
-	RETURN_BOOL(ocrpt_parse_xml(oo->o, filename->val));
+	RETURN_BOOL(ocrpt_parse_xml(oo->o, ZSTR_VAL(filename)));
+}
+
+PHP_METHOD(opencreport, set_output_format) {
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+	zend_long format;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_LONG(format);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_set_output_format(oo->o, format);
 }
 
 PHP_METHOD(opencreport, execute) {
@@ -192,6 +188,62 @@ PHP_METHOD(opencreport, get_output) {
 	RETURN_STRINGL(res, sz);
 }
 
+PHP_METHOD(opencreport, version) {
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_STRING(ocrpt_version());
+}
+
+PHP_METHOD(opencreport, set_numeric_precision_bits) {
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+	zend_long prec;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_LONG(prec);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_set_numeric_precision_bits(oo->o, (mpfr_prec_t)prec);
+}
+
+PHP_METHOD(opencreport, set_rounding_mode) {
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+	zend_long mode;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_LONG(mode);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_set_rounding_mode(oo->o, (mpfr_rnd_t)mode);
+}
+
+PHP_METHOD(opencreport, bindtextdomain) {
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+	zend_string *domainname;
+	zend_string *dirname;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_STR(domainname);
+		Z_PARAM_STR(dirname);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_bindtextdomain(oo->o, ZSTR_VAL(domainname), ZSTR_VAL(dirname));
+}
+
+PHP_METHOD(opencreport, set_locale) {
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+	zend_string *locale;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR(locale);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_set_locale(oo->o, ZSTR_VAL(locale));
+}
+
 PHP_METHOD(opencreport, add_search_path) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
@@ -201,47 +253,91 @@ PHP_METHOD(opencreport, add_search_path) {
 		Z_PARAM_STR(path);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_add_search_path(oo->o, path->val);
+	ocrpt_add_search_path(oo->o, ZSTR_VAL(path));
 }
 
-PHP_METHOD(opencreport, set_output_format) {
-	zval *object = ZEND_THIS;
-	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_long format;
+PHP_METHOD(opencreport, canonicalize_path) {
+	zend_string *path;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_LONG(format);
+		Z_PARAM_STR(path);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_set_output_format(oo->o, format);
+	RETURN_STRING(ocrpt_canonicalize_path(ZSTR_VAL(path)));
 }
 
-ZEND_BEGIN_ARG_INFO(arginfo_opencreport_void, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_opencreport_ctor_dtor, 0, ZEND_RETURN_VALUE, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_opencreport_parse_xml, 0, 0, 1)
-ZEND_ARG_INFO(0, filename)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_parse_xml, 0, 1, _IS_BOOL, 0)
+ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_opencreport_path, 0, 0, 1)
-ZEND_ARG_INFO(0, path)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_output_format, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, format, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_opencreport_format, 0, 0, 1)
-ZEND_ARG_INFO(0, format)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_execute, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_spool, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_get_output, 0, 0, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_version, 0, 0, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_numeric_precision_bits, 0, 1, IS_LONG, 0)
+ZEND_ARG_TYPE_INFO(0, prec, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_rounding_mode, 0, 1, IS_LONG, 0)
+ZEND_ARG_TYPE_INFO(0, mode, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_bindtextdomain, 0, 2, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, domainname, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, dirname, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_locale, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, locale, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_add_search_path, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_canonicalize_path, 0, 1, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry opencreport_class_methods[] = {
-	PHP_ME(opencreport, __construct, arginfo_opencreport_void, ZEND_ACC_PUBLIC)
-	PHP_ME(opencreport, __destruct, arginfo_opencreport_void, ZEND_ACC_PUBLIC)
-	PHP_ME(opencreport, version, arginfo_opencreport_void, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	PHP_ME(opencreport, canonicalize_path, arginfo_opencreport_path, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	/*
+	 * High level API
+	 */
+	PHP_ME(opencreport, __construct, arginfo_opencreport_ctor_dtor, ZEND_ACC_PUBLIC)
+	PHP_ME(opencreport, __destruct, arginfo_opencreport_ctor_dtor, ZEND_ACC_PUBLIC)
 	PHP_ME(opencreport, parse_xml, arginfo_opencreport_parse_xml, ZEND_ACC_PUBLIC)
-	PHP_ME(opencreport, set_output_format, arginfo_opencreport_format, ZEND_ACC_PUBLIC)
-	PHP_ME(opencreport, execute, arginfo_opencreport_void, ZEND_ACC_PUBLIC)
-	PHP_ME(opencreport, spool, arginfo_opencreport_void, ZEND_ACC_PUBLIC)
-	PHP_ME(opencreport, get_output, arginfo_opencreport_void, ZEND_ACC_PUBLIC)
-	PHP_ME(opencreport, add_search_path, arginfo_opencreport_path, ZEND_ACC_PUBLIC)
+	PHP_ME(opencreport, set_output_format, arginfo_opencreport_set_output_format, ZEND_ACC_PUBLIC)
+	PHP_ME(opencreport, execute, arginfo_opencreport_execute, ZEND_ACC_PUBLIC)
+	PHP_ME(opencreport, spool, arginfo_opencreport_spool, ZEND_ACC_PUBLIC)
+	PHP_ME(opencreport, get_output, arginfo_opencreport_get_output, ZEND_ACC_PUBLIC)
+	PHP_ME(opencreport, version, arginfo_opencreport_version, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	/*
+	 * Low level API
+	 */
+	/* Numeric behavior related functions */
+	PHP_ME(opencreport, set_numeric_precision_bits, arginfo_opencreport_set_numeric_precision_bits, ZEND_ACC_PUBLIC)
+	PHP_ME(opencreport, set_rounding_mode, arginfo_opencreport_set_rounding_mode, ZEND_ACC_PUBLIC)
+	/* Locale related functions */
+	PHP_ME(opencreport, bindtextdomain, arginfo_opencreport_bindtextdomain, ZEND_ACC_PUBLIC)
+	PHP_ME(opencreport, set_locale, arginfo_opencreport_set_locale, ZEND_ACC_PUBLIC)
+	/*  */
+	PHP_ME(opencreport, add_search_path, arginfo_opencreport_add_search_path, ZEND_ACC_PUBLIC)
+	PHP_ME(opencreport, canonicalize_path, arginfo_opencreport_canonicalize_path, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -471,6 +567,14 @@ static PHP_MINIT_FUNCTION(opencreport)
 	REGISTER_OPENCREPORT_CLASS_CONST_LONG("RESULT_STRING", OCRPT_RESULT_STRING);
 	REGISTER_OPENCREPORT_CLASS_CONST_LONG("RESULT_NUMBER", OCRPT_RESULT_NUMBER);
 	REGISTER_OPENCREPORT_CLASS_CONST_LONG("RESULT_DATETIME", OCRPT_RESULT_DATETIME);
+
+	REGISTER_OPENCREPORT_CLASS_CONST_LONG("MPFR_RNDN", MPFR_RNDN);
+	REGISTER_OPENCREPORT_CLASS_CONST_LONG("MPFR_RNDZ", MPFR_RNDZ);
+	REGISTER_OPENCREPORT_CLASS_CONST_LONG("MPFR_RNDU", MPFR_RNDU);
+	REGISTER_OPENCREPORT_CLASS_CONST_LONG("MPFR_RNDD", MPFR_RNDD);
+	REGISTER_OPENCREPORT_CLASS_CONST_LONG("MPFR_RNDA", MPFR_RNDA);
+	REGISTER_OPENCREPORT_CLASS_CONST_LONG("MPFR_RNDF", MPFR_RNDF);
+	REGISTER_OPENCREPORT_CLASS_CONST_LONG("MPFR_RNDNA", MPFR_RNDNA);
 
 	return SUCCESS;
 }

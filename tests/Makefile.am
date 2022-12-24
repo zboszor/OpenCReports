@@ -123,6 +123,8 @@ PDF_TESTS = \
 	layout_pdf_xml42_test
 
 PHP_PDF_TESTS = \
+	layout_pdf_xml_test \
+	layout_pdf_xml2_test \
 	layout_pdf_xml37_test
 
 if ENABLE_XLATE_TESTS
