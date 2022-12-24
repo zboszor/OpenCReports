@@ -125,7 +125,46 @@ PDF_TESTS = \
 PHP_PDF_TESTS = \
 	layout_pdf_xml_test \
 	layout_pdf_xml2_test \
-	layout_pdf_xml37_test
+	layout_pdf_xml3_test \
+	layout_pdf_xml4_test \
+	layout_pdf_xml5_test \
+	layout_pdf_xml6_test \
+	layout_pdf_xml7_test \
+	layout_pdf_xml8_test \
+	layout_pdf_xml9_test \
+	layout_pdf_xml10_test \
+	layout_pdf_xml11_test \
+	layout_pdf_xml12_test \
+	layout_pdf_xml13_test \
+	layout_pdf_xml14_test \
+	layout_pdf_xml15_test \
+	layout_pdf_xml16_test \
+	layout_pdf_xml17_test \
+	layout_pdf_xml18_test \
+	layout_pdf_xml19_test \
+	layout_pdf_xml20_test \
+	layout_pdf_xml21_test \
+	layout_pdf_xml22_test \
+	layout_pdf_xml23_test \
+	layout_pdf_xml24_test \
+	layout_pdf_xml25_test \
+	layout_pdf_xml26_test \
+	layout_pdf_xml27_test \
+	layout_pdf_xml28_test \
+	layout_pdf_xml29_test \
+	layout_pdf_xml30_test \
+	layout_pdf_xml31_test \
+	layout_pdf_xml32_test \
+	layout_pdf_xml33_test \
+	layout_pdf_xml34_test \
+	layout_pdf_xml35_test \
+	layout_pdf_xml36_test \
+	layout_pdf_xml37_test \
+	layout_pdf_xml38_test \
+	layout_pdf_xml39_test \
+	layout_pdf_xml40_test \
+	layout_pdf_xml41_test \
+	layout_pdf_xml42_test
 
 if ENABLE_XLATE_TESTS
 
