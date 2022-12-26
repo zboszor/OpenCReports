@@ -10,7 +10,9 @@
 
 #include <opencreport.h>
 
-const char *array[10][4] = {
+#define ROWS 9
+#define COLS 4
+const char *array[ROWS + 1][COLS] = {
 	{ "id", "name", "age", "adult" },
 	{ "1", "Fred Flintstone", "31", "yes" },
 	{ "2", "Wilma Flintstone", "28", "yes" },
@@ -23,7 +25,7 @@ const char *array[10][4] = {
 	{ "9", "The Great Gazoo", "1200", "yes" },
 };
 
-const int32_t coltypes[4] = {
+const int32_t coltypes[COLS] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 
@@ -47,7 +49,7 @@ int main(void) {
 	ocrpt_mem_string_free(localedir, true);
 
 	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "myarray");
-	ocrpt_query *q = ocrpt_query_add_array(ds, "a", (const char **)array, 9, 4, coltypes);
+	ocrpt_query *q = ocrpt_query_add_array(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 
 	ocrpt_part *p = ocrpt_part_new(o);
 	ocrpt_part_set_paper_by_name(p, "A4");
