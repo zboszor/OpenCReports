@@ -273,7 +273,8 @@ ocrpt_query_add_array(ocrpt_datasource *source,
                       const char *name,
                       const char **array,
                       int32_t rows, int32_t cols,
-                      const int32_t *types);</programlisting>
+                      const int32_t *types,
+                      int32_t types_cols);</programlisting>
 				</para>
 				<para>
 					If the <literal>types</literal> pointer is
@@ -300,7 +301,8 @@ ocrpt_datasource_add_csv(opencreport *o,
 ocrpt_query_add_csv(ocrpt_datasource *source,
                     const char *name,
                     const char *filename,
-                    const int32_t *types);</programlisting>
+                    const int32_t *types,
+                    int32_t types_cols);</programlisting>
 				</para>
 				<para>
 					The <literal>types</literal> array pointer is optional.
@@ -327,7 +329,8 @@ ocrpt_datasource_add_json(opencreport *o,
 ocrpt_query_add_json(ocrpt_datasource *source,
                      const char *name,
                      const char *filename,
-                     const int32_t *types);</programlisting>
+                     const int32_t *types,
+                     int32_t types_cols);</programlisting>
 				</para>
 				<para>
 					The JSON file format defined in <xref linkend="jsonds"/>
@@ -361,7 +364,8 @@ ocrpt_datasource_add_xml(opencreport *o,
 ocrpt_query_add_xml(ocrpt_datasource *source,
                     const char *name,
                     const char *filename,
-                    const int32_t *types);</programlisting>
+                    const int32_t *types,
+                    int32_t types_cols);</programlisting>
 				</para>
 				<para>
 					The XML file format defined in <xref linkend="xmlds"/>
