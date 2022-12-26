@@ -174,8 +174,11 @@ XLATE_DEPS = \
 .po.mo:
 	$(MSGFMT) -o $@ $(srcdir)/$<
 
-XLATE_PDF_TESTS = \
+PDF_TESTS += \
 	layout_pdf_translate1_test \
+	layout_pdf_translate_xml1_test
+
+PHP_PDF_TESTS += \
 	layout_pdf_translate_xml1_test
 
 endif
