@@ -145,6 +145,10 @@ DLL_EXPORT_SYM ocrpt_list *ocrpt_list_remove(ocrpt_list *l, const void *data) {
 	return l;
 }
 
+DLL_EXPORT_SYM ocrpt_list *ocrpt_list_next(ocrpt_list *l) {
+	return l ? l->next : NULL;
+}
+
 DLL_EXPORT_SYM void *ocrpt_list_get_data(ocrpt_list *l) {
 	if (!l)
 		return NULL;

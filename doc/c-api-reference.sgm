@@ -2838,6 +2838,17 @@ ocrpt_list_remove(ocrpt_list *l,
 				</para>
 			</sect3>
 			<sect3>
+				<title>Get next link in the list</title>
+				<para>
+					This can be used to iterate through a list.
+					It returns <literal>NULL</literal> if the
+					passed-in link is the last list in the list
+					or it's an empty list.
+					<programlisting>ocrpt_list *
+ocrpt_list_next(ocrpt_list *l);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
 				<title>Get the data element from a list</title>
 				<para>
 					<programlisting>void *

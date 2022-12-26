@@ -1026,6 +1026,7 @@ ocrpt_list *ocrpt_list_end_append(ocrpt_list *l, ocrpt_list **e, const void *dat
 ocrpt_list *ocrpt_list_append(ocrpt_list *l, const void *data);
 ocrpt_list *ocrpt_list_prepend(ocrpt_list *l, const void *data);
 ocrpt_list *ocrpt_list_remove(ocrpt_list *l, const void *data);
+ocrpt_list *ocrpt_list_next(ocrpt_list *l);
 void *ocrpt_list_get_data(ocrpt_list *l);
 void ocrpt_list_free(ocrpt_list *l);
 void ocrpt_list_free_deep(ocrpt_list *l, ocrpt_mem_free_t freefunc);
