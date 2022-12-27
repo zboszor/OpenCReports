@@ -751,7 +751,7 @@ ocrpt_report_expr_parse(ocrpt_report *r,
 					Free an expression parse tree. If it was bound
 					to the passed-in <literal>ocrpt_report</literal>,
 					this association is also deleted. Alternatively,
-					the expression doesn't need to be free if it was
+					the expression doesn't need to be freed if it was
 					bound to a report when it was parsed, as it will be
 					automatically freed when freeing either the report,
 					or the global <literal>opencreport</literal> structure.
