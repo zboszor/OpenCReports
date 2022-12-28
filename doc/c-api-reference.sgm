@@ -1364,6 +1364,7 @@ ocrpt_break_reset_vars(ocrpt_break *br);</programlisting>
 ocrpt_function_add(opencreport *o,
                    const char *fname,
                    ocrpt_function_call func,
+                   void *user_data,
                    int32_t n_ops,
                    bool commutative,
                    bool associative,

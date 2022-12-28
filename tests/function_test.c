@@ -62,8 +62,8 @@ int main(void) {
 	char *err;
 
 	/* Override the stock increment and decrement functions with constant 1 and 0 */
-	ocrpt_function_add(o, "inc", my_inc, 1, false, false, false, false);
-	ocrpt_function_add(o, "dec", my_dec, 1, false, false, false, false);
+	ocrpt_function_add(o, "inc", my_inc, NULL, 1, false, false, false, false);
+	ocrpt_function_add(o, "dec", my_dec, NULL, 1, false, false, false, false);
 
 	err = NULL;
 	e1 = ocrpt_expr_parse(o, "100++", &err);

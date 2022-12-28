@@ -9,6 +9,7 @@
 struct ocrpt_function {
 	const char *fname;
 	ocrpt_function_call func;
+	void *user_data;
 	int32_t n_ops;
 	bool commutative:1;
 	bool associative:1;

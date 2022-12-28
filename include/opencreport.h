@@ -142,7 +142,7 @@ typedef struct ocrpt_list ocrpt_list;
 
 #define OCRPT_UNUSED_PARAM __attribute__((unused))
 
-#define OCRPT_FUNCTION_PARAMS ocrpt_expr *e
+#define OCRPT_FUNCTION_PARAMS ocrpt_expr *e, void *user_data
 #define OCRPT_FUNCTION(name) void name(OCRPT_FUNCTION_PARAMS)
 #define OCRPT_STATIC_FUNCTION(name) static void name(OCRPT_FUNCTION_PARAMS)
 typedef void (*ocrpt_function_call)(OCRPT_FUNCTION_PARAMS);
@@ -643,7 +643,8 @@ void ocrpt_break_reset_vars(ocrpt_break *br);
 /*
  * Add a new custom function to the opencreport structure
  */
-bool ocrpt_function_add(opencreport *o, const char *fname, ocrpt_function_call func,
+bool ocrpt_function_add(opencreport *o, const char *fname,
+						ocrpt_function_call func, void *user_data,
 						int32_t n_ops, bool commutative, bool associative,
 						bool left_associative, bool dont_optimize);
 /*

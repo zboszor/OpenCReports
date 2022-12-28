@@ -388,7 +388,7 @@ static void ocrpt_expr_optimize_worker(ocrpt_expr *e) {
 		 */
 		if (e->func) {
 			if (e->func->func && !e->func->dont_optimize) {
-				e->func->func(e);
+				e->func->func(e, e->func->user_data);
 				for (i = 0; i < e->n_ops; i++)
 					ocrpt_expr_free(e->ops[i]);
 				ocrpt_mem_free(e->ops);
@@ -899,7 +899,7 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 
 		if (e->func && e->func->func) {
 			if (e->func->func)
-				e->func->func(e);
+				e->func->func(e, e->func->user_data);
 			else
 				fprintf(stderr, "funccall is unset\n");
 		} else
