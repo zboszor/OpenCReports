@@ -1380,7 +1380,7 @@ ocrpt_function_add(opencreport *o,
 					OpenCReports functions are called with the
 					parameters as declared below.
 					<programlisting>#define OCRPT_FUNCTION_PARAMS \
-    ocrpt_expr *e</programlisting>
+    ocrpt_expr *e, void *user_data</programlisting>
 				</para>
 				<para>
 					OpenCReports functions may be declared
