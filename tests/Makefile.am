@@ -64,6 +64,9 @@ TESTS = \
 	find_file_test \
 	color_test
 
+PHP_TESTS = \
+	grammar_test expr_test function_test
+
 SLOW_TESTS = \
 	pgsql_numeric_precision_test \
 	pgsql_numeric_precision2_test
@@ -200,6 +203,9 @@ all: $(noinst_PROGRAMS)
 basic-test: $(TESTS) execute_test.sh
 	$(foreach TEST,$(TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
 
+php-basic-test: $(PHP_TESTS) execute_php_test.sh
+	$(foreach TEST,$(PHP_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_php_test.sh $(TEST) &&) true
+
 if ENABLE_PDF_TESTS
 
 pdf-test: $(PDF_TESTS) $(XLATE_DEPS) execute_pdf_test.sh
@@ -215,6 +221,8 @@ else
 endif
 
 test: basic-test pdf-test
+
+php-test: php-basic-test php-pdf-test
 
 slow-test: $(SLOW_TESTS) execute_test.sh
 	$(foreach TEST,$(SLOW_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true

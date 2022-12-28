@@ -1,0 +1,1412 @@
+string: 1
+expr reprinted: 1.000000
+expr nodes: 1
+
+string: -1
+expr reprinted: uminus(1.000000)
+expr nodes: 2
+
+string: 1.235
+expr reprinted: 1.235000
+expr nodes: 1
+
+string: -1.235
+expr reprinted: uminus(1.235000)
+expr nodes: 2
+
+string: 0.1234
+expr reprinted: 0.123400
+expr nodes: 1
+
+string: -0.1234
+expr reprinted: uminus(0.123400)
+expr nodes: 2
+
+string: .1234
+expr reprinted: 0.123400
+expr nodes: 1
+
+string: -.1234
+expr reprinted: uminus(0.123400)
+expr nodes: 2
+
+string: 1e5
+expr reprinted: 100000.000000
+expr nodes: 1
+
+string: -1e5
+expr reprinted: uminus(100000.000000)
+expr nodes: 2
+
+string: 1e-5
+expr reprinted: 0.000010
+expr nodes: 1
+
+string: -1e-5
+expr reprinted: uminus(0.000010)
+expr nodes: 2
+
+string: 1.235e5
+expr reprinted: 123500.000000
+expr nodes: 1
+
+string: -1.235e5
+expr reprinted: uminus(123500.000000)
+expr nodes: 2
+
+string: 1.235e-5
+expr reprinted: 0.000012
+expr nodes: 1
+
+string: -1.235e-5
+expr reprinted: uminus(0.000012)
+expr nodes: 2
+
+string: 0.1234e5
+expr reprinted: 12340.000000
+expr nodes: 1
+
+string: 0.1234e-5
+expr reprinted: 0.000001
+expr nodes: 1
+
+string: -0.1234e5
+expr reprinted: uminus(12340.000000)
+expr nodes: 2
+
+string: -0.1234e-5
+expr reprinted: uminus(0.000001)
+expr nodes: 2
+
+string: .1234e5
+expr reprinted: 12340.000000
+expr nodes: 1
+
+string: .1234e-5
+expr reprinted: 0.000001
+expr nodes: 1
+
+string: -.1234e5
+expr reprinted: uminus(12340.000000)
+expr nodes: 2
+
+string: -.1234e-5
+expr reprinted: uminus(0.000001)
+expr nodes: 2
+
+string: 1E5
+expr reprinted: 100000.000000
+expr nodes: 1
+
+string: -1E5
+expr reprinted: uminus(100000.000000)
+expr nodes: 2
+
+string: 1E-5
+expr reprinted: 0.000010
+expr nodes: 1
+
+string: -1E-5
+expr reprinted: uminus(0.000010)
+expr nodes: 2
+
+string: 1.235E5
+expr reprinted: 123500.000000
+expr nodes: 1
+
+string: -1.235E5
+expr reprinted: uminus(123500.000000)
+expr nodes: 2
+
+string: 1.235E-5
+expr reprinted: 0.000012
+expr nodes: 1
+
+string: -1.235E-5
+expr reprinted: uminus(0.000012)
+expr nodes: 2
+
+string: 0.1234E5
+expr reprinted: 12340.000000
+expr nodes: 1
+
+string: 0.1234E-5
+expr reprinted: 0.000001
+expr nodes: 1
+
+string: -0.1234E5
+expr reprinted: uminus(12340.000000)
+expr nodes: 2
+
+string: -0.1234E-5
+expr reprinted: uminus(0.000001)
+expr nodes: 2
+
+string: .1234E5
+expr reprinted: 12340.000000
+expr nodes: 1
+
+string: .1234E-5
+expr reprinted: 0.000001
+expr nodes: 1
+
+string: -.1234E5
+expr reprinted: uminus(12340.000000)
+expr nodes: 2
+
+string: -.1234E-5
+expr reprinted: uminus(0.000001)
+expr nodes: 2
+
+string: 'apple'''
+expr reprinted: (string)apple'
+expr nodes: 1
+
+string: 'apple'''''
+expr reprinted: (string)apple''
+expr nodes: 1
+
+string: 'apple''xx'
+expr reprinted: (string)apple'xx
+expr nodes: 1
+
+string: 'apple''''xx'
+expr reprinted: (string)apple''xx
+expr nodes: 1
+
+string: "apple"""
+expr reprinted: (string)apple"
+expr nodes: 1
+
+string: "apple"""""
+expr reprinted: (string)apple""
+expr nodes: 1
+
+string: "apple""xx"
+expr reprinted: (string)apple"xx
+expr nodes: 1
+
+string: "apple""""xx"
+expr reprinted: (string)apple""xx
+expr nodes: 1
+
+string: "apple"
+"vv"
+expr reprinted: (string)applevv
+expr nodes: 1
+
+string: "apple
+qq"
+
+"_hul"
+expr reprinted: (string)apple
+qq_hul
+expr nodes: 1
+
+string: 'apple
+qq'
+
+'_hul'
+expr reprinted: (string)apple
+qq_hul
+expr nodes: 1
+
+string: "app'le" 'b"b' "cc"
+expr reprinted: (string)app'leb"bcc
+expr nodes: 1
+
+string: "app'le"'b"b'"cc"
+expr reprinted: (string)app'leb"bcc
+expr nodes: 1
+
+string: true
+expr reprinted: 1.000000
+expr nodes: 1
+
+string: false
+expr reprinted: 0.000000
+expr nodes: 1
+
+string: yes
+expr reprinted: 1.000000
+expr nodes: 1
+
+string: no
+expr reprinted: 0.000000
+expr nodes: 1
+
+string: a
+expr reprinted: .'a'
+expr nodes: 1
+
+string: _
+expr reprinted: .'_'
+expr nodes: 1
+
+string: _a
+expr reprinted: .'_a'
+expr nodes: 1
+
+string: a_
+expr reprinted: .'a_'
+expr nodes: 1
+
+string: aa
+expr reprinted: .'aa'
+expr nodes: 1
+
+string: _aa
+expr reprinted: .'_aa'
+expr nodes: 1
+
+string: aa_
+expr reprinted: .'aa_'
+expr nodes: 1
+
+string: a_a
+expr reprinted: .'a_a'
+expr nodes: 1
+
+string: apple
+expr reprinted: .'apple'
+expr nodes: 1
+
+string: apple1
+expr reprinted: .'apple1'
+expr nodes: 1
+
+string: app1e
+expr reprinted: .'app1e'
+expr nodes: 1
+
+string: .a
+expr reprinted: .'a'
+expr nodes: 1
+
+string: ._
+expr reprinted: .'_'
+expr nodes: 1
+
+string: .a_
+expr reprinted: .'a_'
+expr nodes: 1
+
+string: ._a
+expr reprinted: .'_a'
+expr nodes: 1
+
+string: .aa
+expr reprinted: .'aa'
+expr nodes: 1
+
+string: ._aa
+expr reprinted: .'_aa'
+expr nodes: 1
+
+string: .aa_
+expr reprinted: .'aa_'
+expr nodes: 1
+
+string: .a_a
+expr reprinted: .'a_a'
+expr nodes: 1
+
+string: .apple
+expr reprinted: .'apple'
+expr nodes: 1
+
+string: .apple1
+expr reprinted: .'apple1'
+expr nodes: 1
+
+string: .app1e
+expr reprinted: .'app1e'
+expr nodes: 1
+
+string: .'a'
+expr reprinted: .'a'
+expr nodes: 1
+
+string: .'_'
+expr reprinted: .'_'
+expr nodes: 1
+
+string: .'a_'
+expr reprinted: .'a_'
+expr nodes: 1
+
+string: .'_a'
+expr reprinted: .'_a'
+expr nodes: 1
+
+string: .'aa'
+expr reprinted: .'aa'
+expr nodes: 1
+
+string: .'_aa'
+expr reprinted: .'_aa'
+expr nodes: 1
+
+string: .'aa_'
+expr reprinted: .'aa_'
+expr nodes: 1
+
+string: .'a_a'
+expr reprinted: .'a_a'
+expr nodes: 1
+
+string: .'apple'
+expr reprinted: .'apple'
+expr nodes: 1
+
+string: .'apple1'
+expr reprinted: .'apple1'
+expr nodes: 1
+
+string: .'app1e'
+expr reprinted: .'app1e'
+expr nodes: 1
+
+string: .'app-e'
+expr reprinted: .'app-e'
+expr nodes: 1
+
+string: .'app e'
+expr reprinted: .'app e'
+expr nodes: 1
+
+string: .' '
+expr reprinted: .' '
+expr nodes: 1
+
+string: .''
+syntax error: quoted identifier cannot be empty at or near ".''"
+
+string: .""
+syntax error: quoted identifier cannot be empty at or near "."""
+
+string: a.a
+expr reprinted: 'a'.'a'
+expr nodes: 1
+
+string: _._
+expr reprinted: '_'.'_'
+expr nodes: 1
+
+string: a_.a_
+expr reprinted: 'a_'.'a_'
+expr nodes: 1
+
+string: _a._a
+expr reprinted: '_a'.'_a'
+expr nodes: 1
+
+string: aa.aa
+expr reprinted: 'aa'.'aa'
+expr nodes: 1
+
+string: _aa._aa
+expr reprinted: '_aa'.'_aa'
+expr nodes: 1
+
+string: aa_.aa_
+expr reprinted: 'aa_'.'aa_'
+expr nodes: 1
+
+string: a_a.a_a
+expr reprinted: 'a_a'.'a_a'
+expr nodes: 1
+
+string: apple.apple
+expr reprinted: 'apple'.'apple'
+expr nodes: 1
+
+string: apple1.apple1
+expr reprinted: 'apple1'.'apple1'
+expr nodes: 1
+
+string: app1e.app1e
+expr reprinted: 'app1e'.'app1e'
+expr nodes: 1
+
+string: 'a'.'a'
+expr reprinted: 'a'.'a'
+expr nodes: 1
+
+string: '_'.'_'
+expr reprinted: '_'.'_'
+expr nodes: 1
+
+string: 'a_'.'a_'
+expr reprinted: 'a_'.'a_'
+expr nodes: 1
+
+string: '_a'.'_a'
+expr reprinted: '_a'.'_a'
+expr nodes: 1
+
+string: 'aa'.'aa'
+expr reprinted: 'aa'.'aa'
+expr nodes: 1
+
+string: '_aa'.'_aa'
+expr reprinted: '_aa'.'_aa'
+expr nodes: 1
+
+string: 'aa_'.'aa_'
+expr reprinted: 'aa_'.'aa_'
+expr nodes: 1
+
+string: 'a_a'.'a_a'
+expr reprinted: 'a_a'.'a_a'
+expr nodes: 1
+
+string: 'apple'.'apple'
+expr reprinted: 'apple'.'apple'
+expr nodes: 1
+
+string: 'apple1'.'apple1'
+expr reprinted: 'apple1'.'apple1'
+expr nodes: 1
+
+string: 'app1e'.'app1e'
+expr reprinted: 'app1e'.'app1e'
+expr nodes: 1
+
+string: 'app-e'.'app-e'
+expr reprinted: 'app-e'.'app-e'
+expr nodes: 1
+
+string: 'app e'.'app e'
+expr reprinted: 'app e'.'app e'
+expr nodes: 1
+
+string: ' '.' '
+expr reprinted: ' '.' '
+expr nodes: 1
+
+string: ''.apple
+syntax error: quoted identifier cannot be empty at or near "''.apple"
+
+string: "".apple
+syntax error: quoted identifier cannot be empty at or near """.apple"
+
+string: ''.'apple'
+syntax error: quoted identifier cannot be empty at or near "''.'apple'"
+
+string: "".'apple'
+syntax error: quoted identifier cannot be empty at or near """.'apple'"
+
+string: 'apple'.''
+syntax error: quoted identifier cannot be empty at or near "'apple'.''"
+
+string: "apple".""
+syntax error: quoted identifier cannot be empty at or near ""apple"."""
+
+string: ''.''
+syntax error: quoted identifier cannot be empty at or near "''.''"
+
+string: "".""
+syntax error: quoted identifier cannot be empty at or near """."""
+
+string: +a
+expr reprinted: .'a'
+expr nodes: 1
+
+string: -_
+expr reprinted: uminus(.'_')
+expr nodes: 2
+
+string: +_a
+expr reprinted: .'_a'
+expr nodes: 1
+
+string: -a_
+expr reprinted: uminus(.'a_')
+expr nodes: 2
+
+string: +aa
+expr reprinted: .'aa'
+expr nodes: 1
+
+string: -_aa
+expr reprinted: uminus(.'_aa')
+expr nodes: 2
+
+string: +aa_
+expr reprinted: .'aa_'
+expr nodes: 1
+
+string: -a_a
+expr reprinted: uminus(.'a_a')
+expr nodes: 2
+
+string: +apple
+expr reprinted: .'apple'
+expr nodes: 1
+
+string: -apple1
+expr reprinted: uminus(.'apple1')
+expr nodes: 2
+
+string: +app1e
+expr reprinted: .'app1e'
+expr nodes: 1
+
+string: +.a
+expr reprinted: .'a'
+expr nodes: 1
+
+string: -._
+expr reprinted: uminus(.'_')
+expr nodes: 2
+
+string: +.a_
+expr reprinted: .'a_'
+expr nodes: 1
+
+string: -._a
+expr reprinted: uminus(.'_a')
+expr nodes: 2
+
+string: +.aa
+expr reprinted: .'aa'
+expr nodes: 1
+
+string: -._aa
+expr reprinted: uminus(.'_aa')
+expr nodes: 2
+
+string: +.aa_
+expr reprinted: .'aa_'
+expr nodes: 1
+
+string: -.a_a
+expr reprinted: uminus(.'a_a')
+expr nodes: 2
+
+string: +.apple
+expr reprinted: .'apple'
+expr nodes: 1
+
+string: -.apple1
+expr reprinted: uminus(.'apple1')
+expr nodes: 2
+
+string: +.app1e
+expr reprinted: .'app1e'
+expr nodes: 1
+
+string: +.'a'
+expr reprinted: .'a'
+expr nodes: 1
+
+string: -.'_'
+expr reprinted: uminus(.'_')
+expr nodes: 2
+
+string: +.'a_'
+expr reprinted: .'a_'
+expr nodes: 1
+
+string: -.'_a'
+expr reprinted: uminus(.'_a')
+expr nodes: 2
+
+string: +.'aa'
+expr reprinted: .'aa'
+expr nodes: 1
+
+string: -.'_aa'
+expr reprinted: uminus(.'_aa')
+expr nodes: 2
+
+string: +.'aa_'
+expr reprinted: .'aa_'
+expr nodes: 1
+
+string: -.'a_a'
+expr reprinted: uminus(.'a_a')
+expr nodes: 2
+
+string: +.'apple'
+expr reprinted: .'apple'
+expr nodes: 1
+
+string: -.'apple1'
+expr reprinted: uminus(.'apple1')
+expr nodes: 2
+
+string: +.'app1e'
+expr reprinted: .'app1e'
+expr nodes: 1
+
+string: -.'app-e'
+expr reprinted: uminus(.'app-e')
+expr nodes: 2
+
+string: +.'app e'
+expr reprinted: .'app e'
+expr nodes: 1
+
+string: -.' '
+expr reprinted: uminus(.' ')
+expr nodes: 2
+
+string: +.''
+syntax error: quoted identifier cannot be empty at or near "+.''"
+
+string: +.""
+syntax error: quoted identifier cannot be empty at or near "+."""
+
+string: +a.a
+expr reprinted: 'a'.'a'
+expr nodes: 1
+
+string: -_._
+expr reprinted: uminus('_'.'_')
+expr nodes: 2
+
+string: +a_.a_
+expr reprinted: 'a_'.'a_'
+expr nodes: 1
+
+string: --_a._a
+expr reprinted: dec('_a'.'_a')
+expr nodes: 2
+
+string: +aa.aa
+expr reprinted: 'aa'.'aa'
+expr nodes: 1
+
+string: -_aa._aa
+expr reprinted: uminus('_aa'.'_aa')
+expr nodes: 2
+
+string: +aa_.aa_
+expr reprinted: 'aa_'.'aa_'
+expr nodes: 1
+
+string: -a_a.a_a
+expr reprinted: uminus('a_a'.'a_a')
+expr nodes: 2
+
+string: +apple.apple
+expr reprinted: 'apple'.'apple'
+expr nodes: 1
+
+string: -apple1.apple1
+expr reprinted: uminus('apple1'.'apple1')
+expr nodes: 2
+
+string: +app1e.app1e
+expr reprinted: 'app1e'.'app1e'
+expr nodes: 1
+
+string: +'a'.'a'
+expr reprinted: 'a'.'a'
+expr nodes: 1
+
+string: -'_'.'_'
+expr reprinted: uminus('_'.'_')
+expr nodes: 2
+
+string: +'a_'.'a_'
+expr reprinted: 'a_'.'a_'
+expr nodes: 1
+
+string: -'_a'.'_a'
+expr reprinted: uminus('_a'.'_a')
+expr nodes: 2
+
+string: +'aa'.'aa'
+expr reprinted: 'aa'.'aa'
+expr nodes: 1
+
+string: -'_aa'.'_aa'
+expr reprinted: uminus('_aa'.'_aa')
+expr nodes: 2
+
+string: +'aa_'.'aa_'
+expr reprinted: 'aa_'.'aa_'
+expr nodes: 1
+
+string: -'a_a'.'a_a'
+expr reprinted: uminus('a_a'.'a_a')
+expr nodes: 2
+
+string: +'apple'.'apple'
+expr reprinted: 'apple'.'apple'
+expr nodes: 1
+
+string: -'apple1'.'apple1'
+expr reprinted: uminus('apple1'.'apple1')
+expr nodes: 2
+
+string: +'app1e'.'app1e'
+expr reprinted: 'app1e'.'app1e'
+expr nodes: 1
+
+string: -'app-e'.'app-e'
+expr reprinted: uminus('app-e'.'app-e')
+expr nodes: 2
+
+string: +'app e'.'app e'
+expr reprinted: 'app e'.'app e'
+expr nodes: 1
+
+string: -' '.' '
+expr reprinted: uminus(' '.' ')
+expr nodes: 2
+
+string: +''.''
+syntax error: quoted identifier cannot be empty at or near "''.''"
+
+string: +"".""
+syntax error: quoted identifier cannot be empty at or near """."""
+
+string: m.envvarname
+expr reprinted: m.'envvarname'
+expr nodes: 1
+
+string: m."env var name"
+expr reprinted: m.'env var name'
+expr nodes: 1
+
+string: r.envvarname
+expr reprinted: r.'envvarname'
+expr nodes: 1
+
+string: r."env var name"
+expr reprinted: r.'env var name'
+expr nodes: 1
+
+string: v.repvarname
+expr reprinted: v.'repvarname'
+expr nodes: 1
+
+string: v."rep var name"
+expr reprinted: v.'rep var name'
+expr nodes: 1
+
+string: "m".envvarname
+expr reprinted: 'm'.'envvarname'
+expr nodes: 1
+
+string: "m"."env var name"
+expr reprinted: 'm'.'env var name'
+expr nodes: 1
+
+string: "r".envvarname
+expr reprinted: 'r'.'envvarname'
+expr nodes: 1
+
+string: "r"."env var name"
+expr reprinted: 'r'.'env var name'
+expr nodes: 1
+
+string: "v".repvarname
+expr reprinted: 'v'.'repvarname'
+expr nodes: 1
+
+string: "v"."rep var name"
+expr reprinted: 'v'.'rep var name'
+expr nodes: 1
+
+string: .true
+expr reprinted: .'true'
+expr nodes: 1
+
+string: .false
+expr reprinted: .'false'
+expr nodes: 1
+
+string: .yes
+expr reprinted: .'yes'
+expr nodes: 1
+
+string: .no
+expr reprinted: .'no'
+expr nodes: 1
+
+string: false.false
+expr reprinted: 'false'.'false'
+expr nodes: 1
+
+string: false.true
+expr reprinted: 'false'.'true'
+expr nodes: 1
+
+string: false.no
+expr reprinted: 'false'.'no'
+expr nodes: 1
+
+string: false.yes
+expr reprinted: 'false'.'yes'
+expr nodes: 1
+
+string: true.false
+expr reprinted: 'true'.'false'
+expr nodes: 1
+
+string: true.true
+expr reprinted: 'true'.'true'
+expr nodes: 1
+
+string: true.no
+expr reprinted: 'true'.'no'
+expr nodes: 1
+
+string: true.yes
+expr reprinted: 'true'.'yes'
+expr nodes: 1
+
+string: no.false
+expr reprinted: 'no'.'false'
+expr nodes: 1
+
+string: no.true
+expr reprinted: 'no'.'true'
+expr nodes: 1
+
+string: no.yes
+expr reprinted: 'no'.'yes'
+expr nodes: 1
+
+string: no.no
+expr reprinted: 'no'.'no'
+expr nodes: 1
+
+string: yes.false
+expr reprinted: 'yes'.'false'
+expr nodes: 1
+
+string: yes.true
+expr reprinted: 'yes'.'true'
+expr nodes: 1
+
+string: yes.no
+expr reprinted: 'yes'.'no'
+expr nodes: 1
+
+string: yes.yes
+expr reprinted: 'yes'.'yes'
+expr nodes: 1
+
+string: .'or'
+expr reprinted: .'or'
+expr nodes: 1
+
+string: ."and"
+expr reprinted: .'and'
+expr nodes: 1
+
+string: hülye
+expr reprinted: .'hülye'
+expr nodes: 1
+
+string: nagyképű.hólyag
+expr reprinted: 'nagyképű'.'hólyag'
+expr nodes: 1
+
+string: 1+2
+expr reprinted: add(1.000000,2.000000)
+expr nodes: 3
+
+string: 1+ 2
+expr reprinted: add(1.000000,2.000000)
+expr nodes: 3
+
+string: 1 +2
+expr reprinted: add(1.000000,2.000000)
+expr nodes: 3
+
+string: 1 + 2
+expr reprinted: add(1.000000,2.000000)
+expr nodes: 3
+
+string: 1+a
+expr reprinted: add(1.000000,.'a')
+expr nodes: 3
+
+string: 1+ a
+expr reprinted: add(1.000000,.'a')
+expr nodes: 3
+
+string: 1 +a
+expr reprinted: add(1.000000,.'a')
+expr nodes: 3
+
+string: 1 + a
+expr reprinted: add(1.000000,.'a')
+expr nodes: 3
+
+string: 1+aa
+expr reprinted: add(1.000000,.'aa')
+expr nodes: 3
+
+string: 1+ aa
+expr reprinted: add(1.000000,.'aa')
+expr nodes: 3
+
+string: 1 +aa
+expr reprinted: add(1.000000,.'aa')
+expr nodes: 3
+
+string: 1 + aa
+expr reprinted: add(1.000000,.'aa')
+expr nodes: 3
+
+string: 1+ +2
+expr reprinted: add(1.000000,2.000000)
+expr nodes: 3
+
+string: 1+ ++2
+expr reprinted: add(1.000000,inc(2.000000))
+expr nodes: 4
+
+string: 1++ + ++2
+expr reprinted: add(inc(1.000000),inc(2.000000))
+expr nodes: 5
+
+string: 1+++ ++2
+expr reprinted: add(inc(1.000000),inc(2.000000))
+expr nodes: 5
+
+string: 1++ +++2
+expr reprinted: add(inc(inc(1.000000)),2.000000)
+expr nodes: 5
+
+string: 1+++++2
+expr reprinted: add(inc(inc(1.000000)),2.000000)
+expr nodes: 5
+
+string: 1+ +2
+expr reprinted: add(1.000000,2.000000)
+expr nodes: 3
+
+string: 1 ++2
+syntax error at or near "2"
+
+string: 1 + +2
+expr reprinted: add(1.000000,2.000000)
+expr nodes: 3
+
+string: 1 + + 2
+expr reprinted: add(1.000000,2.000000)
+expr nodes: 3
+
+string: 1+ +a
+expr reprinted: add(1.000000,.'a')
+expr nodes: 3
+
+string: 1 ++a
+syntax error at or near "a"
+
+string: 1 + +a
+expr reprinted: add(1.000000,.'a')
+expr nodes: 3
+
+string: 1 + + a
+expr reprinted: add(1.000000,.'a')
+expr nodes: 3
+
+string: 1++aa
+syntax error at or near "aa"
+
+string: 1+ +aa
+expr reprinted: add(1.000000,.'aa')
+expr nodes: 3
+
+string: 1 ++aa
+syntax error at or near "aa"
+
+string: 1 + +aa
+expr reprinted: add(1.000000,.'aa')
+expr nodes: 3
+
+string: 1 + + aa
+expr reprinted: add(1.000000,.'aa')
+expr nodes: 3
+
+string: 1+-2
+expr reprinted: add(1.000000,uminus(2.000000))
+expr nodes: 4
+
+string: 1+ -2
+expr reprinted: add(1.000000,uminus(2.000000))
+expr nodes: 4
+
+string: 1 +-2
+expr reprinted: add(1.000000,uminus(2.000000))
+expr nodes: 4
+
+string: 1 + -2
+expr reprinted: add(1.000000,uminus(2.000000))
+expr nodes: 4
+
+string: 1 + - 2
+expr reprinted: add(1.000000,uminus(2.000000))
+expr nodes: 4
+
+string: 1+-a
+expr reprinted: add(1.000000,uminus(.'a'))
+expr nodes: 4
+
+string: 1+ -a
+expr reprinted: add(1.000000,uminus(.'a'))
+expr nodes: 4
+
+string: 1 +-a
+expr reprinted: add(1.000000,uminus(.'a'))
+expr nodes: 4
+
+string: 1 + -a
+expr reprinted: add(1.000000,uminus(.'a'))
+expr nodes: 4
+
+string: 1 + - a
+expr reprinted: add(1.000000,uminus(.'a'))
+expr nodes: 4
+
+string: 1+-aa
+expr reprinted: add(1.000000,uminus(.'aa'))
+expr nodes: 4
+
+string: 1+ -aa
+expr reprinted: add(1.000000,uminus(.'aa'))
+expr nodes: 4
+
+string: 1 +-aa
+expr reprinted: add(1.000000,uminus(.'aa'))
+expr nodes: 4
+
+string: 1 + -aa
+expr reprinted: add(1.000000,uminus(.'aa'))
+expr nodes: 4
+
+string: 1 + - aa
+expr reprinted: add(1.000000,uminus(.'aa'))
+expr nodes: 4
+
+string: 1 + 2 + 3
+expr reprinted: add(add(1.000000,2.000000),3.000000)
+expr nodes: 5
+
+string: 1 * 2 * 3
+expr reprinted: mul(mul(1.000000,2.000000),3.000000)
+expr nodes: 5
+
+string: 1 * 2 / 3
+expr reprinted: div(mul(1.000000,2.000000),3.000000)
+expr nodes: 5
+
+string: 1 / 2 * 3
+expr reprinted: mul(div(1.000000,2.000000),3.000000)
+expr nodes: 5
+
+string: 1 + 2 * 3
+expr reprinted: add(1.000000,mul(2.000000,3.000000))
+expr nodes: 5
+
+string: 1 - 2 * 3
+expr reprinted: sub(1.000000,mul(2.000000,3.000000))
+expr nodes: 5
+
+string: -1 + -2 * -3
+expr reprinted: add(uminus(1.000000),mul(uminus(2.000000),uminus(3.000000)))
+expr nodes: 8
+
+string: -1 - -2 * -3
+expr reprinted: sub(uminus(1.000000),mul(uminus(2.000000),uminus(3.000000)))
+expr nodes: 8
+
+string: (1 + 2) * 3
+expr reprinted: mul(add(1.000000,2.000000),3.000000)
+expr nodes: 5
+
+string: (1 - 2) * 3
+expr reprinted: mul(sub(1.000000,2.000000),3.000000)
+expr nodes: 5
+
+string: (-1 + -2) * -3
+expr reprinted: mul(add(uminus(1.000000),uminus(2.000000)),uminus(3.000000))
+expr nodes: 8
+
+string: (-1 - -2) * -3
+expr reprinted: mul(sub(uminus(1.000000),uminus(2.000000)),uminus(3.000000))
+expr nodes: 8
+
+string: a == b
+expr reprinted: eq(.'a',.'b')
+expr nodes: 3
+
+string: a = b
+expr reprinted: eq(.'a',.'b')
+expr nodes: 3
+
+string: a != b
+expr reprinted: ne(.'a',.'b')
+expr nodes: 3
+
+string: a <> b
+expr reprinted: ne(.'a',.'b')
+expr nodes: 3
+
+string: a < b
+expr reprinted: lt(.'a',.'b')
+expr nodes: 3
+
+string: a <= b
+expr reprinted: le(.'a',.'b')
+expr nodes: 3
+
+string: a > b
+expr reprinted: gt(.'a',.'b')
+expr nodes: 3
+
+string: a >= b
+expr reprinted: ge(.'a',.'b')
+expr nodes: 3
+
+string: a << b
+expr reprinted: shl(.'a',.'b')
+expr nodes: 3
+
+string: a >> b
+expr reprinted: shr(.'a',.'b')
+expr nodes: 3
+
+string: q.a ? 'true' : 'false'
+expr reprinted: iif('q'.'a',(string)true,(string)false)
+expr nodes: 4
+
+string: !q.a ? -1.5 : -3
+expr reprinted: iif(lnot('q'.'a'),uminus(1.500000),uminus(3.000000))
+expr nodes: 7
+
+string: q.a ? +1.5 : +3
+expr reprinted: iif('q'.'a',1.500000,3.000000)
+expr nodes: 4
+
+string: !q.a ? 1 + 2 * 3 : (1 + 2) * 3
+expr reprinted: iif(lnot('q'.'a'),add(1.000000,mul(2.000000,3.000000)),mul(add(1.000000,2.000000),3.000000))
+expr nodes: 13
+
+string: iif(q.a,'true','false')
+expr reprinted: iif('q'.'a',(string)true,(string)false)
+expr nodes: 4
+
+string: iif 
+	 (q.a,'true','false')
+expr reprinted: iif('q'.'a',(string)true,(string)false)
+expr nodes: 4
+
+string: iif(!q.a, -1.5, -3)
+expr reprinted: iif(lnot('q'.'a'),uminus(1.500000),uminus(3.000000))
+expr nodes: 7
+
+string: iif(q.a, +1.5, +3)
+expr reprinted: iif('q'.'a',1.500000,3.000000)
+expr nodes: 4
+
+string: iif(!q.a, 1 + 2 * 3, (1 + 2) * 3)
+expr reprinted: iif(lnot('q'.'a'),add(1.000000,mul(2.000000,3.000000)),mul(add(1.000000,2.000000),3.000000))
+expr nodes: 13
+
+string: a and b
+expr reprinted: land(.'a',.'b')
+expr nodes: 3
+
+string: a or b
+expr reprinted: lor(.'a',.'b')
+expr nodes: 3
+
+string: a or b and c
+expr reprinted: lor(.'a',land(.'b',.'c'))
+expr nodes: 5
+
+string: (a or b) and c
+expr reprinted: land(lor(.'a',.'b'),.'c')
+expr nodes: 5
+
+string: a && b
+expr reprinted: land(.'a',.'b')
+expr nodes: 3
+
+string: a || b
+expr reprinted: lor(.'a',.'b')
+expr nodes: 3
+
+string: a || b && c
+expr reprinted: lor(.'a',land(.'b',.'c'))
+expr nodes: 5
+
+string: (a || b) && c
+expr reprinted: land(lor(.'a',.'b'),.'c')
+expr nodes: 5
+
+string: a + b
+expr reprinted: add(.'a',.'b')
+expr nodes: 3
+
+string: a - b
+expr reprinted: sub(.'a',.'b')
+expr nodes: 3
+
+string: a * b
+expr reprinted: mul(.'a',.'b')
+expr nodes: 3
+
+string: a / b
+expr reprinted: div(.'a',.'b')
+expr nodes: 3
+
+string: a % b
+expr reprinted: mod(.'a',.'b')
+expr nodes: 3
+
+string: a ^ b
+expr reprinted: pow(.'a',.'b')
+expr nodes: 3
+
+string: a | b
+expr reprinted: or(.'a',.'b')
+expr nodes: 3
+
+string: a & b
+expr reprinted: and(.'a',.'b')
+expr nodes: 3
+
+string: !a
+expr reprinted: lnot(.'a')
+expr nodes: 2
+
+string: ~a
+expr reprinted: not(.'a')
+expr nodes: 2
+
+string: b2 or !b2
+expr reprinted: lor(.'b2',lnot(.'b2'))
+expr nodes: 4
+
+string: myfunc(a,b,c,d,e,f)
+invalid function name at or near "myfunc(a,b,c,d,e,f)"
+
+string: myfunc(a)
+expr reprinted: mul(.'myfunc',.'a')
+expr nodes: 3
+
+string: 1 + myfunc(a,b,c,d,e,f) + 3
+invalid function name at or near "myfunc(a,b,c,d,e,f)"
+
+string: 1 + myfunc(a) + 2
+expr reprinted: add(add(1.000000,mul(.'myfunc',.'a')),2.000000)
+expr nodes: 7
+
+string: 8/2(2+2)
+expr reprinted: div(8.000000,mul(2.000000,add(2.000000,2.000000)))
+expr nodes: 7
+
+string: 1/2x
+expr reprinted: div(1.000000,mul(2.000000,.'x'))
+expr nodes: 5
+
+string: 1/2e
+expr reprinted: div(1.000000,mul(2.000000,.'e'))
+expr nodes: 5
+
+string: 2e
+expr reprinted: mul(2.000000,.'e')
+expr nodes: 3
+
+string: -2e
+expr reprinted: uminus(mul(2.000000,.'e'))
+expr nodes: 4
+
+string: 2e-1
+expr reprinted: 0.200000
+expr nodes: 1
+
+string: -2e-1
+expr reprinted: uminus(0.200000)
+expr nodes: 2
+
+string: 2e - 1
+expr reprinted: sub(mul(2.000000,.'e'),1.000000)
+expr nodes: 5
+
+string: -2e - 1
+expr reprinted: sub(uminus(mul(2.000000,.'e')),1.000000)
+expr nodes: 6
+
+string: -2e-1e
+expr reprinted: uminus(mul(0.200000,.'e'))
+expr nodes: 4
+
+string: --2e-1e
+expr reprinted: dec(mul(0.200000,.'e'))
+expr nodes: 4
+
+string: (2+2).2
+expr reprinted: mul(add(2.000000,2.000000),0.200000)
+expr nodes: 5
+
+string: (2+2).a
+expr reprinted: mul(add(2.000000,2.000000),.'a')
+expr nodes: 5
+
+string: (2+2)a
+expr reprinted: mul(add(2.000000,2.000000),.'a')
+expr nodes: 5
+
+string: 1/(1+1)(2+2)
+expr reprinted: div(1.000000,mul(add(1.000000,1.000000),add(2.000000,2.000000)))
+expr nodes: 9
+
+string: 1 / ( 1 + 1 ) ( 2 + 2 )
+syntax error at or near "1 / ( 1 + 1 ) ("
+
+string: a.b|
+syntax error at or near "|"
+
+string: c.d;
+syntax error at or near ";"
+
+string: .m.envvarname
+syntax error at or near "m."
+
+string: .v.repvarname
+syntax error at or near "v."
+
+string: .or
+syntax error at or near "or"
+
+string: .and
+syntax error at or near "and"
+
+string: 1++2
+syntax error at or near "2"
+
+string: 1++a
+syntax error at or near "a"
+
+string: 1++2 ? yes : false
+syntax error at or near "2"
+
+string: yes ? 1++2 : 2
+syntax error at or near "2"
+
+string: yes ? 1 : 1++2
+syntax error at or near "yes ? 1 : 1++2"
+
+string: add(1, 2, 3, 4, 5, 6, 7++8)
+syntax error at or near "8"
+
+string: add(1, 2, 3, 4, 5, (6))
+expr reprinted: add(1.000000,2.000000,3.000000,4.000000,5.000000,6.000000)
+expr nodes: 7
+
+string: add(1, 2, 3, 4, 5, (6, 7)
+syntax error at or near "6,"
+

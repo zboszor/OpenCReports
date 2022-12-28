@@ -17,6 +17,11 @@ extern zend_module_entry ocrpt_module_entry;
 /* Structure for main OpenCReport object. */
 typedef struct _php_opencreport_object {
 	opencreport *o;
+	ocrpt_list *assoc_objs;
+	ocrpt_list *assoc_objs_last;
+	ocrpt_list *funcnames;
+	ocrpt_list *funcnames_last;
+	bool in_dtor;
 	zend_object zo;
 } php_opencreport_object;
 
@@ -28,6 +33,7 @@ static inline php_opencreport_object *php_opencreport_from_obj(zend_object *obj)
 
 typedef struct _php_opencreport_ds_object {
 	ocrpt_datasource *ds;
+	php_opencreport_object *oo;
 	zend_object zo;
 } php_opencreport_ds_object;
 
@@ -39,6 +45,7 @@ static inline php_opencreport_ds_object *php_opencreport_ds_from_obj(zend_object
 
 typedef struct _php_opencreport_query_object {
 	ocrpt_query *q;
+	php_opencreport_object *oo;
 	zend_object zo;
 } php_opencreport_query_object;
 
@@ -47,5 +54,30 @@ static inline php_opencreport_query_object *php_opencreport_query_from_obj(zend_
 }
 
 #define Z_OPENCREPORT_QUERY_P(zv) php_opencreport_query_from_obj(Z_OBJ_P((zv)))
+
+typedef struct _php_opencreport_expr_object {
+	ocrpt_expr *e;
+	php_opencreport_object *oo;
+	bool freed_by_lib;
+	zend_object zo;
+} php_opencreport_expr_object;
+
+static inline php_opencreport_expr_object *php_opencreport_expr_from_obj(zend_object *obj) {
+	return (php_opencreport_expr_object *)((char *)(obj) - XtOffsetOf(php_opencreport_expr_object, zo));
+}
+
+#define Z_OPENCREPORT_EXPR_P(zv) php_opencreport_expr_from_obj(Z_OBJ_P((zv)))
+
+typedef struct _php_opencreport_result_object {
+	ocrpt_result *r;
+	php_opencreport_object *oo;
+	zend_object zo;
+} php_opencreport_result_object;
+
+static inline php_opencreport_result_object *php_opencreport_result_from_obj(zend_object *obj) {
+	return (php_opencreport_result_object *)((char *)(obj) - XtOffsetOf(php_opencreport_result_object, zo));
+}
+
+#define Z_OPENCREPORT_RESULT_P(zv) php_opencreport_result_from_obj(Z_OBJ_P((zv)))
 
 #endif /* PHP_OPENCREPORT_H */

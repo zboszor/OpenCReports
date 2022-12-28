@@ -1,0 +1,875 @@
+string: |1|
+expr reprinted: abs(1.000000)
+expr nodes: 2
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: |nulln()|
+expr reprinted: abs(nulln())
+expr nodes: 2
+expr optimized: NULL
+expr nodes: 1
+(number)NULL
+
+string: -1
+expr reprinted: uminus(1.000000)
+expr nodes: 2
+expr optimized: -1.000000
+expr nodes: 1
+(number)-1.000000
+
+string: -nulln()
+expr reprinted: uminus(nulln())
+expr nodes: 2
+expr optimized: NULL
+expr nodes: 1
+(number)NULL
+
+string: factorial(nulln())
+expr reprinted: factorial(nulln())
+expr nodes: 2
+expr optimized: NULL
+expr nodes: 1
+(number)NULL
+
+string: factorial(-1)
+expr reprinted: factorial(uminus(1.000000))
+expr nodes: 3
+expr optimized: (ERROR)invalid operand(s)
+expr nodes: 1
+(ERROR)invalid operand(s)
+
+string: factorial(0)
+expr reprinted: factorial(0.000000)
+expr nodes: 2
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: factorial(1)
+expr reprinted: factorial(1.000000)
+expr nodes: 2
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: factorial(3)
+expr reprinted: factorial(3.000000)
+expr nodes: 2
+expr optimized: 6.000000
+expr nodes: 1
+(number)6.000000
+
+string: 3!
+expr reprinted: factorial(3.000000)
+expr nodes: 2
+expr optimized: 6.000000
+expr nodes: 1
+(number)6.000000
+
+string: !3!
+expr reprinted: factorial(lnot(3.000000))
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 5 % 3
+expr reprinted: mod(5.000000,3.000000)
+expr nodes: 3
+expr optimized: 2.000000
+expr nodes: 1
+(number)2.000000
+
+string: 4.9 % 2.9
+expr reprinted: mod(4.900000,2.900000)
+expr nodes: 3
+expr optimized: 2.000000
+expr nodes: 1
+(number)2.000000
+
+string: 4.9 % 3.1
+expr reprinted: mod(4.900000,3.100000)
+expr nodes: 3
+expr optimized: 1.800000
+expr nodes: 1
+(number)1.800000
+
+string: fmod(5, 3)
+expr reprinted: fmod(5.000000,3.000000)
+expr nodes: 3
+expr optimized: 2.000000
+expr nodes: 1
+(number)2.000000
+
+string: fmod(4.9, 2.9)
+expr reprinted: fmod(4.900000,2.900000)
+expr nodes: 3
+expr optimized: 2.000000
+expr nodes: 1
+(number)2.000000
+
+string: fmod(4.9, 3.1)
+expr reprinted: fmod(4.900000,3.100000)
+expr nodes: 3
+expr optimized: 1.800000
+expr nodes: 1
+(number)1.800000
+
+string: remainder(5, 3)
+expr reprinted: remainder(5.000000,3.000000)
+expr nodes: 3
+expr optimized: 2.000000
+expr nodes: 1
+(number)2.000000
+
+string: remainder(4.9, 2.9)
+expr reprinted: remainder(4.900000,2.900000)
+expr nodes: 3
+expr optimized: 2.000000
+expr nodes: 1
+(number)2.000000
+
+string: remainder(4.9, 3.1)
+expr reprinted: remainder(4.900000,3.100000)
+expr nodes: 3
+expr optimized: 1.800000
+expr nodes: 1
+(number)1.800000
+
+string: 1 + 2 + 3
+expr reprinted: add(add(1.000000,2.000000),3.000000)
+expr nodes: 5
+expr optimized: 6.000000
+expr nodes: 1
+(number)6.000000
+
+string: 1 * 2 * 3
+expr reprinted: mul(mul(1.000000,2.000000),3.000000)
+expr nodes: 5
+expr optimized: 6.000000
+expr nodes: 1
+(number)6.000000
+
+string: 1 * 2 / 3
+expr reprinted: div(mul(1.000000,2.000000),3.000000)
+expr nodes: 5
+expr optimized: 0.666667
+expr nodes: 1
+(number)0.666667
+
+string: 1 / 2 * 3
+expr reprinted: mul(div(1.000000,2.000000),3.000000)
+expr nodes: 5
+expr optimized: 1.500000
+expr nodes: 1
+(number)1.500000
+
+string: 1 + 2 * 3
+expr reprinted: add(1.000000,mul(2.000000,3.000000))
+expr nodes: 5
+expr optimized: 7.000000
+expr nodes: 1
+(number)7.000000
+
+string: 1 - 2 * 3
+expr reprinted: sub(1.000000,mul(2.000000,3.000000))
+expr nodes: 5
+expr optimized: -5.000000
+expr nodes: 1
+(number)-5.000000
+
+string: -1 + -2 * -3
+expr reprinted: add(uminus(1.000000),mul(uminus(2.000000),uminus(3.000000)))
+expr nodes: 8
+expr optimized: 5.000000
+expr nodes: 1
+(number)5.000000
+
+string: -1 - -2 * -3
+expr reprinted: sub(uminus(1.000000),mul(uminus(2.000000),uminus(3.000000)))
+expr nodes: 8
+expr optimized: -7.000000
+expr nodes: 1
+(number)-7.000000
+
+string: (1 + 2) * 3
+expr reprinted: mul(add(1.000000,2.000000),3.000000)
+expr nodes: 5
+expr optimized: 9.000000
+expr nodes: 1
+(number)9.000000
+
+string: (1 - 2) * 3
+expr reprinted: mul(sub(1.000000,2.000000),3.000000)
+expr nodes: 5
+expr optimized: -3.000000
+expr nodes: 1
+(number)-3.000000
+
+string: (-1 + -2) * -3
+expr reprinted: mul(add(uminus(1.000000),uminus(2.000000)),uminus(3.000000))
+expr nodes: 8
+expr optimized: 9.000000
+expr nodes: 1
+(number)9.000000
+
+string: (-1 - -2) * -3
+expr reprinted: mul(sub(uminus(1.000000),uminus(2.000000)),uminus(3.000000))
+expr nodes: 8
+expr optimized: -3.000000
+expr nodes: 1
+(number)-3.000000
+
+string: 1++
+expr reprinted: inc(1.000000)
+expr nodes: 2
+expr optimized: 2.000000
+expr nodes: 1
+(number)2.000000
+
+string: ++1
+expr reprinted: inc(1.000000)
+expr nodes: 2
+expr optimized: 2.000000
+expr nodes: 1
+(number)2.000000
+
+string: 1--
+expr reprinted: dec(1.000000)
+expr nodes: 2
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: --1
+expr reprinted: dec(1.000000)
+expr nodes: 2
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 6 / 3 / 2 
+expr reprinted: div(div(6.000000,3.000000),2.000000)
+expr nodes: 5
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: (6 / 3) / 2
+expr reprinted: div(div(6.000000,3.000000),2.000000)
+expr nodes: 5
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 6 / (3 / 2)
+expr reprinted: div(6.000000,div(3.000000,2.000000))
+expr nodes: 5
+expr optimized: 4.000000
+expr nodes: 1
+(number)4.000000
+
+string: a / b / c
+expr reprinted: div(div(.'a',.'b'),.'c')
+expr nodes: 5
+expr optimized: div(.'a',.'b',.'c')
+expr nodes: 4
+(ERROR)invalid operand(s)
+
+string: (a / b) / c
+expr reprinted: div(div(.'a',.'b'),.'c')
+expr nodes: 5
+expr optimized: div(.'a',.'b',.'c')
+expr nodes: 4
+(ERROR)invalid operand(s)
+
+string: a / (b / c)
+expr reprinted: div(.'a',div(.'b',.'c'))
+expr nodes: 5
+expr optimized: div(.'a',div(.'b',.'c'))
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: 1/(1+1)(2+2)
+expr reprinted: div(1.000000,mul(add(1.000000,1.000000),add(2.000000,2.000000)))
+expr nodes: 9
+expr optimized: 0.125000
+expr nodes: 1
+(number)0.125000
+
+string: 1/(1+1)*(2+2)
+expr reprinted: mul(div(1.000000,add(1.000000,1.000000)),add(2.000000,2.000000))
+expr nodes: 9
+expr optimized: 2.000000
+expr nodes: 1
+(number)2.000000
+
+string: (2+2).2
+expr reprinted: mul(add(2.000000,2.000000),0.200000)
+expr nodes: 5
+expr optimized: 0.800000
+expr nodes: 1
+(number)0.800000
+
+string: 1/2x
+expr reprinted: div(1.000000,mul(2.000000,.'x'))
+expr nodes: 5
+expr optimized: div(1.000000,mul(2.000000,.'x'))
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: 1/2e
+expr reprinted: div(1.000000,mul(2.000000,.'e'))
+expr nodes: 5
+expr optimized: div(1.000000,mul(2.000000,.'e'))
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: 2e
+expr reprinted: mul(2.000000,.'e')
+expr nodes: 3
+expr optimized: mul(2.000000,.'e')
+expr nodes: 3
+(ERROR)invalid operand(s)
+
+string: add(1, 2, 3, 4, 5, (6))
+expr reprinted: add(1.000000,2.000000,3.000000,4.000000,5.000000,6.000000)
+expr nodes: 7
+expr optimized: 21.000000
+expr nodes: 1
+(number)21.000000
+
+string: add(a, 1, b, 2)
+expr reprinted: add(.'a',1.000000,.'b',2.000000)
+expr nodes: 5
+expr optimized: add(3.000000,.'a',.'b')
+expr nodes: 4
+(ERROR)invalid operand(s)
+
+string: a + 1 + b + 2
+expr reprinted: add(add(add(.'a',1.000000),.'b'),2.000000)
+expr nodes: 7
+expr optimized: add(3.000000,.'a',.'b')
+expr nodes: 4
+(ERROR)invalid operand(s)
+
+string: 'a' = 'a'
+expr reprinted: eq((string)a,(string)a)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 'a' = 'b'
+expr reprinted: eq((string)a,(string)b)
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 'a' <> 'a'
+expr reprinted: ne((string)a,(string)a)
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 'a' <> 'b'
+expr reprinted: ne((string)a,(string)b)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 'a' < 'a'
+expr reprinted: lt((string)a,(string)a)
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 'a' < 'b'
+expr reprinted: lt((string)a,(string)b)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 'a' <= 'a'
+expr reprinted: le((string)a,(string)a)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 'a' <= 'b'
+expr reprinted: le((string)a,(string)b)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 'a' > 'a'
+expr reprinted: gt((string)a,(string)a)
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 'a' > 'b'
+expr reprinted: gt((string)a,(string)b)
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 'a' >= 'a'
+expr reprinted: ge((string)a,(string)a)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 'a' >= 'b'
+expr reprinted: ge((string)a,(string)b)
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 0 && 0
+expr reprinted: land(0.000000,0.000000)
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 0 && 1
+expr reprinted: land(0.000000,1.000000)
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 1 && 0
+expr reprinted: land(1.000000,0.000000)
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 1 && 1
+expr reprinted: land(1.000000,1.000000)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 0 && 0.5
+expr reprinted: land(0.000000,0.500000)
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 0.5 && 0.5
+expr reprinted: land(0.500000,0.500000)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 0 && 0.4
+expr reprinted: land(0.000000,0.400000)
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 0.4 && 0.4
+expr reprinted: land(0.400000,0.400000)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 0 || 0
+expr reprinted: lor(0.000000,0.000000)
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 0 || 1
+expr reprinted: lor(0.000000,1.000000)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 1 || 0
+expr reprinted: lor(1.000000,0.000000)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 1 || 1
+expr reprinted: lor(1.000000,1.000000)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 0 || 0.5
+expr reprinted: lor(0.000000,0.500000)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 0.5 || 0.5
+expr reprinted: lor(0.500000,0.500000)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 0 || 0.4
+expr reprinted: lor(0.000000,0.400000)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 0.4 || 0.4
+expr reprinted: lor(0.400000,0.400000)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: !0
+expr reprinted: lnot(0.000000)
+expr nodes: 2
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: !1
+expr reprinted: lnot(1.000000)
+expr nodes: 2
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: !0.4
+expr reprinted: lnot(0.400000)
+expr nodes: 2
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 1 | 2
+expr reprinted: or(1.000000,2.000000)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 1 & 2
+expr reprinted: and(1.000000,2.000000)
+expr nodes: 3
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
+string: 3 & 2
+expr reprinted: and(3.000000,2.000000)
+expr nodes: 3
+expr optimized: 2.000000
+expr nodes: 1
+(number)2.000000
+
+string: 1 ^ 2
+expr reprinted: pow(1.000000,2.000000)
+expr nodes: 3
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: 3 ^ 2
+expr reprinted: pow(3.000000,2.000000)
+expr nodes: 3
+expr optimized: 9.000000
+expr nodes: 1
+(number)9.000000
+
+string: ~0
+expr reprinted: not(0.000000)
+expr nodes: 2
+expr optimized: 18446744073709551615.000000
+expr nodes: 1
+(number)18446744073709551615.000000
+
+string: ~1
+expr reprinted: not(1.000000)
+expr nodes: 2
+expr optimized: 18446744073709551614.000000
+expr nodes: 1
+(number)18446744073709551614.000000
+
+string: 1 << 2
+expr reprinted: shl(1.000000,2.000000)
+expr nodes: 3
+expr optimized: 4.000000
+expr nodes: 1
+(number)4.000000
+
+string: 12 >> 2
+expr reprinted: shr(12.000000,2.000000)
+expr nodes: 3
+expr optimized: 3.000000
+expr nodes: 1
+(number)3.000000
+
+string: 'a' + 'b'
+expr reprinted: add((string)a,(string)b)
+expr nodes: 3
+expr optimized: (string)ab
+expr nodes: 1
+(string)ab
+
+string: 'a' + nulls()
+expr reprinted: add((string)a,nulls())
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: concat('a', 'b')
+expr reprinted: concat((string)a,(string)b)
+expr nodes: 3
+expr optimized: (string)ab
+expr nodes: 1
+(string)ab
+
+string: 'a' - 'b'
+expr reprinted: sub((string)a,(string)b)
+expr nodes: 3
+expr optimized: (ERROR)invalid operand(s)
+expr nodes: 1
+(ERROR)invalid operand(s)
+
+string: left('árvíztűrő tükörfúrógép', 9)
+expr reprinted: left((string)árvíztűrő tükörfúrógép,9.000000)
+expr nodes: 3
+expr optimized: (string)árvíztűrő
+expr nodes: 1
+(string)árvíztűrő
+
+string: mid('árvíztűrő tükörfúrógép', 0, 9)
+expr reprinted: mid((string)árvíztűrő tükörfúrógép,0.000000,9.000000)
+expr nodes: 4
+expr optimized: (string)árvíztűrő
+expr nodes: 1
+(string)árvíztűrő
+
+string: mid('árvíztűrő tükörfúrógép', 1, 9)
+expr reprinted: mid((string)árvíztűrő tükörfúrógép,1.000000,9.000000)
+expr nodes: 4
+expr optimized: (string)árvíztűrő
+expr nodes: 1
+(string)árvíztűrő
+
+string: mid('árvíztűrő tükörfúrógép', 6, 10)
+expr reprinted: mid((string)árvíztűrő tükörfúrógép,6.000000,10.000000)
+expr nodes: 4
+expr optimized: (string)tűrő tükör
+expr nodes: 1
+(string)tűrő tükör
+
+string: mid('árvíztűrő tükörfúrógép', -12, 9)
+expr reprinted: mid((string)árvíztűrő tükörfúrógép,uminus(12.000000),9.000000)
+expr nodes: 5
+expr optimized: (string)tükörfúró
+expr nodes: 1
+(string)tükörfúró
+
+string: right('árvíztűrő tükörfúrógép', 7)
+expr reprinted: right((string)árvíztűrő tükörfúrógép,7.000000)
+expr nodes: 3
+expr optimized: (string)fúrógép
+expr nodes: 1
+(string)fúrógép
+
+string: lower('ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP')
+expr reprinted: lower((string)ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP)
+expr nodes: 2
+expr optimized: (string)árvíztűrő tükörfúrógép
+expr nodes: 1
+(string)árvíztűrő tükörfúrógép
+
+string: upper('árvíztűrő tükörfúrógép')
+expr reprinted: upper((string)árvíztűrő tükörfúrógép)
+expr nodes: 2
+expr optimized: (string)ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP
+expr nodes: 1
+(string)ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP
+
+string: proper('ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP')
+expr reprinted: proper((string)ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP)
+expr nodes: 2
+expr optimized: (string)Árvíztűrő tükörfúrógép
+expr nodes: 1
+(string)Árvíztűrő tükörfúrógép
+
+string: proper('árvíztűrő tükörfúrógép')
+expr reprinted: proper((string)árvíztűrő tükörfúrógép)
+expr nodes: 2
+expr optimized: (string)Árvíztűrő tükörfúrógép
+expr nodes: 1
+(string)Árvíztűrő tükörfúrógép
+
+string: left('a', nulln())
+expr reprinted: left((string)a,nulln())
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: left(nulls(), 1)
+expr reprinted: left(nulls(),1.000000)
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: left(nulls(), nulln())
+expr reprinted: left(nulls(),nulln())
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: right('a', nulln())
+expr reprinted: right((string)a,nulln())
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: right(nulls(), 1)
+expr reprinted: right(nulls(),1.000000)
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: right(nulls(), nulln())
+expr reprinted: right(nulls(),nulln())
+expr nodes: 3
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: val('1.5')
+expr reprinted: val((string)1.5)
+expr nodes: 2
+expr optimized: 1.500000
+expr nodes: 1
+(number)1.500000
+
+string: val(1.5)
+expr reprinted: val(1.500000)
+expr nodes: 2
+expr optimized: 1.500000
+expr nodes: 1
+(number)1.500000
+
+string: val('yes')
+expr reprinted: val((string)yes)
+expr nodes: 2
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: val(yes)
+expr reprinted: val(1.000000)
+expr nodes: 2
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: fxpval('123456', 2)
+expr reprinted: fxpval((string)123456,2.000000)
+expr nodes: 3
+expr optimized: 1234.560000
+expr nodes: 1
+(number)1234.560000
+
+string: fxpval(val('123456'), 2)
+expr reprinted: fxpval(val((string)123456),2.000000)
+expr nodes: 4
+expr optimized: 1234.560000
+expr nodes: 1
+(number)1234.560000
+
+string: str(1234.56, 6, 4)
+expr reprinted: str(1234.560000,6.000000,4.000000)
+expr nodes: 4
+expr optimized: (string)1234.5600
+expr nodes: 1
+(string)1234.5600
+
+string: str(1234.56, 10, 4)
+expr reprinted: str(1234.560000,10.000000,4.000000)
+expr nodes: 4
+expr optimized: (string) 1234.5600
+expr nodes: 1
+(string) 1234.5600
+
+string: null(1)
+expr reprinted: null(1.000000)
+expr nodes: 2
+expr optimized: NULL
+expr nodes: 1
+(number)NULL
+
+string: null('a')
+expr reprinted: null((string)a)
+expr nodes: 2
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: nulldt()
+expr reprinted: nulldt()
+expr nodes: 1
+expr optimized: (datetime)NULL
+expr nodes: 1
+(datetime)NULL
+
+string: nulln()
+expr reprinted: nulln()
+expr nodes: 1
+expr optimized: NULL
+expr nodes: 1
+(number)NULL
+
+string: nulls()
+expr reprinted: nulls()
+expr nodes: 1
+expr optimized: (string)NULL
+expr nodes: 1
+(string)NULL
+
+string: error('custom error')
+expr reprinted: error((string)custom error)
+expr nodes: 2
+expr optimized: (ERROR)custom error
+expr nodes: 1
+(ERROR)custom error
+
