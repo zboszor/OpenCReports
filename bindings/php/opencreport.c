@@ -102,6 +102,7 @@ static zend_object *opencreport_object_new(zend_class_entry *class_type) /* {{{ 
 
 	intern->zo.handlers = &opencreport_object_handlers;
 
+	intern->o = ocrpt_init();
 	intern->assoc_objs = NULL;
 	intern->assoc_objs_last = NULL;
 	intern->funcnames = NULL;
@@ -144,8 +145,7 @@ static void opencreport_object_free(zend_object *object) /* {{{ */
 	oo->funcnames = NULL;
 	oo->funcnames_last = NULL;
 
-	if (oo->o)
-		ocrpt_free(oo->o);
+	ocrpt_free(oo->o);
 	oo->o = NULL;
 
 	zend_object_std_dtor(&oo->zo);
@@ -271,25 +271,6 @@ static void opencreport_result_object_free(zend_object *object) /* {{{ */
 	zend_object_std_dtor(object);
 }
 /* }}} */
-
-PHP_METHOD(opencreport, __construct) {
-	zval *object = ZEND_THIS;
-	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-
-	ZEND_PARSE_PARAMETERS_NONE();
-
-	oo->o = ocrpt_init();
-}
-
-PHP_METHOD(opencreport, __destruct) {
-	zval *object = ZEND_THIS;
-	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-
-	ZEND_PARSE_PARAMETERS_NONE();
-
-	ocrpt_free(oo->o);
-	oo->o = NULL;
-}
 
 PHP_METHOD(opencreport, parse_xml) {
 	zval *object = ZEND_THIS;
@@ -631,9 +612,6 @@ PHP_METHOD(opencreport, canonicalize_path) {
 	RETURN_STRING(ocrpt_canonicalize_path(ZSTR_VAL(path)));
 }
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_opencreport_ctor_dtor, 0, ZEND_RETURN_VALUE, 0)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_parse_xml, 0, 1, _IS_BOOL, 0)
 ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
 ZEND_END_ARG_INFO()
@@ -705,8 +683,6 @@ static const zend_function_entry opencreport_class_methods[] = {
 	/*
 	 * High level API
 	 */
-	PHP_ME(opencreport, __construct, arginfo_opencreport_ctor_dtor, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport, __destruct, arginfo_opencreport_ctor_dtor, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, parse_xml, arginfo_opencreport_parse_xml, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, set_output_format, arginfo_opencreport_set_output_format, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, execute, arginfo_opencreport_execute, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
