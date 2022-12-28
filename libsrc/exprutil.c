@@ -1110,6 +1110,15 @@ DLL_EXPORT_SYM const char *ocrpt_expr_get_string_value(ocrpt_expr *e) {
 	return NULL;
 }
 
+DLL_EXPORT_SYM void ocrpt_expr_set_string_value(ocrpt_expr *e, const char *s) {
+	if (!e)
+		return;
+
+	ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
+	e->result[e->o->residx]->string->len = 0;
+	ocrpt_mem_string_append_len(e->result[e->o->residx]->string, s, strlen(s));
+}
+
 DLL_EXPORT_SYM long ocrpt_expr_get_long_value(ocrpt_expr *e) {
 	if (!e)
 		return 0;
