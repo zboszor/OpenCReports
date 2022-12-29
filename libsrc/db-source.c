@@ -354,6 +354,10 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o
 	return ds;
 }
 
+DLL_EXPORT_SYM bool ocrpt_datasource_is_postgresql(ocrpt_datasource *source) {
+	return source->input == &ocrpt_postgresql_input;
+}
+
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_postgresql(ocrpt_datasource *source, const char *name, const char *querystr) {
 	if (!source || !name || !*name || !querystr || !*querystr)
 		return NULL;
@@ -633,6 +637,10 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, c
 
 	ds->priv = mysql;
 	return ds;
+}
+
+DLL_EXPORT_SYM bool ocrpt_datasource_is_mariadb(ocrpt_datasource *source) {
+	return source->input == &ocrpt_mariadb_input;
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_mariadb(ocrpt_datasource *source, const char *name, const char *querystr) {
@@ -1098,6 +1106,10 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, cons
 
 	ds->priv = priv;
 	return ds;
+}
+
+DLL_EXPORT_SYM bool ocrpt_datasource_is_odbc(ocrpt_datasource *source) {
+	return source->input == &ocrpt_odbc_input;
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_odbc(ocrpt_datasource *source, const char *name, const char *querystr) {

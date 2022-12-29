@@ -250,6 +250,10 @@ ssize_t ocrpt_mpfr_strfmon(opencreport *o, char * __restrict s, size_t maxsize, 
  */
 ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, const char *source_name);
 /*
+ * Query whether the datasource is array based
+ */
+bool ocrpt_datasource_is_array(ocrpt_datasource *source);
+/*
  * Add an array query using the datasource pointer
  *
  * The array's first row contains the header names
@@ -267,6 +271,10 @@ ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source,
  */
 ocrpt_datasource *ocrpt_datasource_add_csv(opencreport *o, const char *source_name);
 /*
+ * Query whether the datasource is CSV based
+ */
+bool ocrpt_datasource_is_csv(ocrpt_datasource *source);
+/*
  * Add a CSV query
  */
 ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
@@ -278,6 +286,10 @@ ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
  */
 ocrpt_datasource *ocrpt_datasource_add_json(opencreport *o, const char *source_name);
 /*
+ * Query whether the datasource is JSON based
+ */
+bool ocrpt_datasource_is_json(ocrpt_datasource *source);
+/*
  * Add a JSON query
  */
 ocrpt_query *ocrpt_query_add_json(ocrpt_datasource *source,
@@ -288,6 +300,10 @@ ocrpt_query *ocrpt_query_add_json(ocrpt_datasource *source,
  * Add an XML datasource
  */
 ocrpt_datasource *ocrpt_datasource_add_xml(opencreport *o, const char *source_name);
+/*
+ * Query whether the datasource is XML based
+ */
+bool ocrpt_datasource_is_xml(ocrpt_datasource *source);
 /*
  * Add a XML query
  */
@@ -306,6 +322,10 @@ ocrpt_datasource *ocrpt_datasource_add_postgresql(opencreport *o, const char *so
  */
 ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o, const char *source_name, const char *conninfo);
 /*
+ * Query whether the datasource is PostgreSQL based
+ */
+bool ocrpt_datasource_is_postgresql(ocrpt_datasource *source);
+/*
  * Add a PostgreSQL query
  */
 ocrpt_query *ocrpt_query_add_postgresql(ocrpt_datasource *source, const char *name, const char *querystr);
@@ -321,6 +341,10 @@ ocrpt_datasource *ocrpt_datasource_add_mariadb(opencreport *o, const char *sourc
  */
 ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, const char *source_name, const char *optionfile, const char *group);
 /*
+ * Query whether the datasource is MariaDB based
+ */
+bool ocrpt_datasource_is_mariadb(ocrpt_datasource *source);
+/*
  * Add a MariaDB/MySQL query
  */
 ocrpt_query *ocrpt_query_add_mariadb(ocrpt_datasource *source, const char *name, const char *querystr);
@@ -333,6 +357,10 @@ ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const char *source_n
  * Add an ODBC datasource using a connection info string
  */
 ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, const char *source_name, const char *conninfo);
+/*
+ * Query whether the datasource is ODBC based
+ */
+bool ocrpt_datasource_is_odbc(ocrpt_datasource *source);
 /*
  * Add an ODBC query
  */
