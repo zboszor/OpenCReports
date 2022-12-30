@@ -71,6 +71,7 @@ static inline php_opencreport_expr_object *php_opencreport_expr_from_obj(zend_ob
 typedef struct _php_opencreport_result_object {
 	ocrpt_result *r;
 	php_opencreport_object *oo;
+	bool freed_by_lib;
 	zend_object zo;
 } php_opencreport_result_object;
 
