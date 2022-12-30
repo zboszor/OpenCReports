@@ -1,8 +1,8 @@
-e1 nodes: 2
 inc(100.000000)
-e1 nodes: 1
+e1 nodes: 2
 1.000000
-e2 nodes: 2
+e1 nodes: 1
 dec(100.000000)
-e2 nodes: 1
+e2 nodes: 2
 0.000000
+e2 nodes: 1
