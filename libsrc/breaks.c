@@ -71,7 +71,7 @@ DLL_EXPORT_SYM bool ocrpt_break_set_attribute_from_expr(ocrpt_break *br, const o
 
 	ocrpt_expr_optimize(expr);
 	if (!ocrpt_expr_is_const(expr) || !ocrpt_expr_is_dconst(expr)) {
-		fprintf(stderr, "invalid (non-constant) expression\n");
+		ocrpt_err_printf("invalid (non-constant) expression\n");
 		return false;
 	}
 
@@ -139,12 +139,12 @@ DLL_EXPORT_SYM bool ocrpt_break_add_breakfield(ocrpt_break *br, ocrpt_expr *bf) 
 
 	if (ocrpt_expr_references(bf, OCRPT_VARREF_VVAR, &vartypes)) {
 		if ((vartypes & OCRPT_VARIABLE_UNKNOWN_BIT)) {
-			fprintf(stderr, "breakfield for '%s' references an unknown variable name\n", br->name);
+			ocrpt_err_printf("breakfield for '%s' references an unknown variable name\n", br->name);
 			ocrpt_expr_free(bf);
 			return false;
 		}
 		if ((vartypes & ~OCRPT_VARIABLE_EXPRESSION_BIT) != 0) {
-			fprintf(stderr, "breakfield for '%s' may only reference expression variables\n", br->name);
+			ocrpt_err_printf("breakfield for '%s' may only reference expression variables\n", br->name);
 			ocrpt_expr_free(bf);
 			return false;
 		}

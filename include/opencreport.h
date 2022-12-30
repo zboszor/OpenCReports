@@ -434,6 +434,13 @@ extern ocrpt_query_discover_func ocrpt_query_discover_array;
  * Discovery function for data and type arrays
  */
 void ocrpt_query_discover_array_c(const char *arrayname, void **array, int32_t *rows, int32_t *cols, const char *typesname, void **types, int32_t *types_cols);
+/*
+ * Set the print debugger function
+ */
+typedef int (*ocrpt_printf_func)(const char *fmt, ...);
+
+void ocrpt_set_printf_func(ocrpt_printf_func func);
+void ocrpt_set_err_printf_func(ocrpt_printf_func func);
 
 /********************************
  * Expression related functions *
@@ -560,17 +567,21 @@ void ocrpt_result_print(ocrpt_result *r);
  */
 void ocrpt_result_free(ocrpt_result *r);
 /*
- * Get the column's NULL-ness, * discover its type and
- * get its underlying value * depending on its type
+ * Get/set the column's NULL-ness, discover its type and
+ * get its underlying value depending on its type
  * from ocrpt_result
  */
 bool ocrpt_result_isnull(ocrpt_result *result);
+void ocrpt_result_set_isnull(ocrpt_result *result, bool isnull);
 
 bool ocrpt_result_isnumber(ocrpt_result *result);
 mpfr_ptr ocrpt_result_get_number(ocrpt_result *result);
+void ocrpt_result_set_long(ocrpt_result *result, long value);
+void ocrpt_result_set_double(ocrpt_result *result, double value);
 
 bool ocrpt_result_isstring(ocrpt_result *result);
 ocrpt_string *ocrpt_result_get_string(ocrpt_result *result);
+void ocrpt_result_set_string(ocrpt_result *result, const char *value);
 
 bool ocrpt_result_isdatetime(ocrpt_result *result);
 const struct tm *ocrpt_result_get_datetime(ocrpt_result *result);

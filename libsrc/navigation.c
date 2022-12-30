@@ -185,7 +185,7 @@ static bool ocrpt_navigate_next_private(ocrpt_query *q) {
 
 	if (!q->n_to_1_started) {
 		if (!q->source->input || !q->source->input->next) {
-			fprintf(stderr, "datasource doesn't have ->next() function\n");
+			ocrpt_err_printf("datasource doesn't have ->next() function\n");
 			return false;
 		}
 		if (!q->source->input->next(q)) {
@@ -239,7 +239,7 @@ static void ocrpt_navigate_start_private(ocrpt_query *q) {
 	if (q->source && q->source->input && q->source->input->rewind)
 		q->source->input->rewind(q);
 	else
-		fprintf(stderr, "'%s' doesn't have ->rewind() function\n", q->name);
+		ocrpt_err_printf("'%s' doesn't have ->rewind() function\n", q->name);
 
 	q->current_row = -1;
 	ocrpt_expr_init_result(q->rownum, OCRPT_RESULT_NUMBER);

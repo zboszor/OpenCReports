@@ -150,4 +150,11 @@ struct ocrpt_query_result {
 	ocrpt_result result;
 };
 
+extern mpfr_prec_t global_prec;
+extern mpfr_rnd_t global_rndmode;
+
+/* Default print debugger functions */
+extern ocrpt_printf_func ocrpt_std_printf;
+extern ocrpt_printf_func ocrpt_err_printf;
+
 #endif

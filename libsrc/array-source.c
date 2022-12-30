@@ -240,7 +240,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source, cons
 		return NULL;
 
 	if (source->input != &ocrpt_array_input) {
-		fprintf(stderr, "datasource is not array\n");
+		ocrpt_err_printf("datasource is not array\n");
 		return NULL;
 	}
 
@@ -418,7 +418,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
 		return NULL;
 
 	if (source->input != &ocrpt_csv_input) {
-		fprintf(stderr, "datasource is not csv\n");
+		ocrpt_err_printf("datasource is not csv\n");
 		return NULL;
 	}
 
@@ -433,27 +433,27 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
 	int32_t fd, row;
 
 	if (stat(filename, &st) != 0) {
-		fprintf(stderr, "error opening file\n");
+		ocrpt_err_printf("error opening file\n");
 		return NULL;
 	}
 
 	fd = open(filename, O_RDONLY);
 	if (fd < 0) {
-		fprintf(stderr, "error opening file\n");
+		ocrpt_err_printf("error opening file\n");
 		return NULL;
 	}
 
 	buf = ocrpt_mem_malloc(st.st_size);
 	if (!buf) {
 		close(fd);
-		fprintf(stderr, "out of memory\n");
+		ocrpt_err_printf("out of memory\n");
 		return NULL;
 	}
 
 	if (read(fd, buf, st.st_size) != st.st_size) {
 		close(fd);
 		ocrpt_mem_free(buf);
-		fprintf(stderr, "error reading file\n");
+		ocrpt_err_printf("error reading file\n");
 		return NULL;
 	}
 
@@ -461,7 +461,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
 
 	if (csv_init(&csv, CSV_STRICT | CSV_REPALL_NL | CSV_STRICT_FINI | CSV_APPEND_NULL | CSV_EMPTY_IS_NULL) != 0) {
 		ocrpt_mem_free(buf);
-		fprintf(stderr, "error initializing CSV parser\n");
+		ocrpt_err_printf("error initializing CSV parser\n");
 		return NULL;
 	}
 
@@ -474,7 +474,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
 		ocrpt_mem_free(buf);
 		csv_free(&csv);
 		ocrpt_file_query_free(&fq, true);
-		fprintf(stderr, "parsing CSV file \"%s\" failed\n", filename);
+		ocrpt_err_printf("parsing CSV file \"%s\" failed\n", filename);
 		return NULL;
 	}
 
@@ -485,7 +485,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
 	array = ocrpt_mem_malloc(fq.rows * fq.cols * sizeof(char *));
 	if (!array) {
 		ocrpt_file_query_free(&fq, true);
-		fprintf(stderr, "out of memory\n");
+		ocrpt_err_printf("out of memory\n");
 		return NULL;
 	}
 
@@ -755,7 +755,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(ocrpt_datasource *source,
 		return NULL;
 
 	if (source->input != &ocrpt_json_input) {
-		fprintf(stderr, "datasource is not json\n");
+		ocrpt_err_printf("datasource is not json\n");
 		return NULL;
 	}
 
@@ -770,27 +770,27 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(ocrpt_datasource *source,
 	int32_t fd, row;
 
 	if (stat(filename, &st) != 0) {
-		fprintf(stderr, "error opening file\n");
+		ocrpt_err_printf("error opening file\n");
 		return NULL;
 	}
 
 	fd = open(filename, O_RDONLY);
 	if (fd < 0) {
-		fprintf(stderr, "error opening file\n");
+		ocrpt_err_printf("error opening file\n");
 		return NULL;
 	}
 
 	buf = ocrpt_mem_malloc(st.st_size);
 	if (!buf) {
 		close(fd);
-		fprintf(stderr, "out of memory\n");
+		ocrpt_err_printf("out of memory\n");
 		return NULL;
 	}
 
 	if (read(fd, buf, st.st_size) != st.st_size) {
 		close(fd);
 		ocrpt_mem_free(buf);
-		fprintf(stderr, "error reading file\n");
+		ocrpt_err_printf("error reading file\n");
 		return NULL;
 	}
 
@@ -816,7 +816,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(ocrpt_datasource *source,
 	array = ocrpt_mem_malloc(fq.rows * fq.cols * sizeof(char *));
 	if (!array) {
 		ocrpt_file_query_free(&fq, true);
-		fprintf(stderr, "out of memory\n");
+		ocrpt_err_printf("out of memory\n");
 		return NULL;
 	}
 
@@ -1162,7 +1162,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(ocrpt_datasource *source,
 		return NULL;
 
 	if (source->input != &ocrpt_xml_input) {
-		fprintf(stderr, "datasource is not json\n");
+		ocrpt_err_printf("datasource is not json\n");
 		return NULL;
 	}
 
@@ -1219,7 +1219,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_xml(ocrpt_datasource *source,
 	array = ocrpt_mem_malloc((fq.rows + 1) * fq.cols * sizeof(char *));
 	if (!array) {
 		ocrpt_file_query_free(&fq, true);
-		fprintf(stderr, "out of memory\n");
+		ocrpt_err_printf("out of memory\n");
 		return NULL;
 	}
 

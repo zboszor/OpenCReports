@@ -44,16 +44,16 @@ static void processNode(xmlTextReaderPtr reader) {
 		name = xmlStrdup(BAD_CAST "--");
 	value = xmlTextReaderValue(reader);
 
-	fprintf(stderr, "%d %d %s %d",
+	ocrpt_err_printf("%d %d %s %d",
 			xmlTextReaderDepth(reader),
 			xmlTextReaderNodeType(reader),
 			name,
 			xmlTextReaderIsEmptyElement(reader));
 	xmlFree(name);
 	if (value == NULL)
-		fprintf(stderr, "\n");
+		ocrpt_err_printf("\n");
 	else {
-		fprintf(stderr, " %s\n", value);
+		ocrpt_err_printf(" %s\n", value);
 		xmlFree(value);
 	}
 }
@@ -191,7 +191,7 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 			if (arrayptr)
 				q = ocrpt_query_add_array(ds, name_s, arrayptr, rows_i, cols_i, coltypesptr, ct_cols_i);
 			else
-				fprintf(stderr, "Cannot determine array pointer for array query\n");
+				ocrpt_err_printf("Cannot determine array pointer for array query\n");
 		} else if (ds->input == &ocrpt_csv_input) {
 			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, coltypes_s, &coltypesptr, &ct_cols_i);
 			q = ocrpt_query_add_csv(ds, name_s, value_s, coltypesptr, ct_cols_i);
@@ -224,12 +224,12 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 				if (e)
 					ocrpt_query_add_follower_n_to_1(lq, q, e);
 				else
-					fprintf(stderr, "Cannot parse matching expression between queries \"%s\" and \"%s\": \"%s\"\n", follower_for_s, name_s, follower_expr);
+					ocrpt_err_printf("Cannot parse matching expression between queries \"%s\" and \"%s\": \"%s\"\n", follower_for_s, name_s, follower_expr);
 			} else
 				ocrpt_query_add_follower(lq, q);
 		}
 	} else
-		fprintf(stderr, "cannot add query \"%s\"\n", name_s);
+		ocrpt_err_printf("cannot add query \"%s\"\n", name_s);
 
 
 	for (i = 0; xmlattrs[i].attrp; i++)
@@ -458,7 +458,7 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 		else if (strcasecmp((char *)type, "custom") == 0)
 			vtype = OCRPT_VARIABLE_CUSTOM;
 		else
-			fprintf(stderr, "invalid type for variable declaration for v.'%s', using \"expression\"\n", name);
+			ocrpt_err_printf("invalid type for variable declaration for v.'%s', using \"expression\"\n", name);
 	}
 
 	if (basetype) {
@@ -469,7 +469,7 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 		else if (strcasecmp((char *)basetype, "datetime") == 0)
 			rtype = OCRPT_RESULT_DATETIME;
 		else
-			fprintf(stderr, "invalid result type for custom variable declaration for v.'%s'\n", name);
+			ocrpt_err_printf("invalid result type for custom variable declaration for v.'%s'\n", name);
 	}
 
 	if (baseexpr) {
@@ -932,13 +932,13 @@ static void ocrpt_break_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr r
 	brname = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
 
 	if (!brname) {
-		fprintf(stderr, "nameless break is useless, not adding to report\n");
+		ocrpt_err_printf("nameless break is useless, not adding to report\n");
 		return;
 	}
 
 	/* There's no BreakFields sub-element, useless break. */
 	if (xmlTextReaderIsEmptyElement(reader)) {
-		fprintf(stderr, "break '%s' is useless, not adding to report\n", (char *)brname);
+		ocrpt_err_printf("break '%s' is useless, not adding to report\n", (char *)brname);
 		xmlFree(brname);
 		return;
 	}
@@ -995,7 +995,7 @@ static void ocrpt_break_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr r
 
 	/* There's no BreakFields sub-element, useless break. */
 	if (!have_breakfield) {
-		fprintf(stderr, "break '%s' is useless, not adding to report\n", (char *)brname);
+		ocrpt_err_printf("break '%s' is useless, not adding to report\n", (char *)brname);
 		ocrpt_break_free(br);
 		r->breaks = ocrpt_list_remove(r->breaks, br);
 	}
@@ -1423,7 +1423,7 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 
 		real_filename = ocrpt_find_file(o, filename_s);
 		if (!real_filename) {
-			fprintf(stderr, "ocrpt_parse_load: can't find file %s\n", filename_s);
+			ocrpt_err_printf("ocrpt_parse_load: can't find file %s\n", filename_s);
 			return;
 		}
 
@@ -1447,7 +1447,7 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 									XML_PARSE_XINCLUDE | XML_PARSE_NOXINCNODE);
 		ocrpt_mem_free(real_filename);
 		if (!reader) {
-			fprintf(stderr, "ocrpt_parse_load: invalid XML file name or invalid contents\n");
+			ocrpt_err_printf("ocrpt_parse_load: invalid XML file name or invalid contents\n");
 			return;
 		}
 

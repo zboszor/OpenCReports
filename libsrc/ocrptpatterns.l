@@ -9,10 +9,11 @@
 
 #include "scanner.h"
 #include "opencreport.h"
+#include "ocrpt-private.h"
 #include "ocrptgrammar.tab.h"
 
 /* Suppress using the built-in yy_fatal_error function */
-#define YY_FATAL_ERROR(msg)	fprintf(stderr, msg)
+#define YY_FATAL_ERROR(msg)	ocrpt_err_printf(msg)
 }
 
 %option reentrant
@@ -483,7 +484,7 @@ yyscan_t scanner_init(const char *str, core_yy_extra_type *yyext) {
 	YYSTYPE ocrpt_lval;
 
 	if (yylex_init(&scanner) != 0) {
-		fprintf(stderr, "yylex_init() failed: %m");
+		ocrpt_err_printf("yylex_init() failed: %m");
 		return NULL;
 	}
 

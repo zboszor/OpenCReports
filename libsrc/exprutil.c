@@ -901,9 +901,9 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 			if (e->func->func)
 				e->func->func(e, e->func->user_data);
 			else
-				fprintf(stderr, "funccall is unset\n");
+				ocrpt_err_printf("funccall is unset\n");
 		} else
-			fprintf(stderr, "function is unknown (impossible, it is caught by the parser)\n");
+			ocrpt_err_printf("function is unknown (impossible, it is caught by the parser)\n");
 		break;
 
 	case OCRPT_EXPR_VVAR:
@@ -1085,7 +1085,7 @@ DLL_EXPORT_SYM bool ocrpt_expr_cmp_results(ocrpt_expr *e) {
 			return false;
 		return !memcmp(&cur->datetime, &prev->datetime, sizeof(struct tm));
 	default:
-		fprintf(stderr, "unknown expression type %d\n", cur->type);
+		ocrpt_err_printf("unknown expression type %d\n", cur->type);
 		return false;
 	}
 }
@@ -1252,6 +1252,13 @@ DLL_EXPORT_SYM bool ocrpt_result_isnull(ocrpt_result *result) {
 	return result->isnull;
 }
 
+DLL_EXPORT_SYM void ocrpt_result_set_isnull(ocrpt_result *result, bool isnull) {
+	if (!result)
+		return;
+
+	result->isnull = isnull;
+}
+
 DLL_EXPORT_SYM bool ocrpt_result_isnumber(ocrpt_result *result) {
 	if (!result)
 		return false;
@@ -1266,6 +1273,34 @@ DLL_EXPORT_SYM mpfr_ptr ocrpt_result_get_number(ocrpt_result *result) {
 	return result->number;
 }
 
+DLL_EXPORT_SYM void ocrpt_result_set_long(ocrpt_result *result, long value) {
+	if (!result)
+		return;
+
+	result->type = OCRPT_RESULT_NUMBER;
+	result->isnull = false;
+	if (!result->number_initialized) {
+		result->number_initialized = true;
+		mpfr_init2(result->number, global_prec);
+	}
+
+	mpfr_set_si(result->number, value, global_rndmode);
+}
+
+DLL_EXPORT_SYM void ocrpt_result_set_double(ocrpt_result *result, double value) {
+	if (!result)
+		return;
+
+	result->type = OCRPT_RESULT_NUMBER;
+	result->isnull = false;
+	if (!result->number_initialized) {
+		result->number_initialized = true;
+		mpfr_init2(result->number, global_prec);
+	}
+
+	mpfr_set_d(result->number, value, global_rndmode);
+}
+
 DLL_EXPORT_SYM bool ocrpt_result_isstring(ocrpt_result *result) {
 	if (!result)
 		return false;
@@ -1278,6 +1313,28 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_result_get_string(ocrpt_result *result) {
 		return NULL;
 
 	return result->string;
+}
+
+DLL_EXPORT_SYM void ocrpt_result_set_string(ocrpt_result *result, const char *value) {
+	if (!result)
+		return;
+
+	result->type = OCRPT_RESULT_STRING;
+	if (value) {
+		result->isnull = false;
+
+		ocrpt_string *string = ocrpt_mem_string_resize(result->string, 16);
+		if (string) {
+			if (!result->string) {
+				result->string = string;
+				result->string_owned = true;
+			}
+			string->len = 0;
+		}
+
+		ocrpt_mem_string_append(string, value);
+	} else
+		result->isnull = true;
 }
 
 DLL_EXPORT_SYM bool ocrpt_result_isdatetime(ocrpt_result *result) {

@@ -130,7 +130,7 @@ static void ocrpt_postgresql_describe(ocrpt_query *query, ocrpt_query_result **q
 				type = OCRPT_RESULT_DATETIME;
 				break;
 			default:
-				fprintf(stderr, "type %d\n", PQftype(res, i));
+				ocrpt_err_printf("type %d\n", PQftype(res, i));
 				type = OCRPT_RESULT_STRING;
 				break;
 			}
@@ -363,7 +363,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_postgresql(ocrpt_datasource *source,
 		return NULL;
 
 	if (source->input != &ocrpt_postgresql_input) {
-		fprintf(stderr, "datasource is not a PostgreSQL source\n");
+		ocrpt_err_printf("datasource is not a PostgreSQL source\n");
 		return NULL;
 	}
 
@@ -378,7 +378,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_postgresql(ocrpt_datasource *source,
 	case PGRES_NONFATAL_ERROR:
 		break;
 	default:
-		fprintf(stderr, "failed to execute query: %s\nwith error message: %s", querystr, PQerrorMessage(source->priv));
+		ocrpt_err_printf("failed to execute query: %s\nwith error message: %s", querystr, PQerrorMessage(source->priv));
 		PQclear(res);
 		return NULL;
 	}
@@ -471,7 +471,7 @@ static ocrpt_query_result *ocrpt_mariadb_describe_early(ocrpt_query *query) {
 			type = OCRPT_RESULT_DATETIME;
 			break;
 		default:
-			fprintf(stderr, "type %d\n", field->type);
+			ocrpt_err_printf("type %d\n", field->type);
 			type = OCRPT_RESULT_STRING;
 			break;
 		}
@@ -648,7 +648,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_mariadb(ocrpt_datasource *source, co
 		return NULL;
 
 	if (source->input != &ocrpt_mariadb_input) {
-		fprintf(stderr, "datasource is not a MariaDB source\n");
+		ocrpt_err_printf("datasource is not a MariaDB source\n");
 		return NULL;
 	}
 
@@ -717,12 +717,12 @@ static void ocrpt_odbc_print_diag(ocrpt_query *query, const char *stmt, SQLRETUR
 	SQLCHAR	stat[10];
 	SQLCHAR	msg[200];
 
-	fprintf(stderr, "query \"%s\" %s ret %d\n", query->name, stmt, ret);
+	ocrpt_err_printf("query \"%s\" %s ret %d\n", query->name, stmt, ret);
 
 	SQLError(priv->env, priv->dbc, NULL, (SQLCHAR *)state, NULL, buffer, 256, NULL);
 	SQLGetDiagRec(SQL_HANDLE_DBC, priv->dbc, 1, stat, &err, msg, 100, &mlen);
 
-	fprintf(stderr, "%s result %d: %6.6s \"%s\", %s \"%s\"\n", stmt, ret, state, msg, stat, msg);
+	ocrpt_err_printf("%s result %d: %6.6s \"%s\", %s \"%s\"\n", stmt, ret, state, msg, stat, msg);
 }
 
 static ocrpt_query_result *ocrpt_odbc_describe_early(ocrpt_query *query) {
@@ -825,7 +825,7 @@ static ocrpt_query_result *ocrpt_odbc_describe_early(ocrpt_query *query) {
 			type = OCRPT_RESULT_DATETIME;
 			break;
 		default:
-			fprintf(stderr, "type %d\n", col_type);
+			ocrpt_err_printf("type %d\n", col_type);
 			type = OCRPT_RESULT_STRING;
 			break;
 		}
@@ -1048,13 +1048,13 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const
 
 	ocrpt_odbc_private *priv = ocrpt_odbc_setup();
 	if (!priv) {
-		fprintf(stderr, "ODBC private data setup failed\n");
+		ocrpt_err_printf("ODBC private data setup failed\n");
 		return NULL;
 	}
 
 	SQLRETURN ret = SQLConnect(priv->dbc, (SQLCHAR *)dbname, SQL_NTS, (SQLCHAR *)user, SQL_NTS, (SQLCHAR *)password, SQL_NTS);
 	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
-		fprintf(stderr, "SQLConnect failed\n");
+		ocrpt_err_printf("SQLConnect failed\n");
 		SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
 		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
 		ocrpt_mem_free(priv);
@@ -1063,7 +1063,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const
 
 	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_odbc_input);
 	if (!ds) {
-		fprintf(stderr, "ocrpt_datasource_add failed\n");
+		ocrpt_err_printf("ocrpt_datasource_add failed\n");
 		SQLDisconnect(priv->dbc);
 		SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
 		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
@@ -1081,13 +1081,13 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, cons
 
 	ocrpt_odbc_private *priv = ocrpt_odbc_setup();
 	if (!priv) {
-		fprintf(stderr, "ODBC private data setup failed\n");
+		ocrpt_err_printf("ODBC private data setup failed\n");
 		return NULL;
 	}
 
 	SQLRETURN ret = SQLDriverConnect(priv->dbc, NULL, (SQLCHAR *)conninfo, SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
 	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
-		fprintf(stderr, "SQLDriverConnect failed\n");
+		ocrpt_err_printf("SQLDriverConnect failed\n");
 		SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
 		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
 		ocrpt_mem_free(priv);
@@ -1096,7 +1096,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, cons
 
 	ocrpt_datasource *ds = ocrpt_datasource_add(o, source_name, &ocrpt_odbc_input);
 	if (!ds) {
-		fprintf(stderr, "ocrpt_datasource_add failed\n");
+		ocrpt_err_printf("ocrpt_datasource_add failed\n");
 		SQLDisconnect(priv->dbc);
 		SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
 		SQLFreeHandle(SQL_HANDLE_ENV, priv->env);
@@ -1117,7 +1117,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_odbc(ocrpt_datasource *source, const
 		return NULL;
 
 	if (source->input != &ocrpt_odbc_input) {
-		fprintf(stderr, "datasource is not an ODBC source\n");
+		ocrpt_err_printf("datasource is not an ODBC source\n");
 		return NULL;
 	}
 
@@ -1126,13 +1126,13 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_odbc(ocrpt_datasource *source, const
 	SQLHSTMT stmt;
 	SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_STMT, priv->dbc, &stmt);
 	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
-		fprintf(stderr, "allocation statement handle failed\n");
+		ocrpt_err_printf("allocation statement handle failed\n");
 		return NULL;
 	}
 
 	ret = SQLExecDirect(stmt, (SQLCHAR *)querystr, SQL_NTS);
 	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
-		fprintf(stderr, "executing query failed: %s\n", querystr);
+		ocrpt_err_printf("executing query failed: %s\n", querystr);
 		SQLFreeHandle(SQL_HANDLE_STMT, stmt);
 		return NULL;
 	}

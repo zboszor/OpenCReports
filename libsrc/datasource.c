@@ -381,37 +381,37 @@ static bool ocrpt_query_follower_circular(ocrpt_query *leader, ocrpt_query *foll
 
 static bool ocrpt_query_follower_validity(ocrpt_query *leader, ocrpt_query *follower) {
 	if (!leader) {
-		fprintf(stderr, "leader query unset\n");
+		ocrpt_err_printf("leader query unset\n");
 		return false;
 	}
 
 	if (!leader->source) {
-		fprintf(stderr, "%s leader query's source unset\n", leader->name);
+		ocrpt_err_printf("%s leader query's source unset\n", leader->name);
 		return false;
 	}
 
 	if (!follower) {
-		fprintf(stderr, "follower query unset\n");
+		ocrpt_err_printf("follower query unset\n");
 		return false;
 	}
 
 	if (!follower->source) {
-		fprintf(stderr, "%s follower query's source unset\n", follower->name);
+		ocrpt_err_printf("%s follower query's source unset\n", follower->name);
 		return false;
 	}
 
 	if (leader->source->o != follower->source->o) {
-		fprintf(stderr, "Parent pointers for leader ('%s') and follower ('%s') do not match\n", leader->name, follower->name);
+		ocrpt_err_printf("Parent pointers for leader ('%s') and follower ('%s') do not match\n", leader->name, follower->name);
 		return false;
 	}
 
 	if (leader == follower) {
-		fprintf(stderr, "leader and follower queries cannot be identical\n");
+		ocrpt_err_printf("leader and follower queries cannot be identical\n");
 		return false;
 	}
 
 	if (!ocrpt_query_follower_circular(leader, follower)) {
-		fprintf(stderr, "%s:%s follower would create a circular graph for %s:%s leader\n", follower->source->name, follower->name, leader->source->name, leader->name);
+		ocrpt_err_printf("%s:%s follower would create a circular graph for %s:%s leader\n", follower->source->name, follower->name, leader->source->name, leader->name);
 		return false;
 	}
 
@@ -425,7 +425,7 @@ DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(ocrpt_query *leader, ocrpt_q
 	}
 
 	if (ocrpt_expr_references(match, OCRPT_VARREF_MVAR | OCRPT_VARREF_RVAR | OCRPT_VARREF_VVAR, NULL)) {
-		fprintf(stderr, "invalid expression for follower query\n");
+		ocrpt_err_printf("invalid expression for follower query\n");
 		ocrpt_expr_free(match);
 		return false;
 	}
@@ -433,7 +433,7 @@ DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(ocrpt_query *leader, ocrpt_q
 	uint32_t mask = 0;
 	if (ocrpt_expr_references(match, OCRPT_VARREF_IDENT, &mask)) {
 		if ((mask & OCRPT_IDENT_UNKNOWN_BIT) == OCRPT_IDENT_UNKNOWN_BIT) {
-			fprintf(stderr, "invalid expression for follower query\n");
+			ocrpt_err_printf("invalid expression for follower query\n");
 			ocrpt_expr_free(match);
 			return false;
 		}

@@ -1079,7 +1079,7 @@ ocrpt_expr *ocrpt_layout_expr_parse(opencreport *o, ocrpt_report *r, const char 
 
 	if (!e) {
 		if (report)
-			fprintf(stderr, "Cannot parse: %s\n", expr);
+			ocrpt_err_printf("Cannot parse: %s\n", expr);
 
 		if (create_string)
 			e = ocrpt_newstring(o, r, expr);
@@ -1119,7 +1119,7 @@ ocrpt_expr *ocrpt_layout_const_expr_parse(opencreport *o, const char *expr, bool
 					strcat(vartypes, "VVAR");
 				}
 
-				fprintf(stderr, "constant expression expected, %s references found: %s\n", vartypes, expr);
+				ocrpt_err_printf("constant expression expected, %s references found: %s\n", vartypes, expr);
 				ocrpt_expr_free(e);
 				e = NULL;
 			} else
@@ -1127,7 +1127,7 @@ ocrpt_expr *ocrpt_layout_const_expr_parse(opencreport *o, const char *expr, bool
 		}
 	} else {
 		if (report)
-			fprintf(stderr, "Cannot parse: %s\n", expr);
+			ocrpt_err_printf("Cannot parse: %s\n", expr);
 		ocrpt_strfree(err);
 	}
 

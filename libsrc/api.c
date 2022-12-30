@@ -13,6 +13,7 @@
 #include <locale.h>
 #include <langinfo.h>
 #include <pthread.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,6 +40,33 @@
 #include "color.h"
 #include "layout.h"
 #include "pdf.h"
+
+static int ocrpt_stderr_printf(const char *fmt, ...) {
+	va_list ap;
+	int ret;
+
+	va_start(ap, fmt);
+	ret = vfprintf(stderr, fmt, ap);
+	va_end(ap);
+
+	return ret;
+}
+
+DLL_EXPORT_SYM ocrpt_printf_func ocrpt_std_printf = printf;
+DLL_EXPORT_SYM ocrpt_printf_func ocrpt_err_printf = ocrpt_stderr_printf;
+
+DLL_EXPORT_SYM void ocrpt_set_printf_func(ocrpt_printf_func func) {
+	if (func)
+		ocrpt_std_printf = func;
+}
+
+DLL_EXPORT_SYM void ocrpt_set_err_printf_func(ocrpt_printf_func func) {
+	if (func)
+		ocrpt_err_printf = func;
+}
+
+mpfr_prec_t global_prec = OCRPT_MPFR_PRECISION_BITS;
+mpfr_rnd_t global_rndmode = MPFR_RNDN;
 
 char cwdpath[PATH_MAX];
 static ocrpt_paper *papersizes;
@@ -171,6 +199,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 }
 
 DLL_EXPORT_SYM void ocrpt_set_numeric_precision_bits(opencreport *o, mpfr_prec_t prec) {
+	global_prec = prec;
 	if (!o)
 		return;
 
@@ -179,6 +208,7 @@ DLL_EXPORT_SYM void ocrpt_set_numeric_precision_bits(opencreport *o, mpfr_prec_t
 }
 
 DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode) {
+	global_rndmode = rndmode;
 	if (!o)
 		return;
 
