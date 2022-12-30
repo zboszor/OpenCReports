@@ -255,6 +255,13 @@ ocrpt_datasource_add_array(opencreport *o,
 				</para>
 			</sect3>
 			<sect3>
+				<title>Test whether a datasource is array based</title>
+				<para>
+					<programlisting>bool
+ocrpt_datasource_is_array(ocrpt_datasource *source);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
 				<title>Add an array query</title>
 				<para>
 					Add an "array query" to the report handler.
@@ -292,6 +299,13 @@ ocrpt_datasource_add_csv(opencreport *o,
 				</para>
 			</sect3>
 			<sect3>
+				<title>Test whether a datasource is CSV based</title>
+				<para>
+					<programlisting>bool
+ocrpt_datasource_is_csv(ocrpt_datasource *source);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
 				<title>Add a CSV query</title>
 				<para>
 					Add a "CSV query" to the report handler.
@@ -317,6 +331,13 @@ ocrpt_query_add_csv(ocrpt_datasource *source,
 					<programlisting>ocrpt_datasource *
 ocrpt_datasource_add_json(opencreport *o,
                           const char *source_name);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Test whether a datasource is JSON based</title>
+				<para>
+					<programlisting>bool
+ocrpt_datasource_is_json(ocrpt_datasource *source);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -352,6 +373,13 @@ ocrpt_query_add_json(ocrpt_datasource *source,
 					<programlisting>ocrpt_datasource *
 ocrpt_datasource_add_xml(opencreport *o,
                          const char *source_name);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Test whether a datasource is XML based</title>
+				<para>
+					<programlisting>bool
+ocrpt_datasource_is_xml(ocrpt_datasource *source);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -405,6 +433,13 @@ ocrpt_datasource_add_postgresql2(opencreport *o,
 				</para>
 			</sect3>
 			<sect3>
+				<title>Test whether a datasource is PostgreSQL based</title>
+				<para>
+					<programlisting>bool
+ocrpt_datasource_is_postgresql(ocrpt_datasource *source);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
 				<title>Add a PostgreSQL query</title>
 				<para>
 					Add a SQL query using the PostgreSQL datasource
@@ -440,6 +475,13 @@ ocrpt_datasource_add_mariadb2(opencreport *o,
 				</para>
 			</sect3>
 			<sect3>
+				<title>Test whether a datasource is MariaDB based</title>
+				<para>
+					<programlisting>bool
+ocrpt_datasource_is_mariadb(ocrpt_datasource *source);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
 				<title>Add a MariaDB query</title>
 				<para>
 					Add an SQL query using the MariaDB datasource
@@ -468,6 +510,13 @@ ocrpt_datasource_add_odbc2(opencreport *o,
 				</para>
 				<para>
 					For the parameters, see <xref linkend="odbcds"/>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Test whether a datasource is ODBC based</title>
+				<para>
+					<programlisting>bool
+ocrpt_datasource_is_odbc(ocrpt_datasource *source);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
