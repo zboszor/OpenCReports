@@ -573,7 +573,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 	case OCRPT_EXPR_MVAR:
 		if ((varref_exclude_mask & OCRPT_VARREF_MVAR) == 0) {
 			if (!e->result[0]) {
-				ocrpt_result *result = ocrpt_env_get_c(e->name->str);
+				ocrpt_result *result = ocrpt_env_get(e->name->str);
 
 				ocrpt_mem_string_free(e->query, true);
 				e->query = NULL;
