@@ -106,8 +106,8 @@ struct ocrpt_expr {
 ocrpt_expr *newblankexpr(opencreport *o, ocrpt_report *r, enum ocrpt_expr_type type, uint32_t n_ops);
 ocrpt_expr *ocrpt_newstring(opencreport *o, ocrpt_report *r, const char *string);
 
-void ocrpt_expr_print_internal(ocrpt_expr *e, FILE *stream);
-void ocrpt_expr_result_deep_print_worker(ocrpt_expr *e, FILE *stream);
+void ocrpt_expr_print_internal(ocrpt_expr *e, ocrpt_printf_func func);
+void ocrpt_expr_result_deep_print_worker(ocrpt_expr *e, ocrpt_printf_func func);
 void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask);
 void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exclude_mask);
 bool ocrpt_expr_references(ocrpt_expr *e, int32_t varref_include_mask, uint32_t *varref_vartype_mask);

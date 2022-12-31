@@ -520,10 +520,10 @@ static void print_token_value (FILE *file, int type, YYSTYPE value) {
 	case SCONST:
 	case DCONST:
 	case IDENT:
-		fprintf(file, "%s", value.s->str);
+		ocrpt_err_printf("%s", value.s->str);
 		break;
 	default:
-		fprintf(file, "%d", type);
+		ocrpt_err_printf("%d", type);
 		break;
 	}
 }

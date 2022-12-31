@@ -518,7 +518,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 							}
 						}
 					} else {
-						fprintf(stderr,
+						ocrpt_err_printf(
 							"ocrpt_execute_parts: <pd> sections with width set exceed page width.\n"
 							"ocrpt_execute_parts: Suppressing <pd> sections with no widths set.\n");
 						for (pdl = pr->pd_list; pdl; pdl = pdl->next) {

@@ -30,7 +30,7 @@
 #define UNUSED __attribute__((unused))
 #endif
 
-void ocrpt_result_print_internal(ocrpt_result *r, FILE *stream);
+void ocrpt_result_print_internal(ocrpt_result *r, ocrpt_printf_func func);
 
 ocrpt_expr *newblankexpr(opencreport *o, ocrpt_report *r, enum ocrpt_expr_type type, uint32_t n_ops) {
 	ocrpt_expr *e;
@@ -166,22 +166,22 @@ static void ocrpt_expr_print_worker(ocrpt_expr *e, int depth, const char *delimi
 		ocrpt_mem_string_append_printf(str, "%s", delimiter);
 }
 
-void ocrpt_expr_print_internal(ocrpt_expr *e, FILE *stream) {
-	if (!e || !stream)
+void ocrpt_expr_print_internal(ocrpt_expr *e, ocrpt_printf_func func) {
+	if (!e || !func)
 		return;
 
 	ocrpt_string *str = ocrpt_mem_string_new_with_len(NULL, 256);
 	ocrpt_expr_print_worker(e, 0, "\n", str);
-	fprintf(stream, "%s", str->str);
+	func("%s", str->str);
 	ocrpt_mem_string_free(str, true);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_print(ocrpt_expr *e) {
-	ocrpt_expr_print_internal(e, stdout);
+	ocrpt_expr_print_internal(e, ocrpt_std_printf);
 }
 
-void ocrpt_expr_result_deep_print_worker(ocrpt_expr *e, FILE *stream) {
-	if (!e || !stream)
+void ocrpt_expr_result_deep_print_worker(ocrpt_expr *e, ocrpt_printf_func func) {
+	if (!e || !func)
 		return;
 
 	ocrpt_string *str = ocrpt_mem_string_new_with_len(NULL, 256);
@@ -190,30 +190,30 @@ void ocrpt_expr_result_deep_print_worker(ocrpt_expr *e, FILE *stream) {
 	switch (e->type) {
 	case OCRPT_EXPR:
 		for (i = 0; i < e->n_ops; i++)
-			ocrpt_expr_result_deep_print_worker(e->ops[i], stream);
+			ocrpt_expr_result_deep_print_worker(e->ops[i], func);
 		break;
 	case OCRPT_EXPR_VVAR:
 		assert(e->var);
 		if (e->var->baseexpr)
-			ocrpt_expr_result_deep_print_worker(e->var->baseexpr, stream);
+			ocrpt_expr_result_deep_print_worker(e->var->baseexpr, func);
 		if (e->var->intermedexpr)
-			ocrpt_expr_result_deep_print_worker(e->var->intermedexpr, stream);
+			ocrpt_expr_result_deep_print_worker(e->var->intermedexpr, func);
 		if (e->var->intermed2expr)
-			ocrpt_expr_result_deep_print_worker(e->var->intermed2expr, stream);
-		ocrpt_expr_result_deep_print_worker(e->var->resultexpr, stream);
+			ocrpt_expr_result_deep_print_worker(e->var->intermed2expr, func);
+		ocrpt_expr_result_deep_print_worker(e->var->resultexpr, func);
 		break;
 	default:
 		break;
 	}
 
 	ocrpt_expr_print_worker(e, 0, " - ", str);
-	fprintf(stream, "%s\n", str->str);
+	func("%s\n", str->str);
 	ocrpt_mem_string_free(str, true);
-	ocrpt_result_print_internal(e->result[e->o->residx], stream);
+	ocrpt_result_print_internal(e->result[e->o->residx], func);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_result_deep_print(ocrpt_expr *e) {
-	ocrpt_expr_result_deep_print_worker(e, stdout);
+	ocrpt_expr_result_deep_print_worker(e, ocrpt_std_printf);
 }
 
 DLL_EXPORT_SYM void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_result *src) {
@@ -260,16 +260,16 @@ DLL_EXPORT_SYM void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_r
 	}
 }
 
-void ocrpt_result_print_internal(ocrpt_result *r, FILE *stream) {
-	if (!r || !stream)
+void ocrpt_result_print_internal(ocrpt_result *r, ocrpt_printf_func func) {
+	if (!r || !func)
 		return;
 
 	switch (r->type) {
 	case OCRPT_RESULT_ERROR:
-		fprintf(stream, "(ERROR)%s\n", (r->isnull || !r->string) ? "NULL" : r->string->str);
+		func("(ERROR)%s\n", (r->isnull || !r->string) ? "NULL" : r->string->str);
 		break;
 	case OCRPT_RESULT_STRING:
-		fprintf(stream, "(string)%s\n", (r->isnull || !r->string) ? "NULL" : r->string->str);
+		func("(string)%s\n", (r->isnull || !r->string) ? "NULL" : r->string->str);
 		break;
 	case OCRPT_RESULT_DATETIME: {
 		if (!r->isnull) {
@@ -287,7 +287,7 @@ void ocrpt_result_print_internal(ocrpt_result *r, FILE *stream) {
 					ocrpt_mem_string_append_printf(str, "%s%d mins", str->len ? " " : "", r->datetime.tm_min);
 				if (r->datetime.tm_sec)
 					ocrpt_mem_string_append_printf(str, "%s%d seconds", str->len ? " " : "", r->datetime.tm_sec);
-				fprintf(stream, "(datetime)%s\n", str->str);
+				func("(datetime)%s\n", str->str);
 				ocrpt_mem_string_free(str, true);
 			} else {
 				char tmp[128] = "";
@@ -297,23 +297,28 @@ void ocrpt_result_print_internal(ocrpt_result *r, FILE *stream) {
 					strftime(tmp, sizeof(tmp), "%F", &r->datetime);
 				else if (r->time_valid)
 					strftime(tmp, sizeof(tmp), "%T", &r->datetime);
-				fprintf(stream, "(datetime)%s\n", tmp);
+				func("(datetime)%s\n", tmp);
 			}
 		} else
-			fprintf(stream, "(datetime)NULL\n");
+			func("(datetime)NULL\n");
 		break;
 	}
 	case OCRPT_RESULT_NUMBER:
 		if (r->isnull)
-			fprintf(stream, "(number)NULL\n");
-		else
-			mpfr_fprintf(stream, "(number)%RF\n", r->number);
+			func("(number)NULL\n");
+		else {
+			size_t len = mpfr_snprintf(NULL, 0, "(number)%RF\n", r->number);
+			ocrpt_string *s = ocrpt_mem_string_new_with_len("", len + 16);
+			mpfr_snprintf(s->str, len + 1, "(number)%RF\n", r->number);
+			func("%s", s->str);
+			ocrpt_mem_string_free(s, true);
+		}
 		break;
 	}
 }
 
 DLL_EXPORT_SYM void ocrpt_result_print(ocrpt_result *r) {
-	ocrpt_result_print_internal(r, stdout);
+	ocrpt_result_print_internal(r, ocrpt_std_printf);
 }
 
 static void ocrpt_expr_nodes_worker(ocrpt_expr *e, int32_t *nodes) {
