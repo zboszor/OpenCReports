@@ -93,13 +93,7 @@ static void php_opencreport_kill_assoc_refs(const void *ptr) {
 	}
 }
 
-static void opencreport_object_free(zend_object *object) /* {{{ */
-{
-	php_opencreport_object *oo = php_opencreport_from_obj(object);
-
-	if (!oo->o)
-		return;
-
+static void opencreport_object_deinit(php_opencreport_object *oo) {
 	ocrpt_list_free_deep(oo->assoc_objs, php_opencreport_kill_assoc_refs);
 	oo->assoc_objs = NULL;
 	oo->assoc_objs_last = NULL;
@@ -110,6 +104,16 @@ static void opencreport_object_free(zend_object *object) /* {{{ */
 
 	ocrpt_free(oo->o);
 	oo->o = NULL;
+}
+
+static void opencreport_object_free(zend_object *object) /* {{{ */
+{
+	php_opencreport_object *oo = php_opencreport_from_obj(object);
+
+	if (!oo->o)
+		return;
+
+	opencreport_object_deinit(oo);
 
 	zend_object_std_dtor(&oo->zo);
 }
@@ -250,6 +254,11 @@ PHP_METHOD(opencreport, parse_xml) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *filename;
 
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(filename);
 	ZEND_PARSE_PARAMETERS_END();
@@ -262,6 +271,11 @@ PHP_METHOD(opencreport, set_output_format) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_long format;
 
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_LONG(format);
 	ZEND_PARSE_PARAMETERS_END();
@@ -273,6 +287,11 @@ PHP_METHOD(opencreport, execute) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	RETURN_BOOL(ocrpt_execute(oo->o));
@@ -282,6 +301,11 @@ PHP_METHOD(opencreport, spool) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	ocrpt_spool(oo->o);
@@ -290,6 +314,11 @@ PHP_METHOD(opencreport, spool) {
 PHP_METHOD(opencreport, get_output) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
@@ -310,6 +339,11 @@ PHP_METHOD(opencreport, set_numeric_precision_bits) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_long prec;
 
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_LONG(prec);
 	ZEND_PARSE_PARAMETERS_END();
@@ -321,6 +355,11 @@ PHP_METHOD(opencreport, set_rounding_mode) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_long mode;
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_LONG(mode);
@@ -335,6 +374,11 @@ PHP_METHOD(opencreport, bindtextdomain) {
 	zend_string *domainname;
 	zend_string *dirname;
 
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_STR(domainname);
 		Z_PARAM_STR(dirname);
@@ -347,6 +391,11 @@ PHP_METHOD(opencreport, set_locale) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *locale;
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(locale);
@@ -361,6 +410,11 @@ PHP_METHOD(opencreport, datasource_add_array) {
 	zend_string *source_name;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(source_name);
@@ -385,6 +439,11 @@ PHP_METHOD(opencreport, datasource_add_csv) {
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
 
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(source_name);
 	ZEND_PARSE_PARAMETERS_END();
@@ -408,6 +467,11 @@ PHP_METHOD(opencreport, datasource_add_json) {
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
 
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(source_name);
 	ZEND_PARSE_PARAMETERS_END();
@@ -430,6 +494,11 @@ PHP_METHOD(opencreport, datasource_add_xml) {
 	zend_string *source_name;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(source_name);
@@ -455,6 +524,11 @@ PHP_METHOD(opencreport, datasource_add_postgresql) {
 	zend_string *user, *password;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 6, 6)
 		Z_PARAM_STR(source_name);
@@ -491,6 +565,11 @@ PHP_METHOD(opencreport, datasource_add_postgresql2) {
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
 
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_STR(source_name);
 		Z_PARAM_STR_EX(connection_info, 1, 0);
@@ -518,6 +597,11 @@ PHP_METHOD(opencreport, datasource_add_mariadb) {
 	zend_string *user, *password, *unix_socket;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 7, 7)
 		Z_PARAM_STR(source_name);
@@ -556,6 +640,11 @@ PHP_METHOD(opencreport, datasource_add_mariadb2) {
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
 
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
 		Z_PARAM_STR(source_name);
 		Z_PARAM_STR_EX(option_file, 1, 0);
@@ -584,6 +673,11 @@ PHP_METHOD(opencreport, datasource_add_odbc) {
 	zend_string *dbname, *user, *password;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 4, 4)
 		Z_PARAM_STR(source_name);
@@ -616,6 +710,11 @@ PHP_METHOD(opencreport, datasource_add_odbc2) {
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
 
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_STR(source_name);
 		Z_PARAM_STR_EX(connection_info, 1, 0);
@@ -639,6 +738,11 @@ PHP_METHOD(opencreport, expr_parse) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *expr_string;
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(expr_string);
@@ -729,6 +833,11 @@ PHP_METHOD(opencreport, function_add) {
 	zend_long n_ops;
 	zend_bool commutative, associative, left_associative, dont_optimize;
 
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 7, 7)
 		Z_PARAM_STR(expr_func_name);
 		Z_PARAM_STR(zend_func_name);
@@ -813,6 +922,11 @@ PHP_METHOD(opencreport, add_search_path) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *path;
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(path);
@@ -1732,7 +1846,14 @@ ZEND_FUNCTION(rlib_free) {
 		Z_PARAM_OBJECT_OF_CLASS(obj, opencreport_ce)
 	ZEND_PARSE_PARAMETERS_END();
 
-	/* Do nothing */
+	php_opencreport_object *oo = Z_OPENCREPORT_P(obj);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
+	opencreport_object_deinit(oo);
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_rlib_init, 0, 0, OpenCReport, 1)
