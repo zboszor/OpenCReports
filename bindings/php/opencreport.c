@@ -656,7 +656,7 @@ PHP_METHOD(opencreport, expr_parse) {
 		php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(&tmp);
 		eo->e = e;
 		eo->oo = oo;
-
+		eo->has_parent = true;
 		oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &eo->zo);
 	} else {
 		ZVAL_NULL(&tmp);
@@ -690,6 +690,7 @@ OCRPT_STATIC_FUNCTION(opencreport_default_function) {
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(&params[0]);
 	eo->e = e;
 	eo->oo = NULL;
+	eo->has_parent = false;
 
 #if PHP_MAJOR_VERSION >= 8
 	if (call_user_function(CG(function_table), NULL, &zfname, &retval, 1, params) == FAILURE)
@@ -804,6 +805,7 @@ PHP_METHOD(opencreport, env_get) {
 	ro = Z_OPENCREPORT_RESULT_P(return_value);
 	ro->oo = NULL;
 	ro->r = r;
+	ro->has_parent = false;
 	ro->freed_by_lib = false;
 }
 
@@ -993,6 +995,11 @@ PHP_METHOD(opencreport_ds, query_add) {
 	void *array_x, *types_x = NULL;
 	int32_t rows, cols, types_cols = 0;
 
+	if (!ds->oo) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 3)
 		Z_PARAM_STR(name);
 		Z_PARAM_STR(array_or_file_or_sql);
@@ -1038,8 +1045,6 @@ PHP_METHOD(opencreport_ds, query_add) {
 	object_init_ex(return_value, opencreport_query_ce);
 	qo = Z_OPENCREPORT_QUERY_P(return_value);
 	qo->q = q;
-	qo->ds = ds;
-	ds->assoc_objs = ocrpt_list_end_append(ds->assoc_objs, &ds->assoc_objs_last, &qo->zo);
 
 	php_opencreport_object *oo = ds->oo;
 	qo->oo = ds->oo;
@@ -1065,6 +1070,11 @@ PHP_METHOD(opencreport_expr, print) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
 
+	if (e->has_parent && !e->oo) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	ocrpt_expr_print(e->e);
@@ -1073,6 +1083,11 @@ PHP_METHOD(opencreport_expr, print) {
 PHP_METHOD(opencreport_expr, nodes) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
+
+	if (e->has_parent && !e->oo) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
@@ -1083,6 +1098,11 @@ PHP_METHOD(opencreport_expr, optimize) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
 
+	if (e->has_parent && !e->oo) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	ocrpt_expr_optimize(e->e);
@@ -1091,6 +1111,11 @@ PHP_METHOD(opencreport_expr, optimize) {
 PHP_METHOD(opencreport_expr, resolve) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
+
+	if (e->has_parent && !e->oo) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
@@ -1102,6 +1127,11 @@ PHP_METHOD(opencreport_expr, eval) {
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
 	php_opencreport_result_object *ro;
 
+	if (e->has_parent && !e->oo) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	ocrpt_result *r = ocrpt_expr_eval(e->e);
@@ -1110,11 +1140,12 @@ PHP_METHOD(opencreport_expr, eval) {
 
 	object_init_ex(return_value, opencreport_result_ce);
 	ro = Z_OPENCREPORT_RESULT_P(return_value);
+	php_opencreport_object *oo = e->oo;
 	ro->r = r;
+	ro->oo = oo;
+	ro->has_parent = !!oo;
 	ro->freed_by_lib = true;
 
-	php_opencreport_object *oo = e->oo;
-	ro->oo = e->oo;
 	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &ro->zo);
 }
 
@@ -1122,6 +1153,11 @@ PHP_METHOD(opencreport_expr, set_string_value) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
 	zend_string *value;
+
+	if (e->has_parent && !e->oo) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(value);
@@ -1135,6 +1171,11 @@ PHP_METHOD(opencreport_expr, set_long_value) {
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
 	zend_long value;
 
+	if (e->has_parent && !e->oo) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_LONG(value);
 	ZEND_PARSE_PARAMETERS_END();
@@ -1147,6 +1188,11 @@ PHP_METHOD(opencreport_expr, set_double_value) {
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
 	double value;
 
+	if (e->has_parent && !e->oo) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_DOUBLE(value);
 	ZEND_PARSE_PARAMETERS_END();
@@ -1158,6 +1204,11 @@ PHP_METHOD(opencreport_expr, get_num_operands) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
 
+	if (e->has_parent && !e->oo) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	RETURN_LONG(ocrpt_expr_get_num_operands(e->e));
@@ -1167,6 +1218,11 @@ PHP_METHOD(opencreport_expr, operand_get_result) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
 	zend_long opidx;
+
+	if (e->has_parent && !e->oo) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_LONG(opidx);
@@ -1178,11 +1234,12 @@ PHP_METHOD(opencreport_expr, operand_get_result) {
 
 	object_init_ex(return_value, opencreport_result_ce);
 	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(return_value);
+	php_opencreport_object *oo = e->oo;
 	ro->r = r;
+	ro->oo = oo;
+	ro->has_parent = !!oo;
 	ro->freed_by_lib = true;
 
-	php_opencreport_object *oo = e->oo;
-	ro->oo = e->oo;
 	if (oo)
 		oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &ro->zo);
 }
@@ -1239,6 +1296,11 @@ PHP_METHOD(opencreport_result, print) {
 	zval *object = ZEND_THIS;
 	php_opencreport_result_object *r = Z_OPENCREPORT_RESULT_P(object);
 
+	if (r->has_parent && !r->oo) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	ocrpt_result_print(r->r);
@@ -1247,6 +1309,11 @@ PHP_METHOD(opencreport_result, print) {
 PHP_METHOD(opencreport_result, get_type) {
 	zval *object = ZEND_THIS;
 	php_opencreport_result_object *r = Z_OPENCREPORT_RESULT_P(object);
+
+	if (r->has_parent && !r->oo) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
@@ -1535,6 +1602,7 @@ static PHP_MINIT_FUNCTION(opencreport)
 	opencreport_ds_object_handlers.offset = XtOffsetOf(php_opencreport_ds_object, zo);
 	opencreport_ds_object_handlers.clone_obj = NULL;
 	opencreport_ds_object_handlers.free_obj = opencreport_ds_object_free;
+	opencreport_ds_object_handlers.compare = zend_objects_not_comparable;
 	opencreport_ds_ce = zend_register_internal_class(&ce);
 	opencreport_ds_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -1550,6 +1618,7 @@ static PHP_MINIT_FUNCTION(opencreport)
 	opencreport_query_object_handlers.offset = XtOffsetOf(php_opencreport_query_object, zo);
 	opencreport_query_object_handlers.clone_obj = NULL;
 	opencreport_query_object_handlers.free_obj = opencreport_query_object_free;
+	opencreport_query_object_handlers.compare = zend_objects_not_comparable;
 	opencreport_query_ce = zend_register_internal_class(&ce);
 	opencreport_query_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -1565,6 +1634,7 @@ static PHP_MINIT_FUNCTION(opencreport)
 	opencreport_expr_object_handlers.offset = XtOffsetOf(php_opencreport_expr_object, zo);
 	opencreport_expr_object_handlers.clone_obj = NULL;
 	opencreport_expr_object_handlers.free_obj = opencreport_expr_object_free;
+	opencreport_expr_object_handlers.compare = zend_objects_not_comparable;
 	opencreport_expr_ce = zend_register_internal_class(&ce);
 	opencreport_expr_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -1580,6 +1650,7 @@ static PHP_MINIT_FUNCTION(opencreport)
 	opencreport_result_object_handlers.offset = XtOffsetOf(php_opencreport_result_object, zo);
 	opencreport_result_object_handlers.clone_obj = NULL;
 	opencreport_result_object_handlers.free_obj = opencreport_result_object_free;
+	opencreport_result_object_handlers.compare = zend_objects_not_comparable;
 	opencreport_result_ce = zend_register_internal_class(&ce);
 	opencreport_result_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
