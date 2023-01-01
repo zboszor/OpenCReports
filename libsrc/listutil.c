@@ -97,12 +97,7 @@ DLL_EXPORT_SYM ocrpt_list *ocrpt_list_end_append(ocrpt_list *l, ocrpt_list **end
 }
 
 DLL_EXPORT_SYM ocrpt_list *ocrpt_list_append(ocrpt_list *l, const void *data) {
-	ocrpt_list *e;
-
-	if (!l)
-		return ocrpt_makelist1(data);
-	e = ocrpt_list_last(l);
-	return ocrpt_list_end_append(l, &e, data);
+	return ocrpt_list_end_append(l, NULL, data);
 }
 
 DLL_EXPORT_SYM ocrpt_list *ocrpt_list_prepend(ocrpt_list *l, const void *data) {
@@ -119,7 +114,7 @@ DLL_EXPORT_SYM ocrpt_list *ocrpt_list_prepend(ocrpt_list *l, const void *data) {
 	return e;
 }
 
-DLL_EXPORT_SYM ocrpt_list *ocrpt_list_remove(ocrpt_list *l, const void *data) {
+DLL_EXPORT_SYM ocrpt_list *ocrpt_list_end_remove(ocrpt_list *l, ocrpt_list **endptr, const void *data) {
 	ocrpt_list *e, *prev = NULL;
 
 	if (!l)
@@ -133,16 +128,32 @@ DLL_EXPORT_SYM ocrpt_list *ocrpt_list_remove(ocrpt_list *l, const void *data) {
 	if (!e)
 		return l;
 
-	if (prev)
+	if (prev) {
 		prev->next = e->next;
-	else
+
+		if (prev->next == NULL && endptr)
+			*endptr = prev;
+	} else {
 		l = e->next;
+		if (endptr) {
+			if (l) {
+				if (l->next == NULL)
+					*endptr = l;
+			} else
+				*endptr = NULL;
+		}
+	}
+
 	if (l)
 		l->len--;
 
 	ocrpt_mem_free(e);
 
 	return l;
+}
+
+DLL_EXPORT_SYM ocrpt_list *ocrpt_list_remove(ocrpt_list *l, const void *data) {
+	return ocrpt_list_end_remove(l, NULL, data);
 }
 
 DLL_EXPORT_SYM ocrpt_list *ocrpt_list_next(ocrpt_list *l) {

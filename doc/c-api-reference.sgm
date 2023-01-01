@@ -2888,6 +2888,15 @@ ocrpt_list_remove(ocrpt_list *l,
 				</para>
 			</sect3>
 			<sect3>
+				<title>Remove a data element from a list and update the last link</title>
+				<para>
+					<programlisting>ocrpt_list *
+ocrpt_list_end_remove(ocrpt_list *l,
+                      ocrpt_list **endptr,
+                      const void *data);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
 				<title>Get next link in the list</title>
 				<para>
 					This can be used to iterate through a list.
