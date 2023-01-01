@@ -679,9 +679,10 @@ PHP_METHOD(opencreport, datasource_add_odbc) {
 		RETURN_THROWS();
 	}
 
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 4, 4)
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 4)
 		Z_PARAM_STR(source_name);
 		Z_PARAM_STR_EX(dbname, 1, 0);
+		Z_PARAM_OPTIONAL;
 		Z_PARAM_STR_EX(user, 1, 0);
 		Z_PARAM_STR_EX(password, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
@@ -717,12 +718,12 @@ PHP_METHOD(opencreport, datasource_add_odbc2) {
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_STR(source_name);
-		Z_PARAM_STR_EX(connection_info, 1, 0);
+		Z_PARAM_STR(connection_info);
 	ZEND_PARSE_PARAMETERS_END();
 
 	ds = ocrpt_datasource_add_odbc2(
 				oo->o, ZSTR_VAL(source_name),
-				connection_info ? ZSTR_VAL(connection_info) : NULL);
+				ZSTR_VAL(connection_info));
 	if (!ds)
 		RETURN_NULL();
 
@@ -1856,17 +1857,365 @@ ZEND_FUNCTION(rlib_free) {
 	opencreport_object_deinit(oo);
 }
 
+ZEND_FUNCTION(rlib_add_datasource_mysql) {
+	zval *object;
+	zend_string *source_name;
+	zend_string *host, *dbname;
+	zend_string *user, *password;
+	ocrpt_datasource *ds;
+	php_opencreport_ds_object *dso;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 6, 6)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce)
+		Z_PARAM_STR(source_name);
+		Z_PARAM_STR_EX(host, 1, 0);
+		Z_PARAM_STR_EX(user, 1, 0);
+		Z_PARAM_STR_EX(password, 1, 0);
+		Z_PARAM_STR_EX(dbname, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ds = ocrpt_datasource_add_mariadb(
+				oo->o, ZSTR_VAL(source_name),
+				host ? ZSTR_VAL(host) : NULL,
+				NULL /* port */,
+				dbname ? ZSTR_VAL(dbname) : NULL,
+				user ? ZSTR_VAL(user) : NULL,
+				password ? ZSTR_VAL(password) : NULL,
+				NULL /* unix_socket */);
+	if (!ds)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_ds_ce);
+	dso = Z_OPENCREPORT_DS_P(return_value);
+	dso->ds = ds;
+	dso->oo = oo;
+
+	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &dso->zo);
+}
+
+ZEND_FUNCTION(rlib_add_datasource_mysql_from_group) {
+	zval *object;
+	zend_string *source_name;
+	zend_string *option_file, *group;
+	ocrpt_datasource *ds;
+	php_opencreport_ds_object *dso;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 4)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce)
+		Z_PARAM_STR(source_name);
+		Z_PARAM_STR_EX(group, 1, 0);
+		Z_PARAM_OPTIONAL;
+		Z_PARAM_STR_EX(option_file, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ds = ocrpt_datasource_add_mariadb2(
+				oo->o, ZSTR_VAL(source_name),
+				option_file ? ZSTR_VAL(option_file) : NULL,
+				group ? ZSTR_VAL(group) : NULL);
+	if (!ds)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_ds_ce);
+	dso = Z_OPENCREPORT_DS_P(return_value);
+	dso->ds = ds;
+	dso->oo = oo;
+
+	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &dso->zo);
+}
+
+ZEND_FUNCTION(rlib_add_datasource_postgres) {
+	zval *object;
+	zend_string *source_name;
+	zend_string *connection_info;
+	ocrpt_datasource *ds;
+	php_opencreport_ds_object *dso;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce)
+		Z_PARAM_STR(source_name);
+		Z_PARAM_STR_EX(connection_info, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ds = ocrpt_datasource_add_postgresql2(
+				oo->o, ZSTR_VAL(source_name),
+				connection_info ? ZSTR_VAL(connection_info) : NULL);
+	if (!ds)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_ds_ce);
+	dso = Z_OPENCREPORT_DS_P(return_value);
+	dso->ds = ds;
+	dso->oo = oo;
+
+	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &dso->zo);
+}
+
+ZEND_FUNCTION(rlib_add_datasource_odbc) {
+	zval *object;
+	zend_string *source_name;
+	zend_string *dbname, *user, *password;
+	ocrpt_datasource *ds;
+	php_opencreport_ds_object *dso;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 5)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(source_name);
+		Z_PARAM_STR_EX(dbname, 1, 0);
+		Z_PARAM_OPTIONAL;
+		Z_PARAM_STR_EX(user, 1, 0);
+		Z_PARAM_STR_EX(password, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ds = ocrpt_datasource_add_odbc(
+				oo->o, ZSTR_VAL(source_name),
+				dbname ? ZSTR_VAL(dbname) : NULL,
+				user ? ZSTR_VAL(user) : NULL,
+				password ? ZSTR_VAL(password) : NULL);
+	if (!ds)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_ds_ce);
+	dso = Z_OPENCREPORT_DS_P(return_value);
+	dso->ds = ds;
+	dso->oo = oo;
+
+	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &dso->zo);
+}
+
+ZEND_FUNCTION(rlib_add_datasource_array) {
+	zval *object;
+	zend_string *source_name;
+	ocrpt_datasource *ds;
+	php_opencreport_ds_object *dso;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(source_name);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ds = ocrpt_datasource_add_array(oo->o, ZSTR_VAL(source_name));
+	if (!ds)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_ds_ce);
+	dso = Z_OPENCREPORT_DS_P(return_value);
+	dso->ds = ds;
+	dso->oo = oo;
+
+	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &dso->zo);
+}
+
+ZEND_FUNCTION(rlib_add_datasource_xml) {
+	zval *object;
+	zend_string *source_name;
+	ocrpt_datasource *ds;
+	php_opencreport_ds_object *dso;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(source_name);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ds = ocrpt_datasource_add_xml(oo->o, ZSTR_VAL(source_name));
+	if (!ds)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_ds_ce);
+	dso = Z_OPENCREPORT_DS_P(return_value);
+	dso->ds = ds;
+	dso->oo = oo;
+
+	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &dso->zo);
+}
+
+ZEND_FUNCTION(rlib_add_datasource_csv) {
+	zval *object;
+	zend_string *source_name;
+	ocrpt_datasource *ds;
+	php_opencreport_ds_object *dso;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(source_name);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ds = ocrpt_datasource_add_csv(oo->o, ZSTR_VAL(source_name));
+	if (!ds)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_ds_ce);
+	dso = Z_OPENCREPORT_DS_P(return_value);
+	dso->ds = ds;
+	dso->oo = oo;
+
+	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &dso->zo);
+}
+
+ZEND_FUNCTION(rlib_add_query_as) {
+	zval *object;
+	zend_string *source_name, *array_or_file_or_sql, *name;
+	ocrpt_query *q;
+	php_opencreport_query_object *qo;
+	void *array_x;
+	int32_t rows, cols;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 4, 4)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(source_name);
+		Z_PARAM_STR(array_or_file_or_sql);
+		Z_PARAM_STR(name);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ocrpt_datasource *ds = ocrpt_datasource_get(oo->o, ZSTR_VAL(source_name));
+
+	if (ocrpt_datasource_is_array(ds)) {
+		ocrpt_query_discover_array(ZSTR_VAL(array_or_file_or_sql), &array_x, &rows, &cols, NULL, NULL, NULL);
+		q = ocrpt_query_add_array(ds, ZSTR_VAL(name), array_x, rows, cols, NULL, 0);
+	} else if (ocrpt_datasource_is_csv(ds))
+		q = ocrpt_query_add_csv(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), NULL, 0);
+	else if (ocrpt_datasource_is_json(ds))
+		q = ocrpt_query_add_json(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), NULL, 0);
+	else if (ocrpt_datasource_is_xml(ds))
+		q = ocrpt_query_add_xml(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), NULL, 0);
+	else if (ocrpt_datasource_is_postgresql(ds))
+		q = ocrpt_query_add_postgresql(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
+	else if (ocrpt_datasource_is_mariadb(ds))
+		q = ocrpt_query_add_mariadb(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
+	else if (ocrpt_datasource_is_odbc(ds))
+		q = ocrpt_query_add_odbc(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
+	else
+		RETURN_NULL();
+
+	if (!q)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_query_ce);
+	qo = Z_OPENCREPORT_QUERY_P(return_value);
+	qo->q = q;
+
+	qo->oo = oo;
+	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &qo->zo);
+}
+
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_rlib_init, 0, 0, OpenCReport, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_free, 0, 1, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_rlib_add_datasource_mysql, 0, 6, OpenCReport\\Datasource, 1)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, password, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, dbname, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_rlib_add_datasource_mysql_from_group, 0, 3, OpenCReport\\Datasource, 1)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, group, IS_STRING, 0)
+ZEND_ARG_VARIADIC_TYPE_INFO(0, option_file, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_rlib_add_datasource_postgres, 0, 3, OpenCReport\\Datasource, 1)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, connection_info, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_rlib_add_datasource_odbc, 0, 3, OpenCReport\\Datasource, 1)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, dsn, IS_STRING, 0)
+ZEND_ARG_VARIADIC_TYPE_INFO(0, user, IS_STRING, 1)
+ZEND_ARG_VARIADIC_TYPE_INFO(0, password, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_rlib_add_datasource_array, 0, 2, OpenCReport\\Datasource, 1)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_rlib_add_datasource_xml, 0, 2, OpenCReport\\Datasource, 1)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_rlib_add_datasource_csv, 0, 2, OpenCReport\\Datasource, 1)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_rlib_add_query_as, 0, 4, OpenCReport\\Query, 1)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, array_or_file_or_sql, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, query_name, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 /* {{{ zend_function_entry */
 static const zend_function_entry opencreport_functions[] = {
 	ZEND_FE(rlib_init, arginfo_rlib_init)
 	ZEND_FE(rlib_free, arginfo_rlib_free)
-#if 0
 	ZEND_FE(rlib_add_datasource_mysql, arginfo_rlib_add_datasource_mysql)
 	ZEND_FE(rlib_add_datasource_mysql_from_group, arginfo_rlib_add_datasource_mysql_from_group)
 	ZEND_FE(rlib_add_datasource_postgres, arginfo_rlib_add_datasource_postgres)
@@ -1875,6 +2224,7 @@ static const zend_function_entry opencreport_functions[] = {
 	ZEND_FE(rlib_add_datasource_xml, arginfo_rlib_add_datasource_xml)
 	ZEND_FE(rlib_add_datasource_csv, arginfo_rlib_add_datasource_csv)
 	ZEND_FE(rlib_add_query_as, arginfo_rlib_add_query_as)
+#if 0
 	ZEND_FE(rlib_graph_add_bg_region, arginfo_rlib_graph_add_bg_region)
 	ZEND_FE(rlib_graph_clear_bg_region, arginfo_rlib_graph_clear_bg_region)
 	ZEND_FE(rlib_graph_set_x_minor_tick, arginfo_rlib_graph_set_x_minor_tick)
