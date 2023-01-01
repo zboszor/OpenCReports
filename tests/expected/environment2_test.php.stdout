@@ -1,0 +1,6 @@
+OCRPTENV is set.
+Before resolving: m.'OCRPTENV'
+After resolving: (string)This is a test string
+OCRPTENV is unset.
+Before resolving: m.'OCRPTENV'
+After resolving: (string)NULL

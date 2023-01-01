@@ -21,7 +21,6 @@ typedef struct _php_opencreport_object {
 	ocrpt_list *assoc_objs_last;
 	ocrpt_list *funcnames;
 	ocrpt_list *funcnames_last;
-	bool in_dtor;
 	zend_object zo;
 } php_opencreport_object;
 
@@ -34,6 +33,8 @@ static inline php_opencreport_object *php_opencreport_from_obj(zend_object *obj)
 typedef struct _php_opencreport_ds_object {
 	ocrpt_datasource *ds;
 	php_opencreport_object *oo;
+	ocrpt_list *assoc_objs;
+	ocrpt_list *assoc_objs_last;
 	zend_object zo;
 } php_opencreport_ds_object;
 
@@ -46,6 +47,7 @@ static inline php_opencreport_ds_object *php_opencreport_ds_from_obj(zend_object
 typedef struct _php_opencreport_query_object {
 	ocrpt_query *q;
 	php_opencreport_object *oo;
+	php_opencreport_ds_object *ds;
 	zend_object zo;
 } php_opencreport_query_object;
 
@@ -58,7 +60,6 @@ static inline php_opencreport_query_object *php_opencreport_query_from_obj(zend_
 typedef struct _php_opencreport_expr_object {
 	ocrpt_expr *e;
 	php_opencreport_object *oo;
-	bool freed_by_lib;
 	zend_object zo;
 } php_opencreport_expr_object;
 

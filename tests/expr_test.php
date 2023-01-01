@@ -175,16 +175,17 @@ foreach ($exprs as &$str) {
 	echo "string: " . $str . PHP_EOL;
 	[ $e, $err ] = $o->expr_parse($str);
 	if ($e instanceof OpenCReport\Expr) {
-		echo "expr reprinted: " . $e->print();
+		echo "expr reprinted: "; flush();
+		$e->print();
 		echo "expr nodes: " . $e->nodes() . PHP_EOL;
 
 		$e->optimize();
-		echo "expr optimized: " . $e->print();
-		echo "expr nodes: " . $e->nodes();
+		echo "expr optimized: "; flush();
+		$e->print();
+		echo "expr nodes: " . $e->nodes() . PHP_EOL;
 
 		$r = $e->eval();
 		$r->print();
-		echo PHP_EOL;
 	} else {
 		echo $err . PHP_EOL;
 	}

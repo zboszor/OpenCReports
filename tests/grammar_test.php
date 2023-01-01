@@ -447,7 +447,8 @@ foreach ($exprs as &$str) {
 
 	[ $e, $err ] = $o->expr_parse($str);
 	if ($e instanceof OpenCReport\Expr) {
-		echo "expr reprinted: " . $e->print();
+		echo "expr reprinted: "; flush();
+		$e->print();
 		echo "expr nodes: " . $e->nodes() . PHP_EOL;
 	} else {
 		echo $err . PHP_EOL;
