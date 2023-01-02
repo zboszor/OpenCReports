@@ -105,6 +105,8 @@ struct ocrpt_expr {
 
 ocrpt_expr *newblankexpr(opencreport *o, ocrpt_report *r, enum ocrpt_expr_type type, uint32_t n_ops);
 ocrpt_expr *ocrpt_newstring(opencreport *o, ocrpt_report *r, const char *string);
+ocrpt_expr *ocrpt_newstring_add_to_list(opencreport *o, ocrpt_report *r, const char *string);
+void ocrpt_expr_free_internal(ocrpt_expr *e, bool free_from_list);
 
 void ocrpt_expr_print_internal(ocrpt_expr *e, ocrpt_printf_func func);
 void ocrpt_expr_result_deep_print_worker(ocrpt_expr *e, ocrpt_printf_func func);

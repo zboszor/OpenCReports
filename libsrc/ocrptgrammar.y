@@ -484,8 +484,10 @@ static ocrpt_expr *ocrpt_expr_parse_internal(opencreport *o, ocrpt_report *r, co
 		r->exprs = ocrpt_list_end_append(r->exprs, &r->exprs_last, yyextra.last_expr);
 		yyextra.last_expr->result_index = r->num_expressions++;
 		yyextra.last_expr->result_index_set = true;
-	} else
+	} else {
+		o->exprs = ocrpt_list_end_append(o->exprs, &o->exprs_last, yyextra.last_expr);
 		yyextra.last_expr->result_index = -1;
+	}
 
 	yyextra.last_expr->o = o;
 	yyextra.last_expr->r = r;

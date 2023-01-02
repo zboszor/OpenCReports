@@ -64,13 +64,15 @@ DLL_EXPORT_SYM void ocrpt_result_free(ocrpt_result *r) {
 	ocrpt_mem_free(r);
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_free(ocrpt_expr *e) {
+void ocrpt_expr_free_internal(ocrpt_expr *e, bool free_from_list) {
 	if (!e)
 		return;
 
-	if (e->r && !e->r->executing) {
-		e->r->exprs = ocrpt_list_remove(e->r->exprs, e);
-		e->r->exprs_last = NULL;
+	if (free_from_list) {
+		if (e->r)
+			e->r->exprs = ocrpt_list_end_remove(e->r->exprs, &e->r->exprs_last, e);
+		if (e->o)
+			e->o->exprs = ocrpt_list_end_remove(e->o->exprs, &e->o->exprs_last, e);
 	}
 
 	uint32_t i;
@@ -111,6 +113,10 @@ DLL_EXPORT_SYM void ocrpt_expr_free(ocrpt_expr *e) {
 			ocrpt_mem_free(e->result[i]);
 	ocrpt_result_free(e->delayed_result);
 	ocrpt_mem_free(e);
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_free(ocrpt_expr *e) {
+	ocrpt_expr_free_internal(e, true);
 }
 
 void ocrpt_image_free(const void *ptr) {

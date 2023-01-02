@@ -170,6 +170,18 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	}
 
 	ocrpt_parts_free(o);
+
+	for (ocrpt_list *l = o->exprs; l; l = l->next) {
+		ocrpt_expr *e = (ocrpt_expr *)l->data;
+		/*
+		 * Any ocrpt_report pointer is freed at this point.
+		 * Setting the lingering pointer to NULL avoids use-after-free.
+		 */
+		e->r = NULL;
+		ocrpt_expr_free_internal(e, false);
+	}
+	ocrpt_list_free(o->exprs);
+
 	if (o->locale)
 		freelocale(o->locale);
 

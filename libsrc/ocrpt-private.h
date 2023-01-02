@@ -44,6 +44,10 @@ struct opencreport {
 	ocrpt_function **functions;
 	int32_t n_functions;
 
+	/* List of expressions not assigned to an ocrpt_report structure */
+	ocrpt_list *exprs;
+	ocrpt_list *exprs_last;
+
 	/* List and array of struct ocrpt_datasource */
 	ocrpt_list *datasources;
 

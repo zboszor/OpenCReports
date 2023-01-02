@@ -163,8 +163,11 @@ void ocrpt_report_free(ocrpt_report *r) {
 	ocrpt_variables_free(r);
 	ocrpt_breaks_free(r);
 	r->executing = true;
-	for (ocrpt_list *l = r->exprs; l; l = l->next)
-		ocrpt_expr_free((ocrpt_expr *)l->data);
+	for (ocrpt_list *l = r->exprs; l; l = l->next) {
+		ocrpt_expr *e = (ocrpt_expr *)l->data;
+		e->o->exprs = ocrpt_list_end_remove(e->o->exprs, &e->o->exprs_last, e);
+		ocrpt_expr_free_internal(e, false);
+	}
 	ocrpt_list_free(r->exprs);
 	r->executing = false;
 	r->exprs = r->exprs_last = NULL;

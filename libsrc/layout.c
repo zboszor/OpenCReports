@@ -1082,7 +1082,7 @@ ocrpt_expr *ocrpt_layout_expr_parse(opencreport *o, ocrpt_report *r, const char 
 			ocrpt_err_printf("Cannot parse: %s\n", expr);
 
 		if (create_string)
-			e = ocrpt_newstring(o, r, expr);
+			e = ocrpt_newstring_add_to_list(o, r, expr);
 	}
 	ocrpt_strfree(err);
 
@@ -1317,7 +1317,7 @@ DLL_EXPORT_SYM void ocrpt_image_set_alignment(ocrpt_image *image, const char *ex
 
 	if (expr_string) {
 		if (strcasecmp(expr_string, "left") == 0 || strcasecmp(expr_string, "right") == 0 || strcasecmp(expr_string, "center") == 0)
-			image->align = ocrpt_newstring(image->output->o, image->output->r, expr_string);
+			image->align = ocrpt_newstring_add_to_list(image->output->o, image->output->r, expr_string);
 		else
 			image->align = ocrpt_layout_expr_parse(image->output->o, image->output->r, expr_string, true, false);
 	} else
@@ -1376,7 +1376,7 @@ DLL_EXPORT_SYM void ocrpt_text_set_value_string(ocrpt_text *text, const char *st
 	if (text->value)
 		ocrpt_expr_free(text->value);
 
-	text->value = string ? ocrpt_newstring(text->output->o, text->output->r, string) : NULL;
+	text->value = string ? ocrpt_newstring_add_to_list(text->output->o, text->output->r, string) : NULL;
 
 	ocrpt_text_set_rvalue_internal(text);
 }
@@ -1439,7 +1439,7 @@ DLL_EXPORT_SYM void ocrpt_text_set_alignment(ocrpt_text *text, const char *expr_
 
 	if (expr_string) {
 		if (strcasecmp(expr_string, "left") == 0 || strcasecmp(expr_string, "right") == 0 || strcasecmp(expr_string, "center") == 0 || strcasecmp(expr_string, "justified") == 0)
-			text->align = ocrpt_newstring(text->output->o, text->output->r, expr_string);
+			text->align = ocrpt_newstring_add_to_list(text->output->o, text->output->r, expr_string);
 		else
 			text->align = ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false);
 	} else

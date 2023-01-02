@@ -81,6 +81,14 @@ ocrpt_expr *ocrpt_newstring(opencreport *o, ocrpt_report *r, const char *string)
 	return e;
 }
 
+ocrpt_expr *ocrpt_newstring_add_to_list(opencreport *o, ocrpt_report *r, const char *string) {
+	ocrpt_expr *e = ocrpt_newstring(o, r, string);
+
+	o->exprs = ocrpt_list_end_append(o->exprs, &o->exprs_last, e);
+
+	return e;
+}
+
 static void ocrpt_expr_print_worker(ocrpt_expr *e, int depth, const char *delimiter, ocrpt_string *str) {
 	ocrpt_result *result;
 	int i;
