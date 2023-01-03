@@ -46,6 +46,7 @@
 static zend_object_handlers opencreport_object_handlers;
 static zend_object_handlers opencreport_ds_object_handlers;
 static zend_object_handlers opencreport_query_object_handlers;
+static zend_object_handlers opencreport_query_result_object_handlers;
 static zend_object_handlers opencreport_expr_object_handlers;
 static zend_object_handlers opencreport_result_object_handlers;
 
@@ -53,6 +54,7 @@ static zend_object_handlers opencreport_result_object_handlers;
 zend_class_entry *opencreport_ce;
 zend_class_entry *opencreport_ds_ce;
 zend_class_entry *opencreport_query_ce;
+zend_class_entry *opencreport_query_result_ce;
 zend_class_entry *opencreport_expr_ce;
 zend_class_entry *opencreport_result_ce;
 
@@ -84,6 +86,9 @@ static void php_opencreport_kill_assoc_refs(const void *ptr) {
 	} else if (instanceof_function(obj->ce, opencreport_query_ce)) {
 		php_opencreport_query_object *qo = php_opencreport_query_from_obj(obj);
 		qo->oo = NULL;
+	} else if (instanceof_function(obj->ce, opencreport_query_result_ce)) {
+		php_opencreport_query_result_object *qro = php_opencreport_query_result_from_obj(obj);
+		qro->oo = NULL;
 	} else if (instanceof_function(obj->ce, opencreport_expr_ce)) {
 		php_opencreport_expr_object *eo = php_opencreport_expr_from_obj(obj);
 		eo->oo = NULL;
@@ -182,6 +187,58 @@ static void opencreport_query_object_free(zend_object *object) /* {{{ */
 	qo->q = NULL;
 	qo->oo = NULL;
 
+	ocrpt_list_free_deep(qo->assoc_objs, php_opencreport_kill_assoc_refs);
+	qo->assoc_objs = NULL;
+	qo->assoc_objs_last = NULL;
+
+	zend_object_std_dtor(object);
+}
+/* }}} */
+
+static zend_object *opencreport_query_result_object_new(zend_class_entry *class_type) /* {{{ */
+{
+	php_opencreport_query_result_object *intern;
+
+	intern = zend_object_alloc(sizeof(php_opencreport_query_result_object), class_type);
+
+	zend_object_std_init(&intern->zo, class_type);
+	object_properties_init(&intern->zo, class_type);
+
+	intern->zo.handlers = &opencreport_query_result_object_handlers;
+
+	return &intern->zo;
+}
+/* }}} */
+
+static void php_opencreport_query_result_kill_assoc_refs(const void *ptr) {
+	zend_object *obj = (zend_object *)ptr;
+
+	if (instanceof_function(obj->ce, opencreport_result_ce)) {
+		php_opencreport_result_object *ro = php_opencreport_result_from_obj(obj);
+		ro->qro = NULL;
+	}
+}
+
+static void opencreport_query_result_object_free(zend_object *object) /* {{{ */
+{
+	php_opencreport_query_result_object *qro = php_opencreport_query_result_from_obj(object);
+	php_opencreport_object *oo = qro->oo;
+	php_opencreport_query_object *qo = qro->qo;
+
+	if (oo)
+		oo->assoc_objs = ocrpt_list_end_remove(oo->assoc_objs, &oo->assoc_objs_last, object);
+	if (qo)
+		qo->assoc_objs = ocrpt_list_end_remove(qo->assoc_objs, &qo->assoc_objs_last, object);
+
+	qro->qr = NULL;
+	qro->qo = NULL;
+	qro->oo = NULL;
+	qro->cols = 0;
+
+	ocrpt_list_free_deep(qro->assoc_objs, php_opencreport_query_result_kill_assoc_refs);
+	qro->assoc_objs = NULL;
+	qro->assoc_objs_last = NULL;
+
 	zend_object_std_dtor(object);
 }
 /* }}} */
@@ -235,9 +292,12 @@ static void opencreport_result_object_free(zend_object *object) /* {{{ */
 {
 	php_opencreport_result_object *ro = php_opencreport_result_from_obj(object);
 	php_opencreport_object *oo = ro->oo;
+	php_opencreport_query_result_object *qro = ro->qro;
 
 	if (oo)
 		oo->assoc_objs = ocrpt_list_end_remove(oo->assoc_objs, &oo->assoc_objs_last, object);
+	if (ro->has_query && qro)
+		qro->assoc_objs = ocrpt_list_end_remove(qro->assoc_objs, &qro->assoc_objs_last, object);
 
 	if (ro->r && !ro->freed_by_lib)
 		ocrpt_result_free(ro->r);
@@ -255,7 +315,7 @@ PHP_METHOD(opencreport, parse_xml) {
 	zend_string *filename;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -272,7 +332,7 @@ PHP_METHOD(opencreport, set_output_format) {
 	zend_long format;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -288,7 +348,7 @@ PHP_METHOD(opencreport, execute) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -302,7 +362,7 @@ PHP_METHOD(opencreport, spool) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -316,7 +376,7 @@ PHP_METHOD(opencreport, get_output) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -340,7 +400,7 @@ PHP_METHOD(opencreport, set_numeric_precision_bits) {
 	zend_long prec;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -357,7 +417,7 @@ PHP_METHOD(opencreport, set_rounding_mode) {
 	zend_long mode;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -375,7 +435,7 @@ PHP_METHOD(opencreport, bindtextdomain) {
 	zend_string *dirname;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -393,7 +453,7 @@ PHP_METHOD(opencreport, set_locale) {
 	zend_string *locale;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -412,7 +472,7 @@ PHP_METHOD(opencreport, datasource_add_array) {
 	php_opencreport_ds_object *dso;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -440,7 +500,7 @@ PHP_METHOD(opencreport, datasource_add_csv) {
 	php_opencreport_ds_object *dso;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -468,7 +528,7 @@ PHP_METHOD(opencreport, datasource_add_json) {
 	php_opencreport_ds_object *dso;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -496,7 +556,7 @@ PHP_METHOD(opencreport, datasource_add_xml) {
 	php_opencreport_ds_object *dso;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -526,7 +586,7 @@ PHP_METHOD(opencreport, datasource_add_postgresql) {
 	php_opencreport_ds_object *dso;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -566,7 +626,7 @@ PHP_METHOD(opencreport, datasource_add_postgresql2) {
 	php_opencreport_ds_object *dso;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -599,7 +659,7 @@ PHP_METHOD(opencreport, datasource_add_mariadb) {
 	php_opencreport_ds_object *dso;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -641,7 +701,7 @@ PHP_METHOD(opencreport, datasource_add_mariadb2) {
 	php_opencreport_ds_object *dso;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -675,7 +735,7 @@ PHP_METHOD(opencreport, datasource_add_odbc) {
 	php_opencreport_ds_object *dso;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -712,7 +772,7 @@ PHP_METHOD(opencreport, datasource_add_odbc2) {
 	php_opencreport_ds_object *dso;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -735,13 +795,69 @@ PHP_METHOD(opencreport, datasource_add_odbc2) {
 	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &dso->zo);
 }
 
+PHP_METHOD(opencreport, datasource_get) {
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+	zend_string *source_name;
+	ocrpt_datasource *ds;
+	php_opencreport_ds_object *dso;
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR(source_name);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ds = ocrpt_datasource_get(oo->o, ZSTR_VAL(source_name));
+	if (!ds)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_ds_ce);
+	dso = Z_OPENCREPORT_DS_P(return_value);
+	dso->ds = ds;
+	dso->oo = oo;
+
+	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &dso->zo);
+}
+
+PHP_METHOD(opencreport, query_get) {
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+	zend_string *query_name;
+	ocrpt_query *q;
+	php_opencreport_query_object *qo;
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR(query_name);
+	ZEND_PARSE_PARAMETERS_END();
+
+	q = ocrpt_query_get(oo->o, ZSTR_VAL(query_name));
+	if (!q)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_query_ce);
+	qo = Z_OPENCREPORT_QUERY_P(return_value);
+	qo->q = q;
+	qo->oo = oo;
+
+	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &qo->zo);
+}
+
 PHP_METHOD(opencreport, expr_parse) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *expr_string;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -835,7 +951,7 @@ PHP_METHOD(opencreport, function_add) {
 	zend_bool commutative, associative, left_associative, dont_optimize;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -914,8 +1030,10 @@ PHP_METHOD(opencreport, env_get) {
 	object_init_ex(return_value, opencreport_result_ce);
 	ro = Z_OPENCREPORT_RESULT_P(return_value);
 	ro->oo = NULL;
+	ro->qro = NULL;
 	ro->r = r;
 	ro->has_parent = false;
+	ro->has_query = false;
 	ro->freed_by_lib = false;
 }
 
@@ -925,7 +1043,7 @@ PHP_METHOD(opencreport, add_search_path) {
 	zend_string *path;
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1033,6 +1151,14 @@ ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
 ZEND_ARG_TYPE_INFO(0, connection_info, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_get, 0, 1, OpenCReport\\Datasource, 1)
+ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_query_get, 0, 1, OpenCReport\\Query, 1)
+ZEND_ARG_TYPE_INFO(0, query_name, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_parse, 0, 1, IS_ARRAY, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 0)
 ZEND_END_ARG_INFO()
@@ -1089,6 +1215,8 @@ static const zend_function_entry opencreport_class_methods[] = {
 	PHP_ME(opencreport, datasource_add_mariadb2, arginfo_opencreport_datasource_add_mariadb2, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, datasource_add_odbc, arginfo_opencreport_datasource_add_odbc, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, datasource_add_odbc2, arginfo_opencreport_datasource_add_odbc2, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport, datasource_get, arginfo_opencreport_datasource_get, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport, query_get, arginfo_opencreport_query_get, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* Expression related methods */
 	PHP_ME(opencreport, expr_parse, arginfo_opencreport_expr_parse, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* Function related methods */
@@ -1111,7 +1239,7 @@ PHP_METHOD(opencreport_ds, query_add) {
 	int32_t rows, cols, types_cols = 0;
 
 	if (!ds->oo) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1166,18 +1294,332 @@ PHP_METHOD(opencreport_ds, query_add) {
 	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &qo->zo);
 }
 
+PHP_METHOD(opencreport_ds, set_encoding) {
+	zval *object = ZEND_THIS;
+	php_opencreport_ds_object *ds = Z_OPENCREPORT_DS_P(object);
+	zend_string *encoding;
+
+	if (!ds->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR(encoding);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_datasource_set_encoding(ds->ds, ZSTR_VAL(encoding));
+}
+
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_ds_query_add, 0, 3, OpenCReport\\Query, 1)
 ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 ZEND_ARG_TYPE_INFO(0, array_or_file_or_sql, IS_STRING, 0)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, types, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_ds_set_encoding, 0, 1, IS_VOID, 1)
+ZEND_ARG_TYPE_INFO(0, encoding, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry opencreport_ds_class_methods[] = {
 	PHP_ME(opencreport_ds, query_add, arginfo_opencreport_ds_query_add, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_ds, set_encoding, arginfo_opencreport_ds_set_encoding, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 
+PHP_METHOD(opencreport_query, get_result) {
+	zval *object = ZEND_THIS;
+	php_opencreport_query_object *q = Z_OPENCREPORT_QUERY_P(object);
+
+	if (!q->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!q->q) {
+		zend_throw_error(NULL, "This OpenCReport\\Query object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	object_init_ex(return_value, opencreport_query_result_ce);
+	php_opencreport_query_result_object *qro = Z_OPENCREPORT_QUERY_RESULT_P(return_value);
+	qro->qo = q;
+	qro->cols = 0;
+	qro->qr = ocrpt_query_get_result(q->q, &qro->cols);
+	qro->assoc_objs = NULL;
+	qro->assoc_objs_last = NULL;
+
+	php_opencreport_object *oo = q->oo;
+	qro->oo = q->oo;
+	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &qro->zo);
+	q->assoc_objs = ocrpt_list_end_append(q->assoc_objs, &q->assoc_objs_last, &qro->zo);
+}
+
+PHP_METHOD(opencreport_query, navigate_start) {
+	zval *object = ZEND_THIS;
+	php_opencreport_query_object *q = Z_OPENCREPORT_QUERY_P(object);
+
+	if (!q->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!q->q) {
+		zend_throw_error(NULL, "This OpenCReport\\Query object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if (!q->q)
+		RETURN_NULL();
+
+	ocrpt_query_navigate_start(q->q);
+}
+
+PHP_METHOD(opencreport_query, navigate_next) {
+	zval *object = ZEND_THIS;
+	php_opencreport_query_object *q = Z_OPENCREPORT_QUERY_P(object);
+
+	if (!q->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!q->q) {
+		zend_throw_error(NULL, "This OpenCReport\\Query object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if (!q->q)
+		RETURN_NULL();
+
+	RETURN_BOOL(ocrpt_query_navigate_next(q->q));
+}
+
+PHP_METHOD(opencreport_query, add_follower) {
+	zval *object = ZEND_THIS;
+	php_opencreport_query_object *q = Z_OPENCREPORT_QUERY_P(object);
+	zval *fobj;
+
+	if (!q->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!q->q) {
+		zend_throw_error(NULL, "This OpenCReport\\Query object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_OBJECT_OF_CLASS(fobj, opencreport_query_ce);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_query_object *fo = Z_OPENCREPORT_QUERY_P(fobj);
+	if (!fo->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!q->q || !fo->q)
+		RETURN_NULL();
+
+	RETURN_BOOL(ocrpt_query_add_follower(q->q, fo->q));
+}
+
+PHP_METHOD(opencreport_query, add_follower_n_to_1) {
+	zval *object = ZEND_THIS;
+	php_opencreport_query_object *q = Z_OPENCREPORT_QUERY_P(object);
+	zval *fobj;
+	zval *mobj;
+
+	if (!q->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!q->q) {
+		zend_throw_error(NULL, "This OpenCReport\\Query object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_OBJECT_OF_CLASS(fobj, opencreport_query_ce);
+		Z_PARAM_OBJECT_OF_CLASS(mobj, opencreport_expr_ce);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_query_object *fo = Z_OPENCREPORT_QUERY_P(fobj);
+	if (!fo->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(mobj);
+	if (!eo->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!q->q || !fo->q || !eo->e)
+		RETURN_NULL();
+
+	RETURN_BOOL(ocrpt_query_add_follower_n_to_1(q->q, fo->q, eo->e));
+}
+
+PHP_METHOD(opencreport_query, free) {
+	zval *object = ZEND_THIS;
+	php_opencreport_query_object *q = Z_OPENCREPORT_QUERY_P(object);
+
+	if (!q->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!q->q) {
+		zend_throw_error(NULL, "This OpenCReport\\Query object was freed");
+		RETURN_THROWS();
+	}
+
+	ocrpt_query_free(q->q);
+	q->q = NULL;
+	q->oo->assoc_objs = ocrpt_list_end_remove(q->oo->assoc_objs, &q->oo->assoc_objs_last, object);
+}
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_query_get_result, 0, 3, OpenCReport\\QueryResult, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_navigate_start, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_navigate_next, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_add_follower, 0, 0, _IS_BOOL, 0)
+ZEND_ARG_OBJ_INFO(0, follower, OpenCReport\\Query, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_add_follower_n_to_1, 0, 0, _IS_BOOL, 0)
+ZEND_ARG_OBJ_INFO(0, follower, OpenCReport\\Query, 0)
+ZEND_ARG_OBJ_INFO(0, match, OpenCReport\\Expr, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_free, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry opencreport_query_class_methods[] = {
+	PHP_ME(opencreport_query, get_result, arginfo_opencreport_query_get_result, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_query, navigate_start, arginfo_opencreport_query_navigate_start, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_query, navigate_next, arginfo_opencreport_query_navigate_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_query, add_follower, arginfo_opencreport_query_add_follower, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_query, add_follower_n_to_1, arginfo_opencreport_query_add_follower_n_to_1, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_query, free, arginfo_opencreport_query_free, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_FE_END
+};
+
+PHP_METHOD(opencreport_query_result, columns) {
+	zval *object = ZEND_THIS;
+	php_opencreport_query_result_object *qr = Z_OPENCREPORT_QUERY_RESULT_P(object);
+
+	if (!qr->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!qr->qo) {
+		zend_throw_error(NULL, "Parent OpenCReport\\Query object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_LONG(qr->cols);
+}
+
+PHP_METHOD(opencreport_query_result, column_name) {
+	zval *object = ZEND_THIS;
+	php_opencreport_query_result_object *qr = Z_OPENCREPORT_QUERY_RESULT_P(object);
+	zend_long index;
+
+	if (!qr->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!qr->qo) {
+		zend_throw_error(NULL, "Parent OpenCReport\\Query object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_LONG(index);
+	ZEND_PARSE_PARAMETERS_END();
+
+	if (index < 0 || index >= qr->cols)
+		RETURN_NULL();
+
+	RETURN_STRING(ocrpt_query_result_column_name(qr->qr, index));
+}
+
+PHP_METHOD(opencreport_query_result, column_result) {
+	zval *object = ZEND_THIS;
+	php_opencreport_query_result_object *qr = Z_OPENCREPORT_QUERY_RESULT_P(object);
+	zend_long index;
+
+	if (!qr->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!qr->qo) {
+		zend_throw_error(NULL, "Parent OpenCReport\\Query object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_LONG(index);
+	ZEND_PARSE_PARAMETERS_END();
+
+	if (index < 0 || index >= qr->cols)
+		RETURN_NULL();
+
+	ocrpt_result *r = ocrpt_query_result_column_result(qr->qr, index);
+
+	if (!r)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_result_ce);
+	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(return_value);
+	php_opencreport_object *oo = qr->oo;
+	ro->r = r;
+	ro->qro = qr;
+	ro->oo = oo;
+	ro->has_parent = !!oo;
+	ro->has_query = true;
+	ro->freed_by_lib = true;
+
+	qr->assoc_objs = ocrpt_list_end_append(qr->assoc_objs, &qr->assoc_objs_last, &ro->zo);
+}
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_result_columns, 0, 0, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_result_column_name, 0, 1, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, index, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_query_result_column_result, 0, 1, OpenCReport\\Result, 1)
+ZEND_ARG_TYPE_INFO(0, index, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+static const zend_function_entry opencreport_query_result_class_methods[] = {
+	PHP_ME(opencreport_query_result, columns, arginfo_opencreport_query_result_columns, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_query_result, column_name, arginfo_opencreport_query_result_column_name, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_query_result, column_result, arginfo_opencreport_query_result_column_result, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 
@@ -1186,7 +1628,7 @@ PHP_METHOD(opencreport_expr, print) {
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
 
 	if (e->has_parent && !e->oo) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1200,7 +1642,7 @@ PHP_METHOD(opencreport_expr, nodes) {
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
 
 	if (e->has_parent && !e->oo) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1214,7 +1656,7 @@ PHP_METHOD(opencreport_expr, optimize) {
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
 
 	if (e->has_parent && !e->oo) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1228,7 +1670,7 @@ PHP_METHOD(opencreport_expr, resolve) {
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
 
 	if (e->has_parent && !e->oo) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1243,7 +1685,7 @@ PHP_METHOD(opencreport_expr, eval) {
 	php_opencreport_result_object *ro;
 
 	if (e->has_parent && !e->oo) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1270,7 +1712,7 @@ PHP_METHOD(opencreport_expr, set_string_value) {
 	zend_string *value;
 
 	if (e->has_parent && !e->oo) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1287,7 +1729,7 @@ PHP_METHOD(opencreport_expr, set_long_value) {
 	zend_long value;
 
 	if (e->has_parent && !e->oo) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1304,7 +1746,7 @@ PHP_METHOD(opencreport_expr, set_double_value) {
 	double value;
 
 	if (e->has_parent && !e->oo) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1320,7 +1762,7 @@ PHP_METHOD(opencreport_expr, get_num_operands) {
 	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
 
 	if (e->has_parent && !e->oo) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1335,7 +1777,7 @@ PHP_METHOD(opencreport_expr, operand_get_result) {
 	zend_long opidx;
 
 	if (e->has_parent && !e->oo) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1357,6 +1799,20 @@ PHP_METHOD(opencreport_expr, operand_get_result) {
 
 	if (oo)
 		oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &ro->zo);
+}
+
+PHP_METHOD(opencreport_expr, cmp_results) {
+	zval *object = ZEND_THIS;
+	php_opencreport_expr_object *e = Z_OPENCREPORT_EXPR_P(object);
+
+	if (e->has_parent && !e->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_BOOL(ocrpt_expr_cmp_results(e->e));
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_print, 0, 0, IS_VOID, 0)
@@ -1393,6 +1849,9 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_expr_operand_get_resu
 ZEND_ARG_TYPE_INFO(0, opidx, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_cmp_results, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry opencreport_expr_class_methods[] = {
 	PHP_ME(opencreport_expr, print, arginfo_opencreport_expr_print, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, nodes, arginfo_opencreport_expr_nodes, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -1404,6 +1863,7 @@ static const zend_function_entry opencreport_expr_class_methods[] = {
 	PHP_ME(opencreport_expr, set_double_value, arginfo_opencreport_expr_set_double_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, get_num_operands, arginfo_opencreport_expr_get_num_operands, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, operand_get_result, arginfo_opencreport_expr_operand_get_result, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, cmp_results, arginfo_opencreport_expr_cmp_results, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 
@@ -1412,7 +1872,12 @@ PHP_METHOD(opencreport_result, print) {
 	php_opencreport_result_object *r = Z_OPENCREPORT_RESULT_P(object);
 
 	if (r->has_parent && !r->oo) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (r->has_query && !r->qro) {
+		zend_throw_error(NULL, "Parent OpenCReport\\QueryResult object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1426,7 +1891,12 @@ PHP_METHOD(opencreport_result, get_type) {
 	php_opencreport_result_object *r = Z_OPENCREPORT_RESULT_P(object);
 
 	if (r->has_parent && !r->oo) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (r->has_query && !r->qro) {
+		zend_throw_error(NULL, "Parent OpenCReport\\QueryResult object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1435,15 +1905,145 @@ PHP_METHOD(opencreport_result, get_type) {
 	RETURN_LONG(ocrpt_result_get_type(r->r));
 }
 
+PHP_METHOD(opencreport_result, is_null) {
+	zval *object = ZEND_THIS;
+	php_opencreport_result_object *r = Z_OPENCREPORT_RESULT_P(object);
+
+	if (r->has_parent && !r->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (r->has_query && !r->qro) {
+		zend_throw_error(NULL, "Parent OpenCReport\\QueryResult object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_BOOL(ocrpt_result_isnull(r->r));
+}
+
+PHP_METHOD(opencreport_result, is_string) {
+	zval *object = ZEND_THIS;
+	php_opencreport_result_object *r = Z_OPENCREPORT_RESULT_P(object);
+
+	if (r->has_parent && !r->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (r->has_query && !r->qro) {
+		zend_throw_error(NULL, "Parent OpenCReport\\QueryResult object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_BOOL(ocrpt_result_isstring(r->r));
+}
+
+PHP_METHOD(opencreport_result, is_number) {
+	zval *object = ZEND_THIS;
+	php_opencreport_result_object *r = Z_OPENCREPORT_RESULT_P(object);
+
+	if (r->has_parent && !r->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (r->has_query && !r->qro) {
+		zend_throw_error(NULL, "Parent OpenCReport\\QueryResult object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_BOOL(ocrpt_result_isnumber(r->r));
+}
+
+PHP_METHOD(opencreport_result, get_string) {
+	zval *object = ZEND_THIS;
+	php_opencreport_result_object *r = Z_OPENCREPORT_RESULT_P(object);
+
+	if (r->has_parent && !r->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (r->has_query && !r->qro) {
+		zend_throw_error(NULL, "Parent OpenCReport\\QueryResult object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if (!ocrpt_result_isstring(r->r))
+		RETURN_NULL();
+
+	RETURN_STRING(ocrpt_result_get_string(r->r)->str);
+}
+
+PHP_METHOD(opencreport_result, get_number) {
+	zval *object = ZEND_THIS;
+	php_opencreport_result_object *r = Z_OPENCREPORT_RESULT_P(object);
+	zend_string *format = NULL;
+
+	if (r->has_parent && !r->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (r->has_query && !r->qro) {
+		zend_throw_error(NULL, "Parent OpenCReport\\QueryResult object was destroyed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
+		Z_PARAM_OPTIONAL;
+		Z_PARAM_STR_EX(format, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	char *fmt = format ? ZSTR_VAL(format) : "%RF";
+	mpfr_ptr number = ocrpt_result_get_number(r->r);
+	size_t len = mpfr_snprintf(NULL, 0, fmt, number);
+
+	char *retval = emalloc(len + 1);
+	mpfr_snprintf(retval, len + 1, fmt, number);
+
+	RETURN_STRING(retval);
+}
+
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_result_print, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_result_get_type, 0, 0, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_result_is_null, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_result_is_string, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_result_is_number, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_result_get_string, 0, 0, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_result_get_number, 0, 0, IS_STRING, 1)
+ZEND_ARG_VARIADIC_TYPE_INFO(0, format, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry opencreport_result_class_methods[] = {
 	PHP_ME(opencreport_result, print, arginfo_opencreport_result_print, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_result, get_type, arginfo_opencreport_result_get_type, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_result, is_null, arginfo_opencreport_result_is_null, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_result, is_string, arginfo_opencreport_result_is_string, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_result, is_number, arginfo_opencreport_result_is_number, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_result, get_string, arginfo_opencreport_result_get_string, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_result, get_number, arginfo_opencreport_result_get_number, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 
@@ -1743,6 +2343,22 @@ static PHP_MINIT_FUNCTION(opencreport)
 	opencreport_query_ce->unserialize = zend_class_unserialize_deny;
 #endif
 
+	memcpy(&opencreport_query_result_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "QueryResult", opencreport_query_result_class_methods);
+	ce.create_object = opencreport_query_result_object_new;
+	opencreport_query_result_object_handlers.offset = XtOffsetOf(php_opencreport_query_result_object, zo);
+	opencreport_query_result_object_handlers.clone_obj = NULL;
+	opencreport_query_result_object_handlers.free_obj = opencreport_query_result_object_free;
+	opencreport_query_result_object_handlers.compare = zend_objects_not_comparable;
+	opencreport_query_result_ce = zend_register_internal_class(&ce);
+	opencreport_query_result_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	opencreport_query_result_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
+	opencreport_query_result_ce->serialize = zend_class_serialize_deny;
+	opencreport_query_result_ce->unserialize = zend_class_unserialize_deny;
+#endif
+
 	memcpy(&opencreport_expr_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Expr", opencreport_expr_class_methods);
 	ce.create_object = opencreport_expr_object_new;
@@ -1850,7 +2466,7 @@ ZEND_FUNCTION(rlib_free) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(obj);
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1877,7 +2493,7 @@ ZEND_FUNCTION(rlib_add_datasource_mysql) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1918,7 +2534,7 @@ ZEND_FUNCTION(rlib_add_datasource_mysql_from_group) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1953,7 +2569,7 @@ ZEND_FUNCTION(rlib_add_datasource_postgres) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -1990,7 +2606,7 @@ ZEND_FUNCTION(rlib_add_datasource_odbc) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -2024,7 +2640,7 @@ ZEND_FUNCTION(rlib_add_datasource_array) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -2054,7 +2670,7 @@ ZEND_FUNCTION(rlib_add_datasource_xml) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -2084,7 +2700,7 @@ ZEND_FUNCTION(rlib_add_datasource_csv) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 
@@ -2118,7 +2734,7 @@ ZEND_FUNCTION(rlib_add_query_as) {
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
-		zend_throw_error(NULL, "Parent object was destroyed");
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
 

@@ -67,7 +67,8 @@ TESTS = \
 PHP_TESTS = \
 	grammar_test expr_test function_test \
 	expr_format_test \
-	environment_test environment2_test
+	environment_test environment2_test \
+	array_test array2_test array_xml_test
 
 SLOW_TESTS = \
 	pgsql_numeric_precision_test \
