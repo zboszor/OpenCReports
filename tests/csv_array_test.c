@@ -104,7 +104,7 @@ int main(void) {
 	printf("--- TESTING FOLLOWER ---\n\n");
 
 	q2 = ocrpt_query_add_array(ds2, "b", (const char **)array2, ROWS, COLS, coltypes, COLS);
-	printf("ocrpt_query_add_array q2: %s\n", q2 == NULL ? "failed" : "successfull");
+	printf("ocrpt_query_add_array q2: %s\n", q2 == NULL ? "failed" : "successful");
 	ocrpt_query_add_follower(q, q2);
 
 	row = 0;

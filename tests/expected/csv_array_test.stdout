@@ -63,7 +63,7 @@ Expression is different from previous row
 
 --- TESTING FOLLOWER ---
 
-ocrpt_query_add_array q2: successfull
+ocrpt_query_add_array q2: successful
 Row #0
 Query: 'a':
 	Col #0: 'id': string value: NULL (converted to number: 1.000000)
