@@ -100,6 +100,9 @@ static zend_object *opencreport_object_new(zend_class_entry *class_type) /* {{{ 
 /* }}} */
 
 static void php_opencreport_kill_assoc_refs(zend_object *obj) {
+	if (!pointer_good(obj->ce))
+		return;
+
 	if (instanceof_function(obj->ce, opencreport_ds_ce)) {
 		php_opencreport_ds_object *dso = php_opencreport_ds_from_obj(obj);
 		dso->oo = NULL;
@@ -1526,14 +1529,23 @@ PHP_METHOD(opencreport_query, free) {
 		RETURN_THROWS();
 	}
 
+	ZEND_PARSE_PARAMETERS_NONE();
+
 	ocrpt_query_free(qo->q);
 	qo->q = NULL;
 
 	php_opencreport_object *oo = qo->oo;
-	oo->assoc_objs = ocrpt_list_end_remove(oo->assoc_objs, &oo->assoc_objs_last, object);
+	if (pointer_good(oo))
+		oo->assoc_objs = ocrpt_list_end_remove(oo->assoc_objs, &oo->assoc_objs_last, object);
+
+	qo->oo = NULL;
+
+	ocrpt_list_free_deep(qo->assoc_objs, (ocrpt_mem_free_t)php_opencreport_query_kill_assoc_refs);
+	qo->assoc_objs = NULL;
+	qo->assoc_objs_last = NULL;
 }
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_query_get_result, 0, 3, OpenCReport\\QueryResult, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_query_get_result, 0, 0, OpenCReport\\QueryResult, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_navigate_start, 0, 0, IS_VOID, 0)
@@ -1665,6 +1677,31 @@ static const zend_function_entry opencreport_query_result_class_methods[] = {
 	PHP_ME(opencreport_query_result, column_result, arginfo_opencreport_query_result_column_result, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
+
+PHP_METHOD(opencreport_expr, free) {
+	zval *object = ZEND_THIS;
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+
+	if (eo->has_parent && !eo->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "This OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	php_opencreport_object *oo = eo->oo;
+	if (pointer_good(oo))
+		oo->assoc_objs = ocrpt_list_end_remove(oo->assoc_objs, &oo->assoc_objs_last, object);
+
+	ocrpt_expr_free(eo->e);
+	eo->e = NULL;
+	eo->oo = NULL;
+}
 
 PHP_METHOD(opencreport_expr, print) {
 	zval *object = ZEND_THIS;
@@ -1858,6 +1895,9 @@ PHP_METHOD(opencreport_expr, cmp_results) {
 	RETURN_BOOL(ocrpt_expr_cmp_results(eo->e));
 }
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_free, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_print, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
@@ -1896,6 +1936,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_cmp_results, 0,
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry opencreport_expr_class_methods[] = {
+	PHP_ME(opencreport_expr, free, arginfo_opencreport_expr_free, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, print, arginfo_opencreport_expr_print, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, nodes, arginfo_opencreport_expr_nodes, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, optimize, arginfo_opencreport_expr_optimize, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
