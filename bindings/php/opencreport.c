@@ -1267,16 +1267,50 @@ static const zend_function_entry opencreport_class_methods[] = {
 	PHP_FE_END
 };
 
+PHP_METHOD(opencreport_ds, free) {
+	zval *object = ZEND_THIS;
+	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(object);
+
+	if (!dso->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!dso->ds) {
+		zend_throw_error(NULL, "This OpenCReport\\Datasource object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_datasource_free(dso->ds);
+	dso->ds = NULL;
+
+	php_opencreport_object *oo = dso->oo;
+	if (pointer_good(oo))
+		oo->assoc_objs = ocrpt_list_end_remove(oo->assoc_objs, &oo->assoc_objs_last, object);
+	dso->oo = NULL;
+
+	ocrpt_list_free_deep(dso->assoc_objs, (ocrpt_mem_free_t)php_opencreport_kill_assoc_refs);
+	dso->assoc_objs = NULL;
+	dso->assoc_objs_last = NULL;
+}
+
 PHP_METHOD(opencreport_ds, query_add) {
 	zval *object = ZEND_THIS;
-	php_opencreport_ds_object *ds = Z_OPENCREPORT_DS_P(object);
+	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(object);
 	zend_string *name, *array_or_file_or_sql, *coltypes;
 	ocrpt_query *q;
 	php_opencreport_query_object *qo;
 	void *array_x, *types_x = NULL;
 	int32_t rows, cols, types_cols = 0;
 
-	if (!ds->oo) {
+	if (!dso->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!dso->ds) {
 		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
@@ -1288,35 +1322,35 @@ PHP_METHOD(opencreport_ds, query_add) {
 		Z_PARAM_STR_EX(coltypes, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
 
-	if (ocrpt_datasource_is_array(ds->ds)) {
+	if (ocrpt_datasource_is_array(dso->ds)) {
 		if (coltypes && ZSTR_LEN(coltypes) > 0) {
 			ocrpt_query_discover_array(ZSTR_VAL(array_or_file_or_sql), &array_x, &rows, &cols, ZSTR_VAL(coltypes), &types_x, &types_cols);
 		} else {
 			ocrpt_query_discover_array(ZSTR_VAL(array_or_file_or_sql), &array_x, &rows, &cols, NULL, NULL, NULL);
 		}
 
-		q = ocrpt_query_add_array(ds->ds, ZSTR_VAL(name), array_x, rows, cols, types_x, types_cols);
-	} else if (ocrpt_datasource_is_csv(ds->ds)) {
+		q = ocrpt_query_add_array(dso->ds, ZSTR_VAL(name), array_x, rows, cols, types_x, types_cols);
+	} else if (ocrpt_datasource_is_csv(dso->ds)) {
 		if (coltypes && ZSTR_LEN(coltypes) > 0)
 			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, ZSTR_VAL(coltypes), &types_x, &types_cols);
 
-		q = ocrpt_query_add_csv(ds->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), types_x, types_cols);
-	} else if (ocrpt_datasource_is_json(ds->ds)) {
+		q = ocrpt_query_add_csv(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), types_x, types_cols);
+	} else if (ocrpt_datasource_is_json(dso->ds)) {
 		if (coltypes && ZSTR_LEN(coltypes) > 0)
 			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, ZSTR_VAL(coltypes), &types_x, &types_cols);
 
-		q = ocrpt_query_add_json(ds->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), types_x, types_cols);
-	} else if (ocrpt_datasource_is_xml(ds->ds)) {
+		q = ocrpt_query_add_json(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), types_x, types_cols);
+	} else if (ocrpt_datasource_is_xml(dso->ds)) {
 		if (coltypes && ZSTR_LEN(coltypes) > 0)
 			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, ZSTR_VAL(coltypes), &types_x, &types_cols);
 
-		q = ocrpt_query_add_xml(ds->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), types_x, types_cols);
-	} else if (ocrpt_datasource_is_postgresql(ds->ds)) {
-		q = ocrpt_query_add_postgresql(ds->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
-	} else if (ocrpt_datasource_is_mariadb(ds->ds)) {
-		q = ocrpt_query_add_mariadb(ds->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
-	} else if (ocrpt_datasource_is_odbc(ds->ds)) {
-		q = ocrpt_query_add_odbc(ds->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
+		q = ocrpt_query_add_xml(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), types_x, types_cols);
+	} else if (ocrpt_datasource_is_postgresql(dso->ds)) {
+		q = ocrpt_query_add_postgresql(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
+	} else if (ocrpt_datasource_is_mariadb(dso->ds)) {
+		q = ocrpt_query_add_mariadb(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
+	} else if (ocrpt_datasource_is_odbc(dso->ds)) {
+		q = ocrpt_query_add_odbc(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
 	} else
 		RETURN_NULL();
 
@@ -1327,17 +1361,22 @@ PHP_METHOD(opencreport_ds, query_add) {
 	qo = Z_OPENCREPORT_QUERY_P(return_value);
 	qo->q = q;
 
-	php_opencreport_object *oo = ds->oo;
-	qo->oo = ds->oo;
+	php_opencreport_object *oo = dso->oo;
+	qo->oo = dso->oo;
 	oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &qo->zo);
 }
 
 PHP_METHOD(opencreport_ds, set_encoding) {
 	zval *object = ZEND_THIS;
-	php_opencreport_ds_object *ds = Z_OPENCREPORT_DS_P(object);
+	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(object);
 	zend_string *encoding;
 
-	if (!ds->oo) {
+	if (!dso->oo) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
+	}
+
+	if (!dso->ds) {
 		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
 		RETURN_THROWS();
 	}
@@ -1346,8 +1385,11 @@ PHP_METHOD(opencreport_ds, set_encoding) {
 		Z_PARAM_STR(encoding);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_datasource_set_encoding(ds->ds, ZSTR_VAL(encoding));
+	ocrpt_datasource_set_encoding(dso->ds, ZSTR_VAL(encoding));
 }
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_ds_free, 0, 0, IS_VOID, 1)
+ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_ds_query_add, 0, 3, OpenCReport\\Query, 1)
 ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
@@ -1360,6 +1402,7 @@ ZEND_ARG_TYPE_INFO(0, encoding, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry opencreport_ds_class_methods[] = {
+	PHP_ME(opencreport_ds, free, arginfo_opencreport_ds_free, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_ds, query_add, arginfo_opencreport_ds_query_add, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_ds, set_encoding, arginfo_opencreport_ds_set_encoding, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
