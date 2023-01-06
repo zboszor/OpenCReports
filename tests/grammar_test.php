@@ -445,13 +445,13 @@ $o = new OpenCReport();
 foreach ($exprs as &$str) {
 	echo "string: " . $str . PHP_EOL;
 
-	[ $e, $err ] = $o->expr_parse($str);
+	$e = $o->expr_parse($str);
 	if ($e instanceof OpenCReport\Expr) {
 		echo "expr reprinted: "; flush();
 		$e->print();
 		echo "expr nodes: " . $e->nodes() . PHP_EOL;
 	} else {
-		echo $err . PHP_EOL;
+		echo $o->expr_error() . PHP_EOL;
 	}
 
 	echo PHP_EOL;

@@ -25,16 +25,16 @@ $ds = $o->datasource_add_array("array");
 /* Latin1 -> UTF-8, a NOP for plain ASCII characters */
 $ds->set_encoding("ISO-8859-1");
 
-[ $id, $err ] = $o->expr_parse("id");
+$id = $o->expr_parse("id");
 $id->print();
 
-[ $name, $err ] = $o->expr_parse("name");
+$name = $o->expr_parse("name");
 $name->print();
 
-[ $age, $err ] = $o->expr_parse("age * 2");
+$age = $o->expr_parse("age * 2");
 $age->print();
 
-[ $adult, $err ] = $o->expr_parse("a.adult");
+$adult = $o->expr_parse("a.adult");
 
 $q = $ds->query_add("a", "array", "coltypes");
 $qr = $q->get_result();

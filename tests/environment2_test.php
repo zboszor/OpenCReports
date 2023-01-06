@@ -10,7 +10,7 @@ $o = new OpenCReport();
 $OCRPTENV = "This is a test string";
 echo "OCRPTENV is set." . PHP_EOL;
 
-[ $e, $err ] = $o->expr_parse("m.OCRPTENV");
+$e = $o->expr_parse("m.OCRPTENV");
 if ($e instanceof OpenCReport\Expr) {
 	echo "Before resolving: "; flush();
 	$e->print();
@@ -25,7 +25,7 @@ if ($e instanceof OpenCReport\Expr) {
 unset($OCRPTENV);
 echo "OCRPTENV is unset." . PHP_EOL;
 
-[ $e, $err ] = $o->expr_parse("m.OCRPTENV");
+$e = $o->expr_parse("m.OCRPTENV");
 if ($e instanceof OpenCReport\Expr) {
 	echo "Before resolving: "; flush();
 	$e->print();

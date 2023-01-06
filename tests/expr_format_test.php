@@ -155,7 +155,7 @@ foreach ($exprs as &$str) {
 	echo "string: " . $str . PHP_EOL;
 	unset($e);
 	unset($err);
-	[ $e, $err ] = $o->expr_parse($str);
+	$e = $o->expr_parse($str);
 	if ($e instanceof OpenCReport\Expr) {
 		echo "expr reprinted: "; flush();
 		$e->print(); flush();
@@ -169,7 +169,7 @@ foreach ($exprs as &$str) {
 		$r = $e->eval();
 		$r->print(); flush();
 	} else {
-		echo $err . PHP_EOL;
+		echo $o->expr_error() . PHP_EOL;
 	}
 
 
@@ -188,7 +188,7 @@ foreach ($locales as &$loc) {
 		echo "string: " . $str . PHP_EOL;
 		unset($e);
 		unset($err);
-		[ $e, $err ] = $o->expr_parse($str);
+		$e = $o->expr_parse($str);
 		if ($e instanceof OpenCReport\Expr) {
 			echo "expr reprinted: "; flush();
 			$e->print(); flush();

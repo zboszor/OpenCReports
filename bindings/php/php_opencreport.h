@@ -17,6 +17,7 @@ extern zend_module_entry ocrpt_module_entry;
 /* Structure for main OpenCReport object. */
 typedef struct _php_opencreport_object {
 	opencreport *o;
+	char *expr_error;
 	ocrpt_list *assoc_objs;
 	ocrpt_list *assoc_objs_last;
 	ocrpt_list *funcnames;

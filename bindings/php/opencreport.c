@@ -90,6 +90,7 @@ static zend_object *opencreport_object_new(zend_class_entry *class_type) /* {{{ 
 	intern->zo.handlers = &opencreport_object_handlers;
 
 	intern->o = ocrpt_init();
+	intern->expr_error = NULL;
 	intern->assoc_objs = NULL;
 	intern->assoc_objs_last = NULL;
 	intern->funcnames = NULL;
@@ -130,6 +131,8 @@ static void opencreport_object_deinit(php_opencreport_object *oo) {
 	oo->funcnames = NULL;
 	oo->funcnames_last = NULL;
 
+	ocrpt_strfree(oo->expr_error);
+	oo->expr_error = NULL;
 	ocrpt_free(oo->o);
 	oo->o = NULL;
 }
@@ -906,32 +909,36 @@ PHP_METHOD(opencreport, expr_parse) {
 	char *err = NULL;
 	ocrpt_expr *e = ocrpt_expr_parse(oo->o, ZSTR_VAL(expr_string), &err);
 
-	array_init(return_value);
-
-	zval tmp;
-
 	if (e) {
-		object_init_ex(&tmp, opencreport_expr_ce);
-		php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(&tmp);
+		object_init_ex(return_value, opencreport_expr_ce);
+		php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
 		eo->e = e;
 		eo->oo = oo;
 		eo->has_parent = true;
 		oo->assoc_objs = ocrpt_list_end_append(oo->assoc_objs, &oo->assoc_objs_last, &eo->zo);
+		ocrpt_strfree(oo->expr_error);
+		oo->expr_error = NULL;
 	} else {
-		ZVAL_NULL(&tmp);
+		oo->expr_error = err;
+		RETURN_NULL();
+	}
+}
+
+PHP_METHOD(opencreport, expr_error) {
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "Parent OpenCReport object was destroyed");
+		RETURN_THROWS();
 	}
 
-	zend_hash_index_add_new(Z_ARRVAL_P(return_value), 0, &tmp);
+	ZEND_PARSE_PARAMETERS_NONE();
 
-	if (err) {
-		zend_string *errs = zend_string_init(err, strlen(err), 0);
-		ZVAL_STR(&tmp, errs);
-		ocrpt_strfree(err);
-	} else {
-		ZVAL_NULL(&tmp);
-	}
-
-	zend_hash_index_add_new(Z_ARRVAL_P(return_value), 1, &tmp);
+	if (oo->expr_error)
+		RETURN_STRING(oo->expr_error);
+	else
+		RETURN_NULL();
 }
 
 OCRPT_STATIC_FUNCTION(opencreport_default_function) {
@@ -1197,8 +1204,11 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_query_get, 0, 1, Open
 ZEND_ARG_TYPE_INFO(0, query_name, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_parse, 0, 1, IS_ARRAY, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_expr_parse, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_error, 0, 0, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_function_add, 0, 7, _IS_BOOL, 0)
@@ -1257,6 +1267,7 @@ static const zend_function_entry opencreport_class_methods[] = {
 	PHP_ME(opencreport, query_get, arginfo_opencreport_query_get, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* Expression related methods */
 	PHP_ME(opencreport, expr_parse, arginfo_opencreport_expr_parse, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport, expr_error, arginfo_opencreport_expr_error, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* Function related methods */
 	PHP_ME(opencreport, function_add, arginfo_opencreport_function_add, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* Environment related methods */
@@ -2105,10 +2116,10 @@ PHP_METHOD(opencreport_result, get_string) {
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
-	if (!ocrpt_result_isstring(ro->r))
+	ocrpt_string *s = ocrpt_result_get_string(ro->r);
+	if (!s)
 		RETURN_NULL();
 
-	ocrpt_string *s = ocrpt_result_get_string(ro->r);
 	RETURN_STRINGL(s->str, s->len);
 }
 
@@ -2297,6 +2308,13 @@ static void php_opencreport_query_discover_array(const char *arrayname, void **a
 
 		if (!arr)
 			zend_string_release(zarrayname);
+	} else {
+		if (array)
+			*array = NULL;
+		if (rows)
+			*rows = 0;
+		if (cols)
+			*cols = 0;
 	}
 
 	if (typesname && *typesname) {
@@ -2365,6 +2383,14 @@ static void php_opencreport_query_discover_array(const char *arrayname, void **a
 			*types = typ ? typ->a.types : NULL;
 		if (types_cols)
 			*types_cols = typ ? typ->cols : 0;
+
+		if (!typ)
+			zend_string_release(ztypesname);
+	} else {
+		if (types)
+			*types = NULL;
+		if (types_cols)
+			*types_cols = 0;
 	}
 }
 

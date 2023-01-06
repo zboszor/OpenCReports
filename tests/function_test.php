@@ -39,7 +39,7 @@ $o = new OpenCReport();
 $o->function_add("inc", "my_inc", 1, false, false, false, false);
 $o->function_add("dec", "my_dec", 1, false, false, false, false);
 
-[ $e1, $err ] = $o->expr_parse("100++");
+$e1 = $o->expr_parse("100++");
 if ($e1 instanceof OpenCReport\Expr) {
 	$e1->print(); flush();
 	echo "e1 nodes: " . $e1->nodes() . PHP_EOL;
@@ -47,10 +47,10 @@ if ($e1 instanceof OpenCReport\Expr) {
 	$e1->print(); flush();
 	echo "e1 nodes: " . $e1->nodes() . PHP_EOL;
 } else {
-	echo $err . PHP_EOL;
+	echo $o->expr_error() . PHP_EOL;
 }
 
-[ $e2, $err ] = $o->expr_parse("100--");
+$e2 = $o->expr_parse("100--");
 if ($e2 instanceof OpenCReport\Expr) {
 	$e2->print(); flush();
 	echo "e2 nodes: " . $e2->nodes() . PHP_EOL;
@@ -58,5 +58,5 @@ if ($e2 instanceof OpenCReport\Expr) {
 	$e2->print(); flush();
 	echo "e2 nodes: " . $e2->nodes() . PHP_EOL;
 } else {
-	echo $err . PHP_EOL;
+	echo $o->expr_error() . PHP_EOL;
 }
