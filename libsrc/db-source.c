@@ -140,6 +140,7 @@ static void ocrpt_postgresql_describe(ocrpt_query *query, ocrpt_query_result **q
 
 				qr[idx].name = PQfname(res, i);
 				qr[idx].result.type = type;
+				qr[idx].result.orig_type = type;
 
 				if (qr[idx].result.type == OCRPT_RESULT_NUMBER) {
 					mpfr_init2(qr[idx].result.number, query->source->o->prec);
@@ -486,6 +487,7 @@ static ocrpt_query_result *ocrpt_mariadb_describe_early(ocrpt_query *query) {
 				qr[idx].name = qr[i].name;
 
 			qr[idx].result.type = type;
+			qr[idx].result.orig_type = type;
 
 			if (qr[idx].result.type == OCRPT_RESULT_NUMBER) {
 				mpfr_init2(qr[idx].result.number, query->source->o->prec);
@@ -834,6 +836,7 @@ static ocrpt_query_result *ocrpt_odbc_describe_early(ocrpt_query *query) {
 			int32_t idx = j * result->cols + i;
 
 			qr[idx].result.type = type;
+			qr[idx].result.orig_type = type;
 
 			if (qr[idx].result.type == OCRPT_RESULT_NUMBER) {
 				mpfr_init2(qr[idx].result.number, query->source->o->prec);

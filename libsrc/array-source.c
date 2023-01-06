@@ -67,10 +67,13 @@ static void ocrpt_array_describe(ocrpt_query *query, ocrpt_query_result **qresul
 			for (int j = 0; j < OCRPT_EXPR_RESULTS; j++) {
 				qr[j * result->cols + i].name = result->data[i];
 
+				enum ocrpt_result_type type;
 				if (result->types && i < result->types_cols)
-					qr[j * result->cols + i].result.type = result->types[i];
+					type = result->types[i];
 				else
-					qr[j * result->cols + i].result.type = OCRPT_RESULT_STRING;
+					type = OCRPT_RESULT_STRING;
+				qr[j * result->cols + i].result.type = type;
+				qr[j * result->cols + i].result.orig_type = type;
 
 				if (qr[i].result.type == OCRPT_RESULT_NUMBER) {
 					mpfr_init2(qr[j * result->cols + i].result.number, query->source->o->prec);
@@ -79,7 +82,6 @@ static void ocrpt_array_describe(ocrpt_query *query, ocrpt_query_result **qresul
 
 				qr[j * result->cols + i].result.isnull = true;
 			}
-
 		}
 
 		result->result = qr;
@@ -579,10 +581,6 @@ static int ocrpt_yajl_string(void *ctx, const unsigned char *str, size_t len) {
 		/* Ignore excess elements in "coltypes" */
 		if (fq->current_col >= fq->cols)
 			return true;
-		if (!strncasecmp((char *)str, "string", len)) {
-			fq->types[fq->current_col++] = OCRPT_RESULT_STRING;
-			return true;
-		}
 		if (!strncasecmp((char *)str, "number", len) || !strncasecmp((char *)str, "numeric", len)) {
 			fq->types[fq->current_col++] = OCRPT_RESULT_NUMBER;
 			return true;
@@ -591,6 +589,8 @@ static int ocrpt_yajl_string(void *ctx, const unsigned char *str, size_t len) {
 			fq->types[fq->current_col++] = OCRPT_RESULT_DATETIME;
 			return true;
 		}
+		fq->types[fq->current_col++] = OCRPT_RESULT_STRING;
+		return true;
 	} else if (ocrpt_yajl_set_field(fq, (char *)str, len))
 		return true;
 
@@ -902,16 +902,12 @@ static int32_t ocrpt_parse_col_node(opencreport *o, xmlTextReaderPtr reader, ocr
 			return 0;
 		}
 
-		if (!strcasecmp((char *)value, "string"))
-			type = OCRPT_RESULT_STRING;
-		else if (!strcasecmp((char *)value, "number") || !strcasecmp((char *)value, "numeric"))
+		if (!strcasecmp((char *)value, "number") || !strcasecmp((char *)value, "numeric"))
 			type = OCRPT_RESULT_NUMBER;
 		else if (!strcasecmp((char *)value, "datetime"))
 			type = OCRPT_RESULT_DATETIME;
-		else {
-			xmlFree(value);
-			return 0;
-		}
+		else
+			type = OCRPT_RESULT_STRING;
 		fq->coltypeslist = ocrpt_list_end_append(fq->coltypeslist, &fq->coltypes_last, (void *)(long)type);
 	}
 

@@ -214,8 +214,10 @@ void ocrpt_query_result_set_values_null(ocrpt_query *q) {
 	int32_t base = o->residx * q->cols;
 	int32_t i;
 
-	for (i = 0; i < q->cols; i++)
+	for (i = 0; i < q->cols; i++) {
+		q->result[base + i].result.type = q->result[base + i].result.orig_type;
 		q->result[base + i].result.isnull = true;
+	}
 }
 
 void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_t conv, const char *str, size_t len) {
@@ -281,7 +283,8 @@ void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_
 		}
 	}
 
-	switch (r->type) {
+	enum ocrpt_result_type type = r->orig_type;
+	switch (type) {
 	case OCRPT_RESULT_NUMBER:
 		if (!r->number_initialized)
 			mpfr_init2(r->number, o->prec);
@@ -290,13 +293,17 @@ void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_
 		if (!strcmp(str, "no") || !strcmp(str, "false") || !strcmp(str, "f"))
 			str = "0";
 		mpfr_set_str(r->number, str, 10, o->rndmode);
+		r->type = type;
 		break;
 	case OCRPT_RESULT_DATETIME:
-		if (ocrpt_parse_datetime(o, str, len, r))
+		if (ocrpt_parse_datetime(o, str, len, r)) {
+			r->type = type;
 			break;
-		if (ocrpt_parse_interval(o, str, len, r))
+		} else if (ocrpt_parse_interval(o, str, len, r)) {
+			r->type = type;
 			break;
-		r->type = OCRPT_RESULT_ERROR;
+		}
+		type = OCRPT_RESULT_ERROR;
 		str = "invalid datetime or interval string";
 		len = strlen(str);
 		FALLTHROUGH;
@@ -313,6 +320,7 @@ void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_
 			rstring->len = 0;
 		}
 		ocrpt_mem_string_append_len(rstring, str, len);
+		r->type = type;
 		break;
 	}
 }

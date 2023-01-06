@@ -126,6 +126,7 @@ struct ocrpt_result {
 	struct tm datetime;
 	/* Group indicators together as bitfields for space saving */
 	enum ocrpt_result_type type:2;
+	enum ocrpt_result_type orig_type:2;
 	bool number_initialized:1;
 	bool string_owned:1;
 	bool date_valid:1;
