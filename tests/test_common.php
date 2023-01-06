@@ -5,21 +5,24 @@
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
-function print_result_row(string $name, OpenCReport\QueryResult $qr) {
+function print_result_row(string $name, OpenCReport\QueryResult &$qr) {
 	echo "Query: '" . $name . "':" . PHP_EOL;
 	for ($i = 0; $i < $qr->columns(); $i++) {
 		$r = $qr->column_result($i);
+		$isnull = $r->is_null();
+		$s = $r->get_string();
 
-		echo "\tCol #" . $i . ": '" . $qr->column_name($i) . "': string value: " . ($r->is_null() || !$r->is_string() ? "NULL" : $r->get_string());
-		if (!$r->is_null() && $r->is_number()) {
-			//echo " (converted to number: " . $r->get_number("%.6RF"); flush();
-			echo " (converted to number: " . $r->get_number() . ")"; flush();
+		echo "\tCol #" . $i . ": '" . $qr->column_name($i) . "': string value: " . (($isnull || is_null($s)) ? "NULL" : $s);
+		if (!$isnull && $r->is_number()) {
+			echo " (converted to number: " . $r->get_number("%.6RF"). ")"; flush();
+			//echo " (converted to number: " . $r->get_number() . ")"; flush();
 		}
 		echo PHP_EOL;
+		unset($r);
 	}
 }
 
-function print_part_reports(string $name, OpenCReport\Part $p) {
+function print_part_reports(string $name, OpenCReport\Part &$p) {
 	echo "part " . $name . ":" . PHP_EOL;
 	for ($pri = $p->row_iter_start(), $i = 0; !$pri->finished(); $pri->next(), $i++) {
 		$pr = $pri->get_row();
@@ -36,7 +39,7 @@ function print_part_reports(string $name, OpenCReport\Part $p) {
 	}
 }
 
-function get_first_report(OpenCReport $o): OpenCReport\Report {
+function get_first_report(OpenCReport &$o): OpenCReport\Report {
 	$pi = $o->part_iter_start();
 	$p = $pi->get_part();
 
