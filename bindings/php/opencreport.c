@@ -621,8 +621,8 @@ PHP_METHOD(opencreport, datasource_add_postgresql) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *source_name;
-	zend_string *host, *port, *dbname;
-	zend_string *user, *password;
+	zend_string *host = NULL, *port = NULL, *dbname = NULL;
+	zend_string *user = NULL, *password = NULL;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
 
@@ -662,7 +662,7 @@ PHP_METHOD(opencreport, datasource_add_postgresql2) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *source_name;
-	zend_string *connection_info;
+	zend_string *connection_info = NULL;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
 
@@ -694,8 +694,8 @@ PHP_METHOD(opencreport, datasource_add_mariadb) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *source_name;
-	zend_string *host, *port, *dbname;
-	zend_string *user, *password, *unix_socket;
+	zend_string *host = NULL, *port = NULL, *dbname = NULL;
+	zend_string *user = NULL, *password = NULL, *unix_socket = NULL;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
 
@@ -737,7 +737,7 @@ PHP_METHOD(opencreport, datasource_add_mariadb2) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *source_name;
-	zend_string *option_file, *group;
+	zend_string *option_file = NULL, *group = NULL;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
 
@@ -771,7 +771,7 @@ PHP_METHOD(opencreport, datasource_add_odbc) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *source_name;
-	zend_string *dbname, *user, *password;
+	zend_string *dbname = NULL, *user = NULL, *password = NULL;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
 
@@ -808,7 +808,7 @@ PHP_METHOD(opencreport, datasource_add_odbc2) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *source_name;
-	zend_string *connection_info;
+	zend_string *connection_info = NULL;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
 
@@ -819,12 +819,12 @@ PHP_METHOD(opencreport, datasource_add_odbc2) {
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_STR(source_name);
-		Z_PARAM_STR(connection_info);
+		Z_PARAM_STR_EX(connection_info, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
 
 	ds = ocrpt_datasource_add_odbc2(
 				oo->o, ZSTR_VAL(source_name),
-				ZSTR_VAL(connection_info));
+				connection_info ? ZSTR_VAL(connection_info) : NULL);
 	if (!ds)
 		RETURN_NULL();
 
@@ -1156,44 +1156,44 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_postgresql, 0, 6, OpenCReport\\Datasource, 1)
 ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, port, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, dbname, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, password, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, port, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, dbname, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, password, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_postgresql2, 0, 2, OpenCReport\\Datasource, 1)
 ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, connection_info, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, connection_info, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_mariadb, 0, 7, OpenCReport\\Datasource, 1)
 ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, port, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, dbname, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, password, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, unix_socket, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, port, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, dbname, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, password, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, unix_socket, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_mariadb2, 0, 3, OpenCReport\\Datasource, 1)
 ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, option_file, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, group, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, option_file, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, group, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_odbc, 0, 4, OpenCReport\\Datasource, 1)
 ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, dbname, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, password, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, dbname, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, password, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_odbc2, 0, 2, OpenCReport\\Datasource, 1)
 ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, connection_info, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, connection_info, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_get, 0, 1, OpenCReport\\Datasource, 1)
