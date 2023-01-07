@@ -73,7 +73,20 @@ PHP_TESTS = \
 	csv_xml_test csv_array_xml_test csv_array_xml2_test \
 	json_test json2_test json3_test json4_test json5_test \
 	json6_test json7_test json8_test \
-	json_xml_test json_xml2_test
+	json_xml_test json_xml2_test \
+	xml_test xml2_test xml3_test xml4_test xml5_test \
+	xml_xml_test xml_xml2_test \
+	pgsql_test pgsql2_test \
+	pgsql_xml_test pgsql_xml2_test pgsql_xml3_test pgsql_xml4_test \
+	pgsql_xml5_test pgsql_xml6_test pgsql_xml7_test pgsql_xml8_test \
+	pgsql_xml9_test pgsql_xml10_test pgsql_xml11_test \
+	mariadb_test mariadb2_test \
+	mariadb_xml_test mariadb_xml2_test mariadb_xml3_test \
+	mariadb_xml4_test \
+	odbc_test odbc2_test odbc3_test odbc4_test \
+	odbc5_test odbc6_test odbc7_test \
+	odbc_xml_test odbc_xml2_test odbc_xml3_test \
+	odbc_xml4_test
 
 SLOW_TESTS = \
 	pgsql_numeric_precision_test \
