@@ -22,12 +22,6 @@ create_exprs($o);
 
 print_query_columns($q);
 
-/*
-$id->resolve();
-$name->resolve();
-$age->resolve();
-$adult->resolve();
-*/
 $row = 0;
 $q->navigate_start();
 
