@@ -62,22 +62,29 @@ function get_first_report(OpenCReport &$o): OpenCReport\Report {
 	return $r;
 }
 
+function create_expr(OpenCReport &$o, &$e, $str, $print = true) {
+	$e = $o->expr_parse($str);
+	if ($print)
+		$e->print();
+}
+
 function create_exprs(OpenCReport &$o, bool $resolve = true) {
 	global $id;
 	global $name;
 	global $age;
 	global $adult;
 
-	$id = $o->expr_parse("id");
-	$id->print();
+	$id = 0;
+	create_expr($o, $id, "id");
 
-	$name = $o->expr_parse("name");
-	$name->print();
+	$name = 0;
+	create_expr($o, $name, "name");
 
-	$age = $o->expr_parse("age * 2");
-	$age->print();
+	$age = 0;
+	create_expr($o, $age, "age * 2");
 
-	$adult = $o->expr_parse("a.adult");
+	$adult = 0;
+	create_expr($o, $adult, "a.adult", false);
 
 	if ($resolve) {
 		$id->resolve();
