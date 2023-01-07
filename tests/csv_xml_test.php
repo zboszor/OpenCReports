@@ -14,7 +14,7 @@ $coltypes = [
 $o = new OpenCReport();
 
 if (!$o->parse_xml("csvquery.xml")) {
-	printf("XML parse error\n");
+	echo "XML parse error" . PHP_EOL;
 	exit(0);
 }
 

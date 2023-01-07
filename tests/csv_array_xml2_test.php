@@ -77,7 +77,7 @@ $q->free();
 echo "--- TESTING FOLLOWER ---" . PHP_EOL . PHP_EOL;
 
 if (!$o->parse_xml("csvquery2-notypes.xml")) {
-	printf("XML parse error\n");
+	echo "XML parse error" . PHP_EOL;
 	exit(0);
 }
 
