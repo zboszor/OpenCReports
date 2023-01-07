@@ -7,19 +7,15 @@
 
 require_once 'test_common.php';
 
-$coltypes = [
-	OpenCReport::RESULT_NUMBER, OpenCReport::RESULT_STRING, OpenCReport::RESULT_STRING, OpenCReport::RESULT_NUMBER, OpenCReport::RESULT_NUMBER
-];
-
 $o = new OpenCReport();
-$ds = $o->datasource_add_csv("csv");
+$ds = $o->datasource_add_json("json");
+$q = $ds->query_add("a", "jsonquery5.json");
+if (!($q instanceof OpenCReport\Query))
+	exit(0);
 
-create_exprs($o, false);
+create_exprs($o);
 
-$q = $ds->query_add("a", "csvquery.csv", "coltypes");
 print_query_columns($q);
-
-resolve_exprs();
 
 $row = 0;
 $q->navigate_start();
@@ -46,3 +42,5 @@ while ($q->navigate_next()) {
 }
 
 echo "--- END ---" . PHP_EOL;
+
+free_exprs();

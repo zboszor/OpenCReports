@@ -12,11 +12,14 @@ $coltypes = [
 ];
 
 $o = new OpenCReport();
-$ds = $o->datasource_add_csv("csv");
+if (!$o->parse_xml("jsonquery.xml")) {
+	echo "XML parse error" . PHP_EOL;
+	exit(0);
+}
 
-create_exprs($o, false);
+create_exprs($o);
 
-$q = $ds->query_add("a", "csvquery.csv", "coltypes");
+$q = $o->query_get("a");
 print_query_columns($q);
 
 resolve_exprs();
@@ -43,6 +46,9 @@ while ($q->navigate_next()) {
 	echo "Expression is " . ($adult->cmp_results() ? "identical to" : "different from") . " previous row" . PHP_EOL;
 
 	echo PHP_EOL;
+
 }
 
 echo "--- END ---" . PHP_EOL;
+
+free_exprs();

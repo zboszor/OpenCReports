@@ -70,7 +70,10 @@ PHP_TESTS = \
 	environment_test environment2_test \
 	array_test array2_test array_xml_test \
 	csv_test csv2_test csv_array_test \
-	csv_xml_test csv_array_xml_test csv_array_xml2_test
+	csv_xml_test csv_array_xml_test csv_array_xml2_test \
+	json_test json2_test json3_test json4_test json5_test \
+	json6_test json7_test json8_test \
+	json_xml_test json_xml2_test
 
 SLOW_TESTS = \
 	pgsql_numeric_precision_test \

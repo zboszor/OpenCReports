@@ -27,27 +27,12 @@ $array2 = [
 $o = new OpenCReport();
 $ds = $o->datasource_add_array("array");
 
-$id = $o->expr_parse("id");
-$id->print();
-
-$name = $o->expr_parse("name");
-$name->print();
-
-$age = $o->expr_parse("age * 2");
-$age->print();
-
-$adult = $o->expr_parse("a.adult");
+create_exprs($o, false);
 
 $q = $ds->query_add("a", "array", "coltypes");
-$qr = $q->get_result();
-echo "Query columns:" . PHP_EOL;
-for ($i = 0; $i < $qr->columns(); $i++)
-	echo $i . ": '" . $qr->column_name($i) . "'" . PHP_EOL;
+print_query_columns($q);
 
-$id->resolve();
-$name->resolve();
-$age->resolve();
-$adult->resolve();
+resolve_exprs();
 
 $row = 0;
 $q->navigate_start();
@@ -61,29 +46,13 @@ while ($q->navigate_next()) {
 
 	echo PHP_EOL;
 
-	echo "Expression: "; flush();
-	$id->print();
-	$r = $id->eval();
-	echo "Evaluated: "; flush();
-	$r->print();
+	eval_print_expr($id);
 
-	echo "Expression: "; flush();
-	$name->print();
-	$r = $name->eval();
-	echo "Evaluated: "; flush();
-	$r->print();
+	eval_print_expr($name);
 
-	echo "Expression: "; flush();
-	$age->print();
-	$r = $age->eval();
-	echo "Evaluated: "; flush();
-	$r->print();
+	eval_print_expr($age);
 
-	echo "Expression: "; flush();
-	$adult->print();
-	$r = $adult->eval();
-	echo "Evaluated: "; flush();
-	$r->print();
+	eval_print_expr($adult);
 	echo "Expression is " . ($adult->cmp_results() ? "identical to" : "different from") . " previous row" . PHP_EOL;
 
 	echo PHP_EOL;
@@ -108,23 +77,11 @@ while ($q->navigate_next()) {
 
 	echo PHP_EOL;
 
-	echo "Expression: "; flush();
-	$id->print();
-	$r = $id->eval();
-	echo "Evaluated: "; flush();
-	$r->print();
+	eval_print_expr($id);
 
-	echo "Expression: "; flush();
-	$name->print();
-	$r = $name->eval();
-	echo "Evaluated: "; flush();
-	$r->print();
+	eval_print_expr($name);
 
-	echo "Expression: "; flush();
-	$age->print();
-	$r = $age->eval();
-	echo "Evaluated: "; flush();
-	$r->print();
+	eval_print_expr($age);
 
 	echo PHP_EOL;
 }
@@ -153,23 +110,11 @@ while ($q->navigate_next()) {
 
 	echo PHP_EOL;
 
-	echo "Expression: "; flush();
-	$id->print();
-	$r = $id->eval();
-	echo "Evaluated: "; flush();
-	$r->print();
+	eval_print_expr($id);
 
-	echo "Expression: "; flush();
-	$name->print();
-	$r = $name->eval();
-	echo "Evaluated: "; flush();
-	$r->print();
+	eval_print_expr($name);
 
-	echo "Expression: "; flush();
-	$age->print();
-	$r = $age->eval();
-	echo "Evaluated: "; flush();
-	$r->print();
+	eval_print_expr($age);
 
 	echo PHP_EOL;
 }

@@ -12,11 +12,14 @@ $coltypes = [
 ];
 
 $o = new OpenCReport();
-$ds = $o->datasource_add_csv("csv");
 
-create_exprs($o, false);
+$ds = $o->datasource_add_json("json");
+$q = $ds->query_add("a", "jsonquery2.json", "coltypes");
+if (!($q instanceof OpenCReport\Query))
+	exit(0);
 
-$q = $ds->query_add("a", "csvquery.csv", "coltypes");
+create_exprs($o);
+
 print_query_columns($q);
 
 resolve_exprs();
@@ -46,3 +49,5 @@ while ($q->navigate_next()) {
 }
 
 echo "--- END ---" . PHP_EOL;
+
+free_exprs();

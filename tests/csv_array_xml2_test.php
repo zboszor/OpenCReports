@@ -13,45 +13,6 @@ $array2 = [
 	[ "1", "Barney Rubble", "small", "29", "yes" ],
 ];
 
-function create_exprs(OpenCReport $o) {
-	global $id;
-	global $name;
-	global $age;
-	global $adult;
-
-	$id = $o->expr_parse("id");
-	$id->print();
-
-	$name = $o->expr_parse("name");
-	$name->print();
-
-	$age = $o->expr_parse("val(age) * 2");
-	$age->print();
-
-	$adult = $o->expr_parse("val(a.adult)");
-
-	$id->resolve();
-	$name->resolve();
-	$age->resolve();
-	$adult->resolve();
-}
-
-function free_exprs() {
-	global $id;
-	global $name;
-	global $age;
-	global $adult;
-
-	$id->free();
-	unset($id);
-	$name->free();
-	unset($name);
-	$age->free();
-	unset($age);
-	$adult->free();
-	unset($adult);
-}
-
 $o = new OpenCReport();
 
 if (!$o->parse_xml("csvquery-notypes.xml")) {
@@ -65,7 +26,7 @@ echo "Query columns:" . PHP_EOL;
 for ($i = 0; $i < $qr->columns(); $i++)
 	echo $i . ": '" . $qr->column_name($i) . "'" . PHP_EOL;
 
-create_exprs($o);
+create_exprs_with_val($o);
 
 $row = 0;
 $q->navigate_start();
@@ -128,7 +89,7 @@ $q2 = $o->query_get("b");
 $qr2 = $q2->get_result();
 echo "q2 cols " . $qr2->columns() . PHP_EOL;
 
-create_exprs($o);
+create_exprs_with_val($o);
 
 $row = 0;
 $q->navigate_start();
@@ -182,7 +143,7 @@ if (!$o->parse_xml("csvquery3-notypes.xml")) {
 $q = $o->query_get("a");
 $q2 = $o->query_get("b");
 
-create_exprs($o);
+create_exprs_with_val($o);
 
 $row = 0;
 $q->navigate_start();
