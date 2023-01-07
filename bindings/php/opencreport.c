@@ -1310,7 +1310,7 @@ PHP_METHOD(opencreport_ds, free) {
 PHP_METHOD(opencreport_ds, query_add) {
 	zval *object = ZEND_THIS;
 	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(object);
-	zend_string *name, *array_or_file_or_sql, *coltypes;
+	zend_string *name, *array_or_file_or_sql, *coltypes = NULL;
 	ocrpt_query *q;
 	php_opencreport_query_object *qo;
 	void *array_x, *types_x = NULL;
@@ -1402,7 +1402,7 @@ PHP_METHOD(opencreport_ds, set_encoding) {
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_ds_free, 0, 0, IS_VOID, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_ds_query_add, 0, 3, OpenCReport\\Query, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_ds_query_add, 0, 2, OpenCReport\\Query, 1)
 ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 ZEND_ARG_TYPE_INFO(0, array_or_file_or_sql, IS_STRING, 0)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, types, IS_STRING, 1)
