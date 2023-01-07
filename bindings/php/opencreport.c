@@ -1563,6 +1563,11 @@ PHP_METHOD(opencreport_query, add_follower_n_to_1) {
 		RETURN_THROWS();
 	}
 
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was destroyed");
+		RETURN_THROWS();
+	}
+
 	if (!qo->q || !fo->q || !eo->e)
 		RETURN_NULL();
 
@@ -2433,7 +2438,7 @@ static int php_opencreport_err_printf(const char *fmt, ...) {
 	s = ocrpt_mem_string_new_vnprintf(len, fmt, va);
 	va_end(va);
 
-	php_error_docref(NULL, E_ERROR, "%s", s->str);
+	php_error_docref(NULL, E_WARNING, "%s", s->str);
 
 	ocrpt_mem_string_free(s, true);
 
