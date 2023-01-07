@@ -5,9 +5,9 @@
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
-function print_query_columns(&$q) {
+function print_query_columns(&$q, $name = NULL) {
 	$qr = $q->get_result();
-	echo "Query columns:" . PHP_EOL;
+	echo "Query columns" . (is_null($name) ? "" : " (" . $name . ")") . ":" . PHP_EOL;
 	for ($i = 0; $i < $qr->columns(); $i++)
 		echo $i . ": '" . $qr->column_name($i) . "'" . PHP_EOL;
 }
