@@ -12,7 +12,7 @@ function print_query_columns(&$q, $name = NULL) {
 		echo $i . ": '" . $qr->column_name($i) . "'" . PHP_EOL;
 }
 
-function print_result_row(string $name, OpenCReport\QueryResult &$qr) {
+function print_result_row(string $name, OpenCReport\Query\Result &$qr) {
 	echo "Query: '" . $name . "':" . PHP_EOL;
 	for ($i = 0; $i < $qr->columns(); $i++) {
 		$r = $qr->column_result($i);
@@ -31,35 +31,19 @@ function print_result_row(string $name, OpenCReport\QueryResult &$qr) {
 
 function print_part_reports(string $name, OpenCReport\Part &$p) {
 	echo "part " . $name . ":" . PHP_EOL;
-	for ($pri = $p->row_iter_start(), $i = 0; !$pri->finished(); $pri->next(), $i++) {
-		$pr = $pri->get_row();
-
-		printf("row %d reports:", i);
+	for ($row = $p->row_get_next(), $i = 0; isset($row); $row = $row->row_get_next(), $i++) {
+		echo "row ". $i . " reports:"; flush();
 		$j = 0;
-		for ($pdi = $pr->column_iter_start(); !$pdi->finished(); $pdi->next()) {
-			$pd = $pdi->get_column();
-
-			for ($ri = $pd->report_iter_start(); !$ri->finished(); $ri->next(), $j++)
-				echo " " . $j;
+		for ($col = $row->column_get_next(); isset($col); $col = $col->column_get_next()) {
+			for ($rpt = $col->report_get_next(); isset($rpt); $rpt = $rpt->report_get_next(), $j++)
+				echo " " . $j; flush();
 		}
 		echo PHP_EOL;
 	}
 }
 
-function get_first_report(OpenCReport &$o): OpenCReport\Report {
-	$pi = $o->part_iter_start();
-	$p = $pi->get_part();
-
-	$pri = $p->row_iter_start();
-	$pr = $pri->get_row();
-
-	$pdi = $pd->column_iter_start();
-	$pd = $pdi->get_column();
-
-	$ri = $pd->report_iter_start();
-	$r = $ri->get_report();
-
-	return $r;
+function get_first_report(OpenCReport &$o): OpenCReport\Part\Row\Column\Report {
+	return $o->part_get_next()->row_get_next()->column_get_next()->report_get_next();
 }
 
 function create_expr(OpenCReport &$o, &$e, $str, $print = true) {
