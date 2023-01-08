@@ -1,0 +1,19 @@
+added query a
+
+added query b
+
+adding N:1 follower a -> b with v.var expression, should fail
+failed
+
+adding N:1 follower a -> b with r.var expression, should fail
+failed
+
+adding N:1 follower a -> b with m.var expression, should fail
+failed
+
+adding N:1 follower a -> b with unknown domain reference, should fail
+failed
+
+adding N:1 follower a -> b with unknown ident reference, should fail
+failed
+

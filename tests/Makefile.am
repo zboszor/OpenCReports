@@ -86,7 +86,13 @@ PHP_TESTS = \
 	odbc_test odbc2_test odbc3_test odbc4_test \
 	odbc5_test odbc6_test odbc7_test \
 	odbc_xml_test odbc_xml2_test odbc_xml3_test \
-	odbc_xml4_test
+	odbc_xml4_test \
+	follower_circular_test \
+	follower_invalidref_test \
+	rownum_test \
+	part_test part_xml_test \
+	variable_expression_test variable_expression_xml_test \
+	variable_check_test
 
 SLOW_TESTS = \
 	pgsql_numeric_precision_test \
