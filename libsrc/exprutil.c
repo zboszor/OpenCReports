@@ -1152,6 +1152,15 @@ DLL_EXPORT_SYM void ocrpt_expr_set_long_value(ocrpt_expr *e, long l) {
 	mpfr_set_si(e->result[e->o->residx]->number, l, e->o->rndmode);
 }
 
+DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_string_value(ocrpt_expr *e, int which, const char *s) {
+	if (!e || which < 0 || which >= OCRPT_EXPR_RESULTS)
+		return;
+
+	ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
+	e->result[which]->string->len = 0;
+	ocrpt_mem_string_append_len(e->result[which]->string, s, strlen(s));
+}
+
 DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_long_value(ocrpt_expr *e, int which, long l) {
 	if (!e || which < 0 || which >= OCRPT_EXPR_RESULTS)
 		return;
