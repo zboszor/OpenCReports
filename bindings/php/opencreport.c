@@ -56,6 +56,7 @@ static zend_object_handlers opencreport_part_row_object_handlers;
 static zend_object_handlers opencreport_part_col_object_handlers;
 static zend_object_handlers opencreport_part_report_object_handlers;
 static zend_object_handlers opencreport_part_report_variable_object_handlers;
+static zend_object_handlers opencreport_part_report_break_object_handlers;
 
 /* Class entries */
 zend_class_entry *opencreport_ce;
@@ -69,6 +70,7 @@ zend_class_entry *opencreport_part_row_ce;
 zend_class_entry *opencreport_part_col_ce;
 zend_class_entry *opencreport_part_report_ce;
 zend_class_entry *opencreport_part_report_variable_ce;
+zend_class_entry *opencreport_part_report_break_ce;
 
 static zend_object *opencreport_object_new(zend_class_entry *class_type) /* {{{ */
 {
@@ -283,6 +285,21 @@ static zend_object *opencreport_part_report_variable_object_new(zend_class_entry
 	object_properties_init(&intern->zo, class_type);
 
 	intern->zo.handlers = &opencreport_part_report_variable_object_handlers;
+
+	return &intern->zo;
+}
+/* }}} */
+
+static zend_object *opencreport_part_report_break_object_new(zend_class_entry *class_type) /* {{{ */
+{
+	php_opencreport_part_report_break_object *intern;
+
+	intern = zend_object_alloc(sizeof(php_opencreport_part_report_break_object), class_type);
+
+	zend_object_std_init(&intern->zo, class_type);
+	object_properties_init(&intern->zo, class_type);
+
+	intern->zo.handlers = &opencreport_part_report_break_object_handlers;
 
 	return &intern->zo;
 }
@@ -1306,7 +1323,7 @@ PHP_METHOD(opencreport_ds, set_encoding) {
 	ocrpt_datasource_set_encoding(dso->ds, ZSTR_VAL(encoding));
 }
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_ds_free, 0, 0, IS_VOID, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_ds_free, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_ds_query_add, 0, 2, OpenCReport\\Query, 1)
@@ -1315,7 +1332,7 @@ ZEND_ARG_TYPE_INFO(0, array_or_file_or_sql, IS_STRING, 0)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, types, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_ds_set_encoding, 0, 1, IS_VOID, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_ds_set_encoding, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, encoding, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
@@ -1390,7 +1407,12 @@ PHP_METHOD(opencreport_query, add_follower_n_to_1) {
 	php_opencreport_query_object *fo = Z_OPENCREPORT_QUERY_P(fobj);
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(mobj);
 
-	RETURN_BOOL(ocrpt_query_add_follower_n_to_1(qo->q, fo->q, eo->e));
+	bool retval = ocrpt_query_add_follower_n_to_1(qo->q, fo->q, eo->e);
+
+	/* The expression's ownership was taken over or it was freed. */
+	eo->e = NULL;
+
+	RETURN_BOOL(retval);
 }
 
 PHP_METHOD(opencreport_query, free) {
@@ -1486,7 +1508,7 @@ PHP_METHOD(opencreport_query_result, column_result) {
 	ro->freed_by_lib = true;
 }
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_result_columns, 0, 0, IS_LONG, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_result_columns, 0, 0, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_result_column_name, 0, 1, IS_STRING, 1)
@@ -1518,6 +1540,11 @@ PHP_METHOD(opencreport_expr, print) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	ocrpt_expr_print(eo->e);
@@ -1526,6 +1553,11 @@ PHP_METHOD(opencreport_expr, print) {
 PHP_METHOD(opencreport_expr, nodes) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
@@ -1536,6 +1568,11 @@ PHP_METHOD(opencreport_expr, optimize) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	ocrpt_expr_optimize(eo->e);
@@ -1544,6 +1581,11 @@ PHP_METHOD(opencreport_expr, optimize) {
 PHP_METHOD(opencreport_expr, resolve) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
@@ -1554,6 +1596,11 @@ PHP_METHOD(opencreport_expr, eval) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	php_opencreport_result_object *ro;
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
@@ -1572,6 +1619,11 @@ PHP_METHOD(opencreport_expr, set_string_value) {
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	zend_string *value;
 
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(value);
 	ZEND_PARSE_PARAMETERS_END();
@@ -1583,6 +1635,11 @@ PHP_METHOD(opencreport_expr, set_long_value) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	zend_long value;
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_LONG(value);
@@ -1596,6 +1653,11 @@ PHP_METHOD(opencreport_expr, set_double_value) {
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	double value;
 
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_DOUBLE(value);
 	ZEND_PARSE_PARAMETERS_END();
@@ -1606,6 +1668,11 @@ PHP_METHOD(opencreport_expr, set_double_value) {
 PHP_METHOD(opencreport_expr, get_num_operands) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
@@ -1640,9 +1707,105 @@ PHP_METHOD(opencreport_expr, cmp_results) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	RETURN_BOOL(ocrpt_expr_cmp_results(eo->e));
+}
+
+PHP_METHOD(opencreport_expr, init_results) {
+	zval *object = ZEND_THIS;
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+	zend_long result_type;
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_LONG(result_type);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_expr_init_results(eo->e, result_type);
+}
+
+PHP_METHOD(opencreport_expr, set_nth_result_string_value) {
+	zval *object = ZEND_THIS;
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+	zend_long which;
+	zend_string *value;
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_LONG(which);
+		Z_PARAM_STR(value);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_expr_set_nth_result_string_value(eo->e, which, ZSTR_VAL(value));
+}
+
+PHP_METHOD(opencreport_expr, set_nth_result_long_value) {
+	zval *object = ZEND_THIS;
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+	zend_long which;
+	zend_long value;
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_LONG(which);
+		Z_PARAM_LONG(value);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_expr_set_nth_result_long_value(eo->e, which, value);
+}
+
+PHP_METHOD(opencreport_expr, set_nth_result_double_value) {
+	zval *object = ZEND_THIS;
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+	zend_long which;
+	double value;
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_LONG(which);
+		Z_PARAM_DOUBLE(value);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_expr_set_nth_result_double_value(eo->e, which, value);
+}
+
+PHP_METHOD(opencreport_expr, set_iterative_start_value) {
+	zval *object = ZEND_THIS;
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+	zend_bool value;
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_BOOL(value);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_expr_set_iterative_start_value(eo->e, value);
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_free, 0, 0, IS_VOID, 0)
@@ -1685,6 +1848,29 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_cmp_results, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_init_results, 0, 0, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, result_type, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_nth_result_string_value, 0, 2, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, which, IS_LONG, 0)
+ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_nth_result_long_value, 0, 2, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, which, IS_LONG, 0)
+ZEND_ARG_TYPE_INFO(0, value, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_nth_result_double_value, 0, 2, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, which, IS_LONG, 0)
+ZEND_ARG_TYPE_INFO(0, value, IS_DOUBLE, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_iterative_start_value, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, value, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry opencreport_expr_class_methods[] = {
 	PHP_ME(opencreport_expr, free, arginfo_opencreport_expr_free, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, print, arginfo_opencreport_expr_print, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -1698,6 +1884,11 @@ static const zend_function_entry opencreport_expr_class_methods[] = {
 	PHP_ME(opencreport_expr, get_num_operands, arginfo_opencreport_expr_get_num_operands, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, operand_get_result, arginfo_opencreport_expr_operand_get_result, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, cmp_results, arginfo_opencreport_expr_cmp_results, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, init_results, arginfo_opencreport_expr_init_results, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, set_nth_result_string_value, arginfo_opencreport_expr_set_nth_result_string_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, set_nth_result_long_value, arginfo_opencreport_expr_set_nth_result_long_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, set_nth_result_double_value, arginfo_opencreport_expr_set_nth_result_double_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, set_iterative_start_value, arginfo_opencreport_expr_set_iterative_start_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 
@@ -2157,6 +2348,18 @@ PHP_METHOD(opencreport_part_report, expr_parse) {
 	}
 }
 
+PHP_METHOD(opencreport_part_report, expr_error) {
+	zval *object = ZEND_THIS;
+	php_opencreport_part_report_object *pro = Z_OPENCREPORT_PART_REPORT_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if (pro->expr_error)
+		RETURN_STRING(pro->expr_error);
+	else
+		RETURN_NULL();
+}
+
 PHP_METHOD(opencreport_part_report, resolve_variables) {
 	zval *object = ZEND_THIS;
 	php_opencreport_part_report_object *pro = Z_OPENCREPORT_PART_REPORT_P(object);
@@ -2173,6 +2376,61 @@ PHP_METHOD(opencreport_part_report, evaluate_variables) {
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	ocrpt_report_evaluate_variables(pro->r);
+}
+
+PHP_METHOD(opencreport_part_report, break_new) {
+	zval *object = ZEND_THIS;
+	php_opencreport_part_report_object *pro = Z_OPENCREPORT_PART_REPORT_P(object);
+	zend_string *name;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR(name);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_break *br = ocrpt_break_new(pro->r, ZSTR_VAL(name));
+	if (!br)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_part_report_break_ce);
+	php_opencreport_part_report_break_object *bro = Z_OPENCREPORT_PART_REPORT_BREAK_P(return_value);
+	bro->br = br;
+}
+
+PHP_METHOD(opencreport_part_report, break_get_next) {
+	zval *object = ZEND_THIS;
+	php_opencreport_part_report_object *pro = Z_OPENCREPORT_PART_REPORT_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_list *iter = NULL;
+	ocrpt_break *br = ocrpt_break_get_next(pro->r, &iter);
+	if (!br)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_part_report_break_ce);
+	php_opencreport_part_report_break_object *bro = Z_OPENCREPORT_PART_REPORT_BREAK_P(return_value);
+	bro->r = pro->r;
+	bro->br = br;
+	bro->iter = iter;
+	bro->is_iterator = true;
+}
+
+PHP_METHOD(opencreport_part_report, resolve_breaks) {
+	zval *object = ZEND_THIS;
+	php_opencreport_part_report_object *pro = Z_OPENCREPORT_PART_REPORT_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_report_resolve_breaks(pro->r);
+}
+
+PHP_METHOD(opencreport_part_report, get_query_rownum) {
+	zval *object = ZEND_THIS;
+	php_opencreport_part_report_object *pro = Z_OPENCREPORT_PART_REPORT_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_LONG(ocrpt_report_get_query_rownum(pro->r));
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_report_report_get_next, 0, 0, OpenCReport\\Part\\Row\\Column\\Report, 1)
@@ -2199,10 +2457,26 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_report_expr_pars
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_resolve_variables, 0, 0, IS_VOID, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_expr_error, 0, 0, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_evaluate_variables, 0, 0, IS_VOID, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_resolve_variables, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_evaluate_variables, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_report_break_new, 0, 1, OpenCReport\\Part\\Row\\Column\\Report\\Break, 1)
+ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_report_break_get_next, 0, 0, OpenCReport\\Part\\Row\\Column\\Report\\Break, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_resolve_breaks, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_get_query_rownum, 0, 0, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry opencreport_part_report_class_methods[] = {
@@ -2210,8 +2484,13 @@ static const zend_function_entry opencreport_part_report_class_methods[] = {
 	PHP_ME(opencreport_part_report, variable_new, arginfo_opencreport_part_report_variable_new, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_part_report, variable_new_full, arginfo_opencreport_part_report_variable_new_full, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_part_report, expr_parse, arginfo_opencreport_part_report_expr_parse, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_part_report, expr_error, arginfo_opencreport_part_report_expr_error, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_part_report, resolve_variables, arginfo_opencreport_part_report_resolve_variables, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_part_report, evaluate_variables, arginfo_opencreport_part_report_evaluate_variables, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_part_report, break_new, arginfo_opencreport_part_report_break_new, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_part_report, break_get_next, arginfo_opencreport_part_report_break_get_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_part_report, resolve_breaks, arginfo_opencreport_part_report_resolve_breaks, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_part_report, get_query_rownum, arginfo_opencreport_part_report_get_query_rownum, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 
@@ -2321,14 +2600,14 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_report_variable_resultexpr, 0, 0, OpenCReport\\Expr, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_variable_set_precalculate, 0, 1, IS_VOID, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_variable_set_precalculate, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, precalculate, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_variable_resolve, 0, 0, IS_VOID, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_variable_resolve, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_variable_eval, 0, 0, IS_VOID, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_variable_eval, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry opencreport_part_report_variable_class_methods[] = {
@@ -2339,6 +2618,88 @@ static const zend_function_entry opencreport_part_report_variable_class_methods[
 	PHP_ME(opencreport_part_report_variable, set_precalculate, arginfo_opencreport_part_report_variable_set_precalculate, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_part_report_variable, resolve, arginfo_opencreport_part_report_variable_resolve, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_part_report_variable, eval, arginfo_opencreport_part_report_variable_eval, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_FE_END
+};
+
+PHP_METHOD(opencreport_part_report_break, break_get_next) {
+	zval *object = ZEND_THIS;
+	php_opencreport_part_report_break_object *bro = Z_OPENCREPORT_PART_REPORT_BREAK_P(object);
+
+	if (!bro->is_iterator) {
+		zend_throw_error(NULL, "OpenCReport\\Part\\Row\\Column\\Report\\Break object is not an iterator");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_list *iter = bro->iter;
+	ocrpt_break *br = ocrpt_break_get_next(bro->r, &iter);
+	if (!br)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_part_report_break_ce);
+	php_opencreport_part_report_break_object *bro1 = Z_OPENCREPORT_PART_REPORT_BREAK_P(return_value);
+	bro1->r = bro->r;
+	bro1->br = br;
+	bro1->iter = iter;
+	bro1->is_iterator = true;
+}
+
+PHP_METHOD(opencreport_part_report_break, breakfield_add) {
+	zval *object = ZEND_THIS;
+	php_opencreport_part_report_break_object *bro = Z_OPENCREPORT_PART_REPORT_BREAK_P(object);
+	zval *breakfield_expr;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_OBJECT_OF_CLASS(breakfield_expr, opencreport_expr_ce);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(breakfield_expr);
+
+	bool retval = ocrpt_break_add_breakfield(bro->br, eo->e);
+
+	/* The expression's ownership was taken over or it was freed */
+	eo->e = NULL;
+
+	RETURN_BOOL(retval);
+}
+
+PHP_METHOD(opencreport_part_report_break, check_fields) {
+	zval *object = ZEND_THIS;
+	php_opencreport_part_report_break_object *bro = Z_OPENCREPORT_PART_REPORT_BREAK_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_BOOL(ocrpt_break_check_fields(bro->br));
+}
+
+PHP_METHOD(opencreport_part_report_break, reset_vars) {
+	zval *object = ZEND_THIS;
+	php_opencreport_part_report_break_object *bro = Z_OPENCREPORT_PART_REPORT_BREAK_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_break_reset_vars(bro->br);
+}
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_report_break_break_get_next, 0, 0, OpenCReport\\Part\\Row\\Column\\Report\\Break, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_break_breakfield_add, 0, 1, _IS_BOOL, 0)
+ZEND_ARG_OBJ_INFO(0, breakfield_expr, OpenCReport\\Expr, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_break_check_fields, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_report_break_reset_vars, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
+
+static const zend_function_entry opencreport_part_report_break_class_methods[] = {
+	PHP_ME(opencreport_part_report_break, break_get_next, arginfo_opencreport_part_report_break_break_get_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_part_report_break, breakfield_add, arginfo_opencreport_part_report_break_breakfield_add, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_part_report_break, check_fields, arginfo_opencreport_part_report_break_check_fields, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_part_report_break, reset_vars, arginfo_opencreport_part_report_break_reset_vars, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 
@@ -2772,6 +3133,23 @@ static PHP_MINIT_FUNCTION(opencreport)
 	opencreport_part_report_variable_ce->serialize = zend_class_serialize_deny;
 	opencreport_part_report_variable_ce->unserialize = zend_class_unserialize_deny;
 #endif
+
+	memcpy(&opencreport_part_report_break_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+	INIT_NS_CLASS_ENTRY(ce, "OpenCReport\\Part\\Row\\Column\\Report", "Break", opencreport_part_report_break_class_methods);
+	ce.create_object = opencreport_part_report_break_object_new;
+	opencreport_part_report_break_object_handlers.offset = XtOffsetOf(php_opencreport_part_report_break_object, zo);
+	opencreport_part_report_break_object_handlers.clone_obj = NULL;
+	opencreport_part_report_break_object_handlers.compare = zend_objects_not_comparable;
+	opencreport_part_report_break_ce = zend_register_internal_class(&ce);
+	opencreport_part_report_break_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	opencreport_part_report_break_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
+	opencreport_part_report_break_ce->serialize = zend_class_serialize_deny;
+	opencreport_part_report_break_ce->unserialize = zend_class_unserialize_deny;
+#endif
+
+	REGISTER_OPENCREPORT_CLASS_CONST_LONG("EXPR_RESULTS", OCRPT_EXPR_RESULTS);
 
 	REGISTER_OPENCREPORT_CLASS_CONST_LONG("OUTPUT_UNSET", OCRPT_OUTPUT_UNSET);
 	REGISTER_OPENCREPORT_CLASS_CONST_LONG("OUTPUT_PDF", OCRPT_OUTPUT_PDF);

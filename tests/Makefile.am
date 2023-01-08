@@ -92,7 +92,13 @@ PHP_TESTS = \
 	rownum_test \
 	part_test part_xml_test \
 	variable_expression_test variable_expression_xml_test \
-	variable_check_test
+	variable_check_test \
+	break_test break_xml_test break_xml2_test \
+	break_xml3_test \
+	iterative_expr_test \
+	break_rownum_xml_test \
+	variable_xml_test \
+	variable_resetonbreak_xml_test
 
 SLOW_TESTS = \
 	pgsql_numeric_precision_test \

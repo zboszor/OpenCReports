@@ -154,4 +154,18 @@ static inline php_opencreport_part_report_variable_object *php_opencreport_part_
 
 #define Z_OPENCREPORT_PART_REPORT_VARIABLE_P(zv) php_opencreport_part_report_variable_from_obj(Z_OBJ_P((zv)))
 
+typedef struct _php_opencreport_part_report_break_object {
+	ocrpt_report *r;
+	ocrpt_break *br;
+	ocrpt_list *iter;
+	bool is_iterator;
+	zend_object zo;
+} php_opencreport_part_report_break_object;
+
+static inline php_opencreport_part_report_break_object *php_opencreport_part_report_break_from_obj(zend_object *obj) {
+	return (php_opencreport_part_report_break_object *)((char *)(obj) - XtOffsetOf(php_opencreport_part_report_break_object, zo));
+}
+
+#define Z_OPENCREPORT_PART_REPORT_BREAK_P(zv) php_opencreport_part_report_break_from_obj(Z_OBJ_P((zv)))
+
 #endif /* PHP_OPENCREPORT_H */
