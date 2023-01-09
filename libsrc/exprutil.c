@@ -225,7 +225,7 @@ DLL_EXPORT_SYM void ocrpt_expr_result_deep_print(ocrpt_expr *e) {
 }
 
 DLL_EXPORT_SYM void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_result *src) {
-	if (!o || !src || !dst)
+	if (!src || !dst)
 		return;
 
 	dst->type = src->type;
@@ -252,10 +252,10 @@ DLL_EXPORT_SYM void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_r
 			break;
 		case OCRPT_RESULT_NUMBER:
 			if (!dst->number_initialized) {
-				mpfr_init2(dst->number, o->prec);
+				mpfr_init2(dst->number, o ? o->prec : global_prec);
 				dst->number_initialized = true;
 			}
-			mpfr_set(dst->number, src->number, o->rndmode);
+			mpfr_set(dst->number, src->number, o ? o->rndmode : global_rndmode);
 			break;
 		case OCRPT_RESULT_DATETIME:
 			dst->datetime = src->datetime;
