@@ -1215,50 +1215,20 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_expr_free(orientation_e);
 	}
 
-	if (!p->top_margin_set && top_margin) {
-		ocrpt_expr *top_margin_e;
-		double top_margin_d;
+	if (!p->top_margin_expr && top_margin)
+		ocrpt_part_set_top_margin(p, (char *)top_margin);
 
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, top_margin);
-		ocrpt_part_set_top_margin(p, top_margin_d);
-		ocrpt_expr_free(top_margin_e);
-	}
+	if (!p->bottom_margin_expr && bottom_margin)
+		ocrpt_part_set_bottom_margin(p, (char *)bottom_margin);
 
-	if (!p->bottom_margin_set && bottom_margin) {
-		ocrpt_expr *bottom_margin_e;
-		double bottom_margin_d;
+	if (!p->left_margin_expr && left_margin)
+		ocrpt_part_set_left_margin(p, (char *)left_margin);
 
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, bottom_margin);
-		ocrpt_part_set_bottom_margin(p, bottom_margin_d);
-		ocrpt_expr_free(bottom_margin_e);
-	}
+	if (!p->right_margin_expr && right_margin)
+		ocrpt_part_set_right_margin(p, (char *)right_margin);
 
-	if (!p->left_margin_set && left_margin) {
-		ocrpt_expr *left_margin_e;
-		double left_margin_d;
-
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, left_margin);
-		ocrpt_part_set_left_margin(p, left_margin_d);
-		ocrpt_expr_free(left_margin_e);
-	}
-
-	if (!p->right_margin_set && right_margin) {
-		ocrpt_expr *right_margin_e;
-		double right_margin_d;
-
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, right_margin);
-		ocrpt_part_set_right_margin(p, right_margin_d);
-		ocrpt_expr_free(right_margin_e);
-	}
-
-	if (!p->paper && paper_type) {
-		ocrpt_expr *paper_type_e;
-		char *paper_type_s;
-
-		ocrpt_xml_const_expr_parse_get_value_with_fallback(o, paper_type);
-		ocrpt_part_set_paper_by_name(p, paper_type_s);
-		ocrpt_expr_free(paper_type_e);
-	}
+	if (!p->paper_type_expr && paper_type)
+		ocrpt_part_set_paper_by_name(p, (char *)paper_type);
 
 	if (iterations) {
 		ocrpt_expr *iterations_e;
@@ -1740,23 +1710,11 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 		ocrpt_set_report_height_after_last(o, !!report_height_after_last_i);
 	}
 
-	if (font_name) {
-		ocrpt_expr *font_name_e;
-		char *font_name_s;
+	if (!p->font_name_expr && font_name)
+		ocrpt_part_set_font_name(p, (char *)font_name);
 
-		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, font_name);
-		ocrpt_part_set_font_name(p, font_name_s);
-		ocrpt_expr_free(font_name_e);
-	}
-
-	if (!p->font_size_set && font_size) {
-		ocrpt_expr *font_size_e;
-		double font_size_d;
-
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, font_size);
-		ocrpt_expr_free(font_size_e);
-		ocrpt_part_set_font_size(p, font_size_d);
-	}
+	if (!p->font_size_expr && font_size)
+		ocrpt_part_set_font_size(p, (char *)font_size);
 
 	if (!o->size_unit_set && size_unit) {
 		ocrpt_expr *size_unit_e;
@@ -1776,50 +1734,20 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 		ocrpt_expr_free(orientation_e);
 	}
 
-	if (top_margin) {
-		ocrpt_expr *top_margin_e;
-		double top_margin_d;
+	if (top_margin)
+		ocrpt_part_set_top_margin(p, (char *)top_margin);
 
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, top_margin);
-		ocrpt_expr_free(top_margin_e);
-		ocrpt_part_set_top_margin(p, top_margin_d);
-	}
+	if (bottom_margin)
+		ocrpt_part_set_bottom_margin(p, (char *)bottom_margin);
 
-	if (bottom_margin) {
-		ocrpt_expr *bottom_margin_e;
-		double bottom_margin_d;
+	if (left_margin)
+		ocrpt_part_set_left_margin(p, (char *)left_margin);
 
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, bottom_margin);
-		ocrpt_expr_free(bottom_margin_e);
-		ocrpt_part_set_bottom_margin(p, bottom_margin_d);
-	}
+	if (right_margin)
+		ocrpt_part_set_right_margin(p, (char *)right_margin);
 
-	if (left_margin) {
-		ocrpt_expr *left_margin_e;
-		double left_margin_d;
-
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, left_margin);
-		ocrpt_expr_free(left_margin_e);
-		ocrpt_part_set_left_margin(p, left_margin_d);
-	}
-
-	if (right_margin) {
-		ocrpt_expr *right_margin_e;
-		double right_margin_d;
-
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, right_margin);
-		ocrpt_expr_free(right_margin_e);
-		ocrpt_part_set_right_margin(p, right_margin_d);
-	}
-
-	if (paper_type) {
-		ocrpt_expr *paper_type_e;
-		char *paper_type_s;
-
-		ocrpt_xml_const_expr_parse_get_value_with_fallback(o, paper_type);
-		ocrpt_part_set_paper_by_name(p, paper_type_s);
-		ocrpt_expr_free(paper_type_e);
-	}
+	if (!p->paper_type_expr && paper_type)
+		ocrpt_part_set_paper_by_name(p, (char *)paper_type);
 
 	if (iterations) {
 		ocrpt_expr *iterations_e;

@@ -114,6 +114,14 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_part_column_new_report(ocrpt_part_column *pd)
 void ocrpt_part_free(ocrpt_part *p) {
 	ocrpt_list *row;
 
+	ocrpt_expr_free(p->paper_type_expr);
+	ocrpt_expr_free(p->font_name_expr);
+	ocrpt_expr_free(p->font_size_expr);
+	ocrpt_expr_free(p->top_margin_expr);
+	ocrpt_expr_free(p->bottom_margin_expr);
+	ocrpt_expr_free(p->left_margin_expr);
+	ocrpt_expr_free(p->right_margin_expr);
+
 	for (row = p->rows; row; row = row->next) {
 		ocrpt_part_row *pr = (ocrpt_part_row *)row->data;
 
@@ -135,6 +143,7 @@ void ocrpt_part_free(ocrpt_part *p) {
 	p->row_last = NULL;
 
 	ocrpt_mem_free(p->path);
+	ocrpt_mem_free(p->font_name_exprstr);
 	ocrpt_mem_free(p->font_name);
 #if 0
 	if (p->allocated)

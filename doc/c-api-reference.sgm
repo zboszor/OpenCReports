@@ -1660,7 +1660,7 @@ ocrpt_part_set_font_name(ocrpt_part *p,
 						See <xref linkend="partfontsize"/>.
 						<programlisting>void
 ocrpt_part_set_font_size(ocrpt_part *p,
-                         double font_size);</programlisting>
+                         const char *font_size);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
@@ -1686,21 +1686,23 @@ ocrpt_part_set_landscape(ocrpt_part *p,
 					<title>Set part margins</title>
 					<para>
 						See <xref linkend="marginsettings"/>.
+						The margin values must be passed in via strings
+						as they can be expressions.
 						<programlisting>void
 ocrpt_part_set_top_margin(ocrpt_part *p,
-                          double margin);
+                          const char *margin);
 
 void
 ocrpt_part_set_bottom_margin(ocrpt_part *p,
-                             double margin);
+                             const char *margin);
 
 void
 ocrpt_part_set_left_margin(ocrpt_part *p,
-                           double margin);
+                           const char *margin);
 
 void
 ocrpt_part_set_right_margin(ocrpt_part *p,
-                            double margin);</programlisting>
+                            const char *margin);</programlisting>
 					</para>
 				</sect4>
 				<sect4>

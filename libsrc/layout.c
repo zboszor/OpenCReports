@@ -570,7 +570,7 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 			if (l->font_name && l->font_name->result[o->residx] && l->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && l->font_name->result[o->residx]->string)
 				font_name = l->font_name->result[o->residx]->string->str;
 			else
-				font_name = (r && r->font_name) ? r->font_name : (p->font_name ? p->font_name : "Courier");
+				font_name = (r && r->font_name) ? r->font_name : p->font_name;
 
 			if (l->font_size && l->font_size->result[o->residx] && l->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->font_size->result[o->residx]->number_initialized)
 				font_size = mpfr_get_d(l->font_size->result[o->residx]->number, o->rndmode);
@@ -597,7 +597,7 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 				}
 			}
 
-			font_name = (r && r->font_name) ? r->font_name : (p->font_name ? p->font_name : "Courier");
+			font_name = (r && r->font_name) ? r->font_name : p->font_name;
 
 			if (hl->font_size && hl->font_size->result[o->residx] && hl->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && hl->font_size->result[o->residx]->number_initialized)
 				font_size = mpfr_get_d(hl->font_size->result[o->residx]->number, o->rndmode);
@@ -891,7 +891,7 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 double ocrpt_layout_top_margin(opencreport *o, ocrpt_part *p) {
 	double top_margin;
 
-	if (p->top_margin_set)
+	if (p->top_margin_expr)
 		top_margin = p->top_margin;
 	else
 		top_margin = OCRPT_DEFAULT_TOP_MARGIN;
@@ -905,7 +905,7 @@ double ocrpt_layout_top_margin(opencreport *o, ocrpt_part *p) {
 double ocrpt_layout_bottom_margin(opencreport *o, ocrpt_part *p) {
 	double bottom_margin;
 
-	if (p->bottom_margin_set)
+	if (p->bottom_margin_expr)
 		bottom_margin = p->bottom_margin;
 	else
 		bottom_margin = OCRPT_DEFAULT_BOTTOM_MARGIN;
@@ -919,7 +919,7 @@ double ocrpt_layout_bottom_margin(opencreport *o, ocrpt_part *p) {
 double ocrpt_layout_left_margin(opencreport *o, ocrpt_part *p) {
 	double left_margin;
 
-	if (p->left_margin_set)
+	if (p->left_margin_expr)
 		left_margin = p->left_margin;
 	else
 		left_margin = OCRPT_DEFAULT_LEFT_MARGIN;
@@ -933,7 +933,7 @@ double ocrpt_layout_left_margin(opencreport *o, ocrpt_part *p) {
 double ocrpt_layout_right_margin(opencreport *o, ocrpt_part *p) {
 	double right_margin;
 
-	if (p->right_margin_set)
+	if (p->right_margin_expr)
 		right_margin = p->right_margin;
 	else
 		right_margin = OCRPT_DEFAULT_RIGHT_MARGIN;
@@ -1738,25 +1738,49 @@ DLL_EXPORT_SYM void ocrpt_part_set_font_name(ocrpt_part *p, const char *font_nam
 	if (!p)
 		return;
 
-	ocrpt_mem_free(p->font_name);
-	p->font_name = ocrpt_mem_strdup(font_name);
+	ocrpt_expr_free(p->font_name_expr);
+	ocrpt_mem_free(p->font_name_exprstr);
+	p->font_name_expr = NULL;
+	p->font_name_exprstr = NULL;
+
+	if (!font_name)
+		return;
+
+	p->font_name_exprstr = ocrpt_mem_strdup(font_name);
+	p->font_name_expr = ocrpt_expr_parse(p->o, font_name, NULL);
+
+	if (!p->font_name_expr) {
+		ocrpt_string *s = ocrpt_mem_string_new(NULL, true);
+
+		ocrpt_mem_string_append_printf(s, "'%s'", font_name);
+		p->font_name_expr = ocrpt_expr_parse(p->o, s->str, NULL);
+		ocrpt_mem_string_free(s, true);
+	}
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_font_size(ocrpt_part *p, double font_size) {
+DLL_EXPORT_SYM void ocrpt_part_set_font_size(ocrpt_part *p, const char *font_size) {
 	if (!p)
 		return;
 
-	if (font_size > 1.0) {
-		p->font_size_set = true;
-		p->font_size = font_size;
-	}
+	ocrpt_expr_free(p->font_size_expr);
+	p->font_size_expr = NULL;
+	if (!font_size)
+		return;
+
+	p->font_size_expr = ocrpt_expr_parse(p->o, font_size, NULL);
 }
 
 DLL_EXPORT_SYM void ocrpt_part_set_paper_by_name(ocrpt_part *p, const char *paper_type) {
 	if (!p)
 		return;
 
-	p->paper = ocrpt_get_paper_by_name(paper_type);
+	ocrpt_expr_free(p->paper_type_expr);
+	p->paper_type_expr = NULL;
+
+	if (!paper_type)
+		return;
+
+	p->paper_type_expr = ocrpt_expr_parse(p->o, paper_type, NULL);
 }
 
 DLL_EXPORT_SYM void ocrpt_part_set_landscape(ocrpt_part *p, bool landscape) {
@@ -1767,44 +1791,56 @@ DLL_EXPORT_SYM void ocrpt_part_set_landscape(ocrpt_part *p, bool landscape) {
 	p->orientation_set = true;
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_top_margin(ocrpt_part *p, double margin) {
+DLL_EXPORT_SYM void ocrpt_part_set_top_margin(ocrpt_part *p, const char *margin) {
 	if (!p)
 		return;
 
-	if (margin > 0.0) {
-		p->top_margin_set = true;
-		p->top_margin = margin;
-	}
+	ocrpt_expr_free(p->top_margin_expr);
+	p->top_margin_expr = NULL;
+
+	if (!margin)
+		return;
+
+	p->top_margin_expr = ocrpt_expr_parse(p->o, margin, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_bottom_margin(ocrpt_part *p, double margin) {
+DLL_EXPORT_SYM void ocrpt_part_set_bottom_margin(ocrpt_part *p, const char *margin) {
 	if (!p)
 		return;
 
-	if (margin > 0.0) {
-		p->bottom_margin_set = true;
-		p->bottom_margin = margin;
-	}
+	ocrpt_expr_free(p->bottom_margin_expr);
+	p->bottom_margin_expr = NULL;
+
+	if (!margin)
+		return;
+
+	p->bottom_margin_expr = ocrpt_expr_parse(p->o, margin, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_left_margin(ocrpt_part *p, double margin) {
+DLL_EXPORT_SYM void ocrpt_part_set_left_margin(ocrpt_part *p, const char *margin) {
 	if (!p)
 		return;
 
-	if (margin > 0.0) {
-		p->left_margin_set = true;
-		p->left_margin = margin;
-	}
+	ocrpt_expr_free(p->left_margin_expr);
+	p->left_margin_expr = NULL;
+
+	if (!margin)
+		return;
+
+	p->left_margin_expr = ocrpt_expr_parse(p->o, margin, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_right_margin(ocrpt_part *p, double margin) {
+DLL_EXPORT_SYM void ocrpt_part_set_right_margin(ocrpt_part *p, const char *margin) {
 	if (!p)
 		return;
 
-	if (margin > 0.0) {
-		p->right_margin_set = true;
-		p->right_margin = margin;
-	}
+	ocrpt_expr_free(p->right_margin_expr);
+	p->right_margin_expr = NULL;
+
+	if (!margin)
+		return;
+
+	p->right_margin_expr = ocrpt_expr_parse(p->o, margin, NULL);
 }
 
 DLL_EXPORT_SYM void ocrpt_part_set_suppress(ocrpt_part *p, bool suppress) {

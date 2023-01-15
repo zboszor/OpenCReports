@@ -159,7 +159,6 @@ struct ocrpt_part {
 	double right_margin;
 	double page_header_height;
 	double page_footer_height;
-	char *font_name;
 
 	/* Temporaries */
 	double paper_width;
@@ -178,8 +177,21 @@ struct ocrpt_part {
 	/* Part iteration callback */
 	ocrpt_list *iteration_callbacks;
 
+	/* Global parameters */
+	ocrpt_expr *paper_type_expr;
+	ocrpt_expr *font_name_expr;
+	ocrpt_expr *font_size_expr;
+	ocrpt_expr *top_margin_expr;
+	ocrpt_expr *bottom_margin_expr;
+	ocrpt_expr *left_margin_expr;
+	ocrpt_expr *right_margin_expr;
+
 	/* Paper */
 	const ocrpt_paper *paper;
+
+	/* Font name, non-parsed original and actual value */
+	char *font_name_exprstr;
+	char *font_name;
 
 	/*
 	 * List of ocrpt_part_row structures
@@ -199,13 +211,8 @@ struct ocrpt_part {
 	bool allocated:1;
 	bool parsed:1;
 #endif
-	bool font_size_set:1;
 	bool orientation_set:1;
 	bool landscape:1;
-	bool top_margin_set:1;
-	bool bottom_margin_set:1;
-	bool left_margin_set:1;
-	bool right_margin_set:1;
 	bool suppress:1;
 	bool suppress_pageheader_firstpage_set:1;
 	bool suppress_pageheader_firstpage:1;

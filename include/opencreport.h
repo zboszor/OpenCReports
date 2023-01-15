@@ -819,13 +819,13 @@ void ocrpt_set_report_height_after_last(opencreport *o, bool report_height_after
 
 void ocrpt_part_set_iterations(ocrpt_part *p, int32_t iterations);
 void ocrpt_part_set_font_name(ocrpt_part *p, const char *font_name);
-void ocrpt_part_set_font_size(ocrpt_part *p, double font_size);
+void ocrpt_part_set_font_size(ocrpt_part *p, const char *font_size);
 void ocrpt_part_set_paper_by_name(ocrpt_part *p, const char *paper_name);
 void ocrpt_part_set_landscape(ocrpt_part *p, bool landscape);
-void ocrpt_part_set_top_margin(ocrpt_part *p, double margin);
-void ocrpt_part_set_bottom_margin(ocrpt_part *p, double margin);
-void ocrpt_part_set_left_margin(ocrpt_part *p, double margin);
-void ocrpt_part_set_right_margin(ocrpt_part *p, double margin);
+void ocrpt_part_set_top_margin(ocrpt_part *p, const char * margin);
+void ocrpt_part_set_bottom_margin(ocrpt_part *p, const char *margin);
+void ocrpt_part_set_left_margin(ocrpt_part *p, const char *margin);
+void ocrpt_part_set_right_margin(ocrpt_part *p, const char *margin);
 void ocrpt_part_set_suppress(ocrpt_part *p, bool suppress);
 void ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p, bool suppress);
 

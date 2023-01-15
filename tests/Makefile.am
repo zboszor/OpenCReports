@@ -156,7 +156,8 @@ PDF_TESTS = \
 	layout_pdf_xml40_test \
 	layout_pdf_xml41_test \
 	layout_pdf41_test \
-	layout_pdf_xml42_test
+	layout_pdf_xml42_test \
+	header_query_test
 
 PHP_PDF_TESTS = \
 	layout_pdf_xml_test \
@@ -234,18 +235,18 @@ $(noinst_PROGRAMS): $(top_builddir)/libsrc/libopencreport.la
 all: $(noinst_PROGRAMS)
 
 basic-test: $(TESTS) execute_test.sh
-	$(foreach TEST,$(TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
 
 php-basic-test: $(PHP_TESTS) execute_php_test.sh
-	$(foreach TEST,$(PHP_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_php_test.sh $(TEST) &&) true
+	$(foreach TEST,$(PHP_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_php_test.sh $(TEST) &&) true
 
 if ENABLE_PDF_TESTS
 
 pdf-test: $(PDF_TESTS) $(XLATE_DEPS) execute_pdf_test.sh
-	$(foreach TEST,$(PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_pdf_test.sh $(TEST) &&) true
+	$(foreach TEST,$(PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_pdf_test.sh $(TEST) &&) true
 
 php-pdf-test: $(PHP_PDF_TESTS) $(XLATE_DEPS) execute_php_pdf_test.sh
-	$(foreach TEST,$(PHP_PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_php_pdf_test.sh $(TEST) &&) true
+	$(foreach TEST,$(PHP_PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_php_pdf_test.sh $(TEST) &&) true
 
 else
 

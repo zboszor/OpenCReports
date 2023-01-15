@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport size_unit="rlib">
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="6" cols="4" />
+		<Query name="header" datasource="myarray" value="'header'" rows="1" cols="8" />
+	</Queries>
+	<Part paperType="header.paper_size" fontName="header.font_name" fontSize="val(header.font_size)" topMargin="val(header.top_margin)" bottomMargin="val(header.bottom_margin)" leftMargin="val(header.left_margin)" rightMargin="val(header.right_margin)">
+		<pr>
+			<pd>
+				<Report>
+					<Detail>
+						<FieldDetails>
+							<Output>
+								<Line>
+									<field value="id" width="4" align="right" col="1"/>
+									<literal width="1"/>
+									<field value="name" width="20" align="left" col="2"/>
+									<literal width="1"/>
+									<field value="property" width="10" align="'left'" col="3"/>
+									<literal width="1"/>
+									<field value="age" width="8" format="'%.2d'" align="'right'" col="4"/>
+									<literal width="1"/>
+									<field value="male ? 'yes' : 'no'" width="5" align="'center'" col="5"/>
+								</Line>
+							</Output>
+						</FieldDetails>
+					</Detail>
+				</Report>
+			</pd>
+		</pr>
+	</Part>
+</OpenCReport>
