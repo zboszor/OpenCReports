@@ -563,7 +563,8 @@ static bool ocrpt_resolve_ident(ocrpt_expr *e, ocrpt_query *q) {
 	}
 
 	for (ql = q->followers_n_to_1; !found && ql; ql = ql->next) {
-		found = ocrpt_resolve_ident(e, (ocrpt_query *)ql->data);
+		ocrpt_query_follower *fo = (ocrpt_query_follower *)ql->data;
+		found = ocrpt_resolve_ident(e, fo->follower);
 		if (found)
 			break;
 	}
@@ -910,12 +911,9 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 		for (i = 0; i < e->n_ops; i++)
 			ocrpt_expr_eval_worker(e->ops[i], orig_e, var);
 
-		if (e->func && e->func->func) {
-			if (e->func->func)
-				e->func->func(e, e->func->user_data);
-			else
-				ocrpt_err_printf("funccall is unset\n");
-		} else
+		if (e->func && e->func->func)
+			e->func->func(e, e->func->user_data);
+		else
 			ocrpt_err_printf("function is unknown (impossible, it is caught by the parser)\n");
 		break;
 
@@ -1117,7 +1115,7 @@ DLL_EXPORT_SYM const char *ocrpt_expr_get_string_value(ocrpt_expr *e) {
 
 	ocrpt_result *r = ocrpt_expr_eval(e);
 
-	if (r && r->type == OCRPT_RESULT_STRING)
+	if (r && r->type == OCRPT_RESULT_STRING && r->string)
 		return r->string->str;
 
 	return NULL;
@@ -1367,7 +1365,7 @@ DLL_EXPORT_SYM bool ocrpt_result_isdatetime(ocrpt_result *result) {
 }
 
 DLL_EXPORT_SYM const struct tm *ocrpt_result_get_datetime(ocrpt_result *result) {
-	if (!result && result->isnull && result->type != OCRPT_RESULT_DATETIME)
+	if (!result || result->isnull || result->type != OCRPT_RESULT_DATETIME)
 		return NULL;
 
 	return &result->datetime;

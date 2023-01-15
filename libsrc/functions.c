@@ -39,7 +39,7 @@ static bool ocrpt_expr_init_result_internal(ocrpt_expr *e, enum ocrpt_result_typ
 	}
 	if (result) {
 		switch (type) {
-		case OCRPT_RESULT_STRING:
+		case OCRPT_RESULT_STRING: {
 			ocrpt_string *string = ocrpt_mem_string_resize(result->string, 16);
 			if (string) {
 				if (!result->string) {
@@ -49,6 +49,7 @@ static bool ocrpt_expr_init_result_internal(ocrpt_expr *e, enum ocrpt_result_typ
 				string->len = 0;
 			}
 			break;
+		}
 		case OCRPT_RESULT_NUMBER:
 			if (!result->number_initialized) {
 				mpfr_init2(result->number, e->o->prec);
@@ -1065,7 +1066,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_iif) {
 		return;
 	}
 
-	if (e->ops[0]->result[e->o->residx]->type != OCRPT_RESULT_NUMBER || e->ops[0]->result[e->o->residx]->isnull) {
+	if (!e->ops[0]->result[e->o->residx] || e->ops[0]->result[e->o->residx]->type != OCRPT_RESULT_NUMBER || e->ops[0]->result[e->o->residx]->isnull) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}

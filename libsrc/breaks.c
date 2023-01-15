@@ -170,6 +170,14 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(ocrpt_break *br) {
 	if (!br)
 		return false;
 
+	ocrpt_report *r = br->r;
+	if (!r)
+		return false;
+
+	opencreport *o = r->o;
+	if (!o)
+		return false;
+
 	bool match = true;
 
 	for (ocrpt_list *ptr = br->breakfields; ptr; ptr = ptr->next) {
@@ -183,10 +191,8 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(ocrpt_break *br) {
 		}
 	}
 
-	ocrpt_query *q = NULL;
+	ocrpt_query *q = r->query;
 
-	if (br->r && br->r->query)
-		q = br->r->query;
 	if (!q && br->r && br->r->o->queries)
 		q = (ocrpt_query *)br->r->o->queries->data;
 
@@ -194,7 +200,7 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(ocrpt_break *br) {
 	bool retval = !match || (q && q->current_row == 0);
 
 	if (retval) {
-		mpfr_set_ui(br->rownum->result[br->r->o->residx]->number, 1, br->r->o->rndmode);
+		mpfr_set_ui(br->rownum->result[o->residx]->number, 1, o->rndmode);
 		ocrpt_expr_set_iterative_start_value(br->rownum, true);
 	}
 	ocrpt_expr_eval(br->rownum);

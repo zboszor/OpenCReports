@@ -708,13 +708,13 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, ocrpt_string *string0, o
 	locale = uselocale(o->locale);
 
 	ocrpt_string *string = ocrpt_mem_string_resize(string0, 16);
-	if (string) {
-		if (e && !e->result[o->residx]->string) {
-			e->result[o->residx]->string = string;
-			e->result[o->residx]->string_owned = true;
-		}
-		string->len = 0;
+	assert(string);
+
+	if (e && !e->result[o->residx]->string) {
+		e->result[o->residx]->string = string;
+		e->result[o->residx]->string_owned = true;
 	}
+	string->len = 0;
 
 	advance = 0;
 	for (i = 0; i < n_expr; i++) {
@@ -858,13 +858,13 @@ void ocrpt_format_string_literal(opencreport *o, ocrpt_expr *e, ocrpt_string *st
 	locale = uselocale(o->locale);
 
 	ocrpt_string *string = ocrpt_mem_string_resize(string0, 16);
-	if (string) {
-		if (e && !e->result[o->residx]->string) {
-			e->result[o->residx]->string = string;
-			e->result[o->residx]->string_owned = true;
-		}
-		string->len = 0;
+	assert(string);
+
+	if (e && !e->result[o->residx]->string) {
+		e->result[o->residx]->string = string;
+		e->result[o->residx]->string_owned = true;
 	}
+	string->len = 0;
 
 	advance = 0;
 
@@ -913,7 +913,7 @@ void ocrpt_format_string_literal(opencreport *o, ocrpt_expr *e, ocrpt_string *st
 			break;
 		case OCRPT_FORMAT_DATETIME:
 			break;
-		case OCRPT_FORMAT_STRING:
+		case OCRPT_FORMAT_STRING: {
 			int32_t blen = literal->len;
 
 			if (length > 0) {
@@ -939,6 +939,7 @@ void ocrpt_format_string_literal(opencreport *o, ocrpt_expr *e, ocrpt_string *st
 
 			data_handled = true;
 			break;
+		}
 		case OCRPT_FORMAT_NONE:
 			break;
 		}

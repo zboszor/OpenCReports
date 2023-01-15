@@ -922,8 +922,10 @@ DLL_EXPORT_SYM char *ocrpt_canonicalize_path(const char *path) {
 
 		/* Leave out path elements referencing the current directory */
 		if (dotdot) {
-			ocrpt_mem_free(last_element->data);
-			last_element->data = c1;
+			if (last_element) {
+				ocrpt_mem_free(last_element->data);
+				last_element->data = c1;
+			}
 			dotdot = false;
 		} else if (!strcmp(c1, "."))
 			ocrpt_mem_free(c1);

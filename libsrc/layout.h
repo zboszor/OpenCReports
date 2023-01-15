@@ -192,6 +192,7 @@ static inline void ocrpt_cairo_create(opencreport *o) {
 	}
 }
 
+static inline void ocrpt_layout_output_init(ocrpt_output *output) __attribute__((nonnull(1)));
 static inline void ocrpt_layout_output_init(ocrpt_output *output) {
 	output->has_memo = false;
 	output->iter = output->output_list;
@@ -201,10 +202,11 @@ static inline void ocrpt_layout_output_init(ocrpt_output *output) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
 
 		switch (oe->type) {
-		case OCRPT_OUTPUT_LINE:
+		case OCRPT_OUTPUT_LINE: {
 			ocrpt_line *l = (ocrpt_line *)oe;
 			l->current_line = 0;
 			break;
+		}
 		default:
 			break;
 		}

@@ -296,6 +296,7 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 		} else if (has_value)
 			ocrpt_format_string(o, NULL, rstring, fstring, &le->value, 1);
 
+		assert(rstring);
 		pango_layout_set_text(le->layout, rstring->str, rstring->len);
 
 		if (le->width && le->width->result[o->residx] && le->width->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->width->result[o->residx]->number_initialized) {

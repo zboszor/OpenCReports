@@ -227,8 +227,11 @@ static void ocrpt_navigate_start_private(ocrpt_query *q) {
 	ocrpt_query_result *qr;
 	int32_t cols;
 
-	if (!q || !q->source || !q->source->o)
+	if (!q)
 		return;
+
+	assert(q->source);
+	assert(q->source->o);
 
 	qr = ocrpt_query_get_result(q, &cols);
 	if (!qr || !cols) {
@@ -236,7 +239,7 @@ static void ocrpt_navigate_start_private(ocrpt_query *q) {
 		return;
 	}
 
-	if (q->source && q->source->input && q->source->input->rewind)
+	if (q->source->input && q->source->input->rewind)
 		q->source->input->rewind(q);
 	else
 		ocrpt_err_printf("'%s' doesn't have ->rewind() function\n", q->name);
