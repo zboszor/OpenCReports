@@ -408,6 +408,15 @@ static void ocrpt_expr_optimize_worker(ocrpt_expr *e) {
 				e->n_ops = 0;
 				e->ops = NULL;
 				e->type = e->result[e->o->residx]->type;
+
+				int residx = e->o->residx;
+				for (i = 0; i < OCRPT_EXPR_RESULTS - 1; i++) {
+					residx = ocrpt_expr_next_residx(residx);
+
+					ocrpt_result_free_data(e->result[residx]);
+					e->result[residx] = e->result[e->o->residx];
+					ocrpt_expr_set_result_owned(e, residx, false);
+				}
 			}
 		}
 
