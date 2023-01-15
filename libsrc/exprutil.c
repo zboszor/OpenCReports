@@ -759,8 +759,13 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 				break;
 			if (e->r && e->r->query)
 				found = ocrpt_resolve_ident(e, e->r->query);
-			else if (e->o->queries)
-				found = ocrpt_resolve_ident(e, (ocrpt_query *)e->o->queries->data);
+			else if (e->o->queries) {
+				for (ocrpt_list *ql = e->o->queries; !found && ql; ql = ql->next) {
+					found = ocrpt_resolve_ident(e, (ocrpt_query *)ql->data);
+					if (found)
+						break;
+				}
+			}
 
 			if (!found)
 				ocrpt_expr_make_error_result(e, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);

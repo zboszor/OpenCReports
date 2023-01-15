@@ -443,6 +443,26 @@ static void ocrpt_execute_parts(opencreport *o) {
 		if (p->suppress)
 			continue;
 
+		ocrpt_layout_output_resolve(o, p, NULL, &p->pageheader);
+		ocrpt_layout_output_resolve(o, p, NULL, &p->pagefooter);
+
+		/*
+		 * Make all queries stand on their first row
+		 * so part, part row, column and part report parameters
+		 * and settings in their headers can use values of
+		 * query columns. This is expected by RLIB semantics:
+		 * some queries may be independent/standalone instead
+		 * of followers to the report's main query. Usually
+		 * such queries have a single row and they may be
+		 * used by contexts outside a part report.
+		 */
+		for (ocrpt_list *ql = o->queries; ql; ql = ql->next) {
+			ocrpt_query *q = (ocrpt_query *)ql->data;
+
+			ocrpt_query_navigate_start(q);
+			ocrpt_query_navigate_next(q);
+		}
+
 		if (!p->paper)
 			p->paper = o->paper;
 
@@ -453,9 +473,6 @@ static void ocrpt_execute_parts(opencreport *o) {
 			p->paper_width = p->paper->width;
 			p->paper_height = p->paper->height;
 		}
-
-		ocrpt_layout_output_resolve(o, p, NULL, &p->pageheader);
-		ocrpt_layout_output_resolve(o, p, NULL, &p->pagefooter);
 
 		if (p->font_size_set)
 			ocrpt_layout_set_font_sizes(o, p->font_name ? p->font_name : "Courier", p->font_size, false, false, NULL, &p->font_width);
