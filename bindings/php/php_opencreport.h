@@ -18,8 +18,7 @@ extern zend_module_entry ocrpt_module_entry;
 typedef struct _php_opencreport_object {
 	opencreport *o;
 	char *expr_error;
-	ocrpt_list *funcnames;
-	ocrpt_list *funcnames_last;
+	bool free_me;
 	zend_object zo;
 } php_opencreport_object;
 
@@ -75,6 +74,7 @@ static inline php_opencreport_expr_object *php_opencreport_expr_from_obj(zend_ob
 #define Z_OPENCREPORT_EXPR_P(zv) php_opencreport_expr_from_obj(Z_OBJ_P((zv)))
 
 typedef struct _php_opencreport_result_object {
+	opencreport *o;
 	ocrpt_result *r;
 	bool freed_by_lib;
 	zend_object zo;
