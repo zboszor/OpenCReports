@@ -261,11 +261,11 @@ static void ocrpt_layout_image_setup(opencreport *o, ocrpt_part *p, ocrpt_part_r
 		image->image_height = mpfr_get_d(image->height->result[o->residx]->number, o->rndmode);
 
 	if (image->bgcolor && image->bgcolor->result[o->residx] && image->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && image->bgcolor->result[o->residx]->string)
-		ocrpt_get_color(o, image->bgcolor->result[o->residx]->string->str, &image->bg, true);
+		ocrpt_get_color(image->bgcolor->result[o->residx]->string->str, &image->bg, true);
 	else if (line && line->bgcolor && line->bgcolor->result[o->residx] && line->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && line->bgcolor->result[o->residx]->string)
-		ocrpt_get_color(o, line->bgcolor->result[o->residx]->string->str, &image->bg, true);
+		ocrpt_get_color(line->bgcolor->result[o->residx]->string->str, &image->bg, true);
 	else
-		ocrpt_get_color(o, NULL, &image->bg, true);
+		ocrpt_get_color(NULL, &image->bg, true);
 
 	char *img_filename = ocrpt_find_file(o, image->value->result[o->residx]->string->str);
 
@@ -1927,7 +1927,7 @@ DLL_EXPORT_SYM void ocrpt_part_column_set_border_color(ocrpt_part_column *pd, co
 	if (!pd)
 		return;
 
-	ocrpt_get_color(pd->o, color, &pd->border_color, false);
+	ocrpt_get_color(color, &pd->border_color, false);
 	pd->border_color_set = true;
 }
 

@@ -355,9 +355,9 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
 	if (le->bgcolor && le->bgcolor->result[o->residx] && le->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && le->bgcolor->result[o->residx]->string)
-		ocrpt_get_color(o, le->bgcolor->result[o->residx]->string->str, &bgcolor, true);
+		ocrpt_get_color(le->bgcolor->result[o->residx]->string->str, &bgcolor, true);
 	else if (l->bgcolor && l->bgcolor->result[o->residx] && l->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && l->bgcolor->result[o->residx]->string)
-		ocrpt_get_color(o, l->bgcolor->result[o->residx]->string->str, &bgcolor, true);
+		ocrpt_get_color(l->bgcolor->result[o->residx]->string->str, &bgcolor, true);
 
 	cairo_set_source_rgb(o->cr, bgcolor.r, bgcolor.g, bgcolor.b);
 	cairo_set_line_width(o->cr, 0.0);
@@ -370,9 +370,9 @@ void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
 	if (le->color && le->color->result[o->residx] && le->color->result[o->residx]->type == OCRPT_RESULT_STRING && le->color->result[o->residx]->string)
-		ocrpt_get_color(o, le->color->result[o->residx]->string->str, &color, true);
+		ocrpt_get_color(le->color->result[o->residx]->string->str, &color, true);
 	else if (l->color && l->color->result[o->residx] && l->color->result[o->residx]->type == OCRPT_RESULT_STRING && l->color->result[o->residx]->string)
-		ocrpt_get_color(o, l->color->result[o->residx]->string->str, &color, true);
+		ocrpt_get_color(l->color->result[o->residx]->string->str, &color, true);
 
 	cairo_set_source_rgb(o->cr, color.r, color.g, color.b);
 
@@ -461,7 +461,7 @@ void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocr
 	if (hline->color && hline->color->result[o->residx] && hline->color->result[o->residx]->type == OCRPT_RESULT_STRING && hline->color->result[o->residx]->string)
 		color_name = hline->color->result[o->residx]->string->str;
 
-	ocrpt_get_color(o, color_name, &color, false);
+	ocrpt_get_color(color_name, &color, false);
 
 	cairo_set_source_rgb(o->cr, color.r, color.g, color.b);
 	cairo_set_line_width(o->cr, 0.0);

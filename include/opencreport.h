@@ -977,7 +977,7 @@ char *ocrpt_find_file(opencreport *o, const char *filename);
  * the expected usage (foreground or background color), the ocrpt_color
  * structure is filled with either white or black.
  */
-void ocrpt_get_color(opencreport *o, const char *cname, ocrpt_color *color, bool bgcolor);
+void ocrpt_get_color(const char *cname, ocrpt_color *color, bool bgcolor);
 
 /********************************
  * Paper size related functions *

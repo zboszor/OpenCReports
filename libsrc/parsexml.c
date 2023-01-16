@@ -1513,7 +1513,7 @@ static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		char *border_color_s;
 
 		ocrpt_xml_const_expr_parse_get_value_with_fallback(o, border_color);
-		ocrpt_get_color(o, border_color_s, &pd->border_color, false);
+		ocrpt_get_color(border_color_s, &pd->border_color, false);
 		ocrpt_expr_free(border_color_e);
 	}
 

@@ -68,8 +68,8 @@ void ocrpt_init_color(void) {
 		ocrpt_parse_html_color(compat_color_names[i].html + 1, &compat_color_names[i]);
 }
 
-DLL_EXPORT_SYM void ocrpt_get_color(opencreport *o, const char *cname, ocrpt_color *color, bool bgcolor) {
-	if (!o || !color)
+DLL_EXPORT_SYM void ocrpt_get_color(const char *cname, ocrpt_color *color, bool bgcolor) {
+	if (!color)
 		return;
 
 	ocrpt_named_color nc;
