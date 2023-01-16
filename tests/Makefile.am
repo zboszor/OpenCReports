@@ -120,6 +120,10 @@ SLOW_TESTS = \
 	pgsql_numeric_precision_test \
 	pgsql_numeric_precision2_test
 
+SLOW_PHP_TESTS = \
+	pgsql_numeric_precision_test \
+	pgsql_numeric_precision2_test
+
 # All PDF output tests are inherently unstable because Cairo:
 # * sets the /Producer PDF property with its own name and version
 # * different Cairo versions support different PDF versions
@@ -275,10 +279,13 @@ test: basic-test pdf-test
 php-test: php-basic-test php-pdf-test
 
 slow-test: $(SLOW_TESTS) execute_test.sh
-	$(foreach TEST,$(SLOW_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(SLOW_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
+
+php-slow-test: $(SLOW_PHP_TESTS) execute_php_test.sh
+	$(foreach TEST,$(SLOW_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_php_test.sh $(TEST) &&) true
 
 unstable-test: $(UNSTABLE_TESTS) execute_test.sh
-	$(foreach TEST,$(UNSTABLE_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrack=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(UNSTABLE_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
 
 all-test: test slow-test unstable-test
 
