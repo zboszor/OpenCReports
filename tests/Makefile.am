@@ -98,7 +98,23 @@ PHP_TESTS = \
 	iterative_expr_test \
 	break_rownum_xml_test \
 	variable_xml_test \
-	variable_resetonbreak_xml_test
+	variable_resetonbreak_xml_test \
+	result_copy_test \
+	break_multi_test \
+	break_multi2_test \
+	break_multi3_test \
+	break_multi4_test \
+	break_multi5_test \
+	datetime_expr_test \
+	execute_test \
+	break_multi6_test \
+	break_multi7_test \
+	break_multi8_test \
+	custom_variable_test \
+	custom_variable_xml_test \
+	canonicalize_path_test \
+	find_file_test \
+	color_test
 
 SLOW_TESTS = \
 	pgsql_numeric_precision_test \

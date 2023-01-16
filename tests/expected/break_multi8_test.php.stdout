@@ -1,0 +1,54 @@
+break 'male' triggered
+break 'adult' triggered
+Row #0
+.'age'
+(number)31.000000
+v.'age_avg'
+(number)19.583333
+sub(.'age',v.'age_avg')
+(number)11.416667
+
+Row #1
+.'age'
+(number)29.000000
+v.'age_avg'
+(number)19.583333
+sub(.'age',v.'age_avg')
+(number)9.416667
+break 'adult' triggered
+
+Row #2
+.'age'
+(number)2.000000
+v.'age_avg'
+(number)19.583333
+sub(.'age',v.'age_avg')
+(number)-17.583333
+break 'male' triggered
+break 'adult' triggered
+
+Row #3
+.'age'
+(number)28.000000
+v.'age_avg'
+(number)19.583333
+sub(.'age',v.'age_avg')
+(number)8.416667
+
+Row #4
+.'age'
+(number)27.000000
+v.'age_avg'
+(number)19.583333
+sub(.'age',v.'age_avg')
+(number)7.416667
+break 'male' triggered
+break 'adult' triggered
+
+Row #5
+.'age'
+(number)0.500000
+v.'age_avg'
+(number)19.583333
+sub(.'age',v.'age_avg')
+(number)-19.083333
