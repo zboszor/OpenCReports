@@ -56,6 +56,19 @@ ocrpt_parse_xml(opencreport *o,
 			</para>
 		</sect2>
 		<sect2>
+			<title>Parse report XML description from a buffer</title>
+			<para>
+				This function parses the buffer as if it contained
+				XML contents and loads the details into the report handler.
+				It returns <literal>true</literal> for success,
+				<literal>false</literal> for failure.
+				<programlisting>bool
+ocrpt_parse_xml_from_buffer(opencreport *o,
+                            const char *buffer,
+                            size_t size);</programlisting>
+			</para>
+		</sect2>
+		<sect2>
 			<title>Set report output format</title>
 			<para>
 				<programlisting>enum ocrpt_format_type {

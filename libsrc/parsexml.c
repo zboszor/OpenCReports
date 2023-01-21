@@ -2006,17 +2006,7 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 	}
 }
 
-DLL_EXPORT_SYM bool ocrpt_parse_xml(opencreport *o, const char *filename) {
-	if (!o || !filename)
-		return false;
-
-	xmlTextReaderPtr reader;
-	bool retval = true;
-
-	reader = xmlReaderForFile(filename, NULL, XML_PARSE_RECOVER |
-								XML_PARSE_NOENT | XML_PARSE_NOBLANKS |
-								XML_PARSE_XINCLUDE | XML_PARSE_NOXINCNODE);
-
+static bool ocrpt_parse_xml_internal(opencreport *o, xmlTextReaderPtr reader) {
 	if (!reader)
 		return false;
 
@@ -2053,5 +2043,33 @@ DLL_EXPORT_SYM bool ocrpt_parse_xml(opencreport *o, const char *filename) {
 
 	xmlFreeTextReader(reader);
 
-	return retval;
+	return true;
+}
+
+DLL_EXPORT_SYM bool ocrpt_parse_xml(opencreport *o, const char *filename) {
+	if (!o || !filename)
+		return false;
+
+	xmlTextReaderPtr reader = xmlReaderForFile(filename, NULL,
+												XML_PARSE_RECOVER |
+												XML_PARSE_NOENT |
+												XML_PARSE_NOBLANKS |
+												XML_PARSE_XINCLUDE |
+												XML_PARSE_NOXINCNODE);
+
+	return ocrpt_parse_xml_internal(o, reader);
+}
+
+DLL_EXPORT_SYM bool ocrpt_parse_xml_from_buffer(opencreport *o, const char *buffer, size_t size) {
+	if (!o || !buffer)
+		return false;
+
+	xmlTextReaderPtr reader = xmlReaderForMemory(buffer, size, NULL, NULL,
+												XML_PARSE_RECOVER |
+												XML_PARSE_NOENT |
+												XML_PARSE_NOBLANKS |
+												XML_PARSE_XINCLUDE |
+												XML_PARSE_NOXINCNODE);
+
+	return ocrpt_parse_xml_internal(o, reader);
 }

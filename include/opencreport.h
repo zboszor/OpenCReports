@@ -176,6 +176,7 @@ void ocrpt_free(opencreport *o);
  * Add details to the report from the parsed XML file
  */
 bool ocrpt_parse_xml(opencreport *o, const char *filename);
+bool ocrpt_parse_xml_from_buffer(opencreport *o, const char *buffer, size_t size);
 /*
  * Execute the reports added up to this point.
  */
