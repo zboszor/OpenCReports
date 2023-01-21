@@ -446,10 +446,10 @@ static void ocrpt_execute_parts(opencreport *o) {
 		ocrpt_layout_output_resolve(o, p, NULL, &p->pageheader);
 		ocrpt_layout_output_resolve(o, p, NULL, &p->pagefooter);
 
-		ocrpt_expr_resolve(p->paper_type_expr);
+		ocrpt_expr_resolve_nowarn(p->paper_type_expr);
 		ocrpt_expr_optimize(p->paper_type_expr);
 
-		ocrpt_expr_resolve(p->font_name_expr);
+		ocrpt_expr_resolve_nowarn(p->font_name_expr);
 		ocrpt_expr_optimize(p->font_name_expr);
 
 		ocrpt_expr_resolve(p->font_size_expr);

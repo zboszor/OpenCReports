@@ -171,16 +171,16 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 	if (!value)
 		value = value_att;
 
-	ocrpt_xml_const_expr_parse_get_value_with_fallback(o, name);
+	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, name);
 	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, value);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback(o, datasource);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback(o, follower_for);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback(o, follower_expr);
+	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, datasource);
+	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, follower_for);
+	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, follower_expr);
 
 	ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, cols);
 	ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, rows);
 
-	ocrpt_xml_const_expr_parse_get_value_with_fallback(o, coltypes);
+	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, coltypes);
 
 	ds = ocrpt_datasource_get(o, datasource_s);
 	if (ds) {
@@ -308,8 +308,8 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	for (i = 0; xmlattrs[i].attrp; i++)
 		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
 
-	ocrpt_xml_const_expr_parse_get_value_with_fallback(o, name);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback(o, type);
+	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, name);
+	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, type);
 
 	ocrpt_xml_const_expr_parse_get_value_with_fallback(o, host);
 	ocrpt_xml_const_expr_parse_get_value_with_fallback(o, unix_socket);
@@ -1261,7 +1261,7 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_expr *query_e;
 		char *query_s;
 
-		ocrpt_xml_const_expr_parse_get_value_with_fallback(o, query);
+		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, query);
 		ocrpt_report_set_main_query_by_name(r, query_s);
 		ocrpt_expr_free(query_e);
 	} else if (o->queries)
@@ -1271,7 +1271,7 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_expr *field_header_priority_e;
 		char *field_header_priority_s;
 
-		ocrpt_xml_const_expr_parse_get_value_with_fallback(o, field_header_priority);
+		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, field_header_priority);
 		ocrpt_report_set_fieldheader_high_priority(r, field_header_priority_s && strcasecmp(field_header_priority_s, "high") == 0);
 		ocrpt_expr_free(field_header_priority_e);
 	}

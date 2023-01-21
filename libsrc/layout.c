@@ -1116,7 +1116,7 @@ ocrpt_expr *ocrpt_layout_const_expr_parse(opencreport *o, const char *expr, bool
 	e = ocrpt_expr_parse(o, expr, &err);
 	if (e) {
 		if (fake_vars_expected) {
-			ocrpt_expr_resolve_exclude(e, OCRPT_VARREF_RVAR | OCRPT_VARREF_VVAR);
+			ocrpt_expr_resolve_worker(e, e, NULL, OCRPT_VARREF_RVAR | OCRPT_VARREF_VVAR, report);
 			ocrpt_expr_optimize(e);
 		} else {
 			uint32_t var_mask;
@@ -1140,7 +1140,7 @@ ocrpt_expr *ocrpt_layout_const_expr_parse(opencreport *o, const char *expr, bool
 				ocrpt_expr_free(e);
 				e = NULL;
 			} else {
-				ocrpt_expr_resolve(e);
+				ocrpt_expr_resolve_worker(e, e, NULL, 0, report);
 				ocrpt_expr_optimize(e);
 			}
 		}

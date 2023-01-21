@@ -581,7 +581,7 @@ static bool ocrpt_resolve_ident(ocrpt_expr *e, ocrpt_query *q) {
 	return found;
 }
 
-void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask) {
+void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask, bool warn) {
 	int32_t i;
 
 	if (!e)
@@ -636,7 +636,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 				if (var && (orig_e == var->intermedexpr || orig_e == var->intermed2expr || orig_e == var->resultexpr)) {
 					e->var = var;
 					if (var->baseexpr) {
-						ocrpt_expr_resolve_worker(e->var->baseexpr, e->var->baseexpr, var, varref_exclude_mask);
+						ocrpt_expr_resolve_worker(e->var->baseexpr, e->var->baseexpr, var, varref_exclude_mask, warn);
 						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 							if (!e->result[i]) {
 								//assert(var->baseexpr->result[i]);
@@ -651,7 +651,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 				if (var && (orig_e == var->intermed2expr || orig_e == var->resultexpr)) {
 					e->var = var;
 					if (var->intermedexpr) {
-						ocrpt_expr_resolve_worker(e->var->intermedexpr, e->var->intermedexpr, var, varref_exclude_mask);
+						ocrpt_expr_resolve_worker(e->var->intermedexpr, e->var->intermedexpr, var, varref_exclude_mask, warn);
 						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 							if (!e->result[i]) {
 								//assert(var->intermedexpr->result[i]);
@@ -666,7 +666,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 				if (var && orig_e == var->resultexpr) {
 					e->var = var;
 					if (var->intermed2expr) {
-						ocrpt_expr_resolve_worker(e->var->intermed2expr, e->var->intermed2expr, var, varref_exclude_mask);
+						ocrpt_expr_resolve_worker(e->var->intermed2expr, e->var->intermed2expr, var, varref_exclude_mask, warn);
 						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 							if (!e->result[i]) {
 								//assert(var->intermed2expr->result[i]);
@@ -776,13 +776,30 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 				}
 			}
 
-			if (!found)
-				ocrpt_expr_make_error_result(e, "invalid identifier '%s%s%s'", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
+			if (!found) {
+				/* No such identifier, turn it into a string. */
+				ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
+				ocrpt_mem_string_append_printf(e->result[e->o->residx]->string, "%s%s%s", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
+				e->result[e->o->residx]->string_owned = true;
+				e->result[ocrpt_expr_next_residx(e->o->residx)] = e->result[e->o->residx];
+				e->result[ocrpt_expr_next_residx(ocrpt_expr_next_residx(e->o->residx))] = e->result[e->o->residx];
+
+				ocrpt_mem_string_free(e->query, true);
+				e->query = NULL;
+				ocrpt_mem_string_free(e->name, true);
+				e->name = NULL;
+				e->dotprefixed = false;
+
+				e->type = OCRPT_EXPR_STRING;
+
+				if (warn)
+					ocrpt_err_printf("invalid field reference: '%s', converted to string literal\n", e->result[e->o->residx]->string->str);
+			}
 		}
 		break;
 	case OCRPT_EXPR:
 		for (i = 0; i < e->n_ops; i++)
-			ocrpt_expr_resolve_worker(e->ops[i], orig_e, var, varref_exclude_mask);
+			ocrpt_expr_resolve_worker(e->ops[i], orig_e, var, varref_exclude_mask, warn);
 		break;
 	default:
 		break;
@@ -793,14 +810,14 @@ DLL_EXPORT_SYM void ocrpt_expr_resolve(ocrpt_expr *e) {
 	if (!e)
 		return;
 
-	ocrpt_expr_resolve_worker(e, e, NULL, 0);
+	ocrpt_expr_resolve_worker(e, e, NULL, 0, true);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exclude_mask) {
 	if (!e)
 		return;
 
-	ocrpt_expr_resolve_worker(e, e, NULL, varref_exclude_mask);
+	ocrpt_expr_resolve_worker(e, e, NULL, varref_exclude_mask, true);
 }
 
 static bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask) {

@@ -110,7 +110,13 @@ void ocrpt_expr_free_internal(ocrpt_expr *e, bool free_from_list);
 
 void ocrpt_expr_print_internal(ocrpt_expr *e, ocrpt_printf_func func);
 void ocrpt_expr_result_deep_print_worker(ocrpt_expr *e, ocrpt_printf_func func);
-void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask);
+void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask, bool warn);
+static inline void ocrpt_expr_resolve_nowarn(ocrpt_expr *e) {
+	if (!e)
+		return;
+	ocrpt_expr_resolve_worker(e, e, NULL, 0, false);
+}
+
 void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exclude_mask);
 bool ocrpt_expr_references(ocrpt_expr *e, int32_t varref_include_mask, uint32_t *varref_vartype_mask);
 void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var);
