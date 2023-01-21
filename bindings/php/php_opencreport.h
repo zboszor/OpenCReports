@@ -100,72 +100,72 @@ static inline php_opencreport_part_object *php_opencreport_part_from_obj(zend_ob
 
 #define Z_OPENCREPORT_PART_P(zv) php_opencreport_part_from_obj(Z_OBJ_P((zv)))
 
-typedef struct _php_opencreport_part_row_object {
+typedef struct _php_opencreport_row_object {
 	ocrpt_part *p;
 	ocrpt_part_row *pr;
 	ocrpt_list *iter;
 	bool is_iterator;
 	zend_object zo;
-} php_opencreport_part_row_object;
+} php_opencreport_row_object;
 
-static inline php_opencreport_part_row_object *php_opencreport_part_row_from_obj(zend_object *obj) {
-	return (php_opencreport_part_row_object *)((char *)(obj) - XtOffsetOf(php_opencreport_part_row_object, zo));
+static inline php_opencreport_row_object *php_opencreport_row_from_obj(zend_object *obj) {
+	return (php_opencreport_row_object *)((char *)(obj) - XtOffsetOf(php_opencreport_row_object, zo));
 }
 
-#define Z_OPENCREPORT_PART_ROW_P(zv) php_opencreport_part_row_from_obj(Z_OBJ_P((zv)))
+#define Z_OPENCREPORT_ROW_P(zv) php_opencreport_row_from_obj(Z_OBJ_P((zv)))
 
-typedef struct _php_opencreport_part_col_object {
+typedef struct _php_opencreport_col_object {
 	ocrpt_part_row *pr;
 	ocrpt_part_column *pc;
 	ocrpt_list *iter;
 	bool is_iterator;
 	zend_object zo;
-} php_opencreport_part_col_object;
+} php_opencreport_col_object;
 
-static inline php_opencreport_part_col_object *php_opencreport_part_col_from_obj(zend_object *obj) {
-	return (php_opencreport_part_col_object *)((char *)(obj) - XtOffsetOf(php_opencreport_part_col_object, zo));
+static inline php_opencreport_col_object *php_opencreport_col_from_obj(zend_object *obj) {
+	return (php_opencreport_col_object *)((char *)(obj) - XtOffsetOf(php_opencreport_col_object, zo));
 }
 
-#define Z_OPENCREPORT_PART_COL_P(zv) php_opencreport_part_col_from_obj(Z_OBJ_P((zv)))
+#define Z_OPENCREPORT_COL_P(zv) php_opencreport_col_from_obj(Z_OBJ_P((zv)))
 
-typedef struct _php_opencreport_part_report_object {
+typedef struct _php_opencreport_report_object {
 	ocrpt_part_column *pc;
 	ocrpt_report *r;
 	char *expr_error;
 	ocrpt_list *iter;
 	bool is_iterator;
 	zend_object zo;
-} php_opencreport_part_report_object;
+} php_opencreport_report_object;
 
-static inline php_opencreport_part_report_object *php_opencreport_part_report_from_obj(zend_object *obj) {
-	return (php_opencreport_part_report_object *)((char *)(obj) - XtOffsetOf(php_opencreport_part_report_object, zo));
+static inline php_opencreport_report_object *php_opencreport_report_from_obj(zend_object *obj) {
+	return (php_opencreport_report_object *)((char *)(obj) - XtOffsetOf(php_opencreport_report_object, zo));
 }
 
-#define Z_OPENCREPORT_PART_REPORT_P(zv) php_opencreport_part_report_from_obj(Z_OBJ_P((zv)))
+#define Z_OPENCREPORT_REPORT_P(zv) php_opencreport_report_from_obj(Z_OBJ_P((zv)))
 
-typedef struct _php_opencreport_part_report_variable_object {
+typedef struct _php_opencreport_variable_object {
 	ocrpt_var *v;
 	zend_object zo;
-} php_opencreport_part_report_variable_object;
+} php_opencreport_variable_object;
 
-static inline php_opencreport_part_report_variable_object *php_opencreport_part_report_variable_from_obj(zend_object *obj) {
-	return (php_opencreport_part_report_variable_object *)((char *)(obj) - XtOffsetOf(php_opencreport_part_report_variable_object, zo));
+static inline php_opencreport_variable_object *php_opencreport_variable_from_obj(zend_object *obj) {
+	return (php_opencreport_variable_object *)((char *)(obj) - XtOffsetOf(php_opencreport_variable_object, zo));
 }
 
-#define Z_OPENCREPORT_PART_REPORT_VARIABLE_P(zv) php_opencreport_part_report_variable_from_obj(Z_OBJ_P((zv)))
+#define Z_OPENCREPORT_VARIABLE_P(zv) php_opencreport_variable_from_obj(Z_OBJ_P((zv)))
 
-typedef struct _php_opencreport_part_report_break_object {
+typedef struct _php_opencreport_break_object {
 	ocrpt_report *r;
 	ocrpt_break *br;
 	ocrpt_list *iter;
 	bool is_iterator;
 	zend_object zo;
-} php_opencreport_part_report_break_object;
+} php_opencreport_break_object;
 
-static inline php_opencreport_part_report_break_object *php_opencreport_part_report_break_from_obj(zend_object *obj) {
-	return (php_opencreport_part_report_break_object *)((char *)(obj) - XtOffsetOf(php_opencreport_part_report_break_object, zo));
+static inline php_opencreport_break_object *php_opencreport_break_from_obj(zend_object *obj) {
+	return (php_opencreport_break_object *)((char *)(obj) - XtOffsetOf(php_opencreport_break_object, zo));
 }
 
-#define Z_OPENCREPORT_PART_REPORT_BREAK_P(zv) php_opencreport_part_report_break_from_obj(Z_OBJ_P((zv)))
+#define Z_OPENCREPORT_BREAK_P(zv) php_opencreport_break_from_obj(Z_OBJ_P((zv)))
 
 #endif /* PHP_OPENCREPORT_H */

@@ -32,7 +32,7 @@ function test_part_added_cb(OpenCReport $o, OpenCReport\Part $p) {
 	echo "appended part " . (count($parts) - 1) . PHP_EOL;
 }
 
-function test_report_start_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report $r) {
+function test_report_start_cb(OpenCReport $o, OpenCReport\Report $r) {
 	global $reports;
 
 	$i = 0;
@@ -47,7 +47,7 @@ function test_report_start_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report
 	echo "unknown report???" . PHP_EOL;
 }
 
-function test_report_done_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report $r) {
+function test_report_done_cb(OpenCReport $o, OpenCReport\Report $r) {
 	global $reports;
 
 	$i = 0;
@@ -62,7 +62,7 @@ function test_report_done_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report 
 	echo "unknown report???" . PHP_EOL;
 }
 
-function test_report_iteration_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report $r) {
+function test_report_iteration_cb(OpenCReport $o, OpenCReport\Report $r) {
 	global $reports;
 
 	$i = 0;
@@ -77,7 +77,7 @@ function test_report_iteration_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Re
 	echo "unknown report???" . PHP_EOL;
 }
 
-function test_report_precalc_done_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report $r) {
+function test_report_precalc_done_cb(OpenCReport $o, OpenCReport\Report $r) {
 	global $reports;
 
 	$i = 0;
@@ -96,7 +96,7 @@ function test_precalc_done_cb(OpenCReport $o) {
 	echo "all reports' precalculation done" . PHP_EOL;
 }
 
-function test_report_added_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report $r) {
+function test_report_added_cb(OpenCReport $o, OpenCReport\Report $r) {
 	global $reports;
 
 	array_push($reports, $r);

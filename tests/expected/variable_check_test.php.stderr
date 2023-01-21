@@ -1,6 +1,6 @@
-PHP Warning:  OpenCReport\Part\Row\Column\Report::variable_new(): variable 'var1': duplicate variable name
+PHP Warning:  OpenCReport\Report::variable_new(): variable 'var1': duplicate variable name
  in /home/zozo/git/OpenCReports/tests/variable_check_test.php on line 32
-PHP Warning:  OpenCReport\Part\Row\Column\Report::variable_new(): variable 'var4': may only reference expression variables
+PHP Warning:  OpenCReport\Report::variable_new(): variable 'var4': may only reference expression variables
  in /home/zozo/git/OpenCReports/tests/variable_check_test.php on line 43
-PHP Warning:  OpenCReport\Part\Row\Column\Report::variable_new(): variable 'var5': references an unknown variable name
+PHP Warning:  OpenCReport\Report::variable_new(): variable 'var5': references an unknown variable name
  in /home/zozo/git/OpenCReports/tests/variable_check_test.php on line 46

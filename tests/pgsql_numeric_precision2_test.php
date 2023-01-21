@@ -9,7 +9,7 @@ const ROWS=10000000;
 
 $row = 0;
 
-function test_newrow_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report $r) {
+function test_newrow_cb(OpenCReport $o, OpenCReport\Report $r) {
 	global $row;
 	global $e;
 

@@ -12,7 +12,7 @@ function print_query_columns(&$q, $name = NULL) {
 		echo $i . ": '" . $qr->column_name($i) . "'" . PHP_EOL;
 }
 
-function print_result_row(string $name, OpenCReport\Query\Result &$qr) {
+function print_result_row(string $name, OpenCReport\QueryResult &$qr) {
 	echo "Query: '" . $name . "':" . PHP_EOL;
 	for ($i = 0; $i < $qr->columns(); $i++) {
 		$r = $qr->column_result($i);
@@ -42,7 +42,7 @@ function print_part_reports(string $name, OpenCReport\Part &$p) {
 	}
 }
 
-function get_first_report(OpenCReport &$o): OpenCReport\Part\Row\Column\Report {
+function get_first_report(OpenCReport &$o): OpenCReport\Report {
 	return $o->part_get_next()->row_get_next()->column_get_next()->report_get_next();
 }
 

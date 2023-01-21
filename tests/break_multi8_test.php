@@ -23,7 +23,7 @@ $coltypes = [
 
 $row = 0;
 
-function test_newrow_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report $r) {
+function test_newrow_cb(OpenCReport $o, OpenCReport\Report $r) {
 	global $row;
 	global $age;
 	global $e;
@@ -47,7 +47,7 @@ function test_newrow_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report $r) {
 	$rs->print();
 }
 
-function test_break_trigger_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report $r, OpenCReport\Part\Row\Column\Report\Break $br) {
+function test_break_trigger_cb(OpenCReport $o, OpenCReport\Report $r, OpenCReport\Break $br) {
 	echo "break '" . $br->name() . "' triggered" . PHP_EOL;
 }
 

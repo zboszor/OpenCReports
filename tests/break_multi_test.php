@@ -25,7 +25,7 @@ $newrowcb_global = array();
 
 $row = 0;
 
-function test_newrow_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report $r) {
+function test_newrow_cb(OpenCReport $o, OpenCReport\Report $r) {
 	global $row;
 	global $q;
 
@@ -38,7 +38,7 @@ function test_newrow_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report $r) {
 	print_result_row("a", $qr);
 }
 
-function test_break_trigger_cb(OpenCReport $o, OpenCReport\Part\Row\Column\Report $r, OpenCReport\Part\Row\Column\Report\Break $br) {
+function test_break_trigger_cb(OpenCReport $o, OpenCReport\Report $r, OpenCReport\Break $br) {
 	echo "break '" . $br->name() . "' triggered" . PHP_EOL;
 }
 
