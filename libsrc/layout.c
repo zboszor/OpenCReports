@@ -1155,11 +1155,25 @@ ocrpt_expr *ocrpt_layout_const_expr_parse(opencreport *o, const char *expr, bool
 	return e;
 }
 
+DLL_EXPORT_SYM void ocrpt_layout_part_page_header_set_report(ocrpt_part *p, ocrpt_report *r) {
+	if (!p)
+		return;
+
+	p->pageheader.r = r;
+}
+
 DLL_EXPORT_SYM ocrpt_output *ocrpt_layout_part_page_header(ocrpt_part *p) {
 	if (!p)
 		return NULL;
 
 	return &p->pageheader;
+}
+
+DLL_EXPORT_SYM void ocrpt_layout_part_page_footer_set_report(ocrpt_part *p, ocrpt_report *r) {
+	if (!p)
+		return;
+
+	p->pagefooter.r = r;
 }
 
 DLL_EXPORT_SYM ocrpt_output *ocrpt_layout_part_page_footer(ocrpt_part *p) {

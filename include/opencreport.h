@@ -849,7 +849,10 @@ void ocrpt_report_set_font_size(ocrpt_report *r, double font_size);
 void ocrpt_report_set_height(ocrpt_report *r, double height);
 void ocrpt_report_set_fieldheader_high_priority(ocrpt_report *r, bool high_priority);
 
+void ocrpt_layout_part_page_header_set_report(ocrpt_part *p, ocrpt_report *r);
 ocrpt_output *ocrpt_layout_part_page_header(ocrpt_part *p);
+
+void ocrpt_layout_part_page_footer_set_report(ocrpt_part *p, ocrpt_report *r);
 ocrpt_output *ocrpt_layout_part_page_footer(ocrpt_part *p);
 
 ocrpt_output *ocrpt_layout_report_nodata(ocrpt_report *r);

@@ -1906,6 +1906,22 @@ ocrpt_layout_part_page_footer(ocrpt_part *p);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
+				<title>Set report for part layout sections</title>
+				<para>
+					Set the report pointer for the part's
+					<literal>&lt;Output&gt;</literal> sections for
+					<literal>&lt;PageHeader&gt;</literal>
+					or <literal>&lt;PageFooter&gt;</literal>.
+					<programlisting>void
+ocrpt_layout_part_page_header_set_report(ocrpt_part *p,
+                                         ocrpt_report *r);
+
+void
+ocrpt_layout_part_page_footer_set_report(ocrpt_part *p,
+                                         ocrpt_report *r);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
 				<title>Get report layout sections</title>
 				<para>
 					Get the report's

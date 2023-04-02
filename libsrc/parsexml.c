@@ -1342,7 +1342,7 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 					ocrpt_ignore_child_nodes(o, reader, -1, "PageHeader");
 					ocrpt_err_printf("Multiple <PageHeader> sections in the same <Part> section or in child <Report> sections\n");
 				} else {
-					p->pageheader.r = r;
+					ocrpt_layout_part_page_header_set_report(p, r);
 					ocrpt_parse_output_parent_node(o, r, "PageHeader", &p->pageheader, reader);
 				}
 			} else if (!strcmp((char *)name, "PageFooter")) {
@@ -1350,7 +1350,7 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 					ocrpt_ignore_child_nodes(o, reader, -1, "PageFooter");
 					ocrpt_err_printf("Multiple <PageFooter> sections in the same <Part> section or in child <Report> sections\n");
 				} else {
-					p->pagefooter.r = r;
+					ocrpt_layout_part_page_footer_set_report(p, r);
 					ocrpt_parse_output_parent_node(o, r, "PageFooter", &p->pagefooter, reader);
 				}
 			} else if (!strcmp((char *)name, "ReportHeader"))
