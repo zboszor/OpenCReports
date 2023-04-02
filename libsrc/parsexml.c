@@ -1338,15 +1338,17 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 			else if (!strcmp((char *)name, "NoData"))
 				ocrpt_parse_output_parent_node(o, r, "NoData", &r->nodata, reader);
 			else if (!strcmp((char *)name, "PageHeader")) {
-				if (p->pageheader.output_list)
+				if (p->pageheader.output_list) {
 					ocrpt_ignore_child_nodes(o, reader, -1, "PageHeader");
-				else
-					ocrpt_parse_output_parent_node(o, NULL, "PageHeader", &p->pageheader, reader);
+					ocrpt_err_printf("Multiple <PageHeader> sections in the same <Part> section or in child <Report> sections\n");
+				} else
+					ocrpt_parse_output_parent_node(o, r, "PageHeader", &p->pageheader, reader);
 			} else if (!strcmp((char *)name, "PageFooter")) {
-				if (p->pagefooter.output_list)
+				if (p->pagefooter.output_list) {
 					ocrpt_ignore_child_nodes(o, reader, -1, "PageFooter");
-				else
-					ocrpt_parse_output_parent_node(o, NULL, "PageFooter", &p->pagefooter, reader);
+					ocrpt_err_printf("Multiple <PageFooter> sections in the same <Part> section or in child <Report> sections\n");
+				} else
+					ocrpt_parse_output_parent_node(o, r, "PageFooter", &p->pagefooter, reader);
 			} else if (!strcmp((char *)name, "ReportHeader"))
 				ocrpt_parse_output_parent_node(o, r, "ReportHeader", &r->reportheader, reader);
 			else if (!strcmp((char *)name, "ReportFooter"))
@@ -1796,10 +1798,19 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 		if (nodetype == XML_READER_TYPE_ELEMENT) {
 			if (!strcmp((char *)name, "pr"))
 				ocrpt_parse_part_row_node(o, p, reader);
-			else if (!strcmp((char *)name, "PageHeader"))
-				ocrpt_parse_output_parent_node(o, NULL, "PageHeader", &p->pageheader, reader);
-			else if (!strcmp((char *)name, "PageFooter"))
-				ocrpt_parse_output_parent_node(o, NULL, "PageFooter", &p->pagefooter, reader);
+			else if (!strcmp((char *)name, "PageHeader")) {
+				if (p->pageheader.output_list) {
+					ocrpt_ignore_child_nodes(o, reader, -1, "PageHeader");
+					ocrpt_err_printf("Multiple <PageHeader> sections in the same <Part> section or in child <Report> sections\n");
+				} else
+					ocrpt_parse_output_parent_node(o, NULL, "PageHeader", &p->pageheader, reader);
+			} else if (!strcmp((char *)name, "PageFooter")) {
+				if (p->pagefooter.output_list) {
+					ocrpt_ignore_child_nodes(o, reader, -1, "PageFooter");
+					ocrpt_err_printf("Multiple <PageFooter> sections in the same <Part> section or in child <Report> sections\n");
+				} else
+					ocrpt_parse_output_parent_node(o, NULL, "PageFooter", &p->pagefooter, reader);
+			}
 		}
 
 		xmlFree(name);
