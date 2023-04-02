@@ -160,8 +160,8 @@ typedef struct ocrpt_output_element ocrpt_output_element;
 
 void *ocrpt_layout_new_page(opencreport *o, const ocrpt_paper *paper, bool landscape);
 void ocrpt_layout_set_font_sizes(opencreport *o, const char *font, double wanted_font_size, bool bold, bool italic, double *result_font_size, double *result_font_width);
-void ocrpt_layout_output_resolve(opencreport *o, ocrpt_part *p, ocrpt_report *r, ocrpt_output *output);
-void ocrpt_layout_output_evaluate(opencreport *o, ocrpt_part *p, ocrpt_report *r, ocrpt_output *output);
+void ocrpt_layout_output_resolve(ocrpt_output *output);
+void ocrpt_layout_output_evaluate(ocrpt_output *output);
 
 double ocrpt_layout_top_margin(opencreport *o, ocrpt_part *p);
 double ocrpt_layout_bottom_margin(opencreport *o, ocrpt_part *p);
