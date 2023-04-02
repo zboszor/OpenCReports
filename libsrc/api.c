@@ -864,14 +864,6 @@ static void ocrpt_execute_parts(opencreport *o) {
 				/* Use the previous row data temporarily */
 				o->residx = ocrpt_expr_prev_residx(o->residx);
 
-				page_position = ocrpt_layout_top_margin(o, p);
-				if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && o->current_page != o->pages)) {
-					ocrpt_layout_output_evaluate(&p->pageheader);
-					ocrpt_layout_output_init(&p->pageheader);
-					ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &page_position);
-					ocrpt_layout_output_internal(true, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &page_position);
-				}
-
 				page_position = p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height;
 				ocrpt_layout_output_evaluate(&p->pagefooter);
 				ocrpt_layout_output_init(&p->pagefooter);

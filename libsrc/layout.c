@@ -827,14 +827,6 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			/* Use the previous row data temporarily */
 			o->residx = ocrpt_expr_prev_residx(o->residx);
 
-			double top_page_position = ocrpt_layout_top_margin(o, p);
-			if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && o->current_page != o->pages)) {
-				ocrpt_layout_output_evaluate(&p->pageheader);
-				ocrpt_layout_output_init(&p->pageheader);
-				ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &top_page_position);
-				ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &top_page_position);
-			}
-
 			if (!o->precalculate && pd && pd->border_width_set && o->output_functions.draw_rectangle)
 				o->output_functions.draw_rectangle(o, p, pr, pd, r,
 													&pd->border_color, pd->border_width,
@@ -1003,8 +995,12 @@ void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr
 	}
 
 	*page_position = ocrpt_layout_top_margin(o, p);
-	if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && o->current_page != o->pages))
-		*page_position += p->page_header_height;
+	if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && o->current_page != o->pages)) {
+		ocrpt_layout_output_evaluate(&p->pageheader);
+		ocrpt_layout_output_init(&p->pageheader);
+		ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, page_position);
+		ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, page_position);
+	}
 
 	if (rows == 1 && !pr->start_page) {
 		if (r) {
