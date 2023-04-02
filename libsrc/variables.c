@@ -354,9 +354,8 @@ void ocrpt_variables_add_precalculated_results(ocrpt_report *r, ocrpt_list *brl_
 				var_br_triggered = true;
 
 			if (var_br_triggered) {
-				ocrpt_result *dst = ocrpt_mem_malloc(sizeof(ocrpt_result));
-				memset(dst, 0, sizeof(ocrpt_result));
-				ocrpt_result_copy(r->o, dst, var->resultexpr->result[r->o->residx]);
+				ocrpt_result *dst = ocrpt_result_new(r->o);
+				ocrpt_result_copy(dst, var->resultexpr->result[r->o->residx]);
 				var->precalc_results = ocrpt_list_append(var->precalc_results, dst);
 			}
 		}

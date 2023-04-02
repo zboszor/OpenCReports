@@ -29,7 +29,7 @@ int main(void) {
 	ocrpt_query *q;
 	ocrpt_query_result *qr;
 	ocrpt_expr *id, *name, *err;
-	ocrpt_result *rs = ocrpt_result_new();
+	ocrpt_result *rs = ocrpt_result_new(o);
 	int32_t cols, row;
 
 	id = ocrpt_expr_parse(o, "id", NULL);
@@ -66,7 +66,7 @@ int main(void) {
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 		printf("Copied: ");
-		ocrpt_result_copy(o, rs, ocrpt_expr_get_result(id));
+		ocrpt_result_copy(rs, ocrpt_expr_get_result(id));
 		ocrpt_result_print(rs);
 
 		printf("Expression: ");
@@ -75,7 +75,7 @@ int main(void) {
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 		printf("Copied: ");
-		ocrpt_result_copy(o, rs, ocrpt_expr_get_result(name));
+		ocrpt_result_copy(rs, ocrpt_expr_get_result(name));
 		ocrpt_result_print(rs);
 
 		printf("Expression: ");
@@ -84,7 +84,7 @@ int main(void) {
 		printf("Evaluated: ");
 		ocrpt_result_print(r);
 		printf("Copied: ");
-		ocrpt_result_copy(o, rs, ocrpt_expr_get_result(err));
+		ocrpt_result_copy(rs, ocrpt_expr_get_result(err));
 		ocrpt_result_print(rs);
 
 		printf("\n");

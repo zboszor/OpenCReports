@@ -30,9 +30,8 @@ static bool ocrpt_expr_init_result_internal(ocrpt_expr *e, enum ocrpt_result_typ
 	ocrpt_result *result = e->result[which];
 
 	if (!result) {
-		result = ocrpt_mem_malloc(sizeof(ocrpt_result));
+		result = ocrpt_result_new(e->o);
 		if (result) {
-			memset(result, 0, sizeof(ocrpt_result));
 			e->result[which] = result;
 			ocrpt_expr_set_result_owned(e, which, true);
 		}
@@ -211,7 +210,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_add) {
 		 * - datetime + datetime
 		 */
 		ocrpt_expr_init_result(e, e->ops[0]->result[e->o->residx]->type);
-		ocrpt_result_copy(e->o, e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
+		ocrpt_result_copy(e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
 
 		for (uint32_t i = 1; i < e->n_ops; i++) {
 			switch (e->result[e->o->residx]->type) {
@@ -250,8 +249,8 @@ OCRPT_STATIC_FUNCTION(ocrpt_add) {
 					}
 					if (e->result[e->o->residx]->interval && !e->ops[i]->result[e->o->residx]->interval) {
 						ocrpt_result interval = { .type = OCRPT_RESULT_DATETIME };
-						ocrpt_result_copy(e->o, &interval, e->result[e->o->residx]);
-						ocrpt_result_copy(e->o, e->result[e->o->residx], e->ops[i]->result[e->o->residx]);
+						ocrpt_result_copy(&interval, e->result[e->o->residx]);
+						ocrpt_result_copy(e->result[e->o->residx], e->ops[i]->result[e->o->residx]);
 						ocrpt_datetime_add_interval(e->o, e, e->result[e->o->residx], &interval);
 					} else
 						ocrpt_datetime_add_interval(e->o, e, e->result[e->o->residx], e->ops[i]->result[e->o->residx]);
@@ -332,7 +331,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_sub) {
 		 * - interval - datetime
 		 */
 		ocrpt_expr_init_result(e, e->ops[0]->result[e->o->residx]->type);
-		ocrpt_result_copy(e->o, e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
+		ocrpt_result_copy(e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
 
 		for (uint32_t i = 1; i < e->n_ops; i++) {
 			switch (e->result[e->o->residx]->type) {
@@ -2695,7 +2694,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_dateof) {
 		return;
 	}
 
-	ocrpt_result_copy(e->o, e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
+	ocrpt_result_copy(e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
 
 	e->result[e->o->residx]->datetime.tm_hour = 0;
 	e->result[e->o->residx]->datetime.tm_min = 0;
@@ -2731,7 +2730,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_timeof) {
 		return;
 	}
 
-	ocrpt_result_copy(e->o, e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
+	ocrpt_result_copy(e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
 
 	e->result[e->o->residx]->datetime.tm_year = 0;
 	e->result[e->o->residx]->datetime.tm_mon = 0;
@@ -2775,7 +2774,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_chgdateof) {
 		}
 	}
 
-	ocrpt_result_copy(e->o, e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
+	ocrpt_result_copy(e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
 
 	e->result[e->o->residx]->datetime.tm_year = e->ops[1]->result[e->o->residx]->datetime.tm_year;
 	e->result[e->o->residx]->datetime.tm_mon = e->ops[1]->result[e->o->residx]->datetime.tm_mon;
@@ -2817,7 +2816,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_chgtimeof) {
 		}
 	}
 
-	ocrpt_result_copy(e->o, e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
+	ocrpt_result_copy(e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
 
 	e->result[e->o->residx]->datetime.tm_hour = e->ops[1]->result[e->o->residx]->datetime.tm_hour;
 	e->result[e->o->residx]->datetime.tm_min = e->ops[1]->result[e->o->residx]->datetime.tm_min;
@@ -2885,7 +2884,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_settimeinsecs) {
 		}
 	}
 
-	ocrpt_result_copy(e->o, e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
+	ocrpt_result_copy(e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
 
 	long ret = mpfr_get_ui(e->ops[1]->result[e->o->residx]->number, e->o->rndmode);
 	if (ret < 0 || ret >= 86400) {
@@ -3844,7 +3843,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_prevval) {
 
 	if (e->ops[0]->result[previdx]) {
 		ocrpt_expr_init_result(e, e->ops[0]->result[previdx]->type);
-		ocrpt_result_copy(e->o, e->result[e->o->residx], e->ops[0]->result[previdx]);
+		ocrpt_result_copy(e->result[e->o->residx], e->ops[0]->result[previdx]);
 	} else
 		ocrpt_expr_make_error_result(e, "Subexpression has no previous result");
 }

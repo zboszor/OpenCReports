@@ -118,6 +118,7 @@ struct opencreport {
 };
 
 struct ocrpt_result {
+	opencreport *o;
 	/* Original lexer token or (computed) string value for expression */
 	ocrpt_string *string;
 	/* Converted numeric constant or computed numeric value for expression */
@@ -154,9 +155,6 @@ struct ocrpt_query_result {
 	bool name_allocated;
 	ocrpt_result result;
 };
-
-extern mpfr_prec_t global_prec;
-extern mpfr_rnd_t global_rndmode;
 
 /* Default print debugger functions */
 extern ocrpt_printf_func ocrpt_std_printf;

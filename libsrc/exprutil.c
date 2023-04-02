@@ -224,8 +224,8 @@ DLL_EXPORT_SYM void ocrpt_expr_result_deep_print(ocrpt_expr *e) {
 	ocrpt_expr_result_deep_print_worker(e, ocrpt_std_printf);
 }
 
-DLL_EXPORT_SYM void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_result *src) {
-	if (!src || !dst)
+DLL_EXPORT_SYM void ocrpt_result_copy(ocrpt_result *dst, ocrpt_result *src) {
+	if (!src || !dst || dst->o != src->o)
 		return;
 
 	dst->type = src->type;
@@ -252,10 +252,10 @@ DLL_EXPORT_SYM void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_r
 			break;
 		case OCRPT_RESULT_NUMBER:
 			if (!dst->number_initialized) {
-				mpfr_init2(dst->number, o ? o->prec : global_prec);
+				mpfr_init2(dst->number, src->o->prec);
 				dst->number_initialized = true;
 			}
-			mpfr_set(dst->number, src->number, o ? o->rndmode : global_rndmode);
+			mpfr_set(dst->number, src->number, src->o->rndmode);
 			break;
 		case OCRPT_RESULT_DATETIME:
 			dst->datetime = src->datetime;
@@ -591,7 +591,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 	case OCRPT_EXPR_MVAR:
 		if ((varref_exclude_mask & OCRPT_VARREF_MVAR) == 0) {
 			if (!e->result[0]) {
-				ocrpt_result *result = ocrpt_env_get(e->name->str);
+				ocrpt_result *result = ocrpt_env_get(e->o, e->name->str);
 
 				ocrpt_mem_string_free(e->query, true);
 				e->query = NULL;
@@ -1061,11 +1061,10 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(ocrpt_expr *e, const c
 	size_t len;
 
 	if (!result) {
-		result = ocrpt_mem_malloc(sizeof(ocrpt_result));
+		result = ocrpt_result_new(e->o);
 		if (!result)
 			return NULL;
 
-		memset(result, 0, sizeof(ocrpt_result));
 		assert(!e->result[e->o->residx]);
 		e->result[e->o->residx] = result;
 		ocrpt_expr_set_result_owned(e, e->o->residx, true);
@@ -1266,9 +1265,8 @@ void ocrpt_report_expressions_add_delayed_results(ocrpt_report *r) {
 		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 
 		if (e->delayed && !e->delayed_result) {
-			ocrpt_result *dst = ocrpt_mem_malloc(sizeof(ocrpt_result));
-			memset(dst, 0, sizeof(ocrpt_result));
-			ocrpt_result_copy(r->o, dst, e->result[e->o->residx]);
+			ocrpt_result *dst = ocrpt_result_new(e->o);
+			ocrpt_result_copy(dst, e->result[e->o->residx]);
 			e->delayed_result = dst;
 		}
 	}
@@ -1281,10 +1279,14 @@ DLL_EXPORT_SYM void ocrpt_expr_set_field_expr(ocrpt_expr *e, ocrpt_expr *rvalue)
 	e->rvalue = rvalue;
 }
 
-DLL_EXPORT_SYM ocrpt_result *ocrpt_result_new(void) {
+DLL_EXPORT_SYM ocrpt_result *ocrpt_result_new(opencreport *o) {
+	if (!o)
+		return NULL;
+
 	ocrpt_result *result = ocrpt_mem_malloc(sizeof(ocrpt_result));
 
 	memset(result, 0, sizeof(ocrpt_result));
+	result->o = o;
 
 	return result;
 }
@@ -1332,10 +1334,10 @@ DLL_EXPORT_SYM void ocrpt_result_set_long(ocrpt_result *result, long value) {
 	result->isnull = false;
 	if (!result->number_initialized) {
 		result->number_initialized = true;
-		mpfr_init2(result->number, global_prec);
+		mpfr_init2(result->number, result->o->prec);
 	}
 
-	mpfr_set_si(result->number, value, global_rndmode);
+	mpfr_set_si(result->number, value, result->o->rndmode);
 }
 
 DLL_EXPORT_SYM void ocrpt_result_set_double(ocrpt_result *result, double value) {
@@ -1346,10 +1348,10 @@ DLL_EXPORT_SYM void ocrpt_result_set_double(ocrpt_result *result, double value) 
 	result->isnull = false;
 	if (!result->number_initialized) {
 		result->number_initialized = true;
-		mpfr_init2(result->number, global_prec);
+		mpfr_init2(result->number, result->o->prec);
 	}
 
-	mpfr_set_d(result->number, value, global_rndmode);
+	mpfr_set_d(result->number, value, result->o->rndmode);
 }
 
 DLL_EXPORT_SYM bool ocrpt_result_isstring(ocrpt_result *result) {

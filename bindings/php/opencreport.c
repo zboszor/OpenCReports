@@ -994,11 +994,11 @@ PHP_METHOD(opencreport, function_add) {
 	RETURN_TRUE;
 }
 
-static ocrpt_result *php_opencreport_env_query(const char *env) {
+static ocrpt_result *php_opencreport_env_query(opencreport *o, const char *env) {
 	if (!env)
 		return NULL;
 
-	ocrpt_result *result = ocrpt_result_new();
+	ocrpt_result *result = ocrpt_result_new(o);
 	if (!result)
 		return NULL;
 
@@ -1172,38 +1172,38 @@ PHP_METHOD(opencreport, add_report_added_cb) {
 }
 
 PHP_METHOD(opencreport, env_get) {
-	zval *object = getThis();
-	php_opencreport_object *oo = object ? Z_OPENCREPORT_P(object) : NULL;
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *var_name;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(var_name);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_result *r = ocrpt_env_get(ZSTR_VAL(var_name));
+	ocrpt_result *r = ocrpt_env_get(oo->o, ZSTR_VAL(var_name));
 	if (!r)
 		RETURN_NULL();
 
 	object_init_ex(return_value, opencreport_result_ce);
 	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(return_value);
-	ro->o = oo ? oo->o : NULL;
+	ro->o = oo->o;
 	ro->r = r;
 	ro->freed_by_lib = false;
 }
 
 PHP_METHOD(opencreport, result_new) {
-	zval *object = getThis();
-	php_opencreport_object *oo = object ? Z_OPENCREPORT_P(object) : NULL;
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
-	ocrpt_result *r = ocrpt_result_new();
+	ocrpt_result *r = ocrpt_result_new(oo->o);
 	if (!r)
 		RETURN_NULL();
 
 	object_init_ex(return_value, opencreport_result_ce);
 	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(return_value);
-	ro->o = oo ? oo->o : NULL;
+	ro->o = oo->o;
 	ro->r = r;
 	ro->freed_by_lib = false;
 }
@@ -1476,9 +1476,9 @@ static const zend_function_entry opencreport_class_methods[] = {
 	PHP_ME(opencreport, add_part_added_cb, arginfo_opencreport_add_any_cb, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, add_report_added_cb, arginfo_opencreport_add_any_cb, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* Environment related methods */
-	PHP_ME(opencreport, env_get, arginfo_opencreport_env_get, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL | ZEND_ACC_STATIC)
+	PHP_ME(opencreport, env_get, arginfo_opencreport_env_get, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* Result related methods */
-	PHP_ME(opencreport, result_new, arginfo_opencreport_result_new, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL | ZEND_ACC_STATIC)
+	PHP_ME(opencreport, result_new, arginfo_opencreport_result_new, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* File handling related methods */
 	PHP_ME(opencreport, add_search_path, arginfo_opencreport_add_search_path, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, canonicalize_path, arginfo_opencreport_canonicalize_path, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL | ZEND_ACC_STATIC)
@@ -2215,7 +2215,7 @@ PHP_METHOD(opencreport_result, copy) {
 		RETURN_THROWS();
 	}
 
-	ocrpt_result_copy(ro->o, ro->r, src_ro->r);
+	ocrpt_result_copy(ro->r, src_ro->r);
 }
 
 PHP_METHOD(opencreport_result, print) {

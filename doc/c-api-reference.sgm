@@ -1040,7 +1040,7 @@ ocrpt_expr_set_field_expr(ocrpt_expr *e,
 					The returned pointer must be freed with
 					<literal>ocrpt_result_free()</literal>.
 					<programlisting>ocrpt_result *
-ocrpt_result_new(void);</programlisting>
+ocrpt_result_new(opencreport *o);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
@@ -1053,11 +1053,16 @@ ocrpt_result_get_type(ocrpt_result *result);</programlisting>
 			<sect3>
 				<title>Copy an expression result</title>
 				<para>
-					Some internal data is specific to the
-					<literal>opencreport</literal> structure.
+					Copy expression result from source to
+					destination. Both results must have been
+					created for the same
+					<literal>opencreport</literal> structure,
+					either explicitly with <literal>ocrpt_result_new()</literal>
+					or implicitly with an expression parsed for
+					this <literal>opencreport</literal> structure
+					or a report structure owned by it.
 					<programlisting>void
-ocrpt_result_copy(opencreport *o,
-                  ocrpt_result *dst,
+ocrpt_result_copy(ocrpt_result *dst,
                   ocrpt_result *src);</programlisting>
 				</para>
 			</sect3>
@@ -2565,7 +2570,8 @@ ocrpt_break_add_trigger_cb(ocrpt_break *br,
 				<title>Indirect function to get an environment variable</title>
 				<para>
 					<programlisting>typedef ocrpt_result *
-(*ocrpt_env_query_func)(const char *);
+(*ocrpt_env_query_func)(opencreport *,
+                        const char *);
 
 extern ocrpt_env_query_func
 ocrpt_env_get;</programlisting>
@@ -2582,7 +2588,8 @@ ocrpt_env_set_query_func(ocrpt_env_query_func func);</programlisting>
 				<title>C API environment query function</title>
 				<para>
 					<programlisting>ocrpt_result *
-ocrpt_env_get_c(const char *env);</programlisting>
+ocrpt_env_get_c(opencreport *o,
+                const char *env);</programlisting>
 				</para>
 			</sect3>
 		</sect2>

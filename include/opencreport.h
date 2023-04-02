@@ -550,7 +550,7 @@ void ocrpt_expr_set_field_expr(ocrpt_expr *e, ocrpt_expr *rvalue);
  * Create an ocrpt_result structure
  * Must be freed with ocrpt_result_free().
  */
-ocrpt_result *ocrpt_result_new(void);
+ocrpt_result *ocrpt_result_new(opencreport *o);
 /*
  * Get result type
  */
@@ -558,7 +558,7 @@ enum ocrpt_result_type ocrpt_result_get_type(ocrpt_result *result);
 /*
  * Copy result value
  */
-void ocrpt_result_copy(opencreport *o, ocrpt_result *dst, ocrpt_result *src);
+void ocrpt_result_copy(ocrpt_result *dst, ocrpt_result *src);
 /*
  * Print the result data. Good for unit testing.
  */
@@ -920,7 +920,7 @@ void ocrpt_output_add_image_end(ocrpt_output *output);
  * Environment related functions *
  *********************************/
 
-typedef ocrpt_result *(*ocrpt_env_query_func)(const char *);
+typedef ocrpt_result *(*ocrpt_env_query_func)(opencreport *, const char *);
 extern ocrpt_env_query_func ocrpt_env_get;
 
 /*
@@ -932,7 +932,7 @@ void ocrpt_env_set_query_func(ocrpt_env_query_func func);
  * Returns the value of an environment variable
  * The returned ocrpt_result pointer must be freed with ocrpt_result_free()
  */
-ocrpt_result *ocrpt_env_get_c(const char *env);
+ocrpt_result *ocrpt_env_get_c(opencreport *o, const char *env);
 
 /**************************************
  * Functions related to file handling *

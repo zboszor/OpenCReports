@@ -65,6 +65,7 @@ static void ocrpt_array_describe(ocrpt_query *query, ocrpt_query_result **qresul
 
 		for (i = 0; i < result->cols; i++) {
 			for (int j = 0; j < OCRPT_EXPR_RESULTS; j++) {
+				qr[j * result->cols + i].result.o = query->source->o;
 				qr[j * result->cols + i].name = result->data[i];
 
 				enum ocrpt_result_type type;

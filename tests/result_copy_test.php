@@ -22,7 +22,7 @@ $o = new OpenCReport();
 $ds = $o->datasource_add_array("array");
 
 /* Standalone "result" object to test copying expression results */
-$rs = OpenCReport::result_new();
+$rs = $o->result_new();
 
 $id = 0;
 create_expr($o, $id, "id");

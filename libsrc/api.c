@@ -65,9 +65,6 @@ DLL_EXPORT_SYM void ocrpt_set_err_printf_func(ocrpt_printf_func func) {
 		ocrpt_err_printf = func;
 }
 
-mpfr_prec_t global_prec = OCRPT_MPFR_PRECISION_BITS;
-mpfr_rnd_t global_rndmode = MPFR_RNDN;
-
 char cwdpath[PATH_MAX];
 static ocrpt_paper *papersizes;
 static const ocrpt_paper *system_paper;
@@ -102,23 +99,19 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	o->locale = newlocale(LC_ALL_MASK, "C", (locale_t)0);
 	o->noquery_show_nodata = true;
 
-	o->current_date = ocrpt_mem_malloc(sizeof(ocrpt_result));
-	memset(o->current_date, 0, sizeof(ocrpt_result));
+	o->current_date = ocrpt_result_new(o);
 	o->current_date->type = OCRPT_RESULT_DATETIME;
 
-	o->current_timestamp = ocrpt_mem_malloc(sizeof(ocrpt_result));
-	memset(o->current_timestamp, 0, sizeof(ocrpt_result));
+	o->current_timestamp = ocrpt_result_new(o);
 	o->current_timestamp->type = OCRPT_RESULT_DATETIME;
 
-	o->pageno = ocrpt_mem_malloc(sizeof(ocrpt_result));
-	memset(o->pageno, 0, sizeof(ocrpt_result));
+	o->pageno = ocrpt_result_new(o);
 	o->pageno->type = OCRPT_RESULT_NUMBER;
 	mpfr_init2(o->pageno->number, o->prec);
 	o->pageno->number_initialized = true;
 	mpfr_set_ui(o->pageno->number, 1, o->rndmode);
 
-	o->totpages = ocrpt_mem_malloc(sizeof(ocrpt_result));
-	memset(o->totpages, 0, sizeof(ocrpt_result));
+	o->totpages = ocrpt_result_new(o);
 	o->totpages->type = OCRPT_RESULT_NUMBER;
 	mpfr_init2(o->totpages->number, o->prec);
 	o->totpages->number_initialized = true;
@@ -211,7 +204,6 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 }
 
 DLL_EXPORT_SYM void ocrpt_set_numeric_precision_bits(opencreport *o, mpfr_prec_t prec) {
-	global_prec = prec;
 	if (!o)
 		return;
 
@@ -220,7 +212,6 @@ DLL_EXPORT_SYM void ocrpt_set_numeric_precision_bits(opencreport *o, mpfr_prec_t
 }
 
 DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode) {
-	global_rndmode = rndmode;
 	if (!o)
 		return;
 
