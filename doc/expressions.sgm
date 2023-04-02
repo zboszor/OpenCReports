@@ -1339,6 +1339,20 @@ a+++++b
 				this function.
 			</para>
 		</sect2>
+		<sect2>
+			<title>prevval()</title>
+			<para>
+				This function accepts one subexpression and
+				returns the subexpression's previous value, i.e.
+				the value generated for the previous query row.
+				If there is no previous value row, the result
+				of this function is an error.
+			</para>
+			<para>
+				This function allows showing carried over values
+				e.g. in page headers.
+			</para>
+		</sect2>
 		<sect2 id="printffunc" xreflabel="printf function">
 			<title>printf()</title>
 			<para>

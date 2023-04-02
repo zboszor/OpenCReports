@@ -3834,6 +3834,21 @@ OCRPT_STATIC_FUNCTION(ocrpt_xlate2) {
 		ocrpt_mem_string_append_len(e->result[e->o->residx]->string, e->ops[0]->result[e->o->residx]->string->str, e->ops[0]->result[e->o->residx]->string->len);
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_prevval) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+		return;
+	}
+
+	int previdx = ocrpt_expr_prev_residx(e->o->residx);
+
+	if (e->ops[0]->result[previdx]) {
+		ocrpt_expr_init_result(e, e->ops[0]->result[previdx]->type);
+		ocrpt_result_copy(e->o, e->result[e->o->residx], e->ops[0]->result[previdx]);
+	} else
+		ocrpt_expr_make_error_result(e, "Subexpression has no previous result");
+}
+
 /*
  * Keep this sorted by function name because it is
  * used via bsearch()
@@ -3902,6 +3917,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "nulls",		ocrpt_nulls,	NULL,	0,	false,	false,	false,	false },
 	{ "or",			ocrpt_or,	NULL,	-1,	true,	true,	false,	false },
 	{ "pow",		ocrpt_pow,	NULL,	2,	false,	false,	false,	false },
+	{ "prevval",	ocrpt_prevval,	NULL,	1,	false, false, false, false },
 	{ "printf",		ocrpt_printf,	NULL,	-1,	false,	false,	false,	false },
 	{ "proper",		ocrpt_proper,	NULL,	1,	false,	false,	false,	false },
 	{ "random",		ocrpt_random,	NULL,	0,	false,	false,	false,	true },
