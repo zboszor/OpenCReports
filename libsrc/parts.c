@@ -122,6 +122,9 @@ void ocrpt_part_free(ocrpt_part *p) {
 	ocrpt_expr_free(p->left_margin_expr);
 	ocrpt_expr_free(p->right_margin_expr);
 
+	ocrpt_output_free(p->o, &p->pageheader, true);
+	ocrpt_output_free(p->o, &p->pagefooter, true);
+
 	for (row = p->rows; row; row = row->next) {
 		ocrpt_part_row *pr = (ocrpt_part_row *)row->data;
 
@@ -149,8 +152,6 @@ void ocrpt_part_free(ocrpt_part *p) {
 	if (p->allocated)
 		ocrpt_mem_free(p->xmlbuf);
 #endif
-	ocrpt_output_free(p->o, &p->pageheader, true);
-	ocrpt_output_free(p->o, &p->pagefooter, true);
 
 	ocrpt_list_free_deep(p->iteration_callbacks, ocrpt_mem_free);
 
