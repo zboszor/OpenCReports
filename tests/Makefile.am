@@ -177,7 +177,8 @@ PDF_TESTS = \
 	layout_pdf_xml41_test \
 	layout_pdf41_test \
 	layout_pdf_xml42_test \
-	header_query_test
+	header_query_test \
+	page_header_footer_vars_test
 
 PHP_PDF_TESTS = \
 	layout_pdf_xml_test \

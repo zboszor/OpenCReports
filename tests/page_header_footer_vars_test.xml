@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="82" cols="2" />
+	</Queries>
+	<Report>
+		<Variables>
+			<Variable name="mysum" value="num" type="sum" />
+		</Variables>
+		<PageHeader>
+			<Output>
+				<HorizontalLine size="1" bgcolor="'black'"/>
+				<Line>
+					<literal>Fruit count </literal>
+					<field value="r.pageno = 1 ? 0 : prevval(v.mysum)"/>
+					<literal> (carry over from previous page)</literal>
+				</Line>
+				<HorizontalLine size="1" bgcolor="'black'"/>
+			</Output>
+		</PageHeader>
+		<PageFooter>
+			<Output>
+				<HorizontalLine size="1" bgcolor="'black'"/>
+				<Line>
+					<literal>Fruit count </literal>
+					<field value="v.mysum"/>
+					<field value="r.pageno = r.totpages ? ' (total count)' : ' (carry over to next page)'" />
+				</Line>
+				<HorizontalLine size="1" bgcolor="'black'"/>
+			</Output>
+		</PageFooter>
+		<Detail>
+			<FieldHeaders>
+				<Output>
+					<Line>
+						<literal width="30">Type</literal>
+						<literal width="1"/>
+						<literal width="6">Number</literal>
+						<literal width="1"/>
+						<literal width="11">Running sum</literal>
+					</Line>
+				</Output>
+			</FieldHeaders>
+			<FieldDetails>
+				<Output>
+					<Line>
+						<field value="type" width="30" align="left"/>
+						<literal width="1"/>
+						<field value="num" width="6" align="right"/>
+						<literal width="1"/>
+						<field value="v.mysum" width="11" align="right"/>
+					</Line>
+				</Output>
+			</FieldDetails>
+		</Detail>
+	</Report>
+</OpenCReport>
