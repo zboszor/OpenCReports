@@ -57,27 +57,24 @@ DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(ocrpt_report *r, const char *name) {
 	return br;
 }
 
-DLL_EXPORT_SYM bool ocrpt_break_set_attribute(ocrpt_break *br, const ocrpt_break_attr_type attr_type, bool value) {
+DLL_EXPORT_SYM void ocrpt_break_set_headernewpage(ocrpt_break *br, const char *headernewpage) {
 	if (!br)
-		return false;
+		return;
 
-	br->attrs[attr_type] = value;
-	return true;
+	ocrpt_expr_free(br->headernewpage_expr);
+	br->headernewpage_expr = NULL;
+	if (headernewpage)
+		br->headernewpage_expr = ocrpt_report_expr_parse(br->r, headernewpage, NULL);
 }
 
-DLL_EXPORT_SYM bool ocrpt_break_set_attribute_from_expr(ocrpt_break *br, const ocrpt_break_attr_type attr_type, ocrpt_expr *expr) {
-	if (!br || !expr)
-		return false;
+DLL_EXPORT_SYM void ocrpt_break_set_suppressblank(ocrpt_break *br, const char *suppressblank) {
+	if (!br)
+		return;
 
-	ocrpt_expr_optimize(expr);
-	if (!ocrpt_expr_is_const(expr) || !ocrpt_expr_is_dconst(expr)) {
-		ocrpt_err_printf("invalid (non-constant) expression\n");
-		return false;
-	}
-
-	long tmp = mpfr_get_si(expr->ops[0]->result[br->r->o->residx]->number, br->r->o->rndmode);
-	br->attrs[attr_type] = !!tmp;
-	return true;
+	ocrpt_expr_free(br->suppressblank_expr);
+	br->suppressblank_expr = NULL;
+	if (suppressblank)
+		br->suppressblank_expr = ocrpt_report_expr_parse(br->r, suppressblank, NULL);
 }
 
 void ocrpt_break_free(ocrpt_break *br) {
@@ -88,6 +85,10 @@ void ocrpt_break_free(ocrpt_break *br) {
 		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 		ocrpt_expr_free(e);
 	}
+
+	ocrpt_expr_free(br->headernewpage_expr);
+	ocrpt_expr_free(br->suppressblank_expr);
+
 	ocrpt_list_free(br->breakfields);
 	ocrpt_list_free_deep(br->callbacks, ocrpt_mem_free);
 	ocrpt_expr_free(br->rownum);
@@ -206,6 +207,35 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(ocrpt_break *br) {
 	ocrpt_expr_eval(br->rownum);
 
 	return retval;
+}
+
+DLL_EXPORT_SYM bool ocrpt_break_check_blank(ocrpt_break *br, bool evaluate) {
+	if (!br || !br->suppressblank)
+		return false;
+
+	ocrpt_report *r = br->r;
+	if (!r)
+		return false;
+
+	opencreport *o = r->o;
+	if (!o)
+		return false;
+
+	for (ocrpt_list *ptr = br->breakfields; ptr; ptr = ptr->next) {
+		ocrpt_expr *e = (ocrpt_expr *)ptr->data;
+
+		if (evaluate)
+			ocrpt_expr_eval(e);
+
+		if (!e->result[o->residx])
+			return true;
+		if (e->result[e->o->residx]->isnull)
+			return true;
+		if (e->result[o->residx]->type == OCRPT_RESULT_STRING && e->result[o->residx]->string && e->result[o->residx]->string->len == 0)
+			return true;
+	}
+
+	return false;
 }
 
 DLL_EXPORT_SYM void ocrpt_break_reset_vars(ocrpt_break *br) {

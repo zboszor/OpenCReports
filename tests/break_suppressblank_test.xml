@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="8" cols="3" />
+	</Queries>
+	<Report>
+		<Breaks>
+			<Break name="country">
+				<BreakHeader>
+					<Output>
+						<Line>
+							<field value="isnull(city) ? printf('City-state: %s, population %d', country, population) : printf('Country: %s', country)" />
+						</Line>
+					</Output>
+				</BreakHeader>
+
+				<BreakFields>
+					<BreakField value="country" />
+				</BreakFields>
+			</Break>
+
+			<Break name="city" suppressblank="yes">
+				<BreakHeader>
+					<Output>
+						<Line>
+							<field value="printf('    City %s, population %d', city, population)" />
+						</Line>
+					</Output>
+				</BreakHeader>
+
+				<BreakFields>
+					<BreakField value="city" />
+				</BreakFields>
+			</Break>
+		</Breaks>
+	</Report>
+</OpenCReport>

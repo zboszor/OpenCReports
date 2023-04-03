@@ -283,6 +283,8 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			if (ocrpt_break_check_fields(br)) {
 				if (!brl_start)
 					brl_start = brl;
+
+				br->blank = br->suppressblank && ocrpt_break_check_blank(br, false);
 			}
 		}
 
@@ -337,8 +339,10 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			for (brl = r->breaks_reverse; brl; brl = brl->next) {
 				ocrpt_break *br = (ocrpt_break *)brl->data;
 
-				ocrpt_layout_output_init(&br->footer);
-				ocrpt_layout_output(o, p, pr, pd, r, &br->footer, rows, newpage, page_indent, page_position, old_page_position);
+				if (!br->suppressblank || (br->suppressblank && !br->blank_prev)) {
+					ocrpt_layout_output_init(&br->footer);
+					ocrpt_layout_output(o, p, pr, pd, r, &br->footer, rows, newpage, page_indent, page_position, old_page_position);
+				}
 
 				if (br == brl_start->data)
 					break;
@@ -352,8 +356,13 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			ocrpt_break *br __attribute__((unused)) = (ocrpt_break *)brl->data;
 
 			if (br->cb_triggered) {
-				ocrpt_layout_output_init(&br->header);
-				ocrpt_layout_output(o, p, pr, pd, r, &br->header, rows, newpage, page_indent, page_position, old_page_position);
+				if (!br->suppressblank || (br->suppressblank && !br->blank)) {
+					if (rows > 1 && br->headernewpage)
+						*newpage = true;
+					ocrpt_layout_output_init(&br->header);
+					ocrpt_layout_output(o, p, pr, pd, r, &br->header, rows, newpage, page_indent, page_position, old_page_position);
+				}
+				br->blank_prev = br->blank;
 			}
 		}
 

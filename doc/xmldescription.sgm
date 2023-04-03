@@ -2588,23 +2588,24 @@ report_height_after_last="no"</programlisting>
 				<title>Newpage</title>
 				<para>
 					Accepted as part of RLIB compatibility.
-					Not implemented.
+					Not implemented. (Same as in RLIB.)
 					<programlisting>&lt;Break newpage="yes" /&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
 				<title>Header on new page</title>
 				<para>
-					Accepted as part of RLIB compatibility.
-					Not implemented.
+					Moves the <programlisting>&lt;BreakHeader&gt;</programlisting>
+					to a new page.
 					<programlisting>&lt;Break headernewpage="yes" /&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3>
-				<title>Suppress blank break contents</title>
+				<title>Suppress break header and footer for blank break fields</title>
 				<para>
-					Accepted as part of RLIB compatibility.
-					Not implemented.
+					Suppress break header and footer in case
+					any of the break fields are either <literal>NULL</literal> value
+					or an empty string, if the break field is of the string type.
 					<programlisting>&lt;Break suppressblank="yes" /&gt;</programlisting>
 				</para>
 			</sect3>

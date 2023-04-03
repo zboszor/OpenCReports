@@ -11,14 +11,19 @@
 struct ocrpt_break {
 	ocrpt_report *r;
 	const char *name;
+	ocrpt_expr *headernewpage_expr;
+	ocrpt_expr *suppressblank_expr;
 	ocrpt_list *breakfields;	/* list of ocrpt_expr pointers */
 	ocrpt_list *callbacks;		/* list of ocrpt_break_trigger_cb_data pointers */
 	ocrpt_expr *rownum;			/* row number of the break */
 	ocrpt_output header;
 	ocrpt_output footer;
 	short index;
-	bool attrs[OCRPT_BREAK_ATTRS_COUNT];
-	bool cb_triggered;
+	bool headernewpage:1;
+	bool suppressblank:1;
+	bool cb_triggered:1;
+	bool blank:1;
+	bool blank_prev:1;
 };
 
 struct ocrpt_break_trigger_cb_data {

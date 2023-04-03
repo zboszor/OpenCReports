@@ -925,29 +925,48 @@ static bool ocrpt_parse_breakfields_node(opencreport *o, ocrpt_report *r, ocrpt_
 }
 
 static void ocrpt_break_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr reader) {
-	xmlChar *brname, *newpage, *headernewpage, *suppressblank;
+	xmlChar *brname, *headernewpage, *suppressblank;
 	ocrpt_break *br;
 	bool have_breakfield = false;
+	struct {
+		char *attr;
+		xmlChar **attrp;
+	} xmlattrs[] = {
+		{ "name", &brname },
+#if 0
+		/*
+		 * "newpage" is a write-only setting in RLIB.
+		 * OpenCReports accepts it in opencreport.dtd
+		 * and just ignore it here, leaving this as
+		 * code documentation.
+		 */
+		{ "newpage", &newpage },
+#endif
+		{ "headernewpage", &headernewpage },
+		{ "suppressblank", &suppressblank },
+		{ NULL, NULL },
+	};
+	int32_t i;
 
-	brname = xmlTextReaderGetAttribute(reader, (const xmlChar *)"name");
+	for (i = 0; xmlattrs[i].attrp; i++)
+		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attr);
 
 	if (!brname) {
 		ocrpt_err_printf("nameless break is useless, not adding to report\n");
-		return;
+		goto out;
 	}
 
 	/* There's no BreakFields sub-element, useless break. */
 	if (xmlTextReaderIsEmptyElement(reader)) {
 		ocrpt_err_printf("break '%s' is useless, not adding to report\n", (char *)brname);
-		xmlFree(brname);
-		return;
+		goto out;
 	}
 
 	br = ocrpt_break_new(r, (char *)brname);
-
-	newpage = xmlTextReaderGetAttribute(reader, (const xmlChar *)"newpage");
-	headernewpage = xmlTextReaderGetAttribute(reader, (const xmlChar *)"headernewpage");
-	suppressblank = xmlTextReaderGetAttribute(reader, (const xmlChar *)"suppressblank");
+	if (!br) {
+		ocrpt_err_printf("Out of memory while allocating break '%s', not adding to report\n", (char *)brname);
+		goto out;
+	}
 
 	int depth = xmlTextReaderDepth(reader);
 
@@ -974,36 +993,18 @@ static void ocrpt_break_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr r
 	}
 
 	if (have_breakfield) {
-		struct {
-			char *name;
-			xmlChar *value;
-			ocrpt_break_attr_type type;
-		} attribs[OCRPT_BREAK_ATTRS_COUNT] = {
-			{ "newpage", newpage, OCRPT_BREAK_ATTR_NEWPAGE },
-			{ "headernewpage", headernewpage, OCRPT_BREAK_ATTR_HEADERNEWPAGE },
-			{ "suppressblank", suppressblank, OCRPT_BREAK_ATTR_SUPPRESSBLANK },
-		};
-		int i;
-
-		for (i = 0; i < OCRPT_BREAK_ATTRS_COUNT; i++) {
-			if (attribs[i].name && attribs[i].value) {
-				ocrpt_expr *e = ocrpt_layout_const_expr_parse(o, (char *)attribs[i].value, false, true);
-				ocrpt_break_set_attribute_from_expr(br, attribs[i].type, e);
-			}
-		}
-	}
-
-	/* There's no BreakFields sub-element, useless break. */
-	if (!have_breakfield) {
+		ocrpt_break_set_headernewpage(br, (char *)headernewpage);
+		ocrpt_break_set_suppressblank(br, (char *)suppressblank);
+	} else {
+		/* There's no BreakFields sub-element, useless break. */
 		ocrpt_err_printf("break '%s' is useless, not adding to report\n", (char *)brname);
 		ocrpt_break_free(br);
 		r->breaks = ocrpt_list_remove(r->breaks, br);
 	}
 
-	xmlFree(brname);
-	xmlFree(newpage);
-	xmlFree(headernewpage);
-	xmlFree(suppressblank);
+	out:
+	for (i = 0; xmlattrs[i].attr; i++)
+		xmlFree(*xmlattrs[i].attrp);
 }
 
 static void ocrpt_parse_breaks_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr reader) {

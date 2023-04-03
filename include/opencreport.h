@@ -60,14 +60,6 @@ struct ocrpt_paper {
 };
 typedef struct ocrpt_paper ocrpt_paper;
 
-enum ocrpt_break_attr_type {
-	OCRPT_BREAK_ATTR_NEWPAGE,
-	OCRPT_BREAK_ATTR_HEADERNEWPAGE,
-	OCRPT_BREAK_ATTR_SUPPRESSBLANK,
-	OCRPT_BREAK_ATTRS_COUNT
-};
-typedef enum ocrpt_break_attr_type ocrpt_break_attr_type;
-
 struct ocrpt_break;
 typedef struct ocrpt_break ocrpt_break;
 
@@ -639,13 +631,13 @@ void ocrpt_variable_evaluate(ocrpt_var *v);
  */
 ocrpt_break *ocrpt_break_new(ocrpt_report *r, const char *name);
 /*
- * Set the break attribute from bool value
+ * Set the headernewpage break attribute from expression string
  */
-bool ocrpt_break_set_attribute(ocrpt_break *br, const ocrpt_break_attr_type attr_type, bool value);
+void ocrpt_break_set_headernewpage(ocrpt_break *br, const char *headernewpage);
 /*
- * Set the break attribute from numeric constant expression
+ * Set the suppressblank break attribute from expression string
  */
-bool ocrpt_break_set_attribute_from_expr(ocrpt_break *br, const ocrpt_break_attr_type attr_type, ocrpt_expr *expr);
+void ocrpt_break_set_suppressblank(ocrpt_break *br, const char *suppressblank);
 /*
  * Find a report break using its name
  */
@@ -671,6 +663,11 @@ void ocrpt_break_resolve_fields(ocrpt_break *br);
  * Check whether the report break triggers
  */
 bool ocrpt_break_check_fields(ocrpt_break *br);
+/*
+ * Check whether any of the report break fields are blank
+ * (empty string or NULL)
+ */
+bool ocrpt_break_check_blank(ocrpt_break *br, bool evaluate);
 /*
  * Reset variables for the break
  */

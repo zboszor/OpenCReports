@@ -136,11 +136,14 @@ PDF_TESTS = \
 	layout_pdf_xml2_test \
 	layout_pdf_xml3_test \
 	layout_pdf_xml4_test \
+	layout_pdf_xml4_headernewpage_test \
 	layout_pdf_xml5_test \
+	layout_pdf_xml5_headernewpage_test \
 	layout_pdf_xml6_test \
 	layout_pdf_xml7_test \
 	layout_pdf_xml8_test \
 	layout_pdf_xml9_test \
+	layout_pdf_xml9_headernewpage_test \
 	layout_pdf_xml10_test \
 	layout_pdf_xml11_test \
 	layout_pdf_xml12_test \
@@ -178,7 +181,8 @@ PDF_TESTS = \
 	layout_pdf41_test \
 	layout_pdf_xml42_test \
 	header_query_test \
-	page_header_footer_vars_test
+	page_header_footer_vars_test \
+	break_suppressblank_test
 
 PHP_PDF_TESTS = \
 	layout_pdf_xml_test \

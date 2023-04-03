@@ -1330,31 +1330,35 @@ ocrpt_break_new(ocrpt_report *r,
 				</para>
 			</sect3>
 			<sect3>
-				<title>Set attribute flags for a break</title>
+				<title>Set attribute flag expressions for a break</title>
 				<para>
-					Set boolean attribute flags for a break,
-					either via explicit boolean value, or from
-					an expression. The flags are not actually used,
-					they are for RLIB compatibility.
-					<programlisting>enum ocrpt_break_attr_type {
-    OCRPT_BREAK_ATTR_NEWPAGE,
-    OCRPT_BREAK_ATTR_HEADERNEWPAGE,
-    OCRPT_BREAK_ATTR_SUPPRESSBLANK,
-    OCRPT_BREAK_ATTRS_COUNT
-};
-typedef enum ocrpt_break_attr_type ocrpt_break_attr_type;
+					Set break attributes from expression strings
+					for <literal>headernewpage</literal> and
+					<literal>suppressblank</literal>.
+					There is a 3rd flag accepted in the report
+					XML DTD called <literal>newpage</literal>
+					which is not represented (ignored) in the API,
+					because it's also ignored in RLIB and is only
+					handled for RLIB compatibility.
+					<programlisting>void
+ocrpt_break_set_headernewpage(ocrpt_break *br,
+                              const char *headernewpage);
 
-bool
-ocrpt_break_set_attribute(ocrpt_break *br,
-                          const ocrpt_break_attr_type attr_type,
-                          bool value);
-
-bool
-ocrpt_break_set_attribute_from_expr(ocrpt_break *br,
-                                    const
-                                    ocrpt_break_attr_type
-                                    attr_type,
-                                    ocrpt_expr *expr);</programlisting>
+void
+ocrpt_break_set_suppressblank(ocrpt_break *br,
+                              const char *suppressblank);</programlisting>
+				</para>
+				<para>
+					<literal>headernewpage="yes"</literal> instructs the
+					layout to render <literal>&lt;BreakHeader&gt;</literal>
+					on a new page.
+				</para>
+				<para>
+					<literal>suppressblank="yes"</literal> instructs the
+					layout to suppress <literal>&lt;BreakHeader&gt;</literal>
+					if any of the <literal>&lt;BreakField&gt;</literal>s
+					are <literal>NULL</literal> value or an empty string,
+					if the break field is of the string type.
 				</para>
 			</sect3>
 			<sect3>
@@ -1405,6 +1409,19 @@ ocrpt_break_resolve_fields(ocrpt_break *br);</programlisting>
 				<para>
 					<programlisting>bool
 ocrpt_break_check_fields(ocrpt_break *br);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Check whether break field values are blank</title>
+				<para>
+					The second parameter <literal>evaluate</literal>
+					allows skipping evaluating the breakfield values.
+					(This is an optimization in case it's executed after
+					<literal>ocrpt_break_check_fields()</literal> which
+					already evaluated the breakfields.)
+					<programlisting>bool
+ocrpt_break_check_blank(ocrpt_break *br,
+                        bool evaluate);</programlisting>
 				</para>
 			</sect3>
 			<sect3>
