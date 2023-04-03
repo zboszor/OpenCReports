@@ -1322,6 +1322,9 @@ report_height_after_last="no"</programlisting>
 				<para>
 					This is the description of the page header.
 					It contains an <xref linkend="outputnode"/>.
+					The same node can be used as a child of
+					<literal>&lt;Report&gt;</literal>, see
+					the difference in <xref linkend="reportpageheader"/>
 					<programlisting>&lt;Part&gt;
     &lt;PageHeader&gt;
         &lt;Output&gt;
@@ -1336,6 +1339,9 @@ report_height_after_last="no"</programlisting>
 				<para>
 					This is the description of the page footer.
 					It contains an <xref linkend="outputnode"/>.
+					The same node can be used as a child of
+					<literal>&lt;Report&gt;</literal>, see
+					the difference in <xref linkend="reportpagefooter"/>
 					<programlisting>&lt;Part&gt;
     &lt;PageFooter&gt;
         &lt;Output&gt;
@@ -2084,12 +2090,16 @@ report_height_after_last="no"</programlisting>
 		</sect2>
 		<sect2>
 			<title>Report subsections</title>
-			<sect3>
+			<sect3 id="reportpageheader" xreflabel="Report page header">
 				<title>Page header</title>
 				<para>
-					This is a shortcut for <xref linkend="pageheader"/>
-					in the implicitly created <literal>&lt;Part&gt;</literal>
+					This may be seen as a shortcut for
+					<xref linkend="pageheader"/> in the implicitly
+					created <literal>&lt;Part&gt;</literal>
 					node when <literal>&lt;Report&gt;</literal> is standalone.
+					Except that report expressions are allowed when
+					it's a child node of <literal>&lt;Report&gt;</literal>
+					instead of <literal>&lt;Part&gt;</literal>.
 					It contains an <xref linkend="outputnode"/>.
 					<programlisting>&lt;Report&gt;
     &lt;PageHeader&gt;
@@ -2101,19 +2111,24 @@ report_height_after_last="no"</programlisting>
 				</para>
 				<para>
 					This subsection for <literal>&lt;Report&gt;</literal>
-					is ignored when there is a page footer section
+					is ignored when there is a page header section
 					defined for the <literal>&lt;Part&gt;</literal> node,
 					either in the <literal>&lt;Part&gt;</literal> node
 					itself or in a previous child <literal>&lt;Report&gt;</literal>
 					node for the same <literal>&lt;Part&gt;</literal>.
+					A warning is issued in this case.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportpagefooter" xreflabel="Report page footer">
 				<title>Page footer</title>
 				<para>
-					This is a shortcut for <xref linkend="pagefooter"/>
-					in the implicitly created <literal>&lt;Part&gt;</literal>
+					This may be seen as a shortcut for
+					<xref linkend="pagefooter"/> in the implicitly
+					created <literal>&lt;Part&gt;</literal>
 					node when <literal>&lt;Report&gt;</literal> is standalone.
+					Except that report expressions are allowed when
+					it's a child node of <literal>&lt;Report&gt;</literal>
+					instead of <literal>&lt;Part&gt;</literal>.
 					It contains an <xref linkend="outputnode"/>.
 					<programlisting>&lt;Report&gt;
     &lt;PageFooter&gt;
@@ -2130,6 +2145,7 @@ report_height_after_last="no"</programlisting>
 					either in the <literal>&lt;Part&gt;</literal> node
 					itself or in a previous child <literal>&lt;Report&gt;</literal>
 					node for the same <literal>&lt;Part&gt;</literal>.
+					A warning is issued in this case.
 				</para>
 			</sect3>
 			<sect3>
