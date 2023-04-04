@@ -430,6 +430,139 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 	return rows;
 }
 
+static void ocrpt_execute_parts_resolve_all_reports(opencreport *o, ocrpt_part *p) {
+	for (ocrpt_list *row = p->rows; row; row = row->next) {
+		ocrpt_part_row *pr = (ocrpt_part_row *)row->data;
+		ocrpt_list *pdl;
+
+		for (pdl = pr->pd_list; pdl; pdl = pdl->next) {
+			ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
+
+			for (ocrpt_list *rl = pd->reports; rl; rl = rl->next) {
+				ocrpt_report *r = (ocrpt_report *)rl->data;
+
+				ocrpt_query_navigate_start(r->query);
+
+				if (o->precalculate) {
+					ocrpt_report_resolve_breaks(r);
+					ocrpt_report_resolve_variables(r);
+					ocrpt_report_resolve_expressions(r);
+				}
+			}
+		}
+	}
+}
+
+static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_part *p) {
+	ocrpt_layout_output_resolve(&p->pageheader);
+	ocrpt_layout_output_resolve(&p->pagefooter);
+
+	ocrpt_expr_resolve_nowarn(p->paper_type_expr);
+	ocrpt_expr_optimize(p->paper_type_expr);
+
+	ocrpt_expr_resolve_nowarn(p->font_name_expr);
+	ocrpt_expr_optimize(p->font_name_expr);
+
+	ocrpt_expr_resolve(p->font_size_expr);
+	ocrpt_expr_optimize(p->font_size_expr);
+
+	ocrpt_expr_resolve(p->top_margin_expr);
+	ocrpt_expr_optimize(p->top_margin_expr);
+
+	ocrpt_expr_resolve(p->bottom_margin_expr);
+	ocrpt_expr_optimize(p->bottom_margin_expr);
+
+	ocrpt_expr_resolve(p->left_margin_expr);
+	ocrpt_expr_optimize(p->left_margin_expr);
+
+	ocrpt_expr_resolve(p->right_margin_expr);
+	ocrpt_expr_optimize(p->right_margin_expr);
+
+	/*
+	 * Make all queries stand on their first row
+	 * so part, part row, column and part report parameters
+	 * and settings in their headers can use values of
+	 * query columns. This is expected by RLIB semantics:
+	 * some queries may be independent/standalone instead
+	 * of followers to the report's main query. Usually
+	 * such queries have a single row and they may be
+	 * used by contexts outside a part report.
+	 */
+	for (ocrpt_list *ql = o->queries; ql; ql = ql->next) {
+		ocrpt_query *q = (ocrpt_query *)ql->data;
+
+		ocrpt_query_navigate_start(q);
+		ocrpt_query_navigate_next(q);
+	}
+
+	if (p->paper_type_expr) {
+		ocrpt_expr_eval(p->paper_type_expr);
+		if (p->paper_type_expr->result[o->residx] && p->paper_type_expr->result[o->residx]->type == OCRPT_RESULT_STRING && p->paper_type_expr->result[o->residx]->string)
+			p->paper = ocrpt_get_paper_by_name(p->paper_type_expr->result[o->residx]->string->str);
+	}
+
+	if (!p->paper)
+		p->paper = o->paper;
+
+	if (p->orientation_set && p->landscape) {
+		p->paper_width = p->paper->height;
+		p->paper_height = p->paper->width;
+	} else {
+		p->paper_width = p->paper->width;
+		p->paper_height = p->paper->height;
+	}
+
+	if (!p->font_name) {
+		if (p->font_name_expr) {
+			ocrpt_expr_eval(p->font_name_expr);
+			if (p->font_name_expr->result[o->residx] && p->font_name_expr->result[o->residx]->type == OCRPT_RESULT_STRING && p->font_name_expr->result[o->residx]->string)
+				p->font_name = ocrpt_mem_strdup(p->font_name_expr->result[o->residx]->string->str);
+			else
+				p->font_name = ocrpt_mem_strdup(p->font_name_exprstr);
+		} else if (p->font_name_exprstr)
+			p->font_name = ocrpt_mem_strdup(p->font_name_exprstr);
+		else
+			p->font_name = ocrpt_mem_strdup("Courier");
+	}
+
+	if (p->font_size_expr) {
+		ocrpt_expr_eval(p->font_size_expr);
+		if (p->font_size_expr->result[o->residx] && p->font_size_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->font_size_expr->result[o->residx]->number_initialized)
+			p->font_size = mpfr_get_d(p->font_size_expr->result[o->residx]->number, o->rndmode);
+		else
+			p->font_size = o->font_size;
+
+		ocrpt_layout_set_font_sizes(o, p->font_name, p->font_size, false, false, NULL, &p->font_width);
+	} else {
+		p->font_size = o->font_size;
+		p->font_width = o->font_width;
+	}
+
+	if (p->top_margin_expr) {
+		ocrpt_expr_eval(p->top_margin_expr);
+		if (p->top_margin_expr->result[o->residx] && p->top_margin_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->top_margin_expr->result[o->residx]->number_initialized)
+			p->top_margin = mpfr_get_d(p->top_margin_expr->result[o->residx]->number, o->rndmode);
+	}
+
+	if (p->bottom_margin_expr) {
+		ocrpt_expr_eval(p->bottom_margin_expr);
+		if (p->bottom_margin_expr->result[o->residx] && p->bottom_margin_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->bottom_margin_expr->result[o->residx]->number_initialized)
+			p->bottom_margin = mpfr_get_d(p->bottom_margin_expr->result[o->residx]->number, o->rndmode);
+	}
+
+	if (p->left_margin_expr) {
+		ocrpt_expr_eval(p->left_margin_expr);
+		if (p->left_margin_expr->result[o->residx] && p->left_margin_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->left_margin_expr->result[o->residx]->number_initialized)
+			p->left_margin = mpfr_get_d(p->left_margin_expr->result[o->residx]->number, o->rndmode);
+	}
+
+	if (p->right_margin_expr) {
+		ocrpt_expr_eval(p->right_margin_expr);
+		if (p->right_margin_expr->result[o->residx] && p->right_margin_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->right_margin_expr->result[o->residx]->number_initialized)
+			p->right_margin = mpfr_get_d(p->right_margin_expr->result[o->residx]->number, o->rndmode);
+	}
+}
+
 static void ocrpt_execute_parts(opencreport *o) {
 	double page_position = 0.0;
 	double old_page_position = 0.0;
@@ -448,134 +581,9 @@ static void ocrpt_execute_parts(opencreport *o) {
 		 * because <PageHeader>s and <PageFooter>s may contain report
 		 * specific variables.
 		 */
-		for (ocrpt_list *row = p->rows; row; row = row->next) {
-			ocrpt_part_row *pr = (ocrpt_part_row *)row->data;
-			ocrpt_list *pdl;
+		ocrpt_execute_parts_resolve_all_reports(o, p);
 
-			for (pdl = pr->pd_list; pdl; pdl = pdl->next) {
-				ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
-
-				for (ocrpt_list *rl = pd->reports; rl; rl = rl->next) {
-					ocrpt_report *r = (ocrpt_report *)rl->data;
-
-					ocrpt_query_navigate_start(r->query);
-
-					if (o->precalculate) {
-						ocrpt_report_resolve_breaks(r);
-						ocrpt_report_resolve_variables(r);
-						ocrpt_report_resolve_expressions(r);
-					}
-				}
-			}
-		}
-
-		ocrpt_layout_output_resolve(&p->pageheader);
-		ocrpt_layout_output_resolve(&p->pagefooter);
-
-		ocrpt_expr_resolve_nowarn(p->paper_type_expr);
-		ocrpt_expr_optimize(p->paper_type_expr);
-
-		ocrpt_expr_resolve_nowarn(p->font_name_expr);
-		ocrpt_expr_optimize(p->font_name_expr);
-
-		ocrpt_expr_resolve(p->font_size_expr);
-		ocrpt_expr_optimize(p->font_size_expr);
-
-		ocrpt_expr_resolve(p->top_margin_expr);
-		ocrpt_expr_optimize(p->top_margin_expr);
-
-		ocrpt_expr_resolve(p->bottom_margin_expr);
-		ocrpt_expr_optimize(p->bottom_margin_expr);
-
-		ocrpt_expr_resolve(p->left_margin_expr);
-		ocrpt_expr_optimize(p->left_margin_expr);
-
-		ocrpt_expr_resolve(p->right_margin_expr);
-		ocrpt_expr_optimize(p->right_margin_expr);
-
-		/*
-		 * Make all queries stand on their first row
-		 * so part, part row, column and part report parameters
-		 * and settings in their headers can use values of
-		 * query columns. This is expected by RLIB semantics:
-		 * some queries may be independent/standalone instead
-		 * of followers to the report's main query. Usually
-		 * such queries have a single row and they may be
-		 * used by contexts outside a part report.
-		 */
-		for (ocrpt_list *ql = o->queries; ql; ql = ql->next) {
-			ocrpt_query *q = (ocrpt_query *)ql->data;
-
-			ocrpt_query_navigate_start(q);
-			ocrpt_query_navigate_next(q);
-		}
-
-		if (p->paper_type_expr) {
-			ocrpt_expr_eval(p->paper_type_expr);
-			if (p->paper_type_expr->result[o->residx] && p->paper_type_expr->result[o->residx]->type == OCRPT_RESULT_STRING && p->paper_type_expr->result[o->residx]->string)
-				p->paper = ocrpt_get_paper_by_name(p->paper_type_expr->result[o->residx]->string->str);
-		}
-
-		if (!p->paper)
-			p->paper = o->paper;
-
-		if (p->orientation_set && p->landscape) {
-			p->paper_width = p->paper->height;
-			p->paper_height = p->paper->width;
-		} else {
-			p->paper_width = p->paper->width;
-			p->paper_height = p->paper->height;
-		}
-
-		if (!p->font_name) {
-			if (p->font_name_expr) {
-				ocrpt_expr_eval(p->font_name_expr);
-				if (p->font_name_expr->result[o->residx] && p->font_name_expr->result[o->residx]->type == OCRPT_RESULT_STRING && p->font_name_expr->result[o->residx]->string)
-					p->font_name = ocrpt_mem_strdup(p->font_name_expr->result[o->residx]->string->str);
-				else
-					p->font_name = ocrpt_mem_strdup(p->font_name_exprstr);
-			} else if (p->font_name_exprstr)
-				p->font_name = ocrpt_mem_strdup(p->font_name_exprstr);
-			else
-				p->font_name = ocrpt_mem_strdup("Courier");
-		}
-
-		if (p->font_size_expr) {
-			ocrpt_expr_eval(p->font_size_expr);
-			if (p->font_size_expr->result[o->residx] && p->font_size_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->font_size_expr->result[o->residx]->number_initialized)
-				p->font_size = mpfr_get_d(p->font_size_expr->result[o->residx]->number, o->rndmode);
-			else
-				p->font_size = o->font_size;
-
-			ocrpt_layout_set_font_sizes(o, p->font_name, p->font_size, false, false, NULL, &p->font_width);
-		} else {
-			p->font_size = o->font_size;
-			p->font_width = o->font_width;
-		}
-
-		if (p->top_margin_expr) {
-			ocrpt_expr_eval(p->top_margin_expr);
-			if (p->top_margin_expr->result[o->residx] && p->top_margin_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->top_margin_expr->result[o->residx]->number_initialized)
-				p->top_margin = mpfr_get_d(p->top_margin_expr->result[o->residx]->number, o->rndmode);
-		}
-
-		if (p->bottom_margin_expr) {
-			ocrpt_expr_eval(p->bottom_margin_expr);
-			if (p->bottom_margin_expr->result[o->residx] && p->bottom_margin_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->bottom_margin_expr->result[o->residx]->number_initialized)
-				p->bottom_margin = mpfr_get_d(p->bottom_margin_expr->result[o->residx]->number, o->rndmode);
-		}
-
-		if (p->left_margin_expr) {
-			ocrpt_expr_eval(p->left_margin_expr);
-			if (p->left_margin_expr->result[o->residx] && p->left_margin_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->left_margin_expr->result[o->residx]->number_initialized)
-				p->left_margin = mpfr_get_d(p->left_margin_expr->result[o->residx]->number, o->rndmode);
-		}
-
-		if (p->right_margin_expr) {
-			ocrpt_expr_eval(p->right_margin_expr);
-			if (p->right_margin_expr->result[o->residx] && p->right_margin_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->right_margin_expr->result[o->residx]->number_initialized)
-				p->right_margin = mpfr_get_d(p->right_margin_expr->result[o->residx]->number, o->rndmode);
-		}
+		ocrpt_execute_parts_evaluate_global_params(o, p);
 
 		p->left_margin_value = ocrpt_layout_left_margin(o, p);
 		p->right_margin_value = ocrpt_layout_right_margin(o, p);
