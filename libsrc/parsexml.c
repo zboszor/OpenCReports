@@ -1150,16 +1150,8 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 	if (!o->noquery_show_nodata_expr)
 		ocrpt_set_noquery_show_nodata(o, (char *)noquery_show_nodata);
 
-	if (!o->report_height_after_last_set) {
-		int32_t report_height_after_last_i = 0;
-		if (report_height_after_last) {
-			ocrpt_expr *report_height_after_last_e;
-			ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, report_height_after_last);
-			ocrpt_expr_free(report_height_after_last_e);
-		}
-
-		ocrpt_set_report_height_after_last(o, !!report_height_after_last_i);
-	}
+	if (!o->report_height_after_last_expr)
+		ocrpt_set_report_height_after_last(o, (char *)report_height_after_last);
 
 	if (!r->font_name && font_name) {
 		ocrpt_expr *font_name_e;
@@ -1690,17 +1682,8 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader, bool 
 	if (!o->noquery_show_nodata_expr)
 		ocrpt_set_noquery_show_nodata(o, (char *)noquery_show_nodata);
 
-	if (!o->report_height_after_last_set) {
-		int32_t report_height_after_last_i = 0;
-
-		if (report_height_after_last) {
-			ocrpt_expr *report_height_after_last_e;
-			ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, report_height_after_last);
-			ocrpt_expr_free(report_height_after_last_e);
-		}
-
-		ocrpt_set_report_height_after_last(o, !!report_height_after_last_i);
-	}
+	if (!o->report_height_after_last_expr)
+		ocrpt_set_report_height_after_last(o, (char *)report_height_after_last);
 
 	if (!p->font_name_expr && font_name)
 		ocrpt_part_set_font_name(p, (char *)font_name);
@@ -1890,14 +1873,8 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 	if (!o->noquery_show_nodata_expr && noquery_show_nodata)
 		ocrpt_set_noquery_show_nodata(o, (char *)noquery_show_nodata);
 
-	if (!o->report_height_after_last_set && report_height_after_last) {
-		ocrpt_expr *report_height_after_last_e;
-		int32_t report_height_after_last_i;
-
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, report_height_after_last);
-		ocrpt_set_report_height_after_last(o, !!report_height_after_last_i);
-		ocrpt_expr_free(report_height_after_last_e);
-	}
+	if (!o->report_height_after_last_expr && report_height_after_last)
+		ocrpt_set_report_height_after_last(o, (char *)report_height_after_last);
 
 	if (!o->size_unit_set && size_unit) {
 		ocrpt_expr *size_unit_e;

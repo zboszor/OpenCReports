@@ -1653,6 +1653,8 @@ ocrpt_set_size_unit_points(opencreport *o,
 					<title>Set "no query show NoData" option</title>
 					<para>
 						See <xref linkend="noqueryshownodata"/>.
+						The expression string should evaluate to
+						a boolean value.
 						<programlisting>void
 ocrpt_set_noquery_show_nodata(opencreport *o,
                               const char *expr_string);</programlisting>
@@ -1662,10 +1664,11 @@ ocrpt_set_noquery_show_nodata(opencreport *o,
 					<title>Set "report height after last" option</title>
 					<para>
 						See <xref linkend="reportheightafterlast"/>.
+						The expression string should evaluate to
+						a boolean value.
 						<programlisting>void
 ocrpt_set_report_height_after_last(opencreport *o,
-                                   bool
-                                   report_height_after_last);</programlisting>
+                                   const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 			</sect3>
