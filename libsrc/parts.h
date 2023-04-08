@@ -206,11 +206,7 @@ struct ocrpt_part {
 	 */
 	uint32_t iterations;
 	uint32_t current_iteration;
-#if 0
-	const char *xmlbuf;
-	bool allocated:1;
-	bool parsed:1;
-#endif
+
 	bool orientation_set:1;
 	bool landscape:1;
 	bool suppress:1;

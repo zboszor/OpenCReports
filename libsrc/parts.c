@@ -147,10 +147,6 @@ void ocrpt_part_free(ocrpt_part *p) {
 
 	ocrpt_mem_free(p->path);
 	ocrpt_mem_free(p->font_name);
-#if 0
-	if (p->allocated)
-		ocrpt_mem_free(p->xmlbuf);
-#endif
 
 	ocrpt_list_free_deep(p->iteration_callbacks, ocrpt_mem_free);
 
