@@ -453,6 +453,9 @@ static void ocrpt_execute_parts_resolve_all_reports(opencreport *o, ocrpt_part *
 }
 
 static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_part *p) {
+	ocrpt_expr_resolve(o->size_unit_expr);
+	ocrpt_expr_optimize(o->size_unit_expr);
+
 	ocrpt_expr_resolve(o->noquery_show_nodata_expr);
 	ocrpt_expr_optimize(o->noquery_show_nodata_expr);
 
@@ -495,6 +498,12 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 
 		ocrpt_query_navigate_start(q);
 		ocrpt_query_navigate_next(q);
+	}
+
+	o->size_in_points = false;
+	if (o->size_unit_expr) {
+		const char *str = ocrpt_expr_get_string_value(o->size_unit_expr);
+		o->size_in_points = str ? strcasecmp(str, "points") == 0 : false;
 	}
 
 	if (o->noquery_show_nodata_expr)

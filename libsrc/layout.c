@@ -1749,12 +1749,20 @@ DLL_EXPORT_SYM void ocrpt_set_report_height_after_last(opencreport *o, const cha
 	}
 }
 
-DLL_EXPORT_SYM void ocrpt_set_size_unit_points(opencreport *o, bool size_in_points) {
+DLL_EXPORT_SYM void ocrpt_set_size_unit(opencreport *o, const char *expr_string) {
 	if (!o)
 		return;
 
-	o->size_in_points = size_in_points;
-	o->size_unit_set = true;
+	ocrpt_expr_free(o->size_unit_expr);
+	o->size_unit_expr = NULL;
+	if (expr_string) {
+		char *err = NULL;
+		o->size_unit_expr = ocrpt_expr_parse(o, expr_string, &err);
+		if (err) {
+			ocrpt_err_printf("ocrpt_set_size_unit: %s\n", err);
+			ocrpt_strfree(err);
+		}
+	}
 }
 
 DLL_EXPORT_SYM void ocrpt_part_set_iterations(ocrpt_part *p, int32_t iterations) {

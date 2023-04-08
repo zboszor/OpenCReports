@@ -442,7 +442,7 @@ void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocr
 	if (hline->length && hline->length->result[o->residx] && hline->length->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->length->result[o->residx]->number_initialized) {
 		double size_multiplier;
 
-		if (o->size_unit_set && o->size_in_points)
+		if (o->size_in_points)
 			size_multiplier = 1.0;
 		else
 			size_multiplier = hline->font_width;

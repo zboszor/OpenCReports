@@ -1644,9 +1644,16 @@ ocrpt_report_evaluate_expressions(ocrpt_report *r);</programlisting>
 					<title>Set "size units in points" option</title>
 					<para>
 						See <xref linkend="sizeunit"/>.
+						The expression string must evaluate to
+						a string value, where <literal>points</literal>
+						will set the layout rendering to use
+						<emphasis>points</emphasis> for size units.
+						Any other value will make the layout rendering
+						use the convoluted RLIB compatible size units,
+						mostly based on font sizes.
 						<programlisting>void
-ocrpt_set_size_unit_points(opencreport *o,
-                           bool size_in_points);</programlisting>
+ocrpt_set_size_unit(opencreport *o,
+                    const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>

@@ -811,8 +811,8 @@ bool ocrpt_break_add_trigger_cb(ocrpt_break *br, ocrpt_break_trigger_cb func, vo
  * Output/layout related functions *
  ***********************************/
 
-void ocrpt_set_size_unit_points(opencreport *o, bool size_in_points);
-void ocrpt_set_noquery_show_nodata(opencreport *o,const char *expr_string);
+void ocrpt_set_size_unit(opencreport *o, const char *expr_string);
+void ocrpt_set_noquery_show_nodata(opencreport *o, const char *expr_string);
 void ocrpt_set_report_height_after_last(opencreport *o, const char *expr_string);
 
 void ocrpt_part_set_iterations(ocrpt_part *p, int32_t iterations);
