@@ -1872,16 +1872,8 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 	if (locale)
 		ocrpt_set_locale_from_expr(o, (char *)locale);
 
-	if (xlate_domain && xlate_dir) {
-		ocrpt_expr *xlate_domain_e, *xlate_dir_e;
-		char *xlate_domain_s, *xlate_dir_s;
-
-		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, xlate_domain);
-		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, xlate_dir);
-		ocrpt_bindtextdomain(o, xlate_domain_s, xlate_dir_s);
-		ocrpt_expr_free(xlate_domain_e);
-		ocrpt_expr_free(xlate_dir_e);
-	}
+	if (xlate_domain && xlate_dir)
+		ocrpt_bindtextdomain_from_expr(o, (char *)xlate_domain, (char *)xlate_dir);
 
 	for (i = 0; xmlattrs[i].attrp; i++)
 		xmlFree(*xmlattrs[i].attrp);

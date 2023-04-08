@@ -56,6 +56,10 @@ struct opencreport {
 	ocrpt_expr *rounding_mode_expr;
 	ocrpt_expr *locale_expr;
 
+	/* Delayed domain settings */
+	char *xlate_domain_s;
+	char *xlate_dir_s;
+
 	/* List and array of struct ocrpt_datasource */
 	ocrpt_list *datasources;
 

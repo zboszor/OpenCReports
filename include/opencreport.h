@@ -214,8 +214,14 @@ void ocrpt_set_rounding_mode(opencreport *o, const char *expr_string);
 
 /*
  * Bind text domain for translating strings
+ *
+ * ocrpt_bindtextdomain() sets the text domain immediately.
+ * It's used as the default setting and a higher priority
+ * setting than set by the delayed function
+ * ocrpt_bindtextdomain_from_expr().
  */
 void ocrpt_bindtextdomain(opencreport *o, const char *domainname, const char *dirname);
+void ocrpt_bindtextdomain_from_expr(opencreport *o, const char *domain_expr, const char *dir_expr);
 /*
  * Set locale for the report
  * It does not affect the main program.

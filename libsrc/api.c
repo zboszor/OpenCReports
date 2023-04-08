@@ -197,6 +197,8 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 
 	ocrpt_mem_string_free(o->output_buffer, true);
 	ocrpt_mem_free(o->textdomain);
+	ocrpt_mem_free(o->xlate_domain_s);
+	ocrpt_mem_free(o->xlate_dir_s);
 
 	cairo_destroy(o->cr);
 	cairo_surface_destroy(o->nullpage_cs);
@@ -540,6 +542,43 @@ static void ocrpt_execute_evaluate_global_params(opencreport *o) {
 		const char *l = ocrpt_expr_get_string_value(o->locale_expr);
 
 		ocrpt_set_locale(o, l);
+	}
+
+	if (!o->textdomain && o->xlate_domain_s && o->xlate_dir_s) {
+		ocrpt_expr *domain_expr, *dir_expr;
+		char *err;
+		const char *domain, *dir;
+
+		err = NULL;
+		domain_expr = ocrpt_expr_parse(o, o->xlate_domain_s, &err);
+		if (domain_expr) {
+			ocrpt_expr_resolve(domain_expr);
+			ocrpt_expr_optimize(domain_expr);
+			domain = ocrpt_expr_get_string_value(domain_expr);
+		} else {
+			ocrpt_err_printf("ocrpt_execute_evaluate_global_params: %s\n", err);
+			ocrpt_strfree(err);
+			domain = o->xlate_domain_s;
+		}
+
+		err = NULL;
+		dir_expr = ocrpt_expr_parse(o, o->xlate_dir_s, &err);
+		if (dir_expr) {
+			ocrpt_expr_resolve(dir_expr);
+			ocrpt_expr_optimize(dir_expr);
+			dir = ocrpt_expr_get_string_value(dir_expr);
+		} else {
+			ocrpt_err_printf("ocrpt_execute_evaluate_global_params: %s\n", err);
+			ocrpt_strfree(err);
+			dir = o->xlate_dir_s;
+		}
+
+		bindtextdomain(domain, dir);
+		bind_textdomain_codeset(domain, "UTF-8");
+		o->textdomain = ocrpt_mem_strdup(domain);
+
+		ocrpt_expr_free(domain_expr);
+		ocrpt_expr_free(dir_expr);
 	}
 }
 
@@ -1329,9 +1368,21 @@ DLL_EXPORT_SYM void ocrpt_bindtextdomain(opencreport *o, const char *domainname,
 	if (!o || !domainname || !dirname)
 		return;
 
+	ocrpt_strfree(o->textdomain);
 	bindtextdomain(domainname, dirname);
 	bind_textdomain_codeset(domainname, "UTF-8");
 	o->textdomain = ocrpt_mem_strdup(domainname);
+}
+
+DLL_EXPORT_SYM void ocrpt_bindtextdomain_from_expr(opencreport *o, const char *domainname, const char *dirname) {
+	if (!o || !domainname || !dirname)
+		return;
+
+	ocrpt_strfree(o->xlate_domain_s);
+	ocrpt_strfree(o->xlate_dir_s);
+
+	o->xlate_domain_s = ocrpt_mem_strdup(domainname);
+	o->xlate_dir_s = ocrpt_mem_strdup(dirname);
 }
 
 DLL_EXPORT_SYM void ocrpt_set_locale(opencreport *o, const char *locale) {

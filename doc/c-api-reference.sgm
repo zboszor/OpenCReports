@@ -192,6 +192,25 @@ ocrpt_bindtextdomain(opencreport *o,
 				</para>
 			</sect3>
 			<sect3>
+				<title>Set up translation (delayed variant)</title>
+				<para>
+					Setting up the translation needs two parameters:
+					the so called <emphasis>translation domain</emphasis>
+					and the toplevel directory for the translations.
+					It relies on GNU Gettext. This function allows
+					setting the translation from a supplemental query.
+					The passed in expressions strings must evaluate
+					to string values, with potential fallbacks to
+					plain strings in case of parse errors or if the
+					expressions may be interpreted as query columns
+					but no such column names exist in any query.
+					<programlisting>void
+ocrpt_bindtextdomain_from_expr(opencreport *o,
+                               const char *domain_expr,
+                               const char *dir_expr);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
 				<title>Set report locale</title>
 				<para>
 					Setting the locale for the report does not affect
