@@ -219,8 +219,14 @@ void ocrpt_bindtextdomain(opencreport *o, const char *domainname, const char *di
 /*
  * Set locale for the report
  * It does not affect the main program.
+ *
+ * ocrpt_set_locale() sets the locale immediately.
+ * It's used as the default setting and a higher priority
+ * setting than set by the delayed function
+ * ocrpt_set_locale_from_expr().
  */
 void ocrpt_set_locale(opencreport *o, const char *locale);
+void ocrpt_set_locale_from_expr(opencreport *o, const char *expr_string);
 /*
  * Get locale for the report
  */

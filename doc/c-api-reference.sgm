@@ -205,6 +205,22 @@ ocrpt_set_locale(opencreport *o,
 				</para>
 			</sect3>
 			<sect3>
+				<title>Set report locale (delayed variant)</title>
+				<para>
+					This function allows setting the locale
+					from a supplementary query of the report.
+					It is used by the report XML parser code
+					and it's a lower priority setting than the
+					previous function: the application executing
+					the report may need to be run a different locale.
+					The expression string must evaluate to a string
+					value that's a valid locale string.
+					<programlisting>void
+ocrpt_set_locale_from_expr(opencreport *o,
+                           const char *expr_string);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
 				<title>Print monetary data in the report locale</title>
 				<para>
 					A customized monetary printing function was implemented

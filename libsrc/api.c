@@ -96,7 +96,7 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	o->rndmode = MPFR_RNDN;
 	gmp_randinit_default(o->randstate);
 	gmp_randseed_ui(o->randstate, seed);
-	o->locale = newlocale(LC_ALL_MASK, "C", (locale_t)0);
+	o->c_locale = o->locale = newlocale(LC_ALL_MASK, "C", (locale_t)0);
 
 	o->current_date = ocrpt_result_new(o);
 	o->current_date->type = OCRPT_RESULT_DATETIME;
@@ -174,6 +174,8 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	}
 	ocrpt_list_free(o->exprs);
 
+	if (o->locale != o->c_locale)
+		freelocale(o->c_locale);
 	if (o->locale)
 		freelocale(o->locale);
 
@@ -530,6 +532,14 @@ static void ocrpt_execute_evaluate_global_params(opencreport *o) {
 			o->rndmode = MPFR_RNDF;
 		else /* default "nearest" */
 			o->rndmode = MPFR_RNDN;
+	}
+
+	ocrpt_expr_resolve(o->locale_expr);
+	ocrpt_expr_optimize(o->locale_expr);
+	if (o->locale == o->c_locale && o->locale_expr) {
+		const char *l = ocrpt_expr_get_string_value(o->locale_expr);
+
+		ocrpt_set_locale(o, l);
 	}
 }
 
@@ -1328,10 +1338,27 @@ DLL_EXPORT_SYM void ocrpt_set_locale(opencreport *o, const char *locale) {
 	if (!o || !locale)
 		return;
 
-	o->locale = newlocale(LC_ALL_MASK, locale, o->locale);
+	if (o->locale != o->c_locale)
+		freelocale(o->locale);
+	o->locale = newlocale(LC_ALL_MASK, locale, (locale_t)0);
 	if (o->locale == (locale_t)0)
-		o->locale = newlocale(LC_ALL_MASK, "C", o->locale);
-	o->locale_set = true;
+		o->locale = o->c_locale;
+}
+
+DLL_EXPORT_SYM void ocrpt_set_locale_from_expr(opencreport *o, const char *expr_string) {
+	if (!o)
+		return;
+
+	ocrpt_expr_free(o->locale_expr);
+	o->locale_expr = NULL;
+	if (expr_string) {
+		char *err = NULL;
+		o->locale_expr = ocrpt_expr_parse(o, expr_string, &err);
+		if (err) {
+			ocrpt_err_printf("ocrpt_set_rounding_mode: %s\n", err);
+			ocrpt_strfree(err);
+		}
+	}
 }
 
 DLL_EXPORT_SYM locale_t ocrpt_get_locale(opencreport *o) {

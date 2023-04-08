@@ -1869,14 +1869,8 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 	if (!o->rounding_mode_expr && rounding_mode)
 		ocrpt_set_rounding_mode(o, (char *)rounding_mode);
 
-	if (!o->locale_set && locale) {
-		ocrpt_expr *locale_e;
-		char *locale_s;
-
-		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, locale);
-		ocrpt_set_locale(o, locale_s);
-		ocrpt_expr_free(locale_e);
-	}
+	if (locale)
+		ocrpt_set_locale_from_expr(o, (char *)locale);
 
 	if (xlate_domain && xlate_dir) {
 		ocrpt_expr *xlate_domain_e, *xlate_dir_e;
