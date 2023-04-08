@@ -1779,23 +1779,14 @@ DLL_EXPORT_SYM void ocrpt_part_set_font_name(ocrpt_part *p, const char *font_nam
 		return;
 
 	ocrpt_expr_free(p->font_name_expr);
-	ocrpt_mem_free(p->font_name_exprstr);
 	p->font_name_expr = NULL;
-	p->font_name_exprstr = NULL;
 
 	if (!font_name)
 		return;
 
-	p->font_name_exprstr = ocrpt_mem_strdup(font_name);
 	p->font_name_expr = ocrpt_expr_parse(p->o, font_name, NULL);
-
-	if (!p->font_name_expr) {
-		ocrpt_string *s = ocrpt_mem_string_new(NULL, true);
-
-		ocrpt_mem_string_append_printf(s, "'%s'", font_name);
-		p->font_name_expr = ocrpt_expr_parse(p->o, s->str, NULL);
-		ocrpt_mem_string_free(s, true);
-	}
+	if (!p->font_name_expr)
+		p->font_name_expr = ocrpt_newstring(p->o, NULL, font_name);
 }
 
 DLL_EXPORT_SYM void ocrpt_part_set_font_size(ocrpt_part *p, const char *font_size) {

@@ -646,11 +646,7 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 			ocrpt_expr_eval(p->font_name_expr);
 			if (p->font_name_expr->result[o->residx] && p->font_name_expr->result[o->residx]->type == OCRPT_RESULT_STRING && p->font_name_expr->result[o->residx]->string)
 				p->font_name = ocrpt_mem_strdup(p->font_name_expr->result[o->residx]->string->str);
-			else
-				p->font_name = ocrpt_mem_strdup(p->font_name_exprstr);
-		} else if (p->font_name_exprstr)
-			p->font_name = ocrpt_mem_strdup(p->font_name_exprstr);
-		else
+		} else
 			p->font_name = ocrpt_mem_strdup("Courier");
 	}
 

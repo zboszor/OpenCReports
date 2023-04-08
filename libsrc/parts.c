@@ -146,7 +146,6 @@ void ocrpt_part_free(ocrpt_part *p) {
 	p->row_last = NULL;
 
 	ocrpt_mem_free(p->path);
-	ocrpt_mem_free(p->font_name_exprstr);
 	ocrpt_mem_free(p->font_name);
 #if 0
 	if (p->allocated)
