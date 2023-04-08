@@ -401,7 +401,7 @@ PHP_METHOD(opencreport, version) {
 PHP_METHOD(opencreport, set_numeric_precision_bits) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_long prec;
+	zend_string *prec;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
@@ -409,10 +409,10 @@ PHP_METHOD(opencreport, set_numeric_precision_bits) {
 	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_LONG(prec);
+		Z_PARAM_STR_EX(prec, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_set_numeric_precision_bits(oo->o, (mpfr_prec_t)prec);
+	ocrpt_set_numeric_precision_bits(oo->o, prec ? ZSTR_VAL(prec) : NULL);
 }
 
 PHP_METHOD(opencreport, set_rounding_mode) {
@@ -1304,7 +1304,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_version, 0, 0, IS_ST
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_numeric_precision_bits, 0, 1, IS_VOID, 0)
-ZEND_ARG_TYPE_INFO(0, prec, IS_LONG, 0)
+ZEND_ARG_TYPE_INFO(0, prec, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_rounding_mode, 0, 1, IS_VOID, 0)

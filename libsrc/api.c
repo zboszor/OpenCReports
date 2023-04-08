@@ -202,12 +202,20 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	ocrpt_mem_free(o);
 }
 
-DLL_EXPORT_SYM void ocrpt_set_numeric_precision_bits(opencreport *o, mpfr_prec_t prec) {
+DLL_EXPORT_SYM void ocrpt_set_numeric_precision_bits(opencreport *o, const char *expr_string) {
 	if (!o)
 		return;
 
-	o->prec = prec;
-	o->precision_set = true;
+	ocrpt_expr_free(o->precision_expr);
+	o->precision_expr = NULL;
+	if (expr_string) {
+		char *err = NULL;
+		o->precision_expr = ocrpt_expr_parse(o, expr_string, &err);
+		if (err) {
+			ocrpt_err_printf("ocrpt_set_numeric_precision_bits: %s\n", err);
+			ocrpt_strfree(err);
+		}
+	}
 }
 
 DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode) {
@@ -452,12 +460,68 @@ static void ocrpt_execute_parts_resolve_all_reports(opencreport *o, ocrpt_part *
 	}
 }
 
-static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_part *p) {
+static void ocrpt_execute_evaluate_global_params(opencreport *o) {
+	/*
+	 * Make all queries stand on their first row
+	 * so part, part row, column and part report parameters
+	 * and settings in their headers can use values of
+	 * query columns. This is expected by RLIB semantics:
+	 * some queries may be independent/standalone instead
+	 * of followers to the report's main query. Usually
+	 * such queries have a single row and they may be
+	 * used by contexts outside a part report.
+	 */
+	for (ocrpt_list *ql = o->queries; ql; ql = ql->next) {
+		ocrpt_query *q = (ocrpt_query *)ql->data;
+
+		ocrpt_query_navigate_start(q);
+		ocrpt_query_navigate_next(q);
+	}
+
 	ocrpt_expr_resolve(o->size_unit_expr);
 	ocrpt_expr_optimize(o->size_unit_expr);
+	o->size_in_points = false;
+	if (o->size_unit_expr) {
+		const char *str = ocrpt_expr_get_string_value(o->size_unit_expr);
+		o->size_in_points = str ? strcasecmp(str, "points") == 0 : false;
+	}
 
 	ocrpt_expr_resolve(o->noquery_show_nodata_expr);
 	ocrpt_expr_optimize(o->noquery_show_nodata_expr);
+	if (o->noquery_show_nodata_expr)
+		o->noquery_show_nodata = !!ocrpt_expr_get_long_value(o->noquery_show_nodata_expr);
+
+	ocrpt_expr_resolve(o->report_height_after_last_expr);
+	ocrpt_expr_optimize(o->report_height_after_last_expr);
+	if (o->report_height_after_last_expr)
+		o->report_height_after_last = !!ocrpt_expr_get_long_value(o->report_height_after_last_expr);
+
+	ocrpt_expr_resolve(o->precision_expr);
+	ocrpt_expr_optimize(o->precision_expr);
+	if (o->precision_expr) {
+		ocrpt_result *prec = ocrpt_expr_get_result(o->precision_expr);
+		if (ocrpt_result_isnumber(prec))
+			o->prec = ocrpt_expr_get_long_value(o->precision_expr);
+	}
+}
+
+static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_part *p) {
+	/*
+	 * Make all queries stand on their first row
+	 * so part, part row, column and part report parameters
+	 * and settings in their headers can use values of
+	 * query columns. This is expected by RLIB semantics:
+	 * some queries may be independent/standalone instead
+	 * of followers to the report's main query. Usually
+	 * such queries have a single row and they may be
+	 * used by contexts outside a part report.
+	 */
+	for (ocrpt_list *ql = o->queries; ql; ql = ql->next) {
+		ocrpt_query *q = (ocrpt_query *)ql->data;
+
+		ocrpt_query_navigate_start(q);
+		ocrpt_query_navigate_next(q);
+	}
 
 	ocrpt_layout_output_resolve(&p->pageheader);
 	ocrpt_layout_output_resolve(&p->pagefooter);
@@ -482,35 +546,6 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 
 	ocrpt_expr_resolve(p->right_margin_expr);
 	ocrpt_expr_optimize(p->right_margin_expr);
-
-	/*
-	 * Make all queries stand on their first row
-	 * so part, part row, column and part report parameters
-	 * and settings in their headers can use values of
-	 * query columns. This is expected by RLIB semantics:
-	 * some queries may be independent/standalone instead
-	 * of followers to the report's main query. Usually
-	 * such queries have a single row and they may be
-	 * used by contexts outside a part report.
-	 */
-	for (ocrpt_list *ql = o->queries; ql; ql = ql->next) {
-		ocrpt_query *q = (ocrpt_query *)ql->data;
-
-		ocrpt_query_navigate_start(q);
-		ocrpt_query_navigate_next(q);
-	}
-
-	o->size_in_points = false;
-	if (o->size_unit_expr) {
-		const char *str = ocrpt_expr_get_string_value(o->size_unit_expr);
-		o->size_in_points = str ? strcasecmp(str, "points") == 0 : false;
-	}
-
-	if (o->noquery_show_nodata_expr)
-		o->noquery_show_nodata = !!ocrpt_expr_get_long_value(o->noquery_show_nodata_expr);
-
-	if (o->report_height_after_last_expr)
-		o->report_height_after_last = !!ocrpt_expr_get_long_value(o->report_height_after_last_expr);
 
 	if (p->paper_type_expr) {
 		ocrpt_expr_eval(p->paper_type_expr);
@@ -587,11 +622,15 @@ static void ocrpt_execute_parts(opencreport *o) {
 	o->current_page = NULL;
 	mpfr_set_ui(o->pageno->number, 1, o->rndmode);
 
+	ocrpt_execute_evaluate_global_params(o);
+
 	for (ocrpt_list *pl = o->parts; pl; pl = pl->next) {
 		ocrpt_part *p = (ocrpt_part *)pl->data;
 
 		if (p->suppress)
 			continue;
+
+		ocrpt_execute_parts_evaluate_global_params(o, p);
 
 		/*
 		 * Resolve reports' breaks, variables and expressions in advance
@@ -599,8 +638,6 @@ static void ocrpt_execute_parts(opencreport *o) {
 		 * specific variables.
 		 */
 		ocrpt_execute_parts_resolve_all_reports(o, p);
-
-		ocrpt_execute_parts_evaluate_global_params(o, p);
 
 		p->left_margin_value = ocrpt_layout_left_margin(o, p);
 		p->right_margin_value = ocrpt_layout_right_margin(o, p);

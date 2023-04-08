@@ -150,9 +150,12 @@ ocrpt_version(void);</programlisting>
 				<title><literal>Set numeric precision</literal></title>
 				<para>
 					The default is 256 bits of floating point precision.
+					The expression string must evaluate to a numeric
+					expression, the integer part will be used to set
+					the number of precision bits for numeric calculations.
 					<programlisting>void
 ocrpt_set_numeric_precision_bits(opencreport *o,
-                                 mpfr_prec_t prec);</programlisting>
+                                 const char *expr_string);</programlisting>
 				</para>
 			</sect3>
 			<sect3>

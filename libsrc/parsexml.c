@@ -1863,14 +1863,8 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 	if (!o->report_height_after_last_expr && report_height_after_last)
 		ocrpt_set_report_height_after_last(o, (char *)report_height_after_last);
 
-	if (!o->precision_set && precision_bits) {
-		ocrpt_expr *precision_bits_e;
-		int32_t precision_bits_i;
-
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, precision_bits);
-		ocrpt_set_numeric_precision_bits(o, precision_bits_i);
-		ocrpt_expr_free(precision_bits_e);
-	}
+	if (!o->precision_expr && precision_bits)
+		ocrpt_set_numeric_precision_bits(o, (char *)precision_bits);
 
 	if (!o->rounding_mode_set && rounding_mode) {
 		ocrpt_expr *rounding_mode_e;
