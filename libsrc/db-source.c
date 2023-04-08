@@ -1019,7 +1019,7 @@ static ocrpt_odbc_private *ocrpt_odbc_setup(void) {
 	 * We expect UTF-8 strings from the database.
 	 * Some database drivers do that implicitly and ignore this call,
 	 * some of them comply with this call.
-	 * But unfortunately, some of the do not comply and ignore it.
+	 * But unfortunately, some of them do not comply and ignore it.
 	 * For them, there's ocrpt_datasource_set_encoding().
 	 */
 	ret = SQLSetEnvAttr(priv->env, SQL_ATTR_APP_UNICODE_TYPE, (void *)SQL_DD_CP_UTF8, SQL_IS_INTEGER);
