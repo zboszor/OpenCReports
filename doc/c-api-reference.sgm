@@ -1727,9 +1727,11 @@ ocrpt_set_report_height_after_last(opencreport *o,
 					<title>Set part iterations</title>
 					<para>
 						See <xref linkend="partiter"/>.
+						The expression string must evaluate to
+						a numeric value.
 						<programlisting>void
 ocrpt_part_set_iterations(ocrpt_part *p,
-                          int32_t iterations);</programlisting>
+                          const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>

@@ -1708,15 +1708,8 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader, bool 
 	if (!p->paper_type_expr && paper_type)
 		ocrpt_part_set_paper_by_name(p, (char *)paper_type);
 
-	if (iterations) {
-		ocrpt_expr *iterations_e;
-		int32_t iterations_i;
-
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, iterations);
-		ocrpt_expr_free(iterations_e);
-
-		ocrpt_part_set_iterations(p, iterations_i);
-	}
+	if (iterations)
+		ocrpt_part_set_iterations(p, (char *)iterations);
 
 	if (suppress) {
 		ocrpt_expr *suppress_e;

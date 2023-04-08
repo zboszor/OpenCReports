@@ -179,6 +179,7 @@ struct ocrpt_part {
 	ocrpt_list *iteration_callbacks;
 
 	/* Global parameters */
+	ocrpt_expr *iterations_expr;
 	ocrpt_expr *paper_type_expr;
 	ocrpt_expr *font_name_expr;
 	ocrpt_expr *font_size_expr;

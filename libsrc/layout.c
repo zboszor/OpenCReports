@@ -1765,13 +1765,20 @@ DLL_EXPORT_SYM void ocrpt_set_size_unit(opencreport *o, const char *expr_string)
 	}
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_iterations(ocrpt_part *p, int32_t iterations) {
+DLL_EXPORT_SYM void ocrpt_part_set_iterations(ocrpt_part *p, const char *expr_string) {
 	if (!p)
 		return;
 
-	if (iterations < 1)
-		iterations = 1;
-	p->iterations = iterations;
+	ocrpt_expr_free(p->iterations_expr);
+	p->iterations_expr = NULL;
+	if (expr_string) {
+		char *err = NULL;
+		p->iterations_expr = ocrpt_expr_parse(p->o, expr_string, &err);
+		if (err) {
+			ocrpt_err_printf("ocrpt_part_set_iterations: %s\n", err);
+			ocrpt_strfree(err);
+		}
+	}
 }
 
 DLL_EXPORT_SYM void ocrpt_part_set_font_name(ocrpt_part *p, const char *font_name) {

@@ -624,6 +624,15 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	ocrpt_expr_resolve(p->right_margin_expr);
 	ocrpt_expr_optimize(p->right_margin_expr);
 
+	ocrpt_expr_resolve(p->iterations_expr);
+	ocrpt_expr_optimize(p->iterations_expr);
+	p->iterations = 1;
+	if (p->iterations_expr) {
+		long it = ocrpt_expr_get_long_value(p->iterations_expr);
+		if (it > 1)
+			p->iterations = it;
+	}
+
 	if (p->paper_type_expr) {
 		ocrpt_expr_eval(p->paper_type_expr);
 		if (p->paper_type_expr->result[o->residx] && p->paper_type_expr->result[o->residx]->type == OCRPT_RESULT_STRING && p->paper_type_expr->result[o->residx]->string)

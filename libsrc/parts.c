@@ -114,6 +114,7 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_part_column_new_report(ocrpt_part_column *pd)
 void ocrpt_part_free(ocrpt_part *p) {
 	ocrpt_list *row;
 
+	ocrpt_expr_free(p->iterations_expr);
 	ocrpt_expr_free(p->paper_type_expr);
 	ocrpt_expr_free(p->font_name_expr);
 	ocrpt_expr_free(p->font_size_expr);
