@@ -1717,12 +1717,20 @@ DLL_EXPORT_SYM void ocrpt_output_set_suppress(ocrpt_output *output, const char *
 	output->suppress = expr_string ? ocrpt_layout_expr_parse(output->o, output->r, expr_string, true, false) : NULL;
 }
 
-DLL_EXPORT_SYM void ocrpt_set_noquery_show_nodata(opencreport *o, bool noquery_show_nodata) {
+DLL_EXPORT_SYM void ocrpt_set_noquery_show_nodata(opencreport *o, const char *expr_string) {
 	if (!o)
 		return;
 
-	o->noquery_show_nodata = noquery_show_nodata;
-	o->noquery_show_nodata_set = true;
+	ocrpt_expr_free(o->noquery_show_nodata_expr);
+	o->noquery_show_nodata_expr = NULL;
+	if (expr_string) {
+		char *err = NULL;
+		o->noquery_show_nodata_expr = ocrpt_expr_parse(o, expr_string, &err);
+		if (err) {
+			ocrpt_err_printf("ocrpt_set_noquery_show_nodata: %s\n", err);
+			ocrpt_strfree(err);
+		}
+	}
 }
 
 DLL_EXPORT_SYM void ocrpt_set_report_height_after_last(opencreport *o, bool report_height_after_last) {

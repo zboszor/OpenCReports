@@ -48,6 +48,9 @@ struct opencreport {
 	ocrpt_list *exprs;
 	ocrpt_list *exprs_last;
 
+	/* Expressions for settings */
+	ocrpt_expr *noquery_show_nodata_expr;
+
 	/* List and array of struct ocrpt_datasource */
 	ocrpt_list *datasources;
 
@@ -108,7 +111,6 @@ struct opencreport {
 	bool precalculate:1;
 	bool size_unit_set:1;
 	bool size_in_points:1;
-	bool noquery_show_nodata_set:1;
 	bool noquery_show_nodata:1;
 	bool report_height_after_last_set:1;
 	bool report_height_after_last:1;

@@ -1166,7 +1166,7 @@ DLL_EXPORT_SYM long ocrpt_expr_get_long_value(ocrpt_expr *e) {
 
 	ocrpt_result *r = ocrpt_expr_eval(e);
 
-	if (r && r->type == OCRPT_RESULT_NUMBER)
+	if (r && r->type == OCRPT_RESULT_NUMBER && r->number_initialized)
 		return mpfr_get_si(r->number, e->o->rndmode);
 
 	return 0L;

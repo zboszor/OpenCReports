@@ -1086,7 +1086,7 @@ static void ocrpt_parse_detail_node(opencreport *o, ocrpt_report *r, xmlTextRead
 	}
 }
 
-static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, xmlTextReaderPtr reader) {
+static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, xmlTextReaderPtr reader, bool called_from_ocrpt_node) {
 	if (xmlTextReaderIsEmptyElement(reader))
 		return NULL;
 
@@ -1101,6 +1101,8 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 	}
 
 	ocrpt_report *r = ocrpt_part_column_new_report(pd);
+
+	r->noquery_show_nodata = called_from_ocrpt_node;
 
 	xmlChar *font_name, *font_size;
 	xmlChar *size_unit, *noquery_show_nodata, *report_height_after_last;
@@ -1145,16 +1147,8 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		}
 	}
 
-	if (!o->noquery_show_nodata_set) {
-		int32_t noquery_show_nodata_i = 0;
-		if (noquery_show_nodata) {
-			ocrpt_expr *noquery_show_nodata_e;
-			ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, noquery_show_nodata);
-			ocrpt_expr_free(noquery_show_nodata_e);
-		}
-
-		ocrpt_set_noquery_show_nodata(o, !!noquery_show_nodata_i);
-	}
+	if (!o->noquery_show_nodata_expr)
+		ocrpt_set_noquery_show_nodata(o, (char *)noquery_show_nodata);
 
 	if (!o->report_height_after_last_set) {
 		int32_t report_height_after_last_i = 0;
@@ -1374,7 +1368,7 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 	return r;
 }
 
-static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, xmlTextReaderPtr reader_parent) {
+static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, xmlTextReaderPtr reader_parent, bool called_from_ocrpt_node) {
 	xmlChar *filename, *query, *iterations;
 	struct {
 		char *attr;
@@ -1439,7 +1433,7 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 				/* ignore - xmllint validation is enough */
 			} else if (nodeType == XML_READER_TYPE_ELEMENT && depth == 0) {
 				if (!strcmp((char *)name, "Report"))
-					r = ocrpt_parse_report_node(o, p, pr, pd, reader);
+					r = ocrpt_parse_report_node(o, p, pr, pd, reader, called_from_ocrpt_node);
 			}
 
 			xmlFree(name);
@@ -1465,7 +1459,7 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 		xmlFree(*xmlattrs[i].attrp);
 }
 
-static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, xmlTextReaderPtr reader) {
+static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, xmlTextReaderPtr reader, bool called_from_ocrpt_node) {
 	ocrpt_part_column *pd = ocrpt_part_row_new_column(pr);
 
 	xmlChar *width, *height, *border_width, *border_color;
@@ -1571,16 +1565,16 @@ static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 
 		if (nodetype == XML_READER_TYPE_ELEMENT) {
 			if (!strcmp((char *)name, "Report"))
-				ocrpt_parse_report_node(o, p, pr, pd, reader);
+				ocrpt_parse_report_node(o, p, pr, pd, reader, called_from_ocrpt_node);
 			else if (!strcmp((char *)name, "load"))
-				ocrpt_parse_load(o, p, pr, pd, reader);
+				ocrpt_parse_load(o, p, pr, pd, reader, called_from_ocrpt_node);
 		}
 
 		xmlFree(name);
 	}
 }
 
-static void ocrpt_parse_part_row_node(opencreport *o, ocrpt_part *p, xmlTextReaderPtr reader) {
+static void ocrpt_parse_part_row_node(opencreport *o, ocrpt_part *p, xmlTextReaderPtr reader, bool called_from_ocrpt_node) {
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
@@ -1646,14 +1640,14 @@ static void ocrpt_parse_part_row_node(opencreport *o, ocrpt_part *p, xmlTextRead
 
 		if (nodetype == XML_READER_TYPE_ELEMENT) {
 			if (!strcmp((char *)name, "pd"))
-				ocrpt_parse_pd_node(o, p, pr, reader);
+				ocrpt_parse_pd_node(o, p, pr, reader, called_from_ocrpt_node);
 		}
 
 		xmlFree(name);
 	}
 }
 
-static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
+static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader, bool called_from_ocrpt_node) {
 	if (xmlTextReaderIsEmptyElement(reader))
 		return;
 
@@ -1693,17 +1687,8 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 		}
 	}
 
-	if (!o->noquery_show_nodata_set) {
-		int32_t noquery_show_nodata_i = 0;
-
-		if (noquery_show_nodata) {
-			ocrpt_expr *noquery_show_nodata_e;
-			ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, noquery_show_nodata);
-			ocrpt_expr_free(noquery_show_nodata_e);
-		}
-
-		ocrpt_set_noquery_show_nodata(o, !!noquery_show_nodata_i);
-	}
+	if (!o->noquery_show_nodata_expr)
+		ocrpt_set_noquery_show_nodata(o, (char *)noquery_show_nodata);
 
 	if (!o->report_height_after_last_set) {
 		int32_t report_height_after_last_i = 0;
@@ -1802,7 +1787,7 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader) {
 
 		if (nodetype == XML_READER_TYPE_ELEMENT) {
 			if (!strcmp((char *)name, "pr"))
-				ocrpt_parse_part_row_node(o, p, reader);
+				ocrpt_parse_part_row_node(o, p, reader, called_from_ocrpt_node);
 			else if (!strcmp((char *)name, "PageHeader")) {
 				if (p->pageheader.output_list) {
 					ocrpt_ignore_child_nodes(o, reader, -1, "PageHeader");
@@ -1902,17 +1887,8 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 	for (i = 0; xmlattrs[i].attrp; i++)
 		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
 
-	if (!o->noquery_show_nodata_set) {
-		int32_t noquery_show_nodata_i = 1;
-
-		if (noquery_show_nodata) {
-			ocrpt_expr *noquery_show_nodata_e;
-			ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, noquery_show_nodata);
-			ocrpt_expr_free(noquery_show_nodata_e);
-		}
-
-		ocrpt_set_noquery_show_nodata(o, !!noquery_show_nodata_i);
-	}
+	if (!o->noquery_show_nodata_expr && noquery_show_nodata)
+		ocrpt_set_noquery_show_nodata(o, (char *)noquery_show_nodata);
 
 	if (!o->report_height_after_last_set && report_height_after_last) {
 		ocrpt_expr *report_height_after_last_e;
@@ -2013,9 +1989,9 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 			else if (!strcmp((char *)name, "Queries"))
 				ocrpt_parse_queries_node(o, reader);
 			else if (!strcmp((char *)name, "Report"))
-				ocrpt_parse_report_node(o, NULL, NULL, NULL, reader);
+				ocrpt_parse_report_node(o, NULL, NULL, NULL, reader, true);
 			else if (!strcmp((char *)name, "Part"))
-				ocrpt_parse_part_node(o, reader);
+				ocrpt_parse_part_node(o, reader, true);
 		}
 
 		xmlFree(name);
@@ -2049,9 +2025,9 @@ static bool ocrpt_parse_xml_internal(opencreport *o, xmlTextReaderPtr reader) {
 			else if (!strcmp((char *)name, "Query"))
 				ocrpt_parse_query_node(o, reader);
 			else if (!strcmp((char *)name, "Report"))
-				ocrpt_parse_report_node(o, NULL, NULL, NULL, reader);
+				ocrpt_parse_report_node(o, NULL, NULL, NULL, reader, false);
 			else if (!strcmp((char *)name, "Part"))
-				ocrpt_parse_part_node(o, reader);
+				ocrpt_parse_part_node(o, reader, false);
 		}
 
 		xmlFree(name);

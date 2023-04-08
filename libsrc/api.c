@@ -97,7 +97,6 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	gmp_randinit_default(o->randstate);
 	gmp_randseed_ui(o->randstate, seed);
 	o->locale = newlocale(LC_ALL_MASK, "C", (locale_t)0);
-	o->noquery_show_nodata = true;
 
 	o->current_date = ocrpt_result_new(o);
 	o->current_date->type = OCRPT_RESULT_DATETIME;
@@ -454,6 +453,9 @@ static void ocrpt_execute_parts_resolve_all_reports(opencreport *o, ocrpt_part *
 }
 
 static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_part *p) {
+	ocrpt_expr_resolve(o->noquery_show_nodata_expr);
+	ocrpt_expr_optimize(o->noquery_show_nodata_expr);
+
 	ocrpt_layout_output_resolve(&p->pageheader);
 	ocrpt_layout_output_resolve(&p->pagefooter);
 
@@ -494,6 +496,9 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 		ocrpt_query_navigate_start(q);
 		ocrpt_query_navigate_next(q);
 	}
+
+	if (o->noquery_show_nodata_expr)
+		o->noquery_show_nodata = !!ocrpt_expr_get_long_value(o->noquery_show_nodata_expr);
 
 	if (p->paper_type_expr) {
 		ocrpt_expr_eval(p->paper_type_expr);
@@ -737,7 +742,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 								}
 							} else {
 								ocrpt_print_reportheader(o, p, pr, pd, r, 0, &newpage, &page_indent, &page_position, &old_page_position);
-								if (o->noquery_show_nodata) {
+								if ((o->noquery_show_nodata_expr && o->noquery_show_nodata) || (!o->noquery_show_nodata_expr && r->noquery_show_nodata)) {
 									ocrpt_layout_output_resolve(&r->nodata);
 									ocrpt_layout_output_evaluate(&r->nodata);
 									ocrpt_layout_output(o, p, pr, pd, r, &r->nodata, 0, &newpage, &page_indent, &page_position, &old_page_position);

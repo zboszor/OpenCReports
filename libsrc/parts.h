@@ -95,6 +95,7 @@ struct ocrpt_report {
 	bool height_set:1;
 	bool fieldheader_high_priority:1;
 	bool finished:1;
+	bool noquery_show_nodata:1;
 };
 
 struct ocrpt_part_column {

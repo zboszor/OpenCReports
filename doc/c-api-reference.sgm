@@ -1652,10 +1652,10 @@ ocrpt_set_size_unit_points(opencreport *o,
 				<sect4>
 					<title>Set "no query show NoData" option</title>
 					<para>
-					See <xref linkend="noqueryshownodata"/>.
-					<programlisting>void
+						See <xref linkend="noqueryshownodata"/>.
+						<programlisting>void
 ocrpt_set_noquery_show_nodata(opencreport *o,
-                              bool noquery_show_nodata);</programlisting>
+                              const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
