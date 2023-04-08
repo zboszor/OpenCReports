@@ -401,7 +401,7 @@ PHP_METHOD(opencreport, version) {
 PHP_METHOD(opencreport, set_numeric_precision_bits) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *prec;
+	zend_string *expr_string;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
@@ -409,16 +409,16 @@ PHP_METHOD(opencreport, set_numeric_precision_bits) {
 	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_STR_EX(prec, 1, 0);
+		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_set_numeric_precision_bits(oo->o, prec ? ZSTR_VAL(prec) : NULL);
+	ocrpt_set_numeric_precision_bits(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport, set_rounding_mode) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *mode;
+	zend_string *expr_string;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
@@ -426,10 +426,10 @@ PHP_METHOD(opencreport, set_rounding_mode) {
 	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_STR_EX(mode, 1, 0);
+		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_set_rounding_mode(oo->o, mode ? ZSTR_VAL(mode) : NULL);
+	ocrpt_set_rounding_mode(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport, bindtextdomain) {
@@ -1304,11 +1304,11 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_version, 0, 0, IS_ST
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_numeric_precision_bits, 0, 1, IS_VOID, 0)
-ZEND_ARG_TYPE_INFO(0, prec, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_rounding_mode, 0, 1, IS_VOID, 0)
-ZEND_ARG_TYPE_INFO(0, mode, IS_LONG, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_bindtextdomain, 0, 2, IS_VOID, 0)
