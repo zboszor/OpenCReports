@@ -32,4 +32,4 @@ endif
 
 EXTRA_DIST = $(SGMLFILES)
 
-CLEANFILES = OpenCReports.pdf html/*
+CLEANFILES = OpenCReports.pdf OpenCReports.aux OpenCReports.log OpenCReports.out html/*
