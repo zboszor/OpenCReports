@@ -1866,29 +1866,8 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 	if (!o->precision_expr && precision_bits)
 		ocrpt_set_numeric_precision_bits(o, (char *)precision_bits);
 
-	if (!o->rounding_mode_set && rounding_mode) {
-		ocrpt_expr *rounding_mode_e;
-		char *rounding_mode_s;
-		mpfr_rnd_t rndmode;
-
-		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, rounding_mode);
-		if (strcasecmp(rounding_mode_s, "nearest") == 0)
-			rndmode = MPFR_RNDN;
-		else if (strcasecmp(rounding_mode_s, "to_minus_inf") == 0)
-			rndmode = MPFR_RNDD;
-		else if (strcasecmp(rounding_mode_s, "to_inf") == 0)
-			rndmode = MPFR_RNDU;
-		else if (strcasecmp(rounding_mode_s, "to_zero") == 0)
-			rndmode = MPFR_RNDZ;
-		else if (strcasecmp(rounding_mode_s, "away_from_zero") == 0)
-			rndmode = MPFR_RNDA;
-		else if (strcasecmp(rounding_mode_s, "faithful") == 0)
-			rndmode = MPFR_RNDF;
-		else /* default "nearest" */
-			rndmode = MPFR_RNDN;
-		ocrpt_set_rounding_mode(o, rndmode);
-		ocrpt_expr_free(rounding_mode_e);
-	}
+	if (!o->rounding_mode_expr && rounding_mode)
+		ocrpt_set_rounding_mode(o, (char *)rounding_mode);
 
 	if (!o->locale_set && locale) {
 		ocrpt_expr *locale_e;

@@ -151,7 +151,7 @@ ocrpt_version(void);</programlisting>
 				<para>
 					The default is 256 bits of floating point precision.
 					The expression string must evaluate to a numeric
-					expression, the integer part will be used to set
+					value, the integer part will be used to set
 					the number of precision bits for numeric calculations.
 					<programlisting>void
 ocrpt_set_numeric_precision_bits(opencreport *o,
@@ -161,14 +161,18 @@ ocrpt_set_numeric_precision_bits(opencreport *o,
 			<sect3>
 				<title>Set rounding mode</title>
 				<para>
-					OpenCReports uses GNU MPFR under the hood and doesn't
-					hide this fact. The MPFR rounding mode constants are
-					used as is to set the rounding behaviour.
-					The default is <literal>MPFR_RNDN</literal>, round
-					to nearest.
+					Set the rounding mode. The expression string must
+					evaluate to a string value with values
+					<literal>nearest</literal>,
+					<literal>to_minus_inf</literal>,
+					<literal>to_inf</literal>,
+					<literal>to_zero</literal>,
+					<literal>away_from_zero</literal> and
+					<literal>faithful</literal>.
+					The default is <literal>nearest</literal>.
 					<programlisting>void
 ocrpt_set_rounding_mode(opencreport *o,
-                        mpfr_rnd_t rndmode);</programlisting>
+                        const char *expr_string);</programlisting>
 				</para>
 			</sect3>
 		</sect2>

@@ -218,12 +218,20 @@ DLL_EXPORT_SYM void ocrpt_set_numeric_precision_bits(opencreport *o, const char 
 	}
 }
 
-DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode) {
+DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, const char *expr_string) {
 	if (!o)
 		return;
 
-	o->rndmode = rndmode;
-	o->rounding_mode_set = true;
+	ocrpt_expr_free(o->rounding_mode_expr);
+	o->rounding_mode_expr = NULL;
+	if (expr_string) {
+		char *err = NULL;
+		o->rounding_mode_expr = ocrpt_expr_parse(o, expr_string, &err);
+		if (err) {
+			ocrpt_err_printf("ocrpt_set_rounding_mode: %s\n", err);
+			ocrpt_strfree(err);
+		}
+	}
 }
 
 DLL_EXPORT_SYM bool ocrpt_add_part_added_cb(opencreport *o, ocrpt_part_cb func, void *data) {
@@ -502,6 +510,26 @@ static void ocrpt_execute_evaluate_global_params(opencreport *o) {
 		ocrpt_result *prec = ocrpt_expr_get_result(o->precision_expr);
 		if (ocrpt_result_isnumber(prec))
 			o->prec = ocrpt_expr_get_long_value(o->precision_expr);
+	}
+
+	ocrpt_expr_resolve(o->rounding_mode_expr);
+	ocrpt_expr_optimize(o->rounding_mode_expr);
+	if (o->rounding_mode_expr) {
+		const char *mode = ocrpt_expr_get_string_value(o->rounding_mode_expr);
+		if (strcasecmp(mode, "nearest") == 0)
+			o->rndmode = MPFR_RNDN;
+		else if (strcasecmp(mode, "to_minus_inf") == 0)
+			o->rndmode = MPFR_RNDD;
+		else if (strcasecmp(mode, "to_inf") == 0)
+			o->rndmode = MPFR_RNDU;
+		else if (strcasecmp(mode, "to_zero") == 0)
+			o->rndmode = MPFR_RNDZ;
+		else if (strcasecmp(mode, "away_from_zero") == 0)
+			o->rndmode = MPFR_RNDA;
+		else if (strcasecmp(mode, "faithful") == 0)
+			o->rndmode = MPFR_RNDF;
+		else /* default "nearest" */
+			o->rndmode = MPFR_RNDN;
 	}
 }
 

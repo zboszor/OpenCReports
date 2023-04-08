@@ -206,7 +206,7 @@ void ocrpt_set_output_format(opencreport *o, ocrpt_format_type format);
  * Numeric fine-tuning
  */
 void ocrpt_set_numeric_precision_bits(opencreport *o, const char *expr_string);
-void ocrpt_set_rounding_mode(opencreport *o, mpfr_rnd_t rndmode);
+void ocrpt_set_rounding_mode(opencreport *o, const char *expr_string);
 
 /****************************
  * Locale related functions *

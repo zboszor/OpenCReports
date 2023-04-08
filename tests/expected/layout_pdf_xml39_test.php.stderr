@@ -1,0 +1,2 @@
+PHP Warning:  OpenCReport::execute(): invalid field reference: 'rlib', converted to string literal
+ in /home/zozo/git/OpenCReports/tests/layout_pdf_xml39_test.php on line 32

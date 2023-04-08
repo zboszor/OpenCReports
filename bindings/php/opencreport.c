@@ -418,7 +418,7 @@ PHP_METHOD(opencreport, set_numeric_precision_bits) {
 PHP_METHOD(opencreport, set_rounding_mode) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_long mode;
+	zend_string *mode;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
@@ -426,10 +426,10 @@ PHP_METHOD(opencreport, set_rounding_mode) {
 	}
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_LONG(mode);
+		Z_PARAM_STR_EX(mode, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_set_rounding_mode(oo->o, (mpfr_rnd_t)mode);
+	ocrpt_set_rounding_mode(oo->o, mode ? ZSTR_VAL(mode) : NULL);
 }
 
 PHP_METHOD(opencreport, bindtextdomain) {
