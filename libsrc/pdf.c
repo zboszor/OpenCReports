@@ -99,7 +99,7 @@ static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 }
 
 void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double total_width) {
-	char *font;
+	const char *font;
 	double size, w;
 	bool bold = false, italic = false, newfont = false, justified = false;
 	PangoAlignment align;

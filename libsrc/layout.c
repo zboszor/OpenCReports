@@ -550,7 +550,7 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
-		char *font_name;
+		const char *font_name;
 		double font_size;
 
 		switch (oe->type) {

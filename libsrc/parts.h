@@ -195,7 +195,7 @@ struct ocrpt_part {
 	const ocrpt_paper *paper;
 
 	/* Font name, non-parsed original and actual value */
-	char *font_name;
+	const char *font_name;
 
 	/*
 	 * List of ocrpt_part_row structures

@@ -615,24 +615,64 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 
 	ocrpt_expr_resolve_nowarn(p->paper_type_expr);
 	ocrpt_expr_optimize(p->paper_type_expr);
+	if (p->paper_type_expr) {
+		const char *paper = ocrpt_expr_get_string_value(p->paper_type_expr);
+		if (paper)
+			p->paper = ocrpt_get_paper_by_name(paper);
+	}
+	if (!p->paper)
+		p->paper = o->paper;
 
 	ocrpt_expr_resolve_nowarn(p->font_name_expr);
 	ocrpt_expr_optimize(p->font_name_expr);
+	if (!p->font_name && p->font_name_expr)
+		p->font_name = ocrpt_expr_get_string_value(p->font_name_expr);
+	if (!p->font_name)
+		p->font_name = "Courier";
 
 	ocrpt_expr_resolve(p->font_size_expr);
 	ocrpt_expr_optimize(p->font_size_expr);
+	if (p->font_size_expr) {
+		double font_size = ocrpt_expr_get_double_value(p->font_size_expr);
+
+		p->font_size = (font_size > 0.0 ? font_size : o->font_size);
+		ocrpt_layout_set_font_sizes(o, p->font_name, p->font_size, false, false, NULL, &p->font_width);
+	} else {
+		p->font_size = o->font_size;
+		p->font_width = o->font_width;
+	}
 
 	ocrpt_expr_resolve(p->top_margin_expr);
 	ocrpt_expr_optimize(p->top_margin_expr);
+	if (p->top_margin_expr) {
+		double margin = ocrpt_expr_get_double_value(p->top_margin_expr);
+		if (margin > 0.0)
+			p->top_margin = margin;
+	}
 
 	ocrpt_expr_resolve(p->bottom_margin_expr);
 	ocrpt_expr_optimize(p->bottom_margin_expr);
+	if (p->bottom_margin_expr) {
+		double margin = ocrpt_expr_get_double_value(p->bottom_margin_expr);
+		if (margin > 0.0)
+			p->bottom_margin = margin;
+	}
 
 	ocrpt_expr_resolve(p->left_margin_expr);
 	ocrpt_expr_optimize(p->left_margin_expr);
+	if (p->left_margin_expr) {
+		double margin = ocrpt_expr_get_double_value(p->left_margin_expr);
+		if (margin > 0.0)
+			p->left_margin = margin;
+	}
 
 	ocrpt_expr_resolve(p->right_margin_expr);
 	ocrpt_expr_optimize(p->right_margin_expr);
+	if (p->right_margin_expr) {
+		double margin = ocrpt_expr_get_double_value(p->right_margin_expr);
+		if (margin > 0.0)
+			p->right_margin = margin;
+	}
 
 	ocrpt_expr_resolve(p->iterations_expr);
 	ocrpt_expr_optimize(p->iterations_expr);
@@ -653,15 +693,6 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	if (p->suppress_pageheader_firstpage_expr)
 		p->suppress_pageheader_firstpage = !!ocrpt_expr_get_long_value(p->suppress_pageheader_firstpage_expr);
 
-	if (p->paper_type_expr) {
-		ocrpt_expr_eval(p->paper_type_expr);
-		if (p->paper_type_expr->result[o->residx] && p->paper_type_expr->result[o->residx]->type == OCRPT_RESULT_STRING && p->paper_type_expr->result[o->residx]->string)
-			p->paper = ocrpt_get_paper_by_name(p->paper_type_expr->result[o->residx]->string->str);
-	}
-
-	if (!p->paper)
-		p->paper = o->paper;
-
 	ocrpt_expr_resolve_nowarn(p->orientation_expr);
 	ocrpt_expr_optimize(p->orientation_expr);
 	if (p->orientation_expr) {
@@ -675,52 +706,6 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	} else {
 		p->paper_width = p->paper->width;
 		p->paper_height = p->paper->height;
-	}
-
-	if (!p->font_name) {
-		if (p->font_name_expr) {
-			ocrpt_expr_eval(p->font_name_expr);
-			if (p->font_name_expr->result[o->residx] && p->font_name_expr->result[o->residx]->type == OCRPT_RESULT_STRING && p->font_name_expr->result[o->residx]->string)
-				p->font_name = ocrpt_mem_strdup(p->font_name_expr->result[o->residx]->string->str);
-		} else
-			p->font_name = ocrpt_mem_strdup("Courier");
-	}
-
-	if (p->font_size_expr) {
-		ocrpt_expr_eval(p->font_size_expr);
-		if (p->font_size_expr->result[o->residx] && p->font_size_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->font_size_expr->result[o->residx]->number_initialized)
-			p->font_size = mpfr_get_d(p->font_size_expr->result[o->residx]->number, o->rndmode);
-		else
-			p->font_size = o->font_size;
-
-		ocrpt_layout_set_font_sizes(o, p->font_name, p->font_size, false, false, NULL, &p->font_width);
-	} else {
-		p->font_size = o->font_size;
-		p->font_width = o->font_width;
-	}
-
-	if (p->top_margin_expr) {
-		ocrpt_expr_eval(p->top_margin_expr);
-		if (p->top_margin_expr->result[o->residx] && p->top_margin_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->top_margin_expr->result[o->residx]->number_initialized)
-			p->top_margin = mpfr_get_d(p->top_margin_expr->result[o->residx]->number, o->rndmode);
-	}
-
-	if (p->bottom_margin_expr) {
-		ocrpt_expr_eval(p->bottom_margin_expr);
-		if (p->bottom_margin_expr->result[o->residx] && p->bottom_margin_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->bottom_margin_expr->result[o->residx]->number_initialized)
-			p->bottom_margin = mpfr_get_d(p->bottom_margin_expr->result[o->residx]->number, o->rndmode);
-	}
-
-	if (p->left_margin_expr) {
-		ocrpt_expr_eval(p->left_margin_expr);
-		if (p->left_margin_expr->result[o->residx] && p->left_margin_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->left_margin_expr->result[o->residx]->number_initialized)
-			p->left_margin = mpfr_get_d(p->left_margin_expr->result[o->residx]->number, o->rndmode);
-	}
-
-	if (p->right_margin_expr) {
-		ocrpt_expr_eval(p->right_margin_expr);
-		if (p->right_margin_expr->result[o->residx] && p->right_margin_expr->result[o->residx]->type == OCRPT_RESULT_NUMBER && p->right_margin_expr->result[o->residx]->number_initialized)
-			p->right_margin = mpfr_get_d(p->right_margin_expr->result[o->residx]->number, o->rndmode);
 	}
 }
 
