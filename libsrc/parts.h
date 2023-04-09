@@ -140,14 +140,17 @@ struct ocrpt_part_row {
 	/* Parent structure */
 	opencreport *o;
 
+	/* Parameter expressions */
+	ocrpt_expr *layout_expr;
+	ocrpt_expr *newpage_expr;
+	ocrpt_expr *suppress_expr;
+
 	ocrpt_list *start_page;
 	ocrpt_list *end_page;
 	ocrpt_list *pd_list;
 	ocrpt_list *pd_last;
-	bool newpage_set:1;
 	bool newpage:1;
 	bool suppress:1;
-	bool layout_set:1;
 	bool fixed:1;
 };
 

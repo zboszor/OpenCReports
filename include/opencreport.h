@@ -839,9 +839,9 @@ void ocrpt_part_set_right_margin(ocrpt_part *p, const char *margin);
 void ocrpt_part_set_suppress(ocrpt_part *p, const char *expr_string);
 void ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p, const char *expr_string);
 
-void ocrpt_part_row_set_suppress(ocrpt_part_row *pr, bool suppress);
-void ocrpt_part_row_set_newpage(ocrpt_part_row *pr, bool newpage);
-void ocrpt_part_row_set_layout_fixed(ocrpt_part_row *pr, bool fixed);
+void ocrpt_part_row_set_suppress(ocrpt_part_row *pr, const char *expr_string);
+void ocrpt_part_row_set_newpage(ocrpt_part_row *pr, const char *expr_string);
+void ocrpt_part_row_set_layout(ocrpt_part_row *pr, const char *expr_string);
 
 void ocrpt_part_column_set_suppress(ocrpt_part_column *pd, bool suppress);
 void ocrpt_part_column_set_width(ocrpt_part_column *pd, double width);

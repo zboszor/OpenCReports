@@ -1912,27 +1912,43 @@ DLL_EXPORT_SYM void ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p, 
 	p->suppress_pageheader_firstpage_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_row_set_suppress(ocrpt_part_row *pr, bool suppress) {
+DLL_EXPORT_SYM void ocrpt_part_row_set_suppress(ocrpt_part_row *pr, const char *expr_string) {
 	if (!pr)
 		return;
 
-	pr->suppress = suppress;
+	ocrpt_expr_free(pr->suppress_expr);
+	pr->suppress_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	pr->suppress_expr = ocrpt_expr_parse(pr->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_row_set_newpage(ocrpt_part_row *pr, bool newpage) {
+DLL_EXPORT_SYM void ocrpt_part_row_set_newpage(ocrpt_part_row *pr, const char *expr_string) {
 	if (!pr)
 		return;
 
-	pr->newpage = newpage;
-	pr->newpage_set = true;
+	ocrpt_expr_free(pr->newpage_expr);
+	pr->newpage_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	pr->newpage_expr = ocrpt_expr_parse(pr->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_row_set_layout_fixed(ocrpt_part_row *pr, bool fixed) {
+DLL_EXPORT_SYM void ocrpt_part_row_set_layout(ocrpt_part_row *pr, const char *expr_string) {
 	if (!pr)
 		return;
 
-	pr->fixed = fixed;
-	pr->layout_set = true;
+	ocrpt_expr_free(pr->layout_expr);
+	pr->layout_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	pr->layout_expr = ocrpt_expr_parse(pr->o, expr_string, NULL);
 }
 
 DLL_EXPORT_SYM void ocrpt_part_column_set_suppress(ocrpt_part_column *pd, bool suppress) {

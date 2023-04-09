@@ -1565,32 +1565,14 @@ static void ocrpt_parse_part_row_node(opencreport *o, ocrpt_part *p, xmlTextRead
 	for (i = 0; xmlattrs[i].attrp; i++)
 		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attr);
 
-	if (!pr->layout_set && layout) {
-		ocrpt_expr *layout_e;
-		char *layout_s;
+	if (layout)
+		ocrpt_part_row_set_layout(pr, (char *)layout);
 
-		ocrpt_xml_const_expr_parse_get_value_with_fallback(o, layout);
-		ocrpt_part_row_set_layout_fixed(pr, layout_s && strcasecmp(layout_s, "fixed") == 0);
-		ocrpt_expr_free(layout_e);
-	}
+	if (newpage)
+		ocrpt_part_row_set_newpage(pr, (char *)newpage);
 
-	if (!pr->newpage_set && newpage) {
-		ocrpt_expr *newpage_e;
-		int32_t newpage_i = 0;
-
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback(o, newpage);
-		ocrpt_expr_free(newpage_e);
-		ocrpt_part_row_set_newpage(pr, !!newpage_i);
-	}
-
-	if (suppress) {
-		ocrpt_expr *suppress_e;
-		int32_t suppress_i = 0;
-
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, suppress);
-		ocrpt_expr_free(suppress_e);
-		ocrpt_part_row_set_suppress(pr, !!suppress_i);
-	}
+	if (suppress)
+		ocrpt_part_row_set_suppress(pr, (char *)suppress);
 
 	for (i = 0; xmlattrs[i].attrp; i++)
 		xmlFree(*xmlattrs[i].attrp);

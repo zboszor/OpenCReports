@@ -1828,28 +1828,37 @@ ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p,
 					<title>Set part row suppression</title>
 					<para>
 						See <xref linkend="partrowsuppress"/>.
+						The expression string must evaluate to
+						a numeric (boolean) value.
 						<programlisting>void
 ocrpt_part_row_set_suppress(ocrpt_part_row *pr,
-                            bool suppress);</programlisting>
+                            const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
 					<title>Set part row new page</title>
 					<para>
 						See <xref linkend="partrownewpage"/>.
+						The expression string must evaluate to
+						a numeric (boolean) value.
 						<programlisting>void
 ocrpt_part_row_set_newpage(ocrpt_part_row *pr,
-                           bool newpage);</programlisting>
+                           const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
 					<title>Set part row layout fixed mode</title>
 					<para>
-						Not implemented.
 						See <xref linkend="partrowlayout"/>.
+						The expression string must evaluate
+						to a string value, with possible options
+						<literal>flow</literal> and
+						<literal>fixed</literal>. This setting
+						is ignored, it's only accepted for RLIB
+						compatibility.
 						<programlisting>void
-ocrpt_part_row_set_layout_fixed(ocrpt_part_row *pr,
-                                bool fixed);</programlisting>
+ocrpt_part_row_set_layout(ocrpt_part_row *pr,
+                          const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 			</sect3>

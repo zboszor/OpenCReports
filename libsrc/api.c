@@ -707,6 +707,38 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 		p->paper_width = p->paper->width;
 		p->paper_height = p->paper->height;
 	}
+
+	for (ocrpt_list *row = p->rows; row; row = row->next) {
+		ocrpt_part_row *pr = (ocrpt_part_row *)row->data;
+
+		ocrpt_expr_resolve_nowarn(pr->layout_expr);
+		ocrpt_expr_optimize(pr->layout_expr);
+		if (pr->layout_expr) {
+			const char *layout = ocrpt_expr_get_string_value(pr->layout_expr);
+			pr->fixed = layout && (strcasecmp(layout, "fixed") == 0);
+		}
+
+		ocrpt_expr_resolve_nowarn(pr->suppress_expr);
+		ocrpt_expr_optimize(pr->suppress_expr);
+		if (pr->suppress_expr)
+			pr->suppress = !!ocrpt_expr_get_long_value(pr->suppress_expr);
+
+		ocrpt_expr_resolve_nowarn(pr->newpage_expr);
+		ocrpt_expr_optimize(pr->newpage_expr);
+		if (pr->newpage_expr)
+			pr->newpage = !!ocrpt_expr_get_long_value(pr->newpage_expr);
+
+#if 0 /* TODO: move evaluating <pd> and <Report> parameters to report execution context */
+		for (ocrpt_list *pdl = pr->pd_list; pdl; pdl = pdl->next) {
+			ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
+
+			for (ocrpt_list *rl = pd->reports; rl; rl = rl->next) {
+				//ocrpt_report *r = (ocrpt_report *)rl->data;
+
+			}
+		}
+#endif
+	}
 }
 
 static void ocrpt_execute_parts(opencreport *o) {
