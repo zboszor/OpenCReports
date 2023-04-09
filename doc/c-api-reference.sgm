@@ -1764,11 +1764,16 @@ ocrpt_part_set_paper_by_name(ocrpt_part *p,
 				<sect4>
 					<title>Set part paper's landscape orientation</title>
 					<para>
-						By default, the part uses portrait orientation.
 						See <xref linkend="partpageorientation"/>.
+						The expression string must evaluate to a string
+						value, with possible options of
+						<literal>portrait</literal> and
+						<literal>landscape</literal>. By default,
+						the part uses <literal>portrait</literal>
+						orientation.
 						<programlisting>void
-ocrpt_part_set_landscape(ocrpt_part *p,
-                         bool landscape);</programlisting>
+ocrpt_part_set_orientation(ocrpt_part *p,
+                           const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>

@@ -662,7 +662,14 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	if (!p->paper)
 		p->paper = o->paper;
 
-	if (p->orientation_set && p->landscape) {
+	ocrpt_expr_resolve_nowarn(p->orientation_expr);
+	ocrpt_expr_optimize(p->orientation_expr);
+	if (p->orientation_expr) {
+		const char *orientation = ocrpt_expr_get_string_value(p->orientation_expr);
+		p->landscape = orientation && (strcasecmp(orientation, "landscape") == 0);
+	}
+
+	if (p->landscape) {
 		p->paper_width = p->paper->height;
 		p->paper_height = p->paper->width;
 	} else {

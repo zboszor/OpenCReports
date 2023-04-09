@@ -1821,12 +1821,17 @@ DLL_EXPORT_SYM void ocrpt_part_set_paper_by_name(ocrpt_part *p, const char *pape
 	p->paper_type_expr = ocrpt_expr_parse(p->o, paper_type, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_landscape(ocrpt_part *p, bool landscape) {
+DLL_EXPORT_SYM void ocrpt_part_set_orientation(ocrpt_part *p, const char *expr_string) {
 	if (!p)
 		return;
 
-	p->landscape = landscape;
-	p->orientation_set = true;
+	ocrpt_expr_free(p->orientation_expr);
+	p->orientation_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	p->orientation_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
 }
 
 DLL_EXPORT_SYM void ocrpt_part_set_top_margin(ocrpt_part *p, const char *margin) {

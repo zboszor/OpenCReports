@@ -1183,14 +1183,8 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_expr_free(height_e);
 	}
 
-	if (!p->orientation_set && orientation) {
-		ocrpt_expr *orientation_e;
-		char *orientation_s;
-
-		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, orientation);
-		ocrpt_part_set_landscape(p, orientation_s && strcasecmp((char *)orientation, "landscape") == 0);
-		ocrpt_expr_free(orientation_e);
-	}
+	if (!p->orientation_expr && orientation)
+		ocrpt_part_set_orientation(p, (char *)orientation);
 
 	if (!p->top_margin_expr && top_margin)
 		ocrpt_part_set_top_margin(p, (char *)top_margin);
@@ -1678,14 +1672,8 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader, bool 
 	if (!p->font_size_expr && font_size)
 		ocrpt_part_set_font_size(p, (char *)font_size);
 
-	if (orientation) {
-		ocrpt_expr *orientation_e;
-		char *orientation_s;
-
-		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, orientation);
-		ocrpt_part_set_landscape(p, orientation_s && strcasecmp((char *)orientation, "landscape") == 0);
-		ocrpt_expr_free(orientation_e);
-	}
+	if (orientation)
+		ocrpt_part_set_orientation(p, (char *)orientation);
 
 	if (top_margin)
 		ocrpt_part_set_top_margin(p, (char *)top_margin);
