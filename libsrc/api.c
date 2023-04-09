@@ -500,7 +500,7 @@ static void ocrpt_execute_evaluate_global_params(opencreport *o) {
 
 	ocrpt_resolve_search_paths(o);
 
-	ocrpt_expr_resolve(o->size_unit_expr);
+	ocrpt_expr_resolve_nowarn(o->size_unit_expr);
 	ocrpt_expr_optimize(o->size_unit_expr);
 	o->size_in_points = false;
 	if (o->size_unit_expr) {
@@ -526,7 +526,7 @@ static void ocrpt_execute_evaluate_global_params(opencreport *o) {
 			o->prec = ocrpt_expr_get_long_value(o->precision_expr);
 	}
 
-	ocrpt_expr_resolve(o->rounding_mode_expr);
+	ocrpt_expr_resolve_nowarn(o->rounding_mode_expr);
 	ocrpt_expr_optimize(o->rounding_mode_expr);
 	if (o->rounding_mode_expr) {
 		const char *mode = ocrpt_expr_get_string_value(o->rounding_mode_expr);
@@ -562,7 +562,7 @@ static void ocrpt_execute_evaluate_global_params(opencreport *o) {
 		err = NULL;
 		domain_expr = ocrpt_expr_parse(o, o->xlate_domain_s, &err);
 		if (domain_expr) {
-			ocrpt_expr_resolve(domain_expr);
+			ocrpt_expr_resolve_nowarn(domain_expr);
 			ocrpt_expr_optimize(domain_expr);
 			domain = ocrpt_expr_get_string_value(domain_expr);
 		} else {
