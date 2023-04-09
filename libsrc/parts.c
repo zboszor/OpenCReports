@@ -185,7 +185,6 @@ void ocrpt_report_free(ocrpt_report *r) {
 	ocrpt_output_free(r->o, &r->reportfooter, false);
 	ocrpt_output_free(r->o, &r->fieldheader, false);
 	ocrpt_output_free(r->o, &r->fielddetails, false);
-	ocrpt_mem_free(r->font_name);
 	ocrpt_mem_free(r);
 }
 
@@ -196,11 +195,19 @@ DLL_EXPORT_SYM void ocrpt_report_set_main_query(ocrpt_report *r, const ocrpt_que
 	r->query = (ocrpt_query *)query;
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_main_query_by_name(ocrpt_report *r, const char *query) {
-	if (!r || !query || !*query)
+DLL_EXPORT_SYM void ocrpt_report_set_main_query_from_expr(ocrpt_report *r, const char *expr_string) {
+	if (!r)
 		return;
 
-	r->query = ocrpt_query_get(r->o, query);
+	ocrpt_expr_free(r->query_expr);
+	r->query_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	r->query_expr = ocrpt_report_expr_parse(r, expr_string, NULL);
+	if (!r->query_expr)
+		r->query_expr = ocrpt_newstring(r->o, r, expr_string);
 }
 
 DLL_EXPORT_SYM void ocrpt_report_resolve_variables(ocrpt_report *r) {

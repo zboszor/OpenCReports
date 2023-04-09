@@ -773,12 +773,69 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 			if (pd->suppress_expr)
 				pd->suppress = !!ocrpt_expr_get_long_value(pd->suppress_expr);
 
-#if 0 /* TODO: move evaluating <pd> and <Report> parameters to report execution context */
 			for (ocrpt_list *rl = pd->reports; rl; rl = rl->next) {
 				ocrpt_report *r = (ocrpt_report *)rl->data;
 
+				ocrpt_expr_resolve_nowarn(r->query_expr);
+				ocrpt_expr_optimize(r->query_expr);
+				if (r->query_expr) {
+					const char *query = ocrpt_expr_get_string_value(r->query_expr);
+					if (query)
+						ocrpt_report_set_main_query(r, ocrpt_query_get(o, query));
+				} else if (o->queries)
+					ocrpt_report_set_main_query(r, (ocrpt_query *)o->queries->data);
+
+				ocrpt_expr_resolve(r->height_expr);
+				ocrpt_expr_optimize(r->height_expr);
+				if (r->height_expr) {
+					double height = ocrpt_expr_get_double_value(r->height_expr);
+					if (height > 0.0)
+						r->height = height;
+					else {
+						/* This does not cause a leak */
+						r->height_expr = NULL;
+					}
+				}
+
+				ocrpt_expr_resolve_nowarn(r->font_name_expr);
+				ocrpt_expr_optimize(r->font_name_expr);
+				if (r->font_name_expr)
+					r->font_name = ocrpt_expr_get_string_value(r->font_name_expr);
+
+				ocrpt_expr_resolve(r->font_size_expr);
+				ocrpt_expr_optimize(r->font_size_expr);
+				if (r->font_size_expr) {
+					double font_size = ocrpt_expr_get_double_value(r->font_size_expr);
+
+					if (font_size > 0.0)
+						r->font_size = font_size;
+					else {
+						/* This does not cause a leak */
+						r->font_size_expr = NULL;
+					}
+				}
+
+				ocrpt_expr_resolve(r->iterations_expr);
+				ocrpt_expr_optimize(r->iterations_expr);
+				r->iterations = 1;
+				if (r->iterations_expr) {
+					long it = ocrpt_expr_get_long_value(r->iterations_expr);
+					if (it > 1)
+						r->iterations = it;
+				}
+
+				ocrpt_expr_resolve(r->suppress_expr);
+				ocrpt_expr_optimize(r->suppress_expr);
+				if (r->suppress_expr)
+					r->suppress = !!ocrpt_expr_get_long_value(r->suppress_expr);
+
+				ocrpt_expr_resolve_nowarn(r->fieldheader_high_priority_expr);
+				ocrpt_expr_optimize(r->fieldheader_high_priority_expr);
+				if (r->fieldheader_high_priority_expr) {
+					const char *fhprio = ocrpt_expr_get_string_value(r->fieldheader_high_priority_expr);
+					r->fieldheader_high_priority = fhprio && (strcasecmp(fhprio, "high") == 0);
+				}
 			}
-#endif
 		}
 	}
 }
@@ -916,7 +973,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 						ocrpt_report *r = (ocrpt_report *)rl->data;
 						ocrpt_list *cbl;
 
-						if (r->font_size_set)
+						if (r->font_size_expr)
 							ocrpt_layout_set_font_sizes(o, r->font_name ? r->font_name : p->font_name, r->font_size, false, false, NULL, &r->font_width);
 						else {
 							r->font_size = p->font_size;
@@ -935,8 +992,8 @@ static void ocrpt_execute_parts(opencreport *o) {
 							r->executing = true;
 
 							r->finished = false;
-							if (r->height_set)
-								r->remaining_height = r->height * (o->size_in_points ? 1.0 : (r->font_size_set ? r->font_size : p->font_size));
+							if (r->height_expr)
+								r->remaining_height = r->height * (o->size_in_points ? 1.0 : (r->font_size_expr ? r->font_size : p->font_size));
 
 							ocrpt_query_navigate_start(r->query);
 							if (r->query) {
@@ -966,7 +1023,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 								}
 							}
 
-							if (r->height_set) {
+							if (r->height_expr) {
 								if (rl->next || o->report_height_after_last) {
 									page_position += r->remaining_height;
 

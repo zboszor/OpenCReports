@@ -633,7 +633,7 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 static inline void get_height_exceeded(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, double old_page_position, double new_page_position, bool *height_exceeded, bool *pd_height_exceeded, bool *r_height_exceeded) {
 	*height_exceeded = (new_page_position + ((pd && pd->border_width_expr) ? pd->border_width : 0.0)) > p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height;
 	*pd_height_exceeded = pd && pd->height_expr && (new_page_position > (pd->start_page_position + pd->remaining_height));
-	*r_height_exceeded = r && r->height_set && (r->remaining_height < (new_page_position - old_page_position));
+	*r_height_exceeded = r && r->height_expr && (r->remaining_height < (new_page_position - old_page_position));
 }
 
 bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, double page_width, double page_indent, double *page_position) {
@@ -875,7 +875,7 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		memo_break = ocrpt_layout_output_internal(!o->precalculate, o, p, pr, pd, r, output, pd ? pd->column_width : p->page_width, *page_indent, &new_page_position);
 	}
 
-	if (r && r->height_set)
+	if (r && r->height_expr)
 		r->remaining_height -= new_page_position - *old_page_position;
 
 	*page_position = new_page_position;
@@ -2042,53 +2042,82 @@ DLL_EXPORT_SYM void ocrpt_part_column_set_column_padding(ocrpt_part_column *pd, 
 	pd->column_pad_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_suppress(ocrpt_report *r, bool suppress) {
+DLL_EXPORT_SYM void ocrpt_report_set_suppress(ocrpt_report *r, const char *expr_string) {
 	if (!r)
 		return;
 
-	r->suppress = suppress;
+	ocrpt_expr_free(r->suppress_expr);
+	r->suppress_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	r->suppress_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_iterations(ocrpt_report *r, int32_t iterations) {
+DLL_EXPORT_SYM void ocrpt_report_set_iterations(ocrpt_report *r, const char *expr_string) {
 	if (!r)
 		return;
 
-	if (iterations < 1)
-		iterations = 1;
-	r->iterations = iterations;
+	ocrpt_expr_free(r->iterations_expr);
+	r->iterations_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	r->iterations_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_font_name(ocrpt_report *r, const char *font_name) {
+DLL_EXPORT_SYM void ocrpt_report_set_font_name(ocrpt_report *r, const char *expr_string) {
 	if (!r)
 		return;
 
-	ocrpt_mem_free(r->font_name);
-	r->font_name = ocrpt_mem_strdup(font_name);
+	ocrpt_expr_free(r->font_name_expr);
+	r->font_name_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	r->font_name_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
+	if (!r->font_name_expr)
+		r->font_name_expr = ocrpt_newstring(r->o, r, expr_string);
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_font_size(ocrpt_report *r, double font_size) {
+DLL_EXPORT_SYM void ocrpt_report_set_font_size(ocrpt_report *r, const char *expr_string) {
 	if (!r)
 		return;
 
-	if (font_size > 0.0) {
-		r->font_size = font_size;
-		r->font_size_set = true;
-	}
+	ocrpt_expr_free(r->font_size_expr);
+	r->font_size_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	r->font_size_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_height(ocrpt_report *r, double height) {
+DLL_EXPORT_SYM void ocrpt_report_set_height(ocrpt_report *r, const char *expr_string) {
 	if (!r)
 		return;
 
-	if (height > 1.0) {
-		r->height = height;
-		r->height_set = true;
-	}
+	ocrpt_expr_free(r->height_expr);
+	r->height_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	r->height_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_fieldheader_high_priority(ocrpt_report *r, bool high_priority) {
+DLL_EXPORT_SYM void ocrpt_report_set_fieldheader_high_priority(ocrpt_report *r, const char *expr_string) {
 	if (!r)
 		return;
 
-	r->fieldheader_high_priority = high_priority;
+	ocrpt_expr_free(r->fieldheader_high_priority_expr);
+	r->fieldheader_high_priority_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	r->fieldheader_high_priority_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
 }

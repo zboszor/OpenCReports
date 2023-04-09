@@ -1156,32 +1156,14 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 	if (!o->report_height_after_last_expr && report_height_after_last)
 		ocrpt_set_report_height_after_last(o, (char *)report_height_after_last);
 
-	if (!r->font_name && font_name) {
-		ocrpt_expr *font_name_e;
-		char *font_name_s;
+	if (font_name)
+		ocrpt_report_set_font_name(r, (char *)font_name);
 
-		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, font_name);
-		ocrpt_report_set_font_name(r, font_name_s);
-		ocrpt_expr_free(font_name_e);
-	}
+	if (font_size)
+		ocrpt_report_set_font_size(r, (char *)font_size);
 
-	if (!r->font_size_set && font_size) {
-		ocrpt_expr *font_size_e;
-		double font_size_d;
-
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, font_size);
-		ocrpt_report_set_font_size(r, font_size_d);
-		ocrpt_expr_free(font_size_e);
-	}
-
-	if (!r->height_set && height) {
-		ocrpt_expr *height_e;
-		double height_d;
-
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, height);
-		ocrpt_report_set_height(r, height_d);
-		ocrpt_expr_free(height_e);
-	}
+	if (height)
+		ocrpt_report_set_height(r, (char *)height);
 
 	if (!p->orientation_expr && orientation)
 		ocrpt_part_set_orientation(p, (char *)orientation);
@@ -1201,45 +1183,20 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 	if (!p->paper_type_expr && paper_type)
 		ocrpt_part_set_paper_by_name(p, (char *)paper_type);
 
-	if (iterations) {
-		ocrpt_expr *iterations_e;
-		int32_t iterations_i;
-
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, iterations);
-		ocrpt_expr_free(iterations_e);
-		ocrpt_report_set_iterations(r, iterations_i);
-	}
+	if (iterations)
+		ocrpt_report_set_iterations(r, (char *)iterations);
 
 	if (!p->suppress_pageheader_firstpage_expr && suppress_pageheader_firstpage)
 		ocrpt_part_set_suppress_pageheader_firstpage(p, (char *)suppress_pageheader_firstpage);
 
-	if (suppress) {
-		ocrpt_expr *suppress_e;
-		int32_t suppress_i = 0;
+	if (suppress)
+		ocrpt_report_set_suppress(r, (char *)suppress);
 
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, suppress);
-		ocrpt_report_set_suppress(r, !!suppress_i);
-		ocrpt_expr_free(suppress_e);
-	}
+	if (query)
+		ocrpt_report_set_main_query_from_expr(r, (char *)query);
 
-	if (query) {
-		ocrpt_expr *query_e;
-		char *query_s;
-
-		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, query);
-		ocrpt_report_set_main_query_by_name(r, query_s);
-		ocrpt_expr_free(query_e);
-	} else if (o->queries)
-		ocrpt_report_set_main_query(r, (ocrpt_query *)o->queries->data);
-
-	if (field_header_priority) {
-		ocrpt_expr *field_header_priority_e;
-		char *field_header_priority_s;
-
-		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, field_header_priority);
-		ocrpt_report_set_fieldheader_high_priority(r, field_header_priority_s && strcasecmp(field_header_priority_s, "high") == 0);
-		ocrpt_expr_free(field_header_priority_e);
-	}
+	if (field_header_priority)
+		ocrpt_report_set_fieldheader_high_priority(r, (char *)field_header_priority);
 
 	if (!pd->border_width_expr && border_width)
 		ocrpt_part_column_set_border_width(pd, (char *)border_width);
@@ -1331,10 +1288,9 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader_parent, (const xmlChar *)xmlattrs[i].attr);
 
 	if (filename) {
-		ocrpt_expr *filename_e, *query_e = NULL;
-		char *filename_s, *real_filename, *query_s = NULL;
+		ocrpt_expr *filename_e;
+		char *filename_s, *real_filename;
 		ocrpt_report *r = NULL;
-		int32_t iterations_i;
 
 		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, filename);
 
@@ -1342,19 +1298,6 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 		if (!real_filename) {
 			ocrpt_err_printf("ocrpt_parse_load: can't find file %s\n", filename_s);
 			return;
-		}
-
-		if (query)
-			ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, query);
-
-		iterations_i = 1;
-		if (iterations) {
-			ocrpt_expr *iterations_e;
-
-			ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, iterations);
-			if (iterations_i < 1)
-				iterations_i = 1;
-			ocrpt_expr_free(iterations_e);
 		}
 
 		xmlTextReaderPtr reader;
@@ -1389,16 +1332,14 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 
 		/* If there was a query specified in <load> then set it for the report */
 		if (r) {
-			if (query_s)
-				r->query = ocrpt_query_get(o, query_s);
-			else if (o->queries)
-				r->query = (ocrpt_query *)o->queries->data;
+			if (query)
+				ocrpt_report_set_main_query_from_expr(r, (char *)query);
 
-			r->iterations = iterations_i;
+			if (iterations)
+				ocrpt_report_set_iterations(r, (char *)iterations);
 		}
 
 		ocrpt_expr_free(filename_e);
-		ocrpt_expr_free(query_e);
 	}
 
 	for (i = 0; xmlattrs[i].attrp; i++)

@@ -98,7 +98,7 @@ int main(void) {
 
 	ocrpt_report *r = ocrpt_part_column_new_report(pd);
 	ocrpt_report_set_main_query(r, q);
-	ocrpt_report_set_font_size(r, 12.0);
+	ocrpt_report_set_font_size(r, "12.0");
 
 	/* Construct field headers */
 

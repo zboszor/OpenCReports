@@ -748,7 +748,7 @@ ocrpt_report *ocrpt_report_get_next(ocrpt_part_column *pd, ocrpt_list **list);
  */
 void ocrpt_report_set_main_query(ocrpt_report *r, const ocrpt_query *query);
 
-void ocrpt_report_set_main_query_by_name(ocrpt_report *r, const char *query);
+void ocrpt_report_set_main_query_from_expr(ocrpt_report *r, const char *expr_string);
 /*
  * Get the current row number of the main query
  */
@@ -851,12 +851,12 @@ void ocrpt_part_column_set_border_color(ocrpt_part_column *pd, const char *expr_
 void ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd, const char *expr_string);
 void ocrpt_part_column_set_column_padding(ocrpt_part_column *pd, const char *expr_string);
 
-void ocrpt_report_set_suppress(ocrpt_report *r, bool suppress);
-void ocrpt_report_set_iterations(ocrpt_report *r, int32_t iterations);
-void ocrpt_report_set_font_name(ocrpt_report *r, const char *font_name);
-void ocrpt_report_set_font_size(ocrpt_report *r, double font_size);
-void ocrpt_report_set_height(ocrpt_report *r, double height);
-void ocrpt_report_set_fieldheader_high_priority(ocrpt_report *r, bool high_priority);
+void ocrpt_report_set_suppress(ocrpt_report *r, const char *expr_string);
+void ocrpt_report_set_iterations(ocrpt_report *r, const char *expr_string);
+void ocrpt_report_set_font_name(ocrpt_report *r, const char *expr_string);
+void ocrpt_report_set_font_size(ocrpt_report *r, const char *expr_string);
+void ocrpt_report_set_height(ocrpt_report *r, const char *expr_string);
+void ocrpt_report_set_fieldheader_high_priority(ocrpt_report *r, const char *expr_string);
 
 void ocrpt_layout_part_page_header_set_report(ocrpt_part *p, ocrpt_report *r);
 ocrpt_output *ocrpt_layout_part_page_header(ocrpt_part *p);

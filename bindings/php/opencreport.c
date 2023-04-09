@@ -2944,7 +2944,7 @@ PHP_METHOD(opencreport_report, set_main_query_by_name) {
 		Z_PARAM_STR(query_name);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_report_set_main_query_by_name(pro->r, ZSTR_VAL(query_name));
+	ocrpt_report_set_main_query_from_expr(pro->r, ZSTR_VAL(query_name));
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_report_get_next, 0, 0, OpenCReport\\Report, 1)

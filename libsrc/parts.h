@@ -28,7 +28,7 @@ struct ocrpt_cb_data {
 typedef struct ocrpt_cb_data ocrpt_cb_data;
 
 struct ocrpt_report {
-	char *font_name;
+	const char *font_name;
 	double font_size;
 	double font_width;
 	double height;
@@ -72,6 +72,15 @@ struct ocrpt_report {
 	ocrpt_list *precalc_done_callbacks;
 	ocrpt_list *iteration_callbacks;
 
+	/* Parameter expressions */
+	ocrpt_expr *query_expr;
+	ocrpt_expr *height_expr;
+	ocrpt_expr *font_name_expr;
+	ocrpt_expr *font_size_expr;
+	ocrpt_expr *iterations_expr;
+	ocrpt_expr *suppress_expr;
+	ocrpt_expr *fieldheader_high_priority_expr;
+
 	/*
 	 * How many times should this report run
 	 */
@@ -91,8 +100,6 @@ struct ocrpt_report {
 	bool suppress:1;
 	bool executing:1;
 	bool dont_add_exprs:1;
-	bool font_size_set:1;
-	bool height_set:1;
 	bool fieldheader_high_priority:1;
 	bool finished:1;
 	bool noquery_show_nodata:1;

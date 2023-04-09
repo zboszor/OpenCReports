@@ -1617,14 +1617,16 @@ ocrpt_report_get_next(ocrpt_part_column *pd,
 				<title>Set the main query for a report</title>
 				<para>
 					Set the main query for a report either by
-					the query structure pointer, or by name.
+					the query structure pointer, or from expression.
+					The expression must resolve to a string value,
+					with fallback to a plain string.
 					<programlisting>void
 ocrpt_report_set_main_query(ocrpt_report *r,
                             const ocrpt_query *query);
 
 void
-ocrpt_report_set_main_query_by_name(ocrpt_report *r,
-                                    const char *query);</programlisting>
+ocrpt_report_set_main_query_from_expr(ocrpt_report *r,
+                                    const char *expr_string);</programlisting>
 				</para>
 				<para>
 					See <xref linkend="reportqueryname"/>.
@@ -1948,54 +1950,70 @@ ocrpt_part_column_set_column_padding(ocrpt_part_column *pd,
 					<title>Set report suppression</title>
 					<para>
 						See <xref linkend="reportsuppress"/>.
+						The expression must evaluate to a numeric
+						(boolean) value.
 						<programlisting>void
 ocrpt_report_set_suppress(ocrpt_report *r,
-                          bool suppress);</programlisting>
+                          const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
 					<title>Set report iterations</title>
 					<para>
 						See <xref linkend="reportiter"/>.
+						The expression must evaluate to a numeric
+						value.
 						<programlisting>void
 ocrpt_report_set_iterations(ocrpt_report *r,
-                            int32_t iterations);</programlisting>
+                            const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
 					<title>Set report font name</title>
 					<para>
 						See <xref linkend="reportfontname"/>.
+						The expression must evaluate to a string
+						value, with fallback to plain string:
+						in case of a parsing error, the value
+						string is taken as is.
 						<programlisting>void
 ocrpt_report_set_font_name(ocrpt_report *r,
-                           const char *font_name);</programlisting>
+                           const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
 					<title>Set report font size</title>
 					<para>
 						See <xref linkend="reportfontsize"/>.
+						The expression must evaluate to a numeric
+						value.
 						<programlisting>void
 ocrpt_report_set_font_size(ocrpt_report *r,
-                           double font_size);</programlisting>
+                           const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
 					<title>Set report height</title>
 					<para>
 						See <xref linkend="reportheight"/>.
+						The expression must evaluate to a numeric
+						value.
 						<programlisting>void
 ocrpt_report_set_height(ocrpt_report *r,
-                        double height);</programlisting>
+                        const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
 					<title>Set report's field header priority</title>
 					<para>
 						See <xref linkend="reportfhpriority"/>.
+						The expression must evaluate to a string
+						value with the options of <literal>high</literal>
+						and <literal>low</literal>. Default is
+						<literal>low</literal>.
 						<programlisting>void
 ocrpt_report_set_fieldheader_high_priority(ocrpt_report *r,
-                                           bool high_priority);</programlisting>
+                                           const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 			</sect3>

@@ -122,7 +122,7 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 			size = mpfr_get_d(le->font_size->result[o->residx]->number, o->rndmode);
 		else if (l && l->font_size && l->font_size->result[o->residx] && l->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->font_size->result[o->residx]->number_initialized)
 			size = mpfr_get_d(l->font_size->result[o->residx]->number, o->rndmode);
-		else if (r && r->font_size_set)
+		else if (r && r->font_size_expr)
 			size = r->font_size;
 		else if (p && p->font_size_expr)
 			size = p->font_size;
