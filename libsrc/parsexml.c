@@ -1711,14 +1711,8 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader, bool 
 	if (iterations)
 		ocrpt_part_set_iterations(p, (char *)iterations);
 
-	if (suppress) {
-		ocrpt_expr *suppress_e;
-		int32_t suppress_i = 0;
-
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, suppress);
-		ocrpt_expr_free(suppress_e);
-		ocrpt_part_set_suppress(p, !!suppress_i);
-	}
+	if (suppress)
+		ocrpt_part_set_suppress(p, (char *)suppress);
 
 	if (!p->suppress_pageheader_firstpage_set && suppress_pageheader_firstpage) {
 		ocrpt_expr *suppress_pageheader_firstpage_e;

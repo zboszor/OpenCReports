@@ -137,7 +137,7 @@ static void ocrpt_free_search_path(const void *ptr) {
 	const ocrpt_search_path *p = ptr;
 
 	ocrpt_mem_free(p->path);
-	ocrpt_expr_free(p->expr);
+	/* p->expr is not needed to be freed. */
 	ocrpt_mem_free(p);
 }
 
@@ -642,6 +642,11 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 		if (it > 1)
 			p->iterations = it;
 	}
+
+	ocrpt_expr_resolve(p->suppress_expr);
+	ocrpt_expr_optimize(p->suppress_expr);
+	if (p->suppress_expr)
+		p->suppress = !!ocrpt_expr_get_long_value(p->suppress_expr);
 
 	if (p->paper_type_expr) {
 		ocrpt_expr_eval(p->paper_type_expr);

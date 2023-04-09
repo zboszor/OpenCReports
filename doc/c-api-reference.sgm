@@ -1798,9 +1798,11 @@ ocrpt_part_set_right_margin(ocrpt_part *p,
 					<title>Set part suppression</title>
 					<para>
 						See <xref linkend="partsuppress"/>.
+						The expression string must evaluate to
+						a numeric (boolean) value.
 						<programlisting>void
 ocrpt_part_set_suppress(ocrpt_part *p,
-                        bool suppress);</programlisting>
+                        const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>

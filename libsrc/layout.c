@@ -1881,11 +1881,17 @@ DLL_EXPORT_SYM void ocrpt_part_set_right_margin(ocrpt_part *p, const char *margi
 	p->right_margin_expr = ocrpt_expr_parse(p->o, margin, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_suppress(ocrpt_part *p, bool suppress) {
+DLL_EXPORT_SYM void ocrpt_part_set_suppress(ocrpt_part *p, const char *expr_string) {
 	if (!p)
 		return;
 
-	p->suppress = suppress;
+	ocrpt_expr_free(p->suppress_expr);
+	p->suppress_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	p->suppress_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
 }
 
 DLL_EXPORT_SYM void ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p, bool suppress) {
