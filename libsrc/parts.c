@@ -146,8 +146,6 @@ void ocrpt_part_free(ocrpt_part *p) {
 	p->rows = NULL;
 	p->row_last = NULL;
 
-	ocrpt_mem_free(p->path);
-
 	ocrpt_list_free_deep(p->iteration_callbacks, ocrpt_mem_free);
 
 	ocrpt_mem_free(p);

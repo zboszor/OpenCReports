@@ -210,7 +210,7 @@ struct ocrpt_part {
 	 */
 	ocrpt_list *rows;
 	ocrpt_list *row_last;
-	const char *path;
+
 	/*
 	 * How many times should this part run
 	 */
