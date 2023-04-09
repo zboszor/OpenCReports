@@ -648,6 +648,11 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	if (p->suppress_expr)
 		p->suppress = !!ocrpt_expr_get_long_value(p->suppress_expr);
 
+	ocrpt_expr_resolve(p->suppress_pageheader_firstpage_expr);
+	ocrpt_expr_optimize(p->suppress_pageheader_firstpage_expr);
+	if (p->suppress_pageheader_firstpage_expr)
+		p->suppress_pageheader_firstpage = !!ocrpt_expr_get_long_value(p->suppress_pageheader_firstpage_expr);
+
 	if (p->paper_type_expr) {
 		ocrpt_expr_eval(p->paper_type_expr);
 		if (p->paper_type_expr->result[o->residx] && p->paper_type_expr->result[o->residx]->type == OCRPT_RESULT_STRING && p->paper_type_expr->result[o->residx]->string)

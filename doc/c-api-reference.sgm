@@ -1809,9 +1809,11 @@ ocrpt_part_set_suppress(ocrpt_part *p,
 					<title>Set part's page header suppressed on the first page</title>
 					<para>
 						See <xref linkend="suppresspageheaderfirstpage"/>.
+						The expression string must evaluate to
+						a numeric (boolean) value.
 						<programlisting>void
 ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p,
-                                             bool suppress);</programlisting>
+                                             const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 			</sect3>

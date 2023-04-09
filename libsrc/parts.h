@@ -181,6 +181,7 @@ struct ocrpt_part {
 	/* Global parameters */
 	ocrpt_expr *iterations_expr;
 	ocrpt_expr *suppress_expr;
+	ocrpt_expr *suppress_pageheader_firstpage_expr;
 	ocrpt_expr *paper_type_expr;
 	ocrpt_expr *font_name_expr;
 	ocrpt_expr *font_size_expr;
@@ -212,7 +213,6 @@ struct ocrpt_part {
 	bool orientation_set:1;
 	bool landscape:1;
 	bool suppress:1;
-	bool suppress_pageheader_firstpage_set:1;
 	bool suppress_pageheader_firstpage:1;
 };
 

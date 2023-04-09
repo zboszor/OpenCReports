@@ -1216,14 +1216,8 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_report_set_iterations(r, iterations_i);
 	}
 
-	if (!p->suppress_pageheader_firstpage_set && suppress_pageheader_firstpage) {
-		ocrpt_expr *suppress_pageheader_firstpage_e;
-		int32_t suppress_pageheader_firstpage_i;
-
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, suppress_pageheader_firstpage);
-		ocrpt_part_set_suppress_pageheader_firstpage(p, !!suppress_pageheader_firstpage_i);
-		ocrpt_expr_free(suppress_pageheader_firstpage_e);
-	}
+	if (!p->suppress_pageheader_firstpage_expr && suppress_pageheader_firstpage)
+		ocrpt_part_set_suppress_pageheader_firstpage(p, (char *)suppress_pageheader_firstpage);
 
 	if (suppress) {
 		ocrpt_expr *suppress_e;
@@ -1714,14 +1708,8 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader, bool 
 	if (suppress)
 		ocrpt_part_set_suppress(p, (char *)suppress);
 
-	if (!p->suppress_pageheader_firstpage_set && suppress_pageheader_firstpage) {
-		ocrpt_expr *suppress_pageheader_firstpage_e;
-		int32_t suppress_pageheader_firstpage_i = 0;
-
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, suppress_pageheader_firstpage);
-		ocrpt_expr_free(suppress_pageheader_firstpage_e);
-		ocrpt_part_set_suppress_pageheader_firstpage(p, !!suppress_pageheader_firstpage_i);
-	}
+	if (suppress_pageheader_firstpage)
+		ocrpt_part_set_suppress_pageheader_firstpage(p, (char *)suppress_pageheader_firstpage);
 
 	for (i = 0; xmlattrs[i].attrp; i++)
 		xmlFree(*xmlattrs[i].attrp);

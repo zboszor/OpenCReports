@@ -1894,12 +1894,17 @@ DLL_EXPORT_SYM void ocrpt_part_set_suppress(ocrpt_part *p, const char *expr_stri
 	p->suppress_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p, bool suppress) {
+DLL_EXPORT_SYM void ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p, const char *expr_string) {
 	if (!p)
 		return;
 
-	p->suppress_pageheader_firstpage = suppress;
-	p->suppress_pageheader_firstpage_set = true;
+	ocrpt_expr_free(p->suppress_pageheader_firstpage_expr);
+	p->suppress_pageheader_firstpage_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	p->suppress_pageheader_firstpage_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
 }
 
 DLL_EXPORT_SYM void ocrpt_part_row_set_suppress(ocrpt_part_row *pr, bool suppress) {

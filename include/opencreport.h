@@ -837,7 +837,7 @@ void ocrpt_part_set_bottom_margin(ocrpt_part *p, const char *margin);
 void ocrpt_part_set_left_margin(ocrpt_part *p, const char *margin);
 void ocrpt_part_set_right_margin(ocrpt_part *p, const char *margin);
 void ocrpt_part_set_suppress(ocrpt_part *p, const char *expr_string);
-void ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p, bool suppress);
+void ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p, const char *expr_string);
 
 void ocrpt_part_row_set_suppress(ocrpt_part_row *pr, bool suppress);
 void ocrpt_part_row_set_newpage(ocrpt_part_row *pr, bool newpage);
