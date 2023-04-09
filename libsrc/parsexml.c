@@ -1782,14 +1782,8 @@ static void ocrpt_parse_path_node(opencreport *o, xmlTextReaderPtr reader) {
 	for (i = 0; xmlattrs[i].attrp; i++)
 		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
 
-	if (value) {
-		ocrpt_expr *value_e;
-		char *value_s;
-
-		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, value);
-		ocrpt_add_search_path(o, value_s);
-		ocrpt_expr_free(value_e);
-	}
+	if (value)
+		ocrpt_add_search_path_from_expr(o, (char *)value);
 
 	for (i = 0; xmlattrs[i].attrp; i++)
 		xmlFree(*xmlattrs[i].attrp);

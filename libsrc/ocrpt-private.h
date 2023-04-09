@@ -36,6 +36,12 @@ enum ocrpt_var_type_bit {
 	OCRPT_VARIABLE_CUSTOM_BIT \
 )
 
+struct ocrpt_search_path {
+	const char *path;
+	ocrpt_expr *expr;
+};
+typedef struct ocrpt_search_path ocrpt_search_path;
+
 struct opencreport {
 	/* Paper name and size */
 	const ocrpt_paper *paper;

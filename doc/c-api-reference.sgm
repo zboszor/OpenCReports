@@ -2688,6 +2688,33 @@ ocrpt_add_search_path(opencreport *o,
 				</para>
 			</sect3>
 			<sect3>
+				<title>Add search path (delayed variant)</title>
+				<para>
+					Add a new directory path from an expression string
+					to the list of search paths. It's useful to find
+					files referenced with relative path.
+					The expression must evaluate to a string value.
+					It is evaluated at the beginning of the report
+					execution. This function may be used explicitly
+					but it's also used when parsing the
+					<literal>&lt;Path&gt;</literal> nodes in a
+					report XML description.
+					<programlisting>void
+ocrpt_add_search_path_from_expr(opencreport *o,
+                                const char *expr_string);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Resolve search paths</title>
+				<para>
+					Resolve expressions added by
+					<literal>ocrpt_add_search_path_from_expr()</literal>.
+					It's used internally when executing the report.
+					<programlisting>void
+ocrpt_resolve_search_paths(opencreport *o);</programlisting>
+				</para>
+			</sect3>
+			<sect3>
 				<title>Find a file</title>
 				<para>
 					Find a file and return the canonicalized path to it.
@@ -2695,6 +2722,13 @@ ocrpt_add_search_path(opencreport *o,
 					<programlisting>char *
 ocrpt_find_file(opencreport *o,
                 const char *filename);</programlisting>
+				</para>
+				<para>
+					Note that search paths added by
+					<literal>ocrpt_add_search_path()</literal>
+					and <literal>ocrpt_add_search_path_from_expr()</literal>
+					are used in their order of appearance when searching
+					for files during executing the report.
 				</para>
 			</sect3>
 		</sect2>

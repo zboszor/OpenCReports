@@ -959,9 +959,18 @@ char *ocrpt_canonicalize_path(const char *path);
  * Add search path (toplevel directories)
  *
  * Useful to find files relative to the search paths.
+ * The paths passed to these functions are searched
+ * in their order of additions during report execution.
+ * The difference is that ocrpt_add_search_path_from_expr()
+ * adds an expression that is resolved at the beginning
+ * of executing the report.
  */
 void ocrpt_add_search_path(opencreport *o, const char *path);
-
+void ocrpt_add_search_path_from_expr(opencreport *o, const char *expr_string);
+/*
+ * Resolve search paths
+ */
+void ocrpt_resolve_search_paths(opencreport *o);
 /*
  * Find a file and return the canonicalized path to it
  *

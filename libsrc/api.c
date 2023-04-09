@@ -133,6 +133,14 @@ DLL_EXPORT_SYM void ocrpt_datasource_free(ocrpt_datasource *source) {
 	o->datasources = ocrpt_list_remove(o->datasources, source);
 }
 
+static void ocrpt_free_search_path(const void *ptr) {
+	const ocrpt_search_path *p = ptr;
+
+	ocrpt_mem_free(p->path);
+	ocrpt_expr_free(p->expr);
+	ocrpt_mem_free(p);
+}
+
 DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	if (!o)
 		return;
@@ -183,7 +191,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	ocrpt_list_free_deep(o->report_added_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(o->precalc_done_callbacks, ocrpt_mem_free);
 
-	ocrpt_list_free_deep(o->search_paths, ocrpt_mem_free);
+	ocrpt_list_free_deep(o->search_paths, ocrpt_free_search_path);
 	ocrpt_list_free_deep(o->images, ocrpt_image_free);
 	ocrpt_list_free_deep(o->pages, (ocrpt_mem_free_t)cairo_surface_destroy);
 
@@ -489,6 +497,8 @@ static void ocrpt_execute_evaluate_global_params(opencreport *o) {
 		ocrpt_query_navigate_start(q);
 		ocrpt_query_navigate_next(q);
 	}
+
+	ocrpt_resolve_search_paths(o);
 
 	ocrpt_expr_resolve(o->size_unit_expr);
 	ocrpt_expr_optimize(o->size_unit_expr);
@@ -1251,7 +1261,8 @@ DLL_EXPORT_SYM void ocrpt_add_search_path(opencreport *o, const char *path) {
 
 	bool found = false;
 	for (ocrpt_list *spl = o->search_paths; spl; spl = spl->next) {
-		if (!strcmp(cpath, (char *)spl->data)) {
+		ocrpt_search_path *p = (ocrpt_search_path *)spl->data;
+		if (p->path && !strcmp(cpath, p->path)) {
 			found = true;
 			break;
 		}
@@ -1259,8 +1270,39 @@ DLL_EXPORT_SYM void ocrpt_add_search_path(opencreport *o, const char *path) {
 
 	if (found)
 		ocrpt_mem_free(cpath);
-	else
-		o->search_paths = ocrpt_list_append(o->search_paths, cpath);
+	else {
+		ocrpt_search_path *p = ocrpt_mem_malloc(sizeof(ocrpt_search_path));
+		p->path = cpath;
+		p->expr = NULL;
+		o->search_paths = ocrpt_list_append(o->search_paths, p);
+	}
+}
+
+DLL_EXPORT_SYM void ocrpt_add_search_path_from_expr(opencreport *o, const char *expr_string) {
+	if (!o || !expr_string)
+		return;
+
+	ocrpt_expr *expr = ocrpt_expr_parse(o, expr_string, NULL);
+	char *path = NULL;
+	if (!expr)
+		path = ocrpt_mem_strdup(expr_string);
+
+	ocrpt_search_path *p = ocrpt_mem_malloc(sizeof(ocrpt_search_path));
+	p->path = path;
+	p->expr = expr;
+	o->search_paths = ocrpt_list_append(o->search_paths, p);
+}
+
+DLL_EXPORT_SYM void ocrpt_resolve_search_paths(opencreport *o) {
+	for (ocrpt_list *l = o->search_paths; l; l = l->next) {
+		ocrpt_search_path *p = (ocrpt_search_path *)l->data;
+
+		if (p->expr && !p->path) {
+			ocrpt_expr_resolve(p->expr);
+			ocrpt_expr_optimize(p->expr);
+			p->path = ocrpt_mem_strdup(ocrpt_expr_get_string_value(p->expr));
+		}
+	}
 }
 
 DLL_EXPORT_SYM char *ocrpt_find_file(opencreport *o, const char *filename) {
@@ -1276,7 +1318,8 @@ DLL_EXPORT_SYM char *ocrpt_find_file(opencreport *o, const char *filename) {
 	}
 
 	for (ocrpt_list *l = o->search_paths; l; l = l->next) {
-		ocrpt_string *s = ocrpt_mem_string_new((char *)l->data, true);
+		ocrpt_search_path *p = (ocrpt_search_path *)l->data;
+		ocrpt_string *s = ocrpt_mem_string_new(p->path, true);
 
 		ocrpt_mem_string_append_printf(s, "/%s", filename);
 
