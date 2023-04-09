@@ -843,13 +843,13 @@ void ocrpt_part_row_set_suppress(ocrpt_part_row *pr, const char *expr_string);
 void ocrpt_part_row_set_newpage(ocrpt_part_row *pr, const char *expr_string);
 void ocrpt_part_row_set_layout(ocrpt_part_row *pr, const char *expr_string);
 
-void ocrpt_part_column_set_suppress(ocrpt_part_column *pd, bool suppress);
-void ocrpt_part_column_set_width(ocrpt_part_column *pd, double width);
-void ocrpt_part_column_set_height(ocrpt_part_column *pd, double height);
-void ocrpt_part_column_set_border_width(ocrpt_part_column *pd, double border_width);
-void ocrpt_part_column_set_border_color(ocrpt_part_column *pd, const char *color);
-void ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd, int32_t detail_columns);
-void ocrpt_part_column_set_column_padding(ocrpt_part_column *pd, double padding);
+void ocrpt_part_column_set_suppress(ocrpt_part_column *pd, const char *expr_string);
+void ocrpt_part_column_set_width(ocrpt_part_column *pd, const char *expr_string);
+void ocrpt_part_column_set_height(ocrpt_part_column *pd, const char *expr_string);
+void ocrpt_part_column_set_border_width(ocrpt_part_column *pd, const char *expr_string);
+void ocrpt_part_column_set_border_color(ocrpt_part_column *pd, const char *expr_string);
+void ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd, const char *expr_string);
+void ocrpt_part_column_set_column_padding(ocrpt_part_column *pd, const char *expr_string);
 
 void ocrpt_report_set_suppress(ocrpt_report *r, bool suppress);
 void ocrpt_report_set_iterations(ocrpt_report *r, int32_t iterations);

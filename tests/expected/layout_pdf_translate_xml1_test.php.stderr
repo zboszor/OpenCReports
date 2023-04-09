@@ -1,2 +1,0 @@
-PHP Warning:  OpenCReport::execute(): invalid field reference: 'translate_test', converted to string literal
- in /home/zozo/git/OpenCReports/tests/layout_pdf_translate_xml1_test.php on line 33

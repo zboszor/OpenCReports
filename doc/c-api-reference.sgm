@@ -1868,63 +1868,77 @@ ocrpt_part_row_set_layout(ocrpt_part_row *pr,
 					<title>Set part column suppression</title>
 					<para>
 						See <xref linkend="partcolsuppress"/>.
+						The expression must evaluate to a numeric
+						(boolean) value.
 						<programlisting>void
 ocrpt_part_column_set_suppress(ocrpt_part_column *pd,
-                               bool suppress);</programlisting>
+                               const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
 					<title>Set part column width</title>
 					<para>
 						See <xref linkend="partcolwidth"/>.
+						The expression must evaluate to a numeric
+						value.
 						<programlisting>void
 ocrpt_part_column_set_width(ocrpt_part_column *pd,
-                            double width);</programlisting>
+                            const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
 					<title>Set part column height</title>
 					<para>
 						See <xref linkend="partcolheight"/>.
+						The expression must evaluate to a numeric
+						value.
 						<programlisting>void
 ocrpt_part_column_set_height(ocrpt_part_column *pd,
-                             double height);</programlisting>
+                             const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
 					<title>Set part column border width</title>
 					<para>
 						See <xref linkend="pdborderwidth"/>.
+						The expression must evaluate to a numeric
+						value.
 						<programlisting>void
 ocrpt_part_column_set_border_width(ocrpt_part_column *pd,
-                                   double border_width);</programlisting>
+                                   const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
 					<title>Set part column border color</title>
 					<para>
 						See <xref linkend="pdbordercolor"/>.
+						The expression must evaluate to a string
+						value with a valid color name or specification.
 						<programlisting>void
 ocrpt_part_column_set_border_color(ocrpt_part_column *pd,
-                                   const char *color);</programlisting>
+                                   const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
 					<title>Set part column's number of detail columns</title>
 					<para>
 						See <xref linkend="detailcolumns"/>.
+						The expression must evaluate to a numeric
+						value.
 						<programlisting>void
 ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd,
-                                     int32_t detail_columns);</programlisting>
+                                     const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
 					<title>Set part column's detail column padding</title>
 					<para>
 						See <xref linkend="columnpadding"/>.
+						The expression must evaluate to a numeric
+						value.
 						<programlisting>void
 ocrpt_part_column_set_column_padding(ocrpt_part_column *pd,
-                                     double padding);</programlisting>
+                                     const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 			</sect3>

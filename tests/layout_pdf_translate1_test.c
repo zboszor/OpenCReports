@@ -97,7 +97,7 @@ int main(void) {
 	ocrpt_part_row *pr = ocrpt_part_new_row(p);
 
 	ocrpt_part_column *pd = ocrpt_part_row_new_column(pr);
-	ocrpt_part_column_set_border_width(pd, 2);
+	ocrpt_part_column_set_border_width(pd, "2");
 	ocrpt_part_column_set_border_color(pd, "bobkratz");
 
 	ocrpt_report *r = ocrpt_part_column_new_report(pd);

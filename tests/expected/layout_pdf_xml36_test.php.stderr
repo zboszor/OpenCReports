@@ -1,2 +1,0 @@
-PHP Warning:  OpenCReport::execute(): invalid field reference: 'points', converted to string literal
- in /home/zozo/git/OpenCReports/tests/layout_pdf_xml36_test.php on line 59

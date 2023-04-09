@@ -119,16 +119,19 @@ struct ocrpt_part_column {
 	/* Parent structure */
 	opencreport *o;
 
+	/* Parameter expressions */
+	ocrpt_expr *width_expr;
+	ocrpt_expr *height_expr;
+	ocrpt_expr *border_width_expr;
+	ocrpt_expr *border_color_expr;
+	ocrpt_expr *detail_columns_expr;
+	ocrpt_expr *column_pad_expr;
+	ocrpt_expr *suppress_expr;
+
 	ocrpt_list *reports;
 	ocrpt_list *last_report;
 	uint32_t detail_columns;
 	uint32_t current_column;
-	bool width_set:1;
-	bool height_set:1;
-	bool border_width_set:1;
-	bool border_color_set:1;
-	bool detail_columns_set:1;
-	bool column_pad_set:1;
 	bool suppress:1;
 	bool finished:1;
 };

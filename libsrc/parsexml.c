@@ -1241,41 +1241,17 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_expr_free(field_header_priority_e);
 	}
 
-	if (!pd->border_width_set && border_width) {
-		ocrpt_expr *border_width_e;
-		double border_width_d;
+	if (!pd->border_width_expr && border_width)
+		ocrpt_part_column_set_border_width(pd, (char *)border_width);
 
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, border_width);
-		ocrpt_expr_free(border_width_e);
-		ocrpt_part_column_set_border_width(pd, border_width_d);
-	}
+	if (!pd->border_color_expr && border_color)
+		ocrpt_part_column_set_border_color(pd, (char *)border_color);
 
-	if (!pd->border_color_set && border_color) {
-		ocrpt_expr *border_color_e;
-		char *border_color_s;
+	if (!pd->detail_columns_expr && detail_columns)
+		ocrpt_part_column_set_detail_columns(pd, (char *)detail_columns);
 
-		ocrpt_xml_const_expr_parse_get_value_with_fallback(o, border_color);
-		ocrpt_part_column_set_border_color(pd, border_color_s);
-		ocrpt_expr_free(border_color_e);
-	}
-
-	if (!pd->detail_columns_set && detail_columns) {
-		ocrpt_expr *detail_columns_e;
-		int32_t detail_columns_i;
-
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, detail_columns);
-		ocrpt_part_column_set_detail_columns(pd, detail_columns_i);
-		ocrpt_expr_free(detail_columns_e);
-	}
-
-	if (!pd->column_pad_set && column_pad) {
-		ocrpt_expr *column_pad_e;
-		double column_pad_d;
-
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback_noreport(o, column_pad);
-		ocrpt_part_column_set_column_padding(pd, column_pad_d);
-		ocrpt_expr_free(column_pad_e);
-	}
+	if (!pd->column_pad_expr && column_pad)
+		ocrpt_part_column_set_column_padding(pd, (char *)column_pad);
 
 	for (i = 0; xmlattrs[i].attrp; i++)
 		xmlFree(*xmlattrs[i].attrp);
@@ -1452,67 +1428,26 @@ static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 	for (i = 0; xmlattrs[i].attrp; i++)
 		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attr);
 
-	if (!pd->width_set && width) {
-		ocrpt_expr *width_e;
-		double width_d = 0.0;
+	if (width)
+		ocrpt_part_column_set_width(pd, (char *)width);
 
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, width);
-		ocrpt_expr_free(width_e);
-		ocrpt_part_column_set_width(pd, width_d);
-	}
+	if (height)
+		ocrpt_part_column_set_height(pd, (char *)height);
 
-	if (!pd->height_set && height) {
-		ocrpt_expr *height_e;
-		double height_d = 0.0;
+	if (border_width)
+		ocrpt_part_column_set_border_width(pd, (char *)border_width);
 
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, height);
-		ocrpt_expr_free(height_e);
-		ocrpt_part_column_set_height(pd, height_d);
-	}
+	if (border_color)
+		ocrpt_part_column_set_border_color(pd, (char *)border_color);
 
-	if (!pd->border_width_set && border_width) {
-		ocrpt_expr *border_width_e;
-		double border_width_d;
+	if (detail_columns)
+		ocrpt_part_column_set_detail_columns(pd, (char *)detail_columns);
 
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, border_width);
-		ocrpt_expr_free(border_width_e);
-		ocrpt_part_column_set_border_width(pd, border_width_d);
-	}
+	if (column_pad)
+		ocrpt_part_column_set_column_padding(pd, (char *)column_pad);
 
-	if (!pd->border_color_set && border_color) {
-		ocrpt_expr *border_color_e;
-		char *border_color_s;
-
-		ocrpt_xml_const_expr_parse_get_value_with_fallback(o, border_color);
-		ocrpt_get_color(border_color_s, &pd->border_color, false);
-		ocrpt_expr_free(border_color_e);
-	}
-
-	if (!pd->detail_columns_set && detail_columns) {
-		ocrpt_expr *detail_columns_e;
-		int32_t detail_columns_i;
-
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, detail_columns);
-		ocrpt_part_column_set_detail_columns(pd, detail_columns_i);
-		ocrpt_expr_free(detail_columns_e);
-	}
-
-	if (!pd->column_pad_set && column_pad) {
-		ocrpt_expr *column_pad_e;
-		double column_pad_d;
-
-		ocrpt_xml_const_expr_parse_get_double_value_with_fallback_noreport(o, column_pad);
-		ocrpt_part_column_set_column_padding(pd, column_pad_d);
-		ocrpt_expr_free(column_pad_e);
-	}
-
-	if (suppress) {
-		ocrpt_expr *suppress_e;
-		int32_t suppress_i = 0;
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, suppress);
-		ocrpt_part_column_set_suppress(pd, !!suppress_i);
-		ocrpt_expr_free(suppress_e);
-	}
+	if (suppress)
+		ocrpt_part_column_set_suppress(pd, (char *)suppress);
 
 	for (i = 0; xmlattrs[i].attrp; i++)
 		xmlFree(*xmlattrs[i].attrp);

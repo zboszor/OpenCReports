@@ -45,7 +45,7 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 
 			switch (elem->le_type) {
 			case OCRPT_OUTPUT_LE_TEXT:
-				o->output_functions.get_text_sizes(o, p, pr, pd, r, output, line, elem, page_width - ((pd && pd->border_width_set) ? 2 * pd->border_width: 0.0));
+				o->output_functions.get_text_sizes(o, p, pr, pd, r, output, line, elem, page_width - ((pd && pd->border_width_expr) ? 2 * pd->border_width: 0.0));
 
 				elem->start = next_start;
 				next_start += elem->width_computed;
@@ -631,8 +631,8 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 }
 
 static inline void get_height_exceeded(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, double old_page_position, double new_page_position, bool *height_exceeded, bool *pd_height_exceeded, bool *r_height_exceeded) {
-	*height_exceeded = (new_page_position + ((pd && pd->border_width_set) ? pd->border_width : 0.0)) > p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height;
-	*pd_height_exceeded = pd && pd->height_set && (new_page_position > (pd->start_page_position + pd->remaining_height));
+	*height_exceeded = (new_page_position + ((pd && pd->border_width_expr) ? pd->border_width : 0.0)) > p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height;
+	*pd_height_exceeded = pd && pd->height_expr && (new_page_position > (pd->start_page_position + pd->remaining_height));
 	*r_height_exceeded = r && r->height_set && (r->remaining_height < (new_page_position - old_page_position));
 }
 
@@ -816,18 +816,18 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			page_break = false;
 
 		if (page_break) {
-			if (pd->height_set)
+			if (pd->height_expr)
 				pd->remaining_height -= new_page_position - pd->start_page_position;
 
 			pd->current_column = 0;
 			*page_indent = pd->page_indent;
-			if (pd->border_width_set)
+			if (pd->border_width_expr)
 				*page_indent += pd->border_width;
 
 			/* Use the previous row data temporarily */
 			o->residx = ocrpt_expr_prev_residx(o->residx);
 
-			if (!o->precalculate && pd && pd->border_width_set && o->output_functions.draw_rectangle)
+			if (!o->precalculate && pd && pd->border_width_expr && o->output_functions.draw_rectangle)
 				o->output_functions.draw_rectangle(o, p, pr, pd, r,
 													&pd->border_color, pd->border_width,
 													pd->page_indent0 + 0.5 * pd->border_width,
@@ -852,7 +852,7 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 		} else if (pd && !pd->finished) {
 			*page_indent += pd->column_width + (o->size_in_points ? 1.0 : 72.0) * pd->column_pad;
 			new_page_position = pd->start_page_position;
-			if (pd->border_width_set)
+			if (pd->border_width_expr)
 				new_page_position += pd->border_width;
 			ocrpt_layout_output_highprio_fieldheader(o, p, pr, pd, r, rows, newpage, page_indent, &new_page_position, old_page_position);
 		}
@@ -1009,14 +1009,14 @@ void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr
 				pr->start_page_position = *page_position;
 				pd->start_page_position = *page_position;
 			}
-			if (pd->border_width_set)
+			if (pd->border_width_expr)
 				*page_position += pd->border_width;
 			ocrpt_layout_output_init(&r->reportheader);
 			ocrpt_layout_output(o, p, pr, pd, r, &r->reportheader, rows, newpage, page_indent, page_position, old_page_position);
 		}
 	} else {
 		pd->start_page_position = *page_position;
-		if (pd->border_width_set)
+		if (pd->border_width_expr)
 			*page_position += pd->border_width;
 	}
 	ocrpt_layout_output_highprio_fieldheader(o, p, pr, pd, r, rows, newpage, page_indent, page_position, old_page_position);
@@ -1951,74 +1951,95 @@ DLL_EXPORT_SYM void ocrpt_part_row_set_layout(ocrpt_part_row *pr, const char *ex
 	pr->layout_expr = ocrpt_expr_parse(pr->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_suppress(ocrpt_part_column *pd, bool suppress) {
+DLL_EXPORT_SYM void ocrpt_part_column_set_suppress(ocrpt_part_column *pd, const char *expr_string) {
 	if (!pd)
 		return;
 
-	pd->suppress = suppress;
+	ocrpt_expr_free(pd->suppress_expr);
+	pd->suppress_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	pd->suppress_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_width(ocrpt_part_column *pd, double width) {
+DLL_EXPORT_SYM void ocrpt_part_column_set_width(ocrpt_part_column *pd, const char *expr_string) {
 	if (!pd)
 		return;
 
-	if (width > 0.0) {
-		pd->width = width;
-		pd->width_set = true;
-	} else
-		pd->width_set = false;
+	ocrpt_expr_free(pd->width_expr);
+	pd->width_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	pd->width_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_height(ocrpt_part_column *pd, double height) {
+DLL_EXPORT_SYM void ocrpt_part_column_set_height(ocrpt_part_column *pd, const char *expr_string) {
 	if (!pd)
 		return;
 
-	if (height > 0.0) {
-		pd->height = height;
-		pd->height_set = true;
-	} else
-		pd->height_set = false;
+	ocrpt_expr_free(pd->height_expr);
+	pd->height_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	pd->height_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_border_width(ocrpt_part_column *pd, double border_width) {
+DLL_EXPORT_SYM void ocrpt_part_column_set_border_width(ocrpt_part_column *pd, const char *expr_string) {
 	if (!pd)
 		return;
 
-	if (border_width > 0.0) {
-		pd->border_width = border_width;
-		pd->border_width_set = true;
-	} else {
-		pd->border_width = 0.0;
-		pd->border_width_set = false;
-	}
+	ocrpt_expr_free(pd->border_width_expr);
+	pd->border_width_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	pd->border_width_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_border_color(ocrpt_part_column *pd, const char *color) {
+DLL_EXPORT_SYM void ocrpt_part_column_set_border_color(ocrpt_part_column *pd, const char *expr_string) {
 	if (!pd)
 		return;
 
-	ocrpt_get_color(color, &pd->border_color, false);
-	pd->border_color_set = true;
+	ocrpt_expr_free(pd->border_color_expr);
+	pd->border_color_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	pd->border_color_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd, int32_t detail_columns) {
+DLL_EXPORT_SYM void ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd, const char *expr_string) {
 	if (!pd)
 		return;
 
-	if (detail_columns < 1)
-		detail_columns = 1;
-	pd->detail_columns = detail_columns;
-	pd->detail_columns_set = true;
+	ocrpt_expr_free(pd->detail_columns_expr);
+	pd->detail_columns_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	pd->detail_columns_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_column_padding(ocrpt_part_column *pd, double padding) {
+DLL_EXPORT_SYM void ocrpt_part_column_set_column_padding(ocrpt_part_column *pd, const char *expr_string) {
 	if (!pd)
 		return;
 
-	if (padding < 0.0)
-		padding = 0.0;
-	pd->column_pad = padding;
-	pd->column_pad_set = true;
+	ocrpt_expr_free(pd->column_pad_expr);
+	pd->column_pad_expr = NULL;
+
+	if (!expr_string)
+		return;
+
+	pd->column_pad_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
 }
 
 DLL_EXPORT_SYM void ocrpt_report_set_suppress(ocrpt_report *r, bool suppress) {

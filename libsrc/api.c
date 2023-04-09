@@ -277,7 +277,7 @@ static void ocrpt_print_reportheader(opencreport *o, ocrpt_part *p, ocrpt_part_r
 		pr->start_page_position = *page_position;
 		pd->start_page_position = *page_position;
 	}
-	if (pd->border_width_set)
+	if (pd->border_width_expr)
 		*page_position += pd->border_width;
 	ocrpt_layout_output_init(&r->reportheader);
 	ocrpt_layout_output(o, p, pr, pd, r, &r->reportheader, rows, newpage, page_indent, page_position, old_page_position);
@@ -728,16 +728,58 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 		if (pr->newpage_expr)
 			pr->newpage = !!ocrpt_expr_get_long_value(pr->newpage_expr);
 
-#if 0 /* TODO: move evaluating <pd> and <Report> parameters to report execution context */
 		for (ocrpt_list *pdl = pr->pd_list; pdl; pdl = pdl->next) {
 			ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
 
+			ocrpt_expr_resolve(pd->width_expr);
+			ocrpt_expr_optimize(pd->width_expr);
+			if (pd->width_expr)
+				pd->width = ocrpt_expr_get_double_value(pd->width_expr);
+
+			ocrpt_expr_resolve(pd->height_expr);
+			ocrpt_expr_optimize(pd->height_expr);
+			if (pd->height_expr)
+				pd->height = ocrpt_expr_get_double_value(pd->height_expr);
+
+			ocrpt_expr_resolve(pd->border_width_expr);
+			ocrpt_expr_optimize(pd->border_width_expr);
+			if (pd->border_width_expr)
+				pd->border_width = ocrpt_expr_get_double_value(pd->border_width_expr);
+
+			ocrpt_expr_resolve_nowarn(pd->border_color_expr);
+			ocrpt_expr_optimize(pd->border_color_expr);
+			if (pd->border_color_expr) {
+				const char *color = ocrpt_expr_get_string_value(pd->border_color_expr);
+				if (color)
+					ocrpt_get_color(color, &pd->border_color, false);
+			}
+
+			ocrpt_expr_resolve(pd->detail_columns_expr);
+			ocrpt_expr_optimize(pd->detail_columns_expr);
+			pd->detail_columns = 1;
+			if (pd->detail_columns_expr) {
+				long dc = ocrpt_expr_get_long_value(pd->detail_columns_expr);
+				if (dc > 1)
+					pd->detail_columns = dc;
+			}
+
+			ocrpt_expr_resolve(pd->column_pad_expr);
+			ocrpt_expr_optimize(pd->column_pad_expr);
+			if (pd->column_pad_expr)
+				pd->column_pad = ocrpt_expr_get_double_value(pd->column_pad_expr);
+
+			ocrpt_expr_resolve(pd->suppress_expr);
+			ocrpt_expr_optimize(pd->suppress_expr);
+			if (pd->suppress_expr)
+				pd->suppress = !!ocrpt_expr_get_long_value(pd->suppress_expr);
+
+#if 0 /* TODO: move evaluating <pd> and <Report> parameters to report execution context */
 			for (ocrpt_list *rl = pd->reports; rl; rl = rl->next) {
-				//ocrpt_report *r = (ocrpt_report *)rl->data;
+				ocrpt_report *r = (ocrpt_report *)rl->data;
 
 			}
-		}
 #endif
+		}
 	}
 }
 
@@ -807,7 +849,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 					ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
 
 					pd->finished = false;
-					if (pd->width_set) {
+					if (pd->width_expr) {
 						pd->real_width = (o->size_in_points ? 1.0 : p->font_width) * pd->width;
 						if (pds_total_width >= p->page_width)
 							pd->suppress = true;
@@ -825,7 +867,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 						for (pdl = pr->pd_list; pdl; pdl = pdl->next) {
 							ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
 
-							if (!pd->width_set) {
+							if (!pd->width_expr) {
 								pd->width = pdw;
 								pd->real_width = pdw;
 							}
@@ -837,7 +879,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 						for (pdl = pr->pd_list; pdl; pdl = pdl->next) {
 							ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
 
-							if (!pd->width_set)
+							if (!pd->width_expr)
 								pd->suppress = true;
 						}
 					}
@@ -856,16 +898,16 @@ static void ocrpt_execute_parts(opencreport *o) {
 					pd->start_page_position = pr->start_page_position;
 
 					pd->page_indent0 = pd->page_indent = page_indent;
-					if (pd->border_width_set)
+					if (pd->border_width_expr)
 						page_indent += pd->border_width;
 
-					pd->column_width = pd->real_width - (pd->border_width_set ? 2 * pd->border_width : 0.0);
+					pd->column_width = pd->real_width - (pd->border_width_expr ? 2 * pd->border_width : 0.0);
 					if (pd->detail_columns > 1)
 						pd->column_width = (pd->column_width - ((o->size_in_points ? pd->column_pad : pd->column_pad * 72.0) * (pd->detail_columns - 1))) / (double)pd->detail_columns;
 
 					pd->current_column = 0;
 
-					if (pd->height_set) {
+					if (pd->height_expr) {
 						pd->real_height = (o->size_in_points ? 1.0 : p->font_size) * pd->height;
 						pd->remaining_height = pd->real_height;
 					}
@@ -959,7 +1001,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 						}
 					}
 
-					if (!o->precalculate && pd->border_width_set && o->output_functions.draw_rectangle) {
+					if (!o->precalculate && pd->border_width_expr && o->output_functions.draw_rectangle) {
 						double bx, by, bw, bh;
 						double page_end_position = p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height - pd->border_width;
 
@@ -967,7 +1009,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 						by = pd->start_page_position;
 						bw = pd->real_width;
 
-						if (pd->height_set) {
+						if (pd->height_expr) {
 							/*
 							 * Rely on the precalculation phase to calculate the same
 							 * visual data but not draw anything yet.
@@ -992,7 +1034,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 							bh = pd->max_page_position - pd->start_page_position;
 						}
 
-						if (pd->border_width_set) {
+						if (pd->border_width_expr) {
 							bx += 0.5 * pd->border_width;
 							by += 0.5 * pd->border_width;
 							bw -= pd->border_width;
@@ -1003,11 +1045,11 @@ static void ocrpt_execute_parts(opencreport *o) {
 														bx, by, bw, bh);
 					}
 
-					if (pd->height_set && pd->finished) {
+					if (pd->height_expr && pd->finished) {
 						page_position = pd->start_page_position + pd->remaining_height;
-						if (pd->border_width_set)
+						if (pd->border_width_expr)
 							page_position += pd->border_width;
-					} else if (pd->border_width_set)
+					} else if (pd->border_width_expr)
 						page_position += pd->border_width;
 
 					if (!pr->end_page) {
