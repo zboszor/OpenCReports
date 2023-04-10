@@ -3100,13 +3100,13 @@ PHP_METHOD(opencreport_variable, resultexpr) {
 PHP_METHOD(opencreport_variable, set_precalculate) {
 	zval *object = ZEND_THIS;
 	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(object);
-	zend_bool precalculate;
+	zend_string *expr_string;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_BOOL(precalculate);
+		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_variable_set_precalculate(vo->v, precalculate);
+	ocrpt_variable_set_precalculate(vo->v, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_variable, resolve) {
@@ -3140,7 +3140,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_variable_resultexpr, 
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_variable_set_precalculate, 0, 1, IS_VOID, 0)
-ZEND_ARG_TYPE_INFO(0, precalculate, _IS_BOOL, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_variable_resolve, 0, 0, IS_VOID, 0)

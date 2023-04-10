@@ -265,11 +265,14 @@ void ocrpt_variables_free(ocrpt_report *r) {
 	r->variables = NULL;
 }
 
-DLL_EXPORT_SYM void ocrpt_variable_set_precalculate(ocrpt_var *var, bool value) {
+DLL_EXPORT_SYM void ocrpt_variable_set_precalculate(ocrpt_var *var, const char *expr_string) {
 	if (!var)
 		return;
 
-	var->precalculate = value;
+	ocrpt_expr_free(var->precalculate_expr);
+	var->precalculate_expr = NULL;
+	if (expr_string)
+		var->precalculate_expr = ocrpt_report_expr_parse(var->r, expr_string, NULL);
 }
 
 DLL_EXPORT_SYM void ocrpt_variable_resolve(ocrpt_var *v) {

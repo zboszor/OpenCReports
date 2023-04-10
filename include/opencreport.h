@@ -624,7 +624,7 @@ ocrpt_expr *ocrpt_variable_resultexpr(ocrpt_var *v);
  * Set precalculate property
  * It will imply delayed="yes" for expressions using this variable
  */
-void ocrpt_variable_set_precalculate(ocrpt_var *var, bool value);
+void ocrpt_variable_set_precalculate(ocrpt_var *var, const char *expr_string);
 /*
  * Resolve a variable
  */

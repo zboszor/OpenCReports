@@ -1334,9 +1334,11 @@ ocrpt_variable_resultexpr(ocrpt_var *v);</programlisting>
 			<sect3>
 				<title>Set precalculate flag for a variable</title>
 				<para>
+					The expression must evaluate to a
+					numeric (boolean) value.
 					<programlisting>void
 ocrpt_variable_set_precalculate(ocrpt_var *var, 
-                                bool value);</programlisting>
+                                const char *expr_string);</programlisting>
 				</para>
 			</sect3>
 			<sect3>

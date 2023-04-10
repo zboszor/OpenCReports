@@ -483,14 +483,8 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 		else
 			v = ocrpt_variable_new(r, vtype, (char *)name, (char *)baseexpr, (char *)resetonbreak);
 
-		if (precalculate) {
-			ocrpt_expr *precalculate_e;
-			int32_t precalculate_i = 0;
-
-			ocrpt_xml_const_expr_parse_get_int_value_with_fallback(o, precalculate);
-			ocrpt_variable_set_precalculate(v, !!precalculate_i);
-			ocrpt_expr_free(precalculate_e);
-		}
+		if (precalculate)
+			ocrpt_variable_set_precalculate(v, (char *)precalculate);
 	}
 
 	for (i = 0; xmlattrs[i].attrp; i++)
