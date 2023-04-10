@@ -46,6 +46,9 @@ struct ocrpt_report {
 
 	/* Parent structure */
 	opencreport *o;
+	ocrpt_part *p;
+	ocrpt_part_row *pr;
+	ocrpt_part_column *pd;
 
 	/* For r.detailcnt */
 	ocrpt_expr *detailcnt;
@@ -73,6 +76,7 @@ struct ocrpt_report {
 	ocrpt_list *iteration_callbacks;
 
 	/* Parameter expressions */
+	ocrpt_expr *filename_expr;
 	ocrpt_expr *query_expr;
 	ocrpt_expr *height_expr;
 	ocrpt_expr *font_name_expr;
@@ -103,6 +107,7 @@ struct ocrpt_report {
 	bool fieldheader_high_priority:1;
 	bool finished:1;
 	bool noquery_show_nodata:1;
+	bool called_from_ocrpt_node:1;
 };
 
 struct ocrpt_part_column {

@@ -1086,7 +1086,7 @@ static void ocrpt_parse_detail_node(opencreport *o, ocrpt_report *r, xmlTextRead
 	}
 }
 
-static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, xmlTextReaderPtr reader, bool called_from_ocrpt_node) {
+static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, xmlTextReaderPtr reader, bool called_from_ocrpt_node) {
 	if (xmlTextReaderIsEmptyElement(reader))
 		return NULL;
 
@@ -1100,7 +1100,8 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		pd = ocrpt_part_row_new_column(pr);
 	}
 
-	ocrpt_report *r = ocrpt_part_column_new_report(pd);
+	if (!r)
+		r = ocrpt_part_column_new_report(pd);
 
 	r->noquery_show_nodata = called_from_ocrpt_node;
 
@@ -1271,6 +1272,64 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 	return r;
 }
 
+bool ocrpt_parse_report_node_for_load(ocrpt_report *r) {
+	const char *filename = ocrpt_expr_get_string_value(r->filename_expr);
+	char *real_filename = ocrpt_find_file(r->o, filename);
+	if (!real_filename) {
+		ocrpt_err_printf("ocrpt_parse_report_node_for_load: can't find file %s\n", filename);
+		return false;
+	}
+
+	ocrpt_expr *query = r->query_expr;
+	r->query_expr = NULL;
+
+	ocrpt_expr *iterations = r->iterations_expr;
+	r->iterations_expr = NULL;
+
+	xmlTextReaderPtr reader;
+	ocrpt_report *r1 = NULL;
+
+	reader = xmlReaderForFile(real_filename, NULL, XML_PARSE_RECOVER |
+								XML_PARSE_NOENT | XML_PARSE_NOBLANKS |
+								XML_PARSE_XINCLUDE | XML_PARSE_NOXINCNODE);
+	ocrpt_mem_free(real_filename);
+	if (!reader) {
+		ocrpt_err_printf("ocrpt_parse_report_node_for_load: invalid XML file name or invalid contents\n");
+		return false;
+	}
+
+	while (xmlTextReaderRead(reader) == 1) {
+		xmlChar *name = xmlTextReaderName(reader);
+		int nodeType = xmlTextReaderNodeType(reader);
+		int depth = xmlTextReaderDepth(reader);
+
+		//processNode(reader);
+
+		if (nodeType == XML_READER_TYPE_DOCUMENT_TYPE) {
+			/* ignore - xmllint validation is enough */
+		} else if (nodeType == XML_READER_TYPE_ELEMENT && depth == 0) {
+			if (!strcmp((char *)name, "Report"))
+				r1 = ocrpt_parse_report_node(r->o, r->p, r->pr, r->pd, r, reader, r->called_from_ocrpt_node);
+		}
+
+		xmlFree(name);
+	}
+
+	xmlFreeTextReader(reader);
+
+	if (r1) {
+		if (query)
+			r->query_expr = query;
+
+		if (iterations)
+			r->iterations_expr = iterations;
+
+		return true;
+	}
+
+	return false;
+}
+
 static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, xmlTextReaderPtr reader_parent, bool called_from_ocrpt_node) {
 	xmlChar *filename, *query, *iterations;
 	struct {
@@ -1288,58 +1347,22 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader_parent, (const xmlChar *)xmlattrs[i].attr);
 
 	if (filename) {
-		ocrpt_expr *filename_e;
-		char *filename_s, *real_filename;
-		ocrpt_report *r = NULL;
+		ocrpt_report *r = ocrpt_part_column_new_report(pd);
 
-		ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, filename);
+		r->p = p;
+		r->pr = pr;
+		r->pd = pd;
+		r->called_from_ocrpt_node = called_from_ocrpt_node;
 
-		real_filename = ocrpt_find_file(o, filename_s);
-		if (!real_filename) {
-			ocrpt_err_printf("ocrpt_parse_load: can't find file %s\n", filename_s);
-			return;
-		}
+		r->filename_expr = ocrpt_expr_parse(o, (char *)filename, NULL);
+		if (!r->filename_expr)
+			r->filename_expr = ocrpt_newstring(o, NULL, (char *)filename);
 
-		xmlTextReaderPtr reader;
+		if (query)
+			ocrpt_report_set_main_query_from_expr(r, (char *)query);
 
-		reader = xmlReaderForFile(real_filename, NULL, XML_PARSE_RECOVER |
-									XML_PARSE_NOENT | XML_PARSE_NOBLANKS |
-									XML_PARSE_XINCLUDE | XML_PARSE_NOXINCNODE);
-		ocrpt_mem_free(real_filename);
-		if (!reader) {
-			ocrpt_err_printf("ocrpt_parse_load: invalid XML file name or invalid contents\n");
-			return;
-		}
-
-		while (xmlTextReaderRead(reader) == 1) {
-			xmlChar *name = xmlTextReaderName(reader);
-			int nodeType = xmlTextReaderNodeType(reader);
-			int depth = xmlTextReaderDepth(reader);
-
-			//processNode(reader);
-
-			if (nodeType == XML_READER_TYPE_DOCUMENT_TYPE) {
-				/* ignore - xmllint validation is enough */
-			} else if (nodeType == XML_READER_TYPE_ELEMENT && depth == 0) {
-				if (!strcmp((char *)name, "Report"))
-					r = ocrpt_parse_report_node(o, p, pr, pd, reader, called_from_ocrpt_node);
-			}
-
-			xmlFree(name);
-		}
-
-		xmlFreeTextReader(reader);
-
-		/* If there was a query specified in <load> then set it for the report */
-		if (r) {
-			if (query)
-				ocrpt_report_set_main_query_from_expr(r, (char *)query);
-
-			if (iterations)
-				ocrpt_report_set_iterations(r, (char *)iterations);
-		}
-
-		ocrpt_expr_free(filename_e);
+		if (iterations)
+			ocrpt_report_set_iterations(r, (char *)iterations);
 	}
 
 	for (i = 0; xmlattrs[i].attrp; i++)
@@ -1411,7 +1434,7 @@ static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 
 		if (nodetype == XML_READER_TYPE_ELEMENT) {
 			if (!strcmp((char *)name, "Report"))
-				ocrpt_parse_report_node(o, p, pr, pd, reader, called_from_ocrpt_node);
+				ocrpt_parse_report_node(o, p, pr, pd, NULL, reader, called_from_ocrpt_node);
 			else if (!strcmp((char *)name, "load"))
 				ocrpt_parse_load(o, p, pr, pd, reader, called_from_ocrpt_node);
 		}
@@ -1718,7 +1741,7 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 			else if (!strcmp((char *)name, "Queries"))
 				ocrpt_parse_queries_node(o, reader);
 			else if (!strcmp((char *)name, "Report"))
-				ocrpt_parse_report_node(o, NULL, NULL, NULL, reader, true);
+				ocrpt_parse_report_node(o, NULL, NULL, NULL, NULL, reader, true);
 			else if (!strcmp((char *)name, "Part"))
 				ocrpt_parse_part_node(o, reader, true);
 		}
@@ -1754,7 +1777,7 @@ static bool ocrpt_parse_xml_internal(opencreport *o, xmlTextReaderPtr reader) {
 			else if (!strcmp((char *)name, "Query"))
 				ocrpt_parse_query_node(o, reader);
 			else if (!strcmp((char *)name, "Report"))
-				ocrpt_parse_report_node(o, NULL, NULL, NULL, reader, false);
+				ocrpt_parse_report_node(o, NULL, NULL, NULL, NULL, reader, false);
 			else if (!strcmp((char *)name, "Part"))
 				ocrpt_parse_part_node(o, reader, false);
 		}

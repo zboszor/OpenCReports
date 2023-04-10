@@ -37,6 +37,7 @@
 #include "exprutil.h"
 #include "functions.h"
 #include "parts.h"
+#include "parsexml.h"
 #include "color.h"
 #include "layout.h"
 #include "pdf.h"
@@ -775,6 +776,14 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 
 			for (ocrpt_list *rl = pd->reports; rl; rl = rl->next) {
 				ocrpt_report *r = (ocrpt_report *)rl->data;
+
+				ocrpt_expr_resolve_nowarn(r->filename_expr);
+				ocrpt_expr_optimize(r->filename_expr);
+				if (r->filename_expr) {
+					ocrpt_parse_report_node_for_load(r);
+					/* Don't load the report again. The expression is freed by ocrpt_free() */
+					r->filename_expr = NULL;
+				}
 
 				ocrpt_expr_resolve_nowarn(r->query_expr);
 				ocrpt_expr_optimize(r->query_expr);
