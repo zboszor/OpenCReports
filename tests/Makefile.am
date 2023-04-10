@@ -181,6 +181,7 @@ PDF_TESTS = \
 	layout_pdf41_test \
 	layout_pdf_xml42_test \
 	header_query_test \
+	header_query2_test \
 	page_header_footer_vars_test \
 	break_suppressblank_test
 

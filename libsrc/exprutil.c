@@ -738,6 +738,24 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 					}
 				} else
 					ocrpt_expr_make_error_result(e, "invalid usage of r.format");
+			} else {
+				/* No such identifier, turn it into a string. */
+				ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
+				ocrpt_mem_string_append_printf(e->result[e->o->residx]->string, "r.%s", e->name->str);
+				e->result[e->o->residx]->string_owned = true;
+				e->result[ocrpt_expr_next_residx(e->o->residx)] = e->result[e->o->residx];
+				e->result[ocrpt_expr_next_residx(ocrpt_expr_next_residx(e->o->residx))] = e->result[e->o->residx];
+
+				ocrpt_mem_string_free(e->query, true);
+				e->query = NULL;
+				ocrpt_mem_string_free(e->name, true);
+				e->name = NULL;
+				e->dotprefixed = false;
+
+				e->type = OCRPT_EXPR_STRING;
+
+				if (warn)
+					ocrpt_err_printf("invalid field reference: '%s', converted to string literal\n", e->result[e->o->residx]->string->str);
 			}
 		}
 
@@ -754,8 +772,25 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 						break;
 					}
 				}
-				if (!ptr)
-					ocrpt_expr_make_error_result(e, "unknown variable v.'%s'\n", e->name->str);
+				if (!ptr) {
+					/* No such identifier, turn it into a string. */
+					ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
+					ocrpt_mem_string_append_printf(e->result[e->o->residx]->string, "v.%s", e->name->str);
+					e->result[e->o->residx]->string_owned = true;
+					e->result[ocrpt_expr_next_residx(e->o->residx)] = e->result[e->o->residx];
+					e->result[ocrpt_expr_next_residx(ocrpt_expr_next_residx(e->o->residx))] = e->result[e->o->residx];
+
+					ocrpt_mem_string_free(e->query, true);
+					e->query = NULL;
+					ocrpt_mem_string_free(e->name, true);
+					e->name = NULL;
+					e->dotprefixed = false;
+
+					e->type = OCRPT_EXPR_STRING;
+
+					if (warn)
+						ocrpt_err_printf("invalid field reference: '%s', converted to string literal\n", e->result[e->o->residx]->string->str);
+				}
 			}
 		}
 		break;
