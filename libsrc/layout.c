@@ -1163,53 +1163,6 @@ ocrpt_expr *ocrpt_layout_expr_parse(opencreport *o, ocrpt_report *r, const char 
 	return e;
 }
 
-ocrpt_expr *ocrpt_layout_const_expr_parse(opencreport *o, const char *expr, bool fake_vars_expected, bool report) {
-	ocrpt_expr *e;
-	char *err;
-
-	if (!expr)
-		return NULL;
-
-	e = ocrpt_expr_parse(o, expr, &err);
-	if (e) {
-		if (fake_vars_expected) {
-			ocrpt_expr_resolve_worker(e, e, NULL, OCRPT_VARREF_RVAR | OCRPT_VARREF_VVAR, report);
-			ocrpt_expr_optimize(e);
-		} else {
-			uint32_t var_mask;
-			if (ocrpt_expr_references(e, OCRPT_VARREF_RVAR | OCRPT_VARREF_VVAR, &var_mask)) {
-				char vartypes[64] = "";
-
-				if ((var_mask & OCRPT_VARREF_RVAR))
-					strcat(vartypes, "RVAR");
-				if ((var_mask & OCRPT_VARREF_IDENT)) {
-					if (*vartypes)
-						strcat(vartypes, " ");
-					strcat(vartypes, "IDENT");
-				}
-				if ((var_mask & OCRPT_VARREF_VVAR)) {
-					if (*vartypes)
-						strcat(vartypes, " ");
-					strcat(vartypes, "VVAR");
-				}
-
-				ocrpt_err_printf("constant expression expected, %s references found: %s\n", vartypes, expr);
-				ocrpt_expr_free(e);
-				e = NULL;
-			} else {
-				ocrpt_expr_resolve_worker(e, e, NULL, 0, report);
-				ocrpt_expr_optimize(e);
-			}
-		}
-	} else {
-		if (report)
-			ocrpt_err_printf("Cannot parse: %s\n", expr);
-		ocrpt_strfree(err);
-	}
-
-	return e;
-}
-
 DLL_EXPORT_SYM void ocrpt_layout_part_page_header_set_report(ocrpt_part *p, ocrpt_report *r) {
 	if (!p)
 		return;

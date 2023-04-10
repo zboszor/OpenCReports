@@ -58,38 +58,18 @@ static void processNode(xmlTextReaderPtr reader) {
 	}
 }
 
-#define ocrpt_xml_const_expr_parse_get_value_with_fallback(o, expr) { \
-					expr##_e = ocrpt_layout_const_expr_parse(o, (char *)expr, true, true); \
+#define get_string_value(o, expr) { \
+					expr##_e = ocrpt_expr_parse(o, (char *)expr, NULL); \
+					ocrpt_expr_resolve_nowarn(expr##_e); \
 					expr##_s = (char *)ocrpt_expr_get_string_value(expr##_e); \
 					if (!expr##_s) \
 						expr##_s = (char *)expr; \
 				}
 
-#define ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, expr) { \
-					expr##_e = ocrpt_layout_const_expr_parse(o, (char *)expr, true, false); \
-					expr##_s = (char *)ocrpt_expr_get_string_value(expr##_e); \
-					if (!expr##_s) \
-						expr##_s = (char *)expr; \
-				}
-
-#define ocrpt_xml_const_expr_parse_get_int_value_with_fallback(o, expr) { \
-					expr##_e = ocrpt_layout_const_expr_parse(o, (char *)expr, false, true); \
+#define get_int_value(o, expr) { \
+					expr##_e = ocrpt_expr_parse(o, (char *)expr, NULL); \
+					ocrpt_expr_resolve_nowarn(expr##_e); \
 					expr##_i = ocrpt_expr_get_long_value(expr##_e); \
-				}
-
-#define ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, expr) { \
-					expr##_e = ocrpt_layout_const_expr_parse(o, (char *)expr, false, false); \
-					expr##_i = ocrpt_expr_get_long_value(expr##_e); \
-				}
-
-#define ocrpt_xml_const_expr_parse_get_double_value_with_fallback(o, expr) { \
-					expr##_e = ocrpt_layout_const_expr_parse(o, (char *)expr, false, true); \
-					expr##_d = ocrpt_expr_get_double_value(expr##_e); \
-				}
-
-#define ocrpt_xml_const_expr_parse_get_double_value_with_fallback_noreport(o, expr) { \
-					expr##_e = ocrpt_layout_const_expr_parse(o, (char *)expr, false, false); \
-					expr##_d = ocrpt_expr_get_double_value(expr##_e); \
 				}
 
 static void ocrpt_ignore_child_nodes(opencreport *o, xmlTextReaderPtr reader, int depth, const char *leaf_name) {
@@ -171,16 +151,16 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 	if (!value)
 		value = value_att;
 
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, name);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, value);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, datasource);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, follower_for);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, follower_expr);
+	get_string_value(o, name);
+	get_string_value(o, value);
+	get_string_value(o, datasource);
+	get_string_value(o, follower_for);
+	get_string_value(o, follower_expr);
 
-	ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, cols);
-	ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, rows);
+	get_int_value(o, cols);
+	get_int_value(o, rows);
 
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, coltypes);
+	get_string_value(o, coltypes);
 
 	ds = ocrpt_datasource_get(o, datasource_s);
 	if (ds) {
@@ -308,14 +288,14 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	for (i = 0; xmlattrs[i].attrp; i++)
 		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
 
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, name);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, type);
+	get_string_value(o, name);
+	get_string_value(o, type);
 
-	ocrpt_xml_const_expr_parse_get_value_with_fallback(o, host);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback(o, unix_socket);
+	get_string_value(o, host);
+	get_string_value(o, unix_socket);
 
 	port_s = NULL;
-	ocrpt_xml_const_expr_parse_get_int_value_with_fallback(o, port);
+	get_int_value(o, port);
 	if (port_i) {
 		port_s = alloca(32);
 		sprintf(port_s, "%d", port_i);
@@ -325,13 +305,13 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	 * Don't report parse errors for database connection details,
 	 * they are sensitive information.
 	 */
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, dbname);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, user);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, password);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, connstr);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, optionfile);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, group);
-	ocrpt_xml_const_expr_parse_get_value_with_fallback_noreport(o, encoding);
+	get_string_value(o, dbname);
+	get_string_value(o, user);
+	get_string_value(o, password);
+	get_string_value(o, connstr);
+	get_string_value(o, optionfile);
+	get_string_value(o, group);
+	get_string_value(o, encoding);
 
 	if (name_s && type_s) {
 		if (!strcmp(type_s, "array"))
