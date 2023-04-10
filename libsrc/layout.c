@@ -321,6 +321,61 @@ static void ocrpt_layout_image(bool draw, opencreport *o, ocrpt_part *p, ocrpt_p
 	output->current_image = image;
 }
 
+void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output) {
+	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
+		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
+
+		switch (oe->type) {
+		case OCRPT_OUTPUT_LINE: {
+			ocrpt_line *line = (ocrpt_line *)oe;
+
+			for (ocrpt_list *l = line->elements; l; l = l->next) {
+				ocrpt_text *elem = (ocrpt_text *)l->data;
+
+				switch (elem->le_type) {
+				case OCRPT_OUTPUT_LE_TEXT:
+					ocrpt_expr_resolve(elem->delayed);
+					ocrpt_expr_optimize(elem->delayed);
+					if (elem->delayed)
+						ocrpt_expr_set_delayed(elem->value, !!ocrpt_expr_get_long_value(elem->delayed));
+
+					ocrpt_expr_resolve(elem->memo_expr);
+					ocrpt_expr_optimize(elem->memo_expr);
+
+					if (elem->memo_expr) {
+						elem->memo = !!ocrpt_expr_get_long_value(elem->memo_expr);
+
+						if (elem->memo) {
+							ocrpt_expr_resolve(elem->wrap_chars);
+							ocrpt_expr_optimize(elem->wrap_chars);
+							if (elem->wrap_chars)
+								elem->memo_wrap_chars = !!ocrpt_expr_get_long_value(elem->wrap_chars);
+
+							ocrpt_expr_resolve(elem->max_lines);
+							ocrpt_expr_optimize(elem->max_lines);
+							if (elem->max_lines)
+								elem->memo_max_lines = ocrpt_expr_get_long_value(elem->max_lines);
+						}
+					}
+
+					break;
+				case OCRPT_OUTPUT_LE_IMAGE:
+				case OCRPT_OUTPUT_LE_BARCODE:
+					/* TODO */
+					break;
+				}
+			}
+
+			break;
+		}
+		case OCRPT_OUTPUT_HLINE:
+		case OCRPT_OUTPUT_IMAGE:
+		case OCRPT_OUTPUT_IMAGEEND:
+			break;
+		}
+	}
+}
+
 void ocrpt_layout_output_resolve(ocrpt_output *output) {
 	ocrpt_expr_resolve(output->suppress);
 	ocrpt_expr_optimize(output->suppress);
@@ -1416,7 +1471,7 @@ DLL_EXPORT_SYM void ocrpt_text_set_value_string(ocrpt_text *text, const char *st
 	ocrpt_text_set_rvalue_internal(text);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr_string, bool delayed) {
+DLL_EXPORT_SYM void ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr_string) {
 	if (!text)
 		return;
 
@@ -1424,9 +1479,18 @@ DLL_EXPORT_SYM void ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr
 		ocrpt_expr_free(text->value);
 
 	text->value = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
-	ocrpt_expr_set_delayed(text->value, delayed);
 
 	ocrpt_text_set_rvalue_internal(text);
+}
+
+DLL_EXPORT_SYM void ocrpt_text_set_value_delayed(ocrpt_text *text, const char *expr_string) {
+	if (!text)
+		return;
+
+	if (text->delayed)
+		ocrpt_expr_free(text->delayed);
+
+	text->delayed = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
 }
 
 DLL_EXPORT_SYM void ocrpt_text_set_format(ocrpt_text *text, const char *expr_string) {
@@ -1568,13 +1632,34 @@ DLL_EXPORT_SYM void ocrpt_text_set_link(ocrpt_text *text, const char *expr_strin
 		text->link->rvalue = text->value;
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_memo(ocrpt_text *text, bool memo, bool wrap_chars, int32_t max_lines) {
+DLL_EXPORT_SYM void ocrpt_text_set_memo(ocrpt_text *text, const char *expr_string) {
 	if (!text)
 		return;
 
-	text->memo = memo;
-	text->memo_wrap_chars = wrap_chars;
-	text->memo_max_lines = max_lines;
+	if (text->memo_expr)
+		ocrpt_expr_free(text->memo_expr);
+
+	text->memo_expr = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
+}
+
+DLL_EXPORT_SYM void ocrpt_text_set_memo_wrap_chars(ocrpt_text *text, const char *expr_string) {
+	if (!text)
+		return;
+
+	if (text->wrap_chars)
+		ocrpt_expr_free(text->wrap_chars);
+
+	text->wrap_chars = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
+}
+
+DLL_EXPORT_SYM void ocrpt_text_set_memo_max_lines(ocrpt_text *text, const char *expr_string) {
+	if (!text)
+		return;
+
+	if (text->max_lines)
+		ocrpt_expr_free(text->max_lines);
+
+	text->max_lines = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
 }
 
 DLL_EXPORT_SYM void ocrpt_line_set_font_name(ocrpt_line *line, const char *expr_string) {

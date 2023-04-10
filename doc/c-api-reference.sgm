@@ -2223,12 +2223,20 @@ ocrpt_text_set_value_string(ocrpt_text *text,
 					<title>Set text element value</title>
 					<para>
 						Set the text element's value from
-						an expression string and whether the
-						expression is delayed.
+						an expression string.
 						<programlisting>void
 ocrpt_text_set_value_expr(ocrpt_text *text,
-                          const char *expr_string,
-                          bool delayed);</programlisting>
+                          const char *expr_string);</programlisting>
+					</para>
+				</sect4>
+				<sect4>
+					<title>Set text element value's delayed property</title>
+					<para>
+						Set the text element value's delayed
+						property from an expression string.
+						<programlisting>void
+ocrpt_text_set_value_delayed(ocrpt_text *text,
+                             const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
@@ -2354,14 +2362,48 @@ ocrpt_text_set_link(ocrpt_text *text,
 					</para>
 				</sect4>
 				<sect4>
-					<title>Set text element multiline parameters</title>
+					<title>Set text element multiline property</title>
 					<para>
-						Set the text element's multiline parameters.
+						Set the text element's multiline property
+						from an expression string. The expression
+						must evaluate to a numeric (boolean) value.
 						<programlisting>void
 ocrpt_text_set_memo(ocrpt_text *text,
-                    bool memo,
-                    bool wrap_chars,
-                    int32_t max_lines);</programlisting>
+                    const char *expr_string);</programlisting>
+					</para>
+				</sect4>
+				<sect4>
+					<title>Set text element "wrap at characters" property</title>
+					<para>
+						Set the text element's "wrap at characters"
+						property from an expression string.
+						The expression must evaluate to a numeric
+						(boolean) value. This setting is only used
+						for multiline fields. When unset or set to
+						<literal>false</literal>, multiline text
+						fields wrap at word boundaries.
+						<programlisting>void
+ocrpt_text_set_memo_wrap_chars(ocrpt_text *text,
+                               const char *expr_string);</programlisting>
+					</para>
+				</sect4>
+				<sect4>
+					<title>Set text element maximum lines</title>
+					<para>
+						Set the text element's maximum lines
+						property from an expression string.
+						The expression must evaluate to a numeric
+						value. This setting is only used for multiline
+						fields. When unset or set to <literal>0</literal>,
+						the whole content of the multiline field is
+						rendered. Otherwise, not more than the
+						maximum lines are rendered from the multiline
+						field value. The used font size, the field's width
+						and word/character wrapping influence the
+						number of lines the field value is rendered into.
+						<programlisting>void
+ocrpt_text_set_memo_max_lines(ocrpt_text *text,
+                              const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 			</sect3>

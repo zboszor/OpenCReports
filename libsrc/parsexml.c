@@ -558,7 +558,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 #endif
 		{ { NULL }, NULL },
 	};
-	int32_t i, j, delayed_i = 0;
+	int32_t i, j;
 	bool run_ignore_child = true;
 	bool literal_string = false;
 
@@ -586,16 +586,13 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 		}
 	}
 
-	if (delayed) {
-		ocrpt_expr *delayed_e;
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, delayed);
-		ocrpt_expr_free(delayed_e);
-	}
-
 	if (literal_string)
 		ocrpt_text_set_value_string(elem, (char *)value);
 	else
-		ocrpt_text_set_value_expr(elem, (char *)value, !!delayed_i);
+		ocrpt_text_set_value_expr(elem, (char *)value);
+
+	if (delayed)
+		ocrpt_text_set_value_delayed(elem, (char *)delayed);
 
 	ocrpt_text_set_format(elem, (char *)format);
 	ocrpt_text_set_width(elem, (char *)width);
@@ -609,27 +606,9 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	ocrpt_text_set_link(elem, (char *)link);
 	ocrpt_text_set_translate(elem, (char *)translate);
 
-	int32_t memo_i = 0, memo_wrap_chars_i = 0, memo_max_lines_i = 0;
-
-	if (memo) {
-		ocrpt_expr *memo_e;
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, memo);
-		ocrpt_expr_free(memo_e);
-
-		if (memo_wrap_chars) {
-			ocrpt_expr *memo_wrap_chars_e;
-			ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, memo_wrap_chars);
-			ocrpt_expr_free(memo_wrap_chars_e);
-		}
-
-		if (memo_max_lines) {
-			ocrpt_expr *memo_max_lines_e;
-			ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, memo_max_lines);
-			ocrpt_expr_free(memo_max_lines_e);
-		}
-	}
-
-	ocrpt_text_set_memo(elem, !!memo_i, !!memo_wrap_chars_i, memo_max_lines_i);
+	ocrpt_text_set_memo(elem, (char *)memo);
+	ocrpt_text_set_memo_wrap_chars(elem, (char *)memo_wrap_chars);
+	ocrpt_text_set_memo_max_lines(elem, (char *)memo_max_lines);
 
 	for (i = 0; xmlattrs[i].attrp; i++)
 		xmlFree(*xmlattrs[i].attrp);

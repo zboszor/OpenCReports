@@ -888,7 +888,8 @@ void ocrpt_line_set_bgcolor(ocrpt_line *line, const char *expr_string);
 ocrpt_text *ocrpt_line_add_text(ocrpt_line *line);
 
 void ocrpt_text_set_value_string(ocrpt_text *text, const char *string);
-void ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr_string, bool delayed);
+void ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr_string);
+void ocrpt_text_set_value_delayed(ocrpt_text *text, const char *expr_string);
 void ocrpt_text_set_format(ocrpt_text *text, const char *expr_string);
 void ocrpt_text_set_translate(ocrpt_text *text, const char *expr_string);
 void ocrpt_text_set_width(ocrpt_text *text, const char *expr_string);
@@ -900,7 +901,9 @@ void ocrpt_text_set_font_size(ocrpt_text *text, const char *expr_string);
 void ocrpt_text_set_bold(ocrpt_text *text, const char *expr_string);
 void ocrpt_text_set_italic(ocrpt_text *text, const char *expr_string);
 void ocrpt_text_set_link(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_memo(ocrpt_text *text, bool memo, bool wrap_chars, int32_t max_lines);
+void ocrpt_text_set_memo(ocrpt_text *text, const char *expr_string);
+void ocrpt_text_set_memo_wrap_chars(ocrpt_text *text, const char *expr_string);
+void ocrpt_text_set_memo_max_lines(ocrpt_text *text, const char *expr_string);
 
 ocrpt_hline *ocrpt_output_add_hline(ocrpt_output *output);
 

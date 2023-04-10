@@ -38,6 +38,10 @@ struct ocrpt_text {
 	ocrpt_output_line_element_type le_type;
 	ocrpt_output *output;
 	ocrpt_expr *value;
+	ocrpt_expr *delayed;
+	ocrpt_expr *memo_expr;
+	ocrpt_expr *wrap_chars;
+	ocrpt_expr *max_lines;
 	ocrpt_expr *format;
 	ocrpt_expr *width;
 	ocrpt_expr *align;
@@ -159,6 +163,7 @@ typedef struct ocrpt_output_element ocrpt_output_element;
 
 void *ocrpt_layout_new_page(opencreport *o, const ocrpt_paper *paper, bool landscape);
 void ocrpt_layout_set_font_sizes(opencreport *o, const char *font, double wanted_font_size, bool bold, bool italic, double *result_font_size, double *result_font_width);
+void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output);
 void ocrpt_layout_output_resolve(ocrpt_output *output);
 void ocrpt_layout_output_evaluate(ocrpt_output *output);
 

@@ -611,6 +611,9 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 		ocrpt_query_navigate_next(q);
 	}
 
+	ocrpt_layout_output_evaluate_expr_params(&p->pageheader);
+	ocrpt_layout_output_evaluate_expr_params(&p->pagefooter);
+
 	ocrpt_layout_output_resolve(&p->pageheader);
 	ocrpt_layout_output_resolve(&p->pagefooter);
 
@@ -843,6 +846,19 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 				if (r->fieldheader_high_priority_expr) {
 					const char *fhprio = ocrpt_expr_get_string_value(r->fieldheader_high_priority_expr);
 					r->fieldheader_high_priority = fhprio && (strcasecmp(fhprio, "high") == 0);
+				}
+
+				ocrpt_layout_output_evaluate_expr_params(&r->nodata);
+				ocrpt_layout_output_evaluate_expr_params(&r->reportheader);
+				ocrpt_layout_output_evaluate_expr_params(&r->reportfooter);
+				ocrpt_layout_output_evaluate_expr_params(&r->fieldheader);
+				ocrpt_layout_output_evaluate_expr_params(&r->fielddetails);
+
+				for (ocrpt_list *brl = r->breaks; brl; brl = brl->next) {
+					ocrpt_break *br = (ocrpt_break *)brl->data;
+
+					ocrpt_layout_output_evaluate_expr_params(&br->header);
+					ocrpt_layout_output_evaluate_expr_params(&br->footer);
 				}
 			}
 		}

@@ -67,7 +67,7 @@ int main(void) {
 	ocrpt_line_set_font_size(l, "14");
 
 	ocrpt_text *t = ocrpt_line_add_text(l);
-	ocrpt_text_set_value_expr(t, "printf(translate('Page header: %d / %d'), r.pageno, r.totpages)", false);
+	ocrpt_text_set_value_expr(t, "printf(translate('Page header: %d / %d'), r.pageno, r.totpages)");
 	ocrpt_text_set_alignment(t, "'right'");
 
 	hl = ocrpt_output_add_hline(out);
@@ -85,7 +85,7 @@ int main(void) {
 	ocrpt_line_set_font_size(l, "14");
 
 	t = ocrpt_line_add_text(l);
-	ocrpt_text_set_value_expr(t, "printf(translate('Page footer: %d / %d'), r.pageno, r.totpages)", false);
+	ocrpt_text_set_value_expr(t, "printf(translate('Page footer: %d / %d'), r.pageno, r.totpages)");
 	ocrpt_text_set_alignment(t, "'right'");
 
 	hl = ocrpt_output_add_hline(out);
@@ -159,19 +159,19 @@ int main(void) {
 	ocrpt_line_set_bgcolor(l, "iif(r.detailcnt%2,'0xe5e5e5','white')");
 
 	t = ocrpt_line_add_text(l);
-	ocrpt_text_set_value_expr(t, "id", false);
+	ocrpt_text_set_value_expr(t, "id");
 	ocrpt_text_set_width(t, "4");
 
 	t = ocrpt_line_add_text(l);
 	ocrpt_text_set_width(t, "1");
 
 	t = ocrpt_line_add_text(l);
-	ocrpt_text_set_value_expr(t, "name", false);
+	ocrpt_text_set_value_expr(t, "name");
 	ocrpt_text_set_format(t, "'Happy birthday, %s!'");
 	ocrpt_text_set_translate(t, "yes");
 	ocrpt_text_set_width(t, "50");
 	ocrpt_text_set_alignment(t, "'justified'");
-	ocrpt_text_set_memo(t, true, false, 0);
+	ocrpt_text_set_memo(t, "yes");
 
 	t = ocrpt_line_add_text(l);
 	ocrpt_text_set_width(t, "1");
@@ -180,7 +180,7 @@ int main(void) {
 	ocrpt_text_set_width(t, "1");
 
 	t = ocrpt_line_add_text(l);
-	ocrpt_text_set_value_expr(t, "age", false);
+	ocrpt_text_set_value_expr(t, "age");
 	ocrpt_text_set_width(t, "7");
 	ocrpt_text_set_format(t, "'%.2d'");
 	ocrpt_text_set_alignment(t, "'right'");
@@ -189,7 +189,7 @@ int main(void) {
 	ocrpt_text_set_width(t, "1");
 
 	t = ocrpt_line_add_text(l);
-	ocrpt_text_set_value_expr(t, "adult ? 'yes' : 'no'", false);
+	ocrpt_text_set_value_expr(t, "adult ? 'yes' : 'no'");
 	ocrpt_text_set_translate(t, "yes");
 	ocrpt_text_set_width(t, "7");
 	ocrpt_text_set_alignment(t, "'center'");
