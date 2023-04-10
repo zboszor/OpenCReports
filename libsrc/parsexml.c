@@ -531,7 +531,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	xmlChar *value, *delayed, *format, *width, *align;
 	xmlChar *color, *bgcolor, *font_name, *font_size;
 	xmlChar *bold, *italic, *link, *memo, *memo_wrap_chars, *memo_max_lines;
-	xmlChar *translate, *col;
+	xmlChar *translate;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
@@ -552,7 +552,10 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 		{ { "memo_wrap_chars" }, &memo_wrap_chars },
 		{ { "memo_max_lines" }, &memo_max_lines },
 		{ { "translate" }, &translate },
+#if 0
+		/* Ignored, accepted in opencreport.dtd for RLIB compatibility. */
 		{ { "col" }, &col },
+#endif
 		{ { NULL }, NULL },
 	};
 	int32_t i, j, delayed_i = 0;
@@ -627,15 +630,6 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	}
 
 	ocrpt_text_set_memo(elem, !!memo_i, !!memo_wrap_chars_i, memo_max_lines_i);
-
-	/* Unused, not exposed in public API */
-	if (col) {
-		ocrpt_expr *col_e;
-		int32_t col_i;
-		ocrpt_xml_const_expr_parse_get_int_value_with_fallback_noreport(o, col);
-		elem->col = col_i;
-		ocrpt_expr_free(col_e);
-	}
 
 	for (i = 0; xmlattrs[i].attrp; i++)
 		xmlFree(*xmlattrs[i].attrp);

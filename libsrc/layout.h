@@ -71,7 +71,6 @@ struct ocrpt_text {
 	PangoAlignment p_align;
 	int32_t memo_max_lines;
 	int32_t lines;
-	int32_t col;
 	bool bold_val:1;
 	bool italic_val:1;
 	bool memo:1;
