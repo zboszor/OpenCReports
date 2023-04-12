@@ -1819,44 +1819,46 @@ DLL_EXPORT_SYM void ocrpt_part_set_iterations(ocrpt_part *p, const char *expr_st
 	}
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_font_name(ocrpt_part *p, const char *font_name) {
+DLL_EXPORT_SYM void ocrpt_part_set_font_name(ocrpt_part *p, const char *expr_string) {
 	if (!p)
 		return;
 
 	ocrpt_expr_free(p->font_name_expr);
 	p->font_name_expr = NULL;
 
-	if (!font_name)
+	if (!expr_string)
 		return;
 
-	p->font_name_expr = ocrpt_expr_parse(p->o, font_name, NULL);
+	p->font_name_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
 	if (!p->font_name_expr)
-		p->font_name_expr = ocrpt_newstring(p->o, NULL, font_name);
+		p->font_name_expr = ocrpt_newstring(p->o, NULL, expr_string);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_font_size(ocrpt_part *p, const char *font_size) {
+DLL_EXPORT_SYM void ocrpt_part_set_font_size(ocrpt_part *p, const char *expr_string) {
 	if (!p)
 		return;
 
 	ocrpt_expr_free(p->font_size_expr);
 	p->font_size_expr = NULL;
-	if (!font_size)
+	if (!expr_string)
 		return;
 
-	p->font_size_expr = ocrpt_expr_parse(p->o, font_size, NULL);
+	p->font_size_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_paper_by_name(ocrpt_part *p, const char *paper_type) {
+DLL_EXPORT_SYM void ocrpt_part_set_paper_by_name(ocrpt_part *p, const char *expr_string) {
 	if (!p)
 		return;
 
 	ocrpt_expr_free(p->paper_type_expr);
 	p->paper_type_expr = NULL;
 
-	if (!paper_type)
+	if (!expr_string)
 		return;
 
-	p->paper_type_expr = ocrpt_expr_parse(p->o, paper_type, NULL);
+	p->paper_type_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
+	if (!p->paper_type_expr)
+		p->paper_type_expr = ocrpt_newstring(p->o, NULL, expr_string);
 }
 
 DLL_EXPORT_SYM void ocrpt_part_set_orientation(ocrpt_part *p, const char *expr_string) {
@@ -1872,56 +1874,56 @@ DLL_EXPORT_SYM void ocrpt_part_set_orientation(ocrpt_part *p, const char *expr_s
 	p->orientation_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_top_margin(ocrpt_part *p, const char *margin) {
+DLL_EXPORT_SYM void ocrpt_part_set_top_margin(ocrpt_part *p, const char *expr_string) {
 	if (!p)
 		return;
 
 	ocrpt_expr_free(p->top_margin_expr);
 	p->top_margin_expr = NULL;
 
-	if (!margin)
+	if (!expr_string)
 		return;
 
-	p->top_margin_expr = ocrpt_expr_parse(p->o, margin, NULL);
+	p->top_margin_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_bottom_margin(ocrpt_part *p, const char *margin) {
+DLL_EXPORT_SYM void ocrpt_part_set_bottom_margin(ocrpt_part *p, const char *expr_string) {
 	if (!p)
 		return;
 
 	ocrpt_expr_free(p->bottom_margin_expr);
 	p->bottom_margin_expr = NULL;
 
-	if (!margin)
+	if (!expr_string)
 		return;
 
-	p->bottom_margin_expr = ocrpt_expr_parse(p->o, margin, NULL);
+	p->bottom_margin_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_left_margin(ocrpt_part *p, const char *margin) {
+DLL_EXPORT_SYM void ocrpt_part_set_left_margin(ocrpt_part *p, const char *expr_string) {
 	if (!p)
 		return;
 
 	ocrpt_expr_free(p->left_margin_expr);
 	p->left_margin_expr = NULL;
 
-	if (!margin)
+	if (!expr_string)
 		return;
 
-	p->left_margin_expr = ocrpt_expr_parse(p->o, margin, NULL);
+	p->left_margin_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_right_margin(ocrpt_part *p, const char *margin) {
+DLL_EXPORT_SYM void ocrpt_part_set_right_margin(ocrpt_part *p, const char *expr_string) {
 	if (!p)
 		return;
 
 	ocrpt_expr_free(p->right_margin_expr);
 	p->right_margin_expr = NULL;
 
-	if (!margin)
+	if (!expr_string)
 		return;
 
-	p->right_margin_expr = ocrpt_expr_parse(p->o, margin, NULL);
+	p->right_margin_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
 }
 
 DLL_EXPORT_SYM void ocrpt_part_set_suppress(ocrpt_part *p, const char *expr_string) {

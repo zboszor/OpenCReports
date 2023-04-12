@@ -1744,7 +1744,7 @@ ocrpt_part_set_iterations(ocrpt_part *p,
 						See <xref linkend="partfontname"/>.
 						<programlisting>void
 ocrpt_part_set_font_name(ocrpt_part *p,
-                         const char *font_name);</programlisting>
+                         const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
@@ -1753,7 +1753,7 @@ ocrpt_part_set_font_name(ocrpt_part *p,
 						See <xref linkend="partfontsize"/>.
 						<programlisting>void
 ocrpt_part_set_font_size(ocrpt_part *p,
-                         const char *font_size);</programlisting>
+                         const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
@@ -1762,7 +1762,7 @@ ocrpt_part_set_font_size(ocrpt_part *p,
 						See <xref linkend="papertype"/>.
 						<programlisting>void
 ocrpt_part_set_paper_by_name(ocrpt_part *p,
-                             const char *paper_name);</programlisting>
+                             const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
@@ -1788,19 +1788,19 @@ ocrpt_part_set_orientation(ocrpt_part *p,
 						as they can be expressions.
 						<programlisting>void
 ocrpt_part_set_top_margin(ocrpt_part *p,
-                          const char *margin);
+                          const char *expr_string);
 
 void
 ocrpt_part_set_bottom_margin(ocrpt_part *p,
-                             const char *margin);
+                             const char *expr_string);
 
 void
 ocrpt_part_set_left_margin(ocrpt_part *p,
-                           const char *margin);
+                           const char *expr_string);
 
 void
 ocrpt_part_set_right_margin(ocrpt_part *p,
-                            const char *margin);</programlisting>
+                            const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 				<sect4>
