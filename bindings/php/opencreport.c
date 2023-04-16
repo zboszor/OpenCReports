@@ -5902,11 +5902,7 @@ static const zend_function_entry opencreport_functions[] = {
 	ZEND_FE(rlib_compile_infix, arginfo_rlib_compile_infix)
 	ZEND_FE(rlib_add_search_path, arginfo_rlib_add_search_path)
 #endif
-#ifdef PHP_FE_END
 	PHP_FE_END
-#else
-	{NULL,NULL,NULL}
-#endif
 };
 /* }}} */
 
