@@ -1397,7 +1397,7 @@ DLL_EXPORT_SYM bool ocrpt_result_isstring(ocrpt_result *result) {
 }
 
 DLL_EXPORT_SYM ocrpt_string *ocrpt_result_get_string(ocrpt_result *result) {
-	if (!result || result->isnull || result->type != OCRPT_RESULT_STRING)
+	if (!result || result->isnull || (result->type != OCRPT_RESULT_STRING && result->type != OCRPT_RESULT_ERROR))
 		return NULL;
 
 	return result->string;

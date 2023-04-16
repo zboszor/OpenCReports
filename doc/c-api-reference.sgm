@@ -2665,7 +2665,18 @@ ocrpt_add_precalculation_done_cb(opencreport *o,
 					<programlisting>bool
 ocrpt_part_add_iteration_cb(ocrpt_part *r,
                             ocrpt_part_cb func,
-                            void *data);</programlisting>
+                            void *data);
+
+bool
+ocrpt_part_add_iteration_cb2(opencreport *o,
+                             ocrpt_part_cb func,
+                             void *data);</programlisting>
+				</para>
+				<para>
+					The second variant adds the callback in the
+					<literal>opencreport</literal> structure
+					context, making the callback apply to
+					every report part. It's for RLIB compatibility.
 				</para>
 			</sect3>
 			<sect3>
@@ -2674,7 +2685,18 @@ ocrpt_part_add_iteration_cb(ocrpt_part *r,
 					<programlisting>bool
 ocrpt_report_add_start_cb(ocrpt_report *r,
                           ocrpt_report_cb func,
-                          void *data);</programlisting>
+                          void *data);
+
+bool
+ocrpt_report_add_start_cb2(opencreport *o,
+                           ocrpt_report_cb func,
+                           void *data);</programlisting>
+				</para>
+				<para>
+					The second variant adds the callback in the
+					<literal>opencreport</literal> structure
+					context, making the callback apply to
+					every report. It's for RLIB compatibility.
 				</para>
 			</sect3>
 			<sect3>
@@ -2683,7 +2705,18 @@ ocrpt_report_add_start_cb(ocrpt_report *r,
 					<programlisting>bool
 ocrpt_report_add_done_cb(ocrpt_report *r,
                          ocrpt_report_cb func,
-                         void *data);</programlisting>
+                         void *data);
+
+bool
+ocrpt_report_add_done_cb2(opencreport *o,
+                          ocrpt_report_cb func,
+                          void *data);</programlisting>
+				</para>
+				<para>
+					The second variant adds the callback in the
+					<literal>opencreport</literal> structure
+					context, making the callback apply to
+					every report. It's for RLIB compatibility.
 				</para>
 			</sect3>
 			<sect3>
@@ -2692,7 +2725,18 @@ ocrpt_report_add_done_cb(ocrpt_report *r,
 					<programlisting>bool
 ocrpt_report_add_new_row_cb(ocrpt_report *r,
                             ocrpt_report_cb func,
-                            void *data);</programlisting>
+                            void *data);
+
+bool
+ocrpt_report_add_new_row_cb2(opencreport *o,
+                             ocrpt_report_cb func,
+                             void *data);</programlisting>
+				</para>
+				<para>
+					The second variant adds the callback in the
+					<literal>opencreport</literal> structure
+					context, making the callback apply to
+					every report. It's for RLIB compatibility.
 				</para>
 			</sect3>
 			<sect3>
@@ -2701,7 +2745,18 @@ ocrpt_report_add_new_row_cb(ocrpt_report *r,
 					<programlisting>bool
 ocrpt_report_add_iteration_cb(ocrpt_report *r,
                               ocrpt_report_cb func,
-                              void *data);</programlisting>
+                              void *data);
+
+bool
+ocrpt_report_add_iteration_cb2(opencreport *o,
+                               ocrpt_report_cb func,
+                               void *data);</programlisting>
+				</para>
+				<para>
+					The second variant adds the callback in the
+					<literal>opencreport</literal> structure
+					context, making the callback apply to
+					every report. It's for RLIB compatibility.
 				</para>
 			</sect3>
 			<sect3>
@@ -2710,7 +2765,18 @@ ocrpt_report_add_iteration_cb(ocrpt_report *r,
 					<programlisting>bool
 ocrpt_report_add_precalculation_done_cb(ocrpt_report *r,
                                         ocrpt_report_cb func,
-                                        void *data);</programlisting>
+                                        void *data);
+
+bool
+ocrpt_report_add_precalculation_done_cb2(opencreport *o,
+                                         ocrpt_report_cb func,
+                                         void *data);</programlisting>
+				</para>
+				<para>
+					The second variant adds the callback in the
+					<literal>opencreport</literal> structure
+					context, making the callback apply to
+					every report. It's for RLIB compatibility.
 				</para>
 			</sect3>
 			<sect3>

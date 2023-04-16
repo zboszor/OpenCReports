@@ -189,7 +189,13 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 		freelocale(o->locale);
 
 	ocrpt_list_free_deep(o->part_added_callbacks, ocrpt_mem_free);
+	ocrpt_list_free_deep(o->part_iteration_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(o->report_added_callbacks, ocrpt_mem_free);
+	ocrpt_list_free_deep(o->report_start_callbacks, ocrpt_mem_free);
+	ocrpt_list_free_deep(o->report_iteration_callbacks, ocrpt_mem_free);
+	ocrpt_list_free_deep(o->report_done_callbacks, ocrpt_mem_free);
+	ocrpt_list_free_deep(o->report_newrow_callbacks, ocrpt_mem_free);
+	ocrpt_list_free_deep(o->report_precalc_done_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(o->precalc_done_callbacks, ocrpt_mem_free);
 
 	ocrpt_list_free_deep(o->search_paths, ocrpt_free_search_path);
@@ -395,7 +401,15 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		}
 
 		if (!o->precalculate) {
-			for (ocrpt_list *cbl = r->newrow_callbacks; cbl; cbl = cbl->next) {
+			ocrpt_list *cbl;
+
+			for (cbl = r->newrow_callbacks; cbl; cbl = cbl->next) {
+				ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+				cbd->func(o, r, cbd->data);
+			}
+
+			for (cbl = o->report_newrow_callbacks; cbl; cbl = cbl->next) {
 				ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
 
 				cbd->func(o, r, cbd->data);
@@ -1020,6 +1034,12 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 								cbd->func(o, r, cbd->data);
 							}
+
+							for (cbl = o->report_start_callbacks; cbl; cbl = cbl->next) {
+								ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+								cbd->func(o, r, cbd->data);
+							}
 						}
 
 						for (r->current_iteration = 0; !r->suppress && (r->current_iteration < r->iterations); r->current_iteration++) {
@@ -1074,17 +1094,36 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 									cbd->func(o, r, cbd->data);
 								}
+
+								for (cbl = o->report_iteration_callbacks; cbl; cbl = cbl->next) {
+									ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+									cbd->func(o, r, cbd->data);
+								}
 							}
 						}
 
 						if (o->precalculate) {
-							for (ocrpt_list *cbl = r->precalc_done_callbacks; cbl; cbl = cbl->next) {
+							ocrpt_list *cbl;
+							for (cbl = r->precalc_done_callbacks; cbl; cbl = cbl->next) {
+								ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+								cbd->func(o, r, cbd->data);
+							}
+
+							for (cbl = o->report_precalc_done_callbacks; cbl; cbl = cbl->next) {
 								ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
 
 								cbd->func(o, r, cbd->data);
 							}
 						} else {
 							for (cbl = r->done_callbacks; cbl; cbl = cbl->next) {
+								ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+								cbd->func(o, r, cbd->data);
+							}
+
+							for (cbl = o->report_done_callbacks; cbl; cbl = cbl->next) {
 								ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
 
 								cbd->func(o, r, cbd->data);
@@ -1176,7 +1215,15 @@ static void ocrpt_execute_parts(opencreport *o) {
 			}
 
 			if (!o->precalculate) {
-				for (ocrpt_list *cbl = p->iteration_callbacks; cbl; cbl = cbl->next) {
+				ocrpt_list *cbl;
+
+				for (cbl = p->iteration_callbacks; cbl; cbl = cbl->next) {
+					ocrpt_part_cb_data *cbd = (ocrpt_part_cb_data *)cbl->data;
+
+					cbd->func(o, p, cbd->data);
+				}
+
+				for (cbl = o->part_iteration_callbacks; cbl; cbl = cbl->next) {
 					ocrpt_part_cb_data *cbd = (ocrpt_part_cb_data *)cbl->data;
 
 					cbd->func(o, p, cbd->data);

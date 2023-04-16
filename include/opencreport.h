@@ -794,26 +794,32 @@ bool ocrpt_add_precalculation_done_cb(opencreport *o, ocrpt_cb func, void *data)
  * Add a "part iteration" callback
  */
 bool ocrpt_part_add_iteration_cb(ocrpt_part *p, ocrpt_part_cb func, void *data);
+bool ocrpt_part_add_iteration_cb2(opencreport *o, ocrpt_part_cb func, void *data);
 /*
  * Add a "report started" callback
  */
 bool ocrpt_report_add_start_cb(ocrpt_report *r, ocrpt_report_cb func, void *data);
+bool ocrpt_report_add_start_cb2(opencreport *o, ocrpt_report_cb func, void *data);
 /*
  * Add "report done" callback
  */
 bool ocrpt_report_add_done_cb(ocrpt_report *r, ocrpt_report_cb func, void *data);
+bool ocrpt_report_add_done_cb2(opencreport *o, ocrpt_report_cb func, void *data);
 /*
  * Add a "new row" callback
  */
 bool ocrpt_report_add_new_row_cb(ocrpt_report *r, ocrpt_report_cb func, void *data);
+bool ocrpt_report_add_new_row_cb2(opencreport *o, ocrpt_report_cb func, void *data);
 /*
  * Add a "report iteration" callback
  */
 bool ocrpt_report_add_iteration_cb(ocrpt_report *r, ocrpt_report_cb func, void *data);
+bool ocrpt_report_add_iteration_cb2(opencreport *o, ocrpt_report_cb func, void *data);
 /*
  * Add a "report precalculation done" callback
  */
 bool ocrpt_report_add_precalculation_done_cb(ocrpt_report *r, ocrpt_report_cb func, void *data);
+bool ocrpt_report_add_precalculation_done_cb2(opencreport *o, ocrpt_report_cb func, void *data);
 /*
  * Add break trigger callback
  */

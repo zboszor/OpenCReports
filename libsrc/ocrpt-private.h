@@ -84,7 +84,13 @@ struct opencreport {
 
 	/* List of ocrpt_report_cb elements */
 	ocrpt_list *part_added_callbacks;
+	ocrpt_list *part_iteration_callbacks;
 	ocrpt_list *report_added_callbacks;
+	ocrpt_list *report_start_callbacks;
+	ocrpt_list *report_iteration_callbacks;
+	ocrpt_list *report_done_callbacks;
+	ocrpt_list *report_newrow_callbacks;
+	ocrpt_list *report_precalc_done_callbacks;
 	ocrpt_list *precalc_done_callbacks;
 
 	/* Output buffer for spooling */
