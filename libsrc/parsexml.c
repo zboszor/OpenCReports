@@ -1144,7 +1144,7 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_report_set_main_query_from_expr(r, (char *)query);
 
 	if (field_header_priority)
-		ocrpt_report_set_fieldheader_high_priority(r, (char *)field_header_priority);
+		ocrpt_report_set_fieldheader_priority(r, (char *)field_header_priority);
 
 	if (!pd->border_width_expr && border_width)
 		ocrpt_part_column_set_border_width(pd, (char *)border_width);

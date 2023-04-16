@@ -83,7 +83,7 @@ struct ocrpt_report {
 	ocrpt_expr *font_size_expr;
 	ocrpt_expr *iterations_expr;
 	ocrpt_expr *suppress_expr;
-	ocrpt_expr *fieldheader_high_priority_expr;
+	ocrpt_expr *fieldheader_priority_expr;
 
 	/*
 	 * How many times should this report run

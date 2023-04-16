@@ -841,10 +841,10 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 				if (r->suppress_expr)
 					r->suppress = !!ocrpt_expr_get_long_value(r->suppress_expr);
 
-				ocrpt_expr_resolve_nowarn(r->fieldheader_high_priority_expr);
-				ocrpt_expr_optimize(r->fieldheader_high_priority_expr);
-				if (r->fieldheader_high_priority_expr) {
-					const char *fhprio = ocrpt_expr_get_string_value(r->fieldheader_high_priority_expr);
+				ocrpt_expr_resolve_nowarn(r->fieldheader_priority_expr);
+				ocrpt_expr_optimize(r->fieldheader_priority_expr);
+				if (r->fieldheader_priority_expr) {
+					const char *fhprio = ocrpt_expr_get_string_value(r->fieldheader_priority_expr);
 					r->fieldheader_high_priority = fhprio && (strcasecmp(fhprio, "high") == 0);
 				}
 

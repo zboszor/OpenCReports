@@ -2014,8 +2014,8 @@ ocrpt_report_set_height(ocrpt_report *r,
 						and <literal>low</literal>. Default is
 						<literal>low</literal>.
 						<programlisting>void
-ocrpt_report_set_fieldheader_high_priority(ocrpt_report *r,
-                                           const char *expr_string);</programlisting>
+ocrpt_report_set_fieldheader_priority(ocrpt_report *r,
+                                      const char *expr_string);</programlisting>
 					</para>
 				</sect4>
 			</sect3>

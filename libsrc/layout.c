@@ -2149,15 +2149,15 @@ DLL_EXPORT_SYM void ocrpt_report_set_height(ocrpt_report *r, const char *expr_st
 	r->height_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_fieldheader_high_priority(ocrpt_report *r, const char *expr_string) {
+DLL_EXPORT_SYM void ocrpt_report_set_fieldheader_priority(ocrpt_report *r, const char *expr_string) {
 	if (!r)
 		return;
 
-	ocrpt_expr_free(r->fieldheader_high_priority_expr);
-	r->fieldheader_high_priority_expr = NULL;
+	ocrpt_expr_free(r->fieldheader_priority_expr);
+	r->fieldheader_priority_expr = NULL;
 
 	if (!expr_string)
 		return;
 
-	r->fieldheader_high_priority_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
+	r->fieldheader_priority_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
 }

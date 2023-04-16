@@ -856,7 +856,7 @@ void ocrpt_report_set_iterations(ocrpt_report *r, const char *expr_string);
 void ocrpt_report_set_font_name(ocrpt_report *r, const char *expr_string);
 void ocrpt_report_set_font_size(ocrpt_report *r, const char *expr_string);
 void ocrpt_report_set_height(ocrpt_report *r, const char *expr_string);
-void ocrpt_report_set_fieldheader_high_priority(ocrpt_report *r, const char *expr_string);
+void ocrpt_report_set_fieldheader_priority(ocrpt_report *r, const char *expr_string);
 
 void ocrpt_layout_part_page_header_set_report(ocrpt_part *p, ocrpt_report *r);
 ocrpt_output *ocrpt_layout_part_page_header(ocrpt_part *p);
