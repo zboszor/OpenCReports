@@ -226,6 +226,7 @@ PHP_PDF_TESTS = \
 	layout_pdf_xml38_test \
 	layout_pdf_xml39_test \
 	layout_pdf_xml40_test \
+	layout_pdf41_test \
 	layout_pdf_xml41_test \
 	layout_pdf_xml42_test
 
@@ -242,6 +243,7 @@ PDF_TESTS += \
 	layout_pdf_translate_xml1_test
 
 PHP_PDF_TESTS += \
+	layout_pdf_translate1_test \
 	layout_pdf_translate_xml1_test
 
 endif

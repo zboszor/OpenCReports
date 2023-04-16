@@ -62,6 +62,10 @@ static zend_object_handlers opencreport_report_object_handlers;
 static zend_object_handlers opencreport_variable_object_handlers;
 static zend_object_handlers opencreport_break_object_handlers;
 static zend_object_handlers opencreport_output_object_handlers;
+static zend_object_handlers opencreport_line_object_handlers;
+static zend_object_handlers opencreport_hline_object_handlers;
+static zend_object_handlers opencreport_image_object_handlers;
+static zend_object_handlers opencreport_text_object_handlers;
 
 /* Class entries */
 zend_class_entry *opencreport_ce;
@@ -77,6 +81,10 @@ zend_class_entry *opencreport_report_ce;
 zend_class_entry *opencreport_variable_ce;
 zend_class_entry *opencreport_break_ce;
 zend_class_entry *opencreport_output_ce;
+zend_class_entry *opencreport_line_ce;
+zend_class_entry *opencreport_hline_ce;
+zend_class_entry *opencreport_image_ce;
+zend_class_entry *opencreport_text_ce;
 
 static zend_object *opencreport_object_new(zend_class_entry *class_type) /* {{{ */
 {
@@ -317,6 +325,66 @@ static zend_object *opencreport_output_object_new(zend_class_entry *class_type) 
 	object_properties_init(&intern->zo, class_type);
 
 	intern->zo.handlers = &opencreport_output_object_handlers;
+
+	return &intern->zo;
+}
+/* }}} */
+
+static zend_object *opencreport_line_object_new(zend_class_entry *class_type) /* {{{ */
+{
+	php_opencreport_line_object *intern;
+
+	intern = zend_object_alloc(sizeof(php_opencreport_line_object), class_type);
+
+	zend_object_std_init(&intern->zo, class_type);
+	object_properties_init(&intern->zo, class_type);
+
+	intern->zo.handlers = &opencreport_line_object_handlers;
+
+	return &intern->zo;
+}
+/* }}} */
+
+static zend_object *opencreport_hline_object_new(zend_class_entry *class_type) /* {{{ */
+{
+	php_opencreport_hline_object *intern;
+
+	intern = zend_object_alloc(sizeof(php_opencreport_hline_object), class_type);
+
+	zend_object_std_init(&intern->zo, class_type);
+	object_properties_init(&intern->zo, class_type);
+
+	intern->zo.handlers = &opencreport_hline_object_handlers;
+
+	return &intern->zo;
+}
+/* }}} */
+
+static zend_object *opencreport_image_object_new(zend_class_entry *class_type) /* {{{ */
+{
+	php_opencreport_image_object *intern;
+
+	intern = zend_object_alloc(sizeof(php_opencreport_image_object), class_type);
+
+	zend_object_std_init(&intern->zo, class_type);
+	object_properties_init(&intern->zo, class_type);
+
+	intern->zo.handlers = &opencreport_image_object_handlers;
+
+	return &intern->zo;
+}
+/* }}} */
+
+static zend_object *opencreport_text_object_new(zend_class_entry *class_type) /* {{{ */
+{
+	php_opencreport_text_object *intern;
+
+	intern = zend_object_alloc(sizeof(php_opencreport_text_object), class_type);
+
+	zend_object_std_init(&intern->zo, class_type);
+	object_properties_init(&intern->zo, class_type);
+
+	intern->zo.handlers = &opencreport_text_object_handlers;
 
 	return &intern->zo;
 }
@@ -4035,7 +4103,806 @@ static const zend_function_entry opencreport_break_class_methods[] = {
 	PHP_FE_END
 };
 
+PHP_METHOD(opencreport_output, set_suppress) {
+	zval *object = ZEND_THIS;
+	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_output_set_suppress(oo->output, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_output, add_line) {
+	zval *object = ZEND_THIS;
+	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
+	ocrpt_line *l;
+	php_opencreport_line_object *lo;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	l = ocrpt_output_add_line(oo->output);
+	if (!l)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_line_ce);
+	lo = Z_OPENCREPORT_LINE_P(return_value);
+	lo->line = l;
+}
+
+PHP_METHOD(opencreport_output, add_hline) {
+	zval *object = ZEND_THIS;
+	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
+	ocrpt_hline *hl;
+	php_opencreport_hline_object *hlo;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	hl = ocrpt_output_add_hline(oo->output);
+	if (!hl)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_hline_ce);
+	hlo = Z_OPENCREPORT_HLINE_P(return_value);
+	hlo->hline = hl;
+}
+
+PHP_METHOD(opencreport_output, add_image) {
+	zval *object = ZEND_THIS;
+	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
+	ocrpt_image *im;
+	php_opencreport_image_object *imo;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	im = ocrpt_output_add_image(oo->output);
+	if (!im)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_image_ce);
+	imo = Z_OPENCREPORT_IMAGE_P(return_value);
+	imo->image = im;
+}
+
+PHP_METHOD(opencreport_output, add_image_end) {
+	zval *object = ZEND_THIS;
+	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_output_add_image_end(oo->output);
+}
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_output_set_suppress, 0, 0, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_output_add_line, 0, 1, OpenCReport\\Line, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_output_add_hline, 0, 1, OpenCReport\\HorizontalLine, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_output_add_image, 0, 1, OpenCReport\\Image, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_output_add_image_end, 0, 0, IS_VOID, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry opencreport_output_class_methods[] = {
+	PHP_ME(opencreport_output, set_suppress, arginfo_opencreport_output_set_suppress, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_output, add_line, arginfo_opencreport_output_add_line, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_output, add_hline, arginfo_opencreport_output_add_hline, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_output, add_image, arginfo_opencreport_output_add_image, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_output, add_image_end, arginfo_opencreport_output_add_image_end, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_FE_END
+};
+
+PHP_METHOD(opencreport_line, set_font_name) {
+	zval *object = ZEND_THIS;
+	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_line_set_font_name(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_line, set_font_size) {
+	zval *object = ZEND_THIS;
+	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_line_set_font_size(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_line, set_bold) {
+	zval *object = ZEND_THIS;
+	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_line_set_bold(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_line, set_italic) {
+	zval *object = ZEND_THIS;
+	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_line_set_italic(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_line, set_suppress) {
+	zval *object = ZEND_THIS;
+	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_line_set_suppress(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_line, set_color) {
+	zval *object = ZEND_THIS;
+	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_line_set_color(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_line, set_bgcolor) {
+	zval *object = ZEND_THIS;
+	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_line_set_bgcolor(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_line, add_text) {
+	zval *object = ZEND_THIS;
+	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+	ocrpt_text *t;
+	php_opencreport_text_object *to;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	t = ocrpt_line_add_text(lo->line);
+	if (!t)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_text_ce);
+	to = Z_OPENCREPORT_TEXT_P(return_value);
+	to->text = t;
+}
+
+PHP_METHOD(opencreport_line, add_image) {
+	zval *object = ZEND_THIS;
+	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+	ocrpt_image *im;
+	php_opencreport_image_object *imo;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	im = ocrpt_line_add_image(lo->line);
+	if (!im)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_image_ce);
+	imo = Z_OPENCREPORT_IMAGE_P(return_value);
+	imo->image = im;
+}
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_font_name, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_font_size, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_bold, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_italic, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_suppress, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_color, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_bgcolor, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_line_add_text, 0, 1, OpenCReport\\Text, 1)
+ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_line_add_image, 0, 1, OpenCReport\\Image, 1)
+ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+static const zend_function_entry opencreport_line_class_methods[] = {
+	PHP_ME(opencreport_line, set_font_name, arginfo_opencreport_line_set_font_name, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_line, set_font_size, arginfo_opencreport_line_set_font_size, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_line, set_bold, arginfo_opencreport_line_set_bold, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_line, set_italic, arginfo_opencreport_line_set_italic, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_line, set_suppress, arginfo_opencreport_line_set_suppress, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_line, set_color, arginfo_opencreport_line_set_color, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_line, set_bgcolor, arginfo_opencreport_line_set_bgcolor, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_line, add_text, arginfo_opencreport_line_add_text, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_line, add_image, arginfo_opencreport_line_add_image, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_FE_END
+};
+
+PHP_METHOD(opencreport_hline, set_size) {
+	zval *object = ZEND_THIS;
+	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_hline_set_size(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_hline, set_indent) {
+	zval *object = ZEND_THIS;
+	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_hline_set_indent(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_hline, set_length) {
+	zval *object = ZEND_THIS;
+	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_hline_set_length(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_hline, set_font_size) {
+	zval *object = ZEND_THIS;
+	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_hline_set_font_size(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_hline, set_suppress) {
+	zval *object = ZEND_THIS;
+	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_hline_set_suppress(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_hline, set_color) {
+	zval *object = ZEND_THIS;
+	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_hline_set_color(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_size, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_indent, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_length, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_font_size, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_suppress, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_color, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+static const zend_function_entry opencreport_hline_class_methods[] = {
+	PHP_ME(opencreport_hline, set_size, arginfo_opencreport_hline_set_size, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_hline, set_indent, arginfo_opencreport_hline_set_indent, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_hline, set_length, arginfo_opencreport_hline_set_length, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_hline, set_font_size, arginfo_opencreport_hline_set_font_size, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_hline, set_suppress, arginfo_opencreport_hline_set_suppress, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_hline, set_color, arginfo_opencreport_hline_set_color, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_FE_END
+};
+
+PHP_METHOD(opencreport_image, set_value) {
+	zval *object = ZEND_THIS;
+	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_image_set_value(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_image, set_suppress) {
+	zval *object = ZEND_THIS;
+	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_image_set_suppress(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_image, set_type) {
+	zval *object = ZEND_THIS;
+	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_image_set_type(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_image, set_width) {
+	zval *object = ZEND_THIS;
+	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_image_set_width(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_image, set_height) {
+	zval *object = ZEND_THIS;
+	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_image_set_height(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_image, set_alignment) {
+	zval *object = ZEND_THIS;
+	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_image_set_alignment(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_image, set_bgcolor) {
+	zval *object = ZEND_THIS;
+	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_image_set_bgcolor(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_image, set_text_width) {
+	zval *object = ZEND_THIS;
+	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_image_set_text_width(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_value, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_suppress, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_type, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_width, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_height, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_alignment, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_bgcolor, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_text_width, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+static const zend_function_entry opencreport_image_class_methods[] = {
+	PHP_ME(opencreport_image, set_value, arginfo_opencreport_image_set_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_image, set_suppress, arginfo_opencreport_image_set_suppress, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_image, set_type, arginfo_opencreport_image_set_type, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_image, set_width, arginfo_opencreport_image_set_width, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_image, set_height, arginfo_opencreport_image_set_height, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_image, set_alignment, arginfo_opencreport_image_set_alignment, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_image, set_bgcolor, arginfo_opencreport_image_set_bgcolor, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_image, set_text_width, arginfo_opencreport_image_set_text_width, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_FE_END
+};
+
+PHP_METHOD(opencreport_text, set_value_string) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_value_string(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_value_expr) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_value_expr(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_value_delayed) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_value_delayed(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_format) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_format(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_translate) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_translate(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_width) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_width(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_alignment) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_alignment(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_color) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_color(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_bgcolor) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_bgcolor(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_font_name) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_font_name(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_font_size) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_font_size(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_bold) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_bold(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_italic) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_italic(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_link) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_link(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_memo) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_memo(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_memo_wrap_chars) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_memo_wrap_chars(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_text, set_memo_max_lines) {
+	zval *object = ZEND_THIS;
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_text_set_memo_max_lines(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_value_string, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_value_expr, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_value_delayed, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_format, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_translate, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_width, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_alignment, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_color, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_bgcolor, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_font_name, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_font_size, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_bold, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_italic, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_link, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_memo, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_memo_wrap_chars, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_memo_max_lines, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+static const zend_function_entry opencreport_text_class_methods[] = {
+	PHP_ME(opencreport_text, set_value_string, arginfo_opencreport_text_set_value_string, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_value_expr, arginfo_opencreport_text_set_value_expr, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_value_delayed, arginfo_opencreport_text_set_value_delayed, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_format, arginfo_opencreport_text_set_format, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_translate, arginfo_opencreport_text_set_translate, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_width, arginfo_opencreport_text_set_width, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_alignment, arginfo_opencreport_text_set_alignment, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_color, arginfo_opencreport_text_set_color, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_bgcolor, arginfo_opencreport_text_set_bgcolor, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_font_name, arginfo_opencreport_text_set_font_name, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_font_size, arginfo_opencreport_text_set_font_size, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_bold, arginfo_opencreport_text_set_bold, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_italic, arginfo_opencreport_text_set_italic, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_link, arginfo_opencreport_text_set_link, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_memo, arginfo_opencreport_text_set_memo, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_memo_wrap_chars, arginfo_opencreport_text_set_memo_wrap_chars, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_memo_max_lines, arginfo_opencreport_text_set_memo_max_lines, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 
@@ -4498,6 +5365,66 @@ static PHP_MINIT_FUNCTION(opencreport)
 #else
 	opencreport_output_ce->serialize = zend_class_serialize_deny;
 	opencreport_output_ce->unserialize = zend_class_unserialize_deny;
+#endif
+
+	memcpy(&opencreport_line_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Line", opencreport_line_class_methods);
+	ce.create_object = opencreport_line_object_new;
+	opencreport_line_object_handlers.offset = XtOffsetOf(php_opencreport_line_object, zo);
+	opencreport_line_object_handlers.clone_obj = NULL;
+	opencreport_line_object_handlers.compare = zend_objects_not_comparable;
+	opencreport_line_ce = zend_register_internal_class(&ce);
+	opencreport_line_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	opencreport_line_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
+	opencreport_line_ce->serialize = zend_class_serialize_deny;
+	opencreport_line_ce->unserialize = zend_class_unserialize_deny;
+#endif
+
+	memcpy(&opencreport_hline_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "HorizontalLine", opencreport_hline_class_methods);
+	ce.create_object = opencreport_hline_object_new;
+	opencreport_hline_object_handlers.offset = XtOffsetOf(php_opencreport_hline_object, zo);
+	opencreport_hline_object_handlers.clone_obj = NULL;
+	opencreport_hline_object_handlers.compare = zend_objects_not_comparable;
+	opencreport_hline_ce = zend_register_internal_class(&ce);
+	opencreport_hline_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	opencreport_hline_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
+	opencreport_hline_ce->serialize = zend_class_serialize_deny;
+	opencreport_hline_ce->unserialize = zend_class_unserialize_deny;
+#endif
+
+	memcpy(&opencreport_image_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Image", opencreport_image_class_methods);
+	ce.create_object = opencreport_image_object_new;
+	opencreport_image_object_handlers.offset = XtOffsetOf(php_opencreport_image_object, zo);
+	opencreport_image_object_handlers.clone_obj = NULL;
+	opencreport_image_object_handlers.compare = zend_objects_not_comparable;
+	opencreport_image_ce = zend_register_internal_class(&ce);
+	opencreport_image_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	opencreport_image_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
+	opencreport_image_ce->serialize = zend_class_serialize_deny;
+	opencreport_image_ce->unserialize = zend_class_unserialize_deny;
+#endif
+
+	memcpy(&opencreport_text_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Text", opencreport_text_class_methods);
+	ce.create_object = opencreport_text_object_new;
+	opencreport_text_object_handlers.offset = XtOffsetOf(php_opencreport_text_object, zo);
+	opencreport_text_object_handlers.clone_obj = NULL;
+	opencreport_text_object_handlers.compare = zend_objects_not_comparable;
+	opencreport_text_ce = zend_register_internal_class(&ce);
+	opencreport_text_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	opencreport_text_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
+	opencreport_text_ce->serialize = zend_class_serialize_deny;
+	opencreport_text_ce->unserialize = zend_class_unserialize_deny;
 #endif
 
 	REGISTER_OPENCREPORT_CLASS_CONST_LONG("EXPR_RESULTS", OCRPT_EXPR_RESULTS);

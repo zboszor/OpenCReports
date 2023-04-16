@@ -179,4 +179,48 @@ static inline php_opencreport_output_object *php_opencreport_output_from_obj(zen
 
 #define Z_OPENCREPORT_OUTPUT_P(zv) php_opencreport_output_from_obj(Z_OBJ_P((zv)))
 
+typedef struct _php_opencreport_line_object {
+	ocrpt_line *line;
+	zend_object zo;
+} php_opencreport_line_object;
+
+static inline php_opencreport_line_object *php_opencreport_line_from_obj(zend_object *obj) {
+	return (php_opencreport_line_object *)((char *)(obj) - XtOffsetOf(php_opencreport_line_object, zo));
+}
+
+#define Z_OPENCREPORT_LINE_P(zv) php_opencreport_line_from_obj(Z_OBJ_P((zv)))
+
+typedef struct _php_opencreport_hline_object {
+	ocrpt_hline *hline;
+	zend_object zo;
+} php_opencreport_hline_object;
+
+static inline php_opencreport_hline_object *php_opencreport_hline_from_obj(zend_object *obj) {
+	return (php_opencreport_hline_object *)((char *)(obj) - XtOffsetOf(php_opencreport_hline_object, zo));
+}
+
+#define Z_OPENCREPORT_HLINE_P(zv) php_opencreport_hline_from_obj(Z_OBJ_P((zv)))
+
+typedef struct _php_opencreport_image_object {
+	ocrpt_image *image;
+	zend_object zo;
+} php_opencreport_image_object;
+
+static inline php_opencreport_image_object *php_opencreport_image_from_obj(zend_object *obj) {
+	return (php_opencreport_image_object *)((char *)(obj) - XtOffsetOf(php_opencreport_image_object, zo));
+}
+
+#define Z_OPENCREPORT_IMAGE_P(zv) php_opencreport_image_from_obj(Z_OBJ_P((zv)))
+
+typedef struct _php_opencreport_text_object {
+	ocrpt_text *text;
+	zend_object zo;
+} php_opencreport_text_object;
+
+static inline php_opencreport_text_object *php_opencreport_text_from_obj(zend_object *obj) {
+	return (php_opencreport_text_object *)((char *)(obj) - XtOffsetOf(php_opencreport_text_object, zo));
+}
+
+#define Z_OPENCREPORT_TEXT_P(zv) php_opencreport_text_from_obj(Z_OBJ_P((zv)))
+
 #endif /* PHP_OPENCREPORT_H */
