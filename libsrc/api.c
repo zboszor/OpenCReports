@@ -72,7 +72,7 @@ static const ocrpt_paper *system_paper;
 int n_papersizes;
 
 DLL_EXPORT_SYM const char *ocrpt_version(void) {
-	return VERSION;
+	return "OpenCReports " VERSION;
 }
 
 DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
