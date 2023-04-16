@@ -14,6 +14,14 @@ Currently missing features
 * output formats other than PDF
 * graphing and barcodes (Graph, Chart and Barcode XML elements)
 
+Roadmap
+
+* 0.7: PHP binding complete with RLIB compatibility API and PHP API documentation
+* 0.8: Output drivers for HTML / TXT / CSV plus JSON as extra
+* 0.9: Graph / Chart / Barcode in PDF (full feature parity with RLIB, with many extras)
+* 1.0: GUI to create either code or XML
+* 1.1: Possibly port the reporting library part to Windows and Android, GUI to Windows
+
 ## Documentation
 
 [OpenCReports documentation](https://zboszor.github.io/OpenCReports-docs/book1.html)
