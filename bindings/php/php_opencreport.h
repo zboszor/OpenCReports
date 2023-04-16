@@ -168,4 +168,15 @@ static inline php_opencreport_break_object *php_opencreport_break_from_obj(zend_
 
 #define Z_OPENCREPORT_BREAK_P(zv) php_opencreport_break_from_obj(Z_OBJ_P((zv)))
 
+typedef struct _php_opencreport_output_object {
+	ocrpt_output *output;
+	zend_object zo;
+} php_opencreport_output_object;
+
+static inline php_opencreport_output_object *php_opencreport_output_from_obj(zend_object *obj) {
+	return (php_opencreport_output_object *)((char *)(obj) - XtOffsetOf(php_opencreport_output_object, zo));
+}
+
+#define Z_OPENCREPORT_OUTPUT_P(zv) php_opencreport_output_from_obj(Z_OBJ_P((zv)))
+
 #endif /* PHP_OPENCREPORT_H */
