@@ -44,10 +44,6 @@
 	}
 /* }}} */
 
-/* Global list of callback data */
-static ocrpt_list *funcnames;
-static ocrpt_list *funcnames_last;
-
 /* Handlers */
 static zend_object_handlers opencreport_object_handlers;
 static zend_object_handlers opencreport_ds_object_handlers;
@@ -489,7 +485,30 @@ PHP_METHOD(opencreport, get_output) {
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	size_t sz = 0;
-	char *res = ocrpt_get_output(oo->o, &sz);
+	const char *res = ocrpt_get_output(oo->o, &sz);
+
+	if (!res)
+		RETURN_FALSE;
+
+	RETURN_STRINGL(res, sz);
+}
+
+PHP_METHOD(opencreport, get_content_type) {
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	size_t sz = 0;
+	const char *res = ocrpt_get_content_type(oo->o, &sz);
+
+	if (!res)
+		RETURN_FALSE;
 
 	RETURN_STRINGL(res, sz);
 }
@@ -938,11 +957,11 @@ PHP_METHOD(opencreport, expr_parse) {
 	char *err = NULL;
 	ocrpt_expr *e = ocrpt_expr_parse(oo->o, ZSTR_VAL(expr_string), &err);
 
+	ocrpt_strfree(oo->expr_error);
 	if (e) {
 		object_init_ex(return_value, opencreport_expr_ce);
 		php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
 		eo->e = e;
-		ocrpt_strfree(oo->expr_error);
 		oo->expr_error = NULL;
 	} else {
 		oo->expr_error = err;
@@ -968,12 +987,12 @@ PHP_METHOD(opencreport, expr_error) {
 }
 
 OCRPT_STATIC_FUNCTION(opencreport_default_function) {
-	char *fname = user_data;
+	zend_string *fname = user_data;
 	zval zfname;
 
 	ocrpt_expr_make_error_result(e, "not implemented");
 
-	ZVAL_STRING(&zfname, fname);
+	ZVAL_STRINGL(&zfname, ZSTR_VAL(fname), ZSTR_LEN(fname));
 
 	zval retval;
 	zval params[1];
@@ -1085,15 +1104,10 @@ PHP_METHOD(opencreport, function_add) {
 		Z_PARAM_BOOL(dont_optimize);
 	ZEND_PARSE_PARAMETERS_END();
 
-	char *zfunc = ocrpt_mem_strdup(ZSTR_VAL(zend_func_name));
+	zend_string *zfunc = zend_string_init(ZSTR_VAL(zend_func_name), ZSTR_LEN(zend_func_name), false);
 	bool ret = ocrpt_function_add(oo->o, ZSTR_VAL(expr_func_name), opencreport_default_function, zfunc, n_ops, commutative, associative, left_associative, dont_optimize);
 
-	if (!ret) {
-		ocrpt_strfree(zfunc);
-		RETURN_FALSE;
-	}
-
-	RETURN_TRUE;
+	RETURN_BOOL(ret);
 }
 
 static ocrpt_result *php_opencreport_env_query(opencreport *o, const char *env) {
@@ -1136,10 +1150,10 @@ static ocrpt_result *php_opencreport_env_query(opencreport *o, const char *env) 
 }
 
 static void opencreport_cb(opencreport *o, void *data) {
-	char *callback = data;
+	zend_string *callback = data;
 	zval zfname;
 
-	ZVAL_STRING(&zfname, callback);
+	ZVAL_STRINGL(&zfname, ZSTR_VAL(callback), ZSTR_LEN(callback));
 
 	zval retval;
 	zval params[1];
@@ -1162,10 +1176,10 @@ static void opencreport_cb(opencreport *o, void *data) {
 }
 
 static void opencreport_part_cb(opencreport *o, ocrpt_part *p, void *data) {
-	char *callback = data;
+	zend_string *callback = data;
 	zval zfname;
 
-	ZVAL_STRING(&zfname, callback);
+	ZVAL_STRINGL(&zfname, ZSTR_VAL(callback), ZSTR_LEN(callback));
 
 	zval retval;
 	zval params[2];
@@ -1202,9 +1216,7 @@ PHP_METHOD(opencreport, add_precalculation_done_cb) {
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
 
-	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
-
-	funcnames = ocrpt_list_end_append(funcnames, &funcnames_last, cb_name);
+	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
 
 	ocrpt_add_precalculation_done_cb(oo->o, opencreport_cb, cb_name);
 }
@@ -1218,18 +1230,16 @@ PHP_METHOD(opencreport, add_part_added_cb) {
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
 
-	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
-
-	funcnames = ocrpt_list_end_append(funcnames, &funcnames_last, cb_name);
+	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
 
 	ocrpt_add_part_added_cb(oo->o, opencreport_part_cb, cb_name);
 }
 
 static void opencreport_report_cb(opencreport *o, ocrpt_report *r, void *data) {
-	char *callback = data;
+	zend_string *callback = data;
 	zval zfname;
 
-	ZVAL_STRING(&zfname, callback);
+	ZVAL_STRINGL(&zfname, ZSTR_VAL(callback), ZSTR_LEN(callback));
 
 	zval retval;
 	zval params[2];
@@ -1266,9 +1276,7 @@ PHP_METHOD(opencreport, add_report_added_cb) {
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
 
-	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
-
-	funcnames = ocrpt_list_end_append(funcnames, &funcnames_last, cb_name);
+	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
 
 	ocrpt_add_report_added_cb(oo->o, opencreport_report_cb, cb_name);
 }
@@ -1454,6 +1462,9 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_get_output, 0, 0, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_get_content_type, 0, 0, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_version, 0, 0, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
@@ -1611,6 +1622,7 @@ static const zend_function_entry opencreport_class_methods[] = {
 	PHP_ME(opencreport, execute, arginfo_opencreport_execute, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, spool, arginfo_opencreport_spool, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, get_output, arginfo_opencreport_get_output, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport, get_content_type, arginfo_opencreport_get_content_type, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, version, arginfo_opencreport_version, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL | ZEND_ACC_STATIC)
 	/*
 	 * Low level API
@@ -2582,9 +2594,7 @@ PHP_METHOD(opencreport_part, add_iteration_cb) {
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
 
-	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
-
-	funcnames = ocrpt_list_end_append(funcnames, &funcnames_last, cb_name);
+	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
 
 	ocrpt_part_add_iteration_cb(po->p, opencreport_part_cb, cb_name);
 }
@@ -3413,9 +3423,7 @@ PHP_METHOD(opencreport_report, add_start_cb) {
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
 
-	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
-
-	funcnames = ocrpt_list_end_append(funcnames, &funcnames_last, cb_name);
+	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
 
 	ocrpt_report_add_start_cb(pro->r, opencreport_report_cb, cb_name);
 }
@@ -3429,9 +3437,7 @@ PHP_METHOD(opencreport_report, add_done_cb) {
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
 
-	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
-
-	funcnames = ocrpt_list_end_append(funcnames, &funcnames_last, cb_name);
+	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
 
 	ocrpt_report_add_done_cb(pro->r, opencreport_report_cb, cb_name);
 }
@@ -3445,9 +3451,7 @@ PHP_METHOD(opencreport_report, add_new_row_cb) {
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
 
-	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
-
-	funcnames = ocrpt_list_end_append(funcnames, &funcnames_last, cb_name);
+	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
 
 	ocrpt_report_add_new_row_cb(pro->r, opencreport_report_cb, cb_name);
 }
@@ -3461,9 +3465,7 @@ PHP_METHOD(opencreport_report, add_iteration_cb) {
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
 
-	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
-
-	funcnames = ocrpt_list_end_append(funcnames, &funcnames_last, cb_name);
+	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
 
 	ocrpt_report_add_iteration_cb(pro->r, opencreport_report_cb, cb_name);
 }
@@ -3477,9 +3479,7 @@ PHP_METHOD(opencreport_report, add_precalculation_done_cb) {
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
 
-	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
-
-	funcnames = ocrpt_list_end_append(funcnames, &funcnames_last, cb_name);
+	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
 
 	ocrpt_report_add_precalculation_done_cb(pro->r, opencreport_report_cb, cb_name);
 }
@@ -4004,10 +4004,10 @@ PHP_METHOD(opencreport_break, reset_vars) {
 }
 
 static void opencreport_break_cb(opencreport *o, ocrpt_report *r, ocrpt_break *br, void *data) {
-	char *callback = data;
+	zend_string *callback = data;
 	zval zfname;
 
-	ZVAL_STRING(&zfname, callback);
+	ZVAL_STRINGL(&zfname, ZSTR_VAL(callback), ZSTR_LEN(callback));
 
 	zval retval;
 	zval params[3];
@@ -4051,9 +4051,7 @@ PHP_METHOD(opencreport_break, add_trigger_cb) {
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
 
-	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
-
-	funcnames = ocrpt_list_end_append(funcnames, &funcnames_last, cb_name);
+	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
 
 	ocrpt_break_add_trigger_cb(bro->br, opencreport_break_cb, cb_name);
 }
@@ -5491,9 +5489,6 @@ static PHP_RINIT_FUNCTION(opencreport) {
 	ALLOC_HASHTABLE(php_opencreport_arrays);
 	zend_hash_init(php_opencreport_arrays, 16, NULL, php_opencreport_array_dtor, 0);
 
-	funcnames = NULL;
-	funcnames_last = NULL;
-
 	return SUCCESS;
 }
 /* }}} */
@@ -5504,10 +5499,6 @@ static PHP_RSHUTDOWN_FUNCTION(opencreport) {
 	zend_hash_destroy(php_opencreport_arrays);
 	FREE_HASHTABLE(php_opencreport_arrays);
 	php_opencreport_arrays = NULL;
-
-	ocrpt_list_free_deep(funcnames, ocrpt_mem_free);
-	funcnames = NULL;
-	funcnames_last = NULL;
 
 	return SUCCESS;
 }
@@ -5526,6 +5517,12 @@ static PHP_MINFO_FUNCTION(opencreport)
 	php_info_print_table_end();
 }
 /* }}} */
+
+ZEND_FUNCTION(rlib_version) {
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_STRING(ocrpt_version());
+}
 
 ZEND_FUNCTION(rlib_init) {
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -5894,6 +5891,31 @@ ZEND_FUNCTION(rlib_add_resultset_follower_n_to_1) {
 	RETURN_BOOL(ocrpt_query_add_follower_n_to_1(leader_query, follower_query, match_expr));
 }
 
+ZEND_FUNCTION(rlib_set_datasource_encoding) {
+	zval *object;
+	zend_string *name, *encoding;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(name);
+		Z_PARAM_STR(encoding);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	ocrpt_datasource *ds = ocrpt_datasource_get(oo->o, ZSTR_VAL(name));
+
+	if (!ds)
+		return;
+
+	ocrpt_datasource_set_encoding(ds, ZSTR_VAL(encoding));
+}
+
 ZEND_FUNCTION(rlib_add_report) {
 	zval *object;
 	zend_string *filename;
@@ -5930,6 +5952,560 @@ ZEND_FUNCTION(rlib_add_report_from_buffer) {
 	}
 
 	RETURN_BOOL(ocrpt_parse_xml_from_buffer(oo->o, ZSTR_VAL(buffer), ZSTR_LEN(buffer)));
+}
+
+ZEND_FUNCTION(rlib_add_search_path) {
+	zval *object;
+	zend_string *path;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(path);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	ocrpt_add_search_path(oo->o, ZSTR_VAL(path));
+}
+
+ZEND_FUNCTION(rlib_set_locale) {
+	zval *object;
+	zend_string *locale;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(locale);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	ocrpt_set_locale(oo->o, ZSTR_VAL(locale));
+}
+
+ZEND_FUNCTION(rlib_bindtextdomain) {
+	zval *object;
+	zend_string *domainname;
+	zend_string *dirname;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(domainname);
+		Z_PARAM_STR(dirname);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	ocrpt_bindtextdomain(oo->o, ZSTR_VAL(domainname), ZSTR_VAL(dirname));
+}
+
+ZEND_FUNCTION(rlib_set_output_format_from_text) {
+	zval *object;
+	zend_string *format;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(format);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	ocrpt_format_type type = OCRPT_OUTPUT_UNSET;
+	const char *fmt = ZSTR_VAL(format);
+
+	if (strcasecmp(fmt, "pdf") == 0)
+		type = OCRPT_OUTPUT_PDF;
+	else if (strcasecmp(fmt, "html") == 0)
+		type = OCRPT_OUTPUT_HTML;
+	else if (strcasecmp(fmt, "txt") == 0 || strcasecmp(fmt, "text") == 0)
+		type = OCRPT_OUTPUT_TXT;
+	else if (strcasecmp(fmt, "csv") == 0)
+		type = OCRPT_OUTPUT_CSV;
+	else if (strcasecmp(fmt, "xml") == 0)
+		type = OCRPT_OUTPUT_XML;
+
+	if (type != OCRPT_OUTPUT_UNSET)
+		ocrpt_set_output_format(oo->o, type);
+	else
+		zend_throw_error(NULL, "Invalid output format!");
+}
+
+OCRPT_STATIC_FUNCTION(rlib_default_function) {
+	ocrpt_expr_make_error_result(e, "not implemented");
+
+	int32_t n_ops = ocrpt_expr_get_num_operands(e);
+
+	zval retval;
+	zval params[n_ops];
+
+	mpfr_ptr mval;
+	ocrpt_string *sval;
+
+	for (int32_t i = 0; i < n_ops; i++) {
+		ocrpt_result *rs = ocrpt_expr_operand_get_result(e, i);
+		switch (ocrpt_result_get_type(rs)) {
+		case OCRPT_RESULT_ERROR:
+			sval = ocrpt_result_get_string(rs);
+			ocrpt_expr_make_error_result(e, sval->str);
+			return;
+		case OCRPT_RESULT_STRING:
+			sval = ocrpt_result_get_string(rs);
+			ZVAL_STRINGL(&params[i], sval->str, sval->len);
+			break;
+		case OCRPT_RESULT_NUMBER:
+			/*
+			 * Naive representation.
+			 * MPFR number may exceed double precision.
+			 */
+			mval = ocrpt_result_get_number(rs);
+			ZVAL_DOUBLE(&params[i], mpfr_get_d(mval, MPFR_RNDN));
+			break;
+		case OCRPT_RESULT_DATETIME:
+			/* Not implemented yet */
+			ZVAL_NULL(&params[i]);
+			break;
+		}
+	}
+
+	char *fname = user_data;
+	zval zfname;
+
+	ZVAL_STRING(&zfname, fname);
+
+#if PHP_MAJOR_VERSION >= 8
+	if (call_user_function(CG(function_table), NULL, &zfname, &retval, n_ops, params) == FAILURE)
+#else
+	if (call_user_function_ex(CG(function_table), NULL, &zfname, &retval, n_ops, params, 0, NULL TSRMLS_CC) == FAILURE)
+#endif
+		return;
+
+	zend_string_release(Z_STR(zfname));
+
+	for (int32_t i = 0; i < n_ops; i++) {
+		ocrpt_result *rs = ocrpt_expr_operand_get_result(e, i);
+		switch (ocrpt_result_get_type(rs)) {
+		case OCRPT_RESULT_ERROR:
+			break;
+		case OCRPT_RESULT_STRING:
+			zend_string_release(Z_STR(params[i]));
+			break;
+		case OCRPT_RESULT_NUMBER:
+			break;
+		case OCRPT_RESULT_DATETIME:
+			break;
+		}
+	}
+
+	/*
+	 * The function must be a real OpenCReports user function
+	 * and called $e->set_{long|double|string}_value(...)
+	 */
+	if (Z_TYPE(retval) == IS_UNDEF || Z_TYPE(retval) == IS_NULL)
+		return;
+	else if (Z_TYPE(retval) == IS_FALSE)
+		ocrpt_expr_set_long_value(e, 0);
+	else if (Z_TYPE(retval) == IS_TRUE)
+		ocrpt_expr_set_long_value(e, 1);
+	else if (Z_TYPE(retval) == IS_LONG)
+		ocrpt_expr_set_long_value(e, Z_LVAL(retval));
+	else if (Z_TYPE(retval) == IS_DOUBLE)
+		ocrpt_expr_set_double_value(e, Z_DVAL(retval));
+	else if (Z_TYPE(retval) == IS_STRING)
+		ocrpt_expr_set_string_value(e, Z_STRVAL(retval));
+	else
+		ocrpt_expr_make_error_result(e, "invalid return value");
+}
+
+ZEND_FUNCTION(rlib_add_function) {
+	zval *object;
+	zend_string *name, *function;
+	zend_long params;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 4, 4)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(name);
+		Z_PARAM_STR(function);
+		Z_PARAM_LONG(params);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	char *zfunc = ocrpt_mem_strdup(ZSTR_VAL(function));
+	ocrpt_function_add(oo->o, ZSTR_VAL(name), rlib_default_function, zfunc, params, false, false, false, true);
+}
+
+ZEND_FUNCTION(rlib_set_output_encoding) {
+	zval *object;
+	zend_string *encoding;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(encoding);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	/* Do nothing. OpenCReports is UTF-8 only. */
+}
+
+ZEND_FUNCTION(rlib_add_parameter) {
+	zval *object;
+	zend_string *param, *value;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(param);
+		Z_PARAM_STR(value);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	/* Silently do nothing. The functionality is not implemented yet. */
+}
+
+ZEND_FUNCTION(rlib_set_output_parameter) {
+	zval *object;
+	zend_string *param, *value;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(param);
+		Z_PARAM_STR(value);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	/* Silently do nothing. The functionality is not implemented yet. */
+}
+
+ZEND_FUNCTION(rlib_query_refresh) {
+	zval *object;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	/* Silently do nothing. The functionality is not implemented yet. */
+}
+
+static void rlib_report_cb(opencreport *o, ocrpt_report *r, void *data) {
+	zend_string *callback = data;
+	zval zfname;
+
+	ZVAL_STRINGL(&zfname, ZSTR_VAL(callback), ZSTR_LEN(callback));
+
+	zval retval;
+
+#if PHP_MAJOR_VERSION >= 8
+	if (call_user_function(CG(function_table), NULL, &zfname, &retval, 0, NULL) == FAILURE)
+#else
+	if (call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 0, NULL, 0, NULL TSRMLS_CC) == FAILURE)
+#endif
+		return;
+
+	zend_string_release(Z_STR(zfname));
+}
+
+static void rlib_part_cb(opencreport *o, ocrpt_part *p, void *data) {
+	zend_string *callback = data;
+	zval zfname;
+
+	ZVAL_STRINGL(&zfname, ZSTR_VAL(callback), ZSTR_LEN(callback));
+
+	zval retval;
+
+#if PHP_MAJOR_VERSION >= 8
+	if (call_user_function(CG(function_table), NULL, &zfname, &retval, 0, NULL) == FAILURE)
+#else
+	if (call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 0, NULL, 0, NULL TSRMLS_CC) == FAILURE)
+#endif
+		return;
+
+	zend_string_release(Z_STR(zfname));
+}
+
+ZEND_FUNCTION(rlib_signal_connect) {
+	zval *object;
+	zend_string *signal, *function;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(signal);
+		Z_PARAM_STR(function);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	zend_string *func = zend_string_init(ZSTR_VAL(function), ZSTR_LEN(function), false);
+
+	char *signal_name = ZSTR_VAL(signal);
+	if (!strcasecmp(signal_name, "row_change"))
+		ocrpt_report_add_new_row_cb2(oo->o, rlib_report_cb, func);
+	else if (!strcasecmp(signal_name, "report_done"))
+		ocrpt_report_add_done_cb2(oo->o, rlib_report_cb, func);
+	else if (!strcasecmp(signal_name, "report_start"))
+		ocrpt_report_add_start_cb2(oo->o, rlib_report_cb, func);
+	else if (!strcasecmp(signal_name, "report_iteration"))
+		ocrpt_report_add_iteration_cb2(oo->o, rlib_report_cb, func);
+	else if (!strcasecmp(signal_name, "part_iteration"))
+		ocrpt_part_add_iteration_cb2(oo->o, rlib_part_cb, func);
+	else if (!strcasecmp(signal_name, "precalculation_done"))
+		ocrpt_report_add_precalculation_done_cb2(oo->o, rlib_report_cb, func);
+}
+
+ZEND_FUNCTION(rlib_execute) {
+	zval *object;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	ocrpt_execute(oo->o);
+}
+
+ZEND_FUNCTION(rlib_spool) {
+	zval *object;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	ocrpt_spool(oo->o);
+}
+
+ZEND_FUNCTION(rlib_get_content_type) {
+	zval *object;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	size_t len;
+	const char *type = ocrpt_get_content_type(oo->o, &len);
+	RETURN_STRINGL(type, len);
+}
+
+ZEND_FUNCTION(rlib_set_radix_character) {
+	zval *object;
+	zend_string *radix;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(radix);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	/* Silently do nothing. The radix character depends on the locale. */
+}
+
+ZEND_FUNCTION(rlib_compile_infix) {
+	zend_string *expr_string;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR(expr_string);
+	ZEND_PARSE_PARAMETERS_END();
+
+	opencreport *o = ocrpt_init();
+
+	char *err = NULL;
+	ocrpt_expr *e = ocrpt_expr_parse(o, ZSTR_VAL(expr_string), &err);
+
+	if (!e) {
+		RETVAL_STRING(err);
+		ocrpt_strfree(err);
+		ocrpt_free(o);
+		return;
+	}
+
+	ocrpt_expr_optimize(e);
+	ocrpt_expr_eval(e);
+
+	mpfr_ptr mval;
+	ocrpt_string *sval;
+	ocrpt_result *rs = ocrpt_expr_get_result(e);
+	switch (ocrpt_result_get_type(rs)) {
+	case OCRPT_RESULT_ERROR:
+	case OCRPT_RESULT_STRING:
+		sval = ocrpt_result_get_string(rs);
+		RETVAL_STRINGL(sval->str, sval->len);
+		break;
+	case OCRPT_RESULT_NUMBER:
+		/*
+		 * Naive representation.
+		 * MPFR number may exceed double precision.
+		 */
+		mval = ocrpt_result_get_number(rs);
+		RETVAL_DOUBLE(mpfr_get_d(mval, MPFR_RNDN));
+		break;
+	case OCRPT_RESULT_DATETIME:
+		/* Not implemented yet */
+		RETVAL_NULL();
+		break;
+	}
+
+	ocrpt_free(o);
+}
+
+ZEND_FUNCTION(rlib_graph_add_bg_region) {
+	zval *object;
+	zend_string *graph, *region, *color;
+	double start, end;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 6, 6)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(graph);
+		Z_PARAM_STR(region);
+		Z_PARAM_STR(color);
+		Z_PARAM_DOUBLE(start);
+		Z_PARAM_DOUBLE(end);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	/* Silently do nothing. Not implemented yet. */
+}
+
+ZEND_FUNCTION(rlib_graph_clear_bg_region) {
+	zval *object;
+	zend_string *graph;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(graph);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	/* Silently do nothing. Not implemented yet. */
+}
+
+ZEND_FUNCTION(rlib_graph_set_x_minor_tick) {
+	zval *object;
+	zend_string *graph, *x;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(graph);
+		Z_PARAM_STR(x);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	/* Silently do nothing. Not implemented yet. */
+}
+
+ZEND_FUNCTION(rlib_graph_set_x_minor_tick_by_location) {
+	zval *object;
+	zend_string *graph;
+	double location;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+		Z_PARAM_STR(graph);
+		Z_PARAM_DOUBLE(location);
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	/* Silently do nothing. Not implemented yet. */
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_rlib_init, 0, 0, OpenCReport, 1)
@@ -6005,6 +6581,12 @@ ZEND_ARG_TYPE_INFO(0, follower, IS_STRING, 0)
 ZEND_ARG_TYPE_INFO(0, follower_field, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_set_datasource_encoding, 0, 3, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, encoding, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_add_report, 0, 2, _IS_BOOL, 0)
 ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
 ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
@@ -6015,8 +6597,115 @@ ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
 ZEND_ARG_TYPE_INFO(0, buffer, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_add_search_path, 0, 2, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_version, 0, 0, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_set_locale, 0, 2, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, locale, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_bindtextdomain, 0, 3, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, domainname, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, dirname, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_set_output_format_from_text, 0, 2, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, format, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_add_function, 0, 4, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, function, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, params, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_set_output_encoding, 0, 2, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, encoding, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_add_parameter, 0, 3, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, param, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_set_output_parameter, 0, 3, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, param, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_query_refresh, 0, 1, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_signal_connect, 0, 3, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, signal, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, function, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_execute, 0, 1, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_spool, 0, 1, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_get_content_type, 0, 1, IS_STRING, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_set_radix_character, 0, 2, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, radix, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+/* The return type may be string, double or false */
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_compile_infix, 0, 1, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_graph_add_bg_region, 0, 6, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, graph, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, region, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, color, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, start, IS_DOUBLE, 0)
+ZEND_ARG_TYPE_INFO(0, end, IS_DOUBLE, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_graph_clear_bg_region, 0, 2, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, graph, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_graph_set_x_minor_tick, 0, 3, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, graph, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, x, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_graph_set_x_minor_tick_by_location, 0, 3, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_ARG_TYPE_INFO(0, graph, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, location, IS_DOUBLE, 0)
+ZEND_END_ARG_INFO()
+
 /* {{{ zend_function_entry */
 static const zend_function_entry opencreport_functions[] = {
+	ZEND_FE(rlib_version, arginfo_rlib_version)
 	ZEND_FE(rlib_init, arginfo_rlib_init)
 	ZEND_FE(rlib_free, arginfo_rlib_free)
 	ZEND_FE(rlib_add_datasource_mysql, arginfo_rlib_add_datasource_mysql)
@@ -6029,31 +6718,28 @@ static const zend_function_entry opencreport_functions[] = {
 	ZEND_FE(rlib_add_query_as, arginfo_rlib_add_query_as)
 	ZEND_FE(rlib_add_resultset_follower, arginfo_rlib_add_resultset_follower)
 	ZEND_FE(rlib_add_resultset_follower_n_to_1, arginfo_rlib_add_resultset_follower_n_to_1)
+	ZEND_FE(rlib_set_datasource_encoding, arginfo_rlib_set_datasource_encoding)
 	ZEND_FE(rlib_add_report, arginfo_rlib_add_report)
 	ZEND_FE(rlib_add_report_from_buffer, arginfo_rlib_add_report_from_buffer)
-#if 0
+	ZEND_FE(rlib_add_search_path, arginfo_rlib_add_search_path)
+	ZEND_FE(rlib_set_locale, arginfo_rlib_set_locale)
+	ZEND_FE(rlib_bindtextdomain, arginfo_rlib_bindtextdomain)
+	ZEND_FE(rlib_set_output_format_from_text, arginfo_rlib_set_output_format_from_text)
+	ZEND_FE(rlib_add_function, arginfo_rlib_add_function)
+	ZEND_FE(rlib_set_output_encoding, arginfo_rlib_set_output_encoding)
+	ZEND_FE(rlib_add_parameter, arginfo_rlib_add_parameter)
+	ZEND_FE(rlib_set_output_parameter, arginfo_rlib_set_output_parameter)
+	ZEND_FE(rlib_query_refresh, arginfo_rlib_query_refresh)
+	ZEND_FE(rlib_signal_connect, arginfo_rlib_signal_connect)
+	ZEND_FE(rlib_execute, arginfo_rlib_execute)
+	ZEND_FE(rlib_spool, arginfo_rlib_spool)
+	ZEND_FE(rlib_get_content_type, arginfo_rlib_get_content_type)
+	ZEND_FE(rlib_set_radix_character, arginfo_rlib_set_radix_character)
+	ZEND_FE(rlib_compile_infix, arginfo_rlib_compile_infix)
 	ZEND_FE(rlib_graph_add_bg_region, arginfo_rlib_graph_add_bg_region)
 	ZEND_FE(rlib_graph_clear_bg_region, arginfo_rlib_graph_clear_bg_region)
 	ZEND_FE(rlib_graph_set_x_minor_tick, arginfo_rlib_graph_set_x_minor_tick)
 	ZEND_FE(rlib_graph_set_x_minor_tick_by_location, arginfo_rlib_graph_set_x_minor_tick_by_location)
-	ZEND_FE(rlib_query_refresh, arginfo_rlib_query_refresh)
-	ZEND_FE(rlib_signal_connect, arginfo_rlib_signal_connect)
-	ZEND_FE(rlib_add_function, arginfo_rlib_add_function)
-	ZEND_FE(rlib_set_output_format_from_text, arginfo_rlib_set_output_format_from_text)
-	ZEND_FE(rlib_execute, arginfo_rlib_execute)
-	ZEND_FE(rlib_spool, arginfo_rlib_spool)
-	ZEND_FE(rlib_get_content_type, arginfo_rlib_get_content_type)
-	ZEND_FE(rlib_add_parameter, arginfo_rlib_add_parameter)
-	ZEND_FE(rlib_set_locale, arginfo_rlib_set_locale)
-	ZEND_FE(rlib_bindtextdomain, arginfo_rlib_bindtextdomain)
-	ZEND_FE(rlib_set_radix_character, arginfo_rlib_set_radix_character)
-	ZEND_FE(rlib_version, arginfo_rlib_version)
-	ZEND_FE(rlib_set_output_parameter, arginfo_rlib_set_output_parameter)
-	ZEND_FE(rlib_set_datasource_encoding, arginfo_rlib_set_datasource_encoding)
-	ZEND_FE(rlib_set_output_encoding, arginfo_rlib_set_output_encoding)
-	ZEND_FE(rlib_compile_infix, arginfo_rlib_compile_infix)
-	ZEND_FE(rlib_add_search_path, arginfo_rlib_add_search_path)
-#endif
 	PHP_FE_END
 };
 /* }}} */
