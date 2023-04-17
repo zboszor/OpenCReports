@@ -507,6 +507,8 @@ void ocrpt_pdf_finalize(opencreport *o) {
 	}
 
 	cairo_surface_destroy(pdf);
+
+	o->content_type = ocrpt_mem_string_new_printf("Content-Type: application/pdf\nContent-Length: %zu\n", o->output_buffer->len);
 }
 
 void ocrpt_pdf_init(opencreport *o) {

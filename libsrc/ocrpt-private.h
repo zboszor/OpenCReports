@@ -95,6 +95,7 @@ struct opencreport {
 
 	/* Output buffer for spooling */
 	ocrpt_string *output_buffer;
+	ocrpt_string *content_type;
 
 	/* Page handling for PDF output, lists of cairo_surface_t pointers */
 	ocrpt_output_functions output_functions;

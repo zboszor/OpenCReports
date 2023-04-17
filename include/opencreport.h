@@ -176,11 +176,15 @@ bool ocrpt_execute(opencreport *o);
 /*
  * Get output data and length
  */
-char *ocrpt_get_output(opencreport *o, size_t *length);
+const char *ocrpt_get_output(opencreport *o, size_t *length);
 /*
  * Send the output to stdout
  */
 void ocrpt_spool(opencreport *o);
+/*
+ * Get content type
+ */
+const char *ocrpt_get_content_type(opencreport *o, size_t *length);
 /*
  * Set output format
  */

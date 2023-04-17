@@ -111,8 +111,18 @@ ocrpt_spool(opencreport *o);</programlisting>
 			<para>
 				Get the report output. The application
 				then can save it as a file.
-				<programlisting>char *
+				<programlisting>const char *
 ocrpt_get_output(opencreport *o, size_t *length);</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Get report content type</title>
+			<para>
+				Get the report content type for web publishing.
+				The content type depends on the output type
+				the report was executed with.
+				<programlisting>const char *
+ocrpt_get_content_type(opencreport *o, size_t *length);</programlisting>
 			</para>
 		</sect2>
 		<sect2>

@@ -1249,6 +1249,9 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	if (!o)
 		return false;
 
+	if (o->output_buffer)
+		return true;
+
 	switch (o->output_format) {
 	case OCRPT_OUTPUT_PDF:
 		ocrpt_pdf_init(o);
@@ -1288,7 +1291,7 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	return true;
 }
 
-DLL_EXPORT_SYM char *ocrpt_get_output(opencreport *o, size_t *length) {
+DLL_EXPORT_SYM const char *ocrpt_get_output(opencreport *o, size_t *length) {
 	if (!o || !o->output_buffer) {
 		if (length)
 			*length = 0;
@@ -1299,6 +1302,19 @@ DLL_EXPORT_SYM char *ocrpt_get_output(opencreport *o, size_t *length) {
 		*length = o->output_buffer->len;
 
 	return o->output_buffer->str;
+}
+
+DLL_EXPORT_SYM const char *ocrpt_get_content_type(opencreport *o, size_t *length) {
+	if (!o || !o->content_type) {
+		if (*length)
+			*length = 0;
+		return NULL;
+	}
+
+	if (length)
+		*length = o->content_type->len;
+
+	return o->content_type->str;
 }
 
 DLL_EXPORT_SYM void ocrpt_spool(opencreport *o) {
