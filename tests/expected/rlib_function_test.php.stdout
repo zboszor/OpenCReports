@@ -1,0 +1,5 @@
+Expression: my_add(1.000000,2.000000)
+Evaluated: (number)3.000000
+invalid number of operands for my_concat at or near "my_concat('aaa', 3, 4)"
+Expression: my_concat((string)abc,3.000000)
+Evaluated: (string)abcabcabc

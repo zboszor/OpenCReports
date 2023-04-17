@@ -114,7 +114,8 @@ PHP_TESTS = \
 	custom_variable_xml_test \
 	canonicalize_path_test \
 	find_file_test \
-	color_test
+	color_test \
+	rlib_function_test
 
 SLOW_TESTS = \
 	pgsql_numeric_precision_test \
@@ -265,7 +266,7 @@ all: $(noinst_PROGRAMS)
 basic-test: $(TESTS) execute_test.sh
 	$(foreach TEST,$(TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
 
-php-basic-test: $(PHP_TESTS) execute_php_test.sh
+php-basic-test: execute_php_test.sh
 	$(foreach TEST,$(PHP_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_php_test.sh $(TEST) &&) true
 
 if ENABLE_PDF_TESTS
@@ -273,7 +274,7 @@ if ENABLE_PDF_TESTS
 pdf-test: $(PDF_TESTS) $(XLATE_DEPS) execute_pdf_test.sh
 	$(foreach TEST,$(PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_pdf_test.sh $(TEST) &&) true
 
-php-pdf-test: $(PHP_PDF_TESTS) $(XLATE_DEPS) execute_php_pdf_test.sh
+php-pdf-test: $(XLATE_DEPS) execute_php_pdf_test.sh
 	$(foreach TEST,$(PHP_PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_php_pdf_test.sh $(TEST) &&) true
 
 else
@@ -289,8 +290,8 @@ php-test: php-basic-test php-pdf-test
 slow-test: $(SLOW_TESTS) execute_test.sh
 	$(foreach TEST,$(SLOW_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
 
-php-slow-test: $(SLOW_PHP_TESTS) execute_php_test.sh
-	$(foreach TEST,$(SLOW_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_php_test.sh $(TEST) &&) true
+php-slow-test: execute_php_test.sh
+	$(foreach TEST,$(SLOW_PHP_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_php_test.sh $(TEST) &&) true
 
 unstable-test: $(UNSTABLE_TESTS) execute_test.sh
 	$(foreach TEST,$(UNSTABLE_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_test.sh $(TEST) &&) true
