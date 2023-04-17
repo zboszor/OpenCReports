@@ -8,13 +8,13 @@ consent from the original authors:
 * Bobby Doan <bdoan@sicom.com>
 * Christian Betz <cbetz@sicom.com>
 
-Currently missing features
+## Currently missing features
 
 * language bindings other than C
 * output formats other than PDF
 * graphing and barcodes (Graph, Chart and Barcode XML elements)
 
-Roadmap
+## Roadmap
 
 * 0.7: PHP binding complete with RLIB compatibility API and PHP API documentation
 * 0.8: Output drivers for HTML / TXT / CSV plus JSON as extra
