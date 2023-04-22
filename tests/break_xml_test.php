@@ -28,6 +28,6 @@ if (!$o->parse_xml("break_xml_test.xml")) {
 /* There is only one ocrpt_report pointer in o->parts, extract it. */
 $r = get_first_report($o);
 
-$br = $r->break_get_next();
+$br = $r->break_get_first();
 if (isset($br))
 	echo "adding a break and a breakfield to it succeeded" . PHP_EOL;

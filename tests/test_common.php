@@ -31,11 +31,11 @@ function print_result_row(string $name, OpenCReport\QueryResult &$qr) {
 
 function print_part_reports(string $name, OpenCReport\Part &$p) {
 	echo "part " . $name . ":" . PHP_EOL;
-	for ($row = $p->row_get_next(), $i = 0; isset($row); $row = $row->row_get_next(), $i++) {
+	for ($row = $p->row_get_first(), $i = 0; isset($row); $row = $row->get_next(), $i++) {
 		echo "row ". $i . " reports:"; flush();
 		$j = 0;
-		for ($col = $row->column_get_next(); isset($col); $col = $col->column_get_next()) {
-			for ($rpt = $col->report_get_next(); isset($rpt); $rpt = $rpt->report_get_next(), $j++)
+		for ($col = $row->column_get_first(); isset($col); $col = $col->get_next()) {
+			for ($rpt = $col->report_get_first(); isset($rpt); $rpt = $rpt->get_next(), $j++)
 				echo " " . $j; flush();
 		}
 		echo PHP_EOL;
@@ -43,7 +43,7 @@ function print_part_reports(string $name, OpenCReport\Part &$p) {
 }
 
 function get_first_report(OpenCReport &$o): OpenCReport\Report {
-	return $o->part_get_next()->row_get_next()->column_get_next()->report_get_next();
+	return $o->part_get_first()->row_get_first()->column_get_first()->report_get_first();
 }
 
 function create_expr(OpenCReport &$o, &$e, $str, $print = true) {

@@ -32,7 +32,7 @@ $qr = $q->get_result();
 $r = get_first_report($o);
 
 /* There is only one break in the report, extract it */
-$br = $r->break_get_next();
+$br = $r->break_get_first();
 
 $row = 0;
 $q->navigate_start();

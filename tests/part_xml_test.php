@@ -18,7 +18,7 @@ if (!$o->parse_xml("part_xml_test.xml")) {
 	exit(0);
 }
 
-for ($p = $o->part_get_next(), $i = 0; isset($p); $p = $p->part_get_next(), $i++) {
+for ($p = $o->part_get_first(), $i = 0; isset($p); $p = $p->get_next(), $i++) {
 	$partname = "part " . $i;
 	print_part_reports($partname, $p);
 }

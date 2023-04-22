@@ -120,7 +120,7 @@ if (!$o->parse_xml("part_xml_test.xml")) {
 	exit(0);
 }
 
-for ($p = $o->part_get_next(); !is_null($p); $p = $p->part_get_next())
+for ($p = $o->part_get_first(); !is_null($p); $p = $p->get_next())
 	$p->add_iteration_cb("test_part_iteration_cb");
 
 $o->execute();
