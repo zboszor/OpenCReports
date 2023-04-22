@@ -121,8 +121,13 @@ ocrpt_get_output(opencreport *o, size_t *length);</programlisting>
 				Get the report content type for web publishing.
 				The content type depends on the output type
 				the report was executed with.
-				<programlisting>const char *
-ocrpt_get_content_type(opencreport *o, size_t *length);</programlisting>
+				It returns an array of
+				<literal>ocrpt_string *</literal> pointers
+				for potentially multiple HTTP header lines.
+				The last pointer in the array is
+				<literal>NULL</literal>.
+				<programlisting>const ocrpt_string **
+ocrpt_get_content_type(opencreport *o);</programlisting>
 			</para>
 		</sect2>
 		<sect2>

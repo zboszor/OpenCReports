@@ -184,7 +184,7 @@ void ocrpt_spool(opencreport *o);
 /*
  * Get content type
  */
-const char *ocrpt_get_content_type(opencreport *o, size_t *length);
+const ocrpt_string **ocrpt_get_content_type(opencreport *o);
 /*
  * Set output format
  */

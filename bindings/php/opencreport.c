@@ -504,13 +504,18 @@ PHP_METHOD(opencreport, get_content_type) {
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
-	size_t sz = 0;
-	const char *res = ocrpt_get_content_type(oo->o, &sz);
+	const ocrpt_string **content_type = ocrpt_get_content_type(oo->o);
 
-	if (!res)
+	if (!content_type)
 		RETURN_FALSE;
 
-	RETURN_STRINGL(res, sz);
+	array_init(return_value);
+
+	for (int32_t i = 0; content_type[i]; i++) {
+		zval tmp;
+		ZVAL_STRINGL(&tmp, content_type[i]->str, content_type[i]->len);
+		zend_hash_next_index_insert_new(Z_ARRVAL_P(return_value), &tmp);
+	}
 }
 
 PHP_METHOD(opencreport, version) {
@@ -6352,9 +6357,19 @@ ZEND_FUNCTION(rlib_get_content_type) {
 		RETURN_THROWS();
 	}
 
-	size_t len;
-	const char *type = ocrpt_get_content_type(oo->o, &len);
-	RETURN_STRINGL(type, len);
+	const ocrpt_string **content_type = ocrpt_get_content_type(oo->o);
+
+	if (!content_type)
+		RETURN_FALSE;
+
+	ocrpt_string *retval = ocrpt_mem_string_new("", true);
+
+	for (int32_t i = 0; content_type[i]; i++)
+		ocrpt_mem_string_append_printf(retval, "%s\n", content_type[i]->str);
+
+	RETVAL_STRINGL(retval->str, retval->len);
+
+	ocrpt_mem_string_free(retval, true);
 }
 
 ZEND_FUNCTION(rlib_set_radix_character) {

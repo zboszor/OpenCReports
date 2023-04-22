@@ -146,7 +146,8 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	if (!o)
 		return;
 
-	for (int32_t i = 0; i < o->n_functions; i++) {
+	int32_t i;
+	for (i = 0; i < o->n_functions; i++) {
 		const ocrpt_function *f = o->functions[i];
 
 		ocrpt_strfree(f->fname);
@@ -211,6 +212,9 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	ocrpt_result_free(o->totpages);
 
 	ocrpt_mem_string_free(o->output_buffer, true);
+	if (o->content_type)
+		for (i = 0; o->content_type[i]; i++)
+			ocrpt_mem_string_free((ocrpt_string *)o->content_type[i], true);
 	ocrpt_mem_free(o->textdomain);
 	ocrpt_mem_free(o->xlate_domain_s);
 	ocrpt_mem_free(o->xlate_dir_s);
@@ -1304,17 +1308,11 @@ DLL_EXPORT_SYM const char *ocrpt_get_output(opencreport *o, size_t *length) {
 	return o->output_buffer->str;
 }
 
-DLL_EXPORT_SYM const char *ocrpt_get_content_type(opencreport *o, size_t *length) {
-	if (!o || !o->content_type) {
-		if (*length)
-			*length = 0;
+DLL_EXPORT_SYM const ocrpt_string **ocrpt_get_content_type(opencreport *o) {
+	if (!o || !o->content_type)
 		return NULL;
-	}
 
-	if (length)
-		*length = o->content_type->len;
-
-	return o->content_type->str;
+	return o->content_type;
 }
 
 DLL_EXPORT_SYM void ocrpt_spool(opencreport *o) {
