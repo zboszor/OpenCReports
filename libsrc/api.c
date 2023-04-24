@@ -215,6 +215,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	if (o->content_type)
 		for (i = 0; o->content_type[i]; i++)
 			ocrpt_mem_string_free((ocrpt_string *)o->content_type[i], true);
+	ocrpt_mem_free(o->content_type);
 	ocrpt_mem_free(o->textdomain);
 	ocrpt_mem_free(o->xlate_domain_s);
 	ocrpt_mem_free(o->xlate_dir_s);
