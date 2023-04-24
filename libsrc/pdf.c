@@ -202,12 +202,18 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 			PangoFontMetrics *metrics = pango_context_get_metrics(context, le->font_description, language);
 
 			PangoAttrList *alist = pango_layout_get_attributes(le->layout);
-			if (!alist)
+			bool free_alist = false;
+			if (!alist) {
 				alist = pango_attr_list_new();
+				free_alist = true;
+			}
 
 			PangoAttribute *nohyph = pango_attr_insert_hyphens_new(TRUE);
 			pango_attr_list_insert(alist, nohyph);
 			pango_layout_set_attributes(le->layout, alist);
+
+			if (free_alist)
+				pango_attr_list_unref(alist);
 
 			pango_layout_set_alignment(le->layout, le->p_align);
 			if (le->justified) {
@@ -220,6 +226,8 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 
 			le->ascent = pango_font_metrics_get_ascent(metrics) / PANGO_SCALE;
 			le->descent = pango_font_metrics_get_descent(metrics) / PANGO_SCALE;
+
+			pango_font_metrics_unref(metrics);
 		}
 
 		bool has_translate = false;

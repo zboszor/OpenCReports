@@ -1135,6 +1135,7 @@ void ocrpt_layout_set_font_sizes(opencreport *o, const char *font, double wanted
 	if (result_font_width)
 		*result_font_width = (monospace ? ((double)char_width / PANGO_SCALE) : wanted_font_size);
 
+	pango_font_metrics_unref(metrics);
 	g_object_unref(layout);
 	pango_font_description_free(font_description);
 }

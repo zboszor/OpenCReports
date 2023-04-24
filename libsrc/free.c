@@ -159,6 +159,10 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 						ocrpt_expr_free(le->link);
 						ocrpt_expr_free(le->translate);
 					}
+					if (le->font_description)
+						pango_font_description_free(le->font_description);
+					if (le->layout)
+						g_object_unref(le->layout);
 					ocrpt_mem_string_free(le->format_str, true);
 					ocrpt_mem_string_free(le->value_str, true);
 					ocrpt_mem_string_free(le->result_str, true);
