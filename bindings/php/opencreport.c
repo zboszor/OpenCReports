@@ -2893,7 +2893,7 @@ static const zend_function_entry opencreport_part_class_methods[] = {
 	PHP_FE_END
 };
 
-PHP_METHOD(opencreport_part_row, get_next) {
+PHP_METHOD(opencreport_row, get_next) {
 	zval *object = ZEND_THIS;
 	php_opencreport_row_object *pro = Z_OPENCREPORT_ROW_P(object);
 
@@ -2919,7 +2919,7 @@ PHP_METHOD(opencreport_part_row, get_next) {
 	pro1->is_iterator = true;
 }
 
-PHP_METHOD(opencreport_part_row, column_new) {
+PHP_METHOD(opencreport_row, column_new) {
 	zval *object = ZEND_THIS;
 	php_opencreport_row_object *pro = Z_OPENCREPORT_ROW_P(object);
 
@@ -2933,7 +2933,7 @@ PHP_METHOD(opencreport_part_row, column_new) {
 	pco->is_iterator = false;
 }
 
-PHP_METHOD(opencreport_part_row, column_get_first) {
+PHP_METHOD(opencreport_row, column_get_first) {
 	zval *object = ZEND_THIS;
 	php_opencreport_row_object *pro = Z_OPENCREPORT_ROW_P(object);
 
@@ -2953,7 +2953,7 @@ PHP_METHOD(opencreport_part_row, column_get_first) {
 	pco->is_iterator = true;
 }
 
-PHP_METHOD(opencreport_part_row, set_suppress) {
+PHP_METHOD(opencreport_row, set_suppress) {
 	zval *object = ZEND_THIS;
 	php_opencreport_row_object *pro = Z_OPENCREPORT_ROW_P(object);
 	zend_string *expr_string = NULL;
@@ -2965,7 +2965,7 @@ PHP_METHOD(opencreport_part_row, set_suppress) {
 	ocrpt_part_row_set_suppress(pro->pr, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
-PHP_METHOD(opencreport_part_row, set_newpage) {
+PHP_METHOD(opencreport_row, set_newpage) {
 	zval *object = ZEND_THIS;
 	php_opencreport_row_object *pro = Z_OPENCREPORT_ROW_P(object);
 	zend_string *expr_string = NULL;
@@ -2977,7 +2977,7 @@ PHP_METHOD(opencreport_part_row, set_newpage) {
 	ocrpt_part_row_set_newpage(pro->pr, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
-PHP_METHOD(opencreport_part_row, set_layout) {
+PHP_METHOD(opencreport_row, set_layout) {
 	zval *object = ZEND_THIS;
 	php_opencreport_row_object *pro = Z_OPENCREPORT_ROW_P(object);
 	zend_string *expr_string = NULL;
@@ -2989,34 +2989,34 @@ PHP_METHOD(opencreport_part_row, set_layout) {
 	ocrpt_part_row_set_layout(pro->pr, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_row_get_next, 0, 0, OpenCReport\\Row, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_row_get_next, 0, 0, OpenCReport\\Row, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_row_column_new, 0, 0, OpenCReport\\Column, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_row_column_new, 0, 0, OpenCReport\\Column, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_row_column_get_first, 0, 0, OpenCReport\\Column, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_row_column_get_first, 0, 0, OpenCReport\\Column, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_row_set_suppress, 0, 1, IS_VOID, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_row_set_suppress, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_row_set_newpage, 0, 1, IS_VOID, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_row_set_newpage, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_row_set_layout, 0, 1, IS_VOID, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_row_set_layout, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-static const zend_function_entry opencreport_part_row_class_methods[] = {
-	PHP_ME(opencreport_part_row, get_next, arginfo_opencreport_part_row_get_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_part_row, column_new, arginfo_opencreport_part_row_column_new, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_part_row, column_get_first, arginfo_opencreport_part_row_column_get_first, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_part_row, set_suppress, arginfo_opencreport_part_row_set_suppress, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_part_row, set_newpage, arginfo_opencreport_part_row_set_newpage, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_part_row, set_layout, arginfo_opencreport_part_row_set_layout, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+static const zend_function_entry opencreport_row_class_methods[] = {
+	PHP_ME(opencreport_row, get_next, arginfo_opencreport_row_get_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_row, column_new, arginfo_opencreport_row_column_new, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_row, column_get_first, arginfo_opencreport_row_column_get_first, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_row, set_suppress, arginfo_opencreport_row_set_suppress, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_row, set_newpage, arginfo_opencreport_row_set_newpage, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_row, set_layout, arginfo_opencreport_row_set_layout, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 
@@ -5302,7 +5302,7 @@ static PHP_MINIT_FUNCTION(opencreport)
 #endif
 
 	memcpy(&opencreport_row_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
-	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Row", opencreport_part_row_class_methods);
+	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Row", opencreport_row_class_methods);
 	ce.create_object = opencreport_row_object_new;
 	opencreport_row_object_handlers.offset = XtOffsetOf(php_opencreport_row_object, zo);
 	opencreport_row_object_handlers.clone_obj = NULL;
