@@ -62,7 +62,8 @@ TESTS = \
 	custom_variable_xml_test \
 	canonicalize_path_test \
 	find_file_test \
-	color_test
+	color_test \
+	quoted_ident_test
 
 PHP_TESTS = \
 	grammar_test expr_test function_test \

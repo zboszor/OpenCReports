@@ -1,0 +1,77 @@
+.'id'
+.'id'
+.'id'
+.'nAMe'
+mul(.'a G E',2.000000)
+Query columns:
+0: 'ID'
+1: 'nAMe'
+2: 'pROPerty'
+3: 'a G E'
+4: 'adUlt'
+Row #0
+Query: 'a':
+	Col #0: 'ID': string value: NULL (converted to number: 1.000000)
+	Col #1: 'nAMe': string value: Fred Flintstone
+	Col #2: 'pROPerty': string value: strong
+	Col #3: 'a G E': string value: NULL (converted to number: 31.000000)
+	Col #4: 'adUlt': string value: NULL (converted to number: 1.000000)
+
+Expression: (string)id
+Evaluated: (string)id
+Expression: .'ID'
+Evaluated: (number)1.000000
+Expression: 'A'.'ID'
+Evaluated: (number)1.000000
+Expression: .'nAMe'
+Evaluated: (string)Fred Flintstone
+Expression: mul(.'a G E',2.000000)
+Evaluated: (number)62.000000
+Expression: (string)a.adult
+Evaluated: (string)a.adult
+Expression is identical to previous row
+
+Row #1
+Query: 'a':
+	Col #0: 'ID': string value: NULL (converted to number: 2.000000)
+	Col #1: 'nAMe': string value: Wilma Flintstone
+	Col #2: 'pROPerty': string value: charming
+	Col #3: 'a G E': string value: NULL (converted to number: 28.000000)
+	Col #4: 'adUlt': string value: NULL (converted to number: 1.000000)
+
+Expression: (string)id
+Evaluated: (string)id
+Expression: .'ID'
+Evaluated: (number)2.000000
+Expression: 'A'.'ID'
+Evaluated: (number)2.000000
+Expression: .'nAMe'
+Evaluated: (string)Wilma Flintstone
+Expression: mul(.'a G E',2.000000)
+Evaluated: (number)56.000000
+Expression: (string)a.adult
+Evaluated: (string)a.adult
+Expression is identical to previous row
+
+Row #2
+Query: 'a':
+	Col #0: 'ID': string value: NULL (converted to number: 3.000000)
+	Col #1: 'nAMe': string value: Pebbles Flintstone
+	Col #2: 'pROPerty': string value: young
+	Col #3: 'a G E': string value: NULL (converted to number: 0.500000)
+	Col #4: 'adUlt': string value: NULL (converted to number: 0.000000)
+
+Expression: (string)id
+Evaluated: (string)id
+Expression: .'ID'
+Evaluated: (number)3.000000
+Expression: 'A'.'ID'
+Evaluated: (number)3.000000
+Expression: .'nAMe'
+Evaluated: (string)Pebbles Flintstone
+Expression: mul(.'a G E',2.000000)
+Evaluated: (number)1.000000
+Expression: (string)a.adult
+Evaluated: (string)a.adult
+Expression is identical to previous row
+

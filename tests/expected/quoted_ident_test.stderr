@@ -1,0 +1,2 @@
+invalid field reference: 'id', converted to string literal
+invalid field reference: 'a.adult', converted to string literal
