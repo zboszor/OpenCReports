@@ -2898,7 +2898,7 @@ PHP_METHOD(opencreport_part_row, get_next) {
 	php_opencreport_row_object *pro = Z_OPENCREPORT_ROW_P(object);
 
 	if (!pro->is_iterator) {
-		zend_throw_error(NULL, "OpenCReport\\Part\\Row object is not an iterator");
+		zend_throw_error(NULL, "OpenCReport\\Row object is not an iterator");
 		RETURN_THROWS();
 	}
 
