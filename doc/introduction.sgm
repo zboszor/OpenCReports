@@ -341,7 +341,7 @@
 				fields in a text line may use custom font settings
 				while keeping the field width calculation identical
 				to RLIB, which ends with the font parameters set for
-				the text line. In OpenCReports, The custom field font
+				the text line. In OpenCReports, the fields' custom font
 				settings (font name and size) don't influence the field
 				width. Using this method, OpenCReports may use proportional
 				fonts even with using the RLIB compatible size settings.
