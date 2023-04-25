@@ -7,6 +7,7 @@ SGMLFILES = \
 	expressions.sgm \
 	formatting.sgm \
 	c-api-reference.sgm \
+	php-api-reference.sgm \
 	license.sgm \
 	jadetex.cfg
 

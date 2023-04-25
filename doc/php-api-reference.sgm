@@ -1,0 +1,1865 @@
+<chapter id="php-api-reference" xreflabel="C API Reference">
+	<title>PHP language API reference</title>
+	<sect1>
+		<title>The OpenCReports PHP module</title>
+		<para>
+			<literal>OpenCReports</literal> comes with a PHP module,
+			which must be enabled in the PHP configuration:
+			<programlisting>extension=opencreports.so</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport class</title>
+		<para>
+			The main class in OpenCReports is called
+			<literal>OpenCReport</literal>. (Note that the project
+			name is used as singular.)
+			<programlisting>class OpenCReport {
+    public const RESULT_ERROR;
+    public const RESULT_STRING;
+    public const RESULT_NUMBER;
+    public const RESULT_DATETIME;
+
+    public const VARIABLE_EXPRESSION;
+    public const VARIABLE_COUNT;
+    public const VARIABLE_COUNTALL;
+    public const VARIABLE_SUM;
+    public const VARIABLE_AVERAGE;
+    public const VARIABLE_AVERAGEALL;
+    public const VARIABLE_LOWEST;
+    public const VARIABLE_HIGHEST;
+    public const VARIABLE_CUSTOM;
+
+    public final __construct();
+
+    public final parse_xml(string $filename): bool;
+    public final parse_xml_from_buffer(string $buffer): bool;
+
+    public const OUTPUT_UNSET;
+    public const OUTPUT_PDF;
+    public const OUTPUT_HTML;
+    public const OUTPUT_TXT;
+    public const OUTPUT_CSV;
+    public const OUTPUT_XML;
+    public final set_output_format(long $format): void;
+
+    public final execute(): bool;
+    public final spool(): void;
+    public final get_output(): string|false;
+    public final get_content_type(): array|false;
+
+    public static final version(): string;
+
+    public final set_numeric_precision_bits(
+                     string $expr_string): void;
+    public final set_rounding_mode(
+                     string $expr_string): void;
+
+    public final bindtextdomain(
+                     string $domainname,
+                     string $dirname): void;
+    public final set_locale(string $locale): void;
+
+    public final datasource_add_array(string $source_name):
+                     ?OpenCReport\DataSource;
+    public final datasource_add_csv(string $source_name):
+                     ?OpenCReport\DataSource;
+    public final datasource_add_json(string $source_name):
+                     ?OpenCReport\DataSource;
+    public final datasource_add_xml(string $source_name):
+                     ?OpenCReport\DataSource;
+    public final datasource_add_postgresql(
+                     string $source_name,
+                     string $host = null,
+                     string $port = null,
+                     string $dbname = null,
+                     string $user = null,
+                     string $password = null):
+                     ?OpenCReport\DataSource;
+    public final datasource_add_postgresql2(
+                     string $source_name,
+                     string $connection_info = null):
+                     ?OpenCReport\DataSource;
+    public final datasource_add_mariadb(
+                     string $source_name,
+                     string $host = null,
+                     string $port = null,
+                     string $dbname = null,
+                     string $user = null,
+                     string $password = null,
+                     string $unix_socket = null):
+                     ?OpenCReport\DataSource;
+    public final datasource_add_mariadb2(
+                     string $source_name,
+                     string $option_file = null,
+                     string $group = null):
+                     ?OpenCReport\DataSource;
+    public final datasource_add_odbc(
+                     string $source_name,
+                     string $dbname = null,
+                     ?string $user,
+                     ?string $password):
+                     ?OpenCReport\DataSource;
+    public final datasource_add_odbc2(
+                     string $source_name,
+                     string $connection_info = null):
+                     ?OpenCReport\DataSource;
+
+    public final datasource_get(string $source_name):
+                     ?OpenCReport\DataSource;
+    public final query_get(string $query_name):
+                     ?OpenCReport\Query;
+
+    public final expr_parse(string $expr_string):
+                     ?OpenCReport\Expr;
+    public final expr_error(): ?string;
+
+    public final part_new(): OpenCReport\Part;
+    public final part_get_next(): OpenCReport\Part;
+
+    public final function_add(
+                     string $expr_func_name,
+                     string $zend_func_name,
+                     long $n_ops,
+                     bool $commutative,
+                     bool $associative,
+                     bool $left_associative,
+                     bool $dont_optimize): bool;
+
+    public final add_precalculation_done_cb(
+                     string $callback): void;
+    public final add_part_added_cb(
+                     string $callback): void;
+    public final add_report_added_cb(
+                     string $callback): void;
+
+    public final env_get(string $var_name):
+                     OpenCReport\Result;
+
+    public final result_new():
+                     OpenCReport\Result;
+
+    public final add_search_path(
+                     string $path): void;
+    public static final canonicalize_path(
+                     string $path): string;
+    public final find_file(string $path): $string;
+
+    public static final get_color(
+                     string $color_name,
+                     ?bool $bgcolor = false): array;
+
+    public final set_paper(string $paper): void;
+
+    public final set_size_unit(string $expr_string):
+                     void;
+    public final set_noquery_show_nodata(
+                     string $expr_string): void;
+    public final set_report_height_after_last(
+                     string $expr_string): void;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1 id="phphighlevelapi" xreflabel="High level PHP API">
+		<title>High level PHP API</title>
+		<para>
+			Here is an example code using the high level
+			PHP API where everything concerning the report
+			(including the data source) is described in
+			the report XML:
+			<programlisting>&lt;?php
+$o = new OpenCReport();
+
+if (!$o->parse_xml(o, "report.xml")) {
+    printf("XML parse error\n");
+    exit(1);
+}
+
+$o->set_output_format(o, OpenCReport::OUTPUT_PDF);
+$o->execute();
+$->spool();</programlisting>
+		</para>
+		<para>
+			This code will load <literal>report.xml</literal>,
+			set the output format to PDF, runs the report and dumps
+			the result on <literal>stdout</literal>, which ends up
+			in your browser if the PHP code is run behind a webserver.
+		</para>
+		<para>
+			Most of the class methods are direct wrappers
+			of the corresponding C API functions.
+		</para>
+		<sect2>
+			<title>Constructor</title>
+			<para>
+				The class constructor creates an
+				<literal>OpenCReport</literal> object.
+				<programlisting>public final
+OpenCReport::__construct();</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Load a report XML description</title>
+			<para>
+				These methods load the report description
+				either from the specified XML file or
+				from the XML content provided in the string.
+				They return
+				<literal>true</literal> for success,
+				<literal>false</literal> for failure.
+				<programlisting>public final
+OpenCReport::parse_xml(string $filename): bool;
+
+public final
+OpenCReport::parse_xml_from_buffer(string $buffer): bool;
+</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Set report output format</title>
+			<para>
+				<programlisting>public const OpenCReport::OUTPUT_UNSET;
+public const OpenCReport::OUTPUT_PDF;
+public const OpenCReport::OUTPUT_HTML;
+public const OpenCReport::OUTPUT_TXT;
+public const OpenCReport::OUTPUT_CSV;
+public const OpenCReport::OUTPUT_XML;
+
+public final
+OpenCReport::set_output_format(int $format): void;</programlisting>
+			</para>
+			<para>
+				Note that these constants are not to be overridden
+				in subclasses. With PHP 8.1 and newer, the
+				<literal>final</literal> flag is added so overriding
+				these constants will throw an exception.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Run the report</title>
+			<para>
+				This method executes the report, constructs
+				the result in memory. It returns <literal>true</literal>
+				for success, <literal>false</literal> for failure.
+				It is a failure if the output format is unset.
+				<programlisting>public final
+OpenCReport::execute(): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Dump report result</title>
+			<para>
+				Dump the report output on the program's
+				standard output channel.
+				<programlisting>public final
+OpenCReport::spool(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Get report result</title>
+			<para>
+				Get the report output. The application
+				then can save it as a file.
+				This method returns the output in a
+				<literal>string</literal> if report execution
+				succeeded, otherwise it returns
+				<literal>false</literal>.
+				<programlisting>public final
+OpenCReport::get_output(): string|false;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Get report content type</title>
+			<para>
+				Get the report content type. The application
+				then can add it as HTTP header line(s)
+				to the request. This method returns an
+				array of strings with
+				<literal>Content-Type:</literal>,
+				<literal>Content-Length:</literal> and
+				other header lines if report execution succeeded.
+				Otherwise it returns <literal>false</literal>.
+				<programlisting>public final
+OpenCReport::get_content_type(): array|false;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Get library version</title>
+			<para>
+				This method reports the OpenCReports
+				library version.
+				<programlisting>public final static
+OpenCReport::version(): string;</programlisting>
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="phplowlevelapi" xreflabel="Low level PHP API">
+		<title>Low level PHP API</title>
+		<para>
+			The <xref linkend="phphighlevelapi"/> is also part of the
+			low level API. The class methods described below allow
+			creating a report using program code, or simply
+			fine tuning the report behavior by mostly using the
+			<xref linkend="phphighlevelapi"/>.
+		</para>
+		<para>
+			Note that whenever the method argument is
+			<literal>string $expr_string</literal>,
+			such arguments are treated as
+			<xref linkend="expressions"/> and are only
+			parsed when calling the method. Evaluation
+			of the expressions is delayed to report
+			execution time.
+		</para>
+		<para>
+			Also note that for class methods that return
+			objects, the parent object must not be
+			<literal>unset()</literal> before using
+			such a derived object. These derived objects
+			are merely wrappers over C pointers in
+			their parent objects' C representation.
+			Such a "use after free" is a sure way to
+			crash the PHP process.
+		</para>
+		<sect2 id="phpnumerictuning" xreflabel="Numeric behavior related methods">
+			<title>Numeric behavior related methods</title>
+			<sect3>
+				<title><literal>Set numeric precision</literal></title>
+				<para>
+					The default is 256 bits of floating point precision.
+				<programlisting>public final
+OpenCReport::set_numeric_precision_bits(
+                     string $expr_string): void;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set rounding mode</title>
+				<para>
+					The rounding modes may be
+					<literal>nearest</literal>,
+					<literal>to_minus_inf</literal>,
+					<literal>to_inf</literal>,
+					<literal>to_zero</literal>,
+					<literal>away_from_zero</literal> and
+					<literal>faithful</literal>.
+					The default is <literal>nearest</literal>.
+					<programlisting>final public
+OpenCReport::set_rounding_mode(
+                     string $expr_string): void;</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Locale related methods</title>
+			<sect3>
+				<title>Set up translation</title>
+				<para>
+					Setting up the translation needs two parameters:
+					the so called <emphasis>translation domain</emphasis>
+					and the toplevel directory for the translations.
+					It relies on GNU Gettext.
+					<programlisting>public final 
+OpenCReport::bindtextdomain(
+                     string $domainname,
+                     string $dirname): void;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set report locale</title>
+				<para>
+					Setting the locale for the report does not affect
+					the main program or other threads. Locale setting
+					includes the language, the country. The UTF-8 suffix
+					is necessary. E.g.: <literal>en_GB.UTF-8</literal> or
+					<literal>de_DE.UTF-8</literal>
+					<programlisting>public final
+OpenCReport::set_locale(string $locale): void;</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Data source and query related methods</title>
+			<sect3>
+				<title>Add an array datasource</title>
+				<para>
+					For the <literal>OpenCReport\DataSource</literal>
+					class methods, see its own section REF: TODO.
+					<programlisting>public final
+OpenCReport::datasource_add_array(string $source_name):
+                     ?OpenCReport\DataSource;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a CSV datasource</title>
+				<para>
+					For the <literal>OpenCReport\DataSource</literal>
+					class methods, see its own section REF: TODO.
+					<programlisting>public final
+OpenCReport::datasource_add_csv(string $source_name):
+                     ?OpenCReport\DataSource;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a JSON datasource</title>
+				<para>
+					For the <literal>OpenCReport\DataSource</literal>
+					class methods, see its own section REF: TODO.
+					<programlisting>public final
+OpenCReport::datasource_add_json(string $source_name):
+                     ?OpenCReport\DataSource;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add an XML datasource</title>
+				<para>
+					For the <literal>OpenCReport\DataSource</literal>
+					class methods, see its own section REF: TODO.
+					<programlisting>public final
+OpenCReport::datasource_add_xml(string $source_name):
+                     ?OpenCReport\DataSource;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add an PostgreSQL datasource</title>
+				<para>
+					For the <literal>OpenCReport\DataSource</literal>
+					class methods, see its own section REF: TODO.
+					<programlisting>public final
+OpenCReport::datasource_add_postgresql(
+                     string $source_name,
+                     string $host = null,
+                     string $port = null,
+                     string $dbname = null,
+                     string $user = null,
+                     string $password = null):
+                     ?OpenCReport\DataSource;
+
+public final
+OpenCReport::datasource_add_postgresql2(
+                     string $source_name,
+                     string $connection_info = null):
+                     ?OpenCReport\DataSource;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a MariaDB datasource</title>
+				<para>
+					For the <literal>OpenCReport\DataSource</literal>
+					class methods, see its own section REF: TODO.
+					<programlisting>public final
+OpenCReport::datasource_add_mariadb(
+                     string $source_name,
+                     string $host = null,
+                     string $port = null,
+                     string $dbname = null,
+                     string $user = null,
+                     string $password = null,
+                     string $unix_socket = null):
+                     ?OpenCReport\DataSource;
+
+public final
+OpenCReport::datasource_add_mariadb2(
+                     string $source_name,
+                     string $option_file = null,
+                     string $group = null):
+                     ?OpenCReport\DataSource;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add an ODBC datasource</title>
+				<para>
+					For the <literal>OpenCReport\DataSource</literal>
+					class methods, see its own section REF: TODO.
+					<programlisting>public final
+OpenCReport::datasource_add_odbc(
+                     string $source_name,
+                     string $dbname = null,
+                     ?string $user,
+                     ?string $password):
+                     ?OpenCReport\DataSource;
+
+public final
+OpenCReport::datasource_add_odbc2(
+                     string $source_name,
+                     string $connection_info = null):
+                     ?OpenCReport\DataSource;</programlisting>
+				</para>
+				<para>
+					For the parameters, see <xref linkend="odbcds"/>.
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get a named datasource</title>
+				<para>
+					For the <literal>OpenCReport\DataSource</literal>
+					class methods, see its own section REF: TODO.
+					<programlisting>public final
+OpenCReport:: datasource_get(string $source_name):
+                     ?OpenCReport\DataSource;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get a named query</title>
+				<para>
+					For the <literal>OpenCReport\Query</literal>
+					class methods, see its own section REF: TODO.
+					<programlisting>public final
+OpenCReport::query_get(string $query_name):
+                     ?OpenCReport\Query;</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2 id="phpexprfunc" xreflabel="Expression related methods">
+			<title>Expression related methods</title>
+			<para>
+				Expressions in OpenCReports is explained in the
+				<xref linkend="expressions"/> chapter.
+			</para>
+			<sect3>
+				<title>Parse an expression</title>
+				<para>
+					The expression string may not reference
+					report specific identifiers.
+					<programlisting>public final
+OpenCReport::expr_parse(string $expr_string):
+                     ?OpenCReport\Expr;</programlisting>
+				</para>
+				<para>
+					If the expression is in any way invalid,
+					<literal>OpenCReport::expr_parse()</literal>
+					returns <literal>null</literal>. The error
+					is returned by:
+					<programlisting>public final
+OpenCReport::expr_error(): ?string;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Add a custom report function</title>
+				<para>
+					<programlisting>public final
+OpenCReport::function_add(
+                     string $expr_func_name,
+                     string $zend_func_name,
+                     long $n_ops,
+                     bool $commutative,
+                     bool $associative,
+                     bool $left_associative,
+                     bool $dont_optimize): bool;</programlisting>
+				</para>
+				<para>
+					After this function returns with
+					success, subsequently parsed expressions
+					may use the function named as the
+					value of <literal>$expr_func_name</literal>.
+					During evaluation of the function, the
+					PHP function named as the value of
+					<literal>$zend_func_name</literal> is called.
+					The expressions that use the new function
+					may call it with either the number of arguments
+					given in <literal>$n_ops</literal>, or
+					if the value is <literal>-1</literal>,
+					any number of arguments.
+				</para>
+				<para>
+					The remaining <literal>bool</literal>
+					arguments indicate the named properties
+					of the function that the expression optimizer
+					considers.
+				</para>
+				<para>
+					The declaration of the PHP function named
+					as the value of <literal>$zend_func_name</literal>
+					must follow this:
+					<programlisting>function my_function(OpenCReport\Expr $e)</programlisting>
+				</para>
+				<para>
+					The function implementation may return
+					any PHP base type (<literal>string</literal>,
+					<literal>long</literal>, <literal>double</literal>
+					or <literal>bool</literal>) or it may not return
+					a value at all (i.e. <literal>void</literal>).
+					In the latter case, the function must set the
+					return value in the passed-in
+					<literal>$e</literal> object.
+				</para>
+				<para>
+					For class methods of
+					<literal>OpenCReport\Expr</literal>,
+					please refer to its own section. REF: TODO.
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Layout part related methods</title>
+			<sect3>
+				<title>Add a new report (layout) part</title>
+				<para>
+					For class methods of
+					<literal>OpenCReport\Part</literal>,
+					see its own section. REF: TODO.
+					<programlisting>public final
+OpenCReport::part_new(): OpenCReport\Part;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Get first (layout) part</title>
+				<para>
+					This function returns an object
+					of the <literal>OpenCReport\Part</literal>
+					class. The object is internally marked
+					as an "iterator object", so
+					<literal>OpenCReport\Part::get_next()</literal>
+					may be called on it again to iterate
+					through every report part of the
+					parent <literal>OpenCReport</literal> object.
+					<programlisting>public final
+OpenCReport::part_get_first(): OpenCReport\Part;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set paper type</title>
+				<para>
+					Set the paper type using the paper name,
+					i.e. <literal>'letter'</literal>,
+					<literal>'A4'</literal>, etc.
+					<programlisting>public final
+OpenCReport::set_paper(string $paper): void;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set size unit</title>
+				<para>
+					Set the size unit.
+					See <xref linkend="sizeunit"/>.
+					Possible settings are
+					<literal>points</literal> and <literal>rlib</literal>.
+					Default is <literal>rlib</literal>
+					for RLIB compatibility.
+					<programlisting>public final
+OpenCReport::set_size_unit(string $expr_string): void;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set "no query show NoData" property</title>
+				<para>
+					<programlisting>public final
+OpenCReport::set_noquery_show_nodata(
+                     string $expr_string): void;</programlisting>
+				</para>
+			</sect3>
+			<sect3>
+				<title>Set "report height after last" property</title>
+				<para>
+					<programlisting>public final
+OpenCReport::set_report_height_after_last(
+                     string $expr_string): void;</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+		<sect2>
+			<title>Callback related methods</title>
+			<para>
+				These methods add a callback function
+				that are called at certain points
+				during executing the report.
+				<programlisting>public final
+OpenCReport::add_precalculation_done_cb(
+                     string $callback): void;
+
+public final
+OpenCReport::add_part_added_cb(
+                     string $callback): void;
+
+public final
+OpenCReport::add_report_added_cb(
+                     string $callback): void;</programlisting>
+			</para>
+			<para>
+				The "precalculation done" callback
+				is called after the first phase of the
+				report is finished. The interface of
+				the callback function must follow this:
+				<programlisting>function
+my_callback(OpenCReport $o)</programlisting>
+			</para>
+			<para>
+				The "part added" callback is called when
+				either <literal>OpenCReport::part_new()</literal>
+				is called, or a report XML description is parsed
+				via either <literal>OpenCReport::parse_xml()</literal>
+				or <literal>OpenCReport::parse_xml_from_buffer()</literal>
+				and a <literal>&lt;Part&gt;</literal> node is being parsed.
+				The interface of the callback function must follow this:
+				<programlisting>function
+my_callback(OpenCReport $o,
+            OpenCReport\Part $p)</programlisting>
+			</para>
+			<para>
+				The "report added" callback is called when
+				either <literal>OpenCReport\Column::report_new()</literal>
+				is called, or a report XML description is parsed
+				via either <literal>OpenCReport::parse_xml()</literal>
+				or <literal>OpenCReport::parse_xml_from_buffer()</literal>
+				and a <literal>&lt;Report&gt;</literal> node is being parsed.
+				The interface of the callback function must follow this:
+				<programlisting>function
+my_callback(OpenCReport $o,
+            OpenCReport\Report $r)</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Environment related methods</title>
+			<para>
+				In PHP, the "environment" includes both
+				global variables and actual environment
+				variables. If a global variable name exists
+				in the PHP environment, its value is returned
+				as <literal>OpenCReport\Result</literal>.
+				If such a PHP global variable doesn't exist,
+				the variable from operating (e.g. UNIX)
+				environment is used and its value is returned
+				if it exists. Otherwise <literal>NULL</literal>
+				is returned.
+				<programlisting>public final
+OpenCReport::env_get(string $var_name):
+                     OpenCReport\Result;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Result related methods</title>
+			<para>
+				This method creates an uninitialized
+				<literal>OpenCReport\Result</literal>
+				with no value. See its own methods
+				to set the value. REF: TODO
+				<programlisting>public final
+OpenCReport::result_new(): OpenCReport\Result;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Path related methods</title>
+				<sect3>
+					<title>Add a search path</title>
+					<para>
+						<programlisting>public final
+OpenCReport::add_search_path(string $path): void;</programlisting>
+					</para>
+				</sect3>
+				<sect3>
+					<title>Canonicalize path</title>
+					<para>
+						This method returns (a possibly modified)
+						path that will create a canonical
+						absolute path that doesn't contain
+						<literal>.</literal> and <literal>..</literal>
+						references, symlinks are replaced with
+						the actual target directory, etc.
+						<programlisting>public static final
+OpenCReport::canonicalize_path(string $path): string;</programlisting>
+					</para>
+				</sect3>
+				<sect3>
+					<title>Find a file</title>
+					<para>
+						Find a (possibly relative) file using
+						the search paths and return the canonical
+						absolute path if found.
+						<programlisting>public final
+OpenCReport::find_file(string $path): $string;</programlisting>
+					</para>
+				</sect3>
+		</sect2>
+		<sect2>
+			<title>Color related methods</title>
+			<para>
+				Get an array with <literal>double</literal>
+				components for the color name or color
+				specification.
+				<programlisting>public static
+OpenCReport::final get_color(
+                     string $color_name,
+                     ?bool $bgcolor = false): array;</programlisting>
+			</para>
+		</sect2>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Datasource class</title>
+		<para>
+			This class has no constructor, so such an object
+			cannot be created or used on its own. A datasource
+			only is only useful as part of a report. The
+			<literal>OpenCReport::datasource_add_*</literal>
+			methods return an object of this class.
+			<programlisting>class OpenCReport\Datasource {
+    public final free();
+
+    public final query_add(string $name,
+                           string $array_or_file_or_sql,
+                           ?string $coltypes = null):
+                           OpenCReport\Query;
+
+    public final set_encoding(string $encoding): void;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Query class</title>
+		<para>
+			<programlisting>class OpenCReport\Query {
+    public final get_result():
+                     OpenCReport\QueryResult;
+
+    public final navigate_start(): void;
+    public final navigate_next(): bool;
+
+    public final add_follower(
+                     OpenCReport\Query $follower):
+                     bool;
+    public final add_follower_n_to_1(
+                     OpenCReport\Query $follower,
+                     OpenCReport\Expr $match):
+                     bool;
+
+    public final free(): void;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\QueryResult class</title>
+		<para>
+			<programlisting>class OpenCReport\QueryResult {
+    public final columns(): long;
+
+    public final column_name(long $index): ?string;
+
+    public final column_result(long $index):
+                     ?OpenCReport\Result;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Expr class</title>
+		<para>
+			<programlisting>class OpenCReport\Expr {
+    public final free(): void;
+
+    public final print(): void;
+
+    public final nodes(): long;
+
+    public final resolve(): void;
+    public final optimize(): void;
+    public final eval():
+                     ?OpenCReport\Result;
+
+    public final get_result():
+                     ?OpenCReport\Result;
+    public final set_string_value(
+                     string $value): void;
+    public final set_long_value(
+                     long $value): void;
+    public final set_double_value(
+                     double $value): void;
+
+    public final get_num_operands(): long;
+
+    public final operand_get_result(
+                     long $opidx):
+                     ?OpenCReport\Result;
+
+    public final cmp_results(): bool;
+
+    public final init_results(long $result_type):
+                     void;
+
+    public final set_nth_result_string_value(
+                     long $which,
+                     string $value): void;
+
+    public final set_nth_result_long_value(
+                     long $which,
+                     long $value): void;
+
+    public final set_nth_result_double_value(
+                     long $which,
+                     double $value): void;
+
+    public final set_iterative_start_value(
+                     bool $value): void;
+
+    public final set_delayed(
+                     bool $value): void;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Result class</title>
+		<para>
+			<programlisting>class OpenCReport\Result {
+    public final free(): void;
+
+    public final copy(
+                     OpenCReport\Result $src_result):
+                     void;
+
+    public final print(): void;
+
+    public final get_type(): long;
+
+    public final is_null(): bool;
+    public final is_string(): bool;
+    public final is_number(): bool;
+    public final get_string(): ?string;
+    public final get_number(?string $format): ?string;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Part class</title>
+		<para>
+			<programlisting>class OpenCReport\Part {
+    public final get_next():
+                     ?OpenCReport\Part;
+
+    public final row_new():
+                     OpenCReport\Row;
+
+    public final row_get_first():
+                     ?OpenCReport\Row;
+
+    public final add_iteration_cb(
+                     string $callback): void;
+
+    public final equals(
+                     OpenCReport\Part $part): bool;
+
+    public final set_iterations(
+                     ?string $expr_string = null): void;
+
+    public final set_font_name(
+                     ?string $expr_string = null): void;
+
+    public final set_font_size(
+                     ?string $expr_string = null): void;
+
+    public final set_paper(
+                     ?string $expr_string = null): void;
+
+    public final set_orientation(
+                     ?string $expr_string = null): void;
+
+    public final set_top_margin(
+                     ?string $expr_string = null): void;
+
+    public final set_bottom_margin(
+                     ?string $expr_string = null): void;
+
+    public final set_left_margin(
+                     ?string $expr_string = null): void;
+
+    public final set_right_margin(
+                     ?string $expr_string = null): void;
+
+    public final set_suppress(
+                     ?string $expr_string = null): void;
+
+    public final set_suppress_pageheader_firstpage(
+                     ?string $expr_string = null): void;
+
+    public final page_header():
+                     ?OpenCReport\Output;
+
+    public final page_header_set_report(
+                     OpenCReport\Report $report):
+                     void;
+
+    public final page_footer():
+                     ?OpenCReport\Output;
+
+    public final page_footer_set_report(
+                     OpenCReport\Report $report):
+                     void;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Row class</title>
+		<para>
+			<programlisting>class OpenCReport\Row {
+    public final get_next():
+                     ?OpenCReport\Row;
+
+    public final column_new():
+                     OpenCReport\Column;
+
+    public final column_get_first():
+                     ?OpenCReport\Column;
+
+    public final set_suppress(
+                     ?string $expr_string = null): void;
+
+    public final set_newpage(
+                     ?string $expr_string = null): void;
+
+    public final set_layout(
+                     ?string $expr_string = null): void;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Column class</title>
+		<para>
+			<programlisting>class OpenCReport\Column {
+    public final get_next():
+                     ?OpenCReport\Column;
+
+    public final report_new():
+                     OpenCReport\Report;
+
+    public final report_get_first():
+                     ?OpenCReport\Report;
+
+    public final set_suppress(
+                     ?string $expr_string = null): void;
+
+    public final set_width(
+                     ?string $expr_string = null): void;
+
+    public final set_width(
+                     ?string $expr_string = null): void;
+
+    public final set_border_width(
+                     ?string $expr_string = null): void;
+
+    public final set_border_color(
+                     ?string $expr_string = null): void;
+
+    public final set_detail_columns(
+                     ?string $expr_string = null): void;
+
+    public final set_column_padding(
+                     ?string $expr_string = null): void;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Report class</title>
+		<para>
+			<programlisting>class OpenCReport\Report {
+    public final get_next():
+                     ?OpenCReport\Report;
+
+    public final variable_new(
+                     long $variable_type,
+                     string $name,
+                     string $expr,
+                     ?string $reset_on_break_name = null):
+                     OpenCReport\Variable;
+
+    public final variable_new_full(
+                     long $result_type,
+                     string $name,
+                     ?string $baseexpr = null,
+                     ?string $intermedexpr = null,
+                     ?string $intermed2expr = null,
+                     ?string $resultexpr = null,
+                     ?string $reset_on_break_name = null):
+                     OpenCReport\Variable;
+
+    public final expr_parse(
+                     string $expr_string):
+                     ?OpenCReport\Expr;
+
+    public final expr_error(): ?string;
+
+    public final resolve_variables(): void;
+
+    public final evaluate_variables(): void;
+
+    public final break_new(
+                     ?string $name):
+                     OpenCReport\Break;
+
+    public final break_get(
+                     string $break_name):
+                     OpenCReport\Break;
+
+    public final break_get_first():
+                     ?OpenCReport\Break;
+
+    public final resolve_breaks(): void;
+
+    public final get_query_rownum(): long;
+
+    public final add_start_cb(
+                     string $callback): void;
+
+    public final add_done_cb(
+                     string $callback): void;
+
+    public final add_new_row_cb(
+                     string $callback): void;
+
+    public final add_iteration_cb(
+                     string $callback): void;
+
+    public final add_precalculation_done_cb(
+                     string $callback): void;
+
+    public final equals(
+                     OpenCReport\Report $report):
+                     bool;
+
+    public final set_main_query(
+                     OpenCReport\Query $query): void;
+
+    public final set_main_query_by_name(
+                     string $query_name): void;
+
+    public final set_suppress(
+                     ?string $expr_string = null): void;
+
+    public final set_iterations(
+                     ?string $expr_string = null): void;
+
+    public final set_font_name(
+                     ?string $expr_string = null): void;
+
+    public final set_font_size(
+                     ?string $expr_string = null): void;
+
+    public final set_height(
+                     ?string $expr_string = null): void;
+
+    public final set_fieldheader_priority(
+                     ?string $expr_string = null): void;
+
+    public final nodata(): OpenCReport\Output;
+    public final header(): OpenCReport\Output;
+    public final footer(): OpenCReport\Output;
+    public final field_header(): OpenCReport\Output;
+    public final field_details(): OpenCReport\Output;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Variable class</title>
+		<para>
+			<programlisting>class OpenCReport\Variable {
+    public final baseexpr():
+                     ?OpenCReport\Expr;
+
+    public final intermedexpr():
+                     ?OpenCReport\Expr;
+
+    public final intermed2expr():
+                     ?OpenCReport\Expr;
+
+    public final resultexpr():
+                     ?OpenCReport\Expr;
+
+    public final set_precalculate(
+                     ?string $expr_string = null):
+                     void;
+
+    public final resolve(): void;
+    public final eval(): void;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Break class</title>
+		<para>
+			<programlisting>class OpenCReport\Break {
+    public final get_next():
+                     ?OpenCReport\Break;
+
+    public final breakfield_add(
+                     OpenCReport\Expr $breakfield_expr):
+                     void;
+
+    public final check_fields(): bool;
+
+    public final reset_vars(): void;
+
+    public final add_trigger_cb(
+                     ?string $callback):
+                     void;
+
+    public final name(): string;
+
+    public final header(): OpenCReport\Output;
+    public final footer(): OpenCReport\Output;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Output class</title>
+		<para>
+			<programlisting>class OpenCReport\Output {
+    public final set_suppress(
+                     ?string $expr_string = null): void;
+
+    public final add_line():
+                     ?OpenCReport\Line;
+
+    public final add_hline():
+                     ?OpenCReport\HorizontalLine;
+
+    public final add_image():
+                     ?OpenCReport\Image;
+
+    public final add_image_end(): void;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Line class</title>
+		<para>
+			<programlisting>class OpenCReport\Line {
+    public final set_font_name(
+                     ?string $expr_string = null): void;
+
+    public final set_font_size(
+                     ?string $expr_string = null): void;
+
+    public final set_bold(
+                     ?string $expr_string = null): void;
+
+    public final set_italic(
+                     ?string $expr_string = null): void;
+
+    public final set_suppress(
+                     ?string $expr_string = null): void;
+
+    public final set_color(
+                     ?string $expr_string = null): void;
+
+    public final set_bgcolor(
+                     ?string $expr_string = null): void;
+
+    public final add_text():
+                     ?OpenCReport\Text;
+
+    public final add_image():
+                     ?OpenCReport\Image;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\HorizontalLine class</title>
+		<para>
+			<programlisting>class OpenCReport\HorizontalLine {
+    public final set_size(
+                     ?string $expr_string = null): void;
+
+    public final set_indent(
+                     ?string $expr_string = null): void;
+
+    public final set_length(
+                     ?string $expr_string = null): void;
+
+    public final set_font_size(
+                     ?string $expr_string = null): void;
+
+    public final set_suppress(
+                     ?string $expr_string = null): void;
+
+    public final set_color(
+                     ?string $expr_string = null): void;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Image class</title>
+		<para>
+			<programlisting>class OpenCReport\Image {
+    public final set_value(
+                     ?string $expr_string = null): void;
+
+    public final set_suppress(
+                     ?string $expr_string = null): void;
+
+    public final set_type(
+                     ?string $expr_string = null): void;
+
+    public final set_width(
+                     ?string $expr_string = null): void;
+
+    public final set_height(
+                     ?string $expr_string = null): void;
+
+    public final set_alignment(
+                     ?string $expr_string = null): void;
+
+    public final set_bgcolor(
+                     ?string $expr_string = null): void;
+
+    public final set_text_width(
+                     ?string $expr_string = null): void;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>The OpenCReport\Text class</title>
+		<para>
+			<programlisting>class OpenCReport\Text {
+    public final set_value_string(
+                     ?string $expr_string = null): void;
+
+    public final set_value_expr(
+                     ?string $expr_string = null): void;
+
+    public final set_value_delayed(
+                     ?string $expr_string = null): void;
+
+    public final set_format(
+                     ?string $expr_string = null): void;
+
+    public final set_translate(
+                     ?string $expr_string = null): void;
+
+    public final set_width(
+                     ?string $expr_string = null): void;
+
+    public final set_alignment(
+                     ?string $expr_string = null): void;
+
+    public final set_color(
+                     ?string $expr_string = null): void;
+
+    public final set_bgcolor(
+                     ?string $expr_string = null): void;
+
+    public final set_font_name(
+                     ?string $expr_string = null): void;
+
+    public final set_font_size(
+                     ?string $expr_string = null): void;
+
+    public final set_bold(
+                     ?string $expr_string = null): void;
+
+    public final set_italic(
+                     ?string $expr_string = null): void;
+
+    public final set_link(
+                     ?string $expr_string = null): void;
+
+    public final set_memo(
+                     ?string $expr_string = null): void;
+
+    public final set_memo_wrap_chars(
+                     ?string $expr_string = null): void;
+
+    public final set_memo_max_lines(
+                     ?string $expr_string = null): void;
+}</programlisting>
+		</para>
+	</sect1>
+	<sect1>
+		<title>RLIB compatibility API</title>
+		<para>
+			These functions mimic the behaviour
+			of the RLIB PHP API but their declaration
+			differ in a way that the RLIB compatibility
+			API in OpenCReports create and use
+			<literal>OpenCReport</literal> objects,
+			making the OpenCReports methods and
+			RLIB compatibility functions inter-operable.
+		</para>
+		<sect2>
+			<title>Initialize a report</title>
+			<para>
+				<programlisting>function
+rlib_init(): ?OpenCReport;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Destroy a report</title>
+			<para>
+				<programlisting>function
+rlib_free(OpenCReport $r): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Get library version</title>
+			<para>
+				<programlisting>function
+rlib_version(void): string;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add a MySQL/MariaDB datasource</title>
+			<para>
+				This function is mostly equivalent to
+				<literal>OpenCReport::datasource_add_mariadb()</literal>
+				except that this function does not have a
+				<literal>port</literal> parameter and it
+				doesn't handle the port the way RLIB handled
+				it as an afterthought, i.e. the value of
+				<literal>$host</literal> could have a
+				<literal>:port</literal> suffix. Only
+				the default port will be used, which may be
+				set in the MySQL or MariaDB configuration.
+				<programlisting>function
+rlib_add_datasource_mysql(
+                     OpenCReport $r,
+                     string $source_name,
+                     string $host,
+                     string $user,
+                     string $password,
+                     string $dbname):
+                     OpenCReport\Datasource;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add a MySQL/MariaDB datasource from an INI group</title>
+			<para>
+				This function is equivalent to
+				<literal>OpenCReport::datasource_add_mariadb2()</literal>.
+				<programlisting>function
+rlib_add_datasource_mysql_from_group(
+                     OpenCReport $r,
+                     string $source_name,
+                     string $group,
+                     ?string $option_file = null):
+                     OpenCReport\Datasource;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add a PostgreSQL datasource</title>
+			<para>
+				This function is equivalent to
+				<literal>OpenCReport::datasource_add_postgresql2()</literal>.
+				<programlisting>function
+rlib_add_datasource_postgres(
+                     OpenCReport $r,
+                     string $source_name,
+                     ?string $connection_info = null):
+                     OpenCReport\Datasource;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add an ODBC datasource</title>
+			<para>
+				This function is equivalent to
+				<literal>OpenCReport::datasource_add_odbc()</literal>.
+				<programlisting>function
+rlib_add_datasource_odbc(
+                     OpenCReport $r,
+                     string $source_name,
+                     string $dbname,
+                     ?string $user, = null,
+                     ?string $password = null):
+                     OpenCReport\Datasource;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add an array datasource</title>
+			<para>
+				This function is equivalent to
+				<literal>OpenCReport::datasource_add_array()</literal>.
+				<programlisting>function
+rlib_add_datasource_array(
+                     OpenCReport $r,
+                     string $source_name):
+                     OpenCReport\Datasource;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add an XML datasource</title>
+			<para>
+				This function is equivalent to
+				<literal>OpenCReport::datasource_add_xml()</literal>.
+				<programlisting>function
+rlib_add_datasource_xml(
+                     OpenCReport $r,
+                     string $source_name):
+                     OpenCReport\Datasource;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add a CSV datasource</title>
+			<para>
+				This function is equivalent to
+				<literal>OpenCReport::datasource_add_csv()</literal>.
+				<programlisting>function
+rlib_add_datasource_csv(
+                     OpenCReport $r,
+                     string $source_name):
+                     OpenCReport\Datasource;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add a query</title>
+			<para>
+				This function is equivalent to
+				<literal>OpenCReport\Datasource::query_add()</literal>
+				with a different order of parameters.
+				The query name is the last parameter.
+				<programlisting>function
+rlib_add_query_as(
+                     OpenCReport $r,
+                     string $source_name,
+                     string $array_or_file_or_sql,
+                     string $name):
+                     OpenCReport\Datasource;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add a resultset follower</title>
+			<para>
+				This function is about equivalent to
+				<literal>OpenCReport\Query::add_follower()</literal>.
+				The <literal>$leader</literal> and
+				<literal>$follower</literal> are query
+				names.
+				<programlisting>function
+rlib_add_resultset_follower(
+                     OpenCReport $r,
+                     string $leader,
+                     string $follower): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add a resultset N:1 follower</title>
+			<para>
+				This function is about equivalent to
+				<literal>OpenCReport\Query::add_follower_n_to_1()</literal>.
+				The former allows an arbitrary match expression,
+				while the RLIB compatibility function
+				will use the <literal>$leader_field = $follower_field</literal>
+				expression. Similarly to the above
+				function, <literal>$leader</literal> and
+				<literal>$follower</literal> are query
+				names.
+				<programlisting>function
+rlib_add_resultset_follower_n_to_1(
+                     OpenCReport $r,
+                     string $leader,
+                     string $leader_field,
+                     string $follower,
+                     string $follower_field): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Set datasource encoding</title>
+			<para>
+				This function is equivalent to
+				<literal>OpenCReport\Datasource::set_encoding()</literal>.
+				<programlisting>function
+rlib_set_datasource_encoding(
+                     OpenCReport $r,
+                     string $name,
+                     string $encoding): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add a report XML</title>
+			<para>
+				This function is equivalent to
+				<literal>OpenCReport::parse_xml()</literal>.
+				<programlisting>function
+rlib_add_report(
+                     OpenCReport $r,
+                     string $filename): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add a report XML from buffer</title>
+			<para>
+				This function is equivalent to
+				<literal>OpenCReport::parse_xml_from_buffer()</literal>.
+				<programlisting>function
+rlib_add_report_from_buffer(
+                     OpenCReport $r,
+                     string $buffer): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add a search path</title>
+			<para>
+				This function is equivalent to
+				<literal>OpenCReport::add_search_path()</literal>.
+				<programlisting>function
+rlib_add_search_path(
+                     OpenCReport $r,
+                     string $path): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Set locale</title>
+			<para>
+				This function is equivalent to
+				<literal>OpenCReport::set_locale()</literal>.
+				<programlisting>function
+rlib_set_locale(
+                     OpenCReport $r,
+                     string $locale): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Setup translation</title>
+			<para>
+				This function is equivalent to
+				<literal>OpenCReport::bindtextdomain()</literal>.
+				<programlisting>function
+rlib_bindtextdomain(
+                     OpenCReport $r,
+                     string $domain,
+                     string $dirname): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Set output format</title>
+			<para>
+				This function is about equivalent to
+				<literal>OpenCReport::set_output_format()</literal>
+				but accepts textual format names (like
+				<literal>pdf</literal> instead of the
+				numeric constants like <literal>OpenCReport::OUTPUT_PDF</literal>
+				<programlisting>function
+rlib_set_output_format_from_text(
+                     OpenCReport $r,
+                     string $format): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add a custom report function</title>
+			<para>
+				This function is the RLIB compatible
+				variant of <literal>OpenCReport::function_add()</literal>.
+				Unlike the OpenCReports API, the function
+				added by this function does not have
+				the control knobs to optimize it properly.
+				After this function returns, subsequently
+				parsed expressions may use a function
+				name passed in with <literal>$name</literal>.
+				The PHP function name is in <literal>$function</literal>
+				<programlisting>function
+rlib_add_function(
+                     OpenCReport $r,
+                     string $name,
+                     string $function,
+                     long $params): void;</programlisting>
+			</para>
+			<para>
+				The interface of the PHP function must follow the
+				below prototype. It must contain the exact number
+				of arguments passed in via <literal>$params</literal>,
+				i.e. it may not pass <literal>-1</literal> to indicate
+				variadic arguments.
+				<programlisting>function my_function($arg1, $arg2, ...)</programlisting>
+			</para>
+			<para>
+				The function implementation may return
+				any PHP base type (<literal>string</literal>,
+				<literal>long</literal>, <literal>double</literal>
+				or <literal>bool</literal>).
+			</para>
+		</sect2>
+		<sect2>
+			<title>Set output encoding</title>
+			<para>
+				This function silently does nothing.
+				For PDF, it's not relevant. Other
+				(CURRENTLY NOT IMPLEMENTED) output formats
+				will all use UTF-8.
+				<programlisting>function
+rlib_set_output_encoding(
+                     OpenCReport $r,
+                     string $encoding): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add a report parameter</title>
+			<para>
+				This function silently does nothing.
+				Currently no output format (other than PDF)
+				are implemented and there was no need for
+				report parameters yet in OpenCReports.
+				<programlisting>function
+rlib_add_parameter(
+                     OpenCReport $r,
+                     string $param,
+                     string $value): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Set an output parameter</title>
+			<para>
+				This function silently does nothing.
+				Currently no output format (other than PDF)
+				are implemented and there was no need for
+				output parameters yet in OpenCReports.
+				<programlisting>function
+rlib_set_output_parameter(
+                     OpenCReport $r,
+                     string $param,
+                     string $value): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Refresh array query contents</title>
+			<para>
+				This function silently does nothing.
+				NOT IMPLEMENTED YET.
+				<programlisting>function
+rlib_query_refresh(OpenCReport $r): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add an event callback</title>
+			<para>
+				This function adds a callback for
+				the specified <literal>$signal</literal>
+				in an RLIB compatible way. The signal
+				name may be <literal>row_change</literal>,
+				<literal>report_done</literal>,
+				<literal>report_start</literal>,
+				<literal>report_iteration</literal>,
+				<literal>part_iteration</literal> or
+				<literal>precalculation_done</literal>.
+				<programlisting>function
+rlib_signal_connect(
+                     OpenCReport $r,
+                     string $signal,
+                     string $function): void;</programlisting>
+			</para>
+			<para>
+				The PHP function prototype must follow this:
+				<programlisting>function my_callback()</programlisting>
+			</para>
+			<para>
+				This function is different from the
+				methods that add specific callback
+				types for parts, reports, breaks, etc.
+				in that the callback is added to the toplevel
+				<literal>OpenCReport</literal> object context,
+				meaning that a <literal>report_start</literal>
+				callback will be called for every report
+				in case there are multiple reports in the same
+				context. Similarly, the same
+				<literal>part_iteration</literal> callback
+				will be called for every part in a multi-part
+				report.
+			</para>
+			<para>
+				Since there is no way to know which part or
+				which report triggers the callback, it is recommended
+				to use <literal>rlib_signal_connect()</literal>
+				for single-part single-report reports. For
+				more special purposes, the callback creation
+				class methods are recommended.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Execute the report</title>
+			<para>
+				It is equivalent to <literal>OpenCReport::execute()</literal>
+				<programlisting>function
+rlib_execute(OpenCReport $r): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Dump the report output</title>
+			<para>
+				It is equivalent to <literal>OpenCReport::spool()</literal>
+				<programlisting>function
+rlib_spool(OpenCReport $r): ?string;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Get content type</title>
+			<para>
+				It is equivalent to <literal>OpenCReport::get_content_type()</literal>
+				<programlisting>function
+rlib_get_content_type(OpenCReport $r): ?string;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Set radix character</title>
+			<para>
+				This function silently does nothing.
+				Formatting numbers correctly follow the
+				locale information regarding the decimal
+				separator.
+				<programlisting>function
+rlib_set_radix_character(OpenCReport $r): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Compile and evaluate an expression</title>
+			<para>
+				<programlisting>function
+rlib_compile_infix(string $expr_string):
+                     string|double|null;</programlisting>
+			</para>
+			<para>
+				Since only the expression string is passed
+				but not the <literal>$r</literal> resource
+				in RLIB, the compatibility implementation
+				of this function is equivalent to the
+				sequence of creating an internal
+				<literal>OpenCReport</literal> object,
+				parsing, optimizing and evaluating the
+				expression, converting its result to
+				a PHP base type, then destroying the
+				internal object. For this reason, the
+				expression may not reference any query
+				columns or report variables.
+			</para>
+		</sect2>
+		<sect2>
+			<title>Add graph background region</title>
+			<para>
+				This function silently does nothing.
+				GRAPHING IS NOT IMPLEMENTED YET.
+				<programlisting>function
+rlib_graph_add_bg_region(
+                     OpenCReport $r,
+                     string $graph,
+                     string $region,
+                     string $color,
+                     double $start,
+                     double $end): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Clear graph background region</title>
+			<para>
+				This function silently does nothing.
+				GRAPHING IS NOT IMPLEMENTED YET.
+				<programlisting>function
+rlib_graph_clear_bg_region(
+                     OpenCReport $r,
+                     string $graph): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Set graph minor tick</title>
+			<para>
+				This function silently does nothing.
+				GRAPHING IS NOT IMPLEMENTED YET.
+				<programlisting>function
+rlib_graph_set_x_minor_tick(
+                     OpenCReport $r,
+                     string $graph,
+                     string $x): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2>
+			<title>Set graph minor tick by location</title>
+			<para>
+				This function silently does nothing.
+				GRAPHING IS NOT IMPLEMENTED YET.
+				<programlisting>function
+rlib_graph_set_x_minor_tick_by_location(
+                     OpenCReport $r,
+                     string $graph,
+                     double $location): void;</programlisting>
+			</para>
+		</sect2>
+	</sect1>
+</chapter>
