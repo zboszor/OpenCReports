@@ -1,6 +1,6 @@
 <chapter id="formatting" xreflabel="Formatting data">
 	<title>Formatting</title>
-	<sect1>
+	<sect1 id="formattingfuncs">
 		<title>Formatting functions</title>
 		<para>
 			Formatting data can be done via the
@@ -13,7 +13,7 @@
 			report output or processed further as needed.
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="formatstrings">
 		<title>Format strings</title>
 		<para>
 			OpenCReports supports the same set of
@@ -41,13 +41,13 @@
 			embed the format strings.
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="legacyformatstrings">
 		<title>Legacy format strings</title>
 		<para>
 			Legacy format strings are like in C, but not always
 			identical.
 		</para>
-		<sect2>
+		<sect2 id="legacyformatstringstring">
 			<title>Format string for strings</title>
 			<para>
 				To print a string, the <literal>%s</literal>
@@ -57,7 +57,7 @@
        format="'%s'" &gt;
 
 field value="query1.field1"
-       format="'Look, there is a %s there!'" &gt</programlisting>
+       format="'Look, there is a %s there!'" &gt;</programlisting>
 			</para>
 			<para>
 				Example expressions for <xref linkend="formatfunc"/>:
@@ -74,7 +74,7 @@ format('Look, there is a %s there!', query1.field1)</programlisting>
 				<ulink url="https://man7.org/linux/man-pages/man3/printf.3.html">printf(3)</ulink>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="legacyformatstringnum">
 			<title>Format string for numeric values</title>
 			<para>
 				To print a number, the <literal>%d</literal>
@@ -88,7 +88,7 @@ format('Look, there is a %s there!', query1.field1)</programlisting>
        format="'%.3d'" &gt;
 
 field value="query1.field1"
-       format="'You have %.2d apples.'" &gt</programlisting>
+       format="'You have %.2d apples.'" &gt;</programlisting>
 			</para>
 			<para>
 				The same format string can be used for the
@@ -101,7 +101,7 @@ field value="query1.field1"
 				<ulink url="https://man7.org/linux/man-pages/man3/printf.3.html">printf(3)</ulink>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="legacyformatstringdatetime">
 			<title>Format string for datetime values</title>
 			<para>
 				RLIB approximated <literal>strftime()</literal>
@@ -118,7 +118,7 @@ field value="query1.field1"
 			</para>
 		</sect2>
 	</sect1>
-	<sect1>
+	<sect1 id="newformatstrings">
 		<title>New style format strings</title>
 		<para>
 			RLIB supported "new style" format strings that allowed
@@ -128,23 +128,23 @@ field value="query1.field1"
 			are used in both <literal>printf()</literal>,
 			<literal>strfmon()</literal> and <literal>strftime()</literal>.
 		</para>
-		<sect2>
+		<sect2 id="newformatstringsstring">
 			<title>New style format string for strings</title>
 			<para>
 				This is an extension over RLIB, which didn't have
 				such a notion. In OpenCReports, the new style flag
-				is prefixed with <literal>!&</literal>
-				<programlisting>&lt;field ... format="'!&%s'" ... /&gt;</programlisting>
+				is prefixed with <literal>!&amp;</literal>
+				<programlisting>&lt;field ... format="'!&amp;%s'" ... /&gt;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="newformatstringsnum">
 			<title>New style format string for numeric data</title>
 			<para>
 				The new style flag is prefixed with <literal>!#</literal>
 				<programlisting>&lt;field ... format="'!#%5.3d'" ... /&gt;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="newformatstringsmoney">
 			<title>New style format string for monetary data</title>
 			<para>
 				The new style flag is prefixed with <literal>!$</literal>
@@ -162,7 +162,7 @@ field value="query1.field1"
 				using monetary formatting.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="newformatstringsdatetime">
 			<title>New style format string for datetime values</title>
 			<para>
 				The new style flag is prefixed with <literal>!@</literal>
@@ -173,28 +173,28 @@ field value="query1.field1"
 			</para>
 		</sect2>
 	</sect1>
-	<sect1>
+	<sect1 id="newformatstringsgen2">
 		<title>Second generation new style format strings</title>
 		<para>
 			This format string style builds upon the original
 			new style format strings, with the addition of brackets
 			that embed the underlying format strings.
 		</para>
-		<sect2>
+		<sect2 id="newformatstringsgen2string">
 			<title>2nd gen new style format string for strings</title>
 			<para>
-				The format string format is <literal>!&{...}</literal>
-				<programlisting>&lt;field ... format="'!&{%s}'" ... /&gt;</programlisting>
+				The format string format is <literal>!&amp;{...}</literal>
+				<programlisting>&lt;field ... format="'!&amp;{%s}'" ... /&gt;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="newformatstringsgen2num">
 			<title>2nd gen new style format string for numeric data</title>
 			<para>
 				The format string format is <literal>!#{...}</literal>
 				<programlisting>&lt;field ... format="'!#{%5.3d}'" ... /&gt;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="newformatstringsgen2money">
 			<title>2nd gen new style format string for monetary data</title>
 			<para>
 				The format string format is <literal>!${...}</literal>
@@ -212,7 +212,7 @@ field value="query1.field1"
 				using monetary formatting.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="newformatstringsgen2datetime">
 			<title>2nd gen new style format string for datetime values</title>
 			<para>
 				The format string format is <literal>!@{...}</literal>
@@ -222,7 +222,7 @@ field value="query1.field1"
 &lt;field ... format="'!@{%Y-%m-%d}'" ... /&gt;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="swissarmyknife">
 			<title>The swiss army knife of formatting</title>
 			<para>
 				The <xref linkend="printffunc"/> is the most versatile

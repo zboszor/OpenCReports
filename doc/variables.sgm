@@ -1,6 +1,6 @@
 <chapter id="variables" xreflabel="Report variables">
 	<title>Report variables</title>
-	<sect1>
+	<sect1 id="uservarintro">
 		<title>Introduction to report variables</title>
 		<para>
 			Variables are named aliases for
@@ -80,7 +80,7 @@
 			observed when the variable is used multiple times
 			and the report processes a huge data set.
 		</para>
-		<sect2>
+		<sect2 id="exprvariterative">
 			<title>Variables with iterative expressions</title>
 			<para>
 				An expression may be iterative,  where the new value
@@ -139,7 +139,7 @@
 			</para>
 		</sect2>
 	</sect1>
-	<sect1>
+	<sect1 id="uservarsimple">
 		<title>Variable types for simple statistics</title>
 		<para>
 			There are pre-defined variable types for
@@ -147,7 +147,7 @@
 			All of them (except data series counting)
 			operate on numeric values.
 		</para>
-		<sect2>
+		<sect2 id="uservarsum">
 			<title>Summing a data series</title>
 			<para>
 				Summing is done via the <literal>sum</literal>
@@ -177,7 +177,7 @@
 				for the variable's result.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="uservarcount">
 			<title>Counting data in a series</title>
 			<para>
 				Counting is done via the <literal>count</literal>
@@ -206,7 +206,7 @@
 &lt;/Report&gt;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="uservaravg">
 			<title>Averaging data in a series</title>
 			<para>
 				Averaging uses two running expressions
@@ -240,7 +240,7 @@
 &lt;/Report&gt;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="uservarhighestlowest">
 			<title>Highest and lowest values of a series</title>
 			<para>
 				Finding the highest and lowest values in a
@@ -383,7 +383,7 @@
 			See also <xref linkend="precalcvarattr"/>.
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="uservarreset">
 		<title>Resetting a variable on break boundaries</title>
 		<para>
 			It may also be useful to use a regular or precalculated

@@ -1,6 +1,6 @@
 <chapter id="c-api-reference" xreflabel="C API Reference">
 	<title>C language API reference</title>
-	<sect1>
+	<sect1 id="c_header">
 		<title>Header file</title>
 		<para>
 			For using OpenCReports, this single header must be used:
@@ -36,14 +36,14 @@ int main(void) {
 			set the output format to PDF, runs the report and prints
 			its output on <literal>stdout</literal>.
 		</para>
-		<sect2>
+		<sect2 id="rephndinit">
 			<title>Report handler initialization</title>
 			<para>
 				<programlisting>opencreport *
 ocrpt_init(void);</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="loadrepxml">
 			<title>Load a report XML description</title>
 			<para>
 				This function loads the specified XML file
@@ -55,7 +55,7 @@ ocrpt_parse_xml(opencreport *o,
                 const char *filename);</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="parsexmlfrombuf">
 			<title>Parse report XML description from a buffer</title>
 			<para>
 				This function parses the buffer as if it contained
@@ -68,7 +68,7 @@ ocrpt_parse_xml_from_buffer(opencreport *o,
                             size_t size);</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="setoutpfmt">
 			<title>Set report output format</title>
 			<para>
 				<programlisting>enum ocrpt_format_type {
@@ -86,7 +86,7 @@ ocrpt_set_output_format(opencreport *o,
                         ocrpt_format_type format);</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="runreport">
 			<title>Run the report</title>
 			<para>
 				This function executes the report, constructs
@@ -97,7 +97,7 @@ ocrpt_set_output_format(opencreport *o,
 ocrpt_execute(opencreport *o);</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="dumpreport">
 			<title>Dump report result</title>
 			<para>
 				Dump the report output on the program's
@@ -106,7 +106,7 @@ ocrpt_execute(opencreport *o);</programlisting>
 ocrpt_spool(opencreport *o);</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="getresult">
 			<title>Get report result</title>
 			<para>
 				Get the report output. The application
@@ -115,7 +115,7 @@ ocrpt_spool(opencreport *o);</programlisting>
 ocrpt_get_output(opencreport *o, size_t *length);</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="getcontenttype">
 			<title>Get report content type</title>
 			<para>
 				Get the report content type for web publishing.
@@ -130,7 +130,7 @@ ocrpt_get_output(opencreport *o, size_t *length);</programlisting>
 ocrpt_get_content_type(opencreport *o);</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rephnddestroy">
 			<title>Report handler destruction</title>
 			<para>
 				Calling this function frees up the report handler
@@ -140,7 +140,7 @@ ocrpt_get_content_type(opencreport *o);</programlisting>
 ocrpt_free(opencreport *o);</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="getlibver">
 			<title>Get library version</title>
 			<para>
 				This function reports the OpenCReports
@@ -161,7 +161,7 @@ ocrpt_version(void);</programlisting>
 		</para>
 		<sect2 id="numerictuning" xreflabel="Numeric behavior related functions">
 			<title>Numeric behavior related functions</title>
-			<sect3>
+			<sect3 id="setnumprec">
 				<title><literal>Set numeric precision</literal></title>
 				<para>
 					The default is 256 bits of floating point precision.
@@ -173,7 +173,7 @@ ocrpt_set_numeric_precision_bits(opencreport *o,
                                  const char *expr_string);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setroundingmode">
 				<title>Set rounding mode</title>
 				<para>
 					Set the rounding mode. The expression string must
@@ -191,9 +191,9 @@ ocrpt_set_rounding_mode(opencreport *o,
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="localefuncs">
 			<title>Locale related functions</title>
-			<sect3>
+			<sect3 id="setupxlate">
 				<title>Set up translation</title>
 				<para>
 					Setting up the translation needs two parameters:
@@ -206,7 +206,7 @@ ocrpt_bindtextdomain(opencreport *o,
                      const char *dirname);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setupxlate2">
 				<title>Set up translation (delayed variant)</title>
 				<para>
 					Setting up the translation needs two parameters:
@@ -225,7 +225,7 @@ ocrpt_bindtextdomain_from_expr(opencreport *o,
                                const char *dir_expr);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setlocale">
 				<title>Set report locale</title>
 				<para>
 					Setting the locale for the report does not affect
@@ -238,7 +238,7 @@ ocrpt_set_locale(opencreport *o,
                  const char *locale);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setlocale2">
 				<title>Set report locale (delayed variant)</title>
 				<para>
 					This function allows setting the locale
@@ -254,7 +254,7 @@ ocrpt_set_locale_from_expr(opencreport *o,
                            const char *expr_string);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="printmoneyinlocale">
 				<title>Print monetary data in the report locale</title>
 				<para>
 					A customized monetary printing function was implemented
@@ -268,7 +268,7 @@ ocrpt_mpfr_strfmon(opencreport *o,
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="dsqfuncs">
 			<title>Data source and query related functions</title>
 			<para>
 				The following <literal>enum</literal> and
@@ -315,7 +315,7 @@ typedef struct ocrpt_input ocrpt_input;</programlisting>
 				the actual sources of data using a specific data source.
 				Multiple queries may use the same data source.
 			</para>
-			<sect3>
+			<sect3 id="addarrayds">
 				<title>Add an array datasource</title>
 				<para>
 					Add an array datasource to the report handler.
@@ -324,14 +324,14 @@ ocrpt_datasource_add_array(opencreport *o,
                            const char *source_name);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="testdsforarray">
 				<title>Test whether a datasource is array based</title>
 				<para>
 					<programlisting>bool
 ocrpt_datasource_is_array(ocrpt_datasource *source);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addarrayquery">
 				<title>Add an array query</title>
 				<para>
 					Add an "array query" to the report handler.
@@ -359,7 +359,7 @@ ocrpt_query_add_array(ocrpt_datasource *source,
 					as strings. This is how RLIB operated.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addcsvds">
 				<title>Add a CSV datasource</title>
 				<para>
 					Add a CSV datasource to the report handler.
@@ -368,14 +368,14 @@ ocrpt_datasource_add_csv(opencreport *o,
                          const char *source_name);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="testdsforcsv">
 				<title>Test whether a datasource is CSV based</title>
 				<para>
 					<programlisting>bool
 ocrpt_datasource_is_csv(ocrpt_datasource *source);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addcsvquery">
 				<title>Add a CSV query</title>
 				<para>
 					Add a "CSV query" to the report handler.
@@ -394,7 +394,7 @@ ocrpt_query_add_csv(ocrpt_datasource *source,
 					treated as strings. This is how RLIB operated.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addjsonds">
 				<title>Add a JSON datasource</title>
 				<para>
 					Add a JSON datasource to the report handler.
@@ -403,14 +403,14 @@ ocrpt_datasource_add_json(opencreport *o,
                           const char *source_name);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="testdsforjson">
 				<title>Test whether a datasource is JSON based</title>
 				<para>
 					<programlisting>bool
 ocrpt_datasource_is_json(ocrpt_datasource *source);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addjsonquery">
 				<title>Add a JSON query</title>
 				<para>
 					Add a "JSON query" to the report handler.
@@ -436,7 +436,7 @@ ocrpt_query_add_json(ocrpt_datasource *source,
 					treated as strings. RLIB didn't have JSON input.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addxmlds">
 				<title>Add an XML datasource</title>
 				<para>
 					Add an XML datasource to the report handler.
@@ -445,14 +445,14 @@ ocrpt_datasource_add_xml(opencreport *o,
                          const char *source_name);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="testdsforxml">
 				<title>Test whether a datasource is XML based</title>
 				<para>
 					<programlisting>bool
 ocrpt_datasource_is_xml(ocrpt_datasource *source);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addxmlquery">
 				<title>Add an XML query</title>
 				<para>
 					Add an "XML query" to the report handler.
@@ -480,7 +480,7 @@ ocrpt_query_add_xml(ocrpt_datasource *source,
 					compatible without the type specification part.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addpgds">
 				<title>Add a PostgreSQL datasource</title>
 				<para>
 					Add a PostgreSQL datasource to the report handler.
@@ -502,14 +502,14 @@ ocrpt_datasource_add_postgresql2(opencreport *o,
 					For the parameters, see <xref linkend="postgresqlds"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="testdsforpg">
 				<title>Test whether a datasource is PostgreSQL based</title>
 				<para>
 					<programlisting>bool
 ocrpt_datasource_is_postgresql(ocrpt_datasource *source);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addpgquery">
 				<title>Add a PostgreSQL query</title>
 				<para>
 					Add a SQL query using the PostgreSQL datasource
@@ -520,7 +520,7 @@ ocrpt_query_add_postgresql(ocrpt_datasource *source,
                            const char *querystr);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addmariads">
 				<title>Add a MariaDB datasource</title>
 				<para>
 					Add a MariaDB datasource to the report handler.
@@ -544,14 +544,14 @@ ocrpt_datasource_add_mariadb2(opencreport *o,
 					For the parameters, see <xref linkend="mariadbds"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="testdsformaria">
 				<title>Test whether a datasource is MariaDB based</title>
 				<para>
 					<programlisting>bool
 ocrpt_datasource_is_mariadb(ocrpt_datasource *source);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addmariaquery">
 				<title>Add a MariaDB query</title>
 				<para>
 					Add an SQL query using the MariaDB datasource
@@ -562,7 +562,7 @@ ocrpt_query_add_mariadb(ocrpt_datasource *source,
                         const char *querystr);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addodbcds">
 				<title>Add an ODBC datasource</title>
 				<para>
 					Add an ODBC datasource to the report handler.
@@ -582,14 +582,14 @@ ocrpt_datasource_add_odbc2(opencreport *o,
 					For the parameters, see <xref linkend="odbcds"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="testdsforodbc">
 				<title>Test whether a datasource is ODBC based</title>
 				<para>
 					<programlisting>bool
 ocrpt_datasource_is_odbc(ocrpt_datasource *source);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addodbcquery">
 				<title>Add an ODBC query</title>
 				<para>
 					Add an SQL query using the ODBC datasource
@@ -600,7 +600,7 @@ ocrpt_query_add_odbc(ocrpt_datasource *source,
                      const char *querystr);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="findds">
 				<title>Find a datasource</title>
 				<para>
 					Find the data source using its name.
@@ -611,7 +611,7 @@ ocrpt_datasource_get(opencreport *o,
                      const char *source_name);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addcustomds">
 				<title><literal>Add a custom datasource</literal></title>
 				<para>
 					Add a custom data source to the report handler.
@@ -621,7 +621,7 @@ ocrpt_add_datasource(opencreport *o,
                      const ocrpt_input *input);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setdsencoding">
 				<title><literal>Set the encoding of a datasource</literal></title>
 				<para>
 					Set the encoding of a datasource in case
@@ -632,7 +632,7 @@ ocrpt_datasource_set_encoding(ocrpt_datasource *source,
                               const char *encoding);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="freeds">
 				<title><literal>Free a datasource</literal></title>
 				<para>
 					Free a datasource from the opencreport structure
@@ -643,7 +643,7 @@ ocrpt_datasource_set_encoding(ocrpt_datasource *source,
 ocrpt_datasource_free(ocrpt_datasource *source);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="findquery">
 				<title><literal>Find a query</literal></title>
 				<para>
 					Find a query using its name.
@@ -652,7 +652,7 @@ ocrpt_query_get(opencreport *o,
                 const char *name);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="getcurrentrowofquery">
 				<title><literal>Get the current data row from a query</literal></title>
 				<para>
 					Create (first call) or get the <literal>ocrpt_query_result</literal>
@@ -665,7 +665,7 @@ ocrpt_query_get_result(ocrpt_query *q,
                        int32_t *cols);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="getcolname">
 				<title><literal>Get column name</literal></title>
 				<para>
 					Using the <literal>ocrpt_query_result *</literal> result
@@ -676,7 +676,7 @@ ocrpt_query_result_column_name(ocrpt_query_result *qr,
                                int32_t col);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="getcoldata">
 				<title><literal>Get column data</literal></title>
 				<para>
 					Using the <literal>ocrpt_query_result *</literal>
@@ -689,7 +689,7 @@ ocrpt_query_result_column_result(ocrpt_query_result *qr,
                                  int32_t col);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addfollowerquery">
 				<title><literal>Add a follower query</literal></title>
 				<para>
 					Add a <literal>follower</literal> query to the
@@ -703,7 +703,7 @@ ocrpt_query_add_follower(ocrpt_query *leader,
                          ocrpt_query *follower);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addn1followerquery">
 				<title><literal>Add an N:1 follower query</literal></title>
 				<para>
 					Add an N:1 <literal>follower</literal> query to the
@@ -723,7 +723,7 @@ ocrpt_query_add_follower_n_to_1(ocrpt_query *leader,
                                 ocrpt_expr *match);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="freequery">
 				<title><literal>Free a query</literal></title>
 				<para>
 					Free a query and remove it from the report handler.
@@ -734,7 +734,7 @@ ocrpt_query_add_follower_n_to_1(ocrpt_query *leader,
 ocrpt_query_free(ocrpt_query *q);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="startmainquery">
 				<title><literal>Start the main query</literal></title>
 				<para>
 					Start query (or query set) navigation.
@@ -744,7 +744,7 @@ ocrpt_query_free(ocrpt_query *q);</programlisting>
 ocrpt_query_navigate_start(ocrpt_query *q);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="gonextrow">
 				<title><literal>Navigate to the next query row</literal></title>
 				<para>
 					Navigate the query (or query set) to the next row. Returns
@@ -817,7 +817,7 @@ ocrpt_query_discover_array_c(const char *arrayname,
 				Expressions in OpenCReports is explained in the
 				<xref linkend="expressions"/> chapter.
 			</para>
-			<sect3>
+			<sect3 id="parseexpr">
 				<title>Parse an expression string</title>
 				<para>
 					This function parses an expression string and
@@ -840,7 +840,7 @@ ocrpt_expr_parse(opencreport *o,
 					<literal>ocrpt_expr_free()</literal>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="parsereportexpr">
 				<title>Parse an expression string and bind it to a report</title>
 				<para>
 					This function parses an expression string,
@@ -864,7 +864,7 @@ ocrpt_report_expr_parse(ocrpt_report *r,
 					<literal>ocrpt_free()</literal>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="freeexpr">
 				<title>Free an expression parse tree</title>
 				<para>
 					Free an expression parse tree. If it was bound
@@ -878,7 +878,7 @@ ocrpt_report_expr_parse(ocrpt_report *r,
 ocrpt_expr_free(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="resolveexpr">
 				<title>Resolve expression references</title>
 				<para>
 					This function resolves variable (identifier)
@@ -889,7 +889,7 @@ ocrpt_expr_free(ocrpt_expr *e);</programlisting>
 ocrpt_expr_resolve(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="optimizeexpr">
 				<title>Optimize an expression</title>
 				<para>
 					This function optimizes an expression so
@@ -899,7 +899,7 @@ ocrpt_expr_resolve(ocrpt_expr *e);</programlisting>
 ocrpt_expr_optimize(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="evalexpr">
 				<title>Evaluate an expression</title>
 				<para>
 					This function evaluates the expression.
@@ -918,7 +918,7 @@ ocrpt_expr_optimize(ocrpt_expr *e);</programlisting>
 ocrpt_expr_eval(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="getexprresultwnoeval">
 				<title>Get expression result without evaluation</title>
 				<para>
 					This function returns the expression result
@@ -931,7 +931,7 @@ ocrpt_expr_eval(ocrpt_expr *e);</programlisting>
 ocrpt_expr_get_result(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="printexpr">
 				<title>Print an expression tree</title>
 				<para>
 					Print an expression tree in its processed form on the
@@ -940,7 +940,7 @@ ocrpt_expr_get_result(ocrpt_expr *e);</programlisting>
 ocrpt_expr_print(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="printexprwresult">
 				<title>Print an expression tree with subexpressions and their results</title>
 				<para>
 					Print an expression tree with subexpressions
@@ -950,7 +950,7 @@ ocrpt_expr_print(ocrpt_expr *e);</programlisting>
 ocrpt_expr_result_deep_print(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="exprnodesnum">
 				<title>Count the number of expression nodes</title>
 				<para>
 					This function returns the number of expression nodes.
@@ -959,7 +959,7 @@ ocrpt_expr_result_deep_print(ocrpt_expr *e);</programlisting>
 ocrpt_expr_nodes(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="initexprtype">
 				<title>Initialize expression result type</title>
 				<para>
 					OpenCReports keeps track of the last three query
@@ -981,7 +981,7 @@ void ocrpt_expr_init_results(ocrpt_expr *e,
                              enum ocrpt_result_type type);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="seterror">
 				<title>Set an error string as expression result</title>
 				<para>
 					<programlisting>ocrpt_result *
@@ -989,7 +989,7 @@ ocrpt_expr_make_error_result(ocrpt_expr *e,
                              const char *format, ...);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setstartflag">
 				<title>Set start value flag for an iterative expression</title>
 				<para>
 					Set whether the iterative expression's first
@@ -1000,7 +1000,7 @@ ocrpt_expr_set_iterative_start_value(ocrpt_expr *e,
                                      bool start_with_init);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="getexprcurval">
 				<title>Get current value of an expression in base type</title>
 				<para>
 					Get the current value of an expression in a C base
@@ -1016,7 +1016,7 @@ double
 ocrpt_expr_get_double_value(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setexprcurval">
 				<title>Set current value of an expression in a base type</title>
 				<para>
 					Used by unit tests.
@@ -1033,7 +1033,7 @@ ocrpt_expr_set_double_value(ocrpt_expr *e,
                             double d);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setnthexprvalue">
 				<title>Set nth value of an expression in a base type</title>
 				<para>
 					Expressions use <literal>OCRPT_EXPR_RESULTS</literal>
@@ -1055,17 +1055,18 @@ ocrpt_expr_set_nth_result_double_value(ocrpt_expr *e,
                                        double d);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
-				<title>Compare current and previous values of and expression</title>
+			<sect3 id="cmpexprvalues">
+				<title>Compare the current of an expression with its previous value</title>
 				<para>
-					Compare current and previous values of and expression
-					and return <literal>true</literal> if they are equal.
-					It's used to implement <xref linkend="breaks"/>.
+					Compare the current value of an expression with its
+					previous value and return <literal>true</literal>
+					if they are equal. It's used to implement
+					<xref linkend="breaks"/>.
 					<programlisting>bool
 ocrpt_expr_cmp_results(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setexprdelayed">
 				<title>Set delayed flag of an expression</title>
 				<para>
 					<programlisting>void
@@ -1073,7 +1074,7 @@ ocrpt_expr_set_delayed(ocrpt_expr *e,
                        bool delayed);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setexprfieldexprref">
 				<title>Set field expression reference for an expression</title>
 				<para>
 					If <literal>e</literal> contains <literal>r.value</literal>,
@@ -1085,13 +1086,13 @@ ocrpt_expr_set_field_expr(ocrpt_expr *e,
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="resultfuncs">
 			<title>Column data or expression result related functions</title>
 			<para>
 				The internal type <literal>ocrpt_result</literal> holds
 				values either for query columns or expression results.
 			</para>
-			<sect3>
+			<sect3 id="createexprresult">
 				<title>Create an expression result</title>
 				<para>
 					The returned pointer must be freed with
@@ -1100,14 +1101,14 @@ ocrpt_expr_set_field_expr(ocrpt_expr *e,
 ocrpt_result_new(opencreport *o);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="getexprresulttype">
 				<title>Get expression result type</title>
 				<para>
 					<programlisting>enum ocrpt_result_type
 ocrpt_result_get_type(ocrpt_result *result);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="copyexprresult">
 				<title>Copy an expression result</title>
 				<para>
 					Copy expression result from source to
@@ -1123,7 +1124,7 @@ ocrpt_result_copy(ocrpt_result *dst,
                   ocrpt_result *src);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="printexprresult">
 				<title>Print an expression result</title>
 				<para>
 					Used by unit tests.
@@ -1131,14 +1132,14 @@ ocrpt_result_copy(ocrpt_result *dst,
 ocrpt_result_print(ocrpt_result *r);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="freeexprresult">
 				<title>Free an expression result</title>
 				<para>
 					<programlisting>void
 ocrpt_result_free(ocrpt_result *r);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="resultisnull">
 				<title>Detect whether a column result is NULL</title>
 				<para>
 					Using the <literal>ocrpt_result *</literal>
@@ -1148,7 +1149,7 @@ ocrpt_result_free(ocrpt_result *r);</programlisting>
 ocrpt_result_isnull(ocrpt_result *result);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="resultisnumeric">
 				<title>Detect whether a column result is numeric</title>
 				<para>
 					Using the <literal>ocrpt_result *</literal>
@@ -1158,7 +1159,7 @@ ocrpt_result_isnull(ocrpt_result *result);</programlisting>
 ocrpt_result_isnumber(ocrpt_result *result);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="getresultnumericvalue">
 				<title>Get the numeric value of a column result</title>
 				<para>
 					Using the <literal>ocrpt_result *</literal>
@@ -1181,7 +1182,7 @@ ocrpt_result_isnumber(ocrpt_result *result);</programlisting>
 ocrpt_result_get_number(ocrpt_result *result);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="resultisstring">
 				<title>Detect whether a column result is string</title>
 				<para>
 					Using the <literal>ocrpt_result *</literal>
@@ -1191,7 +1192,7 @@ ocrpt_result_get_number(ocrpt_result *result);</programlisting>
 ocrpt_result_isstring(ocrpt_result *result);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="getresultstringvalue">
 				<title>Get the string value of a column result</title>
 				<para>
 					Using the <literal>ocrpt_result *</literal>
@@ -1214,7 +1215,7 @@ ocrpt_result_isstring(ocrpt_result *result);</programlisting>
 ocrpt_result_get_string(ocrpt_result *result);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="resultisdatetime">
 				<title>Detect whether a column result is datetime</title>
 				<para>
 					Using the <literal>ocrpt_result *</literal>
@@ -1224,7 +1225,7 @@ ocrpt_result_get_string(ocrpt_result *result);</programlisting>
 ocrpt_result_isdatetime(ocrpt_result *result);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="getresultdatetimevalue">
 				<title>Get the datetime value of a column result</title>
 				<para>
 					Using the <literal>ocrpt_result *</literal>
@@ -1247,7 +1248,7 @@ ocrpt_result_isdatetime(ocrpt_result *result);</programlisting>
 ocrpt_result_get_datetime(ocrpt_result *result);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="resultisinterval">
 				<title>Detect whether a datetime column result is interval</title>
 				<para>
 					Using the <literal>ocrpt_result *</literal>
@@ -1257,7 +1258,7 @@ ocrpt_result_get_datetime(ocrpt_result *result);</programlisting>
 ocrpt_result_datetime_is_interval(ocrpt_result *result);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="resulthasvaliddate">
 				<title>Detect whether a datetime column result has valid date</title>
 				<para>
 					Using the <literal>ocrpt_result *</literal>
@@ -1267,7 +1268,7 @@ ocrpt_result_datetime_is_interval(ocrpt_result *result);</programlisting>
 ocrpt_result_datetime_is_date_valid(ocrpt_result *result);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="resulthasvalidtime">
 				<title>Detect whether a datetime column result has valid time</title>
 				<para>
 					Using the <literal>ocrpt_result *</literal>
@@ -1278,13 +1279,13 @@ ocrpt_result_datetime_is_time_valid(ocrpt_result *result);</programlisting>
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="uservarrelatedfuncs">
 			<title>Variable related functions</title>
 			<para>
 				Variables can be created for a report using
 				the API.
 			</para>
-			<sect3>
+			<sect3 id="createbasicuservar">
 				<title>Create a basic variable</title>
 				<para>
 					Using this function, any variable type except
@@ -1312,7 +1313,7 @@ ocrpt_variable_new(ocrpt_report *r,
                    const char *reset_on_break_name);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="createcustomuservar">
 				<title>Create a custom variable</title>
 				<para>
 					Create a custom variable of the specified type
@@ -1328,7 +1329,7 @@ ocrpt_variable_new_full(ocrpt_report *r,
                         const char *reset_on_break_name);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="uservargetsubexprs">
 				<title>Get subexpressions of a variable</title>
 				<para>
 					Get subexpressions of a previously created
@@ -1346,7 +1347,7 @@ ocrpt_expr *
 ocrpt_variable_resultexpr(ocrpt_var *v);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="uservarsetprecalc">
 				<title>Set precalculate flag for a variable</title>
 				<para>
 					The expression must evaluate to a
@@ -1356,7 +1357,7 @@ ocrpt_variable_set_precalculate(ocrpt_var *var,
                                 const char *expr_string);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="uservarresolve">
 				<title>Resolve a variable</title>
 				<para>
 					Resolve subexpressions of a variable
@@ -1365,7 +1366,7 @@ ocrpt_variable_set_precalculate(ocrpt_var *var,
 ocrpt_variable_resolve(ocrpt_var *v);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="uservareval">
 				<title>Evaluate a variable</title>
 				<para>
 					After evaluation, the result is in the
@@ -1376,9 +1377,9 @@ ocrpt_variable_evaluate(ocrpt_var *v);</programlisting>
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="breakrelatedfuncs">
 			<title>Break related functions</title>
-			<sect3>
+			<sect3 id="createbreak">
 				<title>Create a break</title>
 				<para>
 					Create a break. No need to free it,
@@ -1388,7 +1389,7 @@ ocrpt_break_new(ocrpt_report *r,
                 const char *name);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breakattfuncs">
 				<title>Set attribute flag expressions for a break</title>
 				<para>
 					Set break attributes from expression strings
@@ -1420,7 +1421,7 @@ ocrpt_break_set_suppressblank(ocrpt_break *br,
 					if the break field is of the string type.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breakgetbyname">
 				<title>Get break using its name</title>
 				<para>
 					Get the pointer to the break using its name.
@@ -1429,7 +1430,7 @@ ocrpt_break_get(ocrpt_report *r,
                 const char *name);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breakgetname">
 				<title>Get the name of a break</title>
 				<para>
 					Get the name of the break using its structure
@@ -1438,7 +1439,7 @@ ocrpt_break_get(ocrpt_report *r,
 ocrpt_break_get_name(ocrpt_break *br);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breakaddbreakfield">
 				<title>Add a watched expression to a break</title>
 				<para>
 					<programlisting>bool
@@ -1446,7 +1447,7 @@ ocrpt_break_add_breakfield(ocrpt_break *br,
                            ocrpt_expr *bf);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="iteratebreaks">
 				<title>Iterate over breaks of a report</title>
 				<para>
 					Iterate over breaks of a report. The first call
@@ -1456,21 +1457,21 @@ ocrpt_break_get_next(ocrpt_report *r,
                      ocrpt_list **list);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breakresolveandopt">
 				<title>Resolve and optimize break fields</title>
 				<para>
 					<programlisting>void
 ocrpt_break_resolve_fields(ocrpt_break *br);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breakchecktrigger">
 				<title>Check whether the break triggers</title>
 				<para>
 					<programlisting>bool
 ocrpt_break_check_fields(ocrpt_break *br);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breakcheckblank">
 				<title>Check whether break field values are blank</title>
 				<para>
 					The second parameter <literal>evaluate</literal>
@@ -1483,7 +1484,7 @@ ocrpt_break_check_blank(ocrpt_break *br,
                         bool evaluate);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breakresetvars">
 				<title>Reset variables for the break</title>
 				<para>
 					<programlisting>void
@@ -1491,9 +1492,9 @@ ocrpt_break_reset_vars(ocrpt_break *br);</programlisting>
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="userfuncfuncs">
 			<title>Function related functions</title>
-			<sect3>
+			<sect3 id="adduserfunc">
 				<title>Add a user defined function</title>
 				<para>
 					Add a user defined function by specifying
@@ -1543,7 +1544,7 @@ ocrpt_function_add(opencreport *o,
 (*ocrpt_function_call)(OCRPT_FUNCTION_PARAMS);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="findfunc">
 				<title>Find a named function</title>
 				<para>
 					<programlisting>const ocrpt_function *
@@ -1551,7 +1552,7 @@ ocrpt_function_get(opencreport *o,
                    const char *fname);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="exprgetops">
 				<title>Get number of operands for an expression (function)</title>
 				<para>
 					In an expression tree, functions
@@ -1564,7 +1565,7 @@ ocrpt_expr_get_num_operands(ocrpt_expr *e);
 </programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="expropgetvalue">
 				<title>Get current value of a function operand</title>
 				<para>
 					This function is used by OpenCReports functions
@@ -1576,37 +1577,37 @@ ocrpt_expr_operand_get_result(ocrpt_expr *e,
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="partandreportfuncs">
 			<title>Report part and report related functions</title>
-			<sect3>
+			<sect3 id="createpart">
 				<title>Create a report part</title>
 				<para>
 					<programlisting>ocrpt_part *
 ocrpt_part_new(opencreport *o);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="createpartrow">
 				<title>Create a row in a report part</title>
 				<para>
 					<programlisting>ocrpt_part_row *
 ocrpt_part_new_row(ocrpt_part *p);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="createpartcol">
 				<title>Create a column in report part row</title>
 				<para>
 					<programlisting>ocrpt_part_column *
 ocrpt_part_row_new_column(ocrpt_part_row *pr);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="createpartreport">
 				<title>Create a new report in a part column</title>
 				<para>
 					<programlisting>ocrpt_report *
 ocrpt_part_column_new_report(ocrpt_part_column *pd);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportiterators">
 				<title>Report part related iterators</title>
 				<para>
 					Iterators for getting report parts, part rows,
@@ -1630,7 +1631,7 @@ ocrpt_report_get_next(ocrpt_part_column *pd,
                       ocrpt_list **list);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportsetmainquery">
 				<title>Set the main query for a report</title>
 				<para>
 					Set the main query for a report either by
@@ -1653,7 +1654,7 @@ ocrpt_report_set_main_query_from_expr(ocrpt_report *r,
 					the low level API is unset.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportgetcurrentrownum">
 				<title>Get the current row number of the main query</title>
 				<para>
 					The row number starts from 1.
@@ -1661,35 +1662,35 @@ ocrpt_report_set_main_query_from_expr(ocrpt_report *r,
 ocrpt_report_get_query_rownum(ocrpt_report *r);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportresolvevars">
 				<title>Resolve all report variables</title>
 				<para>
 					<programlisting>void
 ocrpt_report_resolve_variables(ocrpt_report *r);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportevalvars">
 				<title>Evaluate all report variables</title>
 				<para>
 					<programlisting>void
 ocrpt_report_evaluate_variables(ocrpt_report *r);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportresolvebreaks">
 				<title>Resolve all report breaks</title>
 				<para>
 					<programlisting>void
 ocrpt_report_resolve_breaks(ocrpt_report *r);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportresolveexprs">
 				<title>Resolve all report expressions</title>
 				<para>
 					<programlisting>void
 ocrpt_report_resolve_expressions(ocrpt_report *r);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportevalexprs">
 				<title>Evaluate all report expressions</title>
 				<para>
 					<programlisting>void
@@ -1697,12 +1698,12 @@ ocrpt_report_evaluate_expressions(ocrpt_report *r);</programlisting>
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="layoutfuncs">
 			<title>Layout related functions</title>
-			<sect3>
+			<sect3 id="layoutglobalopts">
 				<title>Global layout options</title>
-				<sect4>
-					<title>Set "size units in points" option</title>
+				<sect4 id="layoutsizeunit">
+					<title>Set "size unit" option</title>
 					<para>
 						See <xref linkend="sizeunit"/>.
 						The expression string must evaluate to
@@ -1717,7 +1718,7 @@ ocrpt_set_size_unit(opencreport *o,
                     const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="layoutnqsnd">
 					<title>Set "no query show NoData" option</title>
 					<para>
 						See <xref linkend="noqueryshownodata"/>.
@@ -1728,7 +1729,7 @@ ocrpt_set_noquery_show_nodata(opencreport *o,
                               const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="layoutrhal">
 					<title>Set "report height after last" option</title>
 					<para>
 						See <xref linkend="reportheightafterlast"/>.
@@ -1740,9 +1741,9 @@ ocrpt_set_report_height_after_last(opencreport *o,
 					</para>
 				</sect4>
 			</sect3>
-			<sect3>
+			<sect3 id="partopts">
 				<title>Report part options</title>
-				<sect4>
+				<sect4 id="setpartiter">
 					<title>Set part iterations</title>
 					<para>
 						See <xref linkend="partiter"/>.
@@ -1753,7 +1754,7 @@ ocrpt_part_set_iterations(ocrpt_part *p,
                           const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="setpartfontname">
 					<title>Set part font name</title>
 					<para>
 						See <xref linkend="partfontname"/>.
@@ -1762,7 +1763,7 @@ ocrpt_part_set_font_name(ocrpt_part *p,
                          const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="setpartfontsize">
 					<title>Set part font size</title>
 					<para>
 						See <xref linkend="partfontsize"/>.
@@ -1771,7 +1772,7 @@ ocrpt_part_set_font_size(ocrpt_part *p,
                          const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="setpartpapertype">
 					<title>Set part paper type</title>
 					<para>
 						See <xref linkend="papertype"/>.
@@ -1780,8 +1781,8 @@ ocrpt_part_set_paper_by_name(ocrpt_part *p,
                              const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
-					<title>Set part paper's landscape orientation</title>
+				<sect4 id="setpartorientation">
+					<title>Set part paper's orientation</title>
 					<para>
 						See <xref linkend="partpageorientation"/>.
 						The expression string must evaluate to a string
@@ -1795,7 +1796,7 @@ ocrpt_part_set_orientation(ocrpt_part *p,
                            const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="partsetmargins">
 					<title>Set part margins</title>
 					<para>
 						See <xref linkend="marginsettings"/>.
@@ -1818,7 +1819,7 @@ ocrpt_part_set_right_margin(ocrpt_part *p,
                             const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="partsetsuppress">
 					<title>Set part suppression</title>
 					<para>
 						See <xref linkend="partsuppress"/>.
@@ -1829,7 +1830,7 @@ ocrpt_part_set_suppress(ocrpt_part *p,
                         const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="partsetphsfp">
 					<title>Set part's page header suppressed on the first page</title>
 					<para>
 						See <xref linkend="suppresspageheaderfirstpage"/>.
@@ -1841,9 +1842,9 @@ ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p,
 					</para>
 				</sect4>
 			</sect3>
-			<sect3>
+			<sect3 id="partrowopts">
 				<title>Part row options</title>
-				<sect4>
+				<sect4 id="partrowsetsuppress">
 					<title>Set part row suppression</title>
 					<para>
 						See <xref linkend="partrowsuppress"/>.
@@ -1854,7 +1855,7 @@ ocrpt_part_row_set_suppress(ocrpt_part_row *pr,
                             const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="partrowsetnewpage">
 					<title>Set part row new page</title>
 					<para>
 						See <xref linkend="partrownewpage"/>.
@@ -1865,8 +1866,8 @@ ocrpt_part_row_set_newpage(ocrpt_part_row *pr,
                            const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
-					<title>Set part row layout fixed mode</title>
+				<sect4 id="partrowsetlayout">
+					<title>Set part row layout mode</title>
 					<para>
 						See <xref linkend="partrowlayout"/>.
 						The expression string must evaluate
@@ -1881,9 +1882,9 @@ ocrpt_part_row_set_layout(ocrpt_part_row *pr,
 					</para>
 				</sect4>
 			</sect3>
-			<sect3>
+			<sect3 id="partcolopts">
 				<title>Part column options</title>
-				<sect4>
+				<sect4 id="partcolsetsuppress">
 					<title>Set part column suppression</title>
 					<para>
 						See <xref linkend="partcolsuppress"/>.
@@ -1894,7 +1895,7 @@ ocrpt_part_column_set_suppress(ocrpt_part_column *pd,
                                const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="partcolsetwidth">
 					<title>Set part column width</title>
 					<para>
 						See <xref linkend="partcolwidth"/>.
@@ -1905,7 +1906,7 @@ ocrpt_part_column_set_width(ocrpt_part_column *pd,
                             const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="partcolsetheight">
 					<title>Set part column height</title>
 					<para>
 						See <xref linkend="partcolheight"/>.
@@ -1916,7 +1917,7 @@ ocrpt_part_column_set_height(ocrpt_part_column *pd,
                              const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="partcolsetborderwidth">
 					<title>Set part column border width</title>
 					<para>
 						See <xref linkend="pdborderwidth"/>.
@@ -1927,7 +1928,7 @@ ocrpt_part_column_set_border_width(ocrpt_part_column *pd,
                                    const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="partcolsetbordercolor">
 					<title>Set part column border color</title>
 					<para>
 						See <xref linkend="pdbordercolor"/>.
@@ -1938,7 +1939,7 @@ ocrpt_part_column_set_border_color(ocrpt_part_column *pd,
                                    const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="partcolsetcolumns">
 					<title>Set part column's number of detail columns</title>
 					<para>
 						See <xref linkend="detailcolumns"/>.
@@ -1949,7 +1950,7 @@ ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd,
                                      const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="partcolsetpadding">
 					<title>Set part column's detail column padding</title>
 					<para>
 						See <xref linkend="columnpadding"/>.
@@ -1961,9 +1962,9 @@ ocrpt_part_column_set_column_padding(ocrpt_part_column *pd,
 					</para>
 				</sect4>
 			</sect3>
-			<sect3>
+			<sect3 id="reportsopts">
 				<title>Report options</title>
-				<sect4>
+				<sect4 id="reportsetsuppress">
 					<title>Set report suppression</title>
 					<para>
 						See <xref linkend="reportsuppress"/>.
@@ -1974,7 +1975,7 @@ ocrpt_report_set_suppress(ocrpt_report *r,
                           const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="reportsetiteration">
 					<title>Set report iterations</title>
 					<para>
 						See <xref linkend="reportiter"/>.
@@ -1985,7 +1986,7 @@ ocrpt_report_set_iterations(ocrpt_report *r,
                             const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="reportsetfontname">
 					<title>Set report font name</title>
 					<para>
 						See <xref linkend="reportfontname"/>.
@@ -1998,7 +1999,7 @@ ocrpt_report_set_font_name(ocrpt_report *r,
                            const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="reportsetfontsize">
 					<title>Set report font size</title>
 					<para>
 						See <xref linkend="reportfontsize"/>.
@@ -2009,7 +2010,7 @@ ocrpt_report_set_font_size(ocrpt_report *r,
                            const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="reportsetheight">
 					<title>Set report height</title>
 					<para>
 						See <xref linkend="reportheight"/>.
@@ -2020,7 +2021,7 @@ ocrpt_report_set_height(ocrpt_report *r,
                         const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="reportsetfhprio">
 					<title>Set report's field header priority</title>
 					<para>
 						See <xref linkend="reportfhpriority"/>.
@@ -2034,7 +2035,7 @@ ocrpt_report_set_fieldheader_priority(ocrpt_report *r,
 					</para>
 				</sect4>
 			</sect3>
-			<sect3>
+			<sect3 id="partgetlayoutsections">
 				<title>Get part layout sections</title>
 				<para>
 					Get the part's
@@ -2048,7 +2049,7 @@ ocrpt_output *
 ocrpt_layout_part_page_footer(ocrpt_part *p);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="partlayoutsetreport">
 				<title>Set report for part layout sections</title>
 				<para>
 					Set the report pointer for the part's
@@ -2064,7 +2065,7 @@ ocrpt_layout_part_page_footer_set_report(ocrpt_part *p,
                                          ocrpt_report *r);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reportgetlayoutsections">
 				<title>Get report layout sections</title>
 				<para>
 					Get the report's
@@ -2090,7 +2091,7 @@ ocrpt_output *
 ocrpt_layout_report_field_details(ocrpt_report *r);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breakgetlayoutsections">
 				<title>Get break layout sections</title>
 				<para>
 					Get the break's
@@ -2104,7 +2105,7 @@ ocrpt_output *
 ocrpt_break_get_footer(ocrpt_break *br);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="outputglobalsections">
 				<title>Set output section global settings</title>
 				<para>
 					Note that part (page) header and footer, and report
@@ -2113,7 +2114,7 @@ ocrpt_break_get_footer(ocrpt_break *br);</programlisting>
 					from query columns.
 					See <xref linkend="expressions"/>.
 				</para>
-				<sect4>
+				<sect4 id="outputsetsuppress">
 					<title>Set output section suppression</title>
 					<para>
 						Set suppression from an expression string.
@@ -2123,14 +2124,14 @@ ocrpt_output_set_suppress(ocrpt_output *output,
 					</para>
 				</sect4>
 			</sect3>
-			<sect3>
+			<sect3 id="outputaddline">
 				<title>Add a text line to an output section</title>
 				<para>
 					<programlisting>ocrpt_line *
 ocrpt_output_add_line(ocrpt_output *output);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="outputlinesettings">
 				<title>Text line settings</title>
 				<para>
 					Note that settings in the part (page) header and
@@ -2139,7 +2140,7 @@ ocrpt_output_add_line(ocrpt_output *output);</programlisting>
 					on data derived from query columns.
 					See <xref linkend="expressions"/>.
 				</para>
-				<sect4>
+				<sect4 id="linesetfontname">
 					<title>Set line font name</title>
 					<para>
 						Set the text line's font name from
@@ -2149,7 +2150,7 @@ ocrpt_line_set_font_name(ocrpt_line *line,
                          const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="linesetfontsize">
 					<title>Set line font size</title>
 					<para>
 						Set the text line's font size from
@@ -2159,7 +2160,7 @@ ocrpt_line_set_font_size(ocrpt_line *line,
                          const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="linesetbold">
 					<title>Set line bold value</title>
 					<para>
 						Set the text line's bold value from
@@ -2169,7 +2170,7 @@ ocrpt_line_set_bold(ocrpt_line *line,
                     const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="linesetitalic">
 					<title>Set line italic value</title>
 					<para>
 						Set the text line's italic value from
@@ -2179,7 +2180,7 @@ ocrpt_line_set_italic(ocrpt_line *line,
                       const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="linesetsuppress">
 					<title>Set line suppression</title>
 					<para>
 						Set the text line's suppression value from
@@ -2189,7 +2190,7 @@ ocrpt_line_set_suppress(ocrpt_line *line,
                         const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="linessettextcolor">
 					<title>Set line text color</title>
 					<para>
 						Set the text line's text color from
@@ -2199,7 +2200,7 @@ ocrpt_line_set_color(ocrpt_line *line,
                      const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="linesetbgcolor">
 					<title>Set line background color</title>
 					<para>
 						Set the text line's background color from
@@ -2210,14 +2211,14 @@ ocrpt_line_set_bgcolor(ocrpt_line *line,
 					</para>
 				</sect4>
 			</sect3>
-			<sect3>
+			<sect3 id="lineaddtext">
 				<title>Add a text element to a text line</title>
 				<para>
 					<programlisting>ocrpt_text *
 ocrpt_line_add_text(ocrpt_line *line);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="textsettings">
 				<title>Text element settings</title>
 				<para>
 					Note that settings in the part (page) header and
@@ -2226,7 +2227,7 @@ ocrpt_line_add_text(ocrpt_line *line);</programlisting>
 					on data derived from query columns.
 					See <xref linkend="expressions"/>.
 				</para>
-				<sect4>
+				<sect4 id="textsetliteral">
 					<title>Set text element literal value</title>
 					<para>
 						Set the text element's literal value from
@@ -2236,7 +2237,7 @@ ocrpt_text_set_value_string(ocrpt_text *text,
                             const char *string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetvalue">
 					<title>Set text element value</title>
 					<para>
 						Set the text element's value from
@@ -2246,7 +2247,7 @@ ocrpt_text_set_value_expr(ocrpt_text *text,
                           const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetdelayed">
 					<title>Set text element value's delayed property</title>
 					<para>
 						Set the text element value's delayed
@@ -2256,7 +2257,7 @@ ocrpt_text_set_value_delayed(ocrpt_text *text,
                              const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetformatstring">
 					<title>Set text element format string</title>
 					<para>
 						Set the text element's format string from
@@ -2266,7 +2267,7 @@ ocrpt_text_set_format(ocrpt_text *text,
                       const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetxlate">
 					<title>Set text element translation</title>
 					<para>
 						Set the text element's translation from
@@ -2281,7 +2282,7 @@ ocrpt_text_set_translate(ocrpt_text *text,
 						value.
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetwidth">
 					<title>Set text element field width</title>
 					<para>
 						Set the text element's field width from
@@ -2291,7 +2292,7 @@ ocrpt_text_set_width(ocrpt_text *text,
                      const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetalignment">
 					<title>Set text element alignment</title>
 					<para>
 						Set the text element's alignment from
@@ -2308,7 +2309,7 @@ ocrpt_text_set_alignment(ocrpt_text *text,
 						accepted either as is, or as an expression.
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetcolor">
 					<title>Set text element text color</title>
 					<para>
 						Set the text element's text color from
@@ -2318,7 +2319,7 @@ ocrpt_text_set_color(ocrpt_text *text,
                      const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetbgcolor">
 					<title>Set text element background color</title>
 					<para>
 						Set the text element's background color from
@@ -2328,7 +2329,7 @@ ocrpt_text_set_bgcolor(ocrpt_text *text,
                        const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetfontname">
 					<title>Set text element font name</title>
 					<para>
 						Set the text element's font name from
@@ -2338,7 +2339,7 @@ ocrpt_text_set_font_name(ocrpt_text *text,
                          const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetfontsize">
 					<title>Set text element font size</title>
 					<para>
 						Set the text element's font size from
@@ -2348,7 +2349,7 @@ ocrpt_text_set_font_size(ocrpt_text *text,
                          const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetbold">
 					<title>Set text element bold value</title>
 					<para>
 						Set the text element's bold value from
@@ -2358,7 +2359,7 @@ ocrpt_text_set_bold(ocrpt_text *text,
                     const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetitalic">
 					<title>Set text element italic value</title>
 					<para>
 						Set the text element's italic value from
@@ -2368,7 +2369,7 @@ ocrpt_text_set_italic(ocrpt_text *text,
                       const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetlink">
 					<title>Set text element link URL</title>
 					<para>
 						Set the text element's link URL from
@@ -2378,7 +2379,7 @@ ocrpt_text_set_link(ocrpt_text *text,
                     const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetmemo">
 					<title>Set text element multiline property</title>
 					<para>
 						Set the text element's multiline property
@@ -2389,7 +2390,7 @@ ocrpt_text_set_memo(ocrpt_text *text,
                     const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetmemowrap">
 					<title>Set text element "wrap at characters" property</title>
 					<para>
 						Set the text element's "wrap at characters"
@@ -2404,7 +2405,7 @@ ocrpt_text_set_memo_wrap_chars(ocrpt_text *text,
                                const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="textsetmemolines">
 					<title>Set text element maximum lines</title>
 					<para>
 						Set the text element's maximum lines
@@ -2424,14 +2425,14 @@ ocrpt_text_set_memo_max_lines(ocrpt_text *text,
 					</para>
 				</sect4>
 			</sect3>
-			<sect3>
+			<sect3 id="outputaddhline">
 				<title>Add a horizontal line to an output section</title>
 				<para>
 					<programlisting>ocrpt_hline *
 ocrpt_output_add_hline(ocrpt_output *output);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="hlinesettings">
 				<title>Horizontal line settings</title>
 				<para>
 					Note that settings in the part (page) header and
@@ -2440,7 +2441,7 @@ ocrpt_output_add_hline(ocrpt_output *output);</programlisting>
 					on data derived from query columns.
 					See <xref linkend="expressions"/>.
 				</para>
-				<sect4>
+				<sect4 id="hlinesetwidth">
 					<title>Set horizontal line size (width)</title>
 					<para>
 						Set the horizontal line's size (width) from
@@ -2450,7 +2451,7 @@ ocrpt_hline_set_size(ocrpt_hline *hline,
                      const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="hlinesetindentation">
 					<title>Set horizontal line indentation</title>
 					<para>
 						Set the horizontal line's indentation value from
@@ -2460,7 +2461,7 @@ ocrpt_hline_set_indent(ocrpt_hline *hline,
                        const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="hlinesetlength">
 					<title>Set horizontal line length</title>
 					<para>
 						Set the horizontal line's length from
@@ -2470,7 +2471,7 @@ ocrpt_hline_set_length(ocrpt_hline *hline,
                        const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="hlinesetfontsize">
 					<title>Set horizontal line font size</title>
 					<para>
 						Set the horizontal line's font size from
@@ -2482,7 +2483,7 @@ ocrpt_hline_set_font_size(ocrpt_hline *hline,
                           const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="hlinesetsuppress">
 					<title>Set horizontal line suppression</title>
 					<para>
 						Set the horizontal line's suppression from
@@ -2492,7 +2493,7 @@ ocrpt_hline_set_suppress(ocrpt_hline *hline,
                          const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="hlinesetcolor">
 					<title>Set horizontal line color</title>
 					<para>
 						Set the horizontal line's color from
@@ -2503,21 +2504,21 @@ ocrpt_hline_set_color(ocrpt_hline *hline,
 					</para>
 				</sect4>
 			</sect3>
-			<sect3>
+			<sect3 id="outputaddimage">
 				<title>Add an image to an output section</title>
 				<para>
 					<programlisting>ocrpt_image *
 ocrpt_output_add_image(ocrpt_output *output);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="textaddimage">
 				<title>Add an image to a text line</title>
 				<para>
 					<programlisting>ocrpt_image *
 ocrpt_line_add_image(ocrpt_line *line);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="imagesettings">
 				<title>Image settings</title>
 				<para>
 					Note that settings in the part (page) header and
@@ -2526,7 +2527,7 @@ ocrpt_line_add_image(ocrpt_line *line);</programlisting>
 					on data derived from query columns.
 					See <xref linkend="expressions"/>.
 				</para>
-				<sect4>
+				<sect4 id="imagesetvalue">
 					<title>Set image value</title>
 					<para>
 						Set the image's value (filename) from
@@ -2536,7 +2537,7 @@ ocrpt_image_set_value(ocrpt_image *image,
                       const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="imagesetsuppress">
 					<title>Set image suppression</title>
 					<para>
 						Set the image's suppression from
@@ -2546,7 +2547,7 @@ ocrpt_image_set_suppress(ocrpt_image *image,
                          const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="imagesettype">
 					<title>Set image type</title>
 					<para>
 						Set the image's type from
@@ -2556,7 +2557,7 @@ ocrpt_image_set_type(ocrpt_image *image,
                      const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="imagesetwidth">
 					<title>Set image width</title>
 					<para>
 						Set the image's width from
@@ -2568,7 +2569,7 @@ ocrpt_image_set_width(ocrpt_image *image,
                       const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="imagesetheight">
 					<title>Set image height</title>
 					<para>
 						Set the image's width from
@@ -2580,7 +2581,7 @@ ocrpt_image_set_height(ocrpt_image *image,
                        const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="imagesetalignment">
 					<title>Set image alignment</title>
 					<para>
 						Set the image's alignment from
@@ -2591,7 +2592,7 @@ ocrpt_image_set_align(ocrpt_image *image,
                       const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="imagesetbgcolor">
 					<title>Set image background color</title>
 					<para>
 						Set the image's background color from
@@ -2601,7 +2602,7 @@ ocrpt_image_set_bgcolor(ocrpt_image *image,
                         const char *expr_string);</programlisting>
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="imagessetfieldwidth">
 					<title>Set image field width</title>
 					<para>
 						Set the image's field width from
@@ -2613,7 +2614,7 @@ ocrpt_image_set_text_width(ocrpt_image *image,
 					</para>
 				</sect4>
 			</sect3>
-			<sect3>
+			<sect3 id="outputaddimageend">
 				<title>Add an image end marker to an output section</title>
 				<para>
 					<programlisting>void
@@ -2621,7 +2622,7 @@ ocrpt_output_add_image_end(ocrpt_output *output);</programlisting>
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="callbackfuncs">
 			<title>Callback related functions</title>
 			<para>
 				Certain stages of the report execution can
@@ -2633,7 +2634,7 @@ ocrpt_output_add_image_end(ocrpt_output *output);</programlisting>
 				<literal>true</literal> for success,
 				<literal>false</literal> for failure.
 			</para>
-			<sect3>
+			<sect3 id="addpartaddedcb">
 				<title>Add a "part added" callback</title>
 				<para>
 					<programlisting>typedef void
@@ -2647,7 +2648,7 @@ ocrpt_add_part_added_cb(opencreport *o,
                         void *data);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addreportaddedcb">
 				<title>Add a "report added" callback</title>
 				<para>
 					<programlisting>typedef void
@@ -2661,7 +2662,7 @@ ocrpt_add_report_added_cb(opencreport *o,
                           void *data);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addprecalcsdonecb">
 				<title>Add an "all precalculations done" callback</title>
 				<para>
 					<programlisting>typedef void
@@ -2674,7 +2675,7 @@ ocrpt_add_precalculation_done_cb(opencreport *o,
                                  void *data);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addpartitercb">
 				<title>Add a "part iteration" callback</title>
 				<para>
 					<programlisting>bool
@@ -2694,7 +2695,7 @@ ocrpt_part_add_iteration_cb2(opencreport *o,
 					every report part. It's for RLIB compatibility.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addreportstartedcb">
 				<title>Add a "report started" callback</title>
 				<para>
 					<programlisting>bool
@@ -2714,7 +2715,7 @@ ocrpt_report_add_start_cb2(opencreport *o,
 					every report. It's for RLIB compatibility.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addreportdonecb">
 				<title>Add a "report done" callback</title>
 				<para>
 					<programlisting>bool
@@ -2734,7 +2735,7 @@ ocrpt_report_add_done_cb2(opencreport *o,
 					every report. It's for RLIB compatibility.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addnewrowcb">
 				<title>Add a "new row" callback</title>
 				<para>
 					<programlisting>bool
@@ -2754,7 +2755,7 @@ ocrpt_report_add_new_row_cb2(opencreport *o,
 					every report. It's for RLIB compatibility.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addreportiterdonecb">
 				<title>Add a "report iteration done" callback</title>
 				<para>
 					<programlisting>bool
@@ -2774,7 +2775,7 @@ ocrpt_report_add_iteration_cb2(opencreport *o,
 					every report. It's for RLIB compatibility.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addreportprecalcdone">
 				<title>Add a "report precalculation done" callback</title>
 				<para>
 					<programlisting>bool
@@ -2794,7 +2795,7 @@ ocrpt_report_add_precalculation_done_cb2(opencreport *o,
 					every report. It's for RLIB compatibility.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addbreaktriggerscb">
 				<title>Add a "break triggers" callback</title>
 				<para>
 					<programlisting>typedef void
@@ -2810,9 +2811,9 @@ ocrpt_break_add_trigger_cb(ocrpt_break *br,
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="envfuncs">
 			<title>Environment related functions</title>
-			<sect3>
+			<sect3 id="getenvvarindirect">
 				<title>Indirect function to get an environment variable</title>
 				<para>
 					<programlisting>typedef ocrpt_result *
@@ -2823,14 +2824,14 @@ extern ocrpt_env_query_func
 ocrpt_env_get;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setenvqueryfunc">
 				<title>Set the environment query function</title>
 				<para>
 					<programlisting>void
 ocrpt_env_set_query_func(ocrpt_env_query_func func);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="capienvqueryfunc">
 				<title>C API environment query function</title>
 				<para>
 					<programlisting>ocrpt_result *
@@ -2839,9 +2840,9 @@ ocrpt_env_get_c(opencreport *o,
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="filefuncs">
 			<title>File handling related functions</title>
-			<sect3>
+			<sect3 id="getcanonfile">
 				<title>Return a canonical file path</title>
 				<para>
 					The returned path contains only single
@@ -2851,7 +2852,7 @@ ocrpt_env_get_c(opencreport *o,
 ocrpt_canonicalize_path(const char *path);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addsearchpath">
 				<title>Add search path</title>
 				<para>
 					Add a new directory path to the list of
@@ -2862,7 +2863,7 @@ ocrpt_add_search_path(opencreport *o,
                       const char *path);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="addsearchpath2">
 				<title>Add search path (delayed variant)</title>
 				<para>
 					Add a new directory path from an expression string
@@ -2879,7 +2880,7 @@ ocrpt_add_search_path_from_expr(opencreport *o,
                                 const char *expr_string);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="resolvesearchpaths">
 				<title>Resolve search paths</title>
 				<para>
 					Resolve expressions added by
@@ -2889,7 +2890,7 @@ ocrpt_add_search_path_from_expr(opencreport *o,
 ocrpt_resolve_search_paths(opencreport *o);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="findfile">
 				<title>Find a file</title>
 				<para>
 					Find a file and return the canonicalized path to it.
@@ -2907,9 +2908,9 @@ ocrpt_find_file(opencreport *o,
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="colorfuncs">
 			<title>Color related functions</title>
-			<sect3>
+			<sect3 id="findcolor">
 				<title>Find a color by its name</title>
 				<para>
 					The function fills in the
@@ -2941,7 +2942,7 @@ ocrpt_get_color(opencreport *o,
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="paperfuncs">
 			<title>Paper size related functions</title>
 			<para>
 				Paper size in OpenCReports is handled via
@@ -2957,21 +2958,21 @@ ocrpt_get_color(opencreport *o,
 };
 typedef struct ocrpt_paper ocrpt_paper;</programlisting>
 			</para>
-			<sect3>
+			<sect3 id="getdefsystempaper">
 				<title>Get the system default paper</title>
 				<para>
 					<programlisting>const ocrpt_paper *
 ocrpt_get_system_paper(void);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="getpaperbyname">
 				<title>Get the paper specified by name</title>
 				<para>
 					<programlisting>const ocrpt_paper *
 ocrpt_get_paper_by_name(const char *paper);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setglobalpaper">
 				<title>Set the global paper</title>
 				<para>
 					Set global paper using an
@@ -2982,7 +2983,7 @@ ocrpt_set_paper(opencreport *o,
                 const ocrpt_paper *paper);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setglobalpaperbyname">
 				<title>Set global paper specified by name</title>
 				<para>
 					Set paper for the report using a paper name.
@@ -2992,14 +2993,14 @@ ocrpt_set_paper_by_name(opencreport *o,
                         const char *paper);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="getglobalpaper">
 				<title>Get currently set global paper</title>
 				<para>
 					<programlisting>const ocrpt_paper *
 ocrpt_get_paper(opencreport *o);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="paperiterator">
 				<title>Iterate over paper sizes</title>
 				<para>
 					Get the next <literal>ocrpt_paper</literal> structure
@@ -3012,14 +3013,14 @@ ocrpt_paper_next(opencreport *o,
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="memoryfuncs">
 			<title>Memory handling related functions</title>
 			<para>
 				Memory handling is done through an indirection,
 				to help with bindings (that may do their own memory
 				handling) override the default.
 			</para>
-			<sect3>
+			<sect3 id="funcptrs">
 				<title>Indirect function pointers</title>
 				<para>
 					<programlisting>typedef void *
@@ -3056,14 +3057,14 @@ extern ocrpt_mem_strdup_t ocrpt_mem_strdup0;
 extern ocrpt_mem_strndup_t ocrpt_mem_strndup0;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="allocmem">
 				<title>Allocate memory</title>
 				<para>
 					<programlisting>void *
 ocrpt_mem_malloc(size_t sz);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reallocmem">
 				<title>Reallocate memory</title>
 				<para>
 					<programlisting>void *
@@ -3071,7 +3072,7 @@ ocrpt_mem_realloc(void *ptr,
                   size_t sz);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="reallocarray">
 				<title>Reallocate array of memory</title>
 				<para>
 					<programlisting>void *
@@ -3080,21 +3081,21 @@ ocrpt_mem_reallocarray(void *ptr,
                        size_t sz);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="freemem">
 				<title>Free memory</title>
 				<para>
 					<programlisting>void
 ocrpt_mem_free(const void *ptr);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="duplicatecstring">
 				<title>Duplicate C string</title>
 				<para>
 					<programlisting>void *
 ocrpt_mem_strdup(const char *ptr);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="duplicatecstringlen">
 				<title>Duplicate C string up to the specified length</title>
 				<para>
 					<programlisting>void *
@@ -3102,7 +3103,7 @@ ocrpt_mem_strndup(const char *ptr,
                   size_t sz);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="freecstring">
 				<title>Free a C string</title>
 				<para>
 					It'a convenience alias for
@@ -3111,7 +3112,7 @@ ocrpt_mem_strndup(const char *ptr,
 ocrpt_strfree(const char *s);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="setallocptrs">
 				<title>Set indirect allocation functions</title>
 				<para>
 					<programlisting>void
@@ -3124,7 +3125,7 @@ ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc,
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="listfuncs">
 			<title>List related functions</title>
 			<para>
 				These functions implement a single linked list.
@@ -3132,21 +3133,21 @@ ocrpt_mem_set_alloc_funcs(ocrpt_mem_malloc_t rmalloc,
 				<programlisting>struct ocrpt_list;
 typedef struct ocrpt_list ocrpt_list;</programlisting>
 			</para>
-			<sect3>
+			<sect3 id="listgetlength">
 				<title>Get the list length</title>
 				<para>
 					<programlisting>size_t
 ocrpt_list_length(ocrpt_list *l);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="listmake1">
 				<title>Make a list from one element</title>
 				<para>
 					<programlisting>ocrpt_list *
 ocrpt_makelist1(const void *data);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="listmakemulti">
 				<title>Make a list from multiple elements</title>
 				<para>
 					This function can be used with variable
@@ -3155,21 +3156,21 @@ ocrpt_makelist1(const void *data);</programlisting>
 ocrpt_makelist(const void *data1, ...);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="listgetlast">
 				<title>Get the last element of a list</title>
 				<para>
 					<programlisting>ocrpt_list *
 ocrpt_list_last(const ocrpt_list *l);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="listgetnth">
 				<title>Get the nth element of a list</title>
 				<para>
 					<programlisting>ocrpt_list *
 ocrpt_list_nth(const ocrpt_list *l, uint32_t n);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="listappend">
 				<title>Append a new element to a list</title>
 				<para>
 					<programlisting>ocrpt_list *
@@ -3177,7 +3178,7 @@ ocrpt_list_append(ocrpt_list *l,
                   const void *data);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="listappendwend">
 				<title>Append to list using the last element</title>
 				<para>
 					This function make appending to the list work
@@ -3189,7 +3190,7 @@ ocrpt_list_end_append(ocrpt_list *l,
                       const void *data);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="listprepend">
 				<title>Prepend a new element to a list</title>
 				<para>
 					<programlisting>ocrpt_list *
@@ -3197,7 +3198,7 @@ ocrpt_list_prepend(ocrpt_list *l,
                    const void *data);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="listremove">
 				<title>Remove a data element from a list</title>
 				<para>
 					<programlisting>ocrpt_list *
@@ -3205,7 +3206,7 @@ ocrpt_list_remove(ocrpt_list *l,
                   const void *data);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="listremovewend">
 				<title>Remove a data element from a list and update the last link</title>
 				<para>
 					<programlisting>ocrpt_list *
@@ -3214,7 +3215,7 @@ ocrpt_list_end_remove(ocrpt_list *l,
                       const void *data);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="listgetnext">
 				<title>Get next link in the list</title>
 				<para>
 					This can be used to iterate through a list.
@@ -3225,21 +3226,21 @@ ocrpt_list_end_remove(ocrpt_list *l,
 ocrpt_list_next(ocrpt_list *l);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="listgetdata">
 				<title>Get the data element from a list</title>
 				<para>
 					<programlisting>void *
 ocrpt_list_get_data(ocrpt_list *l);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="listfree">
 				<title>Free a list</title>
 				<para>
 					<programlisting>void
 ocrpt_list_free(ocrpt_list *l);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="listdeepfree">
 				<title>Free a list and its data elements</title>
 				<para>
 					<programlisting>void
@@ -3248,7 +3249,7 @@ ocrpt_list_free_deep(ocrpt_list *l,
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="stringfuncs">
 			<title>String related functions</title>
 			<para>
 				For memory safety and higher performance, a wrapper
@@ -3260,7 +3261,7 @@ ocrpt_list_free_deep(ocrpt_list *l,
 };
 typedef struct ocrpt_string ocrpt_string;</programlisting>
 			</para>
-			<sect3>
+			<sect3 id="stringcreate">
 				<title>Create a new string</title>
 				<para>
 					Create a new string from a C string.
@@ -3272,7 +3273,7 @@ ocrpt_mem_string_new(const char *str,
                      bool copy);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="stringcreatelen">
 				<title>Create a new string with specified allocated length</title>
 				<para>
 					Create a new string with specified allocated length
@@ -3283,7 +3284,7 @@ ocrpt_mem_string_new_with_len(const char *str,
                               size_t len);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="stringcreatevnprintf">
 				<title>Create a string from a formatted string with maximum length</title>
 				<para>
 					<programlisting>ocrpt_string *
@@ -3292,14 +3293,14 @@ ocrpt_mem_string_new_vnprintf(size_t len,
                               va_list va);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="stringcreateprintf">
 				<title>Create a string from a formatted string</title>
 				<para>
 					<programlisting>ocrpt_string *
 ocrpt_mem_string_new_printf(const char *format, ...);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="stringresize">
 				<title>Resize a string</title>
 				<para>
 					Resize the string to the specified allocated
@@ -3309,7 +3310,7 @@ ocrpt_mem_string_resize(ocrpt_string *string,
                         size_t len);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="stringfree">
 				<title>Free a string</title>
 				<para>
 					<programlisting>char *
@@ -3317,7 +3318,7 @@ ocrpt_mem_string_free(ocrpt_string *string,
                       bool free_str);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="stringappendcstring">
 				<title>Append a C string of the specified length to a string</title>
 				<para>
 					<programlisting>void
@@ -3326,7 +3327,7 @@ ocrpt_mem_string_append_len(ocrpt_string *string,
                             const size_t len);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="stringappendbinary">
 				<title>Append a binary string of the specified length to a string</title>
 				<para>
 					<programlisting>void
@@ -3335,7 +3336,7 @@ ocrpt_mem_string_append_len_binary(ocrpt_string *string,
                                    const size_t len);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="stringappendcstringwlen">
 				<title>Append a C string of unspecified length to a string</title>
 				<para>
 					<programlisting>void
@@ -3343,7 +3344,7 @@ ocrpt_mem_string_append(ocrpt_string *string,
                         const char *str);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="stringappendchar">
 				<title>Append a byte to a string</title>
 				<para>
 					<programlisting>void
@@ -3351,7 +3352,7 @@ ocrpt_mem_string_append_c(ocrpt_string *string,
                           const char c);</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="stringappendprintf">
 				<title>Append a formatted string to a string</title>
 				<para>
 					<programlisting>void

@@ -1,6 +1,6 @@
 <chapter id="php-api-reference" xreflabel="C API Reference">
 	<title>PHP language API reference</title>
-	<sect1>
+	<sect1 id="phpmodule">
 		<title>The OpenCReports PHP module</title>
 		<para>
 			<literal>OpenCReports</literal> comes with a PHP module,
@@ -8,7 +8,7 @@
 			<programlisting>extension=opencreports.so</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="mainclass">
 		<title>The OpenCReport class</title>
 		<para>
 			The main class in OpenCReports is called
@@ -189,7 +189,7 @@ $->spool();</programlisting>
 			Most of the class methods are direct wrappers
 			of the corresponding C API functions.
 		</para>
-		<sect2>
+		<sect2 id="mainclassconstr">
 			<title>Constructor</title>
 			<para>
 				The class constructor creates an
@@ -198,7 +198,7 @@ $->spool();</programlisting>
 OpenCReport::__construct();</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="phploadxml">
 			<title>Load a report XML description</title>
 			<para>
 				These methods load the report description
@@ -215,7 +215,7 @@ OpenCReport::parse_xml_from_buffer(string $buffer): bool;
 </programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="phpreportsetoutputformat">
 			<title>Set report output format</title>
 			<para>
 				<programlisting>public const OpenCReport::OUTPUT_UNSET;
@@ -235,7 +235,7 @@ OpenCReport::set_output_format(int $format): void;</programlisting>
 				these constants will throw an exception.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="phprunreport">
 			<title>Run the report</title>
 			<para>
 				This method executes the report, constructs
@@ -246,7 +246,7 @@ OpenCReport::set_output_format(int $format): void;</programlisting>
 OpenCReport::execute(): bool;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="phpdumpreport">
 			<title>Dump report result</title>
 			<para>
 				Dump the report output on the program's
@@ -255,7 +255,7 @@ OpenCReport::execute(): bool;</programlisting>
 OpenCReport::spool(): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="phpreportgetresult">
 			<title>Get report result</title>
 			<para>
 				Get the report output. The application
@@ -268,7 +268,7 @@ OpenCReport::spool(): void;</programlisting>
 OpenCReport::get_output(): string|false;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="phpreportgetcontenttype">
 			<title>Get report content type</title>
 			<para>
 				Get the report content type. The application
@@ -283,7 +283,7 @@ OpenCReport::get_output(): string|false;</programlisting>
 OpenCReport::get_content_type(): array|false;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="phpgetlibver">
 			<title>Get library version</title>
 			<para>
 				This method reports the OpenCReports
@@ -323,7 +323,7 @@ OpenCReport::version(): string;</programlisting>
 		</para>
 		<sect2 id="phpnumerictuning" xreflabel="Numeric behavior related methods">
 			<title>Numeric behavior related methods</title>
-			<sect3>
+			<sect3 id="phpsetnumprec">
 				<title><literal>Set numeric precision</literal></title>
 				<para>
 					The default is 256 bits of floating point precision.
@@ -332,7 +332,7 @@ OpenCReport::set_numeric_precision_bits(
                      string $expr_string): void;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phpsetroundingmode">
 				<title>Set rounding mode</title>
 				<para>
 					The rounding modes may be
@@ -349,9 +349,9 @@ OpenCReport::set_rounding_mode(
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="phplocalemethods">
 			<title>Locale related methods</title>
-			<sect3>
+			<sect3 id="phpsetupxlate">
 				<title>Set up translation</title>
 				<para>
 					Setting up the translation needs two parameters:
@@ -364,7 +364,7 @@ OpenCReport::bindtextdomain(
                      string $dirname): void;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phpsetlocale">
 				<title>Set report locale</title>
 				<para>
 					Setting the locale for the report does not affect
@@ -377,9 +377,9 @@ OpenCReport::set_locale(string $locale): void;</programlisting>
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="phpdsmethods">
 			<title>Data source and query related methods</title>
-			<sect3>
+			<sect3 id="phpaddarrayds">
 				<title>Add an array datasource</title>
 				<para>
 					For the <literal>OpenCReport\DataSource</literal>
@@ -389,7 +389,7 @@ OpenCReport::datasource_add_array(string $source_name):
                      ?OpenCReport\DataSource;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phpaddcsvds">
 				<title>Add a CSV datasource</title>
 				<para>
 					For the <literal>OpenCReport\DataSource</literal>
@@ -399,7 +399,7 @@ OpenCReport::datasource_add_csv(string $source_name):
                      ?OpenCReport\DataSource;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phpaddjsonds">
 				<title>Add a JSON datasource</title>
 				<para>
 					For the <literal>OpenCReport\DataSource</literal>
@@ -409,7 +409,7 @@ OpenCReport::datasource_add_json(string $source_name):
                      ?OpenCReport\DataSource;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phpaddxmlds">
 				<title>Add an XML datasource</title>
 				<para>
 					For the <literal>OpenCReport\DataSource</literal>
@@ -419,7 +419,7 @@ OpenCReport::datasource_add_xml(string $source_name):
                      ?OpenCReport\DataSource;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phpaddpgds">
 				<title>Add an PostgreSQL datasource</title>
 				<para>
 					For the <literal>OpenCReport\DataSource</literal>
@@ -441,7 +441,7 @@ OpenCReport::datasource_add_postgresql2(
                      ?OpenCReport\DataSource;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phpaddmariads">
 				<title>Add a MariaDB datasource</title>
 				<para>
 					For the <literal>OpenCReport\DataSource</literal>
@@ -465,7 +465,7 @@ OpenCReport::datasource_add_mariadb2(
                      ?OpenCReport\DataSource;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phpaddodbcds">
 				<title>Add an ODBC datasource</title>
 				<para>
 					For the <literal>OpenCReport\DataSource</literal>
@@ -488,7 +488,7 @@ OpenCReport::datasource_add_odbc2(
 					For the parameters, see <xref linkend="odbcds"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phpgetds">
 				<title>Get a named datasource</title>
 				<para>
 					For the <literal>OpenCReport\DataSource</literal>
@@ -498,7 +498,7 @@ OpenCReport:: datasource_get(string $source_name):
                      ?OpenCReport\DataSource;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phpgetquery">
 				<title>Get a named query</title>
 				<para>
 					For the <literal>OpenCReport\Query</literal>
@@ -515,7 +515,7 @@ OpenCReport::query_get(string $query_name):
 				Expressions in OpenCReports is explained in the
 				<xref linkend="expressions"/> chapter.
 			</para>
-			<sect3>
+			<sect3 id="phpparseexpr">
 				<title>Parse an expression</title>
 				<para>
 					The expression string may not reference
@@ -533,7 +533,7 @@ OpenCReport::expr_parse(string $expr_string):
 OpenCReport::expr_error(): ?string;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phpadduserfunc">
 				<title>Add a custom report function</title>
 				<para>
 					<programlisting>public final
@@ -589,9 +589,9 @@ OpenCReport::function_add(
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2  id="phplayoutmethods">
 			<title>Layout part related methods</title>
-			<sect3>
+			<sect3 id="phpaddpart">
 				<title>Add a new report (layout) part</title>
 				<para>
 					For class methods of
@@ -601,7 +601,7 @@ OpenCReport::function_add(
 OpenCReport::part_new(): OpenCReport\Part;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phpgetfirstpart">
 				<title>Get first (layout) part</title>
 				<para>
 					This function returns an object
@@ -616,7 +616,7 @@ OpenCReport::part_new(): OpenCReport\Part;</programlisting>
 OpenCReport::part_get_first(): OpenCReport\Part;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phppartsetpapertype">
 				<title>Set paper type</title>
 				<para>
 					Set the paper type using the paper name,
@@ -626,7 +626,7 @@ OpenCReport::part_get_first(): OpenCReport\Part;</programlisting>
 OpenCReport::set_paper(string $paper): void;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phppartsetsizeunit">
 				<title>Set size unit</title>
 				<para>
 					Set the size unit.
@@ -639,7 +639,7 @@ OpenCReport::set_paper(string $paper): void;</programlisting>
 OpenCReport::set_size_unit(string $expr_string): void;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phppartsetnqsnd">
 				<title>Set "no query show NoData" property</title>
 				<para>
 					<programlisting>public final
@@ -647,7 +647,7 @@ OpenCReport::set_noquery_show_nodata(
                      string $expr_string): void;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="phppartsetrhal">
 				<title>Set "report height after last" property</title>
 				<para>
 					<programlisting>public final
@@ -656,7 +656,7 @@ OpenCReport::set_report_height_after_last(
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="phpcallbackmethods">
 			<title>Callback related methods</title>
 			<para>
 				These methods add a callback function
@@ -707,7 +707,7 @@ my_callback(OpenCReport $o,
             OpenCReport\Report $r)</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="phpenvmethods">
 			<title>Environment related methods</title>
 			<para>
 				In PHP, the "environment" includes both
@@ -725,7 +725,7 @@ OpenCReport::env_get(string $var_name):
                      OpenCReport\Result;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="phpresultmethods">
 			<title>Result related methods</title>
 			<para>
 				This method creates an uninitialized
@@ -736,16 +736,16 @@ OpenCReport::env_get(string $var_name):
 OpenCReport::result_new(): OpenCReport\Result;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2  id="phppathmethods">
 			<title>Path related methods</title>
-				<sect3>
+				<sect3 id="phpaddsearchpath">
 					<title>Add a search path</title>
 					<para>
 						<programlisting>public final
 OpenCReport::add_search_path(string $path): void;</programlisting>
 					</para>
 				</sect3>
-				<sect3>
+				<sect3 id="phpgetcanonfile">
 					<title>Canonicalize path</title>
 					<para>
 						This method returns (a possibly modified)
@@ -758,7 +758,7 @@ OpenCReport::add_search_path(string $path): void;</programlisting>
 OpenCReport::canonicalize_path(string $path): string;</programlisting>
 					</para>
 				</sect3>
-				<sect3>
+				<sect3 id="phpfindfile">
 					<title>Find a file</title>
 					<para>
 						Find a (possibly relative) file using
@@ -769,7 +769,7 @@ OpenCReport::find_file(string $path): $string;</programlisting>
 					</para>
 				</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="phpcolormethods">
 			<title>Color related methods</title>
 			<para>
 				Get an array with <literal>double</literal>
@@ -782,7 +782,7 @@ OpenCReport::final get_color(
 			</para>
 		</sect2>
 	</sect1>
-	<sect1>
+	<sect1 id="phpdsclass">
 		<title>The OpenCReport\Datasource class</title>
 		<para>
 			This class has no constructor, so such an object
@@ -802,7 +802,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phpqueryclass">
 		<title>The OpenCReport\Query class</title>
 		<para>
 			<programlisting>class OpenCReport\Query {
@@ -824,7 +824,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phpqueryresultclass">
 		<title>The OpenCReport\QueryResult class</title>
 		<para>
 			<programlisting>class OpenCReport\QueryResult {
@@ -837,7 +837,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phpexprclass">
 		<title>The OpenCReport\Expr class</title>
 		<para>
 			<programlisting>class OpenCReport\Expr {
@@ -892,7 +892,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phpresultclass">
 		<title>The OpenCReport\Result class</title>
 		<para>
 			<programlisting>class OpenCReport\Result {
@@ -914,7 +914,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phppartclass">
 		<title>The OpenCReport\Part class</title>
 		<para>
 			<programlisting>class OpenCReport\Part {
@@ -982,7 +982,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phppartrowclass">
 		<title>The OpenCReport\Row class</title>
 		<para>
 			<programlisting>class OpenCReport\Row {
@@ -1006,7 +1006,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phppartcolclass">
 		<title>The OpenCReport\Column class</title>
 		<para>
 			<programlisting>class OpenCReport\Column {
@@ -1042,7 +1042,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phpreportclass">
 		<title>The OpenCReport\Report class</title>
 		<para>
 			<programlisting>class OpenCReport\Report {
@@ -1142,7 +1142,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phpvariableclass">
 		<title>The OpenCReport\Variable class</title>
 		<para>
 			<programlisting>class OpenCReport\Variable {
@@ -1167,7 +1167,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phpbreakclass">
 		<title>The OpenCReport\Break class</title>
 		<para>
 			<programlisting>class OpenCReport\Break {
@@ -1193,7 +1193,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phpoutputclass">
 		<title>The OpenCReport\Output class</title>
 		<para>
 			<programlisting>class OpenCReport\Output {
@@ -1213,7 +1213,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phplineclass">
 		<title>The OpenCReport\Line class</title>
 		<para>
 			<programlisting>class OpenCReport\Line {
@@ -1246,7 +1246,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phphlineclass">
 		<title>The OpenCReport\HorizontalLine class</title>
 		<para>
 			<programlisting>class OpenCReport\HorizontalLine {
@@ -1270,7 +1270,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phpimageclass">
 		<title>The OpenCReport\Image class</title>
 		<para>
 			<programlisting>class OpenCReport\Image {
@@ -1300,7 +1300,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phptextclass">
 		<title>The OpenCReport\Text class</title>
 		<para>
 			<programlisting>class OpenCReport\Text {
@@ -1357,7 +1357,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="phprlibcompat">
 		<title>RLIB compatibility API</title>
 		<para>
 			These functions mimic the behaviour
@@ -1368,28 +1368,28 @@ OpenCReport::final get_color(
 			making the OpenCReports methods and
 			RLIB compatibility functions inter-operable.
 		</para>
-		<sect2>
+		<sect2 id="rlibinit">
 			<title>Initialize a report</title>
 			<para>
 				<programlisting>function
 rlib_init(): ?OpenCReport;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibdestroy">
 			<title>Destroy a report</title>
 			<para>
 				<programlisting>function
 rlib_free(OpenCReport $r): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibgetlibver">
 			<title>Get library version</title>
 			<para>
 				<programlisting>function
 rlib_version(void): string;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddmariads">
 			<title>Add a MySQL/MariaDB datasource</title>
 			<para>
 				This function is mostly equivalent to
@@ -1413,7 +1413,7 @@ rlib_add_datasource_mysql(
                      OpenCReport\Datasource;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddmariads2">
 			<title>Add a MySQL/MariaDB datasource from an INI group</title>
 			<para>
 				This function is equivalent to
@@ -1427,7 +1427,7 @@ rlib_add_datasource_mysql_from_group(
                      OpenCReport\Datasource;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddpgds">
 			<title>Add a PostgreSQL datasource</title>
 			<para>
 				This function is equivalent to
@@ -1440,7 +1440,7 @@ rlib_add_datasource_postgres(
                      OpenCReport\Datasource;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddodbcds">
 			<title>Add an ODBC datasource</title>
 			<para>
 				This function is equivalent to
@@ -1455,7 +1455,7 @@ rlib_add_datasource_odbc(
                      OpenCReport\Datasource;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddarrayds">
 			<title>Add an array datasource</title>
 			<para>
 				This function is equivalent to
@@ -1467,7 +1467,7 @@ rlib_add_datasource_array(
                      OpenCReport\Datasource;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddxmlds">
 			<title>Add an XML datasource</title>
 			<para>
 				This function is equivalent to
@@ -1479,7 +1479,7 @@ rlib_add_datasource_xml(
                      OpenCReport\Datasource;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddcsvds">
 			<title>Add a CSV datasource</title>
 			<para>
 				This function is equivalent to
@@ -1491,7 +1491,7 @@ rlib_add_datasource_csv(
                      OpenCReport\Datasource;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddquery">
 			<title>Add a query</title>
 			<para>
 				This function is equivalent to
@@ -1507,7 +1507,7 @@ rlib_add_query_as(
                      OpenCReport\Datasource;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddfollower">
 			<title>Add a resultset follower</title>
 			<para>
 				This function is about equivalent to
@@ -1522,7 +1522,7 @@ rlib_add_resultset_follower(
                      string $follower): bool;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddn1follower">
 			<title>Add a resultset N:1 follower</title>
 			<para>
 				This function is about equivalent to
@@ -1543,7 +1543,7 @@ rlib_add_resultset_follower_n_to_1(
                      string $follower_field): bool;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibsetdsencoding">
 			<title>Set datasource encoding</title>
 			<para>
 				This function is equivalent to
@@ -1555,7 +1555,7 @@ rlib_set_datasource_encoding(
                      string $encoding): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibloadreport">
 			<title>Add a report XML</title>
 			<para>
 				This function is equivalent to
@@ -1566,7 +1566,7 @@ rlib_add_report(
                      string $filename): bool;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibparsexmlfrombuffer">
 			<title>Add a report XML from buffer</title>
 			<para>
 				This function is equivalent to
@@ -1577,7 +1577,7 @@ rlib_add_report_from_buffer(
                      string $buffer): bool;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddsearchpath">
 			<title>Add a search path</title>
 			<para>
 				This function is equivalent to
@@ -1588,7 +1588,7 @@ rlib_add_search_path(
                      string $path): bool;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibsetlocale">
 			<title>Set locale</title>
 			<para>
 				This function is equivalent to
@@ -1599,7 +1599,7 @@ rlib_set_locale(
                      string $locale): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibsetupxlate">
 			<title>Setup translation</title>
 			<para>
 				This function is equivalent to
@@ -1611,7 +1611,7 @@ rlib_bindtextdomain(
                      string $dirname): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibsetoutputformat">
 			<title>Set output format</title>
 			<para>
 				This function is about equivalent to
@@ -1625,7 +1625,7 @@ rlib_set_output_format_from_text(
                      string $format): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibadduserfunc">
 			<title>Add a custom report function</title>
 			<para>
 				This function is the RLIB compatible
@@ -1659,7 +1659,7 @@ rlib_add_function(
 				or <literal>bool</literal>).
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibsetoutputencoding">
 			<title>Set output encoding</title>
 			<para>
 				This function silently does nothing.
@@ -1672,7 +1672,7 @@ rlib_set_output_encoding(
                      string $encoding): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddreportparam">
 			<title>Add a report parameter</title>
 			<para>
 				This function silently does nothing.
@@ -1686,7 +1686,7 @@ rlib_add_parameter(
                      string $value): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibsetoutputparam">
 			<title>Set an output parameter</title>
 			<para>
 				This function silently does nothing.
@@ -1700,7 +1700,7 @@ rlib_set_output_parameter(
                      string $value): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibrefresharray">
 			<title>Refresh array query contents</title>
 			<para>
 				This function silently does nothing.
@@ -1709,7 +1709,7 @@ rlib_set_output_parameter(
 rlib_query_refresh(OpenCReport $r): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddeventcb">
 			<title>Add an event callback</title>
 			<para>
 				This function adds a callback for
@@ -1754,7 +1754,7 @@ rlib_signal_connect(
 				class methods are recommended.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibrunreport">
 			<title>Execute the report</title>
 			<para>
 				It is equivalent to <literal>OpenCReport::execute()</literal>
@@ -1762,7 +1762,7 @@ rlib_signal_connect(
 rlib_execute(OpenCReport $r): bool;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibdumpreport">
 			<title>Dump the report output</title>
 			<para>
 				It is equivalent to <literal>OpenCReport::spool()</literal>
@@ -1770,7 +1770,7 @@ rlib_execute(OpenCReport $r): bool;</programlisting>
 rlib_spool(OpenCReport $r): ?string;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibgetcontenttype">
 			<title>Get content type</title>
 			<para>
 				It is equivalent to <literal>OpenCReport::get_content_type()</literal>
@@ -1778,7 +1778,7 @@ rlib_spool(OpenCReport $r): ?string;</programlisting>
 rlib_get_content_type(OpenCReport $r): ?string;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibsetradix">
 			<title>Set radix character</title>
 			<para>
 				This function silently does nothing.
@@ -1789,7 +1789,7 @@ rlib_get_content_type(OpenCReport $r): ?string;</programlisting>
 rlib_set_radix_character(OpenCReport $r): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibcompileexpr">
 			<title>Compile and evaluate an expression</title>
 			<para>
 				<programlisting>function
@@ -1811,7 +1811,7 @@ rlib_compile_infix(string $expr_string):
 				columns or report variables.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibaddgraphregion">
 			<title>Add graph background region</title>
 			<para>
 				This function silently does nothing.
@@ -1826,7 +1826,7 @@ rlib_graph_add_bg_region(
                      double $end): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibclearregion">
 			<title>Clear graph background region</title>
 			<para>
 				This function silently does nothing.
@@ -1837,7 +1837,7 @@ rlib_graph_clear_bg_region(
                      string $graph): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibsetgraphminortick">
 			<title>Set graph minor tick</title>
 			<para>
 				This function silently does nothing.
@@ -1849,7 +1849,7 @@ rlib_graph_set_x_minor_tick(
                      string $x): void;</programlisting>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rlibsetgraphminortickloc">
 			<title>Set graph minor tick by location</title>
 			<para>
 				This function silently does nothing.

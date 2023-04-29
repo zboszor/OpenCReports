@@ -1,6 +1,6 @@
 <chapter id="introduction" xreflabel="Introduction and concepts">
 	<title>Introduction and concepts</title>
-	<sect1>
+	<sect1 id="rlib" xreflabel="RLIB">
 		<title>The predecessor: RLIB</title>
 		<para>
 			The idea to write <ulink url="https://github.com/zboszor/OpenCReports">OpenCReports</ulink>
@@ -29,9 +29,9 @@
 			open way, and using a free software license.
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="concepts" xreflabel="Concepts">
 		<title>Concepts</title>
-		<sect2>
+		<sect2 id="whatisarepgen">
 			<title>What is a report generator?</title>
 			<para>
 				A report generator uses a tabular data source, which contains
@@ -44,7 +44,7 @@
 				HTML, XML, plain text or CSV.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="xmlbaseddesc">
 			<title>XML based report description</title>
 			<para>
 				The XML file format is widely used. It can describe
@@ -57,7 +57,7 @@
 				<ulink url="https://web.archive.org/web/20131116192438/http://newrlib.sicom.com/~rlib/index.php/Main_Page">RLIB documentation</ulink>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="comprehensiveapi">
 			<title>Comprehensive API for report creation</title>
 			<para>
 				The <xref linkend="lowlevelapi"/> allows creating a report purely
@@ -73,7 +73,7 @@
 				data access added from programming code.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="strictparser">
 			<title>Strict expression parser</title>
 			<para>
 				OpenCReports uses a Flex/Bison based expression parser.
@@ -87,7 +87,7 @@
 				expression.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="expropt">
 			<title>Expression optimization</title>
 			<para>
 				OpenCReports does some expression optimization
@@ -103,7 +103,7 @@
 				<xref linkend="variables"/>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="repvars">
 			<title>Report variables</title>
 			<para>
 				OpenCReports supports standard report variables
@@ -111,7 +111,7 @@
 				or custom defined ones. See <xref linkend="variables"/>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="setoffuncs">
 			<title>Extensive and extensible set of functions</title>
 			<para>
 				OpenCReports has many operators and functions to
@@ -128,7 +128,7 @@
 				functions.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="utf8strings">
 			<title>UTF-8 string handling</title>
 			<para>
 				OpenCReports exclusively uses UTF-8 for strings.
@@ -143,7 +143,7 @@
 				time, multibyte character encodings have won.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="highprecnumerics">
 			<title>High precision numeric data type</title>
 			<para>
 				For historic record, RLIB was designed for the US
@@ -181,7 +181,7 @@
 				<xref linkend="lowlevelapi"/> chapter.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="datetimetypes">
 			<title>Datetime and interval data types</title>
 			<para>
 				OpenCReports differentiates between timestamp and
@@ -191,7 +191,7 @@
 				in the <xref linkend="expressions"/> chapter.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="autoconv">
 			<title>Automatic input data conversion</title>
 			<para>
 				For maximum portability, databases provide their
@@ -221,7 +221,7 @@
 				may be used as is.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="alignments">
 			<title>Versatile field alignment and multi-row fields</title>
 			<para>
 				In the report output, fields may have a fixed width in
@@ -262,7 +262,7 @@
 				<literal>left</literal> alignment for single line fields.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="repbreaks">
 			<title>Report breaks</title>
 			<para>
 				OpenCReports supports report breaks defined on arbitrary
@@ -271,7 +271,7 @@
 				See <xref linkend="breaks"/> and <xref linkend="breaksnode"/>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="multicolrep">
 			<title>Multi-column reports</title>
 			<para>
 				OpenCReports, just like RLIB, supports both single-column
@@ -283,7 +283,7 @@
 				columns on the same page.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="pdfdetails">
 			<title>PDF output format, fonts, layout details</title>
 			<para>
 				By using the excellent drawing possibilities of
@@ -352,7 +352,7 @@
 				points.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="unittests">
 			<title>Extensive set of unit tests</title>
 			<para>
 				The unit tests ensure that OpenCReports' features keep
@@ -362,7 +362,7 @@
 				generation.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="stddeps">
 			<title>Standard Linux dependencies</title>
 			<para>
 				OpenCReports uses
@@ -396,16 +396,16 @@
 			</para>
 		</sect2>
 	</sect1>
-	<sect1>
+	<sect1 id="planned">
 		<title>OpenCReports planned features</title>
-		<sect2>
+		<sect2 id="moreformats">
 			<title>More output formats</title>
 			<para>
 				XML, CSV, plaintext and JSON are not currently supported as
 				output formats.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="graphs">
 			<title>Graph and chart support in HTML and PDF output</title>
 			<para>
 				Currently Gantt chart and various graph types (like
@@ -413,7 +413,7 @@
 				not supported.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="visualeditor">
 			<title>Visual editor for report XML descriptions</title>
 			<para>
 				There are other report generators on the market with

@@ -1,6 +1,6 @@
 <chapter id="xmldescriptor" xreflabel="XML description">
 	<title>Report XML description</title>
-	<sect1>
+	<sect1 id="descstruct">
 		<title>XML description structure</title>
 		<para>
 			<ulink url="https://github.com/zboszor/OpenCReports">OpenCReports</ulink>
@@ -81,7 +81,7 @@
 			child nodes can be used without the parent
 			<literal>&lt;Part&gt;</literal> node.
 		</para>
-		<sect2>
+		<sect2 id="xmlnotes">
 			<title>Notes about XML syntax and attributes</title>
 			<para>
 				Most (if not all) XML attributes in the report
@@ -266,7 +266,7 @@
 				Default is <literal>false</literal>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="precbits">
 			<title>Precision bits</title>
 			<para>
 				This controls the precision for numeric computations.
@@ -276,7 +276,7 @@
 				Default is <literal>256</literal>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="roundingmode">
 			<title>Rounding mode</title>
 			<para>
 				This controls the rounding mode for numeric computations.
@@ -300,7 +300,7 @@
 				<literal>faithful</literal> is experimental.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="locale">
 			<title>Locale</title>
 			<para>
 				This controls the language settings, like the decimal
@@ -313,7 +313,7 @@
 				approximates US English.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="xlatesettings">
 			<title>Translation settings</title>
 			<para>
 				These two settings control the translation.
@@ -538,7 +538,7 @@ user=myuser
 				<ulink url="https://www.connectionstrings.com/">public examples</ulink>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="csvds">
 			<title>CSV file datasource</title>
 			<para>
 				CSV ("Comma Separated Values") is a simple tabulated
@@ -660,7 +660,7 @@ user=myuser
 				or <literal>interval()</literal>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="arrayds">
 			<title>Array datasource</title>
 			<para>
 				Arrays are global in-memory structures in the
@@ -712,9 +712,9 @@ const enum ocrpt_result_type coltypes[COLUMNS] = {
 				<literal>OCRPT_RESULT_DATETIME</literal>. 
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="commondsprops">
 			<title>Common datasource properties</title>
-			<sect3>
+			<sect3 id="dsencoding">
 				<title>Encoding</title>
 				<para>
 					OpenCReports expects strings in UTF-8 encoding.
@@ -742,7 +742,7 @@ const enum ocrpt_result_type coltypes[COLUMNS] = {
     ...
 &lt;/Queries&gt;</programlisting>
 		</para>
-		<sect2>
+		<sect2 id="sqlqueries">
 			<title>SQL queries for SQL datasources</title>
 			<para>
 				SQL queries for MariaDB, PostgreSQL and ODBC
@@ -767,7 +767,7 @@ SELECT * FROM some_table
 				The SQL query can be any <literal>SELECT</literal>
 				statement.
 			</para>
-			<sect3>
+			<sect3 id="sqldsnotes">
 				<title>Special note for SQL datasources</title>
 				<para>
 					The database client libraries for MariaDB,
@@ -969,7 +969,7 @@ SELECT * FROM some_table
 					</listitem>
 				</itemizedlist>
 			</para>
-			<sect3>
+			<sect3 id="followerq">
 				<title>Regular follower queries</title>
 				<para>
 					A follower query is run along the primary query and
@@ -1015,7 +1015,7 @@ SELECT * FROM some_table
 					case is more limited.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="n1followerq">
 				<title>N:1 follower queries</title>
 				<para>
 					An N:1 follower query, for all intents and
@@ -1138,7 +1138,7 @@ SELECT * FROM some_table
 					Default font size is 12.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="partsizeunit">
 				<title>Size unit</title>
 				<para>
 					Shortcut for the <xref linkend="sizeunit"/> in
@@ -1154,7 +1154,7 @@ SELECT * FROM some_table
 					<literal>&lt;Part&gt;</literal> is ignored.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="nqsnd">
 				<title>No query show NoData attribute</title>
 				<para>
 					Shortcut for <xref linkend="noqueryshownodata"/> in
@@ -1168,7 +1168,7 @@ noquery_show_nodata="no"</programlisting>
 					See also <xref linkend="nodatanode"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="rhal">
 				<title>Report height after last attribute</title>
 				<para>
 					Shortcut for <xref linkend="reportheightafterlast"/> in
@@ -1307,7 +1307,7 @@ report_height_after_last="no"</programlisting>
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="partsubsecs">
 			<title>Part subsections</title>
 			<para>
 				As described in <xref linkend="parts"/>,
@@ -1351,7 +1351,7 @@ report_height_after_last="no"</programlisting>
 &lt;/Part&gt;</programlisting>					
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="partrow0">
 				<title>Part row</title>
 				<para>
 					See <xref linkend="partrow"/>.
@@ -1363,14 +1363,13 @@ report_height_after_last="no"</programlisting>
     &lt;/pr&gt;
 &lt;/Part&gt;</programlisting>
 				</para>
-				<sect4>
+				<sect4 id="partrowsubsecs">
 					<title>Part row subsections</title>
-					<sect5>
-						<title>Part column</title>
-						<para>
-							See <xref linkend="partcol"/>.
-						</para>
-					</sect5>
+					<para>
+						There's only one node type which is a
+						subsection of <literal>&lt;Part&gt;</literal>.
+						See <xref linkend="partcol"/>.
+					</para>
 				</sect4>
 			</sect3>
 		</sect2>
@@ -1385,7 +1384,7 @@ report_height_after_last="no"</programlisting>
 			will control the height of the row. The next row will
 			be continuous from that vertical page position.
 		</para>
-		<sect2>
+		<sect2 id="partrowatts">
 			<title>Part row attributes</title>
 			<sect3 id="partrowlayout" xreflabel="Part row layout attribute">
 				<title>Layout</title>
@@ -1463,7 +1462,7 @@ report_height_after_last="no"</programlisting>
     &lt;/pr&gt;
 &lt;/Part&gt;</programlisting>
 		</para>
-		<sect2>
+		<sect2 id="partcolatts">
 			<title>Part column attributes</title>
 			<sect3 id="partcolwidth" xreflabel="Part column width attribute">
 				<title>Width</title>
@@ -1715,7 +1714,7 @@ report_height_after_last="no"</programlisting>
 					<literal>12</literal> if both are unset.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="repsizeunit">
 				<title>Size unit</title>
 				<para>
 					Shortcut for the <xref linkend="sizeunit"/> in
@@ -1732,7 +1731,7 @@ report_height_after_last="no"</programlisting>
 					for <literal>&lt;Report&gt;</literal> is ignored.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="nqsnd1">
 				<title>No query show NoData attribute</title>
 				<para>
 					Shortcut for <xref linkend="noqueryshownodata"/> in
@@ -1746,7 +1745,7 @@ report_height_after_last="no"</programlisting>
 					See also <xref linkend="nodatanode"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="rhal1">
 				<title>Report height after last attribute</title>
 				<para>
 					Shortcut for <xref linkend="reportheightafterlast"/> in
@@ -1760,7 +1759,7 @@ report_height_after_last="no"</programlisting>
 					See also <xref linkend="nodatanode"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="orientation">
 				<title>Orientation</title>
 				<para>
 					Shortcut for <xref linkend="partpageorientation"/>
@@ -1780,7 +1779,7 @@ report_height_after_last="no"</programlisting>
 					in the XML description.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="marginsettings1">
 				<title>Margin settings</title>
 				<para>
 					Shortcuts for <xref linkend="marginsettings"/>
@@ -1822,7 +1821,7 @@ report_height_after_last="no"</programlisting>
 					in the XML description.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="papertype1">
 				<title>Paper type</title>
 				<para>
 					Shortcut for <xref linkend="papertype"/>
@@ -1942,7 +1941,7 @@ report_height_after_last="no"</programlisting>
 					constant. See <xref linkend="expressions"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="sph">
 				<title>Suppress page header on the first page</title>
 				<para>
 					Shortcut for <xref linkend="suppresspageheaderfirstpage"/>
@@ -1999,7 +1998,7 @@ report_height_after_last="no"</programlisting>
 					details.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="bw">
 				<title>Border width</title>
 				<para>
 					This is a shortcut for <xref linkend="pdborderwidth"/>
@@ -2033,7 +2032,7 @@ report_height_after_last="no"</programlisting>
 					<literal>&lt;pd&gt;</literal> node.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="bc">
 				<title>Border color</title>
 				<para>
 					This is a shortcut for <xref linkend="pdbordercolor"/>
@@ -2047,7 +2046,7 @@ report_height_after_last="no"</programlisting>
 					See <xref linkend="colorspec"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="dcols">
 				<title>Detail columns</title>
 				<para>
 					Shortcut for <xref linkend="detailcolumns"/>
@@ -2067,7 +2066,7 @@ report_height_after_last="no"</programlisting>
 					XML description.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="cpadding">
 				<title>Column padding</title>
 				<para>
 					Shortcut for <xref linkend="columnpadding"/>
@@ -2088,7 +2087,7 @@ report_height_after_last="no"</programlisting>
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="repsubsecs">
 			<title>Report subsections</title>
 			<sect3 id="reportpageheader" xreflabel="Report page header">
 				<title>Page header</title>
@@ -2148,7 +2147,7 @@ report_height_after_last="no"</programlisting>
 					A warning is issued in this case.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="repheader">
 				<title>Report header</title>
 				<para>
 					This is the description of the report header that is
@@ -2163,7 +2162,7 @@ report_height_after_last="no"</programlisting>
 &lt;/Part&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="repfooter">
 				<title>Report footer</title>
 				<para>
 					This is the description of the report footer that is
@@ -2178,7 +2177,7 @@ report_height_after_last="no"</programlisting>
 &lt;/Part&gt;</programlisting>					
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="repvars1">
 				<title>Variables</title>
 				<para>
 					This section describes the
@@ -2191,7 +2190,7 @@ report_height_after_last="no"</programlisting>
 &lt;/Part&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breaks1">
 				<title>Breaks</title>
 				<para>
 					This section describes the
@@ -2288,9 +2287,9 @@ report_height_after_last="no"</programlisting>
 			<xref linkend="report"/> is loaded from
 			a different file.
 		</para>
-		<sect2>
+		<sect2 id="lrepatts">
 			<title>Loaded Report attributes</title>
-			<sect3>
+			<sect3 id="lrepfname">
 				<title>File name</title>
 				<para>
 					<programlisting>&lt;load name="report1.xml" /&gt;</programlisting>
@@ -2314,7 +2313,7 @@ report_height_after_last="no"</programlisting>
 					is not displayed.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="lrepiter">
 				<title>Iterations</title>
 				<para>
 					The <literal>iterations</literal> attribute overrides
@@ -2344,9 +2343,9 @@ report_height_after_last="no"</programlisting>
 			It has no children nodes, only attributes.
 			<programlisting>&lt;Variable ... /&gt;</programlisting>
 		</para>
-		<sect2>
+		<sect2 id="varatts">
 			<title>Variable attributes</title>
-			<sect3>
+			<sect3 id="varname">
 				<title>Name</title>
 				<para>
 					The name of the variable. It must be
@@ -2355,7 +2354,7 @@ report_height_after_last="no"</programlisting>
 					<programlisting>&lt;Variable name="var1" /&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="varvalue">
 				<title>Value</title>
 				<para>
 					The "value" of the variable, or rather,
@@ -2368,7 +2367,7 @@ report_height_after_last="no"</programlisting>
 					<programlisting>&lt;Variable value="q1.field1 + 2 * q2.field2" /&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="vartype">
 				<title>Type</title>
 				<para>
 					The type of the variable. Several variable
@@ -2573,9 +2572,9 @@ report_height_after_last="no"</programlisting>
     &lt;/BreakFields&gt;
 &lt;/Break&gt;</programlisting>
 		</para>
-		<sect2>
+		<sect2 id="breakatts">
 			<title>Break attributes</title>
-			<sect3>
+			<sect3 id="breakname">
 				<title>Name</title>
 				<para>
 					The name of the break. It must be
@@ -2584,7 +2583,7 @@ report_height_after_last="no"</programlisting>
 					<programlisting>&lt;Break name="break1" /&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breaknp">
 				<title>Newpage</title>
 				<para>
 					Accepted as part of RLIB compatibility.
@@ -2592,7 +2591,7 @@ report_height_after_last="no"</programlisting>
 					<programlisting>&lt;Break newpage="yes" /&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breakhnp">
 				<title>Header on new page</title>
 				<para>
 					Moves the <programlisting>&lt;BreakHeader&gt;</programlisting>
@@ -2600,7 +2599,7 @@ report_height_after_last="no"</programlisting>
 					<programlisting>&lt;Break headernewpage="yes" /&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breaksb">
 				<title>Suppress break header and footer for blank break fields</title>
 				<para>
 					Suppress break header and footer in case
@@ -2610,7 +2609,7 @@ report_height_after_last="no"</programlisting>
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="breaksubsecs">
 			<title>Break subsections</title>
 			<sect3 id="breakheadernode" xreflabel="BreakHeader">
 				<title>BreakHeader</title>
@@ -2640,7 +2639,7 @@ report_height_after_last="no"</programlisting>
 &lt;/BreakHeader&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="breafields">
 				<title>BreakFields</title>
 				<para>
 					The break fields node contains one or more
@@ -2703,9 +2702,9 @@ report_height_after_last="no"</programlisting>
 			generic node that described how details are displayed
 			in reports.
 		</para>
-		<sect2>
+		<sect2 id="outputatts">
 			<title>Output attributes</title>
-			<sect3>
+			<sect3 id="outpsuppress">
 				<title>Suppress</title>
 				<para>
 					Output nodes may be suppressed as a whole.
@@ -2726,9 +2725,9 @@ report_height_after_last="no"</programlisting>
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="outputsubsecs">
 			<title>Output subsections</title>
-			<sect3>
+			<sect3 id="outpline">
 				<title>Line</title>
 				<para>
 					A line containing text elements of varying widths.
@@ -2740,7 +2739,7 @@ report_height_after_last="no"</programlisting>
 &lt;/Output</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="outphline">
 				<title>HorizontalLine</title>
 				<para>
 					A horizontal line.
@@ -2750,7 +2749,7 @@ report_height_after_last="no"</programlisting>
 &lt;/Output</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="outpimg">
 				<title>Image</title>
 				<para>
 					An image.
@@ -2760,7 +2759,7 @@ report_height_after_last="no"</programlisting>
 &lt;/Output</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="outpimgend">
 				<title>Image end</title>
 				<para>
 					Terminator for a previous image.
@@ -2782,7 +2781,7 @@ report_height_after_last="no"</programlisting>
     &lt;/Line&gt;
 &lt;/Output</programlisting>
 		</para>
-		<sect2>
+		<sect2 id="lineatts">
 			<title>Line attributes</title>
 			<sect3 id="linefontname" xreflabel="Line font name">
 				<title>Font name</title>
@@ -2851,7 +2850,7 @@ report_height_after_last="no"</programlisting>
 					Default is <literal>false</literal>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="linesuppress">
 				<title>Suppress</title>
 				<para>
 					Text lines may be suppressed. If the parent
@@ -2867,7 +2866,7 @@ report_height_after_last="no"</programlisting>
 					i.e. no suppression.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="linetextcolor">
 				<title>Text color</title>
 				<para>
 					This color is used to render text. It's accepted
@@ -2880,7 +2879,7 @@ report_height_after_last="no"</programlisting>
 					See <xref linkend="colorspec"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="linebgcolor">
 				<title>Background color</title>
 				<para>
 					This color is used to render the background
@@ -2895,9 +2894,9 @@ report_height_after_last="no"</programlisting>
 				</para>
 			</sect3>
 		</sect2>
-		<sect2>
+		<sect2 id="linesubsecs">
 			<title>Line subsections</title>
-			<sect3>
+			<sect3 id="linetxtelem">
 				<title>Text element</title>
 				<para>
 					Two variants are accepted.
@@ -2912,7 +2911,7 @@ report_height_after_last="no"</programlisting>
 					See the <xref linkend="textelemnode"/> below.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="lineimg">
 				<title>Image element</title>
 				<para>
 					An <literal>&lt;Image&gt;</literal> is accepted
@@ -2947,7 +2946,7 @@ report_height_after_last="no"</programlisting>
 			The two variants are interchangeable, see
 			<xref linkend="elemvalueattr"/> below.
 		</para>
-		<sect2>
+		<sect2 id="textelematts">
 			<title>Text element attributes</title>
 			<sect3 id="elemvalueattr" xreflabel="Text element value">
 				<title>Value</title>
@@ -2974,7 +2973,7 @@ report_height_after_last="no"</programlisting>
 					examples above.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="textelemdelayed">
 				<title>Delayed (precalculated) value</title>
 				<para>
 					This setting indicates whether the value is
@@ -3122,7 +3121,7 @@ report_height_after_last="no"</programlisting>
 					of characters.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="textcolor">
 				<title>Text color</title>
 				<para>
 					This color is used to render text. It's accepted
@@ -3136,7 +3135,7 @@ report_height_after_last="no"</programlisting>
 					See <xref linkend="colorspec"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="textbgcolor">
 				<title>Background color</title>
 				<para>
 					This color is used to render the background
@@ -3188,7 +3187,7 @@ report_height_after_last="no"</programlisting>
 					Default font size is 12.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="textbold">
 				<title>Bold font</title>
 				<para>
 					Whether the text element uses bold font.
@@ -3202,7 +3201,7 @@ report_height_after_last="no"</programlisting>
 					<literal>false</literal> if both are unset.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="textitalic">
 				<title>Italic font</title>
 				<para>
 					Whether the text element uses italic font.
@@ -3218,7 +3217,7 @@ report_height_after_last="no"</programlisting>
 					<literal>false</literal> if both are unset.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="weblink">
 				<title>Web link</title>
 				<para>
 					This attribute adds a weblink to the text element.
@@ -3231,7 +3230,7 @@ report_height_after_last="no"</programlisting>
 					Default is no weblink.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="memo">
 				<title>Multi-line (memo) field</title>
 				<para>
 					This attribute allows breaking long text fields
@@ -3250,7 +3249,7 @@ report_height_after_last="no"</programlisting>
 					<xref linkend="textelemalign"/>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="memowrap">
 				<title>Multi-line field wrapping</title>
 				<para>
 					This attribute allows wrapping multi-line
@@ -3268,7 +3267,7 @@ report_height_after_last="no"</programlisting>
 					This is a deviation from RLIB.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="memorowlimit">
 				<title>Multi-line field row limit</title>
 				<para>
 					This attribute allows limiting multi-line
@@ -3285,7 +3284,7 @@ report_height_after_last="no"</programlisting>
 					This is a deviation from RLIB.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="textxlate">
 				<title>Translation</title>
 				<para>
 					This attribute allows the text element to
@@ -3323,7 +3322,7 @@ report_height_after_last="no"</programlisting>
 					attribute is not needed.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="textcolid">
 				<title>Column number</title>
 				<para>
 					This attribute is accepted for RLIB compatibility,
@@ -3342,9 +3341,9 @@ report_height_after_last="no"</programlisting>
     &lt;HorizontalLine ... /&gt;
 &lt;/Output</programlisting>
 		</para>
-		<sect2>
+		<sect2 id="hlineatts">
 			<title>HorizontalLine attributes</title>
-			<sect3>
+			<sect3 id="hlinewidth">
 				<title>Line width</title>
 				<para>
 					The line width is measured in points,
@@ -3355,7 +3354,7 @@ report_height_after_last="no"</programlisting>
 					Default is <literal>1.0</literal>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="hlineindent">
 				<title>Indentation</title>
 				<para>
 					Extra indentation for the line.
@@ -3413,7 +3412,7 @@ report_height_after_last="no"</programlisting>
 					to the horizontal line width computation.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="hlinesuppress">
 				<title>Suppress</title>
 				<para>
 					Horizontal lines may be suppressed. If the parent
@@ -3429,7 +3428,7 @@ report_height_after_last="no"</programlisting>
 					i.e. no suppression.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="hlinecolor">
 				<title>Line color</title>
 				<para>
 					This color is used to render text. It's accepted
@@ -3474,9 +3473,9 @@ report_height_after_last="no"</programlisting>
 			node is encountered in that
 			<literal>&lt;Output&gt;</literal> node.
 		</para>
-		<sect2>
+		<sect2 id="imageatts">
 			<title>Image attributes</title>
-			<sect3>
+			<sect3 id="imagefname">
 				<title>File name</title>
 				<para>
 					The file name of the image.
@@ -3488,7 +3487,7 @@ report_height_after_last="no"</programlisting>
 					<literal>Image</literal> not shown.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="imagesuppress">
 				<title>Suppress</title>
 				<para>
 					The image may be suppressed.
@@ -3504,7 +3503,7 @@ report_height_after_last="no"</programlisting>
 					i.e. no suppression.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="imagetype">
 				<title>Type</title>
 				<para>
 					Accepted for RLIB compatibility.
@@ -3521,7 +3520,7 @@ report_height_after_last="no"</programlisting>
 					via <literal>librsvg</literal>.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="imagewidth">
 				<title>Width</title>
 				<para>
 					Image width, measured in points regardless of
@@ -3540,7 +3539,7 @@ report_height_after_last="no"</programlisting>
 					the line height.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="imageheight">
 				<title>Height</title>
 				<para>
 					Image height, measured in points regardless of
@@ -3559,7 +3558,7 @@ report_height_after_last="no"</programlisting>
 					the line height.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="imagetextwidth">
 				<title>Text width</title>
 				<para>
 					When the image is used as a line element, this
@@ -3584,7 +3583,7 @@ report_height_after_last="no"</programlisting>
 					as an output subsection.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="imagebgcolor">
 				<title>Background color</title>
 				<para>
 					Image background color. When the image is a line
@@ -3602,7 +3601,7 @@ report_height_after_last="no"</programlisting>
 					Default is unset, i.e. white.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="imagealign">
 				<title>Alignment</title>
 				<para>
 					Image alignment. When the image is a line
@@ -3665,7 +3664,7 @@ report_height_after_last="no"</programlisting>
 		<para>
 			<inlinemediaobject>
 				<imageobject>
-					<imagedata fileref="images/namedcolors.png" align="center" />
+					<imagedata fileref="images/namedcolors.svg" align="center" />
 				</imageobject>
 			</inlinemediaobject>
 		</para>

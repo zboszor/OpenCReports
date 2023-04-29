@@ -1,6 +1,6 @@
 <chapter id="expressions" xreflabel="Expressions">
 	<title>Expressions in OpenCReports</title>
-	<sect1>
+	<sect1 id="exprintro">
 		<title>Introduction</title>
 		<para>
 			There are four data types in OpenCReports:
@@ -173,7 +173,7 @@ false</programlisting>
 			These references are called <emphasis>identifiers</emphasis>.
 			Their values are evaluated during the report execution.
 		</para>
-		<sect2>
+		<sect2 id="identnames">
 			<title>Identifier names</title>
 			<para>
 				Identifiers are in the format <literal>domain.identifier</literal>
@@ -190,7 +190,7 @@ false</programlisting>
 				and numbers in subsequent characters.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="queryidents">
 			<title>Query field identifiers</title>
 			<para>
 				Any valid identifier is by default a query column
@@ -226,7 +226,7 @@ lekérdezés.mező_név</programlisting>
 			<para>
 				Some domain names carry special meaning for the report.
 			</para>
-			<sect3>
+			<sect3 id="envidents">
 				<title>Environment variables</title>
 				<para>
 					Domain <literal>m</literal> indicates the domain
@@ -255,13 +255,13 @@ lekérdezés.mező_név</programlisting>
 					results) are eliminated or reduced.
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="internalvaridents">
 				<title>Internal report variables</title>
 				<para>
 					Domain <literal>r</literal> indicates the domain
 					of internal report variables.
 				</para>
-				<sect4>
+				<sect4 id="currpage">
 					<title>Current page number</title>
 					<para>
 						<programlisting>r.pageno</programlisting>
@@ -283,7 +283,7 @@ lekérdezés.mező_név</programlisting>
 						<xref linkend="precalcexpr"/>.
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="lineno">
 					<title>Line number</title>
 					<para>
 						<programlisting>r.lineno</programlisting>
@@ -302,7 +302,7 @@ lekérdezés.mező_név</programlisting>
 						and the variable will not work as intended.
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="detailcount">
 					<title>Detail count</title>
 					<para>
 						<programlisting>r.detailcnt</programlisting>
@@ -326,7 +326,7 @@ lekérdezés.mező_név</programlisting>
 						the value of this variable is reset more often.
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="fieldval">
 					<title>Field value</title>
 					<para>
 						<programlisting>r.value</programlisting>
@@ -359,7 +359,7 @@ lekérdezés.mező_név</programlisting>
 						<xref linkend="variables"/>.
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="fieldformat">
 					<title>Format string value</title>
 					<para>
 						<programlisting>r.format</programlisting>
@@ -386,7 +386,7 @@ lekérdezés.mező_név</programlisting>
 						It can be used in any user defined expression.
 					</para>
 				</sect4>
-				<sect4>
+				<sect4 id="uservarsubexpr">
 					<title>Subexpressions of user-defined variables</title>
 					<para>
 						<programlisting>r.baseexpr
@@ -429,7 +429,7 @@ r.intermed2expr</programlisting>
 					</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="quotedidents">
 				<title>Quoted and dot-prefixed identifiers</title>
 				<para>
 					Both <literal>domain</literal> and <literal>identifier</literal>
@@ -444,7 +444,7 @@ query."field with space in the name"
 					</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="dotprefixedidents">
 				<title>Dot-prefixed identifiers</title>
 				<para>
 					A dot-prefixed identifier is one where the domain name
@@ -486,7 +486,7 @@ yes.no
 					</programlisting>
 				</para>
 			</sect3>
-			<sect3>
+			<sect3 id="quotedinternaldomains">
 				<title>Quoted special purpose identifier domains</title>
 				<para>
 					When identifier domains are quoted, they lose their special
@@ -511,7 +511,7 @@ yes.no
 			multiplication. The precedence classes are as below,
 			in increasing order of precedence.
 		</para>
-		<sect2>
+		<sect2 id="ternaryop">
 			<title>Ternary operator</title>
 			<para>
 				The ternary operator is as in the C language:
@@ -527,28 +527,28 @@ yes.no
 				but it can result in runtime errors.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="logicalops">
 			<title>Logical operators with two operands</title>
 			<para>
 				Logical OR can be written as <literal>||</literal> or
 				<literal>or</literal>. Example: <literal>a || b</literal>
 			</para>
 			<para>
-				Logical AND can be written as <literal>&&</literal> or
+				Logical AND can be written as <literal>&amp;&amp;</literal> or
 				<literal>and</literal>. Logical AND has precedence over OR.
-				Example: <literal>a && b</literal>
+				Example: <literal>a &amp;&amp; b</literal>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="bitwiseops">
 			<title>Bitwise operators with two operands</title>
 			<para>
 			The bitwise operators in this precedence class and in their
 			increasing order of precedence are:
 			bitwise OR (<literal>|</literal>) and
-            bitwise AND (<literal>&</literal>).
+            bitwise AND (<literal>&amp;</literal>).
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="eqneops">
 			<title>Equality and inequality comparison operators</title>
 			<para>
 				The equality comparison operator can be written as
@@ -559,7 +559,7 @@ yes.no
 				<literal>&lt;&gt;</literal> or <literal>!=</literal>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="cmpops">
 			<title>Other comparison operators</title>
 			<para>
 				Less-than (<literal>&lt;</literal>),
@@ -568,39 +568,39 @@ yes.no
 				greater-or-equal (<literal>&gt;=</literal>).
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="shiftops">
 			<title>Bitwise shifts</title>
 			<para>
 				Bitwise shift left (<literal>a &gt;&gt; b</literal>) and
 				bitwise shift right (<literal>a &lt;&lt; b</literal>).
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="addsubops">
 			<title>Addition and subtraction</title>
 			<para>
 				<literal>a + b</literal> and <literal>a - b</literal>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="muldivmodops">
 			<title>Multiplication, division and modulo (remainder)</title>
 			<para>
 				<literal>a * b</literal>, <literal>a / b</literal> and
 				<literal>a % b</literal>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="powop">
 			<title>Power-of operator</title>
 			<para>
 				<literal>a ^ b</literal> works as a-to-the-power-of-b.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="factop">
 			<title>Factorial operator</title>
 			<para>
 				<literal>a!</literal>, the '!' sign used as postfix operator.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="unaryprefixops">
 			<title>Unary plus and minus, logical and bitwise NOT, prefix increment and decrement</title>
 			<para>
 				Unary plus (<literal>+a</literal>), unary minus (<literal>-a</literal>),
@@ -609,14 +609,14 @@ yes.no
 				and prefix decrement (<literal>--a</literal>).
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="postfixops">
 			<title>Postfix increment and decrement</title>
 			<para>
 				Postfix increment (<literal>a++</literal>) and decrement
 				(<literal>a--</literal>).
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="funccalls">
 			<title>Function calls and implicit multiplication</title>
 			<para>
 				Function calls execute a function on operands:
@@ -722,13 +722,13 @@ yes.no
 				</itemizedlist>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="parens">
 			<title>Parentheses</title>
 			<para>
 				Parenthesized expressions are always computed first.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="tokmatchandprec">
 			<title>Token matching, precendence and syntax errors</title>
 			<para>
 				Expression parsing works on two levels: token matching (the
@@ -775,7 +775,7 @@ a+++++b
 			</para>
 		</sect2>
 	</sect1>
-	<sect1>
+	<sect1 id="listoffuncs">
 		<title>Alphabetical list of functions</title>
 		<para>
 			Most functions below operate in this way, unless noted otherwise:
@@ -824,7 +824,7 @@ a+++++b
 				</listitem>
 			</itemizedlist>
 		</para>
-		<sect2>
+		<sect2 id="absfunc">
 			<title>abs()</title>
 			<para>
 				Absolute value. Operator <literal>|...|</literal>
@@ -832,13 +832,13 @@ a+++++b
 				It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="acosfunc">
 			<title>acos()</title>
 			<para>
 				Arc-cosine function. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="addfunc">
 			<title>add()</title>
 			<para>
 				Addition. Operator <literal>+</literal> is a shortcut for
@@ -848,20 +848,20 @@ a+++++b
 				i.e. <literal>concat()</literal> below.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="andfunc">
 			<title>and()</title>
 			<para>
-				Bitwise AND. Operator <literal>&</literal> is a shortcut for
+				Bitwise AND. Operator <literal>&amp;</literal> is a shortcut for
 				this function. It takes two or more numeric operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="asinfunc">
 			<title>asin()</title>
 			<para>
 				Arc-sine function. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="atanfunc">
 			<title>atan()</title>
 			<para>
 				Arc-tangent function. It takes one numeric operand.
@@ -875,14 +875,14 @@ a+++++b
 				The row number restarts from 1 at every break boundary.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="ceilfunc">
 			<title>ceil()</title>
 			<para>
 				Rounds its operand to the next higher or equal integer.
 				It takes one numeric operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="chgdateoffunc">
 			<title>chgdateof()</title>
 			<para>
 				It takes two datetime operands.
@@ -890,7 +890,7 @@ a+++++b
 				the date part of the second operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="chgtimeoffunc">
 			<title>chgtimeof()</title>
 			<para>
 				It takes two datetime operands.
@@ -898,51 +898,51 @@ a+++++b
 				the date part of the second operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="concatfunc">
 			<title>concat()</title>
 			<para>
 				String concatenation. It takes two or more string operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="cosfunc">
 			<title>cos()</title>
 			<para>
 				Cosine function. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="cotfunc">
 			<title>cot()</title>
 			<para>
 				Cotangent function. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="cscfunc">
 			<title>csc()</title>
 			<para>
 				Cosecant function. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="datefunc">
 			<title>date()</title>
 			<para>
 				Returns the current date. It takes zero operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="dateoffunc">
 			<title>dateof()</title>
 			<para>
 				It takes one datetime operand.
 				It returns date part of the datetime operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="dayfunc">
 			<title>day()</title>
 			<para>
 				It takes one datetime operand.
 				It returns the day of month value as a number.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="decfunc">
 			<title>dec()</title>
 			<para>
 				Decrement by one. It takes one numeric operand.
@@ -950,7 +950,7 @@ a+++++b
 				either in prefix or postfix uses.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="dimfunc">
 			<title>dim()</title>
 			<para>
 				It takes one datetime operand. Given the year and month
@@ -959,7 +959,7 @@ a+++++b
 				year, it returns 29.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="divfunc">
 			<title>div()</title>
 			<para>
 				Division. Operator <literal>/</literal> is a shortcut for
@@ -968,7 +968,7 @@ a+++++b
 				it by the second and subsequent operands in sequence.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="dtosfunc">
 			<title>dtos()</title>
 			<para>
 				Datetime to string. It takes one datetime operand.
@@ -976,7 +976,7 @@ a+++++b
 				to the date format of the currently set locale.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="dtosffunc">
 			<title>dtosf()</title>
 			<para>
 				Datetime to formatted string. It takes two operands:
@@ -989,7 +989,7 @@ a+++++b
 				with the operands reversed.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="eqfunc">
 			<title>eq()</title>
 			<para>
 				Equivalence. Operator <literal>=</literal> and <literal>==</literal>
@@ -999,7 +999,7 @@ a+++++b
 				equal or non-equal, respectively.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="errorfunc">
 			<title>error()</title>
 			<para>
 				Returns an artificially generated error. It takes one
@@ -1008,28 +1008,28 @@ a+++++b
 				as done in the <literal>ocrpt_expr_test</literal> example.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="expfunc">
 			<title>exp()</title>
 			<para>
 				It takes one numeric operand and returns the exponential 
 				of the operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="exp10func">
 			<title>exp10()</title>
 			<para>
 				It takes one numeric operand and returns 10 to the power
 				of the operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="exp2func">
 			<title>exp2()</title>
 			<para>
 				It takes one numeric operand and returns 2 to the power
 				of the operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="factorialfunc">
 			<title>factorial()</title>
 			<para>
 				Factorial function. It takes one numeric operand.
@@ -1037,14 +1037,14 @@ a+++++b
 				this function.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="floorfunc">
 			<title>floor()</title>
 			<para>
 				Rounds its operand to the next lower or equal integer.
 				It takes one numeric operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="fmodfunc">
 			<title>fmod()</title>
 			<para>
 				The result to the value of <literal>x - ny</literal>
@@ -1072,13 +1072,13 @@ a+++++b
 				See also <xref linkend="formatting"/>
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="fxpvalfunc">
 			<title>fxpval()</title>
 			<para>
 				Compatibility function for RLIB. It takes two operands.
 				The type of the first operand may be string containing
 				a numeric value or numeric. If it's a string, then it will
-				be converted to numeric. The type of the second operand
+				be converted to numeric first. The type of the second operand
 				is numeric. The function divides the value of the first
 				operand with 10 to the power of the value of the second
 				operand. One use case is that if the data contains prices
@@ -1086,7 +1086,7 @@ a+++++b
 				decimal separator to the correct place.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="gefunc">
 			<title>ge()</title>
 			<para>
 				Greater-or-equal. It takes two operands of the same type,
@@ -1095,14 +1095,14 @@ a+++++b
 				this function.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="gettimeinsecsfunc">
 			<title>gettimeinsecs()</title>
 			<para>
 				It takes one datetime operand. It converts the time part
 				of the datetime to seconds elapsed from 00:00:00.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="gtfunc">
 			<title>gt()</title>
 			<para>
 				Greater-than. It takes two operands of the same type,
@@ -1111,7 +1111,7 @@ a+++++b
 				this function.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="iiffunc">
 			<title>iif()</title>
 			<para>
 				Trinary function. It takes three operands of which the first one
@@ -1123,7 +1123,7 @@ a+++++b
 				is the shortcut for this function.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="incfunc">
 			<title>inc()</title>
 			<para>
 				Increment by one. It takes one numeric operand.
@@ -1131,7 +1131,7 @@ a+++++b
 				either in prefix or postfix uses.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="intervalfunc">
 			<title>interval()</title>
 			<para>
 				Convert the parameter(s) to an interval subtype of
@@ -1144,24 +1144,24 @@ a+++++b
 				of years, months, days, hours, minutes and seconds.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="isnullfunc">
 			<title>isnull()</title>
 			<para>
 				Returns numeric 1 if the operand is NULL, 0 otherwise.
 				It takes one operand of any type.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="landfunc">
 			<title>land()</title>
 			<para>
-				Boolean logic AND. Operator <literal>&&</literal> is a
+				Boolean logic AND. Operator <literal>&amp;&amp;</literal> is a
 				shortcut for this function. It takes two or more numeric
 				operands that are treated as boolean logic values. The
 				function is executed until the result is fully determined,
 				i.e. it stops at the first false value.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="lefunc">
 			<title>le()</title>
 			<para>
 				Less-or-equal. It takes two operands of the same type,
@@ -1170,7 +1170,7 @@ a+++++b
 				this function.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="leftfunc">
 			<title>left()</title>
 			<para>
 				Returns the leftmost N characters of a string.
@@ -1179,13 +1179,13 @@ a+++++b
 				and used to determine the returned string length.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="lnfunc">
 			<title>ln()</title>
 			<para>
 				Alias for <literal>log()</literal>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="lnotfunc">
 			<title>lnot()</title>
 			<para>
 				Boolean logic NOT. Prefix operator <literal>!</literal> is
@@ -1193,25 +1193,25 @@ a+++++b
 				boolean value of its operand. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="logfunc">
 			<title>log()</title>
 			<para>
 				Natural logarithm. It takes one nueric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="log10func">
 			<title>log10()</title>
 			<para>
 				Base-10 logarithm. It takes one nueric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="log2func">
 			<title>log2()</title>
 			<para>
 				Base-2 logarithm. It takes one nueric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="lorfunc">
 			<title>lor()</title>
 			<para>
 				Boolean logic OR. Operator <literal>||</literal> is a shortcut for
@@ -1221,13 +1221,13 @@ a+++++b
 				determined fully, i.e. it stops at the first true value.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="lowerfunc">
 			<title>lower()</title>
 			<para>
 				Lowercase conversion. It takes one string operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="ltfunc">
 			<title>lt()</title>
 			<para>
 				Less-than. It takes two operands of the same type,
@@ -1236,7 +1236,7 @@ a+++++b
 				function.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="midfunc">
 			<title>mid()</title>
 			<para>
 				Return characters from the middle of the string.
@@ -1251,27 +1251,27 @@ a+++++b
 				<literal>right(s,n)</literal>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="modfunc">
 			<title>mod()</title>
 			<para>
 				An alias of <literal>remainder()</literal>.
 				It takes two numeric operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="monthfunc">
 			<title>month()</title>
 			<para>
 				Returns the month value of a datetime. It takes one datetime operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="mulfunc">
 			<title>mul()</title>
 			<para>
 				Multiplication. Operator <literal>*</literal> is a shortcut for
 				this function. It takes two or more numeric operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="nefunc">
 			<title>ne()</title>
 			<para>
 				Not equal. It takes two operands of the same type,
@@ -1280,7 +1280,7 @@ a+++++b
 				are shortcuts for it.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="notfunc">
 			<title>not()</title>
 			<para>
 				Bitwise NOT. Prefix operator <literal>~</literal> is
@@ -1288,7 +1288,7 @@ a+++++b
 				negated value of its operand. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="nowfunc">
 			<title>now()</title>
 			<para>
 				Returns the current timestamp. It is run only once
@@ -1298,39 +1298,39 @@ a+++++b
 				It takes zero operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="nullfunc">
 			<title>null()</title>
 			<para>
 				Generate NULL value using the type of its operand.
 				It takes one operand of any type.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="nulldtfunc">
 			<title>nulldt()</title>
 			<para>
 				Generate NULL of the datetime type. It takes no operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="nullnfunc">
 			<title>nulln()</title>
 			<para>
 				Generate NULL of the numeric type. It takes no operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="nullsfunc">
 			<title>nulls()</title>
 			<para>
 				Generate NULL of the string type. It takes no operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="orfunc">
 			<title>or()</title>
 			<para>
 				Bitwise OR. Operator <literal>|</literal> is a shortcut for
 				this function. It takes two or more numeric operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="powfunc">
 			<title>pow()</title>
 			<para>
 				This function raises the first operand to the power of its
@@ -1339,7 +1339,7 @@ a+++++b
 				this function.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="prevvalfunc">
 			<title>prevval()</title>
 			<para>
 				This function accepts one subexpression and
@@ -1364,7 +1364,7 @@ a+++++b
 				the formatted data as a string.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="properfunc">
 			<title>proper()</title>
 			<para>
 				This function takes one string operand. The function
@@ -1372,14 +1372,14 @@ a+++++b
 				letter of the first word, which will be uppercase.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="randomfunc">
 			<title>random()</title>
 			<para>
 				Generate a pseudo-random numeric value between 0 and 1.
 				It takes no operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="remainderfunc">
 			<title>remainder()</title>
 			<para>
 				The result to the value of <literal>x - ny</literal>
@@ -1392,7 +1392,7 @@ a+++++b
 				It takes two numeric operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rightfunc">
 			<title>right()</title>
 			<para>
 				Returns the rightmost N characters of a string.
@@ -1401,7 +1401,7 @@ a+++++b
 				and used to determine the returned string length.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rintfunc">
 			<title>rint()</title>
 			<para>
 				Rounds its operand using the rounding mode set via
@@ -1409,7 +1409,7 @@ a+++++b
 				It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="roundfunc">
 			<title>round()</title>
 			<para>
 				Rounds its operand to the nearest representable integer,
@@ -1417,7 +1417,7 @@ a+++++b
 				It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="rownumfunc">
 			<title>rownum()</title>
 			<para>
 				It takes either zero operands or one string operand.
@@ -1428,13 +1428,13 @@ a+++++b
 				queries.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="secfunc">
 			<title>sec()</title>
 			<para>
 				Secant. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="settimeinsecsfunc">
 			<title>settimeinsecs()</title>
 			<para>
 				It takes two operands, the first operand is a datetime,
@@ -1445,7 +1445,7 @@ a+++++b
 				second operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="shlfunc">
 			<title>shl()</title>
 			<para>
 				Bitwise shift left. Shifts the first operand left with the
@@ -1454,7 +1454,7 @@ a+++++b
 				function. It takes two numeric operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="shrfunc">
 			<title>shr()</title>
 			<para>
 				Bitwise shift right. Shifts the first operand right with the
@@ -1463,25 +1463,25 @@ a+++++b
 				function. It takes two numeric operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="sinfunc">
 			<title>sin()</title>
 			<para>
 				Sine. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="sqrfunc">
 			<title>sqr()</title>
 			<para>
 				Square. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="sqrtfunc">
 			<title>sqrt()</title>
 			<para>
 				Square root. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="stdwiyfunc">
 			<title>stdwiy()</title>
 			<para>
 				It takes one datetime operand. This function returns
@@ -1490,13 +1490,13 @@ a+++++b
 				that has at least 4 days in the new year.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="stodfunc">
 			<title>stod()</title>
 			<para>
 				Alias for <literal>stodt()</literal>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="stodtfunc">
 			<title>stodt()</title>
 			<para>
 				It takes one string operand. This function parses
@@ -1506,13 +1506,13 @@ a+++++b
 				date-only and time-only values in the string.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="stodtsqlfunc">
 			<title>stodtsql()</title>
 			<para>
 				Alias for <literal>stodt()</literal>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="strfunc">
 			<title>str()</title>
 			<para>
 				It takes three numeric operands. The first operand
@@ -1521,20 +1521,20 @@ a+++++b
 				operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="subfunc">
 			<title>sub()</title>
 			<para>
 				Subtraction. Operator <literal>-</literal> is a shortcut for
 				this function. It takes two or more numeric operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="tanfunc">
 			<title>tan()</title>
 			<para>
 				Tangent. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="timeoffunc">
 			<title>timeof()</title>
 			<para>
 				It takes one datetime operand.
@@ -1560,20 +1560,20 @@ a+++++b
 				that determines which translation form is used.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="truncfunc">
 			<title>trunc()</title>
 			<para>
 				Rounds its operand to the next representable integer toward
 				zero. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="tstodfunc">
 			<title>tstod()</title>
 			<para>
 				Alias for <literal>stodt()</literal>.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="uminusfunc">
 			<title>uminus()</title>
 			<para>
 				Unary minus. Changes the sign of its numeric operand
@@ -1582,14 +1582,14 @@ a+++++b
 				It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="upperfunc">
 			<title>upper()</title>
 			<para>
 				It takes one string operand. This function converts
 				the string to uppercase.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="valfunc">
 			<title>val()</title>
 			<para>
 				Numeric value. If a string operand is given, it returns
@@ -1598,7 +1598,7 @@ a+++++b
 				It takes one numeric or string operand.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="wiyfunc">
 			<title>wiy()</title>
 			<para>
 				It takes one datetime operand. This function returns
@@ -1607,7 +1607,7 @@ a+++++b
 				the first day of week 01.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="wiy1func">
 			<title>wiy1()</title>
 			<para>
 				It takes one datetime operand. This function returns
@@ -1616,7 +1616,7 @@ a+++++b
 				the first day of week 01.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="wiyofunc">
 			<title>wiyo()</title>
 			<para>
 				It takes two operands, one datetime and one numeric.
@@ -1626,13 +1626,13 @@ a+++++b
 				(0 = Sunday, 1 = Monday, 2 = Tuesday, ...)
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="xorfunc">
 			<title>xor()</title>
 			<para>
 				Bitwise exclusive OR. It takes two or more numeric operands.
 			</para>
 		</sect2>
-		<sect2>
+		<sect2 id="yearfunc">
 			<title>year()</title>
 			<para>
 				It takes one datetime operand. This function returns

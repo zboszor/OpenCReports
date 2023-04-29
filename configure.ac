@@ -161,13 +161,23 @@ AC_CHECK_PROG(GHOSTSCRIPT,[ghostscript],[ghostscript],[false])
 AC_CHECK_PROG(IMCOMPARE,[compare],[compare],[false])
 AM_CONDITIONAL(ENABLE_PDF_TESTS, [test x$ac_cv_prog_GHOSTSCRIPT = xghostscript -a x$ac_cv_prog_IMCOMPARE = xcompare])
 
-AC_CHECK_PROG(DOCBOOK2PDF,[docbook2pdf],[docbook2pdf],[false])
-AM_CONDITIONAL(ENABLE_PDF_DOCS, [test x$ac_cv_prog_DOCBOOK2PDF = xdocbook2pdf])
+AC_CHECK_PROG(XMLLINT,[xmllint],[xmllint],[false])
+AC_CHECK_PROG(XSLTPROC,[xsltproc],[xsltproc],[false])
+AC_CHECK_PROG(FOP,[fop],[fop],[false])
 
-AC_CHECK_PROG(DOCBOOK2HTML,[docbook2html],[docbook2html],[false])
-AM_CONDITIONAL(ENABLE_HTML_DOCS, [test x$ac_cv_prog_DOCBOOK2HTML = xdocbook2html])
+AC_MSG_CHECKING([whether building HTML documentation is enabled])
+AS_IF([test x$ac_cv_prog_XMLLINT = xxmllint -a x$ac_cv_prog_XSLTPROC = xxsltproc],
+	[enable_docs=yes],
+	[enable_docs=no])
+AC_MSG_RESULT([$enable_docs])
+AM_CONDITIONAL(ENABLE_DOCS, [test x$enable_docs = xyes])
 
-AM_CONDITIONAL(ENABLE_DOCS, [test x$ac_cv_prog_DOCBOOK2PDF = xdocbook2pdf -o x$ac_cv_prog_DOCBOOK2HTML = xdocbook2html])
+AC_MSG_CHECKING([whether building PDF documentation is enabled])
+AS_IF([test x$enable_docs = xyes -a x$ac_cv_prog_FOP = xfop],
+	[enable_pdf_docs=yes],
+	[enable_pdf_docs=no])
+AC_MSG_RESULT([$enable_pdf_docs])
+AM_CONDITIONAL(ENABLE_PDF_DOCS, [test x$enable_pdf_docs = xyes])
 
 AC_CONFIG_FILES([
 	Makefile

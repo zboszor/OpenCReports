@@ -1,6 +1,6 @@
 <chapter id="breaks" xreflabel="Report breaks">
 	<title>Report breaks</title>
-	<sect1>
+	<sect1 id="groupingdata">
 		<title>Grouping data</title>
 		<para>
 			<literal>OpenCReports</literal>, being a report generator,
@@ -43,7 +43,7 @@ ORDER BY department,paygrade,employee;</programlisting>
 			in a report generator.
 		</para>
 	</sect1>
-	<sect1>
+	<sect1 id="reportbreaks">
 		<title>Report breaks in OpenCReports</title>
 		<para>
 			<xref linkend="expressions"/> can reference data via the
@@ -62,7 +62,7 @@ ORDER BY department,paygrade,employee;</programlisting>
 			and footers. See <xref linkend="breakheadernode"/> and
 			<xref linkend="breakfooternode"/>.
 		</para>
-		<sect2>
+		<sect2 id="breakexample">
 			<title>Example</title>
 			<para>
 				This XML part below shows a complete example of
