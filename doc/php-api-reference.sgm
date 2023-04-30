@@ -1741,7 +1741,12 @@ rlib_set_output_parameter(
 				<xref linkend="phprefreshquery"/>.
 				The same limitations apply.
 				<programlisting>function
-rlib_query_refresh(OpenCReport $r): void;</programlisting>
+rlib_query_refresh(?OpenCReport $r = null): void;</programlisting>
+			</para>
+			<para>
+				OpenCReports allows calling this function
+				with no parameters or a <literal>NULL</literal>
+				parameter.
 			</para>
 		</sect2>
 		<sect2 id="rlibaddeventcb">

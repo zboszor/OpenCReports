@@ -6331,17 +6331,20 @@ ZEND_FUNCTION(rlib_set_output_parameter) {
 }
 
 ZEND_FUNCTION(rlib_query_refresh) {
-	zval *object;
+	zval *object = NULL;
 
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
+		Z_PARAM_OPTIONAL;
+		Z_PARAM_OBJECT_OF_CLASS_EX(object, opencreport_ce, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
 
-	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+	if (object) {
+		php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
-	if (!oo->o) {
-		zend_throw_error(NULL, "OpenCReport object was freed");
-		RETURN_THROWS();
+		if (!oo->o) {
+			zend_throw_error(NULL, "OpenCReport object was freed");
+			RETURN_THROWS();
+		}
 	}
 
 	php_opencreport_query_refresh_array();
@@ -6768,8 +6771,8 @@ ZEND_ARG_TYPE_INFO(0, param, IS_STRING, 0)
 ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_query_refresh, 0, 1, IS_VOID, 0)
-ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_query_refresh, 0, 0, IS_VOID, 0)
+ZEND_ARG_VARIADIC_OBJ_INFO(0, r, OpenCReport, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_signal_connect, 0, 3, IS_VOID, 0)
