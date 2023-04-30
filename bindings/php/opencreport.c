@@ -4958,7 +4958,16 @@ static void php_opencreport_array_dtor(zval *data) {
 	struct php_opencreport_array *arr = (struct php_opencreport_array *)Z_PTR_P(data);
 
 	zend_string_release(arr->arrayname);
-	ocrpt_mem_free(arr->a.array);
+
+	if (arr->types)
+		ocrpt_mem_free(arr->a.types);
+	else {
+		for (int32_t row = 0; row <= arr->rows; row++)
+			for (int32_t col = 0; col < arr->cols; col++)
+				ocrpt_mem_free(arr->a.array[(row * arr->cols) + col]);
+		ocrpt_mem_free(arr->a.array);
+	}
+
 	ocrpt_mem_free(arr);
 }
 
