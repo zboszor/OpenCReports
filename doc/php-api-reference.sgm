@@ -1669,6 +1669,67 @@ OpenCReport\Part::page_footer_set_report(
                      ?string $expr_string = null): void;
 }</programlisting>
 		</para>
+		<sect2 id="phprowgetnext">
+			<title>Get the next part row</title>
+			<para>
+				Get the next object in the chain of part rows.
+				This method may only be used on an object created
+				with <literal>OpenCReport\Part::row_get_first()</literal>,
+				i.e. one that was internally marked as an iterator
+				object.
+				<programlisting>public final
+OpenCReport\Row::get_next():
+                     ?OpenCReport\Row;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phprowcolnew">
+			<title>Create a new part column for the row</title>
+			<para>
+				For class methods of <literal>OpenCReport\Column</literal>,
+				see <xref linkend="phppartcolclass"/>.
+				<programlisting>public final
+OpenCReport\Row::column_new():
+                     OpenCReport\Column;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phprowcolgetfirst">
+			<title>Get first column of a part row</title>
+			<para>
+				Get the first column from the part row.
+				The object is marked internally as an iterator.
+				For class methods of <literal>OpenCReport\Column</literal>,
+				see <xref linkend="phppartcolclass"/>
+				<programlisting>public final
+OpenCReport\Row::column_get_first():
+                     ?OpenCReport\Column;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phprowsetsuppress">
+			<title>Set suppression for the part row</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Row:set_suppress(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phprowsetnewpage">
+			<title>Set new page for the part row</title>
+			<para>
+				When set to <literal>yes</literal>,
+				the part row will start on a new page.
+				<programlisting>public final
+OpenCReport\Row:set_newpage(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phprowsetlayout">
+			<title>Set layout type for the part row</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Row::set_layout(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phppartcolclass">
 		<title>The OpenCReport\Column class</title>
