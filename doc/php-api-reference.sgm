@@ -1092,6 +1092,178 @@ OpenCReport\QueryResult::column_result(long $index):
                      bool $value): void;
 }</programlisting>
 		</para>
+		<sect2 id="phpexprfree">
+			<title>Free an expression</title>
+			<para>
+				Used by unit tests.
+				<programlisting>public final
+OpenCReport\Expr::free(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprprint">
+			<title>Print an expression</title>
+			<para>
+				Used by unit tests.
+				<programlisting>public final
+OpenCReport\Expr::print(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprnodes">
+			<title>Get the number of expression tree nodes</title>
+			<para>
+				Used by unit tests to compare the expression
+				tree before and after optimization.
+				<programlisting>public final
+OpenCReport\Expr::nodes(): long;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprresolve">
+			<title>Resolve an expression</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Expr::resolve(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexproptimize">
+			<title>Optimize an expression</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Expr::optimize(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexpreval">
+			<title>Evaluate an expression</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Expr::eval():
+						 ?OpenCReport\Result;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprgetresult">
+			<title>Get the result of an expression</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Expr::get_result():
+						 ?OpenCReport\Result;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprsetstringvalue">
+			<title>Set expression result to a string value</title>
+			<para>
+				Useful for user functions.
+				<programlisting>public final
+OpenCReport\Expr::set_string_value(
+						 string $value): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprsetlongvalue">
+			<title>Set expression result to a long value</title>
+			<para>
+				Useful for user functions.
+				<programlisting>public final
+OpenCReport\Expr::set_long_value(
+						 long $value): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprsetdoublevalue">
+			<title>Set expression result to a double value</title>
+			<para>
+				Useful for user functions.
+				<programlisting>public final
+OpenCReport\Expr::set_double_value(
+						 double $value): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprgetnumops">
+			<title>Get number of operands of a expression</title>
+			<para>
+				Useful for user functions.
+				<programlisting>public final
+OpenCReport\Expr::get_num_operands(): long;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexpropgetresult">
+			<title>Get nth operands' result of a expression</title>
+			<para>
+				Useful for user functions.
+				<programlisting>public final
+OpenCReport\Expr::operand_get_result(
+						 long $opidx):
+						 ?OpenCReport\Result;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprcmpresults">
+			<title>Compare the expression's current and previous results</title>
+			<para>
+				Used internally by the report executor
+				and unit tests. Useful for implementing
+				a custom report executor with breaks.
+				<programlisting>public final
+OpenCReport\Expr::cmp_results(): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprinitresults">
+			<title>Initialize expression results</title>
+			<para>
+				Used internally by the report executor
+				and unit tests. Useful for implementing
+				a custom report executor.
+				<programlisting>public final
+OpenCReport\Expr::init_results(long $result_type):
+						 void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprsetnthstringvalue">
+			<title>Set nth result of an expression to a string value</title>
+			<para>
+				Used by unit tests.
+				<programlisting>public final
+OpenCReport\Expr::set_nth_result_string_value(
+						 long $which,
+						 string $value): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprsetnthlongvalue">
+			<title>Set nth result of an expression to a long value</title>
+			<para>
+				Used by unit tests.
+				<programlisting>public final
+OpenCReport\Expr::set_nth_result_long_value(
+						 long $which,
+						 long $value): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprsetnthdoublevalue">
+			<title>Set nth result of an expression to a double value</title>
+			<para>
+				Used by unit tests.
+				<programlisting>public final
+OpenCReport\Expr::set_nth_result_double_value(
+						 long $which,
+						 double $value): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprsetiterativestartflag">
+			<title>Set iterative start flag of an expression</title>
+			<para>
+				Used internally by the report executor
+				and by unit tests.
+				<programlisting>public final
+OpenCReport\Expr::set_iterative_start_value(
+						 bool $value): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprsetdelayed">
+			<title>Set expression to delayed</title>
+			<para>
+				A delayed expression's final value is
+				precalculated, and this value is used
+				in the output in every row of the report.
+				<programlisting>public final
+OpenCReport\Expr::set_delayed(
+						 bool $value): void;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phpresultclass" xreflabel="The OpenCReport\Result class">
 		<title>The OpenCReport\Result class</title>
