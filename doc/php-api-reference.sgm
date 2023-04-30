@@ -917,6 +917,82 @@ OpenCReport\Datasource::set_encoding(string $encoding): void;</programlisting>
     public final free(): void;
 }</programlisting>
 		</para>
+		<sect2 id="phpquerygetresult">
+			<title>Get result for a query's current row</title>
+			<para>
+				The result is <literal>OpenCReport\QueryResult</literal>.
+				See <xref linkend="phpqueryresultclass"/>.
+				<programlisting>public final
+OpenCReport\Query::get_result():
+                     OpenCReport\QueryResult;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpquerynavstart">
+			<title>Start navigation for a query</title>
+			<para>
+				Reset query (and all its followers) to go
+				before the first row.
+				<programlisting>public final
+OpenCReport\Query::navigate_start(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpquerynavnext">
+			<title>Navigate to the next row</title>
+			<para>
+				Navigate the query to the next row and return
+				if the new row is valid. The current row of
+				the query's follower queries are also moved
+				to the next valid row.
+				<programlisting>public final
+OpenCReport\Query::navigate_next(): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpqueryaddfollower">
+			<title>Add a query follower</title>
+			<para>
+				Add a query as an 1:1 follower to the main
+				query object. The method returns whether
+				the call succeeded.
+				<programlisting>public final
+OpenCReport\Query::add_follower(
+                     OpenCReport\Query $follower):
+                     bool;</programlisting>
+			</para>
+			<para>
+				Adding a circular reference between queries
+				would fail.
+			</para>
+		</sect2>
+		<sect2 id="phpqueryaddn1follower">
+			<title>Add an N:1 query follower</title>
+			<para>
+				Add a query and the matching expression
+				as a follower to the main query object.
+				The method returns whether the call
+				succeeded.
+				<programlisting>public final
+OpenCReport\Query::add_follower_n_to_1(
+                     OpenCReport\Query $follower,
+                     OpenCReport\Expr $match):
+                     bool;</programlisting>
+			</para>
+			<para>
+				Adding a circular reference between queries
+				would fail.
+			</para>
+			<para>
+				The call takes over ownership of the
+				match object and it must not be
+				explicitly freed.
+			</para>
+		</sect2>
+		<sect2 id="phpqueryfree">
+			<title>Free a query</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Query::free(): void;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phpqueryresultclass">
 		<title>The OpenCReport\QueryResult class</title>
