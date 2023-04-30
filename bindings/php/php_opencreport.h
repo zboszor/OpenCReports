@@ -12,7 +12,7 @@
 extern zend_module_entry ocrpt_module_entry;
 #define phpext_ocrpt_ptr &ocrpt_module_entry
 
-#define PHP_OPENCREPORT_VERSION "0.0.1"
+#define PHP_OPENCREPORT_VERSION "0.7.0"
 
 /* Structure for main OpenCReport object. */
 typedef struct _php_opencreport_object {
