@@ -5280,6 +5280,26 @@ static int php_opencreport_err_printf(const char *fmt, ...) {
 	return len;
 }
 
+static void *opencreport_emalloc(size_t size) {
+	return emalloc(size);
+}
+
+static void *opencreport_erealloc(void *ptr, size_t size) {
+	return erealloc(ptr, size);
+}
+
+static void opencreport_efree(const void *ptr) {
+	return efree((void *)ptr);
+}
+
+static char *opencreport_estrdup(const char *s) {
+	return estrdup(s);
+}
+
+static char *opencreport_estrndup(const char *s, size_t size) {
+	return estrndup(s, size);
+}
+
 /* {{{ PHP_MINIT_FUNCTION */
 static PHP_MINIT_FUNCTION(opencreport)
 {
@@ -5289,6 +5309,7 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ocrpt_env_set_query_func(php_opencreport_env_query);
 	ocrpt_set_printf_func(php_opencreport_std_printf);
 	ocrpt_set_err_printf_func(php_opencreport_err_printf);
+	ocrpt_mem_set_alloc_funcs(opencreport_emalloc, opencreport_erealloc, NULL, opencreport_efree, opencreport_estrdup, opencreport_estrndup);
 
 	memcpy(&opencreport_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_CLASS_ENTRY(ce, "OpenCReport", opencreport_class_methods);
