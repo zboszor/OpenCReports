@@ -1439,6 +1439,212 @@ OpenCReport\Result::get_number(?string $format): ?string;</programlisting>
                      void;
 }</programlisting>
 		</para>
+		<sect2 id="phppartgetnext">
+			<title>Get the next report part</title>
+			<para>
+				Get the next object in the chain of report parts.
+				This method may only be used on an object created
+				with <literal>OpenCReport::part_get_first()</literal>,
+				i.e. one that was internally marked as an iterator
+				object.
+				<programlisting>public final
+OpenCReport\Part::get_next():
+                     ?OpenCReport\Part;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartrownew">
+			<title>Create a new report part row</title>
+			<para>
+				For class methods of <literal>OpenCReport\Row</literal>,
+				see <xref linkend="phppartrowclass"/>
+				<programlisting>public final
+OpenCReport\Part::row_new():
+                     OpenCReport\Row;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartrowgetfirst">
+			<title>Get the first report part row</title>
+			<para>
+				Get the first part row from the part.
+				The object is marked internally as an iterator.
+				For class methods of <literal>OpenCReport\Row</literal>,
+				see <xref linkend="phppartrowclass"/>
+				<programlisting>public final
+OpenCReport\Part::row_get_first():
+                     ?OpenCReport\Row;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartadditerationcb">
+			<title>Add iteration callback for the part</title>
+			<para>
+				Add an "iteration done" event callback
+				for the part object.
+				<programlisting>public final
+OpenCReport\Part::add_iteration_cb(
+                     string $callback): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartequals">
+			<title>Check whether two parts are identical</title>
+			<para>
+				Check whether two part objects refer to
+				the same internal part structure of the report.
+				Used by unit tests.
+				<programlisting>public final
+OpenCReport\Part::equals(
+                     OpenCReport\Part $part): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartsetiterations">
+			<title>Check whether two parts are identical</title>
+			<para>
+				Set the number of iterations for the part.
+				The expression must evaluate to a numeric
+				(integer) value.
+				<programlisting>public final
+OpenCReport\Part::set_iterations(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartsetfontname">
+			<title>Set part font name</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Part::set_font_name(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartsetfontsize">
+			<title>Set part font size</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Part::set_font_size(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartsetpaper">
+			<title>Set part font size</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Part::set_paper(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartsetorientation">
+			<title>Set part orientation</title>
+			<para>
+				The expression must evaluate
+				to a string value. The possible
+				values are <literal>portrait</literal>
+				and <literal>landscape</literal>.
+				Default is <literal>portrait</literal>.
+				<programlisting>public final
+OpenCReport\Part::set_orientation(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartsettopmargin">
+			<title>Set part top margin</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Part::set_top_margin(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartsetbottommargin">
+			<title>Set part bottom margin</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Part::set_bottom_margin(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartsetleftmargin">
+			<title>Set part left margin</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Part::set_left_margin(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartsetrightmargin">
+			<title>Set part right margin</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Part::set_right_margin(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartsetsuppress">
+			<title>Set part suppression</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Part::set_suppress(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartsetsphf">
+			<title>Set suppression of the page header on the first page</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Part::set_suppress_pageheader_firstpage(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartpageheader">
+			<title>Get the part's page header</title>
+			<para>
+				Get the part's page header <literal>&lt;Output&gt;</literal>
+				section. See <xref linkend="phpoutputclass"/> and
+				<xref linkend="outputnode"/>.
+				<programlisting>public final
+OpenCReport\Part::page_header():
+                     ?OpenCReport\Output;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartpageheadersetreport">
+			<title>Set the report object for the part's page header</title>
+			<para>
+				Set the report object for the part's page header.
+				This will add the internal association between
+				the part's page header and the report, and
+				expressions in the part page header may reference
+				report query column identifiers and report user variables.
+				Therefore it is only recommended for single-part,
+				single-report reports.
+				<programlisting>public final
+OpenCReport\Part::page_header_set_report(
+                     OpenCReport\Report $report):
+                     void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartpagefooter">
+			<title>Get the part's page footer</title>
+			<para>
+				Get the part's page footer <literal>&lt;Output&gt;</literal>
+				section. See <xref linkend="phpoutputclass"/> and
+				<xref linkend="outputnode"/>.
+				<programlisting>public final
+OpenCReport\Part::page_footer():
+                     ?OpenCReport\Output;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phppartpagefootersetreport">
+			<title>Set the report object for the part's page footer</title>
+			<para>
+				Set the report object for the part's page footer.
+				This will add the internal association between
+				the part's page footer and the report, and
+				expressions in the part page footer may reference
+				report query column identifiers and report user variables.
+				Therefore it is only recommended for single-part,
+				single-report reports.
+				<programlisting>public final
+OpenCReport\Part::page_footer_set_report(
+                     OpenCReport\Report $report):
+                     void;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phppartrowclass">
 		<title>The OpenCReport\Row class</title>
