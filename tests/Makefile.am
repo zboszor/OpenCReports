@@ -215,6 +215,10 @@ PHP_PDF_TESTS = \
 	layout_pdf_xml25_test \
 	layout_pdf_xml26_test \
 	layout_pdf_xml27_test \
+	layout_rlib_fixed_part_test \
+	layout_rlib_fixed_part2_test \
+	layout_ocrpt_fixed_part_test \
+	layout_ocrpt_fixed_part2_test \
 	layout_pdf_xml28_test \
 	layout_pdf_xml29_test \
 	layout_pdf_xml30_test \
