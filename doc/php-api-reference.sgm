@@ -1006,6 +1006,37 @@ OpenCReport\Query::free(): void;</programlisting>
                      ?OpenCReport\Result;
 }</programlisting>
 		</para>
+		<sect2 id="phpqueryresultcolumns">
+			<title>Get number of columns for a query result</title>
+			<para>
+				This method returns the number of columns
+				for the query result.
+				<programlisting>public final
+OpenCReport\QueryResult::columns(): long;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpqueryresultcolname">
+			<title>Get the nth column name for a query result</title>
+			<para>
+				This method returns the column name
+				for the query result at <literal>$index</literal>.
+				It returns <literal>NULL</literal> for invalid indices.
+				<programlisting>public final
+OpenCReport\QueryResult::column_name(long $index):
+                     ?string;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpqueryresultcolresult">
+			<title>Get the nth column result for a query result</title>
+			<para>
+				This method returns the column result
+				for the query result at <literal>$index</literal>.
+				It returns <literal>NULL</literal> for invalid indices.
+				<programlisting>public final
+OpenCReport\QueryResult::column_result(long $index):
+                     ?OpenCReport\Result;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phpexprclass" xreflabel="The OpenCReport\Expr class">
 		<title>The OpenCReport\Expr class</title>
