@@ -1286,6 +1286,91 @@ OpenCReport\Expr::set_delayed(
     public final get_number(?string $format): ?string;
 }</programlisting>
 		</para>
+		<sect2 id="phpresultfree">
+			<title>Free a result object</title>
+			<para>
+				Only use it for separately created
+				result objects, like via
+				<literal>OpenCReport::env_get()</literal> and
+				<literal>OpenCReport::result_new()</literal>.
+				Not needed for freeing an expression.
+				<programlisting>public final
+OpenCReport\Result::free(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpresultcopy">
+			<title>Copy a result object</title>
+			<para>
+				Used by unit tests.
+				<programlisting>public final
+OpenCReport\Result::copy(
+                     OpenCReport\Result $src_result):
+                     void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpresultprint">
+			<title>Print a result object</title>
+			<para>
+				Used by unit tests.
+				<programlisting>public final
+OpenCReport\Result::print(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpresultgettype">
+			<title>Get result object value type</title>
+			<para>
+				Useful for user functions.
+				<programlisting>public final
+OpenCReport\Result::public final get_type(): long;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpresultisnull">
+			<title>Detect whether result object value is NULL</title>
+			<para>
+				Useful for user functions.
+				<programlisting>public final
+OpenCReport\Result::is_null(): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpresultisstring">
+			<title>Detect whether result object value is a string</title>
+			<para>
+				Useful for user functions.
+				<programlisting>public final
+OpenCReport\Result::is_string(): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpresultisnumber">
+			<title>Detect whether result object value is a number</title>
+			<para>
+				Useful for user functions.
+				<programlisting>public final
+OpenCReport\Result::is_number(): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpresultgetstring">
+			<title>Get string value of a result object</title>
+			<para>
+				Useful for user functions.
+				<programlisting>public final
+OpenCReport\Result::get_string(): ?string;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpresultgetnumber">
+			<title>Get numeric value of a result object as a string</title>
+			<para>
+				Useful for user functions.
+				The method may optionally use a format string
+				to specify the number of decimal digits.
+				The returned value may be used with
+				<ulink url="https://www.php.net/manual/en/book.bc.php">BC Math</ulink>
+				in PHP or (if the precision is small enough)
+				converted to <literal>double</literal> or
+				<literal>long</literal>.
+				<programlisting>public final
+OpenCReport\Result::get_number(?string $format): ?string;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phppartclass" xreflabel="The OpenCReport\Part class">
 		<title>The OpenCReport\Part class</title>
