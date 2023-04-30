@@ -110,6 +110,8 @@
     public final query_get(string $query_name):
                      ?OpenCReport\Query;
 
+    public static final query_refresh(): void;
+
     public final expr_parse(string $expr_string):
                      ?OpenCReport\Expr;
     public final expr_error(): ?string;
@@ -506,6 +508,38 @@ OpenCReport:: datasource_get(string $source_name):
 					<programlisting>public final
 OpenCReport::query_get(string $query_name):
                      ?OpenCReport\Query;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="phprefreshquery" xreflabel="OpenCReport::query_refresh()">
+				<title>Refresh the internal representation of array queries</title>
+				<para>
+					When adding an array query, the PHP array
+					is internally transformed into a C array
+					representation, decoupling it from the source data.
+					The PHP array may be modified during
+					executing the report, e.g. in an event callback.
+					This method makes the internal representation
+					reflect the new data.
+					<programlisting>public static final
+query_refresh(): void;</programlisting>
+				</para>
+				<para>
+					There are some limitations what may be
+					done to the source PHP array, though.
+					<itemizedlist>
+						<listitem override="bullet">
+							<para>
+								Changes to the first row of data
+								(the column names) are ignored.
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								The number of rows and columns
+								in the data must not change.
+							</para>
+						</listitem>
+					</itemizedlist>
 				</para>
 			</sect3>
 		</sect2>
@@ -1703,8 +1737,9 @@ rlib_set_output_parameter(
 		<sect2 id="rlibrefresharray">
 			<title>Refresh array query contents</title>
 			<para>
-				This function silently does nothing.
-				NOT IMPLEMENTED YET.
+				This function is equivalent to executing
+				<xref linkend="phprefreshquery"/>.
+				The same limitations apply.
 				<programlisting>function
 rlib_query_refresh(OpenCReport $r): void;</programlisting>
 			</para>
