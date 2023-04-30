@@ -14,6 +14,9 @@ SGMLFILES = \
 	jadetex.cfg
 
 PDF =
+if ENABLE_PDF_DOCS
+override PDF += OpenCReports-A4.pdf OpenCReports-US.pdf
+endif
 
 HTML = OpenCReports.html html
 
@@ -38,14 +41,12 @@ OpenCReports.html: stylesheet-html-nochunk.xsl OpenCReports-full.xml $(IMAGES)
 	$(XSLTPROC) --nonet $(XMLINCLUDE) $(XSLTPROCFLAGS) $(XSLTPROC_HTML_FLAGS) -o $@ $(wordlist 1,2,$^)
 
 if ENABLE_PDF_DOCS
-override PDF += OpenCReports-A4.pdf OpenCReports-letter.pdf
-
 XSLTPROC_FO_FLAGS = --stringparam img.src.path '$(srcdir)/'
 
 %-A4.fo: stylesheet-fo.xsl %-full.xml
 	$(XSLTPROC) --nonet $(XMLINCLUDE) $(XSLTPROCFLAGS) $(XSLTPROC_FO_FLAGS) --stringparam paper.type A4 -o $@ $^
 
-%-letter.fo: stylesheet-fo.xsl %-full.xml
+%-US.fo: stylesheet-fo.xsl %-full.xml
 	$(XSLTPROC) --nonet $(XMLINCLUDE) $(XSLTPROCFLAGS) $(XSLTPROC_FO_FLAGS) --stringparam paper.type USletter -o $@ $^
 
 %.pdf: %.fo $(IMAGES)
@@ -55,6 +56,6 @@ endif
 
 EXTRA_DIST = $(SGMLFILES)
 
-CLEANFILES = OpenCReports.pdf OpenCReports.aux OpenCReports.log OpenCReports.out html/*
+CLEANFILES = OpenCReports-A4.pdf OpenCReports-US.pdf html-stamp OpenCReports.html html/*
 
 endif
