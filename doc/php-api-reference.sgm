@@ -61,13 +61,13 @@
     public final set_locale(string $locale): void;
 
     public final datasource_add_array(string $source_name):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
     public final datasource_add_csv(string $source_name):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
     public final datasource_add_json(string $source_name):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
     public final datasource_add_xml(string $source_name):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
     public final datasource_add_postgresql(
                      string $source_name,
                      string $host = null,
@@ -75,11 +75,11 @@
                      string $dbname = null,
                      string $user = null,
                      string $password = null):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
     public final datasource_add_postgresql2(
                      string $source_name,
                      string $connection_info = null):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
     public final datasource_add_mariadb(
                      string $source_name,
                      string $host = null,
@@ -88,25 +88,25 @@
                      string $user = null,
                      string $password = null,
                      string $unix_socket = null):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
     public final datasource_add_mariadb2(
                      string $source_name,
                      string $option_file = null,
                      string $group = null):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
     public final datasource_add_odbc(
                      string $source_name,
                      string $dbname = null,
                      ?string $user,
                      ?string $password):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
     public final datasource_add_odbc2(
                      string $source_name,
                      string $connection_info = null):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
 
     public final datasource_get(string $source_name):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
     public final query_get(string $query_name):
                      ?OpenCReport\Query;
 
@@ -384,48 +384,48 @@ OpenCReport::set_locale(string $locale): void;</programlisting>
 			<sect3 id="phpaddarrayds">
 				<title>Add an array datasource</title>
 				<para>
-					For the <literal>OpenCReport\DataSource</literal>
-					class methods, see its own section REF: TODO.
+					For the <literal>OpenCReport\Datasource</literal>
+					class methods, see <xref linkend="phpdsclass"/>
 					<programlisting>public final
 OpenCReport::datasource_add_array(string $source_name):
-                     ?OpenCReport\DataSource;</programlisting>
+                     ?OpenCReport\Datasource;</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="phpaddcsvds">
 				<title>Add a CSV datasource</title>
 				<para>
-					For the <literal>OpenCReport\DataSource</literal>
-					class methods, see its own section REF: TODO.
+					For the <literal>OpenCReport\Datasource</literal>
+					class methods, see <xref linkend="phpdsclass"/>
 					<programlisting>public final
 OpenCReport::datasource_add_csv(string $source_name):
-                     ?OpenCReport\DataSource;</programlisting>
+                     ?OpenCReport\Datasource;</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="phpaddjsonds">
 				<title>Add a JSON datasource</title>
 				<para>
-					For the <literal>OpenCReport\DataSource</literal>
-					class methods, see its own section REF: TODO.
+					For the <literal>OpenCReport\Datasource</literal>
+					class methods, see <xref linkend="phpdsclass"/>.
 					<programlisting>public final
 OpenCReport::datasource_add_json(string $source_name):
-                     ?OpenCReport\DataSource;</programlisting>
+                     ?OpenCReport\Datasource;</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="phpaddxmlds">
 				<title>Add an XML datasource</title>
 				<para>
-					For the <literal>OpenCReport\DataSource</literal>
-					class methods, see its own section REF: TODO.
+					For the <literal>OpenCReport\Datasource</literal>
+					class methods, see <xref linkend="phpdsclass"/>.
 					<programlisting>public final
 OpenCReport::datasource_add_xml(string $source_name):
-                     ?OpenCReport\DataSource;</programlisting>
+                     ?OpenCReport\Datasource;</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="phpaddpgds">
 				<title>Add an PostgreSQL datasource</title>
 				<para>
-					For the <literal>OpenCReport\DataSource</literal>
-					class methods, see its own section REF: TODO.
+					For the <literal>OpenCReport\Datasource</literal>
+					class methods, see <xref linkend="phpdsclass"/>.
 					<programlisting>public final
 OpenCReport::datasource_add_postgresql(
                      string $source_name,
@@ -434,20 +434,20 @@ OpenCReport::datasource_add_postgresql(
                      string $dbname = null,
                      string $user = null,
                      string $password = null):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
 
 public final
 OpenCReport::datasource_add_postgresql2(
                      string $source_name,
                      string $connection_info = null):
-                     ?OpenCReport\DataSource;</programlisting>
+                     ?OpenCReport\Datasource;</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="phpaddmariads">
 				<title>Add a MariaDB datasource</title>
 				<para>
-					For the <literal>OpenCReport\DataSource</literal>
-					class methods, see its own section REF: TODO.
+					For the <literal>OpenCReport\Datasource</literal>
+					class methods, see <xref linkend="phpdsclass"/>.
 					<programlisting>public final
 OpenCReport::datasource_add_mariadb(
                      string $source_name,
@@ -457,34 +457,34 @@ OpenCReport::datasource_add_mariadb(
                      string $user = null,
                      string $password = null,
                      string $unix_socket = null):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
 
 public final
 OpenCReport::datasource_add_mariadb2(
                      string $source_name,
                      string $option_file = null,
                      string $group = null):
-                     ?OpenCReport\DataSource;</programlisting>
+                     ?OpenCReport\Datasource;</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="phpaddodbcds">
 				<title>Add an ODBC datasource</title>
 				<para>
-					For the <literal>OpenCReport\DataSource</literal>
-					class methods, see its own section REF: TODO.
+					For the <literal>OpenCReport\Datasource</literal>
+					class methods, see <xref linkend="phpdsclass"/>.
 					<programlisting>public final
 OpenCReport::datasource_add_odbc(
                      string $source_name,
                      string $dbname = null,
                      ?string $user,
                      ?string $password):
-                     ?OpenCReport\DataSource;
+                     ?OpenCReport\Datasource;
 
 public final
 OpenCReport::datasource_add_odbc2(
                      string $source_name,
                      string $connection_info = null):
-                     ?OpenCReport\DataSource;</programlisting>
+                     ?OpenCReport\Datasource;</programlisting>
 				</para>
 				<para>
 					For the parameters, see <xref linkend="odbcds"/>.
@@ -493,18 +493,18 @@ OpenCReport::datasource_add_odbc2(
 			<sect3 id="phpgetds">
 				<title>Get a named datasource</title>
 				<para>
-					For the <literal>OpenCReport\DataSource</literal>
-					class methods, see its own section REF: TODO.
+					For the <literal>OpenCReport\Datasource</literal>
+					class methods, see <xref linkend="phpdsclass"/>.
 					<programlisting>public final
 OpenCReport:: datasource_get(string $source_name):
-                     ?OpenCReport\DataSource;</programlisting>
+                     ?OpenCReport\Datasource;</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="phpgetquery">
 				<title>Get a named query</title>
 				<para>
 					For the <literal>OpenCReport\Query</literal>
-					class methods, see its own section REF: TODO.
+					class methods, see <xref linkend="phpqueryclass"/>.
 					<programlisting>public final
 OpenCReport::query_get(string $query_name):
                      ?OpenCReport\Query;</programlisting>
@@ -619,7 +619,7 @@ OpenCReport::function_add(
 				<para>
 					For class methods of
 					<literal>OpenCReport\Expr</literal>,
-					please refer to its own section. REF: TODO.
+					please see <xref linkend="phpexprclass"/>.
 				</para>
 			</sect3>
 		</sect2>
@@ -630,7 +630,7 @@ OpenCReport::function_add(
 				<para>
 					For class methods of
 					<literal>OpenCReport\Part</literal>,
-					see its own section. REF: TODO.
+					see <xref linkend="phppartclass"/>.
 					<programlisting>public final
 OpenCReport::part_new(): OpenCReport\Part;</programlisting>
 				</para>
@@ -764,8 +764,8 @@ OpenCReport::env_get(string $var_name):
 			<para>
 				This method creates an uninitialized
 				<literal>OpenCReport\Result</literal>
-				with no value. See its own methods
-				to set the value. REF: TODO
+				with no value. See <xref linkend="phpresultclass"/>
+				to set the value.
 				<programlisting>public final
 OpenCReport::result_new(): OpenCReport\Result;</programlisting>
 			</para>
@@ -816,7 +816,7 @@ OpenCReport::final get_color(
 			</para>
 		</sect2>
 	</sect1>
-	<sect1 id="phpdsclass">
+	<sect1 id="phpdsclass" xreflabel="The OpenCReport\Datasource class">
 		<title>The OpenCReport\Datasource class</title>
 		<para>
 			This class has no constructor, so such an object
@@ -836,7 +836,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1 id="phpqueryclass">
+	<sect1 id="phpqueryclass" xreflabel="The OpenCReport\Query class">
 		<title>The OpenCReport\Query class</title>
 		<para>
 			<programlisting>class OpenCReport\Query {
@@ -871,7 +871,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1 id="phpexprclass">
+	<sect1 id="phpexprclass" xreflabel="The OpenCReport\Expr class">
 		<title>The OpenCReport\Expr class</title>
 		<para>
 			<programlisting>class OpenCReport\Expr {
@@ -926,7 +926,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1 id="phpresultclass">
+	<sect1 id="phpresultclass" xreflabel="The OpenCReport\Result class">
 		<title>The OpenCReport\Result class</title>
 		<para>
 			<programlisting>class OpenCReport\Result {
@@ -948,7 +948,7 @@ OpenCReport::final get_color(
 }</programlisting>
 		</para>
 	</sect1>
-	<sect1 id="phppartclass">
+	<sect1 id="phppartclass" xreflabel="The OpenCReport\Part class">
 		<title>The OpenCReport\Part class</title>
 		<para>
 			<programlisting>class OpenCReport\Part {
