@@ -1766,6 +1766,100 @@ OpenCReport\Row::set_layout(
                      ?string $expr_string = null): void;
 }</programlisting>
 		</para>
+		<sect2 id="phpcolgetnext">
+			<title>Get next column</title>
+			<para>
+				Get the next object in the chain of part columns.
+				This method may only be used on an object created
+				with <literal>OpenCReport\Row::column_get_first()</literal>,
+				i.e. one that was internally marked as an iterator
+				object.
+				<programlisting>public final
+OpenCReport\Column::get_next():
+                     ?OpenCReport\Column;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpcolreportnew">
+			<title>Create a new report in the column</title>
+			<para>
+				For class methods of <literal>OpenCReport\Report</literal>,
+				see <xref linkend="phpreportclass"/>.
+				<programlisting>public final
+OpenCReport\Column::report_new():
+                     OpenCReport\Report;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpcolreportgetfirst">
+			<title>Get first report of a part column</title>
+			<para>
+				Get the first report from the part column.
+				The object is marked internally as an iterator.
+				For class methods of <literal>OpenCReport\Report</literal>,
+				see <xref linkend="phpreportclass"/>
+				<programlisting>public final
+OpenCReport\Column::public final report_get_first():
+                     ?OpenCReport\Report;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpcolsetsuppress">
+			<title>Set part column suppression</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Column::set_suppress(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpcolsetwidth">
+			<title>Set part column width</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Column::set_width(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpcolsetheight">
+			<title>Set part column height</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Column::set_height(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpcolsetborderwidth">
+			<title>Set border width</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Column::set_border_width(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpcolsetbordercolor">
+			<title>Set border color</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Column::set_border_color(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpcolsetdetailcols">
+			<title>Set number of details columns</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Column::set_detail_columns(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpcolsetpadding">
+			<title>Set column padding</title>
+			<para>
+				Set the padding between detail columns.
+				It is used if the number of detail
+				columns is greater than 1.
+				<programlisting>public final
+OpenCReport\Column::set_column_padding(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phpreportclass">
 		<title>The OpenCReport\Report class</title>
