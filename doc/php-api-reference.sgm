@@ -8,7 +8,7 @@
 			<programlisting>extension=opencreports.so</programlisting>
 		</para>
 	</sect1>
-	<sect1 id="mainclass">
+	<sect1 id="mainclass" xreflabel="The OpenCReport class">
 		<title>The OpenCReport class</title>
 		<para>
 			The main class in OpenCReports is called
@@ -825,7 +825,7 @@ OpenCReport::final get_color(
 			<literal>OpenCReport::datasource_add_*</literal>
 			methods return an object of this class.
 			<programlisting>class OpenCReport\Datasource {
-    public final free();
+    public final free(): void;
 
     public final query_add(string $name,
                            string $array_or_file_or_sql,
@@ -835,6 +835,66 @@ OpenCReport::final get_color(
     public final set_encoding(string $encoding): void;
 }</programlisting>
 		</para>
+		<sect2 id="phpdsfree">
+			<title>Free a datasource</title>
+			<para>
+				The datasource is freed for the
+				parent <literal>OpenCReport</literal>
+				object.
+				<programlisting>public final
+OpenCReport\Datasource::free(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpdsqueryadd">
+			<title>Add a query to the datasource</title>
+			<para>
+				Add a query to the parent
+				<literal>OpenCReport</literal> object
+				associated with the
+				<literal>OpenCReport\Datasource</literal>.
+				<programlisting>public final
+OpenCReport\Datasource::query_add(string $name,
+                           string $array_or_file_or_sql,
+                           ?string $coltypes = null):
+                           OpenCReport\Query;</programlisting>
+			</para>
+			<para>
+				<literal>$name</literal> is the query name
+				that <xref linkend="expressions"/> may use
+				as the identifier domain.
+			</para>
+			<para>
+				<literal>$array_or_file_or_sql</literal>
+				contains the array name (for an array datasource),
+				the file name (for a file based datasource,
+				like JSON, CSV or XML), or the SQL query statement
+				for SQL based datasources (like MariaDB, PostgreSQL
+				or ODBC).
+			</para>
+			<para>
+				Passing <literal>$coltypes</literal> is
+				optional and is only valid for array or
+				file based datasources. File based datasources
+				may or may not include column type specification.
+				Array datasources don't. The <literal>$coltypes</literal>
+				array contains long values
+				<literal>OpenCReport::RESULT_*</literal>.
+				See <xref linkend="mainclass"/>. It helps
+				the engine to add automatic data conversion
+				for query column data.
+				SQL based datasources provide the data type
+				for query columns.
+			</para>
+		</sect2>
+		<sect2 id="phpdssetencoding">
+			<title>Set datasource encoding</title>
+			<para>
+				Set encoding for the datasource.
+				By default, UTF-8 is expected.
+				<programlisting>public final
+OpenCReport\Datasource::set_encoding(string $encoding): void;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phpqueryclass" xreflabel="The OpenCReport\Query class">
 		<title>The OpenCReport\Query class</title>
@@ -1582,6 +1642,7 @@ rlib_add_resultset_follower_n_to_1(
 			<para>
 				This function is equivalent to
 				<literal>OpenCReport\Datasource::set_encoding()</literal>.
+				See <xref linkend="phpdssetencoding"/>
 				<programlisting>function
 rlib_set_datasource_encoding(
                      OpenCReport $r,
