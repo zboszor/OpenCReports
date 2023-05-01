@@ -28,7 +28,6 @@
     public const VARIABLE_AVERAGEALL;
     public const VARIABLE_LOWEST;
     public const VARIABLE_HIGHEST;
-    public const VARIABLE_CUSTOM;
 
     public final __construct();
 
@@ -946,6 +945,13 @@ OpenCReport\Query::navigate_start(): void;</programlisting>
 				<programlisting>public final
 OpenCReport\Query::navigate_next(): bool;</programlisting>
 			</para>
+			<para>
+				Usually queries do not have a uniform
+				way to report the total number of rows,
+				although some datasource types may have
+				such a facility. Instead, they can report
+				that the dataset has ended.
+			</para>
 		</sect2>
 		<sect2 id="phpqueryaddfollower">
 			<title>Add a query follower</title>
@@ -1321,7 +1327,7 @@ OpenCReport\Result::print(): void;</programlisting>
 			<para>
 				Useful for user functions.
 				<programlisting>public final
-OpenCReport\Result::public final get_type(): long;</programlisting>
+OpenCReport\Result::get_type(): long;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpresultisnull">
@@ -1500,7 +1506,9 @@ OpenCReport\Part::equals(
 			<para>
 				Set the number of iterations for the part.
 				The expression must evaluate to a numeric
-				(integer) value.
+				(integer) value. The part and all of its
+				subsections will be calculated and rendered
+				this many times. Default is 1.
 				<programlisting>public final
 OpenCReport\Part::set_iterations(
                      ?string $expr_string = null): void;</programlisting>
@@ -1578,6 +1586,9 @@ OpenCReport\Part::set_right_margin(
 		<sect2 id="phppartsetsuppress">
 			<title>Set part suppression</title>
 			<para>
+				Set whether the part is suppressed, i.e.
+				all its subsections are omitted from calculating
+				and rendering. Default is <literal>false</literal>.
 				<programlisting>public final
 OpenCReport\Part::set_suppress(
                      ?string $expr_string = null): void;</programlisting>
@@ -1586,6 +1597,11 @@ OpenCReport\Part::set_suppress(
 		<sect2 id="phppartsetsphf">
 			<title>Set suppression of the page header on the first page</title>
 			<para>
+				Set whether the page header of the part is
+				suppressed on the first page. The expression
+				must evaluate to a numeric value, which is
+				treated as a boolean (i.e. 0 or non-0).
+				Default is <literal>false</literal>.
 				<programlisting>public final
 OpenCReport\Part::set_suppress_pageheader_firstpage(
                      ?string $expr_string = null): void;</programlisting>
@@ -1797,7 +1813,7 @@ OpenCReport\Column::report_new():
 				For class methods of <literal>OpenCReport\Report</literal>,
 				see <xref linkend="phpreportclass"/>
 				<programlisting>public final
-OpenCReport\Column::public final report_get_first():
+OpenCReport\Column::report_get_first():
                      ?OpenCReport\Report;</programlisting>
 			</para>
 		</sect2>
@@ -1812,6 +1828,9 @@ OpenCReport\Column::set_suppress(
 		<sect2 id="phpcolsetwidth">
 			<title>Set part column width</title>
 			<para>
+				Set the width of the whole part column.
+				If an inner report is wider than the column
+				width, it's rendering is truncated.
 				<programlisting>public final
 OpenCReport\Column::set_width(
                      ?string $expr_string = null): void;</programlisting>
@@ -1820,6 +1839,18 @@ OpenCReport\Column::set_width(
 		<sect2 id="phpcolsetheight">
 			<title>Set part column height</title>
 			<para>
+				Set the part column height. During report
+				execution, the column height is calculated
+				for rendering. Inner reports and the height of
+				their lines that would be rendered are added.
+				New lines of a report that would exceed the
+				part column height are not rendered and the report
+				is rendered partially. The data shown in rendered
+				lines are identical in both cases, whether or not
+				the pre-set height is set. When the set column height
+				is reached, further inner reports are not rendered.
+				Default is unset, i.e. every inner report is
+				fully rendered.
 				<programlisting>public final
 OpenCReport\Column::set_height(
                      ?string $expr_string = null): void;</programlisting>
@@ -1828,6 +1859,10 @@ OpenCReport\Column::set_height(
 		<sect2 id="phpcolsetborderwidth">
 			<title>Set border width</title>
 			<para>
+				Set the border width around the part column.
+				The width is in points (1/72 inches).
+				Default is 0, i.e. a border is not rendered
+				around the part column.
 				<programlisting>public final
 OpenCReport\Column::set_border_width(
                      ?string $expr_string = null): void;</programlisting>
@@ -1836,14 +1871,23 @@ OpenCReport\Column::set_border_width(
 		<sect2 id="phpcolsetbordercolor">
 			<title>Set border color</title>
 			<para>
+				Set the border color around the part column.
+				Only used if the border width is set.
 				<programlisting>public final
 OpenCReport\Column::set_border_color(
                      ?string $expr_string = null): void;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpcolsetdetailcols">
-			<title>Set number of details columns</title>
+			<title>Set number of detail columns</title>
 			<para>
+				Set the number of detail columns in
+				the part column. Inner reports inside the
+				part column may be narrow and visually wasteful
+				with empty areas on the page. In this case,
+				when a page break would occur, a column break
+				would occur instead. Only reaching the last
+				column would result in a page break.
 				<programlisting>public final
 OpenCReport\Column::set_detail_columns(
                      ?string $expr_string = null): void;</programlisting>
@@ -1960,6 +2004,417 @@ OpenCReport\Column::set_column_padding(
     public final field_details(): OpenCReport\Output;
 }</programlisting>
 		</para>
+		<sect2 id="phpreportgetnext">
+			<title>Get the next report</title>
+			<para>
+				Get the next object in the chain of reports.
+				This method may only be used on an object created
+				with <literal>OpenCReport\Column::report_get_first()</literal>,
+				i.e. one that was internally marked as an iterator
+				object.
+				<programlisting>public final
+OpenCReport\Report::get_next():
+                     ?OpenCReport\Report;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportvarnew">
+			<title>Create a new report variable</title>
+			<para>
+				Create a new variable of the specified type and
+				name, using the expression to produce the value.
+				Optionally a break name (see <xref linkend="breaks"/>)
+				may be specified, where, upon a break change,
+				the variable is reset. See <xref linkend="variables"/>.
+				For class methods of
+				<literal>OpenCReport\Variable</literal>,
+				see <xref linkend="phpvariableclass"/>.
+				<programlisting>public const OpenCReport\Report::VARIABLE_EXPRESSION;
+public const OpenCReport\Report::VARIABLE_COUNT;
+public const OpenCReport\Report::VARIABLE_COUNTALL;
+public const OpenCReport\Report::VARIABLE_SUM;
+public const OpenCReport\Report::VARIABLE_AVERAGE;
+public const OpenCReport\Report::VARIABLE_AVERAGEALL;
+public const OpenCReport\Report::VARIABLE_LOWEST;
+public const OpenCReport\Report::VARIABLE_HIGHEST;
+
+public final
+OpenCReport\Report::variable_new(
+                     long $variable_type,
+                     string $name,
+                     string $expr,
+                     ?string $reset_on_break_name = null):
+                     OpenCReport\Variable;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportvarnewfull">
+			<title>Create a new custom report variable</title>
+			<para>
+				Create a new custom variable of the specified name,
+				with total control over the base expression,
+				intermediary expression(s) and the result expression.
+				Optionally a break name (see <xref linkend="breaks"/>)
+				may be specified, where, upon a break change,
+				the variable is reset. See <xref linkend="variables"/>.
+				For class methods of
+				<literal>OpenCReport\Variable</literal>,
+				see <xref linkend="phpvariableclass"/>.
+				<programlisting>public final
+OpenCReport\Report::variable_new_full(
+                     long $result_type,
+                     string $name,
+                     ?string $baseexpr = null,
+                     ?string $intermedexpr = null,
+                     ?string $intermed2expr = null,
+                     ?string $resultexpr = null,
+                     ?string $reset_on_break_name = null):
+                     OpenCReport\Variable;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportexprparse">
+			<title>Parse and expression for the report</title>
+			<para>
+				Parse and expression for the report.
+				If the expression fails to parse, the
+				method returns <literal>NULL</literal>
+				and the error is found in
+				<literal>OpenCReport\Report::expr_parse()</literal>.
+				<programlisting>public final
+OpenCReport\Report::expr_parse(
+                     string $expr_string):
+                     ?OpenCReport\Expr;</programlisting>
+			</para>
+			<para>
+				The main difference between
+				<literal>OpenCReport::expr_parse()</literal>
+				(see <xref linkend="phpparseexpr"/>)
+				and this method is that the former may not
+				reference a report variable identifier.
+				Since the expression for the former method is not
+				associated with a report, report variable identifiers
+				in the expression may not be resolved.
+				The same applies to any function that is related
+				to report internal details, e.g. the
+				<literal>brrownum()</literal> function
+				(see <xref linkend="brrownumfunc"/>:
+				the expression is not associated with a report with
+				breaks, the break name will not be found.
+			</para>
+		</sect2>
+		<sect2 id="phpreportexprerror">
+			<title>Get the error after a failed expression parsing</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Report::expr_error(): ?string;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportresolvevars">
+			<title>Resolve variables of the report</title>
+			<para>
+				Resolve all variables of the report.
+				This method may be useful to implement
+				a custom report executor. The equivalent
+				C function is used internally. This method is
+				used by unit tests.
+				<programlisting>public final
+OpenCReport\Report::resolve_variables(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportevalvars">
+			<title>Evaluate variables of the report</title>
+			<para>
+				This method may be useful to implement
+				a custom report executor. The equivalent
+				C function is used internally. This method is
+				used by unit tests.
+				<programlisting>public final
+OpenCReport\Report::evaluate_variables(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportbreaknew">
+			<title>Create a new report break</title>
+			<para>
+				Create a new report break. A break
+				is the basis for grouping data.
+				See <xref linkend="breaks"/>.
+				For the class methods of
+				<literal>OpenCReport\Break</literal>,
+				see <xref linkend="phpbreakclass"/>.
+				<programlisting>public final
+OpenCReport\Report::break_new(
+                     ?string $name):
+                     OpenCReport\Break;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportbreakget">
+			<title>Get a report break by its name</title>
+			<para>
+				Get a previously created break
+				using its name. The object that's created
+				this way is <emphasis>not</emphasis> marked
+				as an iterator, so
+				<literal>OpenCReport\Break::get_next()</literal>
+				may not be used on it.
+				<programlisting>public final
+OpenCReport\Report::break_get(
+                     string $break_name):
+                     OpenCReport\Break;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportbreakgetfirst">
+			<title>Get the first report break</title>
+			<para>
+				Get the first break object in the
+				chain of breaks of the report.
+				The object is marked internally
+				as an iterator, so
+				<literal>OpenCReport\Break::get_next()</literal>
+				may be used on it.
+				<programlisting>public final
+OpenCReport\Report::break_get_first():
+                     ?OpenCReport\Break;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportresolvebreaks">
+			<title>Resolve breaks of the report</title>
+			<para>
+				Resolve all breaks of the report.
+				It may be useful to create a custom
+				report executor. The equivalent C
+				function is used internally. Used by
+				unit tests.
+				<programlisting>public final
+OpenCReport\Report::resolve_breaks(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportgetqueryrownum">
+			<title>Get the current row number of the main query</title>
+			<para>
+				Get the current row number of the report's main query.
+				Used by unit tests.
+				<programlisting>public final
+OpenCReport\Report::get_query_rownum(): long;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportaddstartcb">
+			<title>Add a "report start" callback</title>
+			<para>
+				Add a "report start" callback to the report.
+				The callback is called when the report starts
+				during report execution.
+				<programlisting>public final
+OpenCReport\Report::add_start_cb(
+                     string $callback): void;</programlisting>
+			</para>
+			<para>
+				The callback function interface must follow this:
+				<programlisting>function
+my_callback(OpenCReport $o, OpenCReport\Report $r): void;
+</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportadddonecb">
+			<title>Add a "report done" callback</title>
+			<para>
+				Add a "report done" callback to the report.
+				The callback is called when the report is done
+				during report execution.
+				<programlisting>public final
+OpenCReport\Report::add_done_cb(
+                     string $callback): void;</programlisting>
+			</para>
+			<para>
+				The callback function interface must follow this:
+				<programlisting>function
+my_callback(OpenCReport $o, OpenCReport\Report $r): void;
+</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportaddnewrowcb">
+			<title>Add a "new row" callback</title>
+			<para>
+				Add a "new row" callback to the report.
+				The callback is called for every data row
+				for the report during report execution.
+				<programlisting>public final
+OpenCReport\Report::add_new_row_cb(
+                     string $callback): void;</programlisting>
+			</para>
+			<para>
+				The callback function interface must follow this:
+				<programlisting>function
+my_callback(OpenCReport $o, OpenCReport\Report $r): void;
+</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportadditerationcb">
+			<title>Add an "iteration done" callback</title>
+			<para>
+				Add an "iteration done" callback to the report.
+				The callback is called after every iteration
+				for the report during report execution.
+				<programlisting>public final
+OpenCReport\Report::add_iteration_cb(
+                     string $callback): void;</programlisting>
+			</para>
+			<para>
+				The callback function interface must follow this:
+				<programlisting>function
+my_callback(OpenCReport $o, OpenCReport\Report $r): void;
+</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportaddprecalcdonecb">
+			<title>Add a "precalculation done" callback</title>
+			<para>
+				Add a "precalculation done" callback to the report.
+				The callback is called after precalculation is done
+				for the report during report execution.
+				<programlisting>public final
+OpenCReport\Report::add_precalculation_done_cb(
+                     string $callback): void;</programlisting>
+			</para>
+			<para>
+				The callback function interface must follow this:
+				<programlisting>function
+my_callback(OpenCReport $o, OpenCReport\Report $r): void;
+</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportequals">
+			<title>Check whether two report objects are the same</title>
+			<para>
+				Check whether the main object's internal C
+				representation is the same as the passed-in
+				object's internal representation.
+				<programlisting>public final
+OpenCReport\Report::equals(
+                     OpenCReport\Report $report):
+                     bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportsetmainquery">
+			<title>Set the report's main query</title>
+			<para>
+				Set the report's main query to
+				the passed-in <literal>OpenCReport\Query</literal>.
+				<programlisting>public final
+OpenCReport\Report::set_main_query(
+                     OpenCReport\Query $query): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportsetmainquerybyname">
+			<title>Set the report's main query by name</title>
+			<para>
+				Set the report's main query using
+				the query name.
+				<programlisting>public final
+OpenCReport\Report::set_main_query_by_name(
+                     string $query_name): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportsetsuppress">
+			<title>Set the report suppression</title>
+			<para>
+				Set the report's suppression.
+				The expression must evaluate too a
+				numeric value. It's zero or non-zero
+				value will decide whether the report
+				is suppressed, i.e. not calculated and
+				not rendered in the output.
+				<programlisting>public final
+OpenCReport\Report::public final set_suppress(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportsetiterations">
+			<title>Set number of iterations for the report</title>
+			<para>
+				Set the number of iterations for the report.
+				The report will be calculated and rendered
+				this many times. Default is 1.
+				<programlisting>public final
+OpenCReport\Report::set_iterations(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportsetfontname">
+			<title>Set the font name for the report</title>
+			<para>
+				Set the font name for the report.
+				The report font name will be used
+				for any child elements that don't specify
+				the font name themselves.
+				<programlisting>public final
+OpenCReport\Report::set_font_name(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportsetfontsize">
+			<title>Set the font size for the report</title>
+			<para>
+				Set the font size for the report.
+				The report font size will be used
+				for any child elements that don't specify
+				the font size themselves.
+				<programlisting>public final
+OpenCReport\Report::set_font_size(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportsetheight">
+			<title>Set the report height</title>
+			<para>
+				Set the report height. During report
+				execution, the report height is calculated
+				for rendering. Height of lines that would be
+				rendered are added. New lines that would
+				exceed the report height are not rendered.
+				The data shown in rendered lines are identical
+				in both cased, whether or not the report height
+				is set. Default is unset, i.e. every line
+				is rendered and the number of lines determine
+				the report height,
+				<programlisting>public final
+OpenCReport\Report::set_height(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportsetfhprio">
+			<title>Set the report's field header prioroty</title>
+			<para>
+				Set the report's field header priority.
+				See <xref linkend="reportfhpriority"/> for explanation.
+				<programlisting>public final
+OpenCReport\Report::set_fieldheader_priority(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportgetoutput">
+			<title>Get output sections of the report</title>
+			<para>
+				Get the output sections of the report.
+				See <xref linkend="nodatanode"/>,
+				<xref linkend="repheader"/>,
+				<xref linkend="repfooter"/> and
+				<xref linkend="detailnode"/>.
+				For class methods of <literal></literal>,
+				see <xref linkend="phpoutputclass"/>.
+				<programlisting>public final
+OpenCReport\Report::nodata(): OpenCReport\Output;
+
+public final
+OpenCReport\Report::header(): OpenCReport\Output;
+
+public final
+OpenCReport\Report::footer(): OpenCReport\Output;
+
+public final
+OpenCReport\Report::field_header(): OpenCReport\Output;
+
+public final
+OpenCReport\Report::field_details(): OpenCReport\Output;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phpvariableclass">
 		<title>The OpenCReport\Variable class</title>
