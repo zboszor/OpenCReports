@@ -2661,6 +2661,70 @@ OpenCReport\Break::footer(): OpenCReport\Output;</programlisting>
     public final add_image_end(): void;
 }</programlisting>
 		</para>
+		<sect2 id="phpoutputsetsuppress">
+			<title>Set suppression of the output section</title>
+			<para>
+				Set suppression of the output section.
+				The expression must evaluate to a numeric
+				value which will be treated as a boolean,
+				i.e. 0 or non-0. The default is <literal>false</literal>,
+				i.e. the section is not suppressed.
+				<programlisting>public final
+OpenCReport\Output::set_suppress(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpoutputaddline">
+			<title>Add a (text) line</title>
+			<para>
+				Add a (text) line to the output section.
+				A line may have children elements, like
+				<literal>OpenCReport\Text</literal> and
+				<literal>OpenCReport\Image</literal>.
+				(See <xref linkend="phptextclass"/> and <xref
+				linkend="phpimageclass"/>.)
+				For class methods of <literal>OpenCReport\Line</literal>,
+				see <xref linkend="phplineclass"/>.
+				<programlisting>public final
+OpenCReport\Output::add_line():
+                     ?OpenCReport\Line;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpoutputaddhline">
+			<title>Add a horizontal line</title>
+			<para>
+				Add a horizontal line (a visual separator)
+				to the output section.
+				For class methods of <literal>OpenCReport\HorizontalLine</literal>,
+				see <xref linkend="phplineclass"/>.
+				<programlisting>public final
+OpenCReport\Output::add_hline():
+                     ?OpenCReport\HorizontalLine;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpoutputaddimage">
+			<title>Add an image</title>
+			<para>
+				Add an image to the output section.
+				The image will indent every subsequent
+				elements in the section, except other images.
+				For class methods of <literal>OpenCReport\Image</literal>,
+				see <xref linkend="phplineclass"/>.
+				<programlisting>public final
+OpenCReport\Output::add_image():
+                     ?OpenCReport\Image;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpoutputaddimageend">
+			<title>Add an image end marker</title>
+			<para>
+				Add an image end marker to the output section.
+				Subsequent elements in the section won't be indented
+				and will be drawn vertically below the previous image.
+				<programlisting>public final
+OpenCReport\Output::add_image_end(): void;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phplineclass">
 		<title>The OpenCReport\Line class</title>
