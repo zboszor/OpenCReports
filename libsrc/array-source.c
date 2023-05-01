@@ -26,6 +26,7 @@
 #include "opencreport.h"
 #include "ocrpt-private.h"
 #include "listutil.h"
+#include "memutil.h"
 #include "datasource.h"
 
 #ifndef UNUSED
@@ -802,7 +803,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_json(ocrpt_datasource *source,
 
 	memset(&fq, 0, sizeof(ocrpt_file_query));
 
-	yhandler = yajl_alloc(&ocrpt_yajl_cb, NULL, (void *) &fq);
+	yhandler = yajl_alloc(&ocrpt_yajl_cb, &ocrpt_yajl_alloc_funcs, (void *) &fq);
 	yajl_config(yhandler, yajl_allow_comments, 1);
 
 	yajl_stat = yajl_parse(yhandler, (unsigned char *)buf, st.st_size);

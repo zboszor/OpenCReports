@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <yajl/yajl_common.h>
 
 #include "opencreport.h"
 
@@ -22,6 +23,25 @@ DLL_EXPORT_SYM ocrpt_mem_free_t ocrpt_mem_free0 = (ocrpt_mem_free_t)free;
 DLL_EXPORT_SYM ocrpt_mem_free_size_t ocrpt_mem_free_size0 = (ocrpt_mem_free_size_t)free;
 DLL_EXPORT_SYM ocrpt_mem_strdup_t ocrpt_mem_strdup0 = strdup;
 DLL_EXPORT_SYM ocrpt_mem_strndup_t ocrpt_mem_strndup0 = strndup;
+
+static void *ocrpt_yajl_malloc_func(void *ctx OCRPT_UNUSED_PARAM, size_t sz) {
+	return ocrpt_mem_malloc0(sz);
+}
+
+static void *ocrpt_yajl_realloc_func(void *ctx OCRPT_UNUSED_PARAM, void *ptr, size_t sz) {
+	return ocrpt_mem_realloc0(ptr, sz);
+}
+
+static void ocrpt_yajl_free_func(void *ctx OCRPT_UNUSED_PARAM, void *ptr) {
+	ocrpt_mem_free0(ptr);
+}
+
+yajl_alloc_funcs ocrpt_yajl_alloc_funcs = {
+	.malloc = ocrpt_yajl_malloc_func,
+	.realloc = ocrpt_yajl_realloc_func,
+	.free = ocrpt_yajl_free_func,
+	.ctx = NULL
+};
 
 static void *ocrpt_mem_fake_reallocarray(void *ptr, size_t nmemb, size_t sz) {
 	return ocrpt_mem_realloc0(ptr, nmemb * sz);
