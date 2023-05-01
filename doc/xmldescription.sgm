@@ -3563,7 +3563,7 @@ report_height_after_last="no"</programlisting>
 				<para>
 					When the image is used as a line element, this
 					is the width in which the image is shown.
-					Its unit subject to the <xref linkend="sizeunit"/>,
+					Its unit is subject to the <xref linkend="sizeunit"/>,
 					by default it's measured in text character
 					width for the parent <literal>&lt;Line&gt;</literal>.
 					This setting is only used when the image is a
