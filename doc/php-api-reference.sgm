@@ -2924,6 +2924,102 @@ OpenCReport\Line::add_image():
                      ?string $expr_string = null): void;
 }</programlisting>
 		</para>
+		<sect2 id="phpimagesetvalue">
+			<title>Set the file name of the image</title>
+			<para>
+				Set the file name of the image.
+				The file name may be and absolute path,
+				relative to the work directory of the application,
+				or relative to any of the paths added with
+				<literal>OpenCReport::add_search_path()</literal>.
+				(See <xref linkend="phpaddsearchpath"/>.)
+				<programlisting>public final
+OpenCReport\Image::set_value(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpimagesetsuppress">
+			<title>Set the suppression flag for the image</title>
+			<para>
+				Set the suppression flag for the image.
+				The expression must evaluate to a numeric
+				value that is treated as a boolean, i.e. 0 or non-0.
+				Default is <literal>false</literal>.
+				<programlisting>public final
+OpenCReport\Image::set_suppress(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpimagesettype">
+			<title>Set the image type</title>
+			<para>
+				Set the image file type.
+				Usually it's auto-detected and not needed.
+				<programlisting>public final
+OpenCReport\Image::set_type(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpimagesetwidth">
+			<title>Set the image width</title>
+			<para>
+				Set the image width. This setting
+				is used when the image element is
+				a direct child of an output section.
+				See <xref linkend="imagewidth"/>.
+				<programlisting>public final
+OpenCReport\Image::set_width(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpimagesetheight">
+			<title>Set the image height</title>
+			<para>
+				Set the image height. This setting
+				is used when the image element is
+				a direct child of an output section.
+				See <xref linkend="imagewidth"/>.
+				<programlisting>public final
+OpenCReport\Image::set_height(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpimagesetalignment">
+			<title>Set the image alignment</title>
+			<para>
+				Set the image alignment. This setting
+				is used when the image element is
+				a child of a text line.
+				See <xref linkend="imagealign"/>.
+				<programlisting>public final
+OpenCReport\Image::set_alignment(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpimagesetbgcolor">
+			<title>Set the image background color</title>
+			<para>
+				Set the image background color. This setting
+				is used when the image element is
+				a child of a text line.
+				See <xref linkend="imagebgcolor"/>.
+				<programlisting>public final
+OpenCReport\Image::set_bgcolor(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpimagesettextwidth">
+			<title>Set the image "text width"</title>
+			<para>
+				Set the image "text width". This setting
+				is used when the image element is
+				a child of a text line.
+				See <xref linkend="imagetextwidth"/>.
+				<programlisting>public final
+OpenCReport\Image::set_text_width(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phptextclass">
 		<title>The OpenCReport\Text class</title>
