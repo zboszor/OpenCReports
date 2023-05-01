@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libxml/xmlmemory.h>
 #include <yajl/yajl_common.h>
 
 #include "opencreport.h"
@@ -61,6 +62,8 @@ DLL_EXPORT_SYM void ocrpt_mem_set_alloc_funcs(
 	ocrpt_mem_free_size0 = (ocrpt_mem_free_size_t)rfree;
 	ocrpt_mem_strdup0 = rstrdup;
 	ocrpt_mem_strndup0 = rstrndup;
+
+	xmlMemSetup((ocrpt_mem_free_nconst_t)rfree, rmalloc, rrealloc, rstrdup);
 
 	/* Use the same allocator in GMP/MPFR */
 	mpfr_mp_memory_cleanup();
