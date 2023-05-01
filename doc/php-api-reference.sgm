@@ -2548,6 +2548,99 @@ OpenCReport\Variable::eval(): void;</programlisting>
     public final footer(): OpenCReport\Output;
 }</programlisting>
 		</para>
+		<sect2 id="phpbreakgetnext">
+			<title>Get next break</title>
+			<para>
+				Get the next break object from the chain of
+				breaks in the report this break belongs to.
+				This method may only be called on an
+				object that was marked as an iterator,
+				i.e. one that was created by
+				<literal>OpenCReport\Report::break_get_first()</literal>.
+				<programlisting>public final
+OpenCReport\Break::get_next():
+                     ?OpenCReport\Break;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpbreakbfadd">
+			<title>Add a breakfield to a break</title>
+			<para>
+				Add a breakfield to a break.
+				A break may consists of multiple breakfields.
+				A break triggers if any of the breakfields
+				change from one data line to another.
+				<programlisting>public final
+OpenCReport\Break::breakfield_add(
+                     OpenCReport\Expr $breakfield_expr):
+                     void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpbreakcheckfields">
+			<title>Check breakfields</title>
+			<para>
+				Check breakfields of a break.
+				This method returns <literal>true</literal> if the break
+				triggers, i.e. field values for the current data row
+				do not match the values for the previous data row.
+				It also the triggers for the first row when there is
+				no previous row.
+				It is used internally by the report executor
+				and also used by unit tests. It may be useful
+				to implement a custom report executor.
+				<programlisting>public final
+OpenCReport\Break::check_fields(): bool;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpbreakresetvars">
+			<title>Reset variables associated with a break</title>
+			<para>
+				Reset report variables associated with a break.
+				Such variables were created with specifying the
+				"reset on break" break name. These variables
+				restart from their initial values.
+				It is used internally by the report executor
+				and also used by unit tests. It may be useful
+				to implement a custom report executor.
+				<programlisting>public final
+OpenCReport\Break::reset_vars(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpbreakaddtriggercb">
+			<title>Add a "trigger" callback to a break</title>
+			<para>
+				Add a "trigger" callback to the break.
+				<programlisting>public final
+OpenCReport\Break::add_trigger_cb(
+                     ?string $callback):
+                     void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpbreakname">
+			<title>Get the name of a break</title>
+			<para>
+				Get the name of a break. It may be useful
+				if the breaks were added via a report
+				XML descriptor but variables are added
+				afterwards from code.
+				<programlisting>public final
+OpenCReport\Break::name(): string;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpbreakoutputs">
+			<title>Get output sections of a break</title>
+			<para>
+				Get the header and footer sections of a break.
+				See also <xref linkend="breakheadernode"/> and
+				<xref linkend="breakfooternode"/>.
+				For class methods of <literal>OpenCReport\Output</literal>,
+				see <xref linkend="phpoutputclass"/>
+				<programlisting>public final
+OpenCReport\Break::header(): OpenCReport\Output;
+
+public final
+OpenCReport\Break::footer(): OpenCReport\Output;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phpoutputclass">
 		<title>The OpenCReport\Output class</title>
