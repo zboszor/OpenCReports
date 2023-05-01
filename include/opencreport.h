@@ -1055,6 +1055,7 @@ typedef void *(*ocrpt_mem_malloc_t)(size_t);
 typedef void *(*ocrpt_mem_realloc_t)(void *, size_t);
 typedef void *(*ocrpt_mem_reallocarray_t)(void *, size_t, size_t);
 typedef void (*ocrpt_mem_free_t)(const void *);
+typedef void (*ocrpt_mem_free_nconst_t)(void *);
 typedef char *(*ocrpt_mem_strdup_t)(const char *);
 typedef char *(*ocrpt_mem_strndup_t)(const char *, size_t);
 /* Dummy type, only used for casting ocrpt_mem_free_t for mp_set_memory_functions() */

@@ -468,6 +468,9 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
 		return NULL;
 	}
 
+	csv_set_realloc_func(&csv, ocrpt_mem_realloc0);
+	csv_set_free_func(&csv, (ocrpt_mem_free_nconst_t)ocrpt_mem_free0);
+
 	memset(&fq, 0, sizeof(ocrpt_file_query));
 	fq.firstrow = true;
 	fq.firstcol = true;
