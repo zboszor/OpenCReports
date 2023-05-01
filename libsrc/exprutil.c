@@ -407,7 +407,7 @@ static void ocrpt_expr_optimize_worker(ocrpt_expr *e) {
 				ocrpt_mem_free(e->ops);
 				e->n_ops = 0;
 				e->ops = NULL;
-				e->type = e->result[e->o->residx]->type;
+				e->type = (enum ocrpt_expr_type)e->result[e->o->residx]->type;
 
 				int residx = e->o->residx;
 				for (i = 0; i < OCRPT_EXPR_RESULTS - 1; i++) {
