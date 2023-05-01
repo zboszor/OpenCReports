@@ -3143,6 +3143,199 @@ OpenCReport\Image::set_text_width(
                      ?string $expr_string = null): void;
 }</programlisting>
 		</para>
+		<sect2 id="phptextsetvaluestring">
+			<title>Set literal value</title>
+			<para>
+				Set the literal value for the text element.
+				<programlisting>public final
+OpenCReport\Text::set_value_string(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetvalueexpr">
+			<title>Set expression value</title>
+			<para>
+				Set the expression value for the text element.
+				And expression may depend on data row values.
+				See <xref linkend="expressions"/>.
+				<programlisting>public final
+OpenCReport\Text::set_value_expr(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetvaluedelayed">
+			<title>Set delayed flag for the field expression</title>
+			<para>
+				Set delayed flag for the field expression.
+				When set to <literal>true</literal>, the field
+				expression's last value is calculated during
+				the precalculation phase of executing the report
+				and this precalculated value is used during
+				rendering the report.
+				<programlisting>public final
+OpenCReport\Text::set_value_delayed(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetformat">
+			<title>Set the format string for the field expression</title>
+			<para>
+				Set the format string for the field expression.
+				This format string will be used instead of
+				the default formats for specific types.
+				See <xref linkend="formatting"/>
+				<programlisting>public final
+OpenCReport\Text::set_format(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetxlate">
+			<title>Set the translation flag for the field expression</title>
+			<para>
+				Set the translation flag for the field expression.
+				When set to <literal>true</literal>, the field
+				value will be translated according to the locale
+				and translation settings.
+				See <xref linkend="phplocalemethods"/>
+				<programlisting>public final
+OpenCReport\Text::set_translate(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetwidth">
+			<title>Set the field width</title>
+			<para>
+				Set the field width.
+				See <xref linkend="textelemwidth"/>
+				<programlisting>public final
+OpenCReport\Text::set_width(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetalign">
+			<title>Set the field alignment</title>
+			<para>
+				Set the field alignment.
+				See <xref linkend="textelemalign"/>
+				<programlisting>public final
+OpenCReport\Text::set_alignment(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetcolor">
+			<title>Set the field text color</title>
+			<para>
+				Set the field text color.
+				See <xref linkend="textcolor"/>
+				<programlisting>public final
+OpenCReport\Text::set_color(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetbgcolor">
+			<title>Set the field background color</title>
+			<para>
+				Set the field background color.
+				See <xref linkend="textbgcolor"/>
+				<programlisting>public final
+OpenCReport\Text::set_bgcolor(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetfontname">
+			<title>Set the field font name</title>
+			<para>
+				Set the field font name.
+				See <xref linkend="textelemfontname"/>
+				<programlisting>public final
+OpenCReport\Text::set_font_name(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetfontsize">
+			<title>Set the field font size</title>
+			<para>
+				Set the field font size.
+				See <xref linkend="textelemfontsize"/>
+				<programlisting>public final
+OpenCReport\Text::set_font_size(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetbold">
+			<title>Set the field's bold flag</title>
+			<para>
+				Set the field's bold flag.
+				See <xref linkend="textbold"/>
+				<programlisting>public final
+OpenCReport\Text::set_bold(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetitalic">
+			<title>Set the field's italic flag</title>
+			<para>
+				Set the field's italic flag.
+				See <xref linkend="textitalic"/>
+				<programlisting>public final
+OpenCReport\Text::set_italic(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetlink">
+			<title>Set the field's link</title>
+			<para>
+				Set the field's link URL.
+				When set, the text field becomes a link
+				with the specified URL.
+				See <xref linkend="weblink"/>
+				<programlisting>public final
+OpenCReport\Text::set_link(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetmemo">
+			<title>Set the field's memo flag</title>
+			<para>
+				Set the field's memo (multi-line text) flag.
+				When set to <literal>true</literal>,
+				the text field becomes a multi-line field.
+				See <xref linkend="memo"/>
+				<programlisting>public final
+OpenCReport\Text::set_memo(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetmemowrap">
+			<title>Set the field's "wrap at characters" flag</title>
+			<para>
+				Set the field's "wrap at characters" flag.
+				Only used when the memo flag is set to
+				<literal>true</literal>.
+				Default is <literal>false</literal>, the text
+				is wrapped at word boundaries.
+				When set to <literal>true</literal>, text is
+				wrapped at character boundaries with hyphenation.
+				See <xref linkend="memowrap"/>
+				<programlisting>public final
+OpenCReport\Text::set_memo_wrap_chars(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetmemomaxlines">
+			<title>Set the field's maximum number of lines</title>
+			<para>
+				Set the field's maximum number of lines.
+				Only used when the memo flag is set to
+				<literal>true</literal>. The text field's value
+				is only rendered up to the set number of lines.
+				Default is unset, the text is rendered fully.
+				See <xref linkend="memorowlimit"/>
+				<programlisting>public final
+OpenCReport\Text::set_memo_max_lines(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phprlibcompat">
 		<title>RLIB compatibility API</title>
