@@ -2758,6 +2758,118 @@ OpenCReport\Output::add_image_end(): void;</programlisting>
                      ?OpenCReport\Image;
 }</programlisting>
 		</para>
+		<sect2 id="phplinesetfontname">
+			<title>Set the font name for the line</title>
+			<para>
+				Set the font name for the line.
+				This font will be used for child text elements
+				that don't set the font name themselves.
+				<programlisting>public final
+OpenCReport\Line::set_font_name(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phplinesetfontsize">
+			<title>Set the font size for the line</title>
+			<para>
+				Set the font size for the line.
+				This font size will be used for child text elements
+				that don't set the font size themselves.
+				<programlisting>public final
+OpenCReport\Line::set_font_size(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phplinesetbold">
+			<title>Set the font's bold flag for the line</title>
+			<para>
+				Set the font's bold flag for the line.
+				The expression must evaluate to a numeric
+				value that is treated as a boolean, i.e. 0 or non-0.
+				Default is <literal>false</literal>.
+				This bold flag value will be used for child text elements
+				that don't set it themselves.
+				<programlisting>public final
+OpenCReport\Line::set_bold(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phplinesetitalic">
+			<title>Set the font's italic flag for the line</title>
+			<para>
+				Set the font's italic flag for the line.
+				The expression must evaluate to a numeric
+				value that is treated as a boolean, i.e. 0 or non-0.
+				Default is <literal>false</literal>.
+				This italic flag value will be used for child text elements
+				that don't set it themselves.
+				<programlisting>public final
+OpenCReport\Line::set_italic(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phplinesetsuppress">
+			<title>Set line suppression</title>
+			<para>
+				Set the suppression flag for the line.
+				The expression must evaluate to a numeric
+				value that is treated as a boolean, i.e. 0 or non-0.
+				Default is <literal>false</literal>,
+				i.e. not suppressed. When set to a non-0 value
+				(i.e. <literal>true</literal>), the whole line
+				with all its child elements (text or image) will
+				be suppressed, i.e. not rendered.
+				<programlisting>public final
+OpenCReport\Line::set_suppress(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phplinesetcolor">
+			<title>Set text color for the line</title>
+			<para>
+				Set text color for the line.
+				See <xref linkend="colorspec"/>.
+				This text color will be used for child elements
+				that don't set the text color themselves.
+				<programlisting>public final
+OpenCReport\Line::set_color(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phplinesetbgcolor">
+			<title>Set background color for the line</title>
+			<para>
+				Set background color for the line.
+				See <xref linkend="colorspec"/>.
+				This background color will be used for child elements
+				that don't set the background color themselves.
+				<programlisting>public final
+OpenCReport\Line::set_bgcolor(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phplineaddtext">
+			<title>Add a text element to the line</title>
+			<para>
+				Add a child text element to the line.
+				For class methods  of <literal>OpenCReport\Text</literal>,
+				see <xref linkend="phptextclass"/>.
+				<programlisting>public final
+OpenCReport\Line::add_text():
+                     ?OpenCReport\Text;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phplineaddimage">
+			<title>Add an image element to the line</title>
+			<para>
+				Add a child image element to the line.
+				For class methods  of <literal>OpenCReport\Image</literal>,
+				see <xref linkend="phpimageclass"/>.
+				<programlisting>public final
+OpenCReport\Line::add_image():
+                     ?OpenCReport\Image;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phphlineclass">
 		<title>The OpenCReport\HorizontalLine class</title>
