@@ -2894,6 +2894,72 @@ OpenCReport\Line::add_image():
                      ?string $expr_string = null): void;
 }</programlisting>
 		</para>
+		<sect2 id="phphlinesetsize">
+			<title>Set the line width</title>
+			<para>
+				Set the line width in points.
+				Also see <xref linkend="hlinewidth"/>
+				<programlisting>public final
+OpenCReport\HorizontalLine::set_size(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phphlinesetindent">
+			<title>Set the line indentation</title>
+			<para>
+				Set the line indentation, i.e. starting point
+				to the right of the left side of the report.
+				Also see <xref linkend="hlineindent"/>
+				<programlisting>public final
+OpenCReport\HorizontalLine::set_indent(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phphlinesetlength">
+			<title>Set the line length</title>
+			<para>
+				Set the line length.
+				See <xref linkend="hlinelength"/> and
+				<xref linkend="sizeunit"/>.
+				<programlisting>public final
+OpenCReport\HorizontalLine::set_length(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phphlinesetfontsize">
+			<title>Set the line's font size</title>
+			<para>
+				Set the line's font size. This font size
+				is used in calculating the line length.
+				See <xref linkend="hlinefontsize"/>
+				<programlisting>public final
+OpenCReport\HorizontalLine::set_font_size(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phphlinesetsuppress">
+			<title>Set the suppression flag for the line</title>
+			<para>
+				Set the suppression flag for the line.
+				The expression must evaluate to a numeric
+				value that is treated as a boolean, i.e. 0 or non-0.
+				When set to <literal>true</literal>, the line
+				is not rendered. Default is <literal>false</literal>.
+				<programlisting>public final
+OpenCReport\HorizontalLine::set_suppress(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phphlinesetcolor">
+			<title>Set the line color</title>
+			<para>
+				Set the line color.
+				See <xref linkend="colorspec"/>.
+				<programlisting>public final
+OpenCReport\HorizontalLine::set_color(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phpimageclass">
 		<title>The OpenCReport\Image class</title>
