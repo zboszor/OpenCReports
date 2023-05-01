@@ -2440,6 +2440,88 @@ OpenCReport\Report::field_details(): OpenCReport\Output;</programlisting>
     public final eval(): void;
 }</programlisting>
 		</para>
+		<sect2 id="phpvarbaseexpr">
+			<title>Get the base expression of a variable</title>
+			<para>
+				Used by unit tests.
+				For class methods of <literal>OpenCReport\Expr</literal>,
+				see <xref linkend="phpexprclass"/>
+				<programlisting>public final
+OpenCReport\Variable::baseexpr():
+                     ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpvarintermedexpr">
+			<title>Get the first intermediary expression of a variable</title>
+			<para>
+				Used by unit tests.
+				For class methods of <literal>OpenCReport\Expr</literal>,
+				see <xref linkend="phpexprclass"/>
+				<programlisting>public final
+OpenCReport\Variable::intermedexpr():
+                     ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpvarintermed2expr">
+			<title>Get the second intermediary expression of a variable</title>
+			<para>
+				Used by unit tests.
+				For class methods of <literal>OpenCReport\Expr</literal>,
+				see <xref linkend="phpexprclass"/>
+				<programlisting>public final
+OpenCReport\Variable::intermed2expr():
+                     ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpvarresultexpr">
+			<title>Get the result expression of a variable</title>
+			<para>
+				Used by unit tests.
+				For class methods of <literal>OpenCReport\Expr</literal>,
+				see <xref linkend="phpexprclass"/>
+				<programlisting>public final
+OpenCReport\Variable::resultexpr():
+                     ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpvarsetprecalc">
+			<title>Set the variable precalculated</title>
+			<para>
+				Set the variable precalculated.
+				A precalculated variable's value (or set of values)
+				is calculated during the precalculation phase
+				of report execution. When the report is being
+				rendered, the precalculated values are used.
+				This allows using an end value in a header,
+				e.g. a report header may contain a summary of
+				bottom line values. Similarly, break headers
+				may show values that would otherwise be shown
+				only in break footer sections for variables
+				that are reset on a break.
+				<programlisting>public final
+OpenCReport\Variable::set_precalculate(
+                     ?string $expr_string = null):
+                     void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpvarresolve">
+			<title>Resolve expressions of a variable</title>
+			<para>
+				Resolve the base, intermediary and result expressions
+				of a single variable. Used by unit tests.
+				<programlisting>public final
+OpenCReport\Variable::resolve(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpvareval">
+			<title>Evaluate expressions of a variable</title>
+			<para>
+				Evaluate the base, intermediary and result expressions
+				of a single variable. Used by unit tests.
+				<programlisting>public final
+OpenCReport\Variable::eval(): void;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phpbreakclass">
 		<title>The OpenCReport\Break class</title>
