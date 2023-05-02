@@ -10,7 +10,7 @@ consent from the original authors:
 
 ## Currently missing features
 
-* language bindings other than C
+* language bindings other than C and PHP
 * output formats other than PDF
 * graphing and barcodes (Graph, Chart and Barcode XML elements)
 
