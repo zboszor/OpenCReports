@@ -1368,6 +1368,7 @@ OpenCReport\Result::get_string(): ?string;</programlisting>
 				Useful for user functions.
 				The method may optionally use a format string
 				to specify the number of decimal digits.
+				See <ulink url="https://www.mpfr.org/mpfr-current/mpfr.html#Format-String">MPFR format strings</ulink>.
 				The returned value may be used with
 				<ulink url="https://www.php.net/manual/en/book.bc.php">BC Math</ulink>
 				in PHP or (if the precision is small enough)
