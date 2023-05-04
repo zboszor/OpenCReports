@@ -50,6 +50,42 @@ int main(void) {
 		ocrpt_strfree(err);
 	}
 
+	ocrpt_add_mvariable(o, "OCRPTENV", "extravar");
+	printf("OCRPTENV is added as mvariable.\n");
+
+	err = NULL;
+	e = ocrpt_expr_parse(o, "m.OCRPTENV", &err);
+	if (e) {
+		printf("Before resolving: ");
+		ocrpt_expr_print(e);
+		ocrpt_expr_resolve(e);
+		ocrpt_expr_optimize(e);
+		printf("After resolving: ");
+		ocrpt_expr_print(e);
+		ocrpt_expr_free(e);
+	} else {
+		printf("expr failed to parse: %s\n", err);
+		ocrpt_strfree(err);
+	}
+
+	ocrpt_add_mvariable(o, "OCRPTENV", NULL);
+	printf("OCRPTENV is removed as mvariable.\n");
+
+	err = NULL;
+	e = ocrpt_expr_parse(o, "m.OCRPTENV", &err);
+	if (e) {
+		printf("Before resolving: ");
+		ocrpt_expr_print(e);
+		ocrpt_expr_resolve(e);
+		ocrpt_expr_optimize(e);
+		printf("After resolving: ");
+		ocrpt_expr_print(e);
+		ocrpt_expr_free(e);
+	} else {
+		printf("expr failed to parse: %s\n", err);
+		ocrpt_strfree(err);
+	}
+
 	ocrpt_free(o);
 
 	return 0;

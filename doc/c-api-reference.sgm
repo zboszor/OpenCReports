@@ -2839,6 +2839,19 @@ ocrpt_env_get_c(opencreport *o,
                 const char *env);</programlisting>
 				</para>
 			</sect3>
+			<sect3 id="addmvarfunc">
+				<title>Add an "m" domain variable</title>
+				<para>
+					Add an "m" domain variable.
+					Such an explicit variable takes
+					precedence over the environment
+					variable of the same name.
+					<programlisting>void
+ocrpt_add_mvariable(opencreport *o,
+                    const char *name,
+                    const char *value);</programlisting>
+				</para>
+			</sect3>
 		</sect2>
 		<sect2 id="filefuncs">
 			<title>File handling related functions</title>

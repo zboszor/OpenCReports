@@ -4,3 +4,9 @@ After resolving: (string)This is a test string
 OCRPTENV is unset.
 Before resolving: m.'OCRPTENV'
 After resolving: (string)NULL
+OCRPTENV is added as mvariable.
+Before resolving: m.'OCRPTENV'
+After resolving: (string)extravar
+OCRPTENV is removed as mvariable.
+Before resolving: m.'OCRPTENV'
+After resolving: (string)NULL

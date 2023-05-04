@@ -42,6 +42,12 @@ struct ocrpt_search_path {
 };
 typedef struct ocrpt_search_path ocrpt_search_path;
 
+struct ocrpt_mvarentry {
+	const char *name;
+	const char *value;
+};
+typedef struct ocrpt_mvarentry ocrpt_mvarentry;
+
 struct opencreport {
 	/* Paper name and size */
 	const ocrpt_paper *paper;
@@ -49,6 +55,10 @@ struct opencreport {
 
 	ocrpt_function **functions;
 	int32_t n_functions;
+
+	/* "m" domain variables added by ocrpt_add_mvariable */
+	ocrpt_list *mvarlist;
+	ocrpt_list *mvarlist_end;
 
 	/* List of expressions not assigned to an ocrpt_report structure */
 	ocrpt_list *exprs;

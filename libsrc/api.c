@@ -142,6 +142,13 @@ static void ocrpt_free_search_path(const void *ptr) {
 	ocrpt_mem_free(p);
 }
 
+static void ocrpt_free_mvarentry(const void *ptr) {
+	const ocrpt_mvarentry *e = ptr;
+	ocrpt_mem_free(e->name);
+	ocrpt_mem_free(e->value);
+	ocrpt_mem_free(e);
+}
+
 DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	if (!o)
 		return;
@@ -199,6 +206,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	ocrpt_list_free_deep(o->report_precalc_done_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(o->precalc_done_callbacks, ocrpt_mem_free);
 
+	ocrpt_list_free_deep(o->mvarlist, ocrpt_free_mvarentry);
 	ocrpt_list_free_deep(o->search_paths, ocrpt_free_search_path);
 	ocrpt_list_free_deep(o->images, ocrpt_image_free);
 	ocrpt_list_free_deep(o->pages, (ocrpt_mem_free_t)cairo_surface_destroy);

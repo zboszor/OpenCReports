@@ -1329,6 +1329,21 @@ PHP_METHOD(opencreport, result_new) {
 	ro->freed_by_lib = false;
 }
 
+PHP_METHOD(opencreport, add_mvariable) {
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+	zend_string *name;
+	zend_string *value = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 2)
+		Z_PARAM_STR(name);
+		Z_PARAM_OPTIONAL;
+		Z_PARAM_STR_EX(value, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_add_mvariable(oo->o, ZSTR_VAL(name), value ? ZSTR_VAL(value) : NULL);
+}
+
 PHP_METHOD(opencreport, add_search_path) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
@@ -1592,6 +1607,11 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_result_new, 0, 1, Ope
 ZEND_ARG_TYPE_INFO(0, var_name, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_add_mvariable, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
+ZEND_ARG_VARIADIC_TYPE_INFO(0, name, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_add_search_path, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 0)
 ZEND_END_ARG_INFO()
@@ -1675,6 +1695,7 @@ static const zend_function_entry opencreport_class_methods[] = {
 	PHP_ME(opencreport, add_report_added_cb, arginfo_opencreport_add_any_cb, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* Environment related methods */
 	PHP_ME(opencreport, env_get, arginfo_opencreport_env_get, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport, add_mvariable, arginfo_opencreport_add_mvariable, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* Result related methods */
 	PHP_ME(opencreport, result_new, arginfo_opencreport_result_new, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* File handling related methods */
@@ -6291,12 +6312,13 @@ ZEND_FUNCTION(rlib_set_output_encoding) {
 
 ZEND_FUNCTION(rlib_add_parameter) {
 	zval *object;
-	zend_string *param, *value;
+	zend_string *param;
+	zend_string *value = NULL;
 
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 3)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(param);
-		Z_PARAM_STR(value);
+		Z_PARAM_STR_EX(value, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
@@ -6306,7 +6328,7 @@ ZEND_FUNCTION(rlib_add_parameter) {
 		RETURN_THROWS();
 	}
 
-	/* Silently do nothing. The functionality is not implemented yet. */
+	ocrpt_add_mvariable(oo->o, ZSTR_VAL(param), value ? ZSTR_VAL(value) : NULL);
 }
 
 ZEND_FUNCTION(rlib_set_output_parameter) {

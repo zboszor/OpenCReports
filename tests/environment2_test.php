@@ -36,3 +36,33 @@ if ($e instanceof OpenCReport\Expr) {
 } else {
 	echo "expr failed to parse: " . $err . PHP_EOL;
 }
+
+$o->add_mvariable("OCRPTENV", "extravar");
+echo "OCRPTENV is added as mvariable." . PHP_EOL;
+
+$e = $o->expr_parse("m.OCRPTENV");
+if ($e instanceof OpenCReport\Expr) {
+	echo "Before resolving: "; flush();
+	$e->print();
+	$e->resolve();
+	$e->optimize();
+	echo "After resolving: "; flush();
+	$e->print();
+} else {
+	echo "expr failed to parse: " . $err . PHP_EOL;
+}
+
+$o->add_mvariable("OCRPTENV", null);
+echo "OCRPTENV is removed as mvariable." . PHP_EOL;
+
+$e = $o->expr_parse("m.OCRPTENV");
+if ($e instanceof OpenCReport\Expr) {
+	echo "Before resolving: "; flush();
+	$e->print();
+	$e->resolve();
+	$e->optimize();
+	echo "After resolving: "; flush();
+	$e->print();
+} else {
+	echo "expr failed to parse: " . $err . PHP_EOL;
+}
