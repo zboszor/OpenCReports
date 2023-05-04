@@ -63,7 +63,10 @@ DLL_EXPORT_SYM void ocrpt_mem_set_alloc_funcs(
 	ocrpt_mem_strdup0 = rstrdup;
 	ocrpt_mem_strndup0 = rstrndup;
 
+	/*
+	 * Don't do this for libXML2. It crashes PHP.
 	xmlMemSetup((ocrpt_mem_free_nconst_t)rfree, rmalloc, rrealloc, rstrdup);
+	 */
 
 	/* Use the same allocator in GMP/MPFR */
 	mpfr_mp_memory_cleanup();
