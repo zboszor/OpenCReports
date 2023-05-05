@@ -1329,7 +1329,7 @@ PHP_METHOD(opencreport, result_new) {
 	ro->freed_by_lib = false;
 }
 
-PHP_METHOD(opencreport, add_mvariable) {
+PHP_METHOD(opencreport, set_mvariable) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *name;
@@ -1341,7 +1341,7 @@ PHP_METHOD(opencreport, add_mvariable) {
 		Z_PARAM_STR_EX(value, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_add_mvariable(oo->o, ZSTR_VAL(name), value ? ZSTR_VAL(value) : NULL);
+	ocrpt_set_mvariable(oo->o, ZSTR_VAL(name), value ? ZSTR_VAL(value) : NULL);
 }
 
 PHP_METHOD(opencreport, add_search_path) {
@@ -1607,7 +1607,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_result_new, 0, 1, Ope
 ZEND_ARG_TYPE_INFO(0, var_name, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_add_mvariable, 0, 1, IS_VOID, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_mvariable, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, name, IS_STRING, 0)
 ZEND_END_ARG_INFO()
@@ -1695,7 +1695,7 @@ static const zend_function_entry opencreport_class_methods[] = {
 	PHP_ME(opencreport, add_report_added_cb, arginfo_opencreport_add_any_cb, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* Environment related methods */
 	PHP_ME(opencreport, env_get, arginfo_opencreport_env_get, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport, add_mvariable, arginfo_opencreport_add_mvariable, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport, set_mvariable, arginfo_opencreport_set_mvariable, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* Result related methods */
 	PHP_ME(opencreport, result_new, arginfo_opencreport_result_new, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* File handling related methods */
@@ -6328,7 +6328,7 @@ ZEND_FUNCTION(rlib_add_parameter) {
 		RETURN_THROWS();
 	}
 
-	ocrpt_add_mvariable(oo->o, ZSTR_VAL(param), value ? ZSTR_VAL(value) : NULL);
+	ocrpt_set_mvariable(oo->o, ZSTR_VAL(param), value ? ZSTR_VAL(value) : NULL);
 }
 
 ZEND_FUNCTION(rlib_set_output_parameter) {

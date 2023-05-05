@@ -957,10 +957,10 @@ void ocrpt_env_set_query_func(ocrpt_env_query_func func);
 ocrpt_result *ocrpt_env_get_c(opencreport *o, const char *env);
 
 /*
- * Add a custom "m" domain variable
+ * Set a custom "m" domain variable
  * without changing the environment.
  */
-void ocrpt_add_mvariable(opencreport *o, const char *name, const char *value);
+void ocrpt_set_mvariable(opencreport *o, const char *name, const char *value);
 
 /**************************************
  * Functions related to file handling *

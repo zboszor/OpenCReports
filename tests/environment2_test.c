@@ -50,7 +50,7 @@ int main(void) {
 		ocrpt_strfree(err);
 	}
 
-	ocrpt_add_mvariable(o, "OCRPTENV", "extravar");
+	ocrpt_set_mvariable(o, "OCRPTENV", "extravar");
 	printf("OCRPTENV is added as mvariable.\n");
 
 	err = NULL;
@@ -68,7 +68,7 @@ int main(void) {
 		ocrpt_strfree(err);
 	}
 
-	ocrpt_add_mvariable(o, "OCRPTENV", NULL);
+	ocrpt_set_mvariable(o, "OCRPTENV", NULL);
 	printf("OCRPTENV is removed as mvariable.\n");
 
 	err = NULL;

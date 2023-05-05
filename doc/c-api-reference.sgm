@@ -2839,15 +2839,20 @@ ocrpt_env_get_c(opencreport *o,
                 const char *env);</programlisting>
 				</para>
 			</sect3>
-			<sect3 id="addmvarfunc">
+			<sect3 id="setmvarfunc">
 				<title>Add an "m" domain variable</title>
 				<para>
-					Add an "m" domain variable.
-					Such an explicit variable takes
-					precedence over the environment
-					variable of the same name.
+					Set an "m" domain variable.
+					If such a variable <literal>name</literal>
+					didn't exist yet, and <literal>value</literal>
+					is not <literal>NULL</literal>, then
+					the variable is set. If <literal>value</literal>
+					is <literal>NULL</literal>, the variable is
+					removed. Such an explicit variable takes
+					precedence over the environment variable
+					of the same name when used in expressions.
 					<programlisting>void
-ocrpt_add_mvariable(opencreport *o,
+ocrpt_set_mvariable(opencreport *o,
                     const char *name,
                     const char *value);</programlisting>
 				</para>

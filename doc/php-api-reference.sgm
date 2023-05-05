@@ -140,7 +140,7 @@
     public final result_new():
                      OpenCReport\Result;
 
-    public final add_mvariable(
+    public final set_mvariable(
                      string $name,
                      ?string $value = null): void;
 
@@ -762,17 +762,21 @@ OpenCReport::env_get(string $var_name):
                      OpenCReport\Result;</programlisting>
 			</para>
 		</sect2>
-		<sect2 id="phpaddmvarmethod">
+		<sect2 id="phpsetmvarmethod" xreflabel="OpenCReport::set_mvariable()">
 			<title>Add "m" domain variable</title>
 			<para>
 				Add an "m" domain variable.
-				Such an explicit variable takes
-				precedence over the PHP global
-				variable or the environment
-				variable of the same name when
+				If such a variable <literal>name</literal>
+				didn't exist yet, and <literal>value</literal>
+				is not <literal>NULL</literal>, then
+				the variable is set. If <literal>value</literal>
+				is <literal>NULL</literal> or omitted, the
+				variable is removed. Such an explicit variable
+				takes precedence over the PHP global variable
+				or the environment variable of the same name when
 				used in expressions.
 				<programlisting>public final
-OpenCReport::add_mvariable(
+OpenCReport::set_mvariable(
                      string $name,
                      string $value): void;</programlisting>
 			</para>
@@ -3677,7 +3681,7 @@ rlib_set_output_encoding(
 			<title>Add a report parameter</title>
 			<para>
 				This function is equivalent to
-				<literal>OpenCReport::add_mvariable</literal>.
+				<xref linkend="phpsetmvarmethod"/>.
 				<programlisting>function
 rlib_add_parameter(
                      OpenCReport $r,

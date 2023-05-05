@@ -37,7 +37,7 @@ if ($e instanceof OpenCReport\Expr) {
 	echo "expr failed to parse: " . $err . PHP_EOL;
 }
 
-$o->add_mvariable("OCRPTENV", "extravar");
+$o->set_mvariable("OCRPTENV", "extravar");
 echo "OCRPTENV is added as mvariable." . PHP_EOL;
 
 $e = $o->expr_parse("m.OCRPTENV");
@@ -52,7 +52,7 @@ if ($e instanceof OpenCReport\Expr) {
 	echo "expr failed to parse: " . $err . PHP_EOL;
 }
 
-$o->add_mvariable("OCRPTENV", null);
+$o->set_mvariable("OCRPTENV", null);
 echo "OCRPTENV is removed as mvariable." . PHP_EOL;
 
 $e = $o->expr_parse("m.OCRPTENV");
