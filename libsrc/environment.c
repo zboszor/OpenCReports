@@ -61,8 +61,12 @@ DLL_EXPORT_SYM void ocrpt_set_mvariable(opencreport *o, const char *name, const 
 		if (value) {
 			ocrpt_mem_free(e->value);
 			e->value = ocrpt_mem_strdup(value);
-		} else
+		} else {
 			o->mvarlist = ocrpt_list_end_remove(o->mvarlist, &o->mvarlist_end, e);
+			ocrpt_mem_free(e->name);
+			ocrpt_mem_free(e->value);
+			ocrpt_mem_free(e);
+		}
 	} else {
 		e = ocrpt_mem_malloc(sizeof(ocrpt_mvarentry));
 		e->name = ocrpt_mem_strdup(name);
