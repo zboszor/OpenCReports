@@ -1084,12 +1084,14 @@ OpenCReport\QueryResult::column_result(long $index):
 
     public final get_result():
                      ?OpenCReport\Result;
-    public final set_string_value(
+    public final set_string(
                      string $value): void;
-    public final set_long_value(
+    public final set_long(
                      long $value): void;
-    public final set_double_value(
+    public final set_double(
                      double $value): void;
+    public final set_number(
+                     string $value): void;
 
     public final get_num_operands(): long;
 
@@ -1101,16 +1103,20 @@ OpenCReport\QueryResult::column_result(long $index):
 
     public final init_results(long $result_type):
                      void;
+    public final get_string(): ?string;
+    public final get_long(): long;
+    public final get_double(): double;
+    public final get_number(): ?string;
 
-    public final set_nth_result_string_value(
+    public final set_nth_result_string(
                      long $which,
                      string $value): void;
 
-    public final set_nth_result_long_value(
+    public final set_nth_result_long(
                      long $which,
                      long $value): void;
 
-    public final set_nth_result_double_value(
+    public final set_nth_result_double(
                      long $which,
                      double $value): void;
 
@@ -1181,7 +1187,7 @@ OpenCReport\Expr::get_result():
 			<para>
 				Useful for user functions.
 				<programlisting>public final
-OpenCReport\Expr::set_string_value(
+OpenCReport\Expr::set_string(
 						 string $value): void;</programlisting>
 			</para>
 		</sect2>
@@ -1190,7 +1196,7 @@ OpenCReport\Expr::set_string_value(
 			<para>
 				Useful for user functions.
 				<programlisting>public final
-OpenCReport\Expr::set_long_value(
+OpenCReport\Expr::set_long(
 						 long $value): void;</programlisting>
 			</para>
 		</sect2>
@@ -1199,8 +1205,19 @@ OpenCReport\Expr::set_long_value(
 			<para>
 				Useful for user functions.
 				<programlisting>public final
-OpenCReport\Expr::set_double_value(
+OpenCReport\Expr::set_double(
 						 double $value): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprsetnumbervaluefromstring">
+			<title>Set expression result to a numeric value from string</title>
+			<para>
+				Useful for user functions.
+				This allows using
+				<ulink url="https://www.php.net/manual/en/book.bc.php">BC Math</ulink>
+				<programlisting>public final
+OpenCReport\Expr::set_number_from_string(
+						 string $value): void;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpexprgetnumops">
@@ -1242,12 +1259,45 @@ OpenCReport\Expr::init_results(long $result_type):
 						 void;</programlisting>
 			</para>
 		</sect2>
+		<sect2 id="phpexprgetstringvalue">
+			<title>Get string value of an expression</title>
+			<para>
+				Used by unit tests.
+				<programlisting>public final
+OpenCReport\Expr::get_string(): ?string;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprgetlongvalue">
+			<title>Get long value of an expression</title>
+			<para>
+				Used by unit tests.
+				<programlisting>public final
+OpenCReport\Expr::get_long(): long;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprgetdoublevalue">
+			<title>Get double value of an expression</title>
+			<para>
+				Used by unit tests.
+				<programlisting>public final
+OpenCReport\Expr::get_double(): double;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprgetnumbervalueasstring">
+			<title>Get numeric value of an expression as a string</title>
+			<para>
+				Used internally by unit tests.
+				<programlisting>public final
+OpenCReport\Expr::get_number():
+                         ?string;</programlisting>
+			</para>
+		</sect2>
 		<sect2 id="phpexprsetnthstringvalue">
 			<title>Set nth result of an expression to a string value</title>
 			<para>
 				Used by unit tests.
 				<programlisting>public final
-OpenCReport\Expr::set_nth_result_string_value(
+OpenCReport\Expr::set_nth_result_string(
 						 long $which,
 						 string $value): void;</programlisting>
 			</para>
@@ -1257,7 +1307,7 @@ OpenCReport\Expr::set_nth_result_string_value(
 			<para>
 				Used by unit tests.
 				<programlisting>public final
-OpenCReport\Expr::set_nth_result_long_value(
+OpenCReport\Expr::set_nth_result_long(
 						 long $which,
 						 long $value): void;</programlisting>
 			</para>
@@ -1267,7 +1317,7 @@ OpenCReport\Expr::set_nth_result_long_value(
 			<para>
 				Used by unit tests.
 				<programlisting>public final
-OpenCReport\Expr::set_nth_result_double_value(
+OpenCReport\Expr::set_nth_result_double(
 						 long $which,
 						 double $value): void;</programlisting>
 			</para>

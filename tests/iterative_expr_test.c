@@ -35,7 +35,7 @@ int main(void) {
 	/* Initialize the value of "e" to 0 */
 	ocrpt_expr_init_results(e1, OCRPT_RESULT_NUMBER);
 	for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
-		ocrpt_expr_set_nth_result_long_value(e1, i, 0);
+		ocrpt_expr_set_nth_result_long(e1, i, 0);
 	ocrpt_expr_set_iterative_start_value(e1, true);
 	ocrpt_expr_resolve(e1);
 	ocrpt_expr_optimize(e1);
@@ -46,7 +46,7 @@ int main(void) {
 	/* Initialize the value of "e" to 0 */
 	ocrpt_expr_init_results(e2, OCRPT_RESULT_NUMBER);
 	for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
-		ocrpt_expr_set_nth_result_long_value(e2, i, 0);
+		ocrpt_expr_set_nth_result_long(e2, i, 0);
 	/* This iterative expression starts with evaluated value */
 	//ocrpt_expr_set_iterative_start_value(e2, true);
 	ocrpt_expr_resolve(e2);

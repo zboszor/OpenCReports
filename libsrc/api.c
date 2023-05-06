@@ -532,32 +532,33 @@ static void ocrpt_execute_evaluate_global_params(opencreport *o) {
 	ocrpt_expr_optimize(o->size_unit_expr);
 	o->size_in_points = false;
 	if (o->size_unit_expr) {
-		const char *str = ocrpt_expr_get_string_value(o->size_unit_expr);
-		o->size_in_points = str ? strcasecmp(str, "points") == 0 : false;
+		const ocrpt_string *str = ocrpt_expr_get_string(o->size_unit_expr);
+		o->size_in_points = str->str ? strcasecmp(str->str, "points") == 0 : false;
 	}
 
 	ocrpt_expr_resolve(o->noquery_show_nodata_expr);
 	ocrpt_expr_optimize(o->noquery_show_nodata_expr);
 	if (o->noquery_show_nodata_expr)
-		o->noquery_show_nodata = !!ocrpt_expr_get_long_value(o->noquery_show_nodata_expr);
+		o->noquery_show_nodata = !!ocrpt_expr_get_long(o->noquery_show_nodata_expr);
 
 	ocrpt_expr_resolve(o->report_height_after_last_expr);
 	ocrpt_expr_optimize(o->report_height_after_last_expr);
 	if (o->report_height_after_last_expr)
-		o->report_height_after_last = !!ocrpt_expr_get_long_value(o->report_height_after_last_expr);
+		o->report_height_after_last = !!ocrpt_expr_get_long(o->report_height_after_last_expr);
 
 	ocrpt_expr_resolve(o->precision_expr);
 	ocrpt_expr_optimize(o->precision_expr);
 	if (o->precision_expr) {
 		ocrpt_result *prec = ocrpt_expr_get_result(o->precision_expr);
 		if (ocrpt_result_isnumber(prec))
-			o->prec = ocrpt_expr_get_long_value(o->precision_expr);
+			o->prec = ocrpt_expr_get_long(o->precision_expr);
 	}
 
 	ocrpt_expr_resolve_nowarn(o->rounding_mode_expr);
 	ocrpt_expr_optimize(o->rounding_mode_expr);
 	if (o->rounding_mode_expr) {
-		const char *mode = ocrpt_expr_get_string_value(o->rounding_mode_expr);
+		const ocrpt_string *str = ocrpt_expr_get_string(o->rounding_mode_expr);
+		const char *mode = str->str;
 		if (strcasecmp(mode, "nearest") == 0)
 			o->rndmode = MPFR_RNDN;
 		else if (strcasecmp(mode, "to_minus_inf") == 0)
@@ -577,14 +578,15 @@ static void ocrpt_execute_evaluate_global_params(opencreport *o) {
 	ocrpt_expr_resolve(o->locale_expr);
 	ocrpt_expr_optimize(o->locale_expr);
 	if (o->locale == o->c_locale && o->locale_expr) {
-		const char *l = ocrpt_expr_get_string_value(o->locale_expr);
+		const ocrpt_string *l = ocrpt_expr_get_string(o->locale_expr);
 
-		ocrpt_set_locale(o, l);
+		ocrpt_set_locale(o, l->str);
 	}
 
 	if (!o->textdomain && o->xlate_domain_s && o->xlate_dir_s) {
 		ocrpt_expr *domain_expr, *dir_expr;
 		char *err;
+		const ocrpt_string *domain0, *dir0;
 		const char *domain, *dir;
 
 		err = NULL;
@@ -592,7 +594,8 @@ static void ocrpt_execute_evaluate_global_params(opencreport *o) {
 		if (domain_expr) {
 			ocrpt_expr_resolve_nowarn(domain_expr);
 			ocrpt_expr_optimize(domain_expr);
-			domain = ocrpt_expr_get_string_value(domain_expr);
+			domain0 = ocrpt_expr_get_string(domain_expr);
+			domain = domain0->str;
 		} else {
 			ocrpt_err_printf("ocrpt_execute_evaluate_global_params: %s\n", err);
 			ocrpt_strfree(err);
@@ -604,7 +607,8 @@ static void ocrpt_execute_evaluate_global_params(opencreport *o) {
 		if (dir_expr) {
 			ocrpt_expr_resolve(dir_expr);
 			ocrpt_expr_optimize(dir_expr);
-			dir = ocrpt_expr_get_string_value(dir_expr);
+			dir0 = ocrpt_expr_get_string(dir_expr);
+			dir = dir0->str;
 		} else {
 			ocrpt_err_printf("ocrpt_execute_evaluate_global_params: %s\n", err);
 			ocrpt_strfree(err);
@@ -647,9 +651,9 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	ocrpt_expr_resolve_nowarn(p->paper_type_expr);
 	ocrpt_expr_optimize(p->paper_type_expr);
 	if (p->paper_type_expr) {
-		const char *paper = ocrpt_expr_get_string_value(p->paper_type_expr);
+		const ocrpt_string *paper = ocrpt_expr_get_string(p->paper_type_expr);
 		if (paper)
-			p->paper = ocrpt_get_paper_by_name(paper);
+			p->paper = ocrpt_get_paper_by_name(paper->str);
 	}
 	if (!p->paper)
 		p->paper = o->paper;
@@ -657,14 +661,14 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	ocrpt_expr_resolve_nowarn(p->font_name_expr);
 	ocrpt_expr_optimize(p->font_name_expr);
 	if (!p->font_name && p->font_name_expr)
-		p->font_name = ocrpt_expr_get_string_value(p->font_name_expr);
+		p->font_name = ocrpt_expr_get_string(p->font_name_expr)->str;
 	if (!p->font_name)
 		p->font_name = "Courier";
 
 	ocrpt_expr_resolve(p->font_size_expr);
 	ocrpt_expr_optimize(p->font_size_expr);
 	if (p->font_size_expr) {
-		double font_size = ocrpt_expr_get_double_value(p->font_size_expr);
+		double font_size = ocrpt_expr_get_double(p->font_size_expr);
 
 		p->font_size = (font_size > 0.0 ? font_size : o->font_size);
 		ocrpt_layout_set_font_sizes(o, p->font_name, p->font_size, false, false, NULL, &p->font_width);
@@ -676,7 +680,7 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	ocrpt_expr_resolve(p->top_margin_expr);
 	ocrpt_expr_optimize(p->top_margin_expr);
 	if (p->top_margin_expr) {
-		double margin = ocrpt_expr_get_double_value(p->top_margin_expr);
+		double margin = ocrpt_expr_get_double(p->top_margin_expr);
 		if (margin > 0.0)
 			p->top_margin = margin;
 	}
@@ -684,7 +688,7 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	ocrpt_expr_resolve(p->bottom_margin_expr);
 	ocrpt_expr_optimize(p->bottom_margin_expr);
 	if (p->bottom_margin_expr) {
-		double margin = ocrpt_expr_get_double_value(p->bottom_margin_expr);
+		double margin = ocrpt_expr_get_double(p->bottom_margin_expr);
 		if (margin > 0.0)
 			p->bottom_margin = margin;
 	}
@@ -692,7 +696,7 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	ocrpt_expr_resolve(p->left_margin_expr);
 	ocrpt_expr_optimize(p->left_margin_expr);
 	if (p->left_margin_expr) {
-		double margin = ocrpt_expr_get_double_value(p->left_margin_expr);
+		double margin = ocrpt_expr_get_double(p->left_margin_expr);
 		if (margin > 0.0)
 			p->left_margin = margin;
 	}
@@ -700,7 +704,7 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	ocrpt_expr_resolve(p->right_margin_expr);
 	ocrpt_expr_optimize(p->right_margin_expr);
 	if (p->right_margin_expr) {
-		double margin = ocrpt_expr_get_double_value(p->right_margin_expr);
+		double margin = ocrpt_expr_get_double(p->right_margin_expr);
 		if (margin > 0.0)
 			p->right_margin = margin;
 	}
@@ -709,7 +713,7 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	ocrpt_expr_optimize(p->iterations_expr);
 	p->iterations = 1;
 	if (p->iterations_expr) {
-		long it = ocrpt_expr_get_long_value(p->iterations_expr);
+		long it = ocrpt_expr_get_long(p->iterations_expr);
 		if (it > 1)
 			p->iterations = it;
 	}
@@ -717,18 +721,18 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	ocrpt_expr_resolve(p->suppress_expr);
 	ocrpt_expr_optimize(p->suppress_expr);
 	if (p->suppress_expr)
-		p->suppress = !!ocrpt_expr_get_long_value(p->suppress_expr);
+		p->suppress = !!ocrpt_expr_get_long(p->suppress_expr);
 
 	ocrpt_expr_resolve(p->suppress_pageheader_firstpage_expr);
 	ocrpt_expr_optimize(p->suppress_pageheader_firstpage_expr);
 	if (p->suppress_pageheader_firstpage_expr)
-		p->suppress_pageheader_firstpage = !!ocrpt_expr_get_long_value(p->suppress_pageheader_firstpage_expr);
+		p->suppress_pageheader_firstpage = !!ocrpt_expr_get_long(p->suppress_pageheader_firstpage_expr);
 
 	ocrpt_expr_resolve_nowarn(p->orientation_expr);
 	ocrpt_expr_optimize(p->orientation_expr);
 	if (p->orientation_expr) {
-		const char *orientation = ocrpt_expr_get_string_value(p->orientation_expr);
-		p->landscape = orientation && (strcasecmp(orientation, "landscape") == 0);
+		const ocrpt_string *orientation = ocrpt_expr_get_string(p->orientation_expr);
+		p->landscape = orientation && (strcasecmp(orientation->str, "landscape") == 0);
 	}
 
 	if (p->landscape) {
@@ -745,19 +749,19 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 		ocrpt_expr_resolve_nowarn(pr->layout_expr);
 		ocrpt_expr_optimize(pr->layout_expr);
 		if (pr->layout_expr) {
-			const char *layout = ocrpt_expr_get_string_value(pr->layout_expr);
-			pr->fixed = layout && (strcasecmp(layout, "fixed") == 0);
+			const ocrpt_string *layout = ocrpt_expr_get_string(pr->layout_expr);
+			pr->fixed = layout && (strcasecmp(layout->str, "fixed") == 0);
 		}
 
 		ocrpt_expr_resolve_nowarn(pr->suppress_expr);
 		ocrpt_expr_optimize(pr->suppress_expr);
 		if (pr->suppress_expr)
-			pr->suppress = !!ocrpt_expr_get_long_value(pr->suppress_expr);
+			pr->suppress = !!ocrpt_expr_get_long(pr->suppress_expr);
 
 		ocrpt_expr_resolve_nowarn(pr->newpage_expr);
 		ocrpt_expr_optimize(pr->newpage_expr);
 		if (pr->newpage_expr)
-			pr->newpage = !!ocrpt_expr_get_long_value(pr->newpage_expr);
+			pr->newpage = !!ocrpt_expr_get_long(pr->newpage_expr);
 
 		for (ocrpt_list *pdl = pr->pd_list; pdl; pdl = pdl->next) {
 			ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
@@ -765,31 +769,31 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 			ocrpt_expr_resolve(pd->width_expr);
 			ocrpt_expr_optimize(pd->width_expr);
 			if (pd->width_expr)
-				pd->width = ocrpt_expr_get_double_value(pd->width_expr);
+				pd->width = ocrpt_expr_get_double(pd->width_expr);
 
 			ocrpt_expr_resolve(pd->height_expr);
 			ocrpt_expr_optimize(pd->height_expr);
 			if (pd->height_expr)
-				pd->height = ocrpt_expr_get_double_value(pd->height_expr);
+				pd->height = ocrpt_expr_get_double(pd->height_expr);
 
 			ocrpt_expr_resolve(pd->border_width_expr);
 			ocrpt_expr_optimize(pd->border_width_expr);
 			if (pd->border_width_expr)
-				pd->border_width = ocrpt_expr_get_double_value(pd->border_width_expr);
+				pd->border_width = ocrpt_expr_get_double(pd->border_width_expr);
 
 			ocrpt_expr_resolve_nowarn(pd->border_color_expr);
 			ocrpt_expr_optimize(pd->border_color_expr);
 			if (pd->border_color_expr) {
-				const char *color = ocrpt_expr_get_string_value(pd->border_color_expr);
+				const ocrpt_string *color = ocrpt_expr_get_string(pd->border_color_expr);
 				if (color)
-					ocrpt_get_color(color, &pd->border_color, false);
+					ocrpt_get_color(color->str, &pd->border_color, false);
 			}
 
 			ocrpt_expr_resolve(pd->detail_columns_expr);
 			ocrpt_expr_optimize(pd->detail_columns_expr);
 			pd->detail_columns = 1;
 			if (pd->detail_columns_expr) {
-				long dc = ocrpt_expr_get_long_value(pd->detail_columns_expr);
+				long dc = ocrpt_expr_get_long(pd->detail_columns_expr);
 				if (dc > 1)
 					pd->detail_columns = dc;
 			}
@@ -797,12 +801,12 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 			ocrpt_expr_resolve(pd->column_pad_expr);
 			ocrpt_expr_optimize(pd->column_pad_expr);
 			if (pd->column_pad_expr)
-				pd->column_pad = ocrpt_expr_get_double_value(pd->column_pad_expr);
+				pd->column_pad = ocrpt_expr_get_double(pd->column_pad_expr);
 
 			ocrpt_expr_resolve(pd->suppress_expr);
 			ocrpt_expr_optimize(pd->suppress_expr);
 			if (pd->suppress_expr)
-				pd->suppress = !!ocrpt_expr_get_long_value(pd->suppress_expr);
+				pd->suppress = !!ocrpt_expr_get_long(pd->suppress_expr);
 
 			for (ocrpt_list *rl = pd->reports; rl; rl = rl->next) {
 				ocrpt_report *r = (ocrpt_report *)rl->data;
@@ -818,16 +822,16 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 				ocrpt_expr_resolve_nowarn(r->query_expr);
 				ocrpt_expr_optimize(r->query_expr);
 				if (r->query_expr) {
-					const char *query = ocrpt_expr_get_string_value(r->query_expr);
+					const ocrpt_string *query = ocrpt_expr_get_string(r->query_expr);
 					if (query)
-						ocrpt_report_set_main_query(r, ocrpt_query_get(o, query));
+						ocrpt_report_set_main_query(r, ocrpt_query_get(o, query->str));
 				} else if (o->queries)
 					ocrpt_report_set_main_query(r, (ocrpt_query *)o->queries->data);
 
 				ocrpt_expr_resolve(r->height_expr);
 				ocrpt_expr_optimize(r->height_expr);
 				if (r->height_expr) {
-					double height = ocrpt_expr_get_double_value(r->height_expr);
+					double height = ocrpt_expr_get_double(r->height_expr);
 					if (height > 0.0)
 						r->height = height;
 					else {
@@ -839,12 +843,12 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 				ocrpt_expr_resolve_nowarn(r->font_name_expr);
 				ocrpt_expr_optimize(r->font_name_expr);
 				if (r->font_name_expr)
-					r->font_name = ocrpt_expr_get_string_value(r->font_name_expr);
+					r->font_name = ocrpt_expr_get_string(r->font_name_expr)->str;
 
 				ocrpt_expr_resolve(r->font_size_expr);
 				ocrpt_expr_optimize(r->font_size_expr);
 				if (r->font_size_expr) {
-					double font_size = ocrpt_expr_get_double_value(r->font_size_expr);
+					double font_size = ocrpt_expr_get_double(r->font_size_expr);
 
 					if (font_size > 0.0)
 						r->font_size = font_size;
@@ -858,7 +862,7 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 				ocrpt_expr_optimize(r->iterations_expr);
 				r->iterations = 1;
 				if (r->iterations_expr) {
-					long it = ocrpt_expr_get_long_value(r->iterations_expr);
+					long it = ocrpt_expr_get_long(r->iterations_expr);
 					if (it > 1)
 						r->iterations = it;
 				}
@@ -866,13 +870,13 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 				ocrpt_expr_resolve(r->suppress_expr);
 				ocrpt_expr_optimize(r->suppress_expr);
 				if (r->suppress_expr)
-					r->suppress = !!ocrpt_expr_get_long_value(r->suppress_expr);
+					r->suppress = !!ocrpt_expr_get_long(r->suppress_expr);
 
 				ocrpt_expr_resolve_nowarn(r->fieldheader_priority_expr);
 				ocrpt_expr_optimize(r->fieldheader_priority_expr);
 				if (r->fieldheader_priority_expr) {
-					const char *fhprio = ocrpt_expr_get_string_value(r->fieldheader_priority_expr);
-					r->fieldheader_high_priority = fhprio && (strcasecmp(fhprio, "high") == 0);
+					const ocrpt_string *fhprio = ocrpt_expr_get_string(r->fieldheader_priority_expr);
+					r->fieldheader_high_priority = fhprio && (strcasecmp(fhprio->str, "high") == 0);
 				}
 
 				ocrpt_layout_output_evaluate_expr_params(&r->nodata);
@@ -894,7 +898,7 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 					ocrpt_expr_resolve(var->precalculate_expr);
 					ocrpt_expr_optimize(var->precalculate_expr);
 					if (var->precalculate_expr)
-						var->precalculate = !!ocrpt_expr_get_long_value(var->precalculate_expr);
+						var->precalculate = !!ocrpt_expr_get_long(var->precalculate_expr);
 				}
 			}
 		}
@@ -1537,7 +1541,7 @@ DLL_EXPORT_SYM void ocrpt_resolve_search_paths(opencreport *o) {
 		if (p->expr && !p->path) {
 			ocrpt_expr_resolve(p->expr);
 			ocrpt_expr_optimize(p->expr);
-			p->path = ocrpt_mem_strdup(ocrpt_expr_get_string_value(p->expr));
+			p->path = ocrpt_mem_strdup(ocrpt_expr_get_string(p->expr)->str);
 		}
 	}
 }

@@ -58,18 +58,17 @@ static void processNode(xmlTextReaderPtr reader) {
 	}
 }
 
-#define get_string_value(o, expr) { \
+#define get_string(o, expr) { \
 					expr##_e = ocrpt_expr_parse(o, (char *)expr, NULL); \
 					ocrpt_expr_resolve_nowarn(expr##_e); \
-					expr##_s = (char *)ocrpt_expr_get_string_value(expr##_e); \
-					if (!expr##_s) \
-						expr##_s = (char *)expr; \
+					const ocrpt_string *expr##_ss = ocrpt_expr_get_string(expr##_e); \
+					expr##_s = expr##_ss ? expr##_ss->str : (char *)expr; \
 				}
 
-#define get_int_value(o, expr) { \
+#define get_int(o, expr) { \
 					expr##_e = ocrpt_expr_parse(o, (char *)expr, NULL); \
 					ocrpt_expr_resolve_nowarn(expr##_e); \
-					expr##_i = ocrpt_expr_get_long_value(expr##_e); \
+					expr##_i = ocrpt_expr_get_long(expr##_e); \
 				}
 
 static void ocrpt_ignore_child_nodes(opencreport *o, xmlTextReaderPtr reader, int depth, const char *leaf_name) {
@@ -151,16 +150,16 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 	if (!value)
 		value = value_att;
 
-	get_string_value(o, name);
-	get_string_value(o, value);
-	get_string_value(o, datasource);
-	get_string_value(o, follower_for);
-	get_string_value(o, follower_expr);
+	get_string(o, name);
+	get_string(o, value);
+	get_string(o, datasource);
+	get_string(o, follower_for);
+	get_string(o, follower_expr);
 
-	get_int_value(o, cols);
-	get_int_value(o, rows);
+	get_int(o, cols);
+	get_int(o, rows);
 
-	get_string_value(o, coltypes);
+	get_string(o, coltypes);
 
 	ds = ocrpt_datasource_get(o, datasource_s);
 	if (ds) {
@@ -288,14 +287,14 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	for (i = 0; xmlattrs[i].attrp; i++)
 		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
 
-	get_string_value(o, name);
-	get_string_value(o, type);
+	get_string(o, name);
+	get_string(o, type);
 
-	get_string_value(o, host);
-	get_string_value(o, unix_socket);
+	get_string(o, host);
+	get_string(o, unix_socket);
 
 	port_s = NULL;
-	get_int_value(o, port);
+	get_int(o, port);
 	if (port_i) {
 		port_s = alloca(32);
 		sprintf(port_s, "%d", port_i);
@@ -305,13 +304,13 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	 * Don't report parse errors for database connection details,
 	 * they are sensitive information.
 	 */
-	get_string_value(o, dbname);
-	get_string_value(o, user);
-	get_string_value(o, password);
-	get_string_value(o, connstr);
-	get_string_value(o, optionfile);
-	get_string_value(o, group);
-	get_string_value(o, encoding);
+	get_string(o, dbname);
+	get_string(o, user);
+	get_string(o, password);
+	get_string(o, connstr);
+	get_string(o, optionfile);
+	get_string(o, group);
+	get_string(o, encoding);
 
 	if (name_s && type_s) {
 		if (!strcmp(type_s, "array"))
@@ -1220,8 +1219,8 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 }
 
 bool ocrpt_parse_report_node_for_load(ocrpt_report *r) {
-	const char *filename = ocrpt_expr_get_string_value(r->filename_expr);
-	char *real_filename = ocrpt_find_file(r->o, filename);
+	const ocrpt_string *filename = ocrpt_expr_get_string(r->filename_expr);
+	char *real_filename = ocrpt_find_file(r->o, filename->str);
 	if (!real_filename) {
 		ocrpt_err_printf("ocrpt_parse_report_node_for_load: can't find file %s\n", filename);
 		return false;

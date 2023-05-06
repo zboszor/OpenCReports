@@ -337,24 +337,24 @@ void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output) {
 					ocrpt_expr_resolve(elem->delayed);
 					ocrpt_expr_optimize(elem->delayed);
 					if (elem->delayed)
-						ocrpt_expr_set_delayed(elem->value, !!ocrpt_expr_get_long_value(elem->delayed));
+						ocrpt_expr_set_delayed(elem->value, !!ocrpt_expr_get_long(elem->delayed));
 
 					ocrpt_expr_resolve(elem->memo_expr);
 					ocrpt_expr_optimize(elem->memo_expr);
 
 					if (elem->memo_expr) {
-						elem->memo = !!ocrpt_expr_get_long_value(elem->memo_expr);
+						elem->memo = !!ocrpt_expr_get_long(elem->memo_expr);
 
 						if (elem->memo) {
 							ocrpt_expr_resolve(elem->wrap_chars);
 							ocrpt_expr_optimize(elem->wrap_chars);
 							if (elem->wrap_chars)
-								elem->memo_wrap_chars = !!ocrpt_expr_get_long_value(elem->wrap_chars);
+								elem->memo_wrap_chars = !!ocrpt_expr_get_long(elem->wrap_chars);
 
 							ocrpt_expr_resolve(elem->max_lines);
 							ocrpt_expr_optimize(elem->max_lines);
 							if (elem->max_lines)
-								elem->memo_max_lines = ocrpt_expr_get_long_value(elem->max_lines);
+								elem->memo_max_lines = ocrpt_expr_get_long(elem->max_lines);
 						}
 					}
 

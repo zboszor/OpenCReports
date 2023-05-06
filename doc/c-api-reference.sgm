@@ -1007,13 +1007,13 @@ ocrpt_expr_set_iterative_start_value(ocrpt_expr *e,
 					type. Used by parsing report description XML files
 					and unit tests.
 					<programlisting>const char *
-ocrpt_expr_get_string_value(ocrpt_expr *e);
+ocrpt_expr_get_string(ocrpt_expr *e);
 
 long
-ocrpt_expr_get_long_value(ocrpt_expr *e);
+ocrpt_expr_get_long(ocrpt_expr *e);
 
 double
-ocrpt_expr_get_double_value(ocrpt_expr *e);</programlisting>
+ocrpt_expr_get_double(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="setexprcurval">
@@ -1021,15 +1021,15 @@ ocrpt_expr_get_double_value(ocrpt_expr *e);</programlisting>
 				<para>
 					Used by unit tests.
 					<programlisting>void
-ocrpt_expr_set_string_value(ocrpt_expr *e,
+ocrpt_expr_set_string(ocrpt_expr *e,
                             const char *s);
 
 void
-ocrpt_expr_set_long_value(ocrpt_expr *e,
+ocrpt_expr_set_long(ocrpt_expr *e,
                           long l);
 
 void
-ocrpt_expr_set_double_value(ocrpt_expr *e,
+ocrpt_expr_set_double(ocrpt_expr *e,
                             double d);</programlisting>
 				</para>
 			</sect3>
@@ -1040,17 +1040,17 @@ ocrpt_expr_set_double_value(ocrpt_expr *e,
 					number of values. With these functions, any of them
 					can be set. Used by unit tests.
 					<programlisting>void
-ocrpt_expr_set_nth_result_string_value(ocrpt_expr *e,
+ocrpt_expr_set_nth_result_string(ocrpt_expr *e,
                                        int which,
                                        const char *s);
 
 void
-ocrpt_expr_set_nth_result_long_value(ocrpt_expr *e,
+ocrpt_expr_set_nth_result_long(ocrpt_expr *e,
                                      int which,
                                      long l);
 
 void
-ocrpt_expr_set_nth_result_double_value(ocrpt_expr *e,
+ocrpt_expr_set_nth_result_double(ocrpt_expr *e,
                                        int which,
                                        double d);</programlisting>
 				</para>

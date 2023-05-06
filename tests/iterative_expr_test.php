@@ -30,7 +30,7 @@ $e1 = $o->expr_parse("r.self + 2");
 /* Initialize the value of "e1" to 0 */
 $e1->init_results(OpenCReport::RESULT_NUMBER);
 for ($i = 0; $i < OpenCReport::EXPR_RESULTS; $i++)
-	$e1->set_nth_result_long_value($i, 0);
+	$e1->set_nth_result_long($i, 0);
 $e1->set_iterative_start_value(true);
 $e1->resolve();
 $e1->optimize();
@@ -41,7 +41,7 @@ $e2 = $o->expr_parse("r.self + 2");
 /* Initialize the value of "e2" to 0 */
 $e2->init_results(OpenCReport::RESULT_NUMBER);
 for ($i = 0; $i < OpenCReport::EXPR_RESULTS; $i++)
-	$e2->set_nth_result_long_value($i, 0);
+	$e2->set_nth_result_long($i, 0);
 /* This iterative expression starts with evaluated value */
 //ocrpt_expr_set_iterative_start_value(e2, true);
 $e2->resolve();

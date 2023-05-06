@@ -523,18 +523,23 @@ void ocrpt_expr_set_iterative_start_value(ocrpt_expr *e, bool start_with_init);
 /*
  * Get the current value for ocrpt_expr in base type
  */
-const char *ocrpt_expr_get_string_value(ocrpt_expr *e);
-long ocrpt_expr_get_long_value(ocrpt_expr *e);
-double ocrpt_expr_get_double_value(ocrpt_expr *e);
-void ocrpt_expr_set_string_value(ocrpt_expr *e, const char *s);
-void ocrpt_expr_set_long_value(ocrpt_expr *e, long l);
-void ocrpt_expr_set_double_value(ocrpt_expr *e, double d);
+const ocrpt_string *ocrpt_expr_get_string(ocrpt_expr *e);
+long ocrpt_expr_get_long(ocrpt_expr *e);
+double ocrpt_expr_get_double(ocrpt_expr *e);
+mpfr_ptr ocrpt_expr_get_number(ocrpt_expr *e);
+ocrpt_string *ocrpt_expr_get_number_as_string(ocrpt_expr *e, const char *format);
+void ocrpt_expr_set_string(ocrpt_expr *e, const char *s);
+void ocrpt_expr_set_long(ocrpt_expr *e, long l);
+void ocrpt_expr_set_double(ocrpt_expr *e, double d);
+void ocrpt_expr_set_number(ocrpt_expr *e, mpfr_ptr m);
+void ocrpt_expr_set_number_from_string(ocrpt_expr *e, const char *s);
 /*
  * Set the nth value for ocrpt_expr in base type
  */
-void ocrpt_expr_set_nth_result_string_value(ocrpt_expr *e, int which, const char *s);
-void ocrpt_expr_set_nth_result_long_value(ocrpt_expr *e, int which, long l);
-void ocrpt_expr_set_nth_result_double_value(ocrpt_expr *e, int which, double d);
+void ocrpt_expr_set_nth_result_string(ocrpt_expr *e, int which, const char *s);
+void ocrpt_expr_set_nth_result_long(ocrpt_expr *e, int which, long l);
+void ocrpt_expr_set_nth_result_double(ocrpt_expr *e, int which, double d);
+void ocrpt_expr_set_nth_result_number_from_string(ocrpt_expr *e, int which, const char *n);
 /*
  * Compare two subsequent row data in the expression,
  * return true if they are identical.
@@ -585,8 +590,11 @@ void ocrpt_result_set_isnull(ocrpt_result *result, bool isnull);
 
 bool ocrpt_result_isnumber(ocrpt_result *result);
 mpfr_ptr ocrpt_result_get_number(ocrpt_result *result);
+ocrpt_string *ocrpt_result_get_number_as_string(ocrpt_result *result, const char *format);
 void ocrpt_result_set_long(ocrpt_result *result, long value);
 void ocrpt_result_set_double(ocrpt_result *result, double value);
+void ocrpt_result_set_number(ocrpt_result *result, mpfr_ptr value);
+void ocrpt_result_set_number_from_string(ocrpt_result *result, const char *value);
 
 bool ocrpt_result_isstring(ocrpt_result *result);
 ocrpt_string *ocrpt_result_get_string(ocrpt_result *result);

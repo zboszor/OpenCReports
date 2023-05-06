@@ -18,7 +18,7 @@ OCRPT_STATIC_FUNCTION(my_inc) {
 	case OCRPT_RESULT_NUMBER:
 		ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
 
-		ocrpt_expr_set_long_value(e, 1L);
+		ocrpt_expr_set_long(e, 1L);
 		break;
 	case OCRPT_RESULT_ERROR:
 		ocrpt_result *rs = ocrpt_expr_operand_get_result(e, 0);
@@ -42,7 +42,7 @@ OCRPT_STATIC_FUNCTION(my_dec) {
 	case OCRPT_RESULT_NUMBER:
 		ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
 
-		ocrpt_expr_set_long_value(e, 0L);
+		ocrpt_expr_set_long(e, 0L);
 		break;
 	case OCRPT_RESULT_ERROR:
 		ocrpt_result *rs = ocrpt_expr_operand_get_result(e, 0);

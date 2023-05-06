@@ -546,5 +546,5 @@ DLL_EXPORT_SYM long ocrpt_report_get_query_rownum(ocrpt_report *r) {
 	if (!r || !r->query_rownum)
 		return 0L;
 
-	return ocrpt_expr_get_long_value(r->query_rownum);
+	return ocrpt_expr_get_long(r->query_rownum);
 }

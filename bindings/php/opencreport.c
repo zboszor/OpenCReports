@@ -1031,15 +1031,15 @@ OCRPT_STATIC_FUNCTION(opencreport_default_function) {
 	if (Z_TYPE(retval) == IS_UNDEF || Z_TYPE(retval) == IS_NULL)
 		return;
 	else if (Z_TYPE(retval) == IS_FALSE)
-		ocrpt_expr_set_long_value(e, 0);
+		ocrpt_expr_set_long(e, 0);
 	else if (Z_TYPE(retval) == IS_TRUE)
-		ocrpt_expr_set_long_value(e, 1);
+		ocrpt_expr_set_long(e, 1);
 	else if (Z_TYPE(retval) == IS_LONG)
-		ocrpt_expr_set_long_value(e, Z_LVAL(retval));
+		ocrpt_expr_set_long(e, Z_LVAL(retval));
 	else if (Z_TYPE(retval) == IS_DOUBLE)
-		ocrpt_expr_set_double_value(e, Z_DVAL(retval));
+		ocrpt_expr_set_double(e, Z_DVAL(retval));
 	else if (Z_TYPE(retval) == IS_STRING)
-		ocrpt_expr_set_string_value(e, Z_STRVAL(retval));
+		ocrpt_expr_set_string(e, Z_STRVAL(retval));
 	else
 		ocrpt_expr_make_error_result(e, "invalid return value");
 }
@@ -1609,7 +1609,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_mvariable, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
-ZEND_ARG_VARIADIC_TYPE_INFO(0, name, IS_STRING, 0)
+ZEND_ARG_VARIADIC_TYPE_INFO(0, name, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_add_search_path, 0, 1, IS_VOID, 0)
@@ -2104,7 +2104,7 @@ PHP_METHOD(opencreport_expr, get_result) {
 	ro->freed_by_lib = true;
 }
 
-PHP_METHOD(opencreport_expr, set_string_value) {
+PHP_METHOD(opencreport_expr, set_string) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	zend_string *value;
@@ -2118,10 +2118,10 @@ PHP_METHOD(opencreport_expr, set_string_value) {
 		Z_PARAM_STR(value);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_expr_set_string_value(eo->e, ZSTR_VAL(value));
+	ocrpt_expr_set_string(eo->e, ZSTR_VAL(value));
 }
 
-PHP_METHOD(opencreport_expr, set_long_value) {
+PHP_METHOD(opencreport_expr, set_long) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	zend_long value;
@@ -2135,10 +2135,10 @@ PHP_METHOD(opencreport_expr, set_long_value) {
 		Z_PARAM_LONG(value);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_expr_set_long_value(eo->e, value);
+	ocrpt_expr_set_long(eo->e, value);
 }
 
-PHP_METHOD(opencreport_expr, set_double_value) {
+PHP_METHOD(opencreport_expr, set_double) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	double value;
@@ -2152,7 +2152,24 @@ PHP_METHOD(opencreport_expr, set_double_value) {
 		Z_PARAM_DOUBLE(value);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_expr_set_double_value(eo->e, value);
+	ocrpt_expr_set_double(eo->e, value);
+}
+
+PHP_METHOD(opencreport_expr, set_number) {
+	zval *object = ZEND_THIS;
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+	zend_string *value;
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR(value);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_expr_set_number_from_string(eo->e, ZSTR_VAL(value));
 }
 
 PHP_METHOD(opencreport_expr, get_num_operands) {
@@ -2224,7 +2241,81 @@ PHP_METHOD(opencreport_expr, init_results) {
 	ocrpt_expr_init_results(eo->e, result_type);
 }
 
-PHP_METHOD(opencreport_expr, set_nth_result_string_value) {
+PHP_METHOD(opencreport_expr, get_string) {
+	zval *object = ZEND_THIS;
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	const ocrpt_string *s = ocrpt_expr_get_string(eo->e);
+
+	if (!s)
+		RETURN_NULL();
+
+	RETURN_STRINGL(s->str, s->len);
+}
+
+PHP_METHOD(opencreport_expr, get_long) {
+	zval *object = ZEND_THIS;
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_LONG(ocrpt_expr_get_long(eo->e));
+}
+
+PHP_METHOD(opencreport_expr, get_double) {
+	zval *object = ZEND_THIS;
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_DOUBLE(ocrpt_expr_get_double(eo->e));
+}
+
+PHP_METHOD(opencreport_expr, get_number) {
+	zval *object = ZEND_THIS;
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+	zend_string *format = NULL;
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
+		Z_PARAM_OPTIONAL;
+		Z_PARAM_STR(format);
+	ZEND_PARSE_PARAMETERS_END();
+
+	char *fmt = format ? ZSTR_VAL(format) : "%RF";
+	mpfr_ptr number = ocrpt_expr_get_number(eo->e);
+	if (!number)
+		RETURN_NULL();
+
+	size_t len = mpfr_snprintf(NULL, 0, fmt, number);
+	char *retval = emalloc(len + 1);
+	mpfr_snprintf(retval, len + 1, fmt, number);
+
+	RETURN_STRINGL(retval, len);
+}
+
+PHP_METHOD(opencreport_expr, set_nth_result_string) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	zend_long which;
@@ -2240,10 +2331,10 @@ PHP_METHOD(opencreport_expr, set_nth_result_string_value) {
 		Z_PARAM_STR(value);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_expr_set_nth_result_string_value(eo->e, which, ZSTR_VAL(value));
+	ocrpt_expr_set_nth_result_string(eo->e, which, ZSTR_VAL(value));
 }
 
-PHP_METHOD(opencreport_expr, set_nth_result_long_value) {
+PHP_METHOD(opencreport_expr, set_nth_result_long) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	zend_long which;
@@ -2259,10 +2350,10 @@ PHP_METHOD(opencreport_expr, set_nth_result_long_value) {
 		Z_PARAM_LONG(value);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_expr_set_nth_result_long_value(eo->e, which, value);
+	ocrpt_expr_set_nth_result_long(eo->e, which, value);
 }
 
-PHP_METHOD(opencreport_expr, set_nth_result_double_value) {
+PHP_METHOD(opencreport_expr, set_nth_result_double) {
 	zval *object = ZEND_THIS;
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	zend_long which;
@@ -2278,7 +2369,7 @@ PHP_METHOD(opencreport_expr, set_nth_result_double_value) {
 		Z_PARAM_DOUBLE(value);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ocrpt_expr_set_nth_result_double_value(eo->e, which, value);
+	ocrpt_expr_set_nth_result_double(eo->e, which, value);
 }
 
 PHP_METHOD(opencreport_expr, set_iterative_start_value) {
@@ -2336,16 +2427,20 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_expr_get_result, 0, 0, OpenCReport\\Result, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_string_value, 0, 1, IS_VOID, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_string, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_long_value, 0, 1, IS_VOID, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_long, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, value, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_double_value, 0, 1, IS_VOID, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_double, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, value, IS_DOUBLE, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_number, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_get_num_operands, 0, 0, IS_LONG, 0)
@@ -2362,17 +2457,30 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_init_results, 0
 ZEND_ARG_TYPE_INFO(0, result_type, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_nth_result_string_value, 0, 2, IS_VOID, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_get_string, 0, 0, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_get_long, 0, 0, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_get_double, 0, 0, IS_DOUBLE, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_get_number, 0, 0, IS_STRING, 0)
+ZEND_ARG_VARIADIC_TYPE_INFO(0, format, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_nth_result_string, 0, 2, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, which, IS_LONG, 0)
 ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_nth_result_long_value, 0, 2, IS_VOID, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_nth_result_long, 0, 2, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, which, IS_LONG, 0)
 ZEND_ARG_TYPE_INFO(0, value, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_nth_result_double_value, 0, 2, IS_VOID, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_nth_result_double, 0, 2, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, which, IS_LONG, 0)
 ZEND_ARG_TYPE_INFO(0, value, IS_DOUBLE, 0)
 ZEND_END_ARG_INFO()
@@ -2393,16 +2501,21 @@ static const zend_function_entry opencreport_expr_class_methods[] = {
 	PHP_ME(opencreport_expr, resolve, arginfo_opencreport_expr_resolve, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, eval, arginfo_opencreport_expr_eval, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, get_result, arginfo_opencreport_expr_get_result, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_expr, set_string_value, arginfo_opencreport_expr_set_string_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_expr, set_long_value, arginfo_opencreport_expr_set_long_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_expr, set_double_value, arginfo_opencreport_expr_set_double_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, set_string, arginfo_opencreport_expr_set_string, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, set_long, arginfo_opencreport_expr_set_long, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, set_double, arginfo_opencreport_expr_set_double, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, set_number, arginfo_opencreport_expr_set_number, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, get_num_operands, arginfo_opencreport_expr_get_num_operands, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, operand_get_result, arginfo_opencreport_expr_operand_get_result, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, cmp_results, arginfo_opencreport_expr_cmp_results, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, init_results, arginfo_opencreport_expr_init_results, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_expr, set_nth_result_string_value, arginfo_opencreport_expr_set_nth_result_string_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_expr, set_nth_result_long_value, arginfo_opencreport_expr_set_nth_result_long_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_expr, set_nth_result_double_value, arginfo_opencreport_expr_set_nth_result_double_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, get_string, arginfo_opencreport_expr_get_string, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, get_long, arginfo_opencreport_expr_get_long, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, get_double, arginfo_opencreport_expr_get_double, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, get_number, arginfo_opencreport_expr_get_number, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, set_nth_result_string, arginfo_opencreport_expr_set_nth_result_string, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, set_nth_result_long, arginfo_opencreport_expr_set_nth_result_long, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, set_nth_result_double, arginfo_opencreport_expr_set_nth_result_double, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, set_iterative_start_value, arginfo_opencreport_expr_set_iterative_start_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, set_delayed, arginfo_opencreport_expr_set_delayed, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
@@ -2513,8 +2626,10 @@ PHP_METHOD(opencreport_result, get_number) {
 
 	char *fmt = format ? ZSTR_VAL(format) : "%RF";
 	mpfr_ptr number = ocrpt_result_get_number(ro->r);
-	size_t len = mpfr_snprintf(NULL, 0, fmt, number);
+	if (!number)
+		RETURN_NULL();
 
+	size_t len = mpfr_snprintf(NULL, 0, fmt, number);
 	char *retval = emalloc(len + 1);
 	mpfr_snprintf(retval, len + 1, fmt, number);
 
@@ -6255,15 +6370,15 @@ OCRPT_STATIC_FUNCTION(rlib_default_function) {
 	if (Z_TYPE(retval) == IS_UNDEF || Z_TYPE(retval) == IS_NULL)
 		return;
 	else if (Z_TYPE(retval) == IS_FALSE)
-		ocrpt_expr_set_long_value(e, 0);
+		ocrpt_expr_set_long(e, 0);
 	else if (Z_TYPE(retval) == IS_TRUE)
-		ocrpt_expr_set_long_value(e, 1);
+		ocrpt_expr_set_long(e, 1);
 	else if (Z_TYPE(retval) == IS_LONG)
-		ocrpt_expr_set_long_value(e, Z_LVAL(retval));
+		ocrpt_expr_set_long(e, Z_LVAL(retval));
 	else if (Z_TYPE(retval) == IS_DOUBLE)
-		ocrpt_expr_set_double_value(e, Z_DVAL(retval));
+		ocrpt_expr_set_double(e, Z_DVAL(retval));
 	else if (Z_TYPE(retval) == IS_STRING)
-		ocrpt_expr_set_string_value(e, Z_STRVAL(retval));
+		ocrpt_expr_set_string(e, Z_STRVAL(retval));
 	else
 		ocrpt_expr_make_error_result(e, "invalid return value");
 }
@@ -6784,7 +6899,7 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_add_parameter, 0, 2, IS_VOID, 0)
 ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
 ZEND_ARG_TYPE_INFO(0, param, IS_STRING, 0)
-ZEND_ARG_VARIADIC_TYPE_INFO(0, value, IS_STRING, 0)
+ZEND_ARG_VARIADIC_TYPE_INFO(0, value, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_set_output_parameter, 0, 3, IS_VOID, 0)

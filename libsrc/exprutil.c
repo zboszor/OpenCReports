@@ -1178,19 +1178,19 @@ DLL_EXPORT_SYM void ocrpt_expr_set_iterative_start_value(ocrpt_expr *e, bool sta
 	e->iterative_start_with_init = start_with_init;
 }
 
-DLL_EXPORT_SYM const char *ocrpt_expr_get_string_value(ocrpt_expr *e) {
+DLL_EXPORT_SYM const ocrpt_string *ocrpt_expr_get_string(ocrpt_expr *e) {
 	if (!e)
 		return NULL;
 
 	ocrpt_result *r = ocrpt_expr_eval(e);
 
-	if (r && r->type == OCRPT_RESULT_STRING && r->string)
-		return r->string->str;
+	if (r && r->type == OCRPT_RESULT_STRING)
+		return r->string;
 
 	return NULL;
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_set_string_value(ocrpt_expr *e, const char *s) {
+DLL_EXPORT_SYM void ocrpt_expr_set_string(ocrpt_expr *e, const char *s) {
 	if (!e)
 		return;
 
@@ -1199,7 +1199,7 @@ DLL_EXPORT_SYM void ocrpt_expr_set_string_value(ocrpt_expr *e, const char *s) {
 	ocrpt_mem_string_append_len(e->result[e->o->residx]->string, s, strlen(s));
 }
 
-DLL_EXPORT_SYM long ocrpt_expr_get_long_value(ocrpt_expr *e) {
+DLL_EXPORT_SYM long ocrpt_expr_get_long(ocrpt_expr *e) {
 	if (!e)
 		return 0;
 
@@ -1211,7 +1211,7 @@ DLL_EXPORT_SYM long ocrpt_expr_get_long_value(ocrpt_expr *e) {
 	return 0L;
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_set_long_value(ocrpt_expr *e, long l) {
+DLL_EXPORT_SYM void ocrpt_expr_set_long(ocrpt_expr *e, long l) {
 	if (!e)
 		return;
 
@@ -1219,7 +1219,7 @@ DLL_EXPORT_SYM void ocrpt_expr_set_long_value(ocrpt_expr *e, long l) {
 	mpfr_set_si(e->result[e->o->residx]->number, l, e->o->rndmode);
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_string_value(ocrpt_expr *e, int which, const char *s) {
+DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_string(ocrpt_expr *e, int which, const char *s) {
 	if (!e || which < 0 || which >= OCRPT_EXPR_RESULTS)
 		return;
 
@@ -1228,7 +1228,7 @@ DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_string_value(ocrpt_expr *e, int wh
 	ocrpt_mem_string_append_len(e->result[which]->string, s, strlen(s));
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_long_value(ocrpt_expr *e, int which, long l) {
+DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_long(ocrpt_expr *e, int which, long l) {
 	if (!e || which < 0 || which >= OCRPT_EXPR_RESULTS)
 		return;
 
@@ -1236,7 +1236,7 @@ DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_long_value(ocrpt_expr *e, int whic
 	mpfr_set_si(e->result[which]->number, l, e->o->rndmode);
 }
 
-DLL_EXPORT_SYM double ocrpt_expr_get_double_value(ocrpt_expr *e) {
+DLL_EXPORT_SYM double ocrpt_expr_get_double(ocrpt_expr *e) {
 	if (!e)
 		return 0.0;
 
@@ -1248,7 +1248,7 @@ DLL_EXPORT_SYM double ocrpt_expr_get_double_value(ocrpt_expr *e) {
 	return 0.0;
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_set_double_value(ocrpt_expr *e, double d) {
+DLL_EXPORT_SYM void ocrpt_expr_set_double(ocrpt_expr *e, double d) {
 	if (!e)
 		return;
 
@@ -1256,12 +1256,68 @@ DLL_EXPORT_SYM void ocrpt_expr_set_double_value(ocrpt_expr *e, double d) {
 	mpfr_set_d(e->result[e->o->residx]->number, d, e->o->rndmode);
 }
 
-DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_double_value(ocrpt_expr *e, int which, double d) {
+DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_double(ocrpt_expr *e, int which, double d) {
 	if (!e || which < 0 || which >= OCRPT_EXPR_RESULTS)
 		return;
 
 	ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
 	mpfr_set_d(e->result[which]->number, d, e->o->rndmode);
+}
+
+DLL_EXPORT_SYM mpfr_ptr ocrpt_expr_get_number(ocrpt_expr *e) {
+	if (!e)
+		return NULL;
+
+	ocrpt_result *r = ocrpt_expr_eval(e);
+
+	if (r && r->type == OCRPT_RESULT_NUMBER)
+		return r->number;
+
+	return NULL;
+}
+
+DLL_EXPORT_SYM ocrpt_string *ocrpt_expr_get_number_as_string(ocrpt_expr *e, const char *format) {
+	if (!e)
+		return NULL;
+
+	ocrpt_result *r = ocrpt_expr_eval(e);
+
+	if (r && r->type == OCRPT_RESULT_NUMBER) {
+		if (!format)
+			format = "%RF";
+
+		size_t len = mpfr_snprintf(NULL, 0, format, r->number);
+		ocrpt_string *s = ocrpt_mem_string_new_with_len("", len + 1);
+		mpfr_snprintf(s->str, s->len, "%RF", r->number);
+
+		return s;
+	}
+
+	return NULL;
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_set_number(ocrpt_expr *e, mpfr_ptr m) {
+	if (!e || !m)
+		return;
+
+	ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
+	mpfr_set(e->result[e->o->residx]->number, m, e->o->rndmode);
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_set_number_from_string(ocrpt_expr *e, const char *s) {
+	if (!e || !s)
+		return;
+
+	ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
+	mpfr_set_str(e->result[e->o->residx]->number, s, 10, e->o->rndmode);
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_set_nth_result_number_from_string(ocrpt_expr *e, int which, const char *n) {
+	if (!e || which < 0 || which >= OCRPT_EXPR_RESULTS || !n)
+		return;
+
+	ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
+	mpfr_set_str(e->result[which]->number, n, 10, e->o->rndmode);
 }
 
 static bool ocrpt_expr_get_precalculate_worker(ocrpt_expr *e, int32_t depth) {
@@ -1365,6 +1421,20 @@ DLL_EXPORT_SYM mpfr_ptr ocrpt_result_get_number(ocrpt_result *result) {
 	return result->number;
 }
 
+DLL_EXPORT_SYM ocrpt_string *ocrpt_result_get_number_as_string(ocrpt_result *result, const char *format) {
+	if (!result || result->isnull || result->type != OCRPT_RESULT_NUMBER || !result->number_initialized)
+		return NULL;
+
+	if (!format)
+		format = "%RF";
+
+	size_t len = mpfr_snprintf(NULL, 0, format, result->number);
+	ocrpt_string *s = ocrpt_mem_string_new_with_len("", len + 1);
+	mpfr_snprintf(s->str, s->len, "%RF", result->number);
+
+	return s;
+}
+
 DLL_EXPORT_SYM void ocrpt_result_set_long(ocrpt_result *result, long value) {
 	if (!result)
 		return;
@@ -1391,6 +1461,34 @@ DLL_EXPORT_SYM void ocrpt_result_set_double(ocrpt_result *result, double value) 
 	}
 
 	mpfr_set_d(result->number, value, result->o->rndmode);
+}
+
+DLL_EXPORT_SYM void ocrpt_result_set_number(ocrpt_result *result, mpfr_ptr value) {
+	if (!result)
+		return;
+
+	result->type = OCRPT_RESULT_NUMBER;
+	result->isnull = false;
+	if (!result->number_initialized) {
+		result->number_initialized = true;
+		mpfr_init2(result->number, result->o->prec);
+	}
+
+	mpfr_set(result->number, value, result->o->rndmode);
+}
+
+DLL_EXPORT_SYM void ocrpt_result_set_number_from_string(ocrpt_result *result, const char *value) {
+	if (!result)
+		return;
+
+	result->type = OCRPT_RESULT_NUMBER;
+	result->isnull = false;
+	if (!result->number_initialized) {
+		result->number_initialized = true;
+		mpfr_init2(result->number, result->o->prec);
+	}
+
+	mpfr_set_str(result->number, value, 10, result->o->rndmode);
 }
 
 DLL_EXPORT_SYM bool ocrpt_result_isstring(ocrpt_result *result) {
