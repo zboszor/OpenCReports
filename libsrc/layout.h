@@ -236,14 +236,6 @@ static inline void ocrpt_layout_output_position_pop(ocrpt_output *output) {
 	}
 }
 
-static inline uint32_t ocrpt_layout_get_page_nr(opencreport *o, cairo_surface_t *cs) {
-	uint32_t p = 1;
-	for (ocrpt_list *pl = o->pages; pl; pl = pl->next, p++)
-		if (pl->data == cs)
-			return p;
-	return 0;
-}
-
 ocrpt_expr *ocrpt_layout_expr_parse(opencreport *o, ocrpt_report *r, const char *expr, bool report, bool create_string);
 
 void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, double page_width, double page_indent, double *page_position);
