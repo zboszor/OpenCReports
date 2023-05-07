@@ -798,7 +798,8 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 		/* Set newpage to false first to prevent infinite recursion. */
 		*newpage = false;
-		ocrpt_layout_add_new_page(o, p, pr, pd, r, rows, newpage, page_indent, page_position, old_page_position);
+		if (o->output_functions.add_new_page)
+			o->output_functions.add_new_page(o, p, pr, pd, r, rows, newpage, page_indent, page_position, old_page_position);
 
 		if (!pr->start_page && !r->current_iteration) {
 			pr->start_page = o->current_page;
@@ -903,7 +904,8 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 			/* Set newpage to false first to prevent infinite recursion. */
 			*newpage = false;
-			ocrpt_layout_add_new_page(o, p, pr, pd, r, rows, newpage, page_indent, &new_page_position, old_page_position);
+			if (o->output_functions.add_new_page)
+				o->output_functions.add_new_page(o, p, pr, pd, r, rows, newpage, page_indent, &new_page_position, old_page_position);
 
 			pd->max_page_position = 0.0;
 		} else if (pd && !pd->finished) {
@@ -1023,74 +1025,6 @@ void ocrpt_layout_output_highprio_fieldheader(opencreport *o, ocrpt_part *p, ocr
 			ocrpt_layout_output(o, p, pr, pd, r, &r->fieldheader, rows, newpage, page_indent, page_position, old_page_position);
 		}
 	}
-}
-
-void ocrpt_layout_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, unsigned int rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
-	if (o->precalculate) {
-		if (!o->current_page) {
-			if (!o->pages) {
-				void *page = ocrpt_layout_new_page(o, p->paper, p->landscape);
-				o->pages = ocrpt_list_end_append(o->pages, &o->last_page, page);
-			}
-			o->current_page = o->pages;
-		} else {
-			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
-			void *page = ocrpt_layout_new_page(o, p->paper, p->landscape);
-			o->pages = ocrpt_list_end_append(o->pages, &o->last_page, page);
-			o->current_page = o->last_page;
-		}
-
-		if (mpfr_cmp(o->totpages->number, o->pageno->number) < 0)
-			mpfr_set(o->totpages->number, o->pageno->number, o->rndmode);
-	} else {
-		if (!o->current_page) {
-			o->current_page = o->pages;
-		} else {
-			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
-			o->current_page = o->current_page->next;
-		}
-	}
-
-	*page_position = ocrpt_layout_top_margin(o, p);
-	if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && o->current_page != o->pages)) {
-		ocrpt_layout_output_evaluate(&p->pageheader);
-		ocrpt_layout_output_init(&p->pageheader);
-		ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, page_position);
-		ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, page_position);
-	}
-
-	if (rows == 1 && !pr->start_page) {
-		if (r) {
-			if (r->current_iteration == 0) {
-				pr->start_page = o->current_page;
-				pr->start_page_position = *page_position;
-				pd->start_page_position = *page_position;
-			}
-			if (pd->border_width_expr)
-				*page_position += pd->border_width;
-			ocrpt_layout_output_init(&r->reportheader);
-			ocrpt_layout_output(o, p, pr, pd, r, &r->reportheader, rows, newpage, page_indent, page_position, old_page_position);
-		}
-	} else {
-		pd->start_page_position = *page_position;
-		if (pd->border_width_expr)
-			*page_position += pd->border_width;
-	}
-	ocrpt_layout_output_highprio_fieldheader(o, p, pr, pd, r, rows, newpage, page_indent, page_position, old_page_position);
-}
-
-void *ocrpt_layout_new_page(opencreport *o, const ocrpt_paper *paper, bool landscape) {
-	cairo_rectangle_t page = { .x = 0.0, .y = 0.0 };
-
-	if (landscape) {
-		page.width = paper->height;
-		page.height = paper->width;
-	} else {
-		page.width = paper->width;
-		page.height = paper->height;
-	}
-
-	return cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, &page);
 }
 
 ocrpt_expr *ocrpt_layout_expr_parse(opencreport *o, ocrpt_report *r, const char *expr, bool report, bool create_string) {

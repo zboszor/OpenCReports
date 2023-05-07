@@ -23,6 +23,98 @@
 #include "parts.h"
 #include "pdf.h"
 
+static cairo_surface_t *ocrpt_pdf_new_page(opencreport *o, const ocrpt_paper *paper, bool landscape) {
+	cairo_rectangle_t page = { .x = 0.0, .y = 0.0 };
+
+	if (landscape) {
+		page.width = paper->height;
+		page.height = paper->width;
+	} else {
+		page.width = paper->width;
+		page.height = paper->height;
+	}
+
+	return cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, &page);
+}
+
+static inline void ocrpt_cairo_create(opencreport *o) {
+	if (o->current_page) {
+		if (o->cr) {
+			if (o->drawing_page != o->current_page) {
+				cairo_destroy(o->cr);
+				o->cr = cairo_create((cairo_surface_t *)o->current_page->data);
+				o->drawing_page = o->current_page;
+			}
+		} else
+			o->cr = cairo_create((cairo_surface_t *)o->current_page->data);
+	} else {
+		if (!o->nullpage_cs)
+			o->nullpage_cs = ocrpt_pdf_new_page(o, o->paper, false);
+		if (o->cr) {
+			if (o->drawing_page != o->current_page) {
+				cairo_destroy(o->cr);
+				o->cr = cairo_create(o->nullpage_cs);
+				o->drawing_page = o->current_page;
+			}
+		} else
+			o->cr = cairo_create(o->nullpage_cs);
+	}
+}
+
+static void ocrpt_pdf_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, unsigned int rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
+	if (o->precalculate) {
+		if (!o->current_page) {
+			if (!o->pages) {
+				cairo_surface_t *page = ocrpt_pdf_new_page(o, p->paper, p->landscape);
+				o->pages = ocrpt_list_end_append(o->pages, &o->last_page, page);
+			}
+			o->current_page = o->pages;
+		} else {
+			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
+			cairo_surface_t *page = ocrpt_pdf_new_page(o, p->paper, p->landscape);
+			o->pages = ocrpt_list_end_append(o->pages, &o->last_page, page);
+			o->current_page = o->last_page;
+		}
+
+		if (mpfr_cmp(o->totpages->number, o->pageno->number) < 0)
+			mpfr_set(o->totpages->number, o->pageno->number, o->rndmode);
+	} else {
+		if (!o->current_page) {
+			o->current_page = o->pages;
+		} else {
+			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
+			o->current_page = o->current_page->next;
+		}
+	}
+
+	*page_position = ocrpt_layout_top_margin(o, p);
+	if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && o->current_page != o->pages)) {
+		ocrpt_layout_output_evaluate(&p->pageheader);
+		ocrpt_layout_output_init(&p->pageheader);
+		ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, page_position);
+		ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, page_position);
+	}
+
+	if (rows == 1 && !pr->start_page) {
+		if (r) {
+			if (r->current_iteration == 0) {
+				pr->start_page = o->current_page;
+				pr->start_page_position = *page_position;
+				pd->start_page_position = *page_position;
+			}
+			if (pd->border_width_expr)
+				*page_position += pd->border_width;
+			ocrpt_layout_output_init(&r->reportheader);
+			ocrpt_layout_output(o, p, pr, pd, r, &r->reportheader, rows, newpage, page_indent, page_position, old_page_position);
+		}
+	} else {
+		pd->start_page_position = *page_position;
+		if (pd->border_width_expr)
+			*page_position += pd->border_width;
+	}
+	ocrpt_layout_output_highprio_fieldheader(o, p, pr, pd, r, rows, newpage, page_indent, page_position, old_page_position);
+}
+
 static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_indent, double x, double y, double w, double h) {
 	ocrpt_image_file *img_file = img->img_file;
 
@@ -574,6 +666,7 @@ void ocrpt_pdf_finalize(opencreport *o) {
 
 void ocrpt_pdf_init(opencreport *o) {
 	memset(&o->output_functions, 0, sizeof(ocrpt_output_functions));
+	o->output_functions.add_new_page = ocrpt_pdf_add_new_page;
 	o->output_functions.draw_hline = ocrpt_pdf_draw_hline;
 	o->output_functions.set_font_sizes = ocrpt_pdf_set_font_sizes;
 	o->output_functions.get_text_sizes = ocrpt_pdf_get_text_sizes;
