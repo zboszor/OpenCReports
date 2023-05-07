@@ -23,14 +23,6 @@
 #include "parts.h"
 #include "pdf.h"
 
-static cairo_status_t ocrpt_write_pdf(void *closure, const unsigned char *data, unsigned int length) {
-	opencreport *o = closure;
-
-	ocrpt_mem_string_append_len_binary(o->output_buffer, (char *)data, length);
-
-	return CAIRO_STATUS_SUCCESS;
-}
-
 static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_indent, double x, double y, double w, double h) {
 	ocrpt_image_file *img_file = img->img_file;
 
@@ -484,6 +476,14 @@ void ocrpt_pdf_draw_rectangle(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 	cairo_set_line_width(o->cr, line_width);
 	cairo_rectangle(o->cr, x, y, width, height);
 	cairo_stroke(o->cr);
+}
+
+static cairo_status_t ocrpt_write_pdf(void *closure, const unsigned char *data, unsigned int length) {
+	opencreport *o = closure;
+
+	ocrpt_mem_string_append_len_binary(o->output_buffer, (char *)data, length);
+
+	return CAIRO_STATUS_SUCCESS;
 }
 
 void ocrpt_pdf_finalize(opencreport *o) {
