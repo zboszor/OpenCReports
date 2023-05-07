@@ -8,6 +8,7 @@
 #ifndef _OUTPUT_H_
 #define _OUTPUT_H_
 
+#include <stdbool.h>
 #include <cairo.h>
 #include <pango/pangocairo.h>
 
@@ -19,6 +20,9 @@ typedef struct ocrpt_color ocrpt_color;
 
 struct ocrpt_output_functions {
 	void (*add_new_page)(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, unsigned int rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position);
+	void *(*get_current_page)(opencreport *o);
+	void (*set_current_page)(opencreport *o, void *page);
+	bool (*is_current_page_first)(opencreport *o);
 	void (*draw_hline)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *, ocrpt_hline *, double, double, double, double);
 	void (*set_font_sizes)(opencreport *o, const char *font, double wanted_font_size, bool bold, bool italic, double *result_font_size, double *result_font_width);
 	void (*get_text_sizes)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *, ocrpt_line *, ocrpt_text *, double);

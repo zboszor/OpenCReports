@@ -209,7 +209,6 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	ocrpt_list_free_deep(o->mvarlist, ocrpt_free_mvarentry);
 	ocrpt_list_free_deep(o->search_paths, ocrpt_free_search_path);
 	ocrpt_list_free_deep(o->images, ocrpt_image_free);
-	ocrpt_list_free_deep(o->pages, (ocrpt_mem_free_t)cairo_surface_destroy);
 
 	gmp_randclear(o->randstate);
 	ocrpt_mem_string_free(o->converted, true);
@@ -227,9 +226,6 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	ocrpt_mem_free(o->textdomain);
 	ocrpt_mem_free(o->xlate_domain_s);
 	ocrpt_mem_free(o->xlate_dir_s);
-
-	cairo_destroy(o->cr);
-	cairo_surface_destroy(o->nullpage_cs);
 
 	ocrpt_mem_free(o);
 }
@@ -293,7 +289,8 @@ DLL_EXPORT_SYM bool ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb fu
 
 static void ocrpt_print_reportheader(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, uint32_t rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
 	if (!pr->start_page && !r->current_iteration) {
-		pr->start_page = o->current_page;
+		if (o->output_functions.get_current_page)
+			pr->start_page = o->output_functions.get_current_page(o);
 		pr->start_page_position = *page_position;
 		pd->start_page_position = *page_position;
 	}
@@ -910,7 +907,8 @@ static void ocrpt_execute_parts(opencreport *o) {
 	double page_position = 0.0;
 	double old_page_position = 0.0;
 
-	o->current_page = NULL;
+	if (o->output_functions.set_current_page)
+		o->output_functions.set_current_page(o, NULL);
 	mpfr_set_ui(o->pageno->number, 1, o->rndmode);
 
 	ocrpt_execute_evaluate_global_params(o);
@@ -959,8 +957,10 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 				if (newpage)
 					pr->start_page = NULL;
-				else
-					pr->start_page = o->current_page;
+				else {
+					if (o->output_functions.get_current_page)
+						pr->start_page = o->output_functions.get_current_page(o);
+				}
 				pr->start_page_position = page_position;
 				pr->end_page = NULL;
 				pr->end_page_position = 0.0;
@@ -1015,7 +1015,8 @@ static void ocrpt_execute_parts(opencreport *o) {
 						continue;
 
 					if (pdl != pr->pd_list) {
-						o->current_page = pr->start_page;
+						if (o->output_functions.set_current_page)
+							o->output_functions.set_current_page(o, pr->start_page);
 						page_position = pr->start_page_position;
 					}
 					pd->start_page_position = pr->start_page_position;
@@ -1202,10 +1203,14 @@ static void ocrpt_execute_parts(opencreport *o) {
 						page_position += pd->border_width;
 
 					if (!pr->end_page) {
-						pr->end_page = o->current_page;
+						if (o->output_functions.get_current_page)
+							pr->end_page = o->output_functions.get_current_page(o);
 						pr->end_page_position = page_position;
 					} else {
-						if (pr->end_page == o->current_page) {
+						void *currpage = NULL;
+						if (o->output_functions.get_current_page)
+							currpage = o->output_functions.get_current_page(o);
+						if (pr->end_page == currpage) {
 							if (pr->end_page_position < page_position)
 								pr->end_page_position = page_position;
 						} else {
@@ -1213,13 +1218,13 @@ static void ocrpt_execute_parts(opencreport *o) {
 							bool earlier = false;
 
 							for (pagel = pr->start_page; pagel && pagel != pr->end_page; pagel = pagel->next) {
-								if (pagel == o->current_page) {
+								if (pagel == currpage) {
 									earlier = true;
 									break;
 								}
 							}
 							if (!earlier) {
-								pr->end_page = o->current_page;
+								pr->end_page = currpage;
 								pr->end_page_position = page_position;
 							}
 						}
@@ -1229,7 +1234,8 @@ static void ocrpt_execute_parts(opencreport *o) {
 					page_indent += pd->real_width;
 				}
 
-				o->current_page = pr->end_page;
+				if (o->output_functions.set_current_page)
+					o->output_functions.set_current_page(o, pr->end_page);
 				page_position = pr->end_page_position;
 			}
 

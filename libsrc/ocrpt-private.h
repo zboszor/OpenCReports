@@ -109,13 +109,8 @@ struct opencreport {
 
 	/* Page handling for PDF output, lists of cairo_surface_t pointers */
 	ocrpt_output_functions output_functions;
+	void *output_private;
 	ocrpt_list *images;
-	ocrpt_list *pages;
-	ocrpt_list *last_page;
-	ocrpt_list *current_page;
-	ocrpt_list *drawing_page;
-	cairo_surface_t *nullpage_cs;
-	cairo_t *cr;
 
 	/* The result of date() and now() functions */
 	ocrpt_result *current_date;

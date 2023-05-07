@@ -8,6 +8,16 @@
 
 #include "opencreport.h"
 
+struct pdf_private_data {
+	ocrpt_list *pages;
+	ocrpt_list *last_page;
+	ocrpt_list *current_page;
+	ocrpt_list *drawing_page;
+	cairo_surface_t *nullpage_cs;
+	cairo_t *cr;
+};
+typedef struct pdf_private_data pdf_private_data;
+
 void ocrpt_pdf_init(opencreport *o);
 
 #endif

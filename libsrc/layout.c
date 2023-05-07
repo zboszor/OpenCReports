@@ -779,11 +779,11 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	bool page_break = false;
 
 	if (*newpage) {
-		if (o->current_page) {
+		if ((o->output_functions.get_current_page && o->output_functions.get_current_page(o)) || !o->output_functions.get_current_page) {
 			ocrpt_layout_output_evaluate(&p->pageheader);
 			ocrpt_layout_output_evaluate(&p->pagefooter);
 
-			if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && o->current_page != o->pages)) {
+			if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && !o->output_functions.is_current_page_first(o))) {
 				double top_page_position = ocrpt_layout_top_margin(o, p);
 				ocrpt_layout_output_init(&p->pageheader);
 				ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &top_page_position);
@@ -802,7 +802,8 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			o->output_functions.add_new_page(o, p, pr, pd, r, rows, newpage, page_indent, page_position, old_page_position);
 
 		if (!pr->start_page && !r->current_iteration) {
-			pr->start_page = o->current_page;
+			if (o->output_functions.get_current_page)
+				pr->start_page = o->output_functions.get_current_page(o);
 			pr->start_page_position = *page_position;
 			pr->end_page_position = *page_position;
 			pd->start_page_position = *page_position;
@@ -826,7 +827,8 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	 * 2. In the second round, Set o->precalculate to what it was and if it's false then draw
 	 *    the section.
 	 */
-	old_current_page = o->current_page;
+	if (o->output_functions.get_current_page)
+		old_current_page = o->output_functions.get_current_page(o);
 	*old_page_position = new_page_position = *page_position;
 
 	ocrpt_layout_output_position_push(output);
@@ -923,7 +925,8 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	}
 
 	if (!page_break && !memo_break) {
-		o->current_page = old_current_page;
+		if (o->output_functions.set_current_page)
+			o->output_functions.set_current_page(o, old_current_page);
 		new_page_position = *old_page_position;
 	}
 
