@@ -162,7 +162,6 @@ struct ocrpt_output_element {
 typedef struct ocrpt_output_element ocrpt_output_element;
 
 void *ocrpt_layout_new_page(opencreport *o, const ocrpt_paper *paper, bool landscape);
-void ocrpt_layout_set_font_sizes(opencreport *o, const char *font, double wanted_font_size, bool bold, bool italic, double *result_font_size, double *result_font_width);
 void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output);
 void ocrpt_layout_output_resolve(ocrpt_output *output);
 void ocrpt_layout_output_evaluate(ocrpt_output *output);

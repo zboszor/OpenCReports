@@ -671,7 +671,8 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 		double font_size = ocrpt_expr_get_double(p->font_size_expr);
 
 		p->font_size = (font_size > 0.0 ? font_size : o->font_size);
-		ocrpt_layout_set_font_sizes(o, p->font_name, p->font_size, false, false, NULL, &p->font_width);
+		if (o->output_functions.set_font_sizes)
+			o->output_functions.set_font_sizes(o, p->font_name, p->font_size, false, false, NULL, &p->font_width);
 	} else {
 		p->font_size = o->font_size;
 		p->font_width = o->font_width;
@@ -1038,9 +1039,10 @@ static void ocrpt_execute_parts(opencreport *o) {
 						ocrpt_report *r = (ocrpt_report *)rl->data;
 						ocrpt_list *cbl;
 
-						if (r->font_size_expr)
-							ocrpt_layout_set_font_sizes(o, r->font_name ? r->font_name : p->font_name, r->font_size, false, false, NULL, &r->font_width);
-						else {
+						if (r->font_size_expr) {
+							if (o->output_functions.set_font_sizes)
+								o->output_functions.set_font_sizes(o, r->font_name ? r->font_name : p->font_name, r->font_size, false, false, NULL, &r->font_width);
+						} else {
 							r->font_size = p->font_size;
 							r->font_width = p->font_width;
 						}
@@ -1286,7 +1288,8 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	o->current_timestamp->time_valid = true;
 
 	/* Set global default font sizes */
-	ocrpt_layout_set_font_sizes(o, "Courier", OCRPT_DEFAULT_FONT_SIZE, false, false, &o->font_size, &o->font_width);
+	if (o->output_functions.set_font_sizes)
+		o->output_functions.set_font_sizes(o, "Courier", OCRPT_DEFAULT_FONT_SIZE, false, false, &o->font_size, &o->font_width);
 
 	/* Run all reports in precalculate mode if needed */
 	o->precalculate = true;
