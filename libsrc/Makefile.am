@@ -41,7 +41,8 @@ libopencreport_la_SOURCES = \
 	api.c free.c parsexml.c datasource.c environment.c \
 	array-source.c db-source.c navigation.c breaks.c \
 	parts.c variables.c strfmon.c datetime.c formatting.c \
-	layout.c color.c pdf.c
+	layout.c color.c pdf-output.c html-output.c txt-output.c \
+	xml-output.c csv-output.c
 
 libopencreport_la_LIBADD = \
 	libopencreport_grammar.la \

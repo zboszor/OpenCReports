@@ -21,7 +21,7 @@
 #include "formatting.h"
 #include "layout.h"
 #include "parts.h"
-#include "pdf.h"
+#include "pdf-output.h"
 
 static cairo_surface_t *ocrpt_pdf_new_page(opencreport *o, const ocrpt_paper *paper, bool landscape) {
 	cairo_rectangle_t page = { .x = 0.0, .y = 0.0 };

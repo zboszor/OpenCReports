@@ -40,7 +40,11 @@
 #include "parsexml.h"
 #include "color.h"
 #include "layout.h"
-#include "pdf.h"
+#include "pdf-output.h"
+#include "html-output.h"
+#include "txt-output.h"
+#include "csv-output.h"
+#include "xml-output.h"
 
 static int ocrpt_stderr_printf(const char *fmt, ...) {
 	va_list ap;
@@ -1281,7 +1285,17 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	case OCRPT_OUTPUT_PDF:
 		ocrpt_pdf_init(o);
 		break;
-	default:
+	case OCRPT_OUTPUT_HTML:
+		ocrpt_html_init(o);
+		break;
+	case OCRPT_OUTPUT_TXT:
+		ocrpt_txt_init(o);
+		break;
+	case OCRPT_OUTPUT_CSV:
+		ocrpt_csv_init(o);
+		break;
+	case OCRPT_OUTPUT_XML:
+		ocrpt_xml_init(o);
 		break;
 	}
 
