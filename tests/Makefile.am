@@ -130,11 +130,11 @@ SLOW_PHP_TESTS = \
 # All PDF output tests are inherently unstable because Cairo:
 # * sets the /Producer PDF property with its own name and version
 # * different Cairo versions support different PDF versions
-# So they need to be treated differently: execute_pdf_test.sh
+# So they need to be treated differently: execute_layout_test.sh
 # converts the PDF pages to individual PNGs which are then
 # compared with the ImageMagick "compare" utility. This slows down
 # running these tests but makes them reliable across Cairo versions.
-PDF_TESTS = \
+LAYOUT_TESTS = \
 	layout_pdf_xml_test \
 	layout_pdf_xml2_test \
 	layout_pdf_xml3_test \
@@ -188,7 +188,7 @@ PDF_TESTS = \
 	page_header_footer_vars_test \
 	break_suppressblank_test
 
-PHP_PDF_TESTS = \
+PHP_LAYOUT_TESTS = \
 	layout_pdf_xml_test \
 	layout_pdf_xml2_test \
 	layout_pdf_xml3_test \
@@ -245,11 +245,11 @@ XLATE_DEPS = \
 .po.mo:
 	$(MSGFMT) -o $@ $(srcdir)/$<
 
-PDF_TESTS += \
+LAYOUT_TESTS += \
 	layout_pdf_translate1_test \
 	layout_pdf_translate_xml1_test
 
-PHP_PDF_TESTS += \
+PHP_LAYOUT_TESTS += \
 	layout_pdf_translate1_test \
 	layout_pdf_translate_xml1_test
 
@@ -263,7 +263,7 @@ UNSTABLE_TESTS = \
 	paper_test \
 	now_test
 
-noinst_PROGRAMS = $(TESTS) $(SLOW_TESTS) $(PDF_TESTS) $(UNSTABLE_TESTS)
+noinst_PROGRAMS = $(TESTS) $(SLOW_TESTS) $(LAYOUT_TESTS) $(UNSTABLE_TESTS)
 
 $(noinst_PROGRAMS): $(top_builddir)/libsrc/libopencreport.la
 
@@ -277,11 +277,11 @@ php-basic-test: execute_php_test.sh
 
 if ENABLE_PDF_TESTS
 
-pdf-test: $(PDF_TESTS) $(XLATE_DEPS) execute_pdf_test.sh
-	$(foreach TEST,$(PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_pdf_test.sh $(TEST) &&) true
+pdf-test: $(LAYOUT_TESTS) $(XLATE_DEPS) execute_layout_test.sh
+	$(foreach TEST,$(LAYOUT_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_layout_test.sh $(TEST) &&) true
 
-php-pdf-test: $(XLATE_DEPS) execute_php_pdf_test.sh
-	$(foreach TEST,$(PHP_PDF_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_php_pdf_test.sh $(TEST) &&) true
+php-pdf-test: $(XLATE_DEPS) execute_php_layout_test.sh
+	$(foreach TEST,$(PHP_LAYOUT_TESTS),ASAN_OPTIONS="log_path=results/$(TEST).asanout,fast_unwind_on_malloc=0" UBSAN_OPTIONS=print_stacktrace=true LSAN_OPTIONS=suppressions=$(top_srcdir)/fontconfig.supp abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) ./execute_php_layout_test.sh $(TEST) &&) true
 
 else
 
