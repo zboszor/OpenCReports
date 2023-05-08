@@ -11,7 +11,7 @@
 #include <opencreport.h>
 #include "test_common.h"
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds;
 	ocrpt_query *q;

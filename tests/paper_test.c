@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <opencreport.h>
 
-int main(void) {
+int main(int argc, char **argv) {
 	const ocrpt_paper *p;
 	void *p_iter;
 	opencreport *o = ocrpt_init();

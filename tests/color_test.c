@@ -10,7 +10,7 @@
 
 #include <opencreport.h>
 
-int main(void) {
+int main(int argc, char **argv) {
 	char *colornames[] = { "Black", "Red", "bobkratz", NULL };
 	int i;
 

@@ -11,7 +11,7 @@
 
 #include <opencreport.h>
 
-int main(void) {
+int main(int argc, char **argv) {
 	char srcdir0[PATH_MAX];
 	char *abs_srcdir = getenv("abs_srcdir");
 	if (!abs_srcdir || !*abs_srcdir)

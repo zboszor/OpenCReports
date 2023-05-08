@@ -47,7 +47,7 @@ static char *test_vars[] = {
 
 #define N_TEST_VARS (sizeof(test_vars) / sizeof(char *))
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_query *q;
 	ocrpt_query_result *qr;

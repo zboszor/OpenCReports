@@ -9,7 +9,7 @@
 #include <opencreport.h>
 #include "test_common.h"
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add_odbc(o, "odbc", "ocrpttest2", "ocrpt", NULL);
 	ocrpt_datasource *ds2 = ocrpt_datasource_add_odbc(o, "odbc2", "ocrpttest2", "ocrpt", NULL);

@@ -8,7 +8,7 @@
 
 #include <opencreport.h>
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add_postgresql2(o, "pgsql", "dbname=ocrpttest user=ocrpt");
 

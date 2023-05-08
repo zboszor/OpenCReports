@@ -21,7 +21,7 @@
 
 #include <opencreport.h>
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o1 = ocrpt_init();
 	opencreport *o2 = ocrpt_init();
 	locale_t o1l, o2l;

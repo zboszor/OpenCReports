@@ -29,7 +29,7 @@ static const char *array2[ROWS1 + 1][COLS] = {
 	{ "1", "Barney Rubble", "small", "29", "yes" },
 };
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "array");
 	ocrpt_query *q, *q2;

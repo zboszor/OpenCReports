@@ -28,7 +28,7 @@
 	{ "1", "B5", "Times New Roman", "9", "1", "2", "1", "2" },
 };
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 
 	if (!ocrpt_parse_xml(o, "header_query_test.xml")) {

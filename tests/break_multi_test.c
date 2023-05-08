@@ -40,7 +40,7 @@ static void test_break_trigger_cb(opencreport *o, ocrpt_report *r, ocrpt_break *
 	printf("break '%s' triggered\n", ocrpt_break_get_name(br));
 }
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_query *q;
 	ocrpt_break *br;

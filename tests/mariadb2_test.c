@@ -8,7 +8,7 @@
 
 #include <opencreport.h>
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add_mariadb2(o, "mariadb", "./mariadb/ocrpt.cnf", "ocrpt");
 

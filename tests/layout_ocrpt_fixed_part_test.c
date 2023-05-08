@@ -70,7 +70,7 @@ void precalc_done_cb(opencreport *o, void *data) {
 	yields[3][2] = "190";
 }
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "local_array");
 

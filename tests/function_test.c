@@ -56,7 +56,7 @@ OCRPT_STATIC_FUNCTION(my_dec) {
 	}
 }
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_expr *e1, *e2;
 	char *err;

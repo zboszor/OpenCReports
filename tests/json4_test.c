@@ -45,7 +45,7 @@ void free_exprs(opencreport *o, ocrpt_report *r) {
 	ocrpt_expr_free(adult);
 }
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add_json(o, "json");
 	ocrpt_query *q;

@@ -84,7 +84,7 @@ static void test_report_added_cb(opencreport *o, ocrpt_report *r, void *dummy UN
 	ocrpt_report_add_precalculation_done_cb(r, test_report_precalc_done_cb, NULL);
 }
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 
 	ocrpt_add_precalculation_done_cb(o, test_precalc_done_cb, NULL);

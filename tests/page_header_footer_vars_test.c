@@ -100,7 +100,7 @@ const int32_t coltypes[2] = {
 	OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER
 };
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 
 	if (!ocrpt_parse_xml(o, "page_header_footer_vars_test.xml")) {

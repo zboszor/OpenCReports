@@ -30,7 +30,7 @@ const char *array2[5][5] = {
 	{ "4", "The Great Gazoo", "hostile alien", "1200", "yes" },
 };
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 
 	if (!ocrpt_parse_xml(o, "layout_pdf_xml26_test.xml")) {

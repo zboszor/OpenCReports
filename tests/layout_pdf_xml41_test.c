@@ -29,7 +29,7 @@ const int32_t coltypes[6] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 
-int main(void) {
+int main(int argc, char **argv) {
 	char srcdir0[PATH_MAX];
 	char *abs_srcdir = getenv("abs_srcdir");
 	if (!abs_srcdir || !*abs_srcdir)

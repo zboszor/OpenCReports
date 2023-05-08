@@ -29,7 +29,7 @@ const int32_t coltypes[COLS] = {
 	OCRPT_RESULT_NUMBER, OCRPT_RESULT_STRING, OCRPT_RESULT_NUMBER, OCRPT_RESULT_NUMBER
 };
 
-int main(void) {
+int main(int argc, char **argv) {
 	char blddir0[PATH_MAX];
 	char *abs_builddir = getenv("abs_builddir");
 	if (!abs_builddir || !*abs_builddir)

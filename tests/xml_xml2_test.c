@@ -9,7 +9,7 @@
 #include <opencreport.h>
 #include "test_common.h"
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_query *q;
 	ocrpt_query_result *qr;

@@ -10,7 +10,7 @@
 
 #include "test_common.h"
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_part *p1;
 	ocrpt_part *p2;

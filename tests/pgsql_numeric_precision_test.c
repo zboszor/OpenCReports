@@ -28,7 +28,7 @@ static void test_newrow_cb(opencreport *o, ocrpt_report *r, void *ptr) {
 	}
 }
 
-int main(void) {
+int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds;
 	ocrpt_query *q;
