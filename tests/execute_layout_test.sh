@@ -1,28 +1,8 @@
 #!/bin/bash
 
-TEST=$1
-
-abs_srcdir=${abs_srcdir:-$(pwd)}
-abs_builddir=${abs_builddir:-$(pwd)}
-
-export abs_srcdir abs_builddir
-
-if [[ ! -x ${TEST} ]]; then
-	echo -e "[ \\033[1;31mERROR\\033[0;39m ] ${TEST} - does not exist"
-	exit 0
-fi
-
-OCRPT_TEST=1
-export OCRPT_TEST
-
-mkdir -p ${abs_builddir}/results
-rm -f results/${TEST}.pdf.*.png results/${TEST}.asanout.*
-./${TEST} 2>results/${TEST}.stderr >results/${TEST}.pdf
-
-WARNINGS=
-if [[ -f ${abs_srcdir}/expected/${TEST}.pdf ]]; then
-	OUTEXP=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r150 -sOutputFile=results/${TEST}.pdf.exp.%d.png ${abs_srcdir}/expected/${TEST}.pdf)
-	OUTRES=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r150 -sOutputFile=results/${TEST}.pdf.%d.png results/${TEST}.pdf)
+function compare_pdf () {
+	OUTEXP=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r150 -sOutputFile=results/"${TEST}"."${SFX[$TYPE]}".exp.%d.png "${abs_srcdir}"/expected/"${TEST}"."${SFX[$TYPE]}")
+	OUTRES=$(ghostscript -dNOPAUSE -dBATCH -sDEVICE=png48 -r150 -sOutputFile=results/"${TEST}"."${SFX[$TYPE]}".%d.png results/"${TEST}"."${SFX[$TYPE]}")
 	PAGESEXP=$(echo "$OUTEXP" | grep 'Processing pages .* through')
 	PAGESEXPEND=$(echo "$PAGESEXP" | sed 's/^Processing pages .* through \([^\.]*\).*$/\1/')
 	PAGESRES=$(echo "$OUTRES" | grep 'Processing pages .* through')
@@ -31,8 +11,8 @@ if [[ -f ${abs_srcdir}/expected/${TEST}.pdf ]]; then
 	if [[ $PAGESEXPEND -ne $PAGESRESEND ]]; then
 		OUTDIFF="Number of expected pages ($PAGESEXPEND) differ from the number of result pages ($PAGESRESEND)"
 	else
-		for i in $(seq 1 $PAGESEXPEND) ; do
-			DIFF=$(compare -metric AE -fuzz '1%' results/${TEST}.pdf.exp.${i}.png results/${TEST}.pdf.${i}.png -colorspace RGB results/${TEST}.pdf.${i}.diff.png 2>&1)
+		for i in $(seq 1 "$PAGESEXPEND") ; do
+			DIFF=$(compare -metric AE -fuzz '1%' results/"${TEST}"."${SFX[$TYPE]}".exp."${i}".png results/"${TEST}"."${SFX[$TYPE]}"."${i}".png -colorspace RGB results/"${TEST}"."${SFX[$TYPE]}"."${i}".diff.png 2>&1)
 			DIFF1=$(echo "$DIFF" | sed 's#^\([0-9]*\)compare:.*$#\1#')
 			if [[ $DIFF1 != "0" ]]; then
 				OUTDIFF="Page $i differs"
@@ -47,11 +27,52 @@ if [[ -f ${abs_srcdir}/expected/${TEST}.pdf ]]; then
 			fi
 		done
 	fi
-else
-	OUTDIFF="expected/${TEST}.pdf does not exist"
+}
+
+TEST=$1
+TYPE=$2
+
+abs_srcdir=${abs_srcdir:-$(pwd)}
+abs_builddir=${abs_builddir:-$(pwd)}
+
+export abs_srcdir abs_builddir
+
+if [[ ! -x ${TEST} ]]; then
+	echo -e "[ \\033[1;31mERROR\\033[0;39m ] ${TEST} - does not exist"
+	exit 0
 fi
 
-ERRDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.stderr ${abs_builddir}/results/${TEST}.stderr 2>/dev/null)
+OCRPT_TEST=1
+export OCRPT_TEST
+
+SFX=("unknown" "pdf" "html" "txt" "csv" "xml")
+
+mkdir -p "${abs_builddir}"/results
+case "$TYPE" in
+1)
+	rm -f results/"${TEST}"."${SFX[$TYPE]}".*.png results/"${TEST}"."${SFX[$TYPE]}".asanout.*
+	;;
+*)
+	rm -f results/"${TEST}"."${SFX[$TYPE]}".asanout.*
+	;;
+esac
+"./${TEST}" "${TYPE}" 2>"results/${TEST}.${SFX[$TYPE]}.stderr" >"results/${TEST}.${SFX[$TYPE]}"
+
+WARNINGS=
+if [[ -f ${abs_srcdir}/expected/${TEST}.${SFX[$TYPE]} ]]; then
+	case $TYPE in
+	1)
+		compare_pdf
+		;;
+	*)
+		# TODO
+		;;
+	esac
+else
+	OUTDIFF="expected/${TEST}.${SFX[$TYPE]} does not exist"
+fi
+
+ERRDIFF=$(diff -durpN "${abs_srcdir}/expected/${TEST}.${SFX[$TYPE]}.stderr" "${abs_builddir}/results/${TEST}.${SFX[$TYPE]}.stderr" 2>/dev/null)
 ERRRET=$?
 
 if [[ -n "$OUTDIFF" ]]; then

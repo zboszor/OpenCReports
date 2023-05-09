@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
 	ocrpt_part_add_iteration_cb(p, part_iter_cb, NULL);
 	ocrpt_add_precalculation_done_cb(o, precalc_done_cb, NULL);
 
-	ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);
+	ocrpt_set_output_format(o, argc >= 2 ? atoi(argv[1]) : OCRPT_OUTPUT_PDF);
 
 	ocrpt_execute(o);
 
