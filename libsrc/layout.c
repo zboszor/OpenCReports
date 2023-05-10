@@ -117,56 +117,54 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 	line->ascent = 0.0;
 	line->descent = 0.0;
 	line->maxlines = 1;
+	next_start = 0;
 
-	if (o->output_functions.get_text_sizes) {
-		next_start = 0;
+	for (ocrpt_list *l = line->elements; l; l = l->next) {
+		ocrpt_text *elem = (ocrpt_text *)l->data;
 
-		for (ocrpt_list *l = line->elements; l; l = l->next) {
-			ocrpt_text *elem = (ocrpt_text *)l->data;
+		switch (elem->le_type) {
+		case OCRPT_OUTPUT_LE_TEXT:
+			ocrpt_layout_compute_text(o, elem);
 
-			switch (elem->le_type) {
-			case OCRPT_OUTPUT_LE_TEXT:
-				ocrpt_layout_compute_text(o, elem);
-
+			if (o->output_functions.get_text_sizes)
 				o->output_functions.get_text_sizes(o, p, pr, pd, r, output, line, elem, page_width - ((pd && pd->border_width_expr) ? 2 * pd->border_width: 0.0));
 
-				elem->start = next_start;
-				next_start += elem->width_computed;
+			elem->start = next_start;
+			next_start += elem->width_computed;
 
-				if (line->ascent < elem->ascent)
-					line->ascent = elem->ascent;
-				if (line->descent < elem->descent)
-					line->descent = elem->descent;
+			if (line->ascent < elem->ascent)
+				line->ascent = elem->ascent;
+			if (line->descent < elem->descent)
+				line->descent = elem->descent;
 
-				if (line->maxlines < elem->lines)
-					line->maxlines = elem->lines;
+			if (line->maxlines < elem->lines)
+				line->maxlines = elem->lines;
 
-				output->has_memo = output->has_memo || (elem->memo && (elem->lines > 1));
-				break;
-			case OCRPT_OUTPUT_LE_IMAGE: {
-				ocrpt_image *img = (ocrpt_image *)elem;
-				img->start = next_start;
+			output->has_memo = output->has_memo || (elem->memo && (elem->lines > 1));
+			break;
+		case OCRPT_OUTPUT_LE_IMAGE: {
+			ocrpt_image *img = (ocrpt_image *)elem;
+			img->start = next_start;
 
-				ocrpt_layout_image_setup(o, p, pr, pd, r, output, line, img, page_width, img->start, page_position);
+			ocrpt_layout_image_setup(o, p, pr, pd, r, output, line, img, page_width, img->start, page_position);
 
-				if (img->text_width && img->text_width->result[o->residx] && img->text_width->result[o->residx]->type == OCRPT_RESULT_NUMBER && img->text_width->result[o->residx]->number_initialized)
-					img->image_text_width = mpfr_get_d(img->text_width->result[o->residx]->number, o->rndmode);
-				else if (img->width && img->width->result[o->residx] && img->width->result[o->residx]->type == OCRPT_RESULT_NUMBER && img->width->result[o->residx]->number_initialized)
-					img->image_text_width = mpfr_get_d(img->width->result[o->residx]->number, o->rndmode);
-				else
-					img->image_text_width = 0.0;
+			if (img->text_width && img->text_width->result[o->residx] && img->text_width->result[o->residx]->type == OCRPT_RESULT_NUMBER && img->text_width->result[o->residx]->number_initialized)
+				img->image_text_width = mpfr_get_d(img->text_width->result[o->residx]->number, o->rndmode);
+			else if (img->width && img->width->result[o->residx] && img->width->result[o->residx]->type == OCRPT_RESULT_NUMBER && img->width->result[o->residx]->number_initialized)
+				img->image_text_width = mpfr_get_d(img->width->result[o->residx]->number, o->rndmode);
+			else
+				img->image_text_width = 0.0;
 
-				if (!o->size_in_points)
-					img->image_text_width *= line->font_width;
+			if (!o->size_in_points)
+				img->image_text_width *= line->font_width;
 
-				next_start += img->image_text_width;
+			next_start += img->image_text_width;
 
-				break;
-			}
-			case OCRPT_OUTPUT_LE_BARCODE:
-				/* TODO */
-				break;
-			}
+			break;
+		}
+		case OCRPT_OUTPUT_LE_BARCODE:
+			/* TODO */
+			break;
 		}
 	}
 
