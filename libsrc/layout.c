@@ -33,7 +33,7 @@
 
 static void ocrpt_layout_image_setup(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, ocrpt_image *image, double page_width, double page_indent, double *page_position);
 
-ocrpt_string *ocrpt_layout_compute_text(opencreport *o, ocrpt_text *le) {
+void ocrpt_layout_compute_text(opencreport *o, ocrpt_text *le) {
 	bool has_translate = false;
 	bool has_format = false;
 	bool has_value = false;
@@ -109,8 +109,6 @@ ocrpt_string *ocrpt_layout_compute_text(opencreport *o, ocrpt_text *le) {
 		ocrpt_format_string(o, NULL, rstring, fstring, &le->value, 1);
 
 	assert(rstring);
-
-	return rstring;
 }
 
 static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, double page_width, double *page_position) {
@@ -128,6 +126,8 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 
 			switch (elem->le_type) {
 			case OCRPT_OUTPUT_LE_TEXT:
+				ocrpt_layout_compute_text(o, elem);
+
 				o->output_functions.get_text_sizes(o, p, pr, pd, r, output, line, elem, page_width - ((pd && pd->border_width_expr) ? 2 * pd->border_width: 0.0));
 
 				elem->start = next_start;

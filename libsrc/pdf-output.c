@@ -386,9 +386,7 @@ void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 			pango_font_metrics_unref(metrics);
 		}
 
-		ocrpt_string *rstring = ocrpt_layout_compute_text(o, le);
-
-		pango_layout_set_text(le->layout, rstring->str, rstring->len);
+		pango_layout_set_text(le->layout, le->result_str->str, le->result_str->len);
 
 		if (le->width && le->width->result[o->residx] && le->width->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->width->result[o->residx]->number_initialized) {
 			w = mpfr_get_d(le->width->result[o->residx]->number, o->rndmode);
