@@ -8,6 +8,8 @@
 #include <config.h>
 
 #include <string.h>
+#include <langinfo.h>
+#include <libintl.h>
 #include <cairo.h>
 #include <cairo-svg.h>
 #include <librsvg/rsvg.h>
@@ -17,6 +19,7 @@
 #include "ocrpt-private.h"
 #include "listutil.h"
 #include "exprutil.h"
+#include "formatting.h"
 #include "variables.h"
 #include "datasource.h"
 #include "parts.h"
@@ -29,6 +32,86 @@
  */
 
 static void ocrpt_layout_image_setup(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, ocrpt_image *image, double page_width, double page_indent, double *page_position);
+
+ocrpt_string *ocrpt_layout_compute_text(opencreport *o, ocrpt_text *le) {
+	bool has_translate = false;
+	bool has_format = false;
+	bool has_value = false;
+	bool string_value = false;
+
+	if (o->textdomain && le->translate && le->translate->result[o->residx] && le->translate->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->translate->result[o->residx]->number_initialized) {
+		has_translate = !!mpfr_get_si(le->translate->result[o->residx]->number, o->rndmode);
+	}
+
+	if (le->format && le->format->result[o->residx] && le->format->result[o->residx]->type == OCRPT_RESULT_STRING && le->format->result[o->residx]->string)
+		has_format = true;
+
+	if (le->value && le->value->result[o->residx] &&
+		(
+			(le->value->result[o->residx]->type == OCRPT_RESULT_STRING && le->value->result[o->residx]->string) ||
+			(le->value->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->value->result[o->residx]->number_initialized) ||
+			(le->value->result[o->residx]->type == OCRPT_RESULT_DATETIME && (le->value->result[o->residx]->date_valid || le->value->result[o->residx]->time_valid))
+		))
+		has_value = true;
+
+	ocrpt_string *fstring = ocrpt_mem_string_resize(le->format_str, 16);
+	if (fstring) {
+		le->format_str = fstring;
+		fstring->len = 0;
+	}
+
+	ocrpt_string *string = ocrpt_mem_string_resize(le->value_str, 16);
+	if (string) {
+		le->value_str = string;
+		string->len = 0;
+	}
+
+	ocrpt_string *rstring = ocrpt_mem_string_resize(le->result_str, 16);
+	if (rstring) {
+		le->result_str = rstring;
+		rstring->len = 0;
+	}
+
+	if (has_value) {
+		if (has_format) {
+			if (has_translate) {
+				locale_t locale = uselocale(o->locale);
+				ocrpt_mem_string_append_printf(fstring, "%s", dgettext(o->textdomain, le->format->result[o->residx]->string->str));
+				uselocale(locale);
+			} else
+				ocrpt_mem_string_append_printf(fstring, "%s", le->format->result[o->residx]->string->str);
+		} else {
+			switch (le->value->result[o->residx]->type) {
+			case OCRPT_RESULT_STRING:
+			case OCRPT_RESULT_ERROR:
+				ocrpt_mem_string_append_printf(fstring, "%s", "%s");
+				string_value = true;
+				break;
+			case OCRPT_RESULT_NUMBER:
+				ocrpt_mem_string_append_printf(fstring, "%s", "%d");
+				break;
+			case OCRPT_RESULT_DATETIME:
+				ocrpt_mem_string_append_printf(fstring, "%s", nl_langinfo_l(D_FMT, o->locale));
+				break;
+			}
+		}
+	}
+
+	if (string_value) {
+		if (has_translate) {
+			locale_t locale = uselocale(o->locale);
+			ocrpt_mem_string_append_printf(string, "%s", dgettext(o->textdomain, le->value->result[o->residx]->string->str));
+			uselocale(locale);
+		} else
+			ocrpt_mem_string_append_printf(string, "%s", le->value->result[o->residx]->string->str);
+		ocrpt_format_string_literal(o, NULL, rstring, fstring, string);
+	} else if (has_value)
+		ocrpt_format_string(o, NULL, rstring, fstring, &le->value, 1);
+
+	assert(rstring);
+
+	return rstring;
+}
 
 static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, double page_width, double *page_position) {
 	double next_start;
