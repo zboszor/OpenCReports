@@ -6,6 +6,7 @@
 #ifndef _OCRPT_PDF_H_
 #define _OCRPT_PDF_H_
 
+#include <cairo.h>
 #include "opencreport.h"
 
 struct pdf_private_data {
