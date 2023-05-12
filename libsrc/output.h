@@ -23,6 +23,10 @@ struct ocrpt_output_functions {
 	void *(*get_current_page)(opencreport *o);
 	void (*set_current_page)(opencreport *o, void *page);
 	bool (*is_current_page_first)(opencreport *o);
+	void (*start_output)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *);
+	void (*end_output)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *);
+	void (*start_data_row)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *);
+	void (*end_data_row)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *);
 	void (*draw_hline)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *, ocrpt_hline *, double, double, double, double);
 	void (*set_font_sizes)(opencreport *o, const char *font, double wanted_font_size, bool bold, bool italic, double *result_font_size, double *result_font_width);
 	void (*get_text_sizes)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *, ocrpt_line *, ocrpt_text *, double);

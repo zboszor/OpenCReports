@@ -173,6 +173,9 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 
 static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, double page_width, double page_indent, double *page_position) {
 	if (draw) {
+		if (o->output_functions.start_data_row)
+			o->output_functions.start_data_row(o, p, pr, pd, r, output);
+
 		for (ocrpt_list *l = line->elements; l; l = l->next) {
 			ocrpt_text *elem = (ocrpt_text *)l->data;
 
@@ -193,6 +196,9 @@ static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_pa
 				break;
 			}
 		}
+
+		if (o->output_functions.end_data_row)
+			o->output_functions.end_data_row(o, p, pr, pd, r, output);
 	}
 
 	if (line->fontsz > 0.0 && !line->elements)
@@ -859,6 +865,9 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 	double new_page_position;
 	bool page_break = false;
 
+	if (!o->precalculate && output->output_list && o->output_functions.start_output)
+		o->output_functions.start_output(o, p, pr, pd, r, output);
+
 	if (*newpage) {
 		if ((o->output_functions.get_current_page && o->output_functions.get_current_page(o)) || !o->output_functions.get_current_page) {
 			ocrpt_layout_output_evaluate(&p->pageheader);
@@ -1027,6 +1036,9 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 	if (memo_break)
 		goto restart;
+
+	if (!o->precalculate && output->output_list && o->output_functions.end_output)
+		o->output_functions.end_output(o, p, pr, pd, r, output);
 }
 
 double ocrpt_layout_top_margin(opencreport *o, ocrpt_part *p) {
