@@ -4,6 +4,7 @@ TEST=$1
 
 abs_srcdir=${abs_srcdir:-$(pwd)}
 abs_builddir=${abs_builddir:-$(pwd)}
+top_srcdir=${top_srcdir:-$(dirname $(readlink -f "$0"))/..}
 
 export abs_srcdir abs_builddir
 
@@ -17,6 +18,9 @@ export OCRPT_TEST
 
 mkdir -p ${abs_builddir}/results
 rm -f results/${TEST}.stdout.*.png results/${TEST}.asanout.*
+export ASAN_OPTIONS="log_path=results/${TEST}.asanout,fast_unwind_on_malloc=0"
+export UBSAN_OPTIONS=print_stacktrace=true
+export LSAN_OPTIONS="suppressions=${top_srcdir}/fontconfig.supp"
 ./${TEST} 2>results/${TEST}.stderr >results/${TEST}.stdout
 
 OUTDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.stdout ${abs_srcdir}/results/${TEST}.stdout 2>/dev/null)

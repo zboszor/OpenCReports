@@ -34,6 +34,7 @@ TYPE=$2
 
 abs_srcdir=${abs_srcdir:-$(pwd)}
 abs_builddir=${abs_builddir:-$(pwd)}
+top_srcdir=${top_srcdir:-$(dirname $(readlink -f "$0"))/..}
 
 export abs_srcdir abs_builddir
 
@@ -56,6 +57,10 @@ case "$TYPE" in
 	rm -f results/"${TEST}"."${SFX[$TYPE]}".asanout.*
 	;;
 esac
+
+export ASAN_OPTIONS="log_path=results/${TEST}.${SFX[$TYPE]}.asanout,fast_unwind_on_malloc=0"
+export UBSAN_OPTIONS=print_stacktrace=true
+export LSAN_OPTIONS="suppressions=${top_srcdir}/fontconfig.supp"
 "./${TEST}" "${TYPE}" 2>"results/${TEST}.${SFX[$TYPE]}.stderr" >"results/${TEST}.${SFX[$TYPE]}"
 
 WARNINGS=

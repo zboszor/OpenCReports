@@ -4,6 +4,7 @@ TEST=$1
 
 abs_srcdir=${abs_srcdir:-$(pwd)}
 abs_builddir=${abs_builddir:-$(pwd)}
+top_srcdir=${top_srcdir:-$(dirname $(readlink -f "$0"))/..}
 
 export abs_srcdir abs_builddir
 
