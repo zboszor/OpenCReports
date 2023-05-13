@@ -70,7 +70,7 @@ if [[ -f ${abs_srcdir}/expected/${TEST}.${SFX[$TYPE]} ]]; then
 		compare_pdf
 		;;
 	*)
-		# TODO
+		OUTDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.${SFX[$TYPE]} ${abs_srcdir}/results/${TEST}.${SFX[$TYPE]} 2>/dev/null)
 		;;
 	esac
 else
