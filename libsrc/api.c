@@ -947,6 +947,9 @@ static void ocrpt_execute_parts(opencreport *o) {
 		ocrpt_layout_output_internal(false, o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, p->left_margin_value, &p->page_footer_height);
 
 		for (p->current_iteration = 0; p->current_iteration < p->iterations; p->current_iteration++) {
+			if (o->output_functions.start_part && !o->precalculate)
+				o->output_functions.start_part(o, p);
+
 			bool newpage = true; /* <Part>'s every iteration must start on a new page */
 
 			for (ocrpt_list *row = p->rows; row; row = row->next) {
@@ -956,6 +959,9 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 				if (pr->suppress)
 					continue;
+
+				if (o->output_functions.start_part_row && !o->precalculate)
+					o->output_functions.start_part_row(o, p, pr);
 
 				newpage = newpage || pr->newpage;
 
@@ -1017,6 +1023,9 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 					if (pd->suppress)
 						continue;
+
+					if (o->output_functions.start_part_column && !o->precalculate)
+						o->output_functions.start_part_column(o, p, pr, pd);
 
 					if (pdl != pr->pd_list) {
 						if (o->output_functions.set_current_page)
@@ -1236,11 +1245,17 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 					page_indent = pd->page_indent;
 					page_indent += pd->real_width;
+
+					if (o->output_functions.end_part_column && !o->precalculate)
+						o->output_functions.end_part_column(o, p, pr, pd);
 				}
 
 				if (o->output_functions.set_current_page)
 					o->output_functions.set_current_page(o, pr->end_page);
 				page_position = pr->end_page_position;
+
+				if (o->output_functions.end_part_row && !o->precalculate)
+					o->output_functions.end_part_row(o, p, pr);
 			}
 
 			if (!o->precalculate) {
@@ -1270,6 +1285,9 @@ static void ocrpt_execute_parts(opencreport *o) {
 				/* Switch back to the current row data */
 				o->residx = ocrpt_expr_next_residx(o->residx);
 			}
+
+			if (o->output_functions.end_part && !o->precalculate)
+				o->output_functions.end_part(o, p);
 		}
 	}
 }

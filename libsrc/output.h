@@ -23,6 +23,12 @@ struct ocrpt_output_functions {
 	void *(*get_current_page)(opencreport *o);
 	void (*set_current_page)(opencreport *o, void *page);
 	bool (*is_current_page_first)(opencreport *o);
+	void (*start_part)(opencreport *, ocrpt_part *);
+	void (*end_part)(opencreport *, ocrpt_part *);
+	void (*start_part_row)(opencreport *, ocrpt_part *, ocrpt_part_row *);
+	void (*end_part_row)(opencreport *, ocrpt_part *, ocrpt_part_row *);
+	void (*start_part_column)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *);
+	void (*end_part_column)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *);
 	void (*start_output)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *);
 	void (*end_output)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *);
 	void (*start_data_row)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *);
