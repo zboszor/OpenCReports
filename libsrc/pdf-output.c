@@ -87,33 +87,6 @@ static void ocrpt_pdf_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row
 			priv->current_page = priv->current_page->next;
 		}
 	}
-
-	*page_position = ocrpt_layout_top_margin(o, p);
-	if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && priv->current_page != priv->pages)) {
-		ocrpt_layout_output_evaluate(&p->pageheader);
-		ocrpt_layout_output_init(&p->pageheader);
-		ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, page_position);
-		ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, page_position);
-	}
-
-	if (rows == 1 && !pr->start_page) {
-		if (r) {
-			if (r->current_iteration == 0) {
-				pr->start_page = priv->current_page;
-				pr->start_page_position = *page_position;
-				pd->start_page_position = *page_position;
-			}
-			if (pd->border_width_expr)
-				*page_position += pd->border_width;
-			ocrpt_layout_output_init(&r->reportheader);
-			ocrpt_layout_output(o, p, pr, pd, r, &r->reportheader, rows, newpage, page_indent, page_position, old_page_position);
-		}
-	} else {
-		pd->start_page_position = *page_position;
-		if (pd->border_width_expr)
-			*page_position += pd->border_width;
-	}
-	ocrpt_layout_output_highprio_fieldheader(o, p, pr, pd, r, rows, newpage, page_indent, page_position, old_page_position);
 }
 
 static void *ocrpt_pdf_get_current_page(opencreport *o) {
