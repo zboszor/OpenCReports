@@ -912,7 +912,8 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			ocrpt_layout_output_evaluate(&p->pageheader);
 			ocrpt_layout_output_evaluate(&p->pagefooter);
 
-			if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && !o->output_functions.is_current_page_first(o))) {
+			bool is_current_page_first = (o->output_functions.is_current_page_first ? o->output_functions.is_current_page_first(o) : true);
+			if (!p->suppress_pageheader_firstpage || (p->suppress_pageheader_firstpage && !is_current_page_first)) {
 				double top_page_position = ocrpt_layout_top_margin(o, p);
 				ocrpt_layout_output_init(&p->pageheader);
 				ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &top_page_position);
