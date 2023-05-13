@@ -174,7 +174,7 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, double page_width, double page_indent, double *page_position) {
 	if (draw) {
 		if (o->output_functions.start_data_row)
-			o->output_functions.start_data_row(o, p, pr, pd, r, output);
+			o->output_functions.start_data_row(o, p, pr, pd, r, output, line, page_indent, *page_position);
 
 		for (ocrpt_list *l = line->elements; l; l = l->next) {
 			ocrpt_text *elem = (ocrpt_text *)l->data;
@@ -198,7 +198,7 @@ static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_pa
 		}
 
 		if (o->output_functions.end_data_row)
-			o->output_functions.end_data_row(o, p, pr, pd, r, output);
+			o->output_functions.end_data_row(o, p, pr, pd, r, output, line);
 	}
 
 	if (line->fontsz > 0.0 && !line->elements)
@@ -406,6 +406,11 @@ static void ocrpt_layout_image(bool draw, opencreport *o, ocrpt_part *p, ocrpt_p
 
 	output->old_page_position = *page_position;
 	output->current_image = image;
+}
+
+static void ocrpt_layout_imageend(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output) {
+	if (draw && o->output_functions.draw_imageend)
+		o->output_functions.draw_imageend(o, p, pr, pd, r, output);
 }
 
 void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output) {
@@ -848,6 +853,8 @@ bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 				*page_position = output->old_page_position + output->current_image->image_height;
 
 			output->current_image = NULL;
+
+			ocrpt_layout_imageend(draw, o, p, pr, pd, r, output);
 			break;
 		}
 	}
