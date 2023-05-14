@@ -799,6 +799,8 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 				if (dc > 1)
 					pd->detail_columns = dc;
 			}
+			if (!o->output_functions.supports_column_break)
+				pd->detail_columns = 1;
 
 			ocrpt_expr_resolve(pd->column_pad_expr);
 			ocrpt_expr_optimize(pd->column_pad_expr);

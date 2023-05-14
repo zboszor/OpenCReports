@@ -42,6 +42,7 @@ struct ocrpt_output_functions {
 	void (*draw_imageend)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *);
 	void (*draw_rectangle)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_color *, double, double, double, double, double);
 	void (*finalize)(opencreport *o);
+	bool supports_column_break;
 };
 typedef struct ocrpt_output_functions ocrpt_output_functions;
 
