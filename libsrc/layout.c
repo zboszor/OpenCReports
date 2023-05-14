@@ -780,7 +780,7 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 }
 
 static inline void get_height_exceeded(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, double old_page_position, double new_page_position, bool *height_exceeded, bool *pd_height_exceeded, bool *r_height_exceeded) {
-	*height_exceeded = (new_page_position + ((pd && pd->border_width_expr) ? pd->border_width : 0.0)) > p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height;
+	*height_exceeded = o->output_functions.supports_page_break && ((new_page_position + ((pd && pd->border_width_expr) ? pd->border_width : 0.0)) > (p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height));
 	*pd_height_exceeded = pd && pd->height_expr && (new_page_position > (pd->start_page_position + pd->remaining_height));
 	*r_height_exceeded = r && r->height_expr && (r->remaining_height < (new_page_position - old_page_position));
 }

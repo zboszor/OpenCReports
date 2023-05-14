@@ -405,8 +405,10 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 
 			if (br->cb_triggered) {
 				if (!br->suppressblank || (br->suppressblank && !br->blank)) {
-					if (rows > 1 && br->headernewpage)
-						*newpage = true;
+					if (rows > 1 && br->headernewpage) {
+						if (o->output_functions.supports_page_break)
+							*newpage = true;
+					}
 					ocrpt_layout_output_init(&br->header);
 					ocrpt_layout_output(o, p, pr, pd, r, &br->header, rows, newpage, page_indent, page_position, old_page_position);
 				}
@@ -763,7 +765,7 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 		ocrpt_expr_resolve_nowarn(pr->newpage_expr);
 		ocrpt_expr_optimize(pr->newpage_expr);
 		if (pr->newpage_expr)
-			pr->newpage = !!ocrpt_expr_get_long(pr->newpage_expr);
+			pr->newpage = o->output_functions.supports_page_break && !!ocrpt_expr_get_long(pr->newpage_expr);
 
 		for (ocrpt_list *pdl = pr->pd_list; pdl; pdl = pdl->next) {
 			ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
@@ -952,7 +954,13 @@ static void ocrpt_execute_parts(opencreport *o) {
 			if (o->output_functions.start_part && !o->precalculate)
 				o->output_functions.start_part(o, p);
 
-			bool newpage = true; /* <Part>'s every iteration must start on a new page */
+			/*
+			 * The first <Part>'s first iteration must start on a new page.
+			 * Every other iteration of the first part and subsequent
+			 * <Part>'s  every iteration must start on a new page if the
+			 * output driver supports it.
+			 */
+			bool newpage = (pl == o->parts && p->current_iteration == 0) || o->output_functions.supports_page_break;
 
 			for (ocrpt_list *row = p->rows; row; row = row->next) {
 				ocrpt_part_row *pr = (ocrpt_part_row *)row->data;

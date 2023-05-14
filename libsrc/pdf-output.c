@@ -611,6 +611,7 @@ void ocrpt_pdf_init(opencreport *o) {
 	o->output_functions.draw_image = ocrpt_pdf_draw_image;
 	o->output_functions.draw_rectangle = ocrpt_pdf_draw_rectangle;
 	o->output_functions.finalize = ocrpt_pdf_finalize;
+	o->output_functions.supports_page_break = true;
 	o->output_functions.supports_column_break = true;
 
 	o->output_private = ocrpt_mem_malloc(sizeof(pdf_private_data));
