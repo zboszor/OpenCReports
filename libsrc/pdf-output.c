@@ -107,7 +107,7 @@ static bool ocrpt_pdf_is_current_page_first(opencreport *o) {
 	return priv->current_page == priv->pages;
 }
 
-static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_indent, double x, double y, double w, double h) {
+static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_width, double page_indent, double x, double y, double w, double h) {
 	pdf_private_data *priv = o->output_private;
 	ocrpt_image_file *img_file = img->img_file;
 
@@ -410,7 +410,7 @@ static void ocrpt_pdf_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_r
 	}
 }
 
-static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double page_indent, double y) {
+static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double page_width, double page_indent, double y) {
 	pdf_private_data *priv = o->output_private;
 
 	ocrpt_cairo_create(o);
@@ -613,6 +613,8 @@ void ocrpt_pdf_init(opencreport *o) {
 	o->output_functions.finalize = ocrpt_pdf_finalize;
 	o->output_functions.supports_page_break = true;
 	o->output_functions.supports_column_break = true;
+	o->output_functions.supports_pd_height = true;
+	o->output_functions.supports_report_height = true;
 
 	o->output_private = ocrpt_mem_malloc(sizeof(pdf_private_data));
 	memset(o->output_private, 0, sizeof(pdf_private_data));
