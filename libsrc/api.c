@@ -1341,6 +1341,8 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 
 	/* Run all reports in layout mode */
 	o->precalculate = false;
+	if (o->output_functions.reset_state)
+		o->output_functions.reset_state(o);
 	ocrpt_execute_parts(o);
 
 	if (o->output_functions.finalize)
