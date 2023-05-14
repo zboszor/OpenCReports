@@ -1273,6 +1273,12 @@ static void ocrpt_execute_parts(opencreport *o) {
 					cbd->func(o, p, cbd->data);
 				}
 
+				if (o->output_functions.start_part_row && !o->precalculate)
+					o->output_functions.start_part_row(o, p, NULL);
+
+				if (o->output_functions.start_part_column && !o->precalculate)
+					o->output_functions.start_part_column(o, p, NULL, NULL);
+
 				/* Use the previous row data temporarily */
 				o->residx = ocrpt_expr_prev_residx(o->residx);
 
@@ -1284,6 +1290,12 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 				/* Switch back to the current row data */
 				o->residx = ocrpt_expr_next_residx(o->residx);
+
+				if (o->output_functions.end_part_column && !o->precalculate)
+					o->output_functions.end_part_column(o, p, NULL, NULL);
+
+				if (o->output_functions.end_part_row && !o->precalculate)
+					o->output_functions.end_part_row(o, p, NULL);
 			}
 
 			if (o->output_functions.end_part && !o->precalculate)
