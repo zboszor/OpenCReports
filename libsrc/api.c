@@ -1260,12 +1260,13 @@ static void ocrpt_execute_parts(opencreport *o) {
 						o->output_functions.end_part_column(o, p, pr, pd);
 				}
 
-				if (o->output_functions.set_current_page)
-					o->output_functions.set_current_page(o, pr->end_page);
-				page_position = pr->end_page_position;
-
 				if (o->output_functions.end_part_row && !o->precalculate)
 					o->output_functions.end_part_row(o, p, pr);
+
+				if (o->output_functions.set_current_page)
+					o->output_functions.set_current_page(o, pr->end_page);
+
+				page_position = pr->end_page_position;
 			}
 
 			if (!o->precalculate) {
