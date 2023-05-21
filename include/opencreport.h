@@ -199,6 +199,10 @@ enum ocrpt_format_type {
 typedef enum ocrpt_format_type ocrpt_format_type;
 
 void ocrpt_set_output_format(opencreport *o, ocrpt_format_type format);
+/*
+ * Set output parameter
+ */
+void ocrpt_set_output_parameter(opencreport *o, const char *param, const char *value);
 
 /*********************************
  *                               *

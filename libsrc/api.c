@@ -227,6 +227,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 		for (i = 0; o->content_type[i]; i++)
 			ocrpt_mem_string_free((ocrpt_string *)o->content_type[i], true);
 	ocrpt_mem_free(o->content_type);
+	ocrpt_mem_free(o->html_meta);
 	ocrpt_mem_free(o->textdomain);
 	ocrpt_mem_free(o->xlate_domain_s);
 	ocrpt_mem_free(o->xlate_dir_s);
@@ -1660,6 +1661,53 @@ DLL_EXPORT_SYM char *ocrpt_find_file(opencreport *o, const char *filename) {
 	ocrpt_mem_free(file);
 
 	return NULL;
+}
+
+DLL_EXPORT_SYM void ocrpt_set_output_parameter(opencreport *o, const char *param, const char *value) {
+	if (!o)
+		return;
+
+	/* HTML output parameters */
+	if (strcmp(param, "suppress_head"))
+		o->suppress_html_head = strcasecmp(value, "yes") == 0 || strcasecmp(value, "true") == 0 || strcasecmp(value, "on") == 0;
+	else if (strcmp(param, "meta") == 0) {
+		/*
+		 * Parse the value:
+		 * - allow a complete <meta ...> syntax with or the closing '>'
+		 * - swallow the charset="..." specification in it
+		 *   as the HTML output driver uses utf-8
+		 */
+		ocrpt_mem_free(o->html_meta);
+		o->html_meta = NULL;
+
+		ocrpt_string *meta;
+		ocrpt_string *html_meta = ocrpt_mem_string_new("", true);
+
+		char *meta0 = strstr(value, "<meta");
+		if (meta0) {
+			meta = ocrpt_mem_string_new(meta0 + 5, true);
+
+			/* Remove the last '>' character, ignore it if it doesn't exist. */
+			char *closegt = strrchr(meta->str, '>');
+			if (closegt)
+				*closegt = 0;
+		} else
+			meta = ocrpt_mem_string_new(value, true);
+
+		char *charset = strstr(meta->str, "charset=\"");
+		char *charsetend = NULL;
+		if (charset) {
+			charsetend = strchr(charset + 9, '"');
+			*charset = 0;
+		}
+
+		ocrpt_mem_string_append(html_meta, meta->str);
+		if (charsetend)
+			ocrpt_mem_string_append(html_meta, charsetend + 1);
+
+		o->html_meta = ocrpt_mem_string_free(html_meta, false);
+		ocrpt_mem_string_free(meta, true);
+	}
 }
 
 static int papersortcmp(const void *a, const void *b) {

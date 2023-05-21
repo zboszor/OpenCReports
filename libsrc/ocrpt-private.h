@@ -107,6 +107,9 @@ struct opencreport {
 	ocrpt_string *output_buffer;
 	const ocrpt_string **content_type;
 
+	/* Output parameters */
+	char *html_meta;
+
 	/* Page handling for PDF output, lists of cairo_surface_t pointers */
 	ocrpt_output_functions output_functions;
 	void *output_private;
@@ -140,6 +143,8 @@ struct opencreport {
 	bool size_in_points:1;
 	bool noquery_show_nodata:1;
 	bool report_height_after_last:1;
+	/* Bools for output parameters */
+	bool suppress_html_head:1;
 };
 
 struct ocrpt_result {
