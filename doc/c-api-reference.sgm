@@ -86,6 +86,43 @@ ocrpt_set_output_format(opencreport *o,
                         ocrpt_format_type format);</programlisting>
 			</para>
 		</sect2>
+		<sect2 id="setoutpparam">
+			<title>Set report output parameter</title>
+			<para>
+				Set output parameters for the report.
+				<programlisting>void
+ocrpt_set_output_parameter(opencreport *o,
+                           const char *param,
+                           const char *value);</programlisting>
+			</para>
+			<para>
+				Possible parameters for the HTML output driver:
+				<itemizedlist>
+					<listitem override="bullet">
+						<para>
+							<literal>meta</literal> extends
+							the default
+							<literal>&lt;meta charset="utf-8"&gt;</literal>.
+                            <literal>literal</literal> (see
+							The passed-in string value may contain
+							the whole <literal>&lt;meta ...&gt;</literal>,
+							in which case the inner parameters are
+							used only. The <literal>charset</literal>
+							specification is ignored. Only the rest is used.
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<literal>suppress_head</literal> suppresses the default
+							<literal>&lt;head&gt; ... &lt;/head&gt;</literal> section.
+							Be aware, that the default section contains
+							importand CSS stylesheet settings that are
+							needed for the correct layout.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+		</sect2>
 		<sect2 id="runreport">
 			<title>Run the report</title>
 			<para>
