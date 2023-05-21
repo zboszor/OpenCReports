@@ -232,6 +232,7 @@ struct ocrpt_part {
 	bool landscape:1;
 	bool suppress:1;
 	bool suppress_pageheader_firstpage:1;
+	bool pageheader_printed:1;
 };
 
 void ocrpt_report_evaluate_detailcnt_dependees(ocrpt_report *r);

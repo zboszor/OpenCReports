@@ -887,6 +887,8 @@ static void ocrpt_layout_output_headers_after_add_new_page(opencreport *o, ocrpt
 		ocrpt_layout_output_init(&p->pageheader);
 		ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, page_position);
 		ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, page_position);
+		if (!o->precalculate)
+			p->pageheader_printed = true;
 
 		if (o->output_functions.end_part_column && !o->precalculate)
 			o->output_functions.end_part_column(o, p, NULL, NULL);
@@ -948,6 +950,8 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 				ocrpt_layout_output_init(&p->pageheader);
 				ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &top_page_position);
 				ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pageheader, p->page_width, p->left_margin_value, &top_page_position);
+				if (!o->precalculate)
+					p->pageheader_printed = true;
 
 				if (o->output_functions.end_part_column && !o->precalculate)
 					o->output_functions.end_part_column(o, p, NULL, NULL);
@@ -960,6 +964,8 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			ocrpt_layout_output_init(&p->pagefooter);
 			ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, p->left_margin_value, &bottom_page_position);
 			ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, p->left_margin_value, &bottom_page_position);
+			if (!o->precalculate)
+				p->pageheader_printed = false;
 		}
 
 		/* Set newpage to false first to prevent infinite recursion. */
@@ -1068,6 +1074,8 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			ocrpt_layout_output_init(&p->pagefooter);
 			ocrpt_layout_output_internal_preamble(o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, p->left_margin_value, &bottom_page_position);
 			ocrpt_layout_output_internal(!o->precalculate, o, p, NULL, NULL, NULL, &p->pagefooter, p->page_width, p->left_margin_value, &bottom_page_position);
+			if (!o->precalculate)
+				p->pageheader_printed = false;
 
 			/* Switch back to the current row data */
 			o->residx = ocrpt_expr_next_residx(o->residx);
