@@ -115,6 +115,12 @@ ocrpt_set_output_parameter(opencreport *o,
 						<para>
 							<literal>suppress_head</literal> suppresses the default
 							<literal>&lt;head&gt; ... &lt;/head&gt;</literal> section.
+							Possible values to enable suppressing the
+							default <literal>&lt;head&gt; ... &lt;/head&gt;</literal>
+							are <literal>yes</literal>,
+							<literal>true</literal> and
+							<literal>on</literal>.
+							Anything else disables it.
 							Be aware, that the default section contains
 							importand CSS stylesheet settings that are
 							needed for the correct layout.
