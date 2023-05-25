@@ -109,6 +109,8 @@ struct opencreport {
 
 	/* Output parameters */
 	char *html_meta;
+	char *csv_filename;
+	char *csv_delimiter;
 
 	/* Page handling for PDF output, lists of cairo_surface_t pointers */
 	ocrpt_output_functions output_functions;
@@ -145,6 +147,7 @@ struct opencreport {
 	bool report_height_after_last:1;
 	/* Bools for output parameters */
 	bool suppress_html_head:1;
+	bool csv_as_text:1;
 };
 
 struct ocrpt_result {

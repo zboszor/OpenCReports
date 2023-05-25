@@ -228,6 +228,8 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 			ocrpt_mem_string_free((ocrpt_string *)o->content_type[i], true);
 	ocrpt_mem_free(o->content_type);
 	ocrpt_mem_free(o->html_meta);
+	ocrpt_mem_free(o->csv_filename);
+	ocrpt_mem_free(o->csv_delimiter);
 	ocrpt_mem_free(o->textdomain);
 	ocrpt_mem_free(o->xlate_domain_s);
 	ocrpt_mem_free(o->xlate_dir_s);
@@ -1669,7 +1671,7 @@ DLL_EXPORT_SYM void ocrpt_set_output_parameter(opencreport *o, const char *param
 
 	/* HTML output parameters */
 	if (strcmp(param, "suppress_head"))
-		o->suppress_html_head = strcasecmp(value, "yes") == 0 || strcasecmp(value, "true") == 0 || strcasecmp(value, "on") == 0;
+		o->suppress_html_head = strcasecmp(value, "yes") == 0 || strcasecmp(value, "true") == 0 || strcasecmp(value, "on") == 0 || atoi(value) > 0;
 	else if (strcmp(param, "meta") == 0) {
 		/*
 		 * Parse the value:
@@ -1707,7 +1709,14 @@ DLL_EXPORT_SYM void ocrpt_set_output_parameter(opencreport *o, const char *param
 
 		o->html_meta = ocrpt_mem_string_free(html_meta, false);
 		ocrpt_mem_string_free(meta, true);
-	}
+	} else if (strcmp(param, "csv_file_name") == 0 || strcmp(param, "file_name") == 0) {
+		ocrpt_mem_free(o->csv_filename);
+		o->csv_filename = ocrpt_mem_strdup(value);
+	} else if (strcmp(param, "csv_delimiter") == 0 || (strcmp(param, "csv_delimeter") == 0)) {
+		ocrpt_mem_free(o->csv_delimiter);
+		o->csv_delimiter = ocrpt_mem_strdup(value);
+	} else if (strcmp(param, "csv_as_text"))
+		o->csv_as_text = strcasecmp(value, "yes") == 0 || strcasecmp(value, "true") == 0 || strcasecmp(value, "on") == 0 || atoi(value) > 0;
 }
 
 static int papersortcmp(const void *a, const void *b) {
