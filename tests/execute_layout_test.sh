@@ -31,6 +31,7 @@ function compare_pdf () {
 
 TEST=$1
 TYPE=$2
+TYPE=${TYPE:-1}
 
 abs_srcdir=${abs_srcdir:-$(pwd)}
 abs_builddir=${abs_builddir:-$(pwd)}
@@ -46,7 +47,7 @@ fi
 OCRPT_TEST=1
 export OCRPT_TEST
 
-SFX=("unknown" "pdf" "html" "txt" "csv" "xml")
+SFX=("unknown" "pdf" "html" "txt" "csv" "xml" "json")
 
 mkdir -p "${abs_builddir}"/results
 case "$TYPE" in
