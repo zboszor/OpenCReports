@@ -59,6 +59,10 @@ tests/expected/*.png
 tests/results/*.png
 tests/results/*.pdf
 tests/results/*.html
+tests/results/*.txt
+tests/results/*.csv
+tests/results/*.xml
+tests/results/*.json
 tests/results/*.stderr
 tests/results/*.stdout
 tests/results/*.asanout.*
