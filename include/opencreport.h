@@ -194,7 +194,8 @@ enum ocrpt_format_type {
 	OCRPT_OUTPUT_HTML,
 	OCRPT_OUTPUT_TXT,
 	OCRPT_OUTPUT_CSV,
-	OCRPT_OUTPUT_XML
+	OCRPT_OUTPUT_XML,
+	OCRPT_OUTPUT_JSON
 };
 typedef enum ocrpt_format_type ocrpt_format_type;
 

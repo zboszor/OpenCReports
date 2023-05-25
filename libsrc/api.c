@@ -45,6 +45,7 @@
 #include "txt-output.h"
 #include "csv-output.h"
 #include "xml-output.h"
+#include "json-output.h"
 
 static int ocrpt_stderr_printf(const char *fmt, ...) {
 	va_list ap;
@@ -1340,6 +1341,9 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 		break;
 	case OCRPT_OUTPUT_XML:
 		ocrpt_xml_init(o);
+		break;
+	case OCRPT_OUTPUT_JSON:
+		ocrpt_json_init(o);
 		break;
 	}
 
