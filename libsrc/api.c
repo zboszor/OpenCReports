@@ -1721,6 +1721,8 @@ DLL_EXPORT_SYM void ocrpt_set_output_parameter(opencreport *o, const char *param
 		o->csv_delimiter = ocrpt_mem_strdup(value);
 	} else if (strcmp(param, "csv_as_text"))
 		o->csv_as_text = strcasecmp(value, "yes") == 0 || strcasecmp(value, "true") == 0 || strcasecmp(value, "on") == 0 || atoi(value) > 0;
+	else if (strcmp(param, "xml_rlib_compat") == 0)
+		o->xml_rlib_compat = strcasecmp(value, "yes") == 0 || strcasecmp(value, "true") == 0 || strcasecmp(value, "on") == 0 || atoi(value) > 0;
 }
 
 static int papersortcmp(const void *a, const void *b) {

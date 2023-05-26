@@ -148,6 +148,7 @@ struct opencreport {
 	/* Bools for output parameters */
 	bool suppress_html_head:1;
 	bool csv_as_text:1;
+	bool xml_rlib_compat:1;
 };
 
 struct ocrpt_result {
