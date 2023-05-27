@@ -1692,7 +1692,7 @@ DLL_EXPORT_SYM void ocrpt_set_output_parameter(opencreport *o, const char *param
 		return;
 
 	/* HTML output parameters */
-	if (strcmp(param, "suppress_head"))
+	if (strcmp(param, "suppress_head") == 0)
 		o->suppress_html_head = strcasecmp(value, "yes") == 0 || strcasecmp(value, "true") == 0 || strcasecmp(value, "on") == 0 || atoi(value) > 0;
 	else if (strcmp(param, "meta") == 0) {
 		/*
