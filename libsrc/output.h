@@ -30,6 +30,10 @@ struct ocrpt_output_functions {
 	void (*end_part_row)(opencreport *, ocrpt_part *, ocrpt_part_row *);
 	void (*start_part_column)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *);
 	void (*end_part_column)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *);
+	void (*start_report)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *);
+	void (*end_report)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *);
+	void (*start_no_data)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *);
+	void (*end_no_data)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *);
 	void (*start_output)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *);
 	void (*end_output)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *);
 	void (*start_data_row)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *, ocrpt_line *, double, double);
@@ -46,6 +50,7 @@ struct ocrpt_output_functions {
 	bool supports_column_break;
 	bool supports_pd_height;
 	bool supports_report_height;
+	bool reopen_tags_across_pages;
 };
 typedef struct ocrpt_output_functions ocrpt_output_functions;
 

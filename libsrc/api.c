@@ -1090,6 +1090,9 @@ static void ocrpt_execute_parts(opencreport *o) {
 						}
 
 						for (r->current_iteration = 0; !r->suppress && (r->current_iteration < r->iterations); r->current_iteration++) {
+							if (o->output_functions.start_report && !o->precalculate)
+								o->output_functions.start_report(o, p, pr, pd, r);
+
 							r->executing = true;
 
 							r->finished = false;
@@ -1110,19 +1113,29 @@ static void ocrpt_execute_parts(opencreport *o) {
 								}
 
 								if (!r->data_rows) {
+									if (o->output_functions.start_no_data && !o->precalculate)
+										o->output_functions.start_no_data(o, p, pr, pd, r);
 									ocrpt_print_reportheader(o, p, pr, pd, r, 0, &newpage, &page_indent, &page_position, &old_page_position);
 									ocrpt_layout_output_resolve(&r->nodata);
 									ocrpt_layout_output_evaluate(&r->nodata);
 									ocrpt_layout_output(o, p, pr, pd, r, &r->nodata, 0, &newpage, &page_indent, &page_position, &old_page_position);
+									if (o->output_functions.end_no_data && !o->precalculate)
+										o->output_functions.end_no_data(o, p, pr, pd, r);
 								}
 							} else {
 								ocrpt_print_reportheader(o, p, pr, pd, r, 0, &newpage, &page_indent, &page_position, &old_page_position);
 								if ((o->noquery_show_nodata_expr && o->noquery_show_nodata) || (!o->noquery_show_nodata_expr && r->noquery_show_nodata)) {
+									if (o->output_functions.start_no_data && !o->precalculate)
+										o->output_functions.start_no_data(o, p, pr, pd, r);
 									ocrpt_layout_output_resolve(&r->nodata);
 									ocrpt_layout_output_evaluate(&r->nodata);
 									ocrpt_layout_output(o, p, pr, pd, r, &r->nodata, 0, &newpage, &page_indent, &page_position, &old_page_position);
+									if (o->output_functions.end_no_data && !o->precalculate)
+										o->output_functions.end_no_data(o, p, pr, pd, r);
 								}
 							}
+							if (o->output_functions.end_report && !o->precalculate)
+								o->output_functions.end_report(o, p, pr, pd, r);
 
 							if (r->height_expr) {
 								if (rl->next || o->report_height_after_last) {
@@ -1288,11 +1301,13 @@ static void ocrpt_execute_parts(opencreport *o) {
 					cbd->func(o, p, cbd->data);
 				}
 
-				if (o->output_functions.start_part_row && !o->precalculate)
-					o->output_functions.start_part_row(o, p, NULL);
+				if (o->output_functions.reopen_tags_across_pages && !o->precalculate) {
+					if (o->output_functions.start_part_row)
+						o->output_functions.start_part_row(o, p, NULL);
 
-				if (o->output_functions.start_part_column && !o->precalculate)
-					o->output_functions.start_part_column(o, p, NULL, NULL);
+					if (o->output_functions.start_part_column)
+						o->output_functions.start_part_column(o, p, NULL, NULL);
+				}
 
 				/* Use the previous row data temporarily */
 				o->residx = ocrpt_expr_prev_residx(o->residx);
@@ -1306,11 +1321,13 @@ static void ocrpt_execute_parts(opencreport *o) {
 				/* Switch back to the current row data */
 				o->residx = ocrpt_expr_next_residx(o->residx);
 
-				if (o->output_functions.end_part_column && !o->precalculate)
-					o->output_functions.end_part_column(o, p, NULL, NULL);
+				if (o->output_functions.reopen_tags_across_pages && !o->precalculate) {
+					if (o->output_functions.end_part_column)
+						o->output_functions.end_part_column(o, p, NULL, NULL);
 
-				if (o->output_functions.end_part_row && !o->precalculate)
-					o->output_functions.end_part_row(o, p, NULL);
+					if (o->output_functions.end_part_row)
+						o->output_functions.end_part_row(o, p, NULL);
+				}
 			}
 
 			if (o->output_functions.end_part && !o->precalculate)

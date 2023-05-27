@@ -635,6 +635,7 @@ void ocrpt_html_init(opencreport *o) {
 	o->output_functions.draw_image = ocrpt_html_draw_image;
 	o->output_functions.draw_imageend = ocrpt_html_draw_imageend;
 	o->output_functions.finalize = ocrpt_html_finalize;
+	o->output_functions.reopen_tags_across_pages = true;
 
 	o->output_private = ocrpt_mem_malloc(sizeof(html_private_data));
 	memset(o->output_private, 0, sizeof(html_private_data));
