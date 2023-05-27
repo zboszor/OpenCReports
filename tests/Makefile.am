@@ -188,6 +188,11 @@ LAYOUT_TESTS = \
 	page_header_footer_vars_test \
 	break_suppressblank_test
 
+LAYOUT_CSV_TESTS = \
+	layout_xml17_csv1_test \
+	layout_xml17_csv2_test \
+	layout_xml17_csv3_test
+
 PHP_LAYOUT_TESTS = \
 	layout_xml_test \
 	layout_xml2_test \
@@ -263,7 +268,7 @@ UNSTABLE_TESTS = \
 	paper_test \
 	now_test
 
-noinst_PROGRAMS = $(TESTS) $(SLOW_TESTS) $(LAYOUT_TESTS) $(UNSTABLE_TESTS)
+noinst_PROGRAMS = $(TESTS) $(SLOW_TESTS) $(LAYOUT_TESTS) $(LAYOUT_CSV_TESTS) $(UNSTABLE_TESTS)
 
 $(noinst_PROGRAMS): $(top_builddir)/libsrc/libopencreport.la
 
@@ -292,8 +297,8 @@ endif
 html-test: $(LAYOUT_TESTS) $(XLATE_DEPS) execute_layout_test.sh
 	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 2 &&) true
 
-csv-test: $(LAYOUT_TESTS) $(XLATE_DEPS) execute_layout_test.sh
-	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 4 &&) true
+csv-test: $(LAYOUT_TESTS) $(LAYOUT_CSV_TESTS) $(XLATE_DEPS) execute_layout_test.sh
+	$(foreach TEST,$(LAYOUT_TESTS) $(LAYOUT_CSV_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 4 &&) true
 
 test: basic-test pdf-test html-test csv-test
 
