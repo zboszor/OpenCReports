@@ -10,6 +10,7 @@
 #include <csv.h>
 
 #include "ocrpt-private.h"
+#include "exprutil.h"
 #include "parts.h"
 #include "csv-output.h"
 
@@ -79,9 +80,31 @@ static void ocrpt_csv_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		if (priv->data->allocated_len < le->result_str->len * 3)
 			ocrpt_mem_string_resize(priv->data, le->result_str->len * 3 + 16);
 
-		size_t len = csv_write(priv->data->str, priv->data->allocated_len, le->result_str->str, le->result_str->len);
-
-		ocrpt_mem_string_append_len(o->output_buffer, priv->data->str, len);
+		if (o->no_quotes)
+			ocrpt_mem_string_append_len(o->output_buffer, le->result_str->str, le->result_str->len);
+		else if (o->only_quote_strings) {
+			if (le->value) {
+				/*
+				 * The field has a value set.
+				 * Quote it if it's a string or string-like value.
+				 */
+				if (le->value->result[o->residx] && (le->value->result[o->residx]->type == OCRPT_RESULT_STRING || le->value->result[o->residx]->type == OCRPT_RESULT_ERROR)) {
+					size_t len = csv_write(priv->data->str, priv->data->allocated_len, le->result_str->str, le->result_str->len);
+					ocrpt_mem_string_append_len(o->output_buffer, priv->data->str, len);
+				} else
+					ocrpt_mem_string_append_len(o->output_buffer, le->result_str->str, le->result_str->len);
+			} else {
+				/*
+				 * The field has no value set, but there's
+				 * a non-empty result string(!) - quote it.
+				 */
+				size_t len = csv_write(priv->data->str, priv->data->allocated_len, le->result_str->str, le->result_str->len);
+				ocrpt_mem_string_append_len(o->output_buffer, priv->data->str, len);
+			}
+		} else {
+			size_t len = csv_write(priv->data->str, priv->data->allocated_len, le->result_str->str, le->result_str->len);
+			ocrpt_mem_string_append_len(o->output_buffer, priv->data->str, len);
+		}
 
 		priv->column_index++;
 	}

@@ -1742,8 +1742,12 @@ DLL_EXPORT_SYM void ocrpt_set_output_parameter(opencreport *o, const char *param
 		o->csv_delimiter = ocrpt_mem_malloc(bytes_read + 1);
 		memcpy(o->csv_delimiter, value, bytes_read);
 		o->csv_delimiter[bytes_read] = 0;
-	} else if (strcmp(param, "csv_as_text"))
+	} else if (strcmp(param, "csv_as_text") == 0)
 		o->csv_as_text = strcasecmp(value, "yes") == 0 || strcasecmp(value, "true") == 0 || strcasecmp(value, "on") == 0 || atoi(value) > 0;
+	else if (strcmp(param, "no_quotes") == 0)
+		o->no_quotes = strcasecmp(value, "yes") == 0 || strcasecmp(value, "true") == 0 || strcasecmp(value, "on") == 0 || atoi(value) > 0;
+	else if (strcmp(param, "only_quote_strings") == 0)
+		o->only_quote_strings = strcasecmp(value, "yes") == 0 || strcasecmp(value, "true") == 0 || strcasecmp(value, "on") == 0 || atoi(value) > 0;
 	else if (strcmp(param, "xml_rlib_compat") == 0)
 		o->xml_rlib_compat = strcasecmp(value, "yes") == 0 || strcasecmp(value, "true") == 0 || strcasecmp(value, "on") == 0 || atoi(value) > 0;
 }
