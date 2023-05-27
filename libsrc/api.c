@@ -25,6 +25,7 @@
 #include <cairo.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <utf8proc.h>
 #include <paper.h>
 
 #include "scanner.h"
@@ -1734,8 +1735,13 @@ DLL_EXPORT_SYM void ocrpt_set_output_parameter(opencreport *o, const char *param
 		ocrpt_mem_free(o->csv_filename);
 		o->csv_filename = ocrpt_mem_strdup(value);
 	} else if (strcmp(param, "csv_delimiter") == 0 || (strcmp(param, "csv_delimeter") == 0)) {
+		utf8proc_int32_t c;
+		utf8proc_ssize_t bytes_read = utf8proc_iterate((utf8proc_uint8_t *)value, strlen(value), &c);
+
 		ocrpt_mem_free(o->csv_delimiter);
-		o->csv_delimiter = ocrpt_mem_strdup(value);
+		o->csv_delimiter = ocrpt_mem_malloc(bytes_read + 1);
+		memcpy(o->csv_delimiter, value, bytes_read);
+		o->csv_delimiter[bytes_read] = 0;
 	} else if (strcmp(param, "csv_as_text"))
 		o->csv_as_text = strcasecmp(value, "yes") == 0 || strcasecmp(value, "true") == 0 || strcasecmp(value, "on") == 0 || atoi(value) > 0;
 	else if (strcmp(param, "xml_rlib_compat") == 0)

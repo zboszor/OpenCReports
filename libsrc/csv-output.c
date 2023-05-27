@@ -75,7 +75,7 @@ static void ocrpt_csv_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 
 	if (le->value || le->result_str->len) {
 		if (priv->column_index)
-			ocrpt_mem_string_append_c(o->output_buffer, o->csv_delimiter ? o->csv_delimiter[0] : ',');
+			ocrpt_mem_string_append(o->output_buffer, o->csv_delimiter ? o->csv_delimiter : ",");
 		if (priv->data->allocated_len < le->result_str->len * 3)
 			ocrpt_mem_string_resize(priv->data, le->result_str->len * 3 + 16);
 
@@ -94,7 +94,7 @@ static void ocrpt_csv_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 		return;
 
 	if (priv->column_index)
-		ocrpt_mem_string_append_c(o->output_buffer, o->csv_delimiter ? o->csv_delimiter[0] : ',');
+		ocrpt_mem_string_append(o->output_buffer, o->csv_delimiter ? o->csv_delimiter : ",");
 
 	/* No data here */
 	priv->column_index++;
