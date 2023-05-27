@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="5" cols="5" />
+	</Queries>
+	<Part>
+		<pr>
+			<pd>
+				<load name="layout_xml13_loaded_part.xml" />
+			</pd>
+		</pr>
+	</Part>
+</OpenCReport>

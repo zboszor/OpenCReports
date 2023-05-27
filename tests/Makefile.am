@@ -135,107 +135,107 @@ SLOW_PHP_TESTS = \
 # compared with the ImageMagick "compare" utility. This slows down
 # running these tests but makes them reliable across Cairo versions.
 LAYOUT_TESTS = \
-	layout_pdf_xml_test \
-	layout_pdf_xml2_test \
-	layout_pdf_xml3_test \
-	layout_pdf_xml4_test \
-	layout_pdf_xml4_headernewpage_test \
-	layout_pdf_xml5_test \
-	layout_pdf_xml5_headernewpage_test \
-	layout_pdf_xml6_test \
-	layout_pdf_xml7_test \
-	layout_pdf_xml8_test \
-	layout_pdf_xml9_test \
-	layout_pdf_xml9_headernewpage_test \
-	layout_pdf_xml10_test \
-	layout_pdf_xml11_test \
-	layout_pdf_xml12_test \
-	layout_pdf_xml13_test \
-	layout_pdf_xml14_test \
-	layout_pdf_xml15_test \
-	layout_pdf_xml16_test \
-	layout_pdf_xml17_test \
-	layout_pdf_xml18_test \
-	layout_pdf_xml19_test \
-	layout_pdf_xml20_test \
-	layout_pdf_xml21_test \
-	layout_pdf_xml22_test \
-	layout_pdf_xml23_test \
-	layout_pdf_xml24_test \
-	layout_pdf_xml25_test \
-	layout_pdf_xml26_test \
-	layout_pdf_xml27_test \
+	layout_xml_test \
+	layout_xml2_test \
+	layout_xml3_test \
+	layout_xml4_test \
+	layout_xml4_headernewpage_test \
+	layout_xml5_test \
+	layout_xml5_headernewpage_test \
+	layout_xml6_test \
+	layout_xml7_test \
+	layout_xml8_test \
+	layout_xml9_test \
+	layout_xml9_headernewpage_test \
+	layout_xml10_test \
+	layout_xml11_test \
+	layout_xml12_test \
+	layout_xml13_test \
+	layout_xml14_test \
+	layout_xml15_test \
+	layout_xml16_test \
+	layout_xml17_test \
+	layout_xml18_test \
+	layout_xml19_test \
+	layout_xml20_test \
+	layout_xml21_test \
+	layout_xml22_test \
+	layout_xml23_test \
+	layout_xml24_test \
+	layout_xml25_test \
+	layout_xml26_test \
+	layout_xml27_test \
 	layout_rlib_fixed_part_test \
 	layout_ocrpt_fixed_part_test \
-	layout_pdf_xml28_test \
-	layout_pdf_xml29_test \
-	layout_pdf_xml30_test \
-	layout_pdf_xml31_test \
-	layout_pdf_xml32_test \
-	layout_pdf_xml33_test \
-	layout_pdf_xml34_test \
-	layout_pdf_xml35_test \
-	layout_pdf_xml36_test \
-	layout_pdf_xml37_test \
-	layout_pdf_xml38_test \
-	layout_pdf_xml39_test \
-	layout_pdf_xml40_test \
-	layout_pdf_xml41_test \
-	layout_pdf41_test \
-	layout_pdf_xml42_test \
+	layout_xml28_test \
+	layout_xml29_test \
+	layout_xml30_test \
+	layout_xml31_test \
+	layout_xml32_test \
+	layout_xml33_test \
+	layout_xml34_test \
+	layout_xml35_test \
+	layout_xml36_test \
+	layout_xml37_test \
+	layout_xml38_test \
+	layout_xml39_test \
+	layout_xml40_test \
+	layout_xml41_test \
+	layout_code41_test \
+	layout_xml42_test \
 	header_query_test \
 	header_query2_test \
 	page_header_footer_vars_test \
 	break_suppressblank_test
 
 PHP_LAYOUT_TESTS = \
-	layout_pdf_xml_test \
-	layout_pdf_xml2_test \
-	layout_pdf_xml3_test \
-	layout_pdf_xml4_test \
-	layout_pdf_xml5_test \
-	layout_pdf_xml6_test \
-	layout_pdf_xml7_test \
-	layout_pdf_xml8_test \
-	layout_pdf_xml9_test \
-	layout_pdf_xml10_test \
-	layout_pdf_xml11_test \
-	layout_pdf_xml12_test \
-	layout_pdf_xml13_test \
-	layout_pdf_xml14_test \
-	layout_pdf_xml15_test \
-	layout_pdf_xml16_test \
-	layout_pdf_xml17_test \
-	layout_pdf_xml18_test \
-	layout_pdf_xml19_test \
-	layout_pdf_xml20_test \
-	layout_pdf_xml21_test \
-	layout_pdf_xml22_test \
-	layout_pdf_xml23_test \
-	layout_pdf_xml24_test \
-	layout_pdf_xml25_test \
-	layout_pdf_xml26_test \
-	layout_pdf_xml27_test \
+	layout_xml_test \
+	layout_xml2_test \
+	layout_xml3_test \
+	layout_xml4_test \
+	layout_xml5_test \
+	layout_xml6_test \
+	layout_xml7_test \
+	layout_xml8_test \
+	layout_xml9_test \
+	layout_xml10_test \
+	layout_xml11_test \
+	layout_xml12_test \
+	layout_xml13_test \
+	layout_xml14_test \
+	layout_xml15_test \
+	layout_xml16_test \
+	layout_xml17_test \
+	layout_xml18_test \
+	layout_xml19_test \
+	layout_xml20_test \
+	layout_xml21_test \
+	layout_xml22_test \
+	layout_xml23_test \
+	layout_xml24_test \
+	layout_xml25_test \
+	layout_xml26_test \
+	layout_xml27_test \
 	layout_rlib_fixed_part_test \
 	layout_rlib_fixed_part2_test \
 	layout_ocrpt_fixed_part_test \
 	layout_ocrpt_fixed_part2_test \
-	layout_pdf_xml28_test \
-	layout_pdf_xml29_test \
-	layout_pdf_xml30_test \
-	layout_pdf_xml31_test \
-	layout_pdf_xml32_test \
-	layout_pdf_xml33_test \
-	layout_pdf_xml34_test \
-	layout_pdf_xml35_test \
-	layout_pdf_xml36_test \
-	layout_pdf_xml37_test \
-	layout_pdf_xml38_test \
-	layout_pdf_xml39_test \
-	layout_pdf_xml40_test \
-	layout_pdf41_test \
-	layout_pdf_xml41_test \
-	layout_pdf_xml42_test
+	layout_xml28_test \
+	layout_xml29_test \
+	layout_xml30_test \
+	layout_xml31_test \
+	layout_xml32_test \
+	layout_xml33_test \
+	layout_xml34_test \
+	layout_xml35_test \
+	layout_xml36_test \
+	layout_xml37_test \
+	layout_xml38_test \
+	layout_xml39_test \
+	layout_xml40_test \
+	layout_xml41_test \
+	layout_code41_test \
+	layout_xml42_test
 
 if ENABLE_XLATE_TESTS
 
@@ -246,12 +246,12 @@ XLATE_DEPS = \
 	$(MSGFMT) -o $@ $(srcdir)/$<
 
 LAYOUT_TESTS += \
-	layout_pdf_translate1_test \
-	layout_pdf_translate_xml1_test
+	layout_translate1_test \
+	layout_translate_xml1_test
 
 PHP_LAYOUT_TESTS += \
-	layout_pdf_translate1_test \
-	layout_pdf_translate_xml1_test
+	layout_translate1_test \
+	layout_translate_xml1_test
 
 endif
 

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="5" cols="5" />
+		<Query name="b" datasource="myarray" value="'array2'" coltypes="'coltypes'" rows="4" cols="5" />
+	</Queries>
+	<Part>
+		<pr>
+			<pd>
+				<Report query="nonexisting">
+					<NoData>
+						<Output>
+							<HorizontalLine size="1" color="'bobkratz'" />
+						</Output>
+					</NoData>
+				</Report>
+			</pd>
+		</pr>
+		<pr>
+			<pd border_width="2" border_color="'green'">
+				<load name="layout_xml17_loaded_part.xml" query="a" />
+			</pd>
+			<pd width="2" />
+			<pd>
+				<load name="layout_xml17_loaded_part.xml" query="b" />
+			</pd>
+		</pr>
+		<pr>
+			<pd>
+				<Report query="nonexisting">
+					<NoData>
+						<Output>
+							<HorizontalLine size="1" color="'bobkratz'" />
+						</Output>
+					</NoData>
+				</Report>
+			</pd>
+		</pr>
+	</Part>
+</OpenCReport>
