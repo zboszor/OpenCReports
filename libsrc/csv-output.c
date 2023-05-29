@@ -58,20 +58,20 @@ static bool ocrpt_csv_is_current_page_first(opencreport *o) {
 	return priv->current_page == priv->pages;
 }
 
-static void ocrpt_csv_start_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, double page_indent, double y) {
+static void ocrpt_csv_start_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, double page_indent, double y) {
 	csv_private_data *priv = o->output_private;
 
 	priv->column_index = 0;
 }
 
-static void ocrpt_csv_end_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l) {
+static void ocrpt_csv_end_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l) {
 	csv_private_data *priv = o->output_private;
 
 	if (priv->column_index)
 		ocrpt_mem_string_append(o->output_buffer, "\n");
 }
 
-static void ocrpt_csv_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double page_width, double page_indent, double y) {
+static void ocrpt_csv_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double page_width, double page_indent, double y) {
 	csv_private_data *priv = o->output_private;
 
 	if (le->value || le->result_str->len) {
@@ -110,7 +110,7 @@ static void ocrpt_csv_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 	}
 }
 
-static void ocrpt_csv_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_width, double page_indent, double x, double y, double w, double h) {
+static void ocrpt_csv_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_width, double page_indent, double x, double y, double w, double h) {
 	csv_private_data *priv = o->output_private;
 
 	if (!line)

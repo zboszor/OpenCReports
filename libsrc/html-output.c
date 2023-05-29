@@ -67,26 +67,26 @@ static void ocrpt_html_end_part_column(opencreport *o, ocrpt_part *p, ocrpt_part
 	ocrpt_mem_string_append(o->output_buffer, "<!--part column end-->\n</td>\n");
 }
 
-static void ocrpt_html_start_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *out) {
+static void ocrpt_html_start_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *out) {
 	ocrpt_mem_string_append_printf(o->output_buffer,
 										"<!--output start--><section style=\"clear: both; width: %.2lfpt; \">\n",
 										pd->real_width);
 }
 
-static void ocrpt_html_end_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *out) {
+static void ocrpt_html_end_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *out) {
 	html_private_data *priv = o->output_private;
 
 	ocrpt_mem_string_append(o->output_buffer, "<!--output end--></section>\n");
 	priv->image_indent = 0.0;
 }
 
-static void ocrpt_html_start_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, double page_indent, double y) {
+static void ocrpt_html_start_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, double page_indent, double y) {
 	ocrpt_mem_string_append_printf(o->output_buffer,
 										"<p style=\"line-height: %.2lfpt; \">",
 										l->line_height);
 }
 
-static void ocrpt_html_end_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l) {
+static void ocrpt_html_end_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l) {
 	ocrpt_mem_string_append(o->output_buffer, "</p>\n");
 }
 
@@ -135,7 +135,7 @@ static bool ocrpt_html_is_current_page_first(opencreport *o) {
 	return priv->current_page == priv->pages;
 }
 
-static void ocrpt_html_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_hline *hline, double page_width, double page_indent, double page_position, double size) {
+static void ocrpt_html_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_hline *hline, double page_width, double page_indent, double page_position, double size) {
 	html_private_data *priv = o->output_private;
 	double indent, length;
 
@@ -424,7 +424,7 @@ static inline void ocrpt_html_escape_data(opencreport *o, ocrpt_text *le) {
 		ocrpt_mem_string_append(priv->data, "&nbsp;");
 }
 
-static void ocrpt_html_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double page_width, double page_indent, double y) {
+static void ocrpt_html_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double page_width, double page_indent, double y) {
 	html_private_data *priv = o->output_private;
 
 	if (pd && (le->start > pd->real_width))
@@ -512,7 +512,7 @@ static const char *ocrpt_html_truncate_file_prefix(html_private_data *priv, cons
 	return filename;
 }
 
-static void ocrpt_html_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_width, double page_indent, double x, double y, double w, double h) {
+static void ocrpt_html_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_width, double page_indent, double x, double y, double w, double h) {
 	html_private_data *priv = o->output_private;
 	ocrpt_image_file *img_file = img->img_file;
 
@@ -580,7 +580,7 @@ static void ocrpt_html_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 	}
 }
 
-static void ocrpt_html_draw_imageend(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output) {
+static void ocrpt_html_draw_imageend(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output) {
 	html_private_data *priv = o->output_private;
 
 	ocrpt_mem_string_append(o->output_buffer,
