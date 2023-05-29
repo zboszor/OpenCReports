@@ -1,0 +1,984 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <part_page_header>
+      <output>
+        <line>
+          <data width="813.09" font_point="14.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">Page header: 1 / 1</data>
+        </line>
+      </output>
+    </part_page_header>
+    <table>
+      <tr>
+        <td width="813.09">
+          <report>
+            <report_header>
+              <output>
+                <line>
+                  <data width="194.00" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Yabba dabba doo header </data>
+                  <data width="141.00" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">average age: 19.58</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">ID</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Name</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Property</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Age</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Adult</data>
+                </line>
+              </output>
+            </field_headers>
+            <break_header name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Male break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Fred Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">strong</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">31.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Barney Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">small</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">29.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Bamm-Bamm Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">energetic</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_footer name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Male break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Female break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Wilma Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">charming</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">28.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Betty Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">beautiful</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">27.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">6</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pebbles Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">young</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">0.50</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_footer name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Female break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Male break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">7</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Fred Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">strong</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">31.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">8</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Barney Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">small</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">29.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">9</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Bamm-Bamm Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">energetic</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_footer name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Male break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Female break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">10</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Wilma Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">charming</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">28.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">11</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Betty Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">beautiful</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">27.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">12</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pebbles Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">young</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">0.50</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_footer name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Female break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Male break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">13</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Fred Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">strong</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">31.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">14</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Barney Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">small</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">29.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">15</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Bamm-Bamm Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">energetic</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_footer name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Male break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Female break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">16</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Wilma Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">charming</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">28.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">17</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Betty Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">beautiful</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">27.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">18</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pebbles Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">young</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">0.50</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_footer name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Female break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Male break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">19</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Fred Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">strong</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">31.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">20</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Barney Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">small</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">29.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">21</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Bamm-Bamm Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">energetic</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_footer name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Male break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Female break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">22</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Wilma Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">charming</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">28.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">23</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Betty Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">beautiful</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">27.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">24</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pebbles Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">young</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">0.50</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_footer name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Female break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Male break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">25</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Fred Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">strong</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">31.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">26</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Barney Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">small</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">29.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">27</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Bamm-Bamm Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">energetic</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_footer name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Male break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">20.67</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Female break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">28</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Wilma Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">charming</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">28.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">29</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Betty Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">beautiful</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">27.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Adult break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break header</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">30</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pebbles Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">young</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">0.50</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="adult">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kid break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_footer name="male">
+              <output>
+                <line>
+                  <data width="156.00" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Female break footer</data>
+                  <data width="62.40" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">18.50</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="31.20" font_point="13.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <report_footer>
+              <output>
+                <line>
+                  <data width="186.00" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Yabba dabba doo footer </data>
+                  <data width="141.00" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">average age: 19.58</data>
+                </line>
+              </output>
+            </report_footer>
+          </report>
+        </td>
+      </tr>
+    </table>
+    <part_page_footer>
+      <output>
+        <line>
+          <data width="813.09" font_point="14.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">Page footer: 1 / 1</data>
+        </line>
+      </output>
+    </part_page_footer>
+  </part>
+</ocrpt>

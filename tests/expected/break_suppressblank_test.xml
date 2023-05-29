@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <table>
+      <tr>
+        <td width="566.48">
+          <report>
+            <break_header name="country">
+              <output>
+                <line>
+                  <data width="566.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Country: Germany</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="city">
+              <output>
+                <line>
+                  <data width="566.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">    City Hamburg, population 1841000</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="city">
+              <output>
+                <line>
+                  <data width="566.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">    City Berlin, population 3645000</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="city">
+              <output>
+                <line>
+                  <data width="566.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">    City Dresden, population 554649</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="country">
+              <output>
+                <line>
+                  <data width="566.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">City-state: San Marino, population 33745</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="country">
+              <output>
+                <line>
+                  <data width="566.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">City-state: Monaco, population 36686</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="country">
+              <output>
+                <line>
+                  <data width="566.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Country: Hungary</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="city">
+              <output>
+                <line>
+                  <data width="566.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">    City Budapest, population 1756000</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="city">
+              <output>
+                <line>
+                  <data width="566.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">    City Szolnok, population 71285</data>
+                </line>
+              </output>
+            </break_header>
+            <break_header name="country">
+              <output>
+                <line>
+                  <data width="566.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">City-state: Vatican, population 825</data>
+                </line>
+              </output>
+            </break_header>
+          </report>
+        </td>
+      </tr>
+    </table>
+  </part>
+</ocrpt>

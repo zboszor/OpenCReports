@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <table>
+      <tr>
+        <td width="566.48">
+          <report>
+            <no_data>
+              <output>
+                <line>
+                  <data width="24.00" font_point="20.00" font_face="Arial" bold="1" italics="0" align="left" bgcolor="#0000ff" color="#ff0000">ABCqwpfgjyb</data>
+                  <data width="24.00" font_point="12.00" font_face="Courier" bold="1" italics="1" align="left" bgcolor="#ffc59f" color="#008000">byjgfpwqCBA</data>
+                  <data width="24.00" font_point="8.00" font_face="Petaluma Script" bold="0" italics="1" align="left" bgcolor="#000000" color="#ffffff">ABCqwpfgjyb</data>
+                  <data width="24.00" font_point="8.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#008080" color="#0000ff">byjgfpwqCBA</data>
+                </line>
+              </output>
+            </no_data>
+          </report>
+        </td>
+      </tr>
+    </table>
+  </part>
+</ocrpt>

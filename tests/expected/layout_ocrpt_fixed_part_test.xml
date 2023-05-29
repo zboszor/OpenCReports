@@ -1,0 +1,1099 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <part_page_header>
+      <output>
+        <line>
+          <data width="813.09" font_point="26.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Fixed Part Test</data>
+        </line>
+        <line>
+          <data width="813.09" font_point="14.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">ICR</data>
+        </line>
+      </output>
+    </part_page_header>
+    <table>
+      <tr>
+        <td width="813.09">
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="813.09" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">      INVENTORY REPORT</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">NUM</data>
+                  <data width="180.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">NAME</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">UNIT</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">OPEN</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">USAGE</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">RECEIVED</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">TRANS IN</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">TRANS OUT</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">WASTE</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">1</data>
+                  <data width="180.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">BUN, REG/PREMIUM</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">DOZEN</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">176</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="180.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">BUN, KAISER</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DOZEN</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">176</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                </line>
+              </output>
+            </field_details>
+          </report>
+        </td>
+      </tr>
+      <tr>
+        <td width="420.00">
+          <report>
+            <report_header>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">YIELDS</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Item</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Portions</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">EQV</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">REG EQUIV</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Hamburger</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">1</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">100</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Chicken</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">150</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Pasta</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">1</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">190</data>
+                </line>
+              </output>
+            </field_details>
+            <report_footer>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">      YIELDS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">      YIELDS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">      YIELDS</data>
+                </line>
+              </output>
+            </report_footer>
+          </report>
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="150.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">   WWW.DT TIMING</data>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NUMBER OF CARS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NUMBER PARKED</data>
+                </line>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">EXCEED COUNT</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NUMBER PARKED</data>
+                </line>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">AVE PARK TIME</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">AVE TOTAL TIME</data>
+                </line>
+              </output>
+            </report_header>
+          </report>
+        </td>
+        <td width="420.00">
+          <report>
+            <report_header>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DEPOSITS</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">  TIME  </data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000"> BAG ID   </data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000"> MGR. ID </data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">   AMOUNT</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">12:00</data>
+                  <data width="500.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">DEPOSIT 1</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">4:00</data>
+                  <data width="500.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DEPOSIT 2</data>
+                </line>
+              </output>
+            </field_details>
+            <report_footer>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> TOTAL DEPOSITS</data>
+                </line>
+              </output>
+            </report_footer>
+          </report>
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OTHER??? </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">BREAK FAST SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">BREAKFAST SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">SALAD SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">SALAD SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DRIVE-THRU SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DRIVE-THRU SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OVER-RINGS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OVER-RINGS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OVER-RINGS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">COUPONS MEALS WASTE</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">COUPONS MEALS WASTE</data>
+                </line>
+              </output>
+            </report_header>
+          </report>
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">      INVENTORY TRANSFER</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">QTY</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Name</data>
+                  <data width="35.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">FROM</data>
+                  <data width="35.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">TO</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">100</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Buns</data>
+                  <data width="35.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">1121</data>
+                  <data width="35.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">4452</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">400</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pattys</data>
+                  <data width="35.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1121</data>
+                  <data width="35.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">4499</data>
+                </line>
+              </output>
+            </field_details>
+          </report>
+        </td>
+        <td width="420.00">
+          <report>
+            <report_header>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">     CASH RECONCILIATION </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NET SALES </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">TAX 	</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">GROSS SALES </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">RESTAURANT BANK</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">ADJUSTED GROSS CASH</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">AMOUNT DEPOSITED</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">GIFT REDEEMED</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">MISC. INCOME</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">PETTY CASH</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NET SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">TAX</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">CASH OVER/SHORT </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">CASHIER OVER/SHORT </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OVER/SHORT RECONCILIATION</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NET SALES </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">GIFT CERT. SOLD </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OTHER NON-FOOD</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NET FOOD SALES</data>
+                </line>
+              </output>
+            </report_header>
+          </report>
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">PETTY CASH</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="40.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">TIME</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">NAME</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">AMOUNT</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="40.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">1:00</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Sugar</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">20.00</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="40.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2:00</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pants</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">40.00</data>
+                </line>
+              </output>
+            </field_details>
+            <report_footer>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> TOTAL PETTY CASH</data>
+                </line>
+              </output>
+            </report_footer>
+          </report>
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">MISC INCOME</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="40.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">TIME</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">NAME</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">AMOUNT</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="40.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">1:00</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Birthday Party</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">20.00</data>
+                </line>
+              </output>
+            </field_details>
+            <report_footer>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> TOTAL MISC INCOME</data>
+                </line>
+              </output>
+            </report_footer>
+          </report>
+        </td>
+      </tr>
+      <tr>
+        <td width="150.00">
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">     LABOR </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">FORMULA HRS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">ACTUAL HRS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DIFFERENCE</data>
+                </line>
+              </output>
+            </report_header>
+          </report>
+        </td>
+        <td width="150.00">
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="499.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> ---------    Comments  ------------------</data>
+                </line>
+                <line>
+                  <data width="499.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">slashdot.org</data>
+                </line>
+                <line>
+                  <data width="499.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">philadelphiaeagles.com</data>
+                </line>
+                <line>
+                  <data width="499.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">sicom.com                  EAT               MORE                 CHEESE</data>
+                </line>
+              </output>
+            </report_header>
+          </report>
+        </td>
+      </tr>
+      <tr>
+        <td width="813.09">
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="813.09" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">      INVENTORY REPORT</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">NUM</data>
+                  <data width="180.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">NAME</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">UNIT</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">OPEN</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">USAGE</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">RECEIVED</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">TRANS IN</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">TRANS OUT</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">WASTE</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">1</data>
+                  <data width="180.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">BUN, REG/PREMIUM</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">DOZEN</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">176</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="180.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">BUN, KAISER</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DOZEN</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">176</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                </line>
+              </output>
+            </field_details>
+          </report>
+        </td>
+      </tr>
+    </table>
+    <part_page_footer>
+      <output>
+        <line>
+          <data width="46.00" font_point="14.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Page: </data>
+          <data width="30.00" font_point="14.00" font_face="Arial" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+        </line>
+        <line>
+          <data width="333.00" font_point="14.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Wheeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee: </data>
+          <data width="30.00" font_point="14.00" font_face="Arial" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+        </line>
+      </output>
+    </part_page_footer>
+  </part>
+  <part>
+    <table>
+      <tr>
+        <td width="813.09">
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="813.09" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">      INVENTORY REPORT</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">NUM</data>
+                  <data width="180.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">NAME</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">UNIT</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">OPEN</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">USAGE</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">RECEIVED</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">TRANS IN</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">TRANS OUT</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">WASTE</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">1</data>
+                  <data width="180.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">BUN, REG/PREMIUM</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">DOZEN</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">176</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="180.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">BUN, KAISER</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DOZEN</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">176</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                </line>
+              </output>
+            </field_details>
+          </report>
+        </td>
+      </tr>
+      <tr>
+        <td width="420.00">
+          <report>
+            <report_header>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">YIELDS</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Item</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Portions</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">EQV</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">REG EQUIV</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Hamburger</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">1</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">100</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Chicken</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">150</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">MIKEROTH</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">CALL</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">BACK</data>
+                </line>
+              </output>
+            </field_details>
+            <report_footer>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">      YIELDS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">      YIELDS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">      YIELDS</data>
+                </line>
+              </output>
+            </report_footer>
+          </report>
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="150.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">   WWW.DT TIMING</data>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NUMBER OF CARS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NUMBER PARKED</data>
+                </line>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">EXCEED COUNT</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NUMBER PARKED</data>
+                </line>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">AVE PARK TIME</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">AVE TOTAL TIME</data>
+                </line>
+              </output>
+            </report_header>
+          </report>
+        </td>
+        <td width="420.00">
+          <report>
+            <report_header>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DEPOSITS</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">  TIME  </data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000"> BAG ID   </data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000"> MGR. ID </data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">   AMOUNT</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">12:00</data>
+                  <data width="500.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">DEPOSIT 1</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">4:00</data>
+                  <data width="500.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DEPOSIT 2</data>
+                </line>
+              </output>
+            </field_details>
+            <report_footer>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> TOTAL DEPOSITS</data>
+                </line>
+              </output>
+            </report_footer>
+          </report>
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OTHER??? </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">BREAK FAST SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">BREAKFAST SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">SALAD SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">SALAD SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DRIVE-THRU SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DRIVE-THRU SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OVER-RINGS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OVER-RINGS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OVER-RINGS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">COUPONS MEALS WASTE</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">COUPONS MEALS WASTE</data>
+                </line>
+              </output>
+            </report_header>
+          </report>
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">      INVENTORY TRANSFER</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">QTY</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Name</data>
+                  <data width="35.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">FROM</data>
+                  <data width="35.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">TO</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">100</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Buns</data>
+                  <data width="35.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">1121</data>
+                  <data width="35.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">4452</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">400</data>
+                  <data width="50.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pattys</data>
+                  <data width="35.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1121</data>
+                  <data width="35.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">4499</data>
+                </line>
+              </output>
+            </field_details>
+          </report>
+        </td>
+        <td width="420.00">
+          <report>
+            <report_header>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">     CASH RECONCILIATION </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NET SALES </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">TAX 	</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">GROSS SALES </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">RESTAURANT BANK</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">ADJUSTED GROSS CASH</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">AMOUNT DEPOSITED</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">GIFT REDEEMED</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">MISC. INCOME</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">PETTY CASH</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NET SALES</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">TAX</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">CASH OVER/SHORT </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">CASHIER OVER/SHORT </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OVER/SHORT RECONCILIATION</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NET SALES </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">GIFT CERT. SOLD </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OTHER NON-FOOD</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">NET FOOD SALES</data>
+                </line>
+              </output>
+            </report_header>
+          </report>
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">PETTY CASH</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="40.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">TIME</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">NAME</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">AMOUNT</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="40.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">1:00</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Sugar</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">20.00</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="40.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2:00</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pants</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">40.00</data>
+                </line>
+              </output>
+            </field_details>
+            <report_footer>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> TOTAL PETTY CASH</data>
+                </line>
+              </output>
+            </report_footer>
+          </report>
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">MISC INCOME</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="40.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">TIME</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">NAME</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">AMOUNT</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="40.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">1:00</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Birthday Party</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">20.00</data>
+                </line>
+              </output>
+            </field_details>
+            <report_footer>
+              <output>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> TOTAL MISC INCOME</data>
+                </line>
+              </output>
+            </report_footer>
+          </report>
+        </td>
+      </tr>
+      <tr>
+        <td width="150.00">
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">     LABOR </data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">FORMULA HRS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">ACTUAL HRS</data>
+                </line>
+                <line>
+                  <data width="249.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DIFFERENCE</data>
+                </line>
+              </output>
+            </report_header>
+          </report>
+        </td>
+        <td width="150.00">
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="499.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> ---------    Comments  ------------------</data>
+                </line>
+                <line>
+                  <data width="499.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">slashdot.org</data>
+                </line>
+                <line>
+                  <data width="499.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">philadelphiaeagles.com</data>
+                </line>
+                <line>
+                  <data width="499.60" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">sicom.com                  EAT               MORE                 CHEESE</data>
+                </line>
+              </output>
+            </report_header>
+          </report>
+        </td>
+      </tr>
+      <tr>
+        <td width="813.09">
+          <report>
+            <report_header>
+              <output>
+                <line/>
+                <line>
+                  <data width="813.09" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">      INVENTORY REPORT</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">NUM</data>
+                  <data width="180.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">NAME</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">UNIT</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">OPEN</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">USAGE</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">RECEIVED</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">TRANS IN</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">TRANS OUT</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">WASTE</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">1</data>
+                  <data width="180.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">BUN, REG/PREMIUM</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">DOZEN</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">176</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">0</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="30.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="180.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">BUN, KAISER</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">DOZEN</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">176</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="90.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                  <data width="100.00" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+                </line>
+              </output>
+            </field_details>
+          </report>
+        </td>
+      </tr>
+    </table>
+    <part_page_footer>
+      <output>
+        <line>
+          <data width="46.00" font_point="14.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Page: </data>
+          <data width="30.00" font_point="14.00" font_face="Arial" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+        </line>
+        <line>
+          <data width="333.00" font_point="14.00" font_face="Arial" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Wheeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee: </data>
+          <data width="30.00" font_point="14.00" font_face="Arial" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+        </line>
+      </output>
+    </part_page_footer>
+  </part>
+</ocrpt>

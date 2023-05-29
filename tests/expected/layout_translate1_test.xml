@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <part_page_header>
+      <output>
+        <line>
+          <data width="813.09" font_point="14.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">Lap fejléc: 1 / 1</data>
+        </line>
+      </output>
+    </part_page_header>
+    <table>
+      <tr>
+        <td width="813.09">
+          <report>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">ID</data>
+                  <data width="360.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Üdvözlet</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Életkor</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">Felnőtt</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">1</data>
+                  <data width="360.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="justified" bgcolor="#e5e5e5" color="#000000">Boldog születésnapot, Fred Flintstone!</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">31,00</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">igen</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="360.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="justified" bgcolor="#ffffff" color="#000000">Boldog születésnapot, Wilma Flintstone!</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">28,00</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">igen</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">3</data>
+                  <data width="360.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="justified" bgcolor="#e5e5e5" color="#000000">Boldog születésnapot, Pebbles Flintstone!</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">0,50</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">nem</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="360.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="justified" bgcolor="#ffffff" color="#000000">Boldog születésnapot, Betty Rubble!</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">27,00</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">igen</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">5</data>
+                  <data width="360.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="justified" bgcolor="#e5e5e5" color="#000000">Boldog születésnapot, Barney Rubble!</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">29,00</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">igen</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">6</data>
+                  <data width="360.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="justified" bgcolor="#ffffff" color="#000000">Boldog születésnapot, Mr. George Slate!</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">53,00</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">igen</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">7</data>
+                  <data width="360.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="justified" bgcolor="#e5e5e5" color="#000000">Boldog születésnapot, Joe Rockhead!</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">33,00</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">igen</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">8</data>
+                  <data width="360.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="justified" bgcolor="#ffffff" color="#000000">Boldog születésnapot, Sam Slagheap!</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">37,00</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">igen</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">9</data>
+                  <data width="360.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="justified" bgcolor="#e5e5e5" color="#000000">Boldog születésnapot, The Great Gazoo!</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">1200,00</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">igen</data>
+                </line>
+              </output>
+            </field_details>
+          </report>
+        </td>
+      </tr>
+    </table>
+    <part_page_footer>
+      <output>
+        <line>
+          <data width="813.09" font_point="14.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">Lap lábléc: 1 / 1</data>
+        </line>
+      </output>
+    </part_page_footer>
+  </part>
+</ocrpt>

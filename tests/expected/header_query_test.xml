@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <table>
+      <tr>
+        <td width="282.90">
+          <report>
+            <field_details>
+              <output>
+                <line>
+                  <data width="15.15" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="75.76" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Fred Flintstone</data>
+                  <data width="37.88" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">property</data>
+                  <data width="30.30" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">31.00</data>
+                  <data width="18.94" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="15.15" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="75.76" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Barney Rubble</data>
+                  <data width="37.88" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">property</data>
+                  <data width="30.30" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">29.00</data>
+                  <data width="18.94" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="15.15" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="75.76" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Bamm-Bamm Rubble</data>
+                  <data width="37.88" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">property</data>
+                  <data width="30.30" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2.00</data>
+                  <data width="18.94" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="15.15" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="75.76" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Wilma Flintstone</data>
+                  <data width="37.88" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">property</data>
+                  <data width="30.30" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">28.00</data>
+                  <data width="18.94" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="15.15" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                  <data width="75.76" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Betty Rubble</data>
+                  <data width="37.88" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">property</data>
+                  <data width="30.30" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">27.00</data>
+                  <data width="18.94" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="15.15" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">6</data>
+                  <data width="75.76" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pebbles Flintstone</data>
+                  <data width="37.88" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">property</data>
+                  <data width="30.30" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">0.50</data>
+                  <data width="18.94" font_point="9.00" font_face="Times New Roman" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+          </report>
+        </td>
+      </tr>
+    </table>
+  </part>
+</ocrpt>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <table>
+      <tr>
+        <td width="566.48">
+          <report>
+            <no_data>
+              <output>
+                <line>
+                  <data width="566.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OpenCReports has links now!</data>
+                </line>
+                <line>
+                  <data width="566.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">OpenCReports has links now!</data>
+                </line>
+              </output>
+            </no_data>
+          </report>
+        </td>
+      </tr>
+    </table>
+  </part>
+</ocrpt>

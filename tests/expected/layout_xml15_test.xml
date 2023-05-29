@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <table>
+      <tr>
+        <td width="566.48">
+          <report>
+            <report_header>
+              <output>
+                <line>
+                  <data width="566.48" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Flintstones report 1 header</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">ID</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Name</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Property</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Age</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Adult</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">1</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Fred Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">strong</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">31.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Wilma Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">charming</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">28.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">3</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Pebbles Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">young</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">0.50</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Betty Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">beautiful</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">27.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">5</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Barney Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">small</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">29.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <report_footer>
+              <output>
+                <line>
+                  <data width="566.48" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Flintstones report 1 footer</data>
+                </line>
+              </output>
+            </report_footer>
+          </report>
+          <report>
+            <report_header>
+              <output>
+                <line>
+                  <data width="566.48" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Flintstones report 1 header</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">ID</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Name</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Property</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Age</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Adult</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">1</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Fred Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">strong</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">31.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Wilma Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">charming</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">28.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">3</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Pebbles Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">young</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">0.50</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Betty Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">beautiful</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">27.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">5</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Barney Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">small</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">29.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <report_footer>
+              <output>
+                <line>
+                  <data width="566.48" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Flintstones report 1 footer</data>
+                </line>
+              </output>
+            </report_footer>
+          </report>
+          <report>
+            <report_header>
+              <output>
+                <line>
+                  <data width="566.48" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Flintstones report 1 header</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">ID</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Name</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Property</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Age</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Adult</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">1</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Fred Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">strong</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">31.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Wilma Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">charming</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">28.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">3</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Pebbles Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">young</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">0.50</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">no</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Betty Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">beautiful</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">27.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">5</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Barney Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">small</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#e5e5e5" color="#000000">29.00</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">yes</data>
+                </line>
+              </output>
+            </field_details>
+            <report_footer>
+              <output>
+                <line>
+                  <data width="566.48" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Flintstones report 1 footer</data>
+                </line>
+              </output>
+            </report_footer>
+          </report>
+        </td>
+      </tr>
+    </table>
+  </part>
+</ocrpt>

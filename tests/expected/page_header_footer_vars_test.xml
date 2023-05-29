@@ -1,0 +1,778 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <part_page_header>
+      <output>
+        <line>
+          <data width="89.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Fruit count </data>
+          <data width="9.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
+          <data width="251.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> (carry over from previous page)</data>
+        </line>
+      </output>
+    </part_page_header>
+    <table>
+      <tr>
+        <td width="566.48">
+          <report>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Type</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Number</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Running sum</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Acai berry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">75</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">75</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Acerola</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">25</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">100</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Apple</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">104</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Appleberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">32</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">136</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Apricot</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">6</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">142</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Avocado</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">6</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">148</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Banana</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">150</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Blackberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">151</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Blackcurrant</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">32</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">183</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Black sapote</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">186</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Blood orange</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">189</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Blueberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">15</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">204</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Boysenberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">35</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">239</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Cantaloupe</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">242</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Carambola</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">245</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Chayote</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">247</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Cherimoya</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">252</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Cherry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">20</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">272</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Coconut</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">274</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Cranberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">35</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">309</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Currant</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">50</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">359</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Date</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">364</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Dewberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">50</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">414</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Dragonfruit</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">415</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Durian</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">416</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Elderberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">32</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">448</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Feijoa</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">15</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">463</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Fig</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">467</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Gooseberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">50</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">517</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Grape</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">522</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Grapefruit</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">523</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Guava</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">525</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Honeydew</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">6</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">531</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Huckleberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">40</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">571</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Jackfruit</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">575</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Jambul</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">579</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kiwi</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">581</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Key lime</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">585</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Kumquat</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">30</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">615</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Lemon</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">618</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Lime</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">621</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Longan</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">624</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Loquat</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">627</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Lychee</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">20</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">647</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Mandarin</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">651</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Mango</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">653</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Mamey</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">655</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Marula</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">657</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Medlar</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">15</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">672</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Mombin</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">676</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Mulberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">40</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">716</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Nectarine</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">718</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Orange</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">723</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Papaw</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">726</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Papaya</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">729</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Passion fruit</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">734</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pawpaw</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">736</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Peach</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">740</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pear</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">743</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Persimmon</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">747</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pineapple</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">748</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pineberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">30</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">778</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Plum</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">35</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">813</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pomegranate</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">815</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pomelo</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">816</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Quince</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">821</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Raspberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">60</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">881</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Redcurrant</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">20</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">901</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Rhubarb</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">903</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Sea buckthorn</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">904</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Serviceberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">50</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">954</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Soursop</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">956</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Starfruit</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">957</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Strawberry</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">15</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">972</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Tamarillo</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">973</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Tangerine</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">976</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Ugli fruit</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">981</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Watermelon</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">983</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">White currant</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">50</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1033</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Yellow plum</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1038</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Yellow watermelon</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1039</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="216.01" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Zinfandel grape</data>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                  <data width="79.20" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1044</data>
+                </line>
+              </output>
+            </field_details>
+          </report>
+        </td>
+      </tr>
+    </table>
+    <part_page_footer>
+      <output>
+        <line>
+          <data width="89.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Fruit count </data>
+          <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1044</data>
+          <data width="98.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> (total count)</data>
+        </line>
+      </output>
+    </part_page_footer>
+  </part>
+</ocrpt>
