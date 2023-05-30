@@ -1355,6 +1355,8 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 	case OCRPT_OUTPUT_JSON:
 		ocrpt_json_init(o);
 		break;
+	default:
+		return false;
 	}
 
 	/* Initialize date() and now() values */
