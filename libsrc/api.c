@@ -98,6 +98,9 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 
 	memset(o, 0, sizeof(struct opencreport));
 
+	/* Default to PDF output */
+	o->output_format = OCRPT_OUTPUT_PDF;
+
 	o->paper = system_paper;
 	o->prec = OCRPT_MPFR_PRECISION_BITS;
 	o->rndmode = MPFR_RNDN;

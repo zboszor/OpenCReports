@@ -189,8 +189,7 @@ const ocrpt_string **ocrpt_get_content_type(opencreport *o);
  * Set output format
  */
 enum ocrpt_format_type {
-	OCRPT_OUTPUT_UNSET,
-	OCRPT_OUTPUT_PDF,
+	OCRPT_OUTPUT_PDF = 1,
 	OCRPT_OUTPUT_HTML,
 	OCRPT_OUTPUT_TXT,
 	OCRPT_OUTPUT_CSV,
