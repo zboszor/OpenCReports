@@ -9,12 +9,10 @@
 #include <stdint.h>
 
 #include "opencreport.h"
+#include "common-output.h"
 
 struct csv_private_data {
-	ocrpt_string *data;
-	ocrpt_list *pages;
-	ocrpt_list *last_page;
-	ocrpt_list *current_page;
+	common_private_data base;
 	uint32_t column_index;
 };
 typedef struct csv_private_data csv_private_data;

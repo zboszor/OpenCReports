@@ -16,24 +16,24 @@ static void ocrpt_txt_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row
 	txt_private_data *priv = o->output_private;
 
 	if (o->precalculate) {
-		if (!priv->current_page) {
-			if (!priv->pages)
-				priv->pages = ocrpt_list_end_append(priv->pages, &priv->last_page, NULL);
-			priv->current_page = priv->pages;
+		if (!priv->base.current_page) {
+			if (!priv->base.pages)
+				priv->base.pages = ocrpt_list_end_append(priv->base.pages, &priv->base.last_page, NULL);
+			priv->base.current_page = priv->base.pages;
 		} else {
 			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
-			priv->pages = ocrpt_list_end_append(priv->pages, &priv->last_page, NULL);
-			priv->current_page = priv->last_page;
+			priv->base.pages = ocrpt_list_end_append(priv->base.pages, &priv->base.last_page, NULL);
+			priv->base.current_page = priv->base.last_page;
 		}
 
 		if (mpfr_cmp(o->totpages->number, o->pageno->number) < 0)
 			mpfr_set(o->totpages->number, o->pageno->number, o->rndmode);
 	} else {
-		if (!priv->current_page) {
-			priv->current_page = priv->pages;
+		if (!priv->base.current_page) {
+			priv->base.current_page = priv->base.pages;
 		} else {
 			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
-			priv->current_page = priv->current_page->next;
+			priv->base.current_page = priv->base.current_page->next;
 		}
 	}
 }
@@ -41,19 +41,19 @@ static void ocrpt_txt_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row
 static void *ocrpt_txt_get_current_page(opencreport *o) {
 	txt_private_data *priv = o->output_private;
 
-	return priv->current_page;
+	return priv->base.current_page;
 }
 
 static void ocrpt_txt_set_current_page(opencreport *o, void *page) {
 	txt_private_data *priv = o->output_private;
 
-	priv->current_page = page;
+	priv->base.current_page = page;
 }
 
 static bool ocrpt_txt_is_current_page_first(opencreport *o) {
 	txt_private_data *priv = o->output_private;
 
-	return priv->current_page == priv->pages;
+	return priv->base.current_page == priv->base.pages;
 }
 
 static void ocrpt_txt_start_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, double page_indent, double y) {
@@ -74,8 +74,8 @@ static void ocrpt_txt_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 static void ocrpt_txt_finalize(opencreport *o) {
 	txt_private_data *priv = o->output_private;
 
-	ocrpt_list_free(priv->pages);
-	ocrpt_mem_string_free(priv->data, true);
+	ocrpt_list_free(priv->base.pages);
+	ocrpt_mem_string_free(priv->base.data, true);
 	ocrpt_mem_free(priv);
 	o->output_private = NULL;
 
@@ -103,7 +103,7 @@ void ocrpt_txt_init(opencreport *o) {
 	memset(o->output_private, 0, sizeof(txt_private_data));
 
 	txt_private_data *priv = o->output_private;
-	priv->data = ocrpt_mem_string_new_with_len(NULL, 4096);
+	priv->base.data = ocrpt_mem_string_new_with_len(NULL, 4096);
 
 	o->output_buffer = ocrpt_mem_string_new_with_len(NULL, 65536);
 }

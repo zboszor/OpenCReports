@@ -8,14 +8,10 @@
 
 #include <libxml/tree.h>
 #include "opencreport.h"
+#include "common-output.h"
 
 struct xml_private_data {
-	ocrpt_list *pages;
-	ocrpt_list *last_page;
-	ocrpt_list *current_page;
-	cairo_surface_t *nullpage_cs;
-	cairo_t *cr;
-	ocrpt_string *tmp;
+	common_private_data base;
 	xmlDocPtr doc;
 	xmlNodePtr toplevel;
 	xmlNodePtr part;

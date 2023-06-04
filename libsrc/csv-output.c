@@ -18,24 +18,24 @@ static void ocrpt_csv_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row
 	csv_private_data *priv = o->output_private;
 
 	if (o->precalculate) {
-		if (!priv->current_page) {
-			if (!priv->pages)
-				priv->pages = ocrpt_list_end_append(priv->pages, &priv->last_page, NULL);
-			priv->current_page = priv->pages;
+		if (!priv->base.current_page) {
+			if (!priv->base.pages)
+				priv->base.pages = ocrpt_list_end_append(priv->base.pages, &priv->base.last_page, NULL);
+			priv->base.current_page = priv->base.pages;
 		} else {
 			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
-			priv->pages = ocrpt_list_end_append(priv->pages, &priv->last_page, NULL);
-			priv->current_page = priv->last_page;
+			priv->base.pages = ocrpt_list_end_append(priv->base.pages, &priv->base.last_page, NULL);
+			priv->base.current_page = priv->base.last_page;
 		}
 
 		if (mpfr_cmp(o->totpages->number, o->pageno->number) < 0)
 			mpfr_set(o->totpages->number, o->pageno->number, o->rndmode);
 	} else {
-		if (!priv->current_page) {
-			priv->current_page = priv->pages;
+		if (!priv->base.current_page) {
+			priv->base.current_page = priv->base.pages;
 		} else {
 			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
-			priv->current_page = priv->current_page->next;
+			priv->base.current_page = priv->base.current_page->next;
 		}
 	}
 }
@@ -43,19 +43,19 @@ static void ocrpt_csv_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row
 static void *ocrpt_csv_get_current_page(opencreport *o) {
 	csv_private_data *priv = o->output_private;
 
-	return priv->current_page;
+	return priv->base.current_page;
 }
 
 static void ocrpt_csv_set_current_page(opencreport *o, void *page) {
 	csv_private_data *priv = o->output_private;
 
-	priv->current_page = page;
+	priv->base.current_page = page;
 }
 
 static bool ocrpt_csv_is_current_page_first(opencreport *o) {
 	csv_private_data *priv = o->output_private;
 
-	return priv->current_page == priv->pages;
+	return priv->base.current_page == priv->base.pages;
 }
 
 static void ocrpt_csv_start_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, double page_indent, double y) {
@@ -77,8 +77,8 @@ static void ocrpt_csv_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 	if (le->value || le->result_str->len) {
 		if (priv->column_index)
 			ocrpt_mem_string_append(o->output_buffer, o->csv_delimiter ? o->csv_delimiter : ",");
-		if (priv->data->allocated_len < le->result_str->len * 3)
-			ocrpt_mem_string_resize(priv->data, le->result_str->len * 3 + 16);
+		if (priv->base.data->allocated_len < le->result_str->len * 3)
+			ocrpt_mem_string_resize(priv->base.data, le->result_str->len * 3 + 16);
 
 		if (o->no_quotes)
 			ocrpt_mem_string_append_len(o->output_buffer, le->result_str->str, le->result_str->len);
@@ -89,8 +89,8 @@ static void ocrpt_csv_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 				 * Quote it if it's a string or string-like value.
 				 */
 				if (le->value->result[o->residx] && (le->value->result[o->residx]->type == OCRPT_RESULT_STRING || le->value->result[o->residx]->type == OCRPT_RESULT_ERROR)) {
-					size_t len = csv_write(priv->data->str, priv->data->allocated_len, le->result_str->str, le->result_str->len);
-					ocrpt_mem_string_append_len(o->output_buffer, priv->data->str, len);
+					size_t len = csv_write(priv->base.data->str, priv->base.data->allocated_len, le->result_str->str, le->result_str->len);
+					ocrpt_mem_string_append_len(o->output_buffer, priv->base.data->str, len);
 				} else
 					ocrpt_mem_string_append_len(o->output_buffer, le->result_str->str, le->result_str->len);
 			} else {
@@ -98,12 +98,12 @@ static void ocrpt_csv_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 				 * The field has no value set, but there's
 				 * a non-empty result string(!) - quote it.
 				 */
-				size_t len = csv_write(priv->data->str, priv->data->allocated_len, le->result_str->str, le->result_str->len);
-				ocrpt_mem_string_append_len(o->output_buffer, priv->data->str, len);
+				size_t len = csv_write(priv->base.data->str, priv->base.data->allocated_len, le->result_str->str, le->result_str->len);
+				ocrpt_mem_string_append_len(o->output_buffer, priv->base.data->str, len);
 			}
 		} else {
-			size_t len = csv_write(priv->data->str, priv->data->allocated_len, le->result_str->str, le->result_str->len);
-			ocrpt_mem_string_append_len(o->output_buffer, priv->data->str, len);
+			size_t len = csv_write(priv->base.data->str, priv->base.data->allocated_len, le->result_str->str, le->result_str->len);
+			ocrpt_mem_string_append_len(o->output_buffer, priv->base.data->str, len);
 		}
 
 		priv->column_index++;
@@ -126,8 +126,8 @@ static void ocrpt_csv_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 static void ocrpt_csv_finalize(opencreport *o) {
 	csv_private_data *priv = o->output_private;
 
-	ocrpt_list_free(priv->pages);
-	ocrpt_mem_string_free(priv->data, true);
+	ocrpt_list_free(priv->base.pages);
+	ocrpt_mem_string_free(priv->base.data, true);
 	ocrpt_mem_free(priv);
 	o->output_private = NULL;
 
@@ -155,7 +155,7 @@ void ocrpt_csv_init(opencreport *o) {
 	memset(o->output_private, 0, sizeof(csv_private_data));
 
 	csv_private_data *priv = o->output_private;
-	priv->data = ocrpt_mem_string_new_with_len(NULL, 4096);
+	priv->base.data = ocrpt_mem_string_new_with_len(NULL, 4096);
 
 	o->output_buffer = ocrpt_mem_string_new_with_len(NULL, 65536);
 }

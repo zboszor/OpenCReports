@@ -7,12 +7,10 @@
 #define _OCRPT_TXT_H_
 
 #include "opencreport.h"
+#include "common-output.h"
 
 struct txt_private_data {
-	ocrpt_string *data;
-	ocrpt_list *pages;
-	ocrpt_list *last_page;
-	ocrpt_list *current_page;
+	common_private_data base;
 };
 typedef struct txt_private_data txt_private_data;
 

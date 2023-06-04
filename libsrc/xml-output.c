@@ -54,14 +54,14 @@ static void ocrpt_xml_start_part_column(opencreport *o, ocrpt_part *p, ocrpt_par
 	priv->td = xmlNewDocNode(priv->doc, NULL, BAD_CAST "td", NULL);
 	xmlAddChild(priv->tr, priv->td);
 
-	priv->tmp->len = 0;
-	ocrpt_mem_string_append_printf(priv->tmp, "%.2lf", pd->real_width);
-	xmlSetProp(priv->td, BAD_CAST "width", BAD_CAST priv->tmp->str);
+	priv->base.data->len = 0;
+	ocrpt_mem_string_append_printf(priv->base.data, "%.2lf", pd->real_width);
+	xmlSetProp(priv->td, BAD_CAST "width", BAD_CAST priv->base.data->str);
 
 	if (pd->height_expr) {
-		priv->tmp->len = 0;
-		ocrpt_mem_string_append_printf(priv->tmp, "%.2lf", pd->height);
-		xmlSetProp(priv->td, BAD_CAST "width", BAD_CAST priv->tmp->str);
+		priv->base.data->len = 0;
+		ocrpt_mem_string_append_printf(priv->base.data, "%.2lf", pd->height);
+		xmlSetProp(priv->td, BAD_CAST "width", BAD_CAST priv->base.data->str);
 	}
 }
 
@@ -102,24 +102,24 @@ static void ocrpt_xml_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row
 	xml_private_data *priv = o->output_private;
 
 	if (o->precalculate) {
-		if (!priv->current_page) {
-			if (!priv->pages)
-				priv->pages = ocrpt_list_end_append(priv->pages, &priv->last_page, NULL);
-			priv->current_page = priv->pages;
+		if (!priv->base.current_page) {
+			if (!priv->base.pages)
+				priv->base.pages = ocrpt_list_end_append(priv->base.pages, &priv->base.last_page, NULL);
+			priv->base.current_page = priv->base.pages;
 		} else {
 			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
-			priv->pages = ocrpt_list_end_append(priv->pages, &priv->last_page, NULL);
-			priv->current_page = priv->last_page;
+			priv->base.pages = ocrpt_list_end_append(priv->base.pages, &priv->base.last_page, NULL);
+			priv->base.current_page = priv->base.last_page;
 		}
 
 		if (mpfr_cmp(o->totpages->number, o->pageno->number) < 0)
 			mpfr_set(o->totpages->number, o->pageno->number, o->rndmode);
 	} else {
-		if (!priv->current_page) {
-			priv->current_page = priv->pages;
+		if (!priv->base.current_page) {
+			priv->base.current_page = priv->base.pages;
 		} else {
 			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
-			priv->current_page = priv->current_page->next;
+			priv->base.current_page = priv->base.current_page->next;
 		}
 	}
 }
@@ -127,19 +127,19 @@ static void ocrpt_xml_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row
 static void *ocrpt_xml_get_current_page(opencreport *o) {
 	xml_private_data *priv = o->output_private;
 
-	return priv->current_page;
+	return priv->base.current_page;
 }
 
 static void ocrpt_xml_set_current_page(opencreport *o, void *page) {
 	xml_private_data *priv = o->output_private;
 
-	priv->current_page = page;
+	priv->base.current_page = page;
 }
 
 static bool ocrpt_xml_is_current_page_first(opencreport *o) {
 	xml_private_data *priv = o->output_private;
 
-	return priv->current_page == priv->pages;
+	return priv->base.current_page == priv->base.pages;
 }
 
 static void ocrpt_xml_start_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output) {
@@ -287,7 +287,7 @@ static void ocrpt_xml_set_font_sizes(opencreport *o, const char *font, double wa
 	pango_font_description_set_style(font_description, italic ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
 	pango_font_description_set_absolute_size(font_description, wanted_font_size * PANGO_SCALE);
 
-	layout = pango_cairo_create_layout(priv->cr);
+	layout = pango_cairo_create_layout(priv->base.cr);
 	pango_layout_set_font_description(layout, font_description);
 
 	PangoContext *context = pango_layout_get_context(layout);
@@ -400,7 +400,7 @@ void ocrpt_xml_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr,
 		}
 
 		if (!le->layout) {
-			le->layout = pango_cairo_create_layout(priv->cr);
+			le->layout = pango_cairo_create_layout(priv->base.cr);
 			newfont = true;
 		}
 
@@ -488,23 +488,23 @@ static void ocrpt_xml_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 	if (le->value) {
 		xmlNodePtr data = xmlNewTextChild(priv->line, NULL, BAD_CAST "data", BAD_CAST le->result_str->str);
 
-		priv->tmp->len = 0;
-		ocrpt_mem_string_append_printf(priv->tmp, "%.2lf", le->width_computed);
-		xmlSetProp(data, BAD_CAST "width", BAD_CAST priv->tmp->str);
+		priv->base.data->len = 0;
+		ocrpt_mem_string_append_printf(priv->base.data, "%.2lf", le->width_computed);
+		xmlSetProp(data, BAD_CAST "width", BAD_CAST priv->base.data->str);
 
-		priv->tmp->len = 0;
-		ocrpt_mem_string_append_printf(priv->tmp, "%.2lf", le->fontsz);
-		xmlSetProp(data, BAD_CAST "font_point", BAD_CAST priv->tmp->str);
+		priv->base.data->len = 0;
+		ocrpt_mem_string_append_printf(priv->base.data, "%.2lf", le->fontsz);
+		xmlSetProp(data, BAD_CAST "font_point", BAD_CAST priv->base.data->str);
 
 		xmlSetProp(data, BAD_CAST "font_face", BAD_CAST le->font);
 
-		priv->tmp->len = 0;
-		ocrpt_mem_string_append_printf(priv->tmp, "%d", le->bold_val);
-		xmlSetProp(data, BAD_CAST "bold", BAD_CAST priv->tmp->str);
+		priv->base.data->len = 0;
+		ocrpt_mem_string_append_printf(priv->base.data, "%d", le->bold_val);
+		xmlSetProp(data, BAD_CAST "bold", BAD_CAST priv->base.data->str);
 
-		priv->tmp->len = 0;
-		ocrpt_mem_string_append_printf(priv->tmp, "%d", le->italic_val);
-		xmlSetProp(data, BAD_CAST "italics", BAD_CAST priv->tmp->str);
+		priv->base.data->len = 0;
+		ocrpt_mem_string_append_printf(priv->base.data, "%d", le->italic_val);
+		xmlSetProp(data, BAD_CAST "italics", BAD_CAST priv->base.data->str);
 
 		const char *align = "left";
 		if (le->align && le->align->result[o->residx] && le->align->result[o->residx]->type == OCRPT_RESULT_STRING && le->align->result[o->residx]->string) {
@@ -523,18 +523,18 @@ static void ocrpt_xml_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 			ocrpt_get_color(le->bgcolor->result[o->residx]->string->str, &bgcolor, true);
 		else if (l->bgcolor && l->bgcolor->result[o->residx] && l->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && l->bgcolor->result[o->residx]->string)
 			ocrpt_get_color(l->bgcolor->result[o->residx]->string->str, &bgcolor, true);
-		priv->tmp->len = 0;
-		ocrpt_mem_string_append_printf(priv->tmp, "#%02x%02x%02x", ocrpt_xml_color_value(bgcolor.r), ocrpt_xml_color_value(bgcolor.g), ocrpt_xml_color_value(bgcolor.b));
-		xmlSetProp(data, BAD_CAST "bgcolor", BAD_CAST priv->tmp->str);
+		priv->base.data->len = 0;
+		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_xml_color_value(bgcolor.r), ocrpt_xml_color_value(bgcolor.g), ocrpt_xml_color_value(bgcolor.b));
+		xmlSetProp(data, BAD_CAST "bgcolor", BAD_CAST priv->base.data->str);
 
 		ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
 		if (le->color && le->color->result[o->residx] && le->color->result[o->residx]->type == OCRPT_RESULT_STRING && le->color->result[o->residx]->string)
 			ocrpt_get_color(le->color->result[o->residx]->string->str, &color, true);
 		else if (l->color && l->color->result[o->residx] && l->color->result[o->residx]->type == OCRPT_RESULT_STRING && l->color->result[o->residx]->string)
 			ocrpt_get_color(l->color->result[o->residx]->string->str, &color, true);
-		priv->tmp->len = 0;
-		ocrpt_mem_string_append_printf(priv->tmp, "#%02x%02x%02x", ocrpt_xml_color_value(color.r), ocrpt_xml_color_value(color.g), ocrpt_xml_color_value(color.b));
-		xmlSetProp(data, BAD_CAST "color", BAD_CAST priv->tmp->str);
+		priv->base.data->len = 0;
+		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_xml_color_value(color.r), ocrpt_xml_color_value(color.g), ocrpt_xml_color_value(color.b));
+		xmlSetProp(data, BAD_CAST "color", BAD_CAST priv->base.data->str);
 	}
 }
 
@@ -570,10 +570,10 @@ static void ocrpt_xml_finalize(opencreport *o) {
 	xmlFree(xmlbuf);
 	xmlFreeDoc(priv->doc);
 
-	ocrpt_mem_string_free(priv->tmp, true);
-	cairo_destroy(priv->cr);
-	cairo_surface_destroy(priv->nullpage_cs);
-	ocrpt_list_free(priv->pages);
+	ocrpt_mem_string_free(priv->base.data, true);
+	cairo_destroy(priv->base.cr);
+	cairo_surface_destroy(priv->base.nullpage_cs);
+	ocrpt_list_free(priv->base.pages);
 	ocrpt_mem_free(priv);
 	o->output_private = NULL;
 
@@ -615,9 +615,9 @@ void ocrpt_xml_init(opencreport *o) {
 	xmlDocSetRootElement(priv->doc, priv->toplevel);
 
 	cairo_rectangle_t page = { .x = o->paper->width, .y = o->paper->height };
-	priv->nullpage_cs = cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, &page);
-	priv->cr = cairo_create(priv->nullpage_cs);
-	priv->tmp = ocrpt_mem_string_new_with_len(NULL, 64);
+	priv->base.nullpage_cs = cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, &page);
+	priv->base.cr = cairo_create(priv->base.nullpage_cs);
+	priv->base.data = ocrpt_mem_string_new_with_len(NULL, 64);
 
 	o->output_buffer = ocrpt_mem_string_new_with_len(NULL, 65536);
 }

@@ -8,14 +8,10 @@
 
 #include <cairo.h>
 #include "opencreport.h"
+#include "common-output.h"
 
 struct html_private_data {
-	ocrpt_list *pages;
-	ocrpt_list *last_page;
-	ocrpt_list *current_page;
-	cairo_surface_t *nullpage_cs;
-	cairo_t *cr;
-	ocrpt_string *data;
+	common_private_data base;
 	char *cwd;
 	size_t cwdlen;
 	double image_indent;
