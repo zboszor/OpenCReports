@@ -20,7 +20,9 @@ typedef struct ocrpt_color ocrpt_color;
 
 struct ocrpt_output_functions {
 	void (*reset_state)(opencreport *o);
+	void *(*get_new_page)(opencreport *o, ocrpt_part *p);
 	void (*add_new_page)(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, unsigned int rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position);
+	void (*add_new_page_epilogue)(opencreport *o);
 	void *(*get_current_page)(opencreport *o);
 	void (*set_current_page)(opencreport *o, void *page);
 	bool (*is_current_page_first)(opencreport *o);

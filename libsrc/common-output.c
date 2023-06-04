@@ -22,12 +22,15 @@ static void ocrpt_common_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_
 
 	if (o->precalculate) {
 		if (!priv->current_page) {
-			if (!priv->pages)
-				priv->pages = ocrpt_list_end_append(priv->pages, &priv->last_page, NULL);
+			if (!priv->pages) {
+				void *page = (o->output_functions.get_new_page ? o->output_functions.get_new_page(o, p) : NULL);
+				priv->pages = ocrpt_list_end_append(priv->pages, &priv->last_page, page);
+			}
 			priv->current_page = priv->pages;
 		} else {
 			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
-			priv->pages = ocrpt_list_end_append(priv->pages, &priv->last_page, NULL);
+			void *page = (o->output_functions.get_new_page ? o->output_functions.get_new_page(o, p) : NULL);
+			priv->pages = ocrpt_list_end_append(priv->pages, &priv->last_page, page);
 			priv->current_page = priv->last_page;
 		}
 
@@ -39,6 +42,8 @@ static void ocrpt_common_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_
 		} else {
 			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
 			priv->current_page = priv->current_page->next;
+			if (o->output_functions.add_new_page_epilogue)
+				o->output_functions.add_new_page_epilogue(o);
 		}
 	}
 }

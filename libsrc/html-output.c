@@ -90,31 +90,8 @@ static void ocrpt_html_end_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 	ocrpt_mem_string_append(o->output_buffer, "</p>\n");
 }
 
-static void ocrpt_html_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, unsigned int rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
-	html_private_data *priv = o->output_private;
-
-	if (o->precalculate) {
-		if (!priv->base.current_page) {
-			if (!priv->base.pages)
-				priv->base.pages = ocrpt_list_end_append(priv->base.pages, &priv->base.last_page, NULL);
-			priv->base.current_page = priv->base.pages;
-		} else {
-			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
-			priv->base.pages = ocrpt_list_end_append(priv->base.pages, &priv->base.last_page, NULL);
-			priv->base.current_page = priv->base.last_page;
-		}
-
-		if (mpfr_cmp(o->totpages->number, o->pageno->number) < 0)
-			mpfr_set(o->totpages->number, o->pageno->number, o->rndmode);
-	} else {
-		if (!priv->base.current_page) {
-			priv->base.current_page = priv->base.pages;
-		} else {
-			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
-			priv->base.current_page = priv->base.current_page->next;
-			ocrpt_mem_string_append(o->output_buffer, "<hr style=\"width: 100%%\">\n");
-		}
-	}
+static void ocrpt_html_add_new_page_epilogue(opencreport *o) {
+	ocrpt_mem_string_append(o->output_buffer, "<hr style=\"width: 100%%\">\n");
 }
 
 static void ocrpt_html_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_hline *hline, double page_width, double page_indent, double page_position, double size) {
@@ -394,7 +371,7 @@ void ocrpt_html_init(opencreport *o) {
 	o->output_functions.end_data_row = ocrpt_html_end_data_row;
 	o->output_functions.start_output = ocrpt_html_start_output;
 	o->output_functions.end_output = ocrpt_html_end_output;
-	o->output_functions.add_new_page = ocrpt_html_add_new_page;
+	o->output_functions.add_new_page_epilogue = ocrpt_html_add_new_page_epilogue;
 	o->output_functions.draw_hline = ocrpt_html_draw_hline;
 	o->output_functions.set_font_sizes = ocrpt_common_set_font_sizes;
 	o->output_functions.get_text_sizes = ocrpt_common_get_text_sizes;

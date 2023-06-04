@@ -34,6 +34,10 @@ static cairo_surface_t *ocrpt_pdf_new_page(opencreport *o, const ocrpt_paper *pa
 	return cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, &page);
 }
 
+static void *ocrpt_pdf_get_new_page(opencreport *o, ocrpt_part *p) {
+	return ocrpt_pdf_new_page(o, p->paper, p->landscape);
+}
+
 static inline void ocrpt_cairo_create(opencreport *o) {
 	pdf_private_data *priv = o->output_private;
 
@@ -57,35 +61,6 @@ static inline void ocrpt_cairo_create(opencreport *o) {
 			}
 		} else
 			priv->cr = cairo_create(priv->nullpage_cs);
-	}
-}
-
-static void ocrpt_pdf_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, unsigned int rows, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
-	pdf_private_data *priv = o->output_private;
-
-	if (o->precalculate) {
-		if (!priv->current_page) {
-			if (!priv->pages) {
-				cairo_surface_t *page = ocrpt_pdf_new_page(o, p->paper, p->landscape);
-				priv->pages = ocrpt_list_end_append(priv->pages, &priv->last_page, page);
-			}
-			priv->current_page = priv->pages;
-		} else {
-			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
-			cairo_surface_t *page = ocrpt_pdf_new_page(o, p->paper, p->landscape);
-			priv->pages = ocrpt_list_end_append(priv->pages, &priv->last_page, page);
-			priv->current_page = priv->last_page;
-		}
-
-		if (mpfr_cmp(o->totpages->number, o->pageno->number) < 0)
-			mpfr_set(o->totpages->number, o->pageno->number, o->rndmode);
-	} else {
-		if (!priv->current_page) {
-			priv->current_page = priv->pages;
-		} else {
-			mpfr_add_ui(o->pageno->number, o->pageno->number, 1, o->rndmode);
-			priv->current_page = priv->current_page->next;
-		}
 	}
 }
 
@@ -343,7 +318,7 @@ static void ocrpt_pdf_finalize(opencreport *o) {
 
 void ocrpt_pdf_init(opencreport *o) {
 	ocrpt_common_init(o, sizeof(pdf_private_data), 4096, 65536);
-	o->output_functions.add_new_page = ocrpt_pdf_add_new_page;
+	o->output_functions.get_new_page = ocrpt_pdf_get_new_page;
 	o->output_functions.draw_hline = ocrpt_pdf_draw_hline;
 	o->output_functions.prepare_set_font_sizes = ocrpt_cairo_create;
 	o->output_functions.set_font_sizes = ocrpt_common_set_font_sizes;
