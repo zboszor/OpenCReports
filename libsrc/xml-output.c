@@ -230,55 +230,6 @@ static inline unsigned char ocrpt_xml_color_value(double component) {
 	return (unsigned char)(0xff * component);
 }
 
-static void ocrpt_xml_set_font_sizes(opencreport *o, const char *font, double wanted_font_size, bool bold, bool italic, double *result_font_size, double *result_font_width) {
-	xml_private_data *priv = o->output_private;
-
-	PangoLayout *layout;
-	PangoFontDescription *font_description;
-
-	font_description = pango_font_description_new();
-
-	pango_font_description_set_family(font_description, font);
-	pango_font_description_set_weight(font_description, bold ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
-	pango_font_description_set_style(font_description, italic ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
-	pango_font_description_set_absolute_size(font_description, wanted_font_size * PANGO_SCALE);
-
-	layout = pango_cairo_create_layout(priv->base.cr);
-	pango_layout_set_font_description(layout, font_description);
-
-	PangoContext *context = pango_layout_get_context(layout);
-	PangoLanguage *language = pango_context_get_language(context);
-	PangoFontMetrics *metrics = pango_context_get_metrics(context, font_description, language);
-
-	const char *family = pango_font_description_get_family(font_description);
-	PangoFontFamily **families;
-	int n_families, i;
-	bool monospace = true;
-
-	pango_context_list_families(context, &families, &n_families);
-
-	for (i = 0; i < n_families; i++) {
-		if (strcmp(family, pango_font_family_get_name(families[i])) == 0) {
-			monospace = pango_font_family_is_monospace(families[i]);
-			break;
-		}
-	}
-
-	/* This pointer MUST be freed with g_free() */
-	g_free(families);
-
-	int char_width = pango_font_metrics_get_approximate_char_width(metrics);
-
-	if (result_font_size)
-		*result_font_size = wanted_font_size;
-	if (result_font_width)
-		*result_font_width = (monospace ? ((double)char_width / PANGO_SCALE) : wanted_font_size);
-
-	pango_font_metrics_unref(metrics);
-	g_object_unref(layout);
-	pango_font_description_free(font_description);
-}
-
 void ocrpt_xml_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double total_width) {
 	xml_private_data *priv = o->output_private;
 	const char *font;
@@ -547,7 +498,7 @@ void ocrpt_xml_init(opencreport *o) {
 	o->output_functions.start_output = ocrpt_xml_start_output;
 	o->output_functions.start_data_row = ocrpt_xml_start_data_row;
 	o->output_functions.draw_image = ocrpt_xml_draw_image;
-	o->output_functions.set_font_sizes = ocrpt_xml_set_font_sizes;
+	o->output_functions.set_font_sizes = ocrpt_common_set_font_sizes;
 	o->output_functions.get_text_sizes = ocrpt_xml_get_text_sizes;
 	o->output_functions.draw_text = ocrpt_xml_draw_text;
 	o->output_functions.finalize = ocrpt_xml_finalize;

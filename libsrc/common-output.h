@@ -16,9 +16,11 @@ struct common_private_data {
 	cairo_surface_t *nullpage_cs;
 	cairo_t *cr;
 	ocrpt_string *data;
+	void (*prepare_set_font_sizes)(opencreport *);
 };
 typedef struct common_private_data common_private_data;
 
+void ocrpt_common_set_font_sizes(opencreport *o, const char *font, double wanted_font_size, bool bold, bool italic, double *result_font_size, double *result_font_width);
 void ocrpt_common_init(opencreport *o, size_t privsz, size_t datasz, size_t outbufsz);
 void ocrpt_common_finalize(opencreport *o);
 
