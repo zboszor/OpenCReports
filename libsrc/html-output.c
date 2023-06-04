@@ -405,6 +405,7 @@ void ocrpt_html_init(opencreport *o) {
 	o->output_functions.reopen_tags_across_pages = true;
 
 	html_private_data *priv = o->output_private;
+	priv->base.line_element_font = true;
 
 	priv->cwd = ocrpt_mem_malloc(PATH_MAX);
 	if (!getcwd(priv->cwd, PATH_MAX)) {

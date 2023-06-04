@@ -346,6 +346,7 @@ void ocrpt_xml_init(opencreport *o) {
 	o->output_functions.finalize = ocrpt_xml_finalize;
 
 	xml_private_data *priv = o->output_private;
+	priv->base.line_element_font = true;
 
 	priv->doc = xmlNewDoc(NULL);
 	priv->toplevel = xmlNewDocNode(priv->doc, NULL, BAD_CAST (o->xml_rlib_compat ? "rlib" : "ocrpt"), NULL);

@@ -21,6 +21,7 @@ struct common_private_data {
 	void (*prepare_get_text_sizes)(opencreport *);
 	bool support_bbox;
 	bool support_fontdesc;
+	bool line_element_font;
 };
 typedef struct common_private_data common_private_data;
 

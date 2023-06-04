@@ -361,4 +361,5 @@ void ocrpt_pdf_init(opencreport *o) {
 	priv->prepare_get_text_sizes = ocrpt_cairo_create;
 	priv->support_bbox = true;
 	priv->support_fontdesc = true;
+	priv->line_element_font = true;
 }

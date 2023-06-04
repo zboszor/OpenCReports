@@ -124,7 +124,7 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 		priv->prepare_get_text_sizes(o);
 
 	if (l->current_line == 0 || (l->current_line > 0 && le->lines > 0 && l->current_line < le->lines)) {
-		if (le->font_name && le->font_name->result[o->residx] && le->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && le->font_name->result[o->residx]->string)
+		if (priv->line_element_font && le->font_name && le->font_name->result[o->residx] && le->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && le->font_name->result[o->residx]->string)
 			font = le->font_name->result[o->residx]->string->str;
 		else if (l->font_name && l->font_name->result[o->residx] && l->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && l->font_name->result[o->residx]->string)
 			font = l->font_name->result[o->residx]->string->str;
@@ -135,7 +135,7 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 		else
 			font = "Courier";
 
-		if (le && le->font_size && le->font_size->result[o->residx] && le->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->font_size->result[o->residx]->number_initialized)
+		if (priv->line_element_font && le && le->font_size && le->font_size->result[o->residx] && le->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->font_size->result[o->residx]->number_initialized)
 			size = mpfr_get_d(le->font_size->result[o->residx]->number, o->rndmode);
 		else if (l && l->font_size && l->font_size->result[o->residx] && l->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->font_size->result[o->residx]->number_initialized)
 			size = mpfr_get_d(l->font_size->result[o->residx]->number, o->rndmode);
