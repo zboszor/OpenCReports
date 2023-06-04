@@ -1356,6 +1356,7 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 		ocrpt_json_init(o);
 		break;
 	default:
+		ocrpt_err_printf("invalid output format: %d\n", o->output_format);
 		return false;
 	}
 
