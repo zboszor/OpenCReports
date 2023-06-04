@@ -10,11 +10,7 @@
 #include "opencreport.h"
 #include "common-output.h"
 
-struct pdf_private_data {
-	common_private_data base;
-	ocrpt_list *drawing_page;
-};
-typedef struct pdf_private_data pdf_private_data;
+typedef struct common_private_data pdf_private_data;
 
 void ocrpt_pdf_init(opencreport *o);
 
