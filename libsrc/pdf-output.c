@@ -89,24 +89,6 @@ static void ocrpt_pdf_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_row
 	}
 }
 
-static void *ocrpt_pdf_get_current_page(opencreport *o) {
-	pdf_private_data *priv = o->output_private;
-
-	return priv->base.current_page;
-}
-
-static void ocrpt_pdf_set_current_page(opencreport *o, void *page) {
-	pdf_private_data *priv = o->output_private;
-
-	priv->base.current_page = page;
-}
-
-static bool ocrpt_pdf_is_current_page_first(opencreport *o) {
-	pdf_private_data *priv = o->output_private;
-
-	return priv->base.current_page == priv->base.pages;
-}
-
 static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_width, double page_indent, double x, double y, double w, double h) {
 	pdf_private_data *priv = o->output_private;
 	ocrpt_image_file *img_file = img->img_file;
@@ -566,8 +548,6 @@ static void ocrpt_pdf_finalize(opencreport *o) {
 	if (testrun && *testrun && (strcasecmp(testrun, "yes") == 0 || strcasecmp(testrun, "true") == 0 || atoi(testrun) > 0))
 		cairo_pdf_surface_set_metadata(pdf, CAIRO_PDF_METADATA_CREATE_DATE, "2022-06-01T12:00:00Z");
 
-	o->output_buffer = ocrpt_mem_string_new_with_len(NULL, 4096);
-
 	for (page = priv->base.pages; page; page = page->next) {
 		cairo_surface_t *surface = (cairo_surface_t *)page->data;
 		cairo_rectangle_t rect;
@@ -585,11 +565,9 @@ static void ocrpt_pdf_finalize(opencreport *o) {
 	cairo_surface_destroy(pdf);
 
 	ocrpt_list_free_deep(priv->base.pages, (ocrpt_mem_free_t)cairo_surface_destroy);
-	cairo_destroy(priv->base.cr);
-	cairo_surface_destroy(priv->base.nullpage_cs);
+	priv->base.pages = NULL;
 
-	ocrpt_mem_free(priv);
-	o->output_private = NULL;
+	ocrpt_common_finalize(o);
 
 	ocrpt_string **content_type = ocrpt_mem_malloc(3 * sizeof(ocrpt_string *));
 	content_type[0] = ocrpt_mem_string_new_printf("Content-Type: application/pdf");
@@ -599,11 +577,8 @@ static void ocrpt_pdf_finalize(opencreport *o) {
 }
 
 void ocrpt_pdf_init(opencreport *o) {
-	memset(&o->output_functions, 0, sizeof(ocrpt_output_functions));
+	ocrpt_common_init(o, sizeof(pdf_private_data), 4096, 65536);
 	o->output_functions.add_new_page = ocrpt_pdf_add_new_page;
-	o->output_functions.get_current_page = ocrpt_pdf_get_current_page;
-	o->output_functions.set_current_page = ocrpt_pdf_set_current_page;
-	o->output_functions.is_current_page_first = ocrpt_pdf_is_current_page_first;
 	o->output_functions.draw_hline = ocrpt_pdf_draw_hline;
 	o->output_functions.set_font_sizes = ocrpt_pdf_set_font_sizes;
 	o->output_functions.get_text_sizes = ocrpt_pdf_get_text_sizes;
@@ -615,7 +590,4 @@ void ocrpt_pdf_init(opencreport *o) {
 	o->output_functions.supports_column_break = true;
 	o->output_functions.supports_pd_height = true;
 	o->output_functions.supports_report_height = true;
-
-	o->output_private = ocrpt_mem_malloc(sizeof(pdf_private_data));
-	memset(o->output_private, 0, sizeof(pdf_private_data));
 }

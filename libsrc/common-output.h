@@ -19,4 +19,7 @@ struct common_private_data {
 };
 typedef struct common_private_data common_private_data;
 
+void ocrpt_common_init(opencreport *o, size_t privsz, size_t datasz, size_t outbufsz);
+void ocrpt_common_finalize(opencreport *o);
+
 #endif

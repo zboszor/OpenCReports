@@ -117,24 +117,6 @@ static void ocrpt_html_add_new_page(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 	}
 }
 
-static void *ocrpt_html_get_current_page(opencreport *o) {
-	html_private_data *priv = o->output_private;
-
-	return priv->base.current_page;
-}
-
-static void ocrpt_html_set_current_page(opencreport *o, void *page) {
-	html_private_data *priv = o->output_private;
-
-	priv->base.current_page = page;
-}
-
-static bool ocrpt_html_is_current_page_first(opencreport *o) {
-	html_private_data *priv = o->output_private;
-
-	return priv->base.current_page == priv->base.pages;
-}
-
 static void ocrpt_html_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_hline *hline, double page_width, double page_indent, double page_position, double size) {
 	html_private_data *priv = o->output_private;
 	double indent, length;
@@ -594,16 +576,11 @@ static void ocrpt_html_draw_imageend(opencreport *o, ocrpt_part *p, ocrpt_part_r
 static void ocrpt_html_finalize(opencreport *o) {
 	html_private_data *priv = o->output_private;
 
-	ocrpt_list_free(priv->base.pages);
-
 	ocrpt_mem_string_append(o->output_buffer, "</body></html>\n");
 
 	ocrpt_mem_free(priv->cwd);
-	ocrpt_mem_string_free(priv->base.data, true);
-	cairo_destroy(priv->base.cr);
-	cairo_surface_destroy(priv->base.nullpage_cs);
-	ocrpt_mem_free(priv);
-	o->output_private = NULL;
+
+	ocrpt_common_finalize(o);
 
 	ocrpt_string **content_type = ocrpt_mem_malloc(3 * sizeof(ocrpt_string *));
 	content_type[0] = ocrpt_mem_string_new_printf("Content-Type: text/html; charset=utf-8\n");
@@ -613,7 +590,7 @@ static void ocrpt_html_finalize(opencreport *o) {
 }
 
 void ocrpt_html_init(opencreport *o) {
-	memset(&o->output_functions, 0, sizeof(ocrpt_output_functions));
+	ocrpt_common_init(o, sizeof(html_private_data), 256, 65536);
 	o->output_functions.start_part = ocrpt_html_start_part;
 	o->output_functions.end_part = ocrpt_html_end_part;
 	o->output_functions.start_part_row = ocrpt_html_start_part_row;
@@ -625,9 +602,6 @@ void ocrpt_html_init(opencreport *o) {
 	o->output_functions.start_output = ocrpt_html_start_output;
 	o->output_functions.end_output = ocrpt_html_end_output;
 	o->output_functions.add_new_page = ocrpt_html_add_new_page;
-	o->output_functions.get_current_page = ocrpt_html_get_current_page;
-	o->output_functions.set_current_page = ocrpt_html_set_current_page;
-	o->output_functions.is_current_page_first = ocrpt_html_is_current_page_first;
 	o->output_functions.draw_hline = ocrpt_html_draw_hline;
 	o->output_functions.set_font_sizes = ocrpt_html_set_font_sizes;
 	o->output_functions.get_text_sizes = ocrpt_html_get_text_sizes;
@@ -637,14 +611,8 @@ void ocrpt_html_init(opencreport *o) {
 	o->output_functions.finalize = ocrpt_html_finalize;
 	o->output_functions.reopen_tags_across_pages = true;
 
-	o->output_private = ocrpt_mem_malloc(sizeof(html_private_data));
-	memset(o->output_private, 0, sizeof(html_private_data));
-
 	html_private_data *priv = o->output_private;
-	cairo_rectangle_t page = { .x = o->paper->width, .y = o->paper->height };
-	priv->base.nullpage_cs = cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, &page);
-	priv->base.cr = cairo_create(priv->base.nullpage_cs);
-	priv->base.data = ocrpt_mem_string_new_with_len("", 256);
+
 	priv->cwd = ocrpt_mem_malloc(PATH_MAX);
 	if (!getcwd(priv->cwd, PATH_MAX)) {
 		ocrpt_mem_free(priv->cwd);
@@ -653,7 +621,6 @@ void ocrpt_html_init(opencreport *o) {
 	} else
 		priv->cwdlen = strlen(priv->cwd);
 
-	o->output_buffer = ocrpt_mem_string_new_with_len(NULL, 65536);
 	ocrpt_mem_string_append(o->output_buffer, "<!DOCTYPE html>\n");
 	ocrpt_mem_string_append(o->output_buffer, "<html lang=\"en\">\n");
 	/*
