@@ -37,18 +37,23 @@ struct ocrpt_output_functions {
 	void (*start_data_row)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_break *, ocrpt_output *, ocrpt_line *, double, double);
 	void (*end_data_row)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_break *, ocrpt_output *, ocrpt_line *);
 	void (*draw_hline)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_break *, ocrpt_output *, ocrpt_hline *, double, double, double, double);
+	void (*prepare_set_font_sizes)(opencreport *);
 	void (*set_font_sizes)(opencreport *o, const char *font, double wanted_font_size, bool bold, bool italic, double *result_font_size, double *result_font_width);
+	void (*prepare_get_text_sizes)(opencreport *);
 	void (*get_text_sizes)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *, ocrpt_line *, ocrpt_text *, double);
 	void (*draw_text)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_break *, ocrpt_output *, ocrpt_line *, ocrpt_text *, double, double, double);
 	void (*draw_image)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_break *, ocrpt_output *, ocrpt_line *, ocrpt_image *, double, double, double, double, double, double);
 	void (*draw_imageend)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_break *, ocrpt_output *);
 	void (*draw_rectangle)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_color *, double, double, double, double, double);
 	void (*finalize)(opencreport *o);
-	bool supports_page_break;
-	bool supports_column_break;
-	bool supports_pd_height;
-	bool supports_report_height;
-	bool reopen_tags_across_pages;
+	bool supports_page_break:1;
+	bool supports_column_break:1;
+	bool supports_pd_height:1;
+	bool supports_report_height:1;
+	bool reopen_tags_across_pages:1;
+	bool support_bbox:1;
+	bool support_fontdesc:1;
+	bool line_element_font:1;
 };
 typedef struct ocrpt_output_functions ocrpt_output_functions;
 

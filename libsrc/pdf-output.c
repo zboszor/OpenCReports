@@ -345,7 +345,9 @@ void ocrpt_pdf_init(opencreport *o) {
 	ocrpt_common_init(o, sizeof(pdf_private_data), 4096, 65536);
 	o->output_functions.add_new_page = ocrpt_pdf_add_new_page;
 	o->output_functions.draw_hline = ocrpt_pdf_draw_hline;
+	o->output_functions.prepare_set_font_sizes = ocrpt_cairo_create;
 	o->output_functions.set_font_sizes = ocrpt_common_set_font_sizes;
+	o->output_functions.prepare_get_text_sizes = ocrpt_cairo_create;
 	o->output_functions.get_text_sizes = ocrpt_common_get_text_sizes;
 	o->output_functions.draw_text = ocrpt_pdf_draw_text;
 	o->output_functions.draw_image = ocrpt_pdf_draw_image;
@@ -355,11 +357,7 @@ void ocrpt_pdf_init(opencreport *o) {
 	o->output_functions.supports_column_break = true;
 	o->output_functions.supports_pd_height = true;
 	o->output_functions.supports_report_height = true;
-
-	pdf_private_data *priv = o->output_private;
-	priv->prepare_set_font_sizes = ocrpt_cairo_create;
-	priv->prepare_get_text_sizes = ocrpt_cairo_create;
-	priv->support_bbox = true;
-	priv->support_fontdesc = true;
-	priv->line_element_font = true;
+	o->output_functions.support_bbox = true;
+	o->output_functions.support_fontdesc = true;
+	o->output_functions.line_element_font = true;
 }

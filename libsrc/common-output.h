@@ -17,11 +17,6 @@ struct common_private_data {
 	cairo_surface_t *nullpage_cs;
 	cairo_t *cr;
 	ocrpt_string *data;
-	void (*prepare_set_font_sizes)(opencreport *);
-	void (*prepare_get_text_sizes)(opencreport *);
-	bool support_bbox;
-	bool support_fontdesc;
-	bool line_element_font;
 };
 typedef struct common_private_data common_private_data;
 
