@@ -283,17 +283,10 @@
 				columns on the same page.
 			</para>
 		</sect2>
-		<sect2 id="pdfdetails">
-			<title>PDF output format, fonts, layout details</title>
+		<sect2 id="layoutdetails">
+			<title>Layout details</title>
 			<para>
-				By using the excellent drawing possibilities of
-				Cairo, OpenCReports supports generating
-				the report in PDF format. RLIB relied on an
-				internal PDF generator in earlier versions called
-				RPDF, and used libHaru in later versions.
-			</para>
-			<para>
-				In RLIB, sizing of other details are a mix of units,
+				In RLIB, sizing of layout details are a mix of units,
 				making it harder to design the report layout:
 				<itemizedlist>
 					<listitem override="bullet">
@@ -352,6 +345,117 @@
 				points.
 			</para>
 		</sect2>
+		<sect2 id="outputformats">
+			<title>Multiple output formats</title>
+			<para>
+				OpenCReports supports several output formats:
+				PDF, HTML, CSV, TXT, XML and JSON.
+			</para>
+			<para>
+				By using the excellent drawing possibilities of
+				Cairo coupled with Pango for text rendering,
+				OpenCReports supports generating the report in
+				PDF format. PDF is the definitive output format
+				in OpenCReports, as in it supports every feature
+				described in <xref linkend="xmldescriptor"/>, such as
+				<itemizedlist>
+					<listitem override="bullet">
+						<para>
+							page breaks (PDF is a multi-page format)
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							all four page margins: top, bottom, left, right
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							column breaks, multi-column reports
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							report column width and height
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				When using the HTML output format, OpenCReports
+				attempts to imitate the PDF drawing capabilities
+				using CSS. However, there are inevitable differences.
+				<itemizedlist>
+					<listitem override="bullet">
+						<para>
+							The HTML output doesn't support page breaks.
+							HTML is rendered as a continuous flow of text
+							and other elements. As a consequence,
+							<literal>r.pageno</literal> and
+							<literal>r.totpages</literal> are both 1
+							for the whole output.
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							HTML output doesn't support column breaks.
+							As a consequence, a multi-column report layout
+							is rendered differently from PDF.
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							When a data row's column does not fit into the
+							width specified by the page margins or the
+							report column's width, it is rendered in the
+							remaining width differently from PDF. While PDF
+							uses the whole field width to render the data
+							field contents and uses bounding box to clip
+							the invisible part, CSS uses the remaining width
+							specified by either the margins or the report
+							column width to render the field. Left, right
+							and center alignment of the field is done
+							according to the remaining width for the field.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				When rendering field data wider than their
+				field widths, both the PDF and the HTML output drivers
+				use clipping (bounding box) to hide parts of the
+				field, fitting them into the designated area
+				<emphasis>visually</emphasis>. Actual field data is
+				not truncated. In some viewer applications
+				(e.g. in Poppler based PDF viewers) a visibly
+				truncated field's whole text can be selected,
+				copied and pasted elsewhere to be viewed in its
+				entirety. Field data in HTML behave the same way
+				in browsers.
+			</para>
+			<para>
+				OpenCReports also supports CSV, XML and JSON as
+				output formats that don't truncate field data.
+				These are plaintext formats with their own internal
+				format. CSV is usually used for importing into office
+				applications or databases. In general, these formats
+				are used in applications where loss of data may
+				not be tolerated. These formats don't support page or
+				column breaks. CSV does not have a way to express
+				multiple inner reports in a table in the same report run.
+			</para>
+			<para>
+				OpenCReports also supports TXT (plaintext) as output
+				format, that approximates RLIB's TXT output.
+				This format may truncate field data because it expects
+				monospace font and character based field widths;
+				and fields in this format cannot be presented separately
+				like in other formats. The TXT format doesn't support
+				page or column breaks. Its rendering ignores font name
+				and font size settings and renders everything internally
+				using a monospace font at 12 point font size.
+			</para>
+		</sect2>
 		<sect2 id="unittests">
 			<title>Extensive set of unit tests</title>
 			<para>
@@ -398,13 +502,6 @@
 	</sect1>
 	<sect1 id="planned">
 		<title>OpenCReports planned features</title>
-		<sect2 id="moreformats">
-			<title>More output formats</title>
-			<para>
-				XML, CSV, plaintext and JSON are not currently supported as
-				output formats.
-			</para>
-		</sect2>
 		<sect2 id="graphs">
 			<title>Graph and chart support in HTML and PDF output</title>
 			<para>
