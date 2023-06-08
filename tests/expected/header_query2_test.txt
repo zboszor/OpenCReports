@@ -1,0 +1,6 @@
+   1 Fred Flintstone      v.myvar       31.00  yes 
+   2 Barney Rubble        v.myvar       29.00  yes 
+   3 Bamm-Bamm Rubble     v.myvar        2.00  yes 
+   4 Wilma Flintstone     v.myvar       28.00  no  
+   5 Betty Rubble         v.myvar       27.00  no  
+   6 Pebbles Flintstone   v.myvar        0.50  no  

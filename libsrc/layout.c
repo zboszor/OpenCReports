@@ -181,13 +181,13 @@ static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_pa
 
 			switch (elem->le_type) {
 			case OCRPT_OUTPUT_LE_TEXT:
-				if (elem->start < page_width && o->output_functions.draw_text)
+				if ((!o->output_functions.support_any_font || (elem->start < page_width)) && o->output_functions.draw_text)
 					o->output_functions.draw_text(o, p, pr, pd, r, br, output, line, elem, page_width, page_indent, *page_position);
 				break;
 			case OCRPT_OUTPUT_LE_IMAGE: {
 				ocrpt_image *img = (ocrpt_image *)elem;
 
-				if (img->start < page_width && o->output_functions.draw_image)
+				if ((!o->output_functions.support_any_font || (img->start < page_width)) && o->output_functions.draw_image)
 					o->output_functions.draw_image(o, p, pr, pd, r, br, output, line, img, page_width, page_indent, page_indent + img->start, *page_position, img->image_text_width, line->line_height);
 				break;
 			}
@@ -714,15 +714,20 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 				}
 			}
 
-			if (l->font_name && l->font_name->result[o->residx] && l->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && l->font_name->result[o->residx]->string)
-				font_name = l->font_name->result[o->residx]->string->str;
-			else
-				font_name = (r && r->font_name) ? r->font_name : p->font_name;
+			if (o->output_functions.support_any_font) {
+				if (l->font_name && l->font_name->result[o->residx] && l->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && l->font_name->result[o->residx]->string)
+					font_name = l->font_name->result[o->residx]->string->str;
+				else
+					font_name = (r && r->font_name) ? r->font_name : p->font_name;
 
-			if (l->font_size && l->font_size->result[o->residx] && l->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->font_size->result[o->residx]->number_initialized)
-				font_size = mpfr_get_d(l->font_size->result[o->residx]->number, o->rndmode);
-			else
-				font_size = r ? r->font_size : p->font_size;
+				if (l->font_size && l->font_size->result[o->residx] && l->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->font_size->result[o->residx]->number_initialized)
+					font_size = mpfr_get_d(l->font_size->result[o->residx]->number, o->rndmode);
+				else
+					font_size = r ? r->font_size : p->font_size;
+			} else {
+				font_name = "Courier";
+				font_size = OCRPT_DEFAULT_FONT_SIZE;
+			}
 
 			if (o->output_functions.set_font_sizes)
 				o->output_functions.set_font_sizes(o, font_name, font_size, false, false, &l->fontsz, &l->font_width);
@@ -745,12 +750,17 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 				}
 			}
 
-			font_name = (r && r->font_name) ? r->font_name : p->font_name;
+			if (o->output_functions.support_any_font) {
+				font_name = (r && r->font_name) ? r->font_name : p->font_name;
 
-			if (hl->font_size && hl->font_size->result[o->residx] && hl->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && hl->font_size->result[o->residx]->number_initialized)
-				font_size = mpfr_get_d(hl->font_size->result[o->residx]->number, o->rndmode);
-			else
-				font_size = (r ? r->font_size : p->font_size);
+				if (hl->font_size && hl->font_size->result[o->residx] && hl->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && hl->font_size->result[o->residx]->number_initialized)
+					font_size = mpfr_get_d(hl->font_size->result[o->residx]->number, o->rndmode);
+				else
+					font_size = (r ? r->font_size : p->font_size);
+			} else {
+				font_name = "Courier";
+				font_size = OCRPT_DEFAULT_FONT_SIZE;
+			}
 
 			if (o->output_functions.set_font_sizes)
 				o->output_functions.set_font_sizes(o, font_name, font_size, false, false, NULL, &hl->font_width);

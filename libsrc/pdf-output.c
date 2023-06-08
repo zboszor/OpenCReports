@@ -333,6 +333,7 @@ void ocrpt_pdf_init(opencreport *o) {
 	o->output_functions.supports_pd_height = true;
 	o->output_functions.supports_report_height = true;
 	o->output_functions.support_bbox = true;
+	o->output_functions.support_any_font = true;
 	o->output_functions.support_fontdesc = true;
 	o->output_functions.line_element_font = true;
 }

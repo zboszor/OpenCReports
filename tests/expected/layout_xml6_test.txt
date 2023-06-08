@@ -1,0 +1,114 @@
+                                                            Page header: 1 / 1
+Yabba dabba doo header average age: 19.58
+Male break header   20.67   1   1   
+Adult break header  20.67   1   1   
+ID   Name                 Property   Age   Adult
+   1 Fred Flintstone      strong     31.00  yes 
+   2 Barney Rubble        small      29.00  yes 
+Adult break footer  20.67   1   1   
+Kid break header    20.67   1   1   
+ID   Name                 Property   Age   Adult
+   3 Bamm-Bamm Rubble     energetic   2.00  no  
+Kid break footer    20.67   1   1   
+Male break footer   20.67   1   1   
+Female break header 18.50   1   1   
+Adult break header  18.50   1   1   
+ID   Name                 Property   Age   Adult
+   4 Wilma Flintstone     charming   28.00  yes 
+   5 Betty Rubble         beautiful  27.00  yes 
+Adult break footer  18.50   1   1   
+Kid break header    18.50   1   1   
+ID   Name                 Property   Age   Adult
+   6 Pebbles Flintstone   young       0.50  no  
+Kid break footer    18.50   1   1   
+Female break footer 18.50   1   1   
+Male break header   20.67   1   1   
+Adult break header  20.67   1   1   
+ID   Name                 Property   Age   Adult
+   7 Fred Flintstone      strong     31.00  yes 
+   8 Barney Rubble        small      29.00  yes 
+Adult break footer  20.67   1   1   
+Kid break header    20.67   1   1   
+ID   Name                 Property   Age   Adult
+   9 Bamm-Bamm Rubble     energetic   2.00  no  
+Kid break footer    20.67   1   1   
+Male break footer   20.67   1   1   
+Female break header 18.50   1   1   
+Adult break header  18.50   1   1   
+ID   Name                 Property   Age   Adult
+  10 Wilma Flintstone     charming   28.00  yes 
+  11 Betty Rubble         beautiful  27.00  yes 
+Adult break footer  18.50   1   1   
+Kid break header    18.50   1   1   
+ID   Name                 Property   Age   Adult
+  12 Pebbles Flintstone   young       0.50  no  
+Kid break footer    18.50   1   1   
+Female break footer 18.50   1   1   
+Male break header   20.67   1   1   
+Adult break header  20.67   1   1   
+ID   Name                 Property   Age   Adult
+  13 Fred Flintstone      strong     31.00  yes 
+  14 Barney Rubble        small      29.00  yes 
+Adult break footer  20.67   1   1   
+Kid break header    20.67   1   1   
+ID   Name                 Property   Age   Adult
+  15 Bamm-Bamm Rubble     energetic   2.00  no  
+Kid break footer    20.67   1   1   
+Male break footer   20.67   1   1   
+Female break header 18.50   1   1   
+Adult break header  18.50   1   1   
+ID   Name                 Property   Age   Adult
+  16 Wilma Flintstone     charming   28.00  yes 
+  17 Betty Rubble         beautiful  27.00  yes 
+Adult break footer  18.50   1   1   
+Kid break header    18.50   1   1   
+ID   Name                 Property   Age   Adult
+  18 Pebbles Flintstone   young       0.50  no  
+Kid break footer    18.50   1   1   
+Female break footer 18.50   1   1   
+Male break header   20.67   1   1   
+Adult break header  20.67   1   1   
+ID   Name                 Property   Age   Adult
+  19 Fred Flintstone      strong     31.00  yes 
+  20 Barney Rubble        small      29.00  yes 
+Adult break footer  20.67   1   1   
+Kid break header    20.67   1   1   
+ID   Name                 Property   Age   Adult
+  21 Bamm-Bamm Rubble     energetic   2.00  no  
+Kid break footer    20.67   1   1   
+Male break footer   20.67   1   1   
+Female break header 18.50   1   1   
+Adult break header  18.50   1   1   
+ID   Name                 Property   Age   Adult
+  22 Wilma Flintstone     charming   28.00  yes 
+  23 Betty Rubble         beautiful  27.00  yes 
+Adult break footer  18.50   1   1   
+Kid break header    18.50   1   1   
+ID   Name                 Property   Age   Adult
+  24 Pebbles Flintstone   young       0.50  no  
+Kid break footer    18.50   1   1   
+Female break footer 18.50   1   1   
+Male break header   20.67   1   1   
+Adult break header  20.67   1   1   
+ID   Name                 Property   Age   Adult
+  25 Fred Flintstone      strong     31.00  yes 
+  26 Barney Rubble        small      29.00  yes 
+Adult break footer  20.67   1   1   
+Kid break header    20.67   1   1   
+ID   Name                 Property   Age   Adult
+  27 Bamm-Bamm Rubble     energetic   2.00  no  
+Kid break footer    20.67   1   1   
+Male break footer   20.67   1   1   
+Female break header 18.50   1   1   
+Adult break header  18.50   1   1   
+ID   Name                 Property   Age   Adult
+  28 Wilma Flintstone     charming   28.00  yes 
+  29 Betty Rubble         beautiful  27.00  yes 
+Adult break footer  18.50   1   1   
+Kid break header    18.50   1   1   
+ID   Name                 Property   Age   Adult
+  30 Pebbles Flintstone   young       0.50  no  
+Kid break footer    18.50   1   1   
+Female break footer 18.50   1   1   
+Yabba dabba doo footer average age: 19.58
+                                                            Page footer: 1 / 1

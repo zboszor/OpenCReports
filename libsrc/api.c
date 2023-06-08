@@ -671,23 +671,29 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 
 	ocrpt_expr_resolve_nowarn(p->font_name_expr);
 	ocrpt_expr_optimize(p->font_name_expr);
-	if (!p->font_name && p->font_name_expr)
-		p->font_name = ocrpt_expr_get_string(p->font_name_expr)->str;
-	if (!p->font_name)
+	if (o->output_functions.support_any_font) {
+		if (!p->font_name && p->font_name_expr)
+			p->font_name = ocrpt_expr_get_string(p->font_name_expr)->str;
+		if (!p->font_name)
+			p->font_name = "Courier";
+	} else
 		p->font_name = "Courier";
 
 	ocrpt_expr_resolve(p->font_size_expr);
 	ocrpt_expr_optimize(p->font_size_expr);
-	if (p->font_size_expr) {
-		double font_size = ocrpt_expr_get_double(p->font_size_expr);
+	if (o->output_functions.support_any_font) {
+		if (p->font_size_expr) {
+			double font_size = ocrpt_expr_get_double(p->font_size_expr);
 
-		p->font_size = (font_size > 0.0 ? font_size : o->font_size);
-		if (o->output_functions.set_font_sizes)
-			o->output_functions.set_font_sizes(o, p->font_name, p->font_size, false, false, NULL, &p->font_width);
-	} else {
-		p->font_size = o->font_size;
-		p->font_width = o->font_width;
-	}
+			p->font_size = (font_size > 0.0 ? font_size : o->font_size);
+			if (o->output_functions.set_font_sizes)
+				o->output_functions.set_font_sizes(o, p->font_name, p->font_size, false, false, NULL, &p->font_width);
+		} else {
+			p->font_size = o->font_size;
+			p->font_width = o->font_width;
+		}
+	} else
+		p->font_size = OCRPT_DEFAULT_FONT_SIZE;
 
 	ocrpt_expr_resolve(p->top_margin_expr);
 	ocrpt_expr_optimize(p->top_margin_expr);

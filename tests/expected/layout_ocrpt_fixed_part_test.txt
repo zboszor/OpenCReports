@@ -1,0 +1,188 @@
+Fixed Part Test
+ICR
+
+      INVENTORY REPORT
+NUM   NAME                      UNIT          OPEN          USAGE         RECEIVED      TRANS IN      TRANS OUT     WASTE         
+1     BUN, REG/PREMIUM          DOZEN         176           0             0             0             0             0             
+2     BUN, KAISER               DOZEN         176           0             0             0             0             0             
+YIELDS
+Item    Portion EQV     REG EQUIV     
+Hamburg 1       100    
+Chicken 1       150    
+Pasta   1       190    
+      YIELDS
+      YIELDS
+      YIELDS
+
+   WWW.DT TIMING    5
+NUMBER OF CARS
+NUMBER PARKED
+
+EXCEED COUNT
+NUMBER PARKED
+
+AVE PARK TIME
+AVE TOTAL TIME
+DEPOSITS
+  TIME   BAG ID  MGR. I    AMOU
+12:00   DEPOSIT 1                                                              101     2000.00
+4:00    DEPOSIT 2                                                              102     1000.00
+ TOTAL DEPOSITS
+
+OTHER??? 
+BREAK FAST SALES
+BREAKFAST SALES
+SALAD SALES
+SALAD SALES
+DRIVE-THRU SALES
+DRIVE-THRU SALES
+OVER-RINGS
+OVER-RINGS
+OVER-RINGS
+COUPONS MEALS WASTE
+COUPONS MEALS WASTE
+
+      INVENTORY TRANSFER
+QTY   Name    FROM  TO   
+100   Buns    1121  4452 
+400   Pattys  1121  4499 
+     CASH RECONCILIATION 
+NET SALES 
+TAX 	
+GROSS SALES 
+RESTAURANT BANK
+ADJUSTED GROSS CASH
+AMOUNT DEPOSITED
+GIFT REDEEMED
+MISC. INCOME
+PETTY CASH
+NET SALES
+TAX
+CASH OVER/SHORT 
+CASHIER OVER/SHORT 
+OVER/SHORT RECONCILIATION
+NET SALES 
+GIFT CERT. SOLD 
+OTHER NON-FOOD
+NET FOOD SALES
+
+            PETTY CASH            
+ TIME        NAME         AMOUNT    
+  1:00  Sugar                  20.00
+  2:00  Pants                  40.00
+ TOTAL PETTY CASH
+
+           MISC INCOME            
+ TIME        NAME         AMOUNT    
+  1:00  Birthday Party         20.00
+ TOTAL MISC INCOME
+
+     LABOR 
+FORMULA HRS
+ACTUAL HRS
+DIFFERENCE
+
+ ---------    Comments  ------------------
+slashdot.org
+philadelphiaeagles.com
+sicom.com                  EAT               MORE                 CHEESE
+
+      INVENTORY REPORT
+NUM   NAME                      UNIT          OPEN          USAGE         RECEIVED      TRANS IN      TRANS OUT     WASTE         
+1     BUN, REG/PREMIUM          DOZEN         176           0             0             0             0             0              
+2     BUN, KAISER               DOZEN         176           0             0             0             0             0              
+Page:     1
+Wheeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:     1
+
+      INVENTORY REPORT
+NUM   NAME                      UNIT          OPEN          USAGE         RECEIVED      TRANS IN      TRANS OUT     WASTE         
+1     BUN, REG/PREMIUM          DOZEN         176           0             0             0             0             0             
+2     BUN, KAISER               DOZEN         176           0             0             0             0             0             
+YIELDS
+Item    Portion EQV     REG EQUIV     
+Hamburg 1       100    
+Chicken 1       150    
+MIKEROT CALL    BACK   
+      YIELDS
+      YIELDS
+      YIELDS
+
+   WWW.DT TIMING    5
+NUMBER OF CARS
+NUMBER PARKED
+
+EXCEED COUNT
+NUMBER PARKED
+
+AVE PARK TIME
+AVE TOTAL TIME
+DEPOSITS
+  TIME   BAG ID  MGR. I    AMOU
+12:00   DEPOSIT 1                                                              101     2000.00
+4:00    DEPOSIT 2                                                              102     1000.00
+ TOTAL DEPOSITS
+
+OTHER??? 
+BREAK FAST SALES
+BREAKFAST SALES
+SALAD SALES
+SALAD SALES
+DRIVE-THRU SALES
+DRIVE-THRU SALES
+OVER-RINGS
+OVER-RINGS
+OVER-RINGS
+COUPONS MEALS WASTE
+COUPONS MEALS WASTE
+
+      INVENTORY TRANSFER
+QTY   Name    FROM  TO   
+100   Buns    1121  4452 
+400   Pattys  1121  4499 
+     CASH RECONCILIATION 
+NET SALES 
+TAX 	
+GROSS SALES 
+RESTAURANT BANK
+ADJUSTED GROSS CASH
+AMOUNT DEPOSITED
+GIFT REDEEMED
+MISC. INCOME
+PETTY CASH
+NET SALES
+TAX
+CASH OVER/SHORT 
+CASHIER OVER/SHORT 
+OVER/SHORT RECONCILIATION
+NET SALES 
+GIFT CERT. SOLD 
+OTHER NON-FOOD
+NET FOOD SALES
+
+            PETTY CASH            
+ TIME        NAME         AMOUNT    
+  1:00  Sugar                  20.00
+  2:00  Pants                  40.00
+ TOTAL PETTY CASH
+
+           MISC INCOME            
+ TIME        NAME         AMOUNT    
+  1:00  Birthday Party         20.00
+ TOTAL MISC INCOME
+
+     LABOR 
+FORMULA HRS
+ACTUAL HRS
+DIFFERENCE
+
+ ---------    Comments  ------------------
+slashdot.org
+philadelphiaeagles.com
+sicom.com                  EAT               MORE                 CHEESE
+
+      INVENTORY REPORT
+NUM   NAME                      UNIT          OPEN          USAGE         RECEIVED      TRANS IN      TRANS OUT     WASTE         
+1     BUN, REG/PREMIUM          DOZEN         176           0             0             0             0             0              
+2     BUN, KAISER               DOZEN         176           0             0             0             0             0              
+Page:     1
+Wheeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:     1

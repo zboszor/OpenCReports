@@ -1,0 +1,6 @@
+   1 Fred Flintstone      property      31.00  yes 
+   2 Barney Rubble        property      29.00  yes 
+   3 Bamm-Bamm Rubble     property       2.00  yes 
+   4 Wilma Flintstone     property      28.00  no  
+   5 Betty Rubble         property      27.00  no  
+   6 Pebbles Flintstone   property       0.50  no  

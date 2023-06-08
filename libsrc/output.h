@@ -54,6 +54,7 @@ struct ocrpt_output_functions {
 	bool supports_report_height:1;
 	bool reopen_tags_across_pages:1;
 	bool support_bbox:1;
+	bool support_any_font:1;
 	bool support_fontdesc:1;
 	bool line_element_font:1;
 };

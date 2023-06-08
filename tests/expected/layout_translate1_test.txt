@@ -1,0 +1,12 @@
+                                                                                               Lap fejléc: 1 / 1
+ID   Üdvözlet                                            Életkor Felnőtt
+1    Boldog születésnapot, Fred Flintstone!                31,00  igen  
+2    Boldog születésnapot, Wilma Flintstone!               28,00  igen  
+3    Boldog születésnapot, Pebbles Flintstone!              0,50   nem  
+4    Boldog születésnapot, Betty Rubble!                   27,00  igen  
+5    Boldog születésnapot, Barney Rubble!                  29,00  igen  
+6    Boldog születésnapot, Mr. George Slate!               53,00  igen  
+7    Boldog születésnapot, Joe Rockhead!                   33,00  igen  
+8    Boldog születésnapot, Sam Slagheap!                   37,00  igen  
+9    Boldog születésnapot, The Great Gazoo!              1200,00  igen  
+                                                                                               Lap lábléc: 1 / 1

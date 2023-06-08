@@ -1,0 +1,7 @@
+Flintstones report 1 header
+ID   Name                 Property   Age    Adult
+   1 Mr. George Slate     grumpy      53.00  yes 
+   2 Joe Rockhead         friendly    33.00  yes 
+   3 Sam Slagheap         leader      37.00  yes 
+   4 The Great Gazoo      alien      800.00  yes 
+Flintstones report 1 footer

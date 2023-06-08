@@ -380,6 +380,7 @@ void ocrpt_html_init(opencreport *o) {
 	o->output_functions.draw_imageend = ocrpt_html_draw_imageend;
 	o->output_functions.finalize = ocrpt_html_finalize;
 	o->output_functions.reopen_tags_across_pages = true;
+	o->output_functions.support_any_font = true;
 	o->output_functions.line_element_font = true;
 
 	html_private_data *priv = o->output_private;

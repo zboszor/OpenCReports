@@ -344,6 +344,7 @@ void ocrpt_xml_init(opencreport *o) {
 	o->output_functions.get_text_sizes = ocrpt_common_get_text_sizes;
 	o->output_functions.draw_text = ocrpt_xml_draw_text;
 	o->output_functions.finalize = ocrpt_xml_finalize;
+	o->output_functions.support_any_font = true;
 	o->output_functions.line_element_font = true;
 
 	xml_private_data *priv = o->output_private;

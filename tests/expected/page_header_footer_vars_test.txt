@@ -1,0 +1,85 @@
+Fruit count 0 (carry over from previous page)
+Type                           Number Running sum
+Acai berry                         75          75
+Acerola                            25         100
+Apple                               4         104
+Appleberry                         32         136
+Apricot                             6         142
+Avocado                             6         148
+Banana                              2         150
+Blackberry                          1         151
+Blackcurrant                       32         183
+Black sapote                        3         186
+Blood orange                        3         189
+Blueberry                          15         204
+Boysenberry                        35         239
+Cantaloupe                          3         242
+Carambola                           3         245
+Chayote                             2         247
+Cherimoya                           5         252
+Cherry                             20         272
+Coconut                             2         274
+Cranberry                          35         309
+Currant                            50         359
+Date                                5         364
+Dewberry                           50         414
+Dragonfruit                         1         415
+Durian                              1         416
+Elderberry                         32         448
+Feijoa                             15         463
+Fig                                 4         467
+Gooseberry                         50         517
+Grape                               5         522
+Grapefruit                          1         523
+Guava                               2         525
+Honeydew                            6         531
+Huckleberry                        40         571
+Jackfruit                           4         575
+Jambul                              4         579
+Kiwi                                2         581
+Key lime                            4         585
+Kumquat                            30         615
+Lemon                               3         618
+Lime                                3         621
+Longan                              3         624
+Loquat                              3         627
+Lychee                             20         647
+Mandarin                            4         651
+Mango                               2         653
+Mamey                               2         655
+Marula                              2         657
+Medlar                             15         672
+Mombin                              4         676
+Mulberry                           40         716
+Nectarine                           2         718
+Orange                              5         723
+Papaw                               3         726
+Papaya                              3         729
+Passion fruit                       5         734
+Pawpaw                              2         736
+Peach                               4         740
+Pear                                3         743
+Persimmon                           4         747
+Pineapple                           1         748
+Pineberry                          30         778
+Plum                               35         813
+Pomegranate                         2         815
+Pomelo                              1         816
+Quince                              5         821
+Raspberry                          60         881
+Redcurrant                         20         901
+Rhubarb                             2         903
+Sea buckthorn                       1         904
+Serviceberry                       50         954
+Soursop                             2         956
+Starfruit                           1         957
+Strawberry                         15         972
+Tamarillo                           1         973
+Tangerine                           3         976
+Ugli fruit                          5         981
+Watermelon                          2         983
+White currant                      50        1033
+Yellow plum                         5        1038
+Yellow watermelon                   1        1039
+Zinfandel grape                     5        1044
+Fruit count 1044 (total count)

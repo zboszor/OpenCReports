@@ -129,26 +129,32 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 		o->output_functions.prepare_get_text_sizes(o);
 
 	if (l->current_line == 0 || (l->current_line > 0 && le->lines > 0 && l->current_line < le->lines)) {
-		if (o->output_functions.line_element_font && le->font_name && le->font_name->result[o->residx] && le->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && le->font_name->result[o->residx]->string)
-			font = le->font_name->result[o->residx]->string->str;
-		else if (l->font_name && l->font_name->result[o->residx] && l->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && l->font_name->result[o->residx]->string)
-			font = l->font_name->result[o->residx]->string->str;
-		else if (r && r->font_name)
-			font = r->font_name;
-		else if (p->font_name)
-			font = p->font_name;
-		else
+		if (o->output_functions.support_any_font) {
+			if (o->output_functions.line_element_font && le->font_name && le->font_name->result[o->residx] && le->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && le->font_name->result[o->residx]->string)
+				font = le->font_name->result[o->residx]->string->str;
+			else if (l->font_name && l->font_name->result[o->residx] && l->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && l->font_name->result[o->residx]->string)
+				font = l->font_name->result[o->residx]->string->str;
+			else if (r && r->font_name)
+				font = r->font_name;
+			else if (p->font_name)
+				font = p->font_name;
+			else
+				font = "Courier";
+		} else
 			font = "Courier";
 
-		if (o->output_functions.line_element_font && le && le->font_size && le->font_size->result[o->residx] && le->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->font_size->result[o->residx]->number_initialized)
-			size = mpfr_get_d(le->font_size->result[o->residx]->number, o->rndmode);
-		else if (l && l->font_size && l->font_size->result[o->residx] && l->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->font_size->result[o->residx]->number_initialized)
-			size = mpfr_get_d(l->font_size->result[o->residx]->number, o->rndmode);
-		else if (r && r->font_size_expr)
-			size = r->font_size;
-		else if (p && p->font_size_expr)
-			size = p->font_size;
-		else
+		if (o->output_functions.support_any_font) {
+			if (o->output_functions.line_element_font && le && le->font_size && le->font_size->result[o->residx] && le->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->font_size->result[o->residx]->number_initialized)
+				size = mpfr_get_d(le->font_size->result[o->residx]->number, o->rndmode);
+			else if (l && l->font_size && l->font_size->result[o->residx] && l->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->font_size->result[o->residx]->number_initialized)
+				size = mpfr_get_d(l->font_size->result[o->residx]->number, o->rndmode);
+			else if (r && r->font_size_expr)
+				size = r->font_size;
+			else if (p && p->font_size_expr)
+				size = p->font_size;
+			else
+				size = OCRPT_DEFAULT_FONT_SIZE;
+		} else
 			size = OCRPT_DEFAULT_FONT_SIZE;
 
 		if (le->bold && le->bold->result[o->residx] && le->bold->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->bold->result[o->residx]->number_initialized)

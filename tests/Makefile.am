@@ -297,13 +297,16 @@ endif
 html-test: $(LAYOUT_TESTS) $(XLATE_DEPS) execute_layout_test.sh
 	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 2 &&) true
 
+txt-test: $(LAYOUT_TESTS) $(XLATE_DEPS) execute_layout_test.sh
+	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 3 &&) true
+
 csv-test: $(LAYOUT_TESTS) $(LAYOUT_CSV_TESTS) $(XLATE_DEPS) execute_layout_test.sh
 	$(foreach TEST,$(LAYOUT_TESTS) $(LAYOUT_CSV_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 4 &&) true
 
 xml-test: $(LAYOUT_TESTS) $(XLATE_DEPS) execute_layout_test.sh
 	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 5 &&) true
 
-test: basic-test pdf-test html-test csv-test xml-test
+test: basic-test pdf-test html-test txt-test csv-test xml-test
 
 php-test: php-basic-test php-pdf-test
 
