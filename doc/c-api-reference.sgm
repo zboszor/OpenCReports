@@ -118,12 +118,106 @@ ocrpt_set_output_parameter(opencreport *o,
 							Possible values to enable suppressing the
 							default <literal>&lt;head&gt; ... &lt;/head&gt;</literal>
 							are <literal>yes</literal>,
-							<literal>true</literal> and
-							<literal>on</literal>.
-							Anything else disables it.
+							<literal>true</literal>,
+							<literal>on</literal> or any positive non-zero
+							number. Anything else disables it.
 							Be aware, that the default section contains
 							importand CSS stylesheet settings that are
 							needed for the correct layout.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				Possible parameters for the CSV output driver:
+				<itemizedlist>
+					<listitem override="bullet">
+						<para>
+							<literal>csv_filename</literal> sets the file
+							name for <literal>Content-Disposition</literal>
+							in the HTTP metadata returned by
+							<literal>ocrpt_get_content_type()</literal>.
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<literal>csv_as_text</literal> sets the MIME type
+							for <literal>Content-Type</literal>
+							in the HTTP metadata returned by
+							<literal>ocrpt_get_content_type()</literal>
+							to <literal>text/plain</literal> when enabled.
+							By default it's <literal>text/csv</literal>.
+							Possible values to enable it are
+							<literal>yes</literal>,
+							<literal>true</literal>,
+							<literal>on</literal> or any positive non-zero
+							number. Anything else disables it.
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<literal>csv_delimiter</literal> (also aliased as
+							<literal>csv_delimeter</literal> according to
+							the historical typo in RLIB) sets the CSV field
+							delimiter to the first character of the string.
+							By default it's a comma.
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<literal>no_quotes</literal> will create a CSV
+							output with values unquoted.
+							Possible values to enable it are
+							<literal>yes</literal>,
+							<literal>true</literal>,
+							<literal>on</literal> or any positive non-zero
+							number. Anything else disables it.
+							It takes precedence over
+							<literal>only_quote_strings</literal>
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<literal>only_quote_strings</literal>
+							will create a CSV output with only string
+							values quoted.
+							Possible values to enable it are
+							<literal>yes</literal>,
+							<literal>true</literal>,
+							<literal>on</literal> or any positive non-zero
+							number. Anything else disables it.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				Note that some languages (e.g. German, Swedish
+				and Hungarian) use comma as the decimal separator
+				instead of decimal point. For these languages,
+				either set <literal>csv_delimiter</literal> or
+				set neither <literal>no_quotes</literal>, nor
+				<literal>only_quote_strings</literal>
+			</para>
+			<para>
+				Possible parameters for the XML output driver:
+				<itemizedlist>
+					<listitem override="bullet">
+						<para>
+							<literal>xml_rlib_compat</literal> sets the
+							flag to create an RLIB compatible XML output.
+							Possible values to enable it are
+							<literal>yes</literal>,
+							<literal>true</literal>,
+							<literal>on</literal> or any positive non-zero
+							number. Anything else disables it.
+						</para>
+						<para>
+							When enabled, the toplevel element
+							will be <literal>&lt;rlib&gt;</literal>
+							and <literal>&lt;Report&gt;</literal>s
+							inside <literal>&lt;pd&gt;</literal>
+							won't be embedded in a
+							<literal>report</literal> element.
 						</para>
 					</listitem>
 				</itemizedlist>
