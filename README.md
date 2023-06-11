@@ -16,7 +16,6 @@ consent from the original authors:
 
 ## Roadmap
 
-* 0.8: Output drivers for HTML / TXT / CSV plus JSON as extra
 * 0.9: Graph / Chart / Barcode in PDF (full feature parity with RLIB, with many extras)
 * 1.0: GUI to create either code or XML
 * 1.1: Possibly port the reporting library part to Windows and Android, GUI to Windows
