@@ -17,15 +17,6 @@
 #include "parts.h"
 #include "html-output.h"
 
-static inline unsigned char ocrpt_html_color_value(double component) {
-	if (component < 0.0)
-		component = 0.0;
-	if (component >= 1.0)
-		component = 1.0;
-
-	return (unsigned char)(0xff * component);
-}
-
 static void ocrpt_html_start_part(opencreport *o, ocrpt_part *p) {
 	ocrpt_mem_string_append(o->output_buffer, "<!--part start-->\n<table>\n");
 }
@@ -51,7 +42,7 @@ static void ocrpt_html_start_part_column(opencreport *o, ocrpt_part *p, ocrpt_pa
 			ocrpt_mem_string_append_printf(o->output_buffer,
 										"border: %.2lfpt solid #%02x%02x%02x; ",
 										pd->border_width,
-										ocrpt_html_color_value(pd->border_color.r), ocrpt_html_color_value(pd->border_color.g), ocrpt_html_color_value(pd->border_color.b));
+										ocrpt_common_color_value(pd->border_color.r), ocrpt_common_color_value(pd->border_color.g), ocrpt_common_color_value(pd->border_color.b));
 		if (pd->height_expr)
 			ocrpt_mem_string_append_printf(o->output_buffer,
 										"height: %.2lfpt; overflow: clip; ",
@@ -137,7 +128,7 @@ static void ocrpt_html_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 										"background-color: #%02x%02x%02x; "
 										"\">&nbsp;</div>\n",
 										indent + priv->image_indent, size, length,
-										ocrpt_html_color_value(color.r), ocrpt_html_color_value(color.g), ocrpt_html_color_value(color.b));
+										ocrpt_common_color_value(color.r), ocrpt_common_color_value(color.g), ocrpt_common_color_value(color.b));
 	}
 }
 
@@ -228,7 +219,7 @@ static void ocrpt_html_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	else if (l->bgcolor && l->bgcolor->result[o->residx] && l->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && l->bgcolor->result[o->residx]->string)
 		ocrpt_get_color(l->bgcolor->result[o->residx]->string->str, &bgcolor, true);
 
-	ocrpt_mem_string_append_printf(o->output_buffer, "background-color: #%02x%02x%02x; ", ocrpt_html_color_value(bgcolor.r), ocrpt_html_color_value(bgcolor.g), ocrpt_html_color_value(bgcolor.b));
+	ocrpt_mem_string_append_printf(o->output_buffer, "background-color: #%02x%02x%02x; ", ocrpt_common_color_value(bgcolor.r), ocrpt_common_color_value(bgcolor.g), ocrpt_common_color_value(bgcolor.b));
 
 	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
 	if (le->color && le->color->result[o->residx] && le->color->result[o->residx]->type == OCRPT_RESULT_STRING && le->color->result[o->residx]->string)
@@ -236,7 +227,7 @@ static void ocrpt_html_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	else if (l->color && l->color->result[o->residx] && l->color->result[o->residx]->type == OCRPT_RESULT_STRING && l->color->result[o->residx]->string)
 		ocrpt_get_color(l->color->result[o->residx]->string->str, &color, true);
 
-	ocrpt_mem_string_append_printf(o->output_buffer, "color: #%02x%02x%02x; ", ocrpt_html_color_value(color.r), ocrpt_html_color_value(color.g), ocrpt_html_color_value(color.b));
+	ocrpt_mem_string_append_printf(o->output_buffer, "color: #%02x%02x%02x; ", ocrpt_common_color_value(color.r), ocrpt_common_color_value(color.g), ocrpt_common_color_value(color.b));
 
 	if (le->bold_val)
 		ocrpt_mem_string_append(o->output_buffer, "font-weight: bold; ");
@@ -293,7 +284,7 @@ static void ocrpt_html_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 											"justify-content: %s; "
 											"background-color: #%02x%02x%02x; \">",
 											w, h, al, al, al,
-											ocrpt_html_color_value(img->bg.r), ocrpt_html_color_value(img->bg.g), ocrpt_html_color_value(img->bg.b));
+											ocrpt_common_color_value(img->bg.r), ocrpt_common_color_value(img->bg.g), ocrpt_common_color_value(img->bg.b));
 
 		if (!line->current_line) {
 			if (img->img_file->rsvg)

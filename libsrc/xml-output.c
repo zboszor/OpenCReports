@@ -221,15 +221,6 @@ static void ocrpt_xml_start_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_r
 	}
 }
 
-static inline unsigned char ocrpt_xml_color_value(double component) {
-	if (component < 0.0)
-		component = 0.0;
-	if (component >= 1.0)
-		component = 1.0;
-
-	return (unsigned char)(0xff * component);
-}
-
 static void ocrpt_xml_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double page_width, double page_indent, double y) {
 	xml_private_data *priv = o->output_private;
 
@@ -273,7 +264,7 @@ static void ocrpt_xml_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		else if (l->bgcolor && l->bgcolor->result[o->residx] && l->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && l->bgcolor->result[o->residx]->string)
 			ocrpt_get_color(l->bgcolor->result[o->residx]->string->str, &bgcolor, true);
 		priv->base.data->len = 0;
-		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_xml_color_value(bgcolor.r), ocrpt_xml_color_value(bgcolor.g), ocrpt_xml_color_value(bgcolor.b));
+		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(bgcolor.r), ocrpt_common_color_value(bgcolor.g), ocrpt_common_color_value(bgcolor.b));
 		xmlSetProp(data, BAD_CAST "bgcolor", BAD_CAST priv->base.data->str);
 
 		ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
@@ -282,7 +273,7 @@ static void ocrpt_xml_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		else if (l->color && l->color->result[o->residx] && l->color->result[o->residx]->type == OCRPT_RESULT_STRING && l->color->result[o->residx]->string)
 			ocrpt_get_color(l->color->result[o->residx]->string->str, &color, true);
 		priv->base.data->len = 0;
-		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_xml_color_value(color.r), ocrpt_xml_color_value(color.g), ocrpt_xml_color_value(color.b));
+		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(color.r), ocrpt_common_color_value(color.g), ocrpt_common_color_value(color.b));
 		xmlSetProp(data, BAD_CAST "color", BAD_CAST priv->base.data->str);
 	}
 }
