@@ -1311,6 +1311,9 @@ static void ocrpt_execute_parts(opencreport *o) {
 						o->output_functions.start_part_column(o, p, NULL, NULL);
 				}
 
+				if (!o->precalculate && p->pageheader.output_list && o->output_functions.start_output)
+					o->output_functions.start_output(o, p, NULL, NULL, NULL, NULL, &p->pagefooter);
+
 				/* Use the previous row data temporarily */
 				o->residx = ocrpt_expr_prev_residx(o->residx);
 
@@ -1322,6 +1325,9 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 				/* Switch back to the current row data */
 				o->residx = ocrpt_expr_next_residx(o->residx);
+
+				if (!o->precalculate && p->pageheader.output_list && o->output_functions.end_output)
+					o->output_functions.end_output(o, p, NULL, NULL, NULL, NULL, &p->pagefooter);
 
 				if (o->output_functions.reopen_tags_across_pages && !o->precalculate) {
 					if (o->output_functions.end_part_column)

@@ -68,9 +68,14 @@ static void ocrpt_html_end_part_column(opencreport *o, ocrpt_part *p, ocrpt_part
 }
 
 static void ocrpt_html_start_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *out) {
-	ocrpt_mem_string_append_printf(o->output_buffer,
-										"<!--output start--><section style=\"clear: both; width: %.2lfpt; \">\n",
+	ocrpt_mem_string_append(o->output_buffer,
+							"<!--output start--><section style=\"clear: both; ");
+	if (pd)
+		ocrpt_mem_string_append_printf(o->output_buffer,
+										"width: %.2lfpt; ",
 										pd->real_width);
+
+	ocrpt_mem_string_append(o->output_buffer, "\">\n");
 }
 
 static void ocrpt_html_end_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *out) {
