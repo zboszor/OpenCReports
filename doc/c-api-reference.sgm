@@ -100,6 +100,13 @@ ocrpt_set_output_parameter(opencreport *o,
 				<itemizedlist>
 					<listitem override="bullet">
 						<para>
+							<literal>document_root</literal> sets
+							the document root for trimming path prefix
+							from image paths.
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
 							<literal>meta</literal> extends
 							the default
 							<literal>&lt;meta charset="utf-8"&gt;</literal>.

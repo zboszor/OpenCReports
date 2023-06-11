@@ -233,6 +233,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 			ocrpt_mem_string_free((ocrpt_string *)o->content_type[i], true);
 	ocrpt_mem_free(o->content_type);
 	ocrpt_mem_free(o->html_meta);
+	ocrpt_mem_free(o->html_docroot);
 	ocrpt_mem_free(o->csv_filename);
 	ocrpt_mem_free(o->csv_delimiter);
 	ocrpt_mem_free(o->textdomain);
@@ -1704,7 +1705,10 @@ DLL_EXPORT_SYM void ocrpt_set_output_parameter(opencreport *o, const char *param
 	/* HTML output parameters */
 	if (strcmp(param, "suppress_head") == 0)
 		o->suppress_html_head = strcasecmp(value, "yes") == 0 || strcasecmp(value, "true") == 0 || strcasecmp(value, "on") == 0 || atoi(value) > 0;
-	else if (strcmp(param, "meta") == 0) {
+	else if (strcmp(param, "document_root") == 0) {
+		ocrpt_mem_free(o->html_docroot);
+		o->html_docroot = ocrpt_mem_strdup(o->html_docroot);
+	} else if (strcmp(param, "meta") == 0) {
 		/*
 		 * Parse the value:
 		 * - allow a complete <meta ...> syntax with or the closing '>'

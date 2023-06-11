@@ -381,13 +381,18 @@ void ocrpt_html_init(opencreport *o) {
 
 	html_private_data *priv = o->output_private;
 
-	priv->cwd = ocrpt_mem_malloc(PATH_MAX);
-	if (!getcwd(priv->cwd, PATH_MAX)) {
-		ocrpt_mem_free(priv->cwd);
-		priv->cwd = NULL;
-		priv->cwdlen = 0;
-	} else
+	if (o->html_docroot) {
+		priv->cwd = ocrpt_mem_strdup(o->html_docroot);
 		priv->cwdlen = strlen(priv->cwd);
+	} else {
+		priv->cwd = ocrpt_mem_malloc(PATH_MAX);
+		if (!getcwd(priv->cwd, PATH_MAX)) {
+			ocrpt_mem_free(priv->cwd);
+			priv->cwd = NULL;
+			priv->cwdlen = 0;
+		} else
+			priv->cwdlen = strlen(priv->cwd);
+	}
 
 	ocrpt_mem_string_append(o->output_buffer, "<!DOCTYPE html>\n");
 	ocrpt_mem_string_append(o->output_buffer, "<html lang=\"en\">\n");

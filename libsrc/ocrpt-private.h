@@ -109,6 +109,7 @@ struct opencreport {
 
 	/* Output parameters */
 	char *html_meta;
+	char *html_docroot;
 	char *csv_filename;
 	char *csv_delimiter;
 
