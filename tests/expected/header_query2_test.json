@@ -1,0 +1,700 @@
+{
+    "part": {
+        "pr": {
+            "pd": {
+                "report": {
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 15.15234375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "1"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 75.76171875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "Fred Flintstone"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 37.880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "v.myvar"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 30.3046875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "31.00"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 18.9404296875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "yes"
+                                }
+                            ]
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 15.15234375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "2"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 75.76171875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "Barney Rubble"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 37.880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "v.myvar"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 30.3046875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "29.00"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 18.9404296875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "yes"
+                                }
+                            ]
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 15.15234375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "3"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 75.76171875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "Bamm-Bamm Rubble"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 37.880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "v.myvar"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 30.3046875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "2.00"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 18.9404296875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "yes"
+                                }
+                            ]
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 15.15234375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "4"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 75.76171875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "Wilma Flintstone"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 37.880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "v.myvar"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 30.3046875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "28.00"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 18.9404296875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "no"
+                                }
+                            ]
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 15.15234375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "5"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 75.76171875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "Betty Rubble"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 37.880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "v.myvar"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 30.3046875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "27.00"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 18.9404296875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "no"
+                                }
+                            ]
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 15.15234375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "6"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 75.76171875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "Pebbles Flintstone"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 37.880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "v.myvar"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 30.3046875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "0.50"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 3.7880859375,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 18.9404296875,
+                                    "font_point": 9.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "no"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,1000 @@
+{
+    "part": {
+        "pageheader": [
+            {
+                "type": "horizontal_line",
+                "color": "#000000",
+                "indent": 0.0,
+                "size": 2.0,
+                "length": 813.08976377952751591
+            },
+            {
+                "type": "line",
+                "elements": [
+                    {
+                        "type": "text",
+                        "width": 813.08976377952751591,
+                        "font_point": 14.0,
+                        "font_face": "Courier",
+                        "bold": false,
+                        "italic": false,
+                        "align": "right",
+                        "bgcolor": "#ffffff",
+                        "color": "#000000",
+                        "data": "Lap fejléc: 1 / 1"
+                    }
+                ]
+            },
+            {
+                "type": "horizontal_line",
+                "color": "#000000",
+                "indent": 0.0,
+                "size": 2.0,
+                "length": 813.08976377952751591
+            }
+        ],
+        "pr": {
+            "pd": {
+                "report": {
+                    "fieldheader": [
+                        {
+                            "type": "horizontal_line",
+                            "color": "#000000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 809.08976377952751591
+                        },
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 28.80078125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "ID"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 360.009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "Üdvözlet"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "Életkor"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "Felnőtt"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#000000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 809.08976377952751591
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 28.80078125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "1"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 360.009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "justified",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "Boldog születésnapot, Fred Flintstone!"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "31,00"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "igen"
+                                }
+                            ]
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 28.80078125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "2"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 360.009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "justified",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "Boldog születésnapot, Wilma Flintstone !"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "28,00"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "igen"
+                                }
+                            ]
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 28.80078125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "3"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 360.009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "justified",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "Boldog születésnapot, Pebbles Flintstone!"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "0,50"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "nem"
+                                }
+                            ]
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 28.80078125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "4"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 360.009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "justified",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "Boldog születésnapot, Betty Rubble !"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "27,00"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "igen"
+                                }
+                            ]
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 28.80078125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "5"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 360.009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "justified",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "Boldog születésnapot, Barney Rubble!"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "29,00"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "igen"
+                                }
+                            ]
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 28.80078125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "6"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 360.009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "justified",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "Boldog születésnapot, Mr. George Slate!"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "53,00"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "igen"
+                                }
+                            ]
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 28.80078125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "7"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 360.009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "justified",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "Boldog születésnapot, Joe Rockhead!"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "33,00"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "igen"
+                                }
+                            ]
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 28.80078125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "8"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 360.009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "justified",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "Boldog születésnapot, Sam Slagheap!"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "37,00"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "igen"
+                                }
+                            ]
+                        }
+                    ],
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 28.80078125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "9"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 360.009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "justified",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "Boldog születésnapot, The Great Gazoo !"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "1200,00"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 7.2001953125,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": ""
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 50.4013671875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "center",
+                                    "bgcolor": "#e5e5e5",
+                                    "color": "#000000",
+                                    "data": "igen"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "pagefooter": [
+            {
+                "type": "horizontal_line",
+                "color": "#000000",
+                "indent": 0.0,
+                "size": 2.0,
+                "length": 813.08976377952751591
+            },
+            {
+                "type": "line",
+                "elements": [
+                    {
+                        "type": "text",
+                        "width": 813.08976377952751591,
+                        "font_point": 14.0,
+                        "font_face": "Courier",
+                        "bold": false,
+                        "italic": false,
+                        "align": "right",
+                        "bgcolor": "#ffffff",
+                        "color": "#000000",
+                        "data": "Lap lábléc: 1 / 1"
+                    }
+                ]
+            },
+            {
+                "type": "horizontal_line",
+                "color": "#000000",
+                "indent": 0.0,
+                "size": 2.0,
+                "length": 813.08976377952751591
+            }
+        ]
+    }
+}

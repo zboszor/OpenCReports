@@ -306,7 +306,10 @@ csv-test: $(LAYOUT_TESTS) $(LAYOUT_CSV_TESTS) $(XLATE_DEPS) execute_layout_test.
 xml-test: $(LAYOUT_TESTS) $(XLATE_DEPS) execute_layout_test.sh
 	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 5 &&) true
 
-test: basic-test pdf-test html-test txt-test csv-test xml-test
+json-test: $(LAYOUT_TESTS) $(XLATE_DEPS) execute_layout_test.sh
+	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 6 &&) true
+
+test: basic-test pdf-test html-test txt-test csv-test xml-test json-test
 
 php-test: php-basic-test php-pdf-test
 
