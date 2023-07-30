@@ -29,6 +29,7 @@ if test "$PHP_OPENCREPORTS" != "no"; then
 	fi
 	OPENCREPORTS_CFLAGS="`$PKG_CONFIG --cflags opencreports`"
 	OPENCREPORTS_LIBS="`$PKG_CONFIG --libs opencreports`"
+	AC_DEFINE_UNQUOTED(PHP_OPENCREPORT_VERSION,["m4_normalize(m4_include([../../VERSION]))"],[OpenCReports version])
 
 	CFLAGS="-Wall -Werror $CFLAGS"
 	LDFLAGS="$OPENCREPORTS_LIBS $LDFLAGS"
