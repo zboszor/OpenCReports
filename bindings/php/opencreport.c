@@ -5734,6 +5734,7 @@ static PHP_MINIT_FUNCTION(opencreport)
 	REGISTER_OPENCREPORT_CLASS_CONST_LONG("OUTPUT_TXT", OCRPT_OUTPUT_TXT);
 	REGISTER_OPENCREPORT_CLASS_CONST_LONG("OUTPUT_CSV", OCRPT_OUTPUT_CSV);
 	REGISTER_OPENCREPORT_CLASS_CONST_LONG("OUTPUT_XML", OCRPT_OUTPUT_XML);
+	REGISTER_OPENCREPORT_CLASS_CONST_LONG("OUTPUT_JSON", OCRPT_OUTPUT_JSON);
 
 	REGISTER_OPENCREPORT_CLASS_CONST_LONG("RESULT_ERROR", OCRPT_RESULT_ERROR);
 	REGISTER_OPENCREPORT_CLASS_CONST_LONG("RESULT_STRING", OCRPT_RESULT_STRING);
@@ -6299,7 +6300,7 @@ ZEND_FUNCTION(rlib_set_output_format_from_text) {
 		RETURN_THROWS();
 	}
 
-	ocrpt_format_type type = OCRPT_OUTPUT_UNSET;
+	ocrpt_format_type type = OCRPT_OUTPUT_PDF;
 	const char *fmt = ZSTR_VAL(format);
 
 	if (strcasecmp(fmt, "pdf") == 0)
@@ -6312,11 +6313,10 @@ ZEND_FUNCTION(rlib_set_output_format_from_text) {
 		type = OCRPT_OUTPUT_CSV;
 	else if (strcasecmp(fmt, "xml") == 0)
 		type = OCRPT_OUTPUT_XML;
+	else if (strcasecmp(fmt, "json") == 0)
+		type = OCRPT_OUTPUT_JSON;
 
-	if (type != OCRPT_OUTPUT_UNSET)
-		ocrpt_set_output_format(oo->o, type);
-	else
-		zend_throw_error(NULL, "Invalid output format!");
+	ocrpt_set_output_format(oo->o, type);
 }
 
 OCRPT_STATIC_FUNCTION(rlib_default_function) {
