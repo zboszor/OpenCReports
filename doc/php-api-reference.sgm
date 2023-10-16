@@ -34,12 +34,12 @@
     public final parse_xml(string $filename): bool;
     public final parse_xml_from_buffer(string $buffer): bool;
 
-    public const OUTPUT_UNSET;
     public const OUTPUT_PDF;
     public const OUTPUT_HTML;
     public const OUTPUT_TXT;
     public const OUTPUT_CSV;
     public const OUTPUT_XML;
+    public const OUTPUT_JSON;
     public final set_output_format(long $format): void;
 
     public final set_output_parameter(
@@ -227,12 +227,12 @@ OpenCReport::parse_xml_from_buffer(string $buffer): bool;
 		<sect2 id="phpreportsetoutputformat">
 			<title>Set report output format</title>
 			<para>
-				<programlisting>public const OpenCReport::OUTPUT_UNSET;
-public const OpenCReport::OUTPUT_PDF;
+				<programlisting>public const OpenCReport::OUTPUT_PDF;
 public const OpenCReport::OUTPUT_HTML;
 public const OpenCReport::OUTPUT_TXT;
 public const OpenCReport::OUTPUT_CSV;
 public const OpenCReport::OUTPUT_XML;
+public const OpenCReport::OUTPUT_JSON;
 
 public final
 OpenCReport::set_output_format(int $format): void;</programlisting>
