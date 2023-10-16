@@ -227,6 +227,7 @@ OpenCReport::parse_xml_from_buffer(string $buffer): bool;
 		<sect2 id="phpreportsetoutputformat">
 			<title>Set report output format</title>
 			<para>
+				Default is <literal>public const OpenCReport::OUTPUT_PDF</literal>.
 				<programlisting>public const OpenCReport::OUTPUT_PDF;
 public const OpenCReport::OUTPUT_HTML;
 public const OpenCReport::OUTPUT_TXT;
