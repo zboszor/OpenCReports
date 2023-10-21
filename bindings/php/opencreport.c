@@ -5753,6 +5753,16 @@ static PHP_MINIT_FUNCTION(opencreport)
 	return SUCCESS;
 }
 
+/* {{{ PHP_MSHUTDOWN_FUNCTION
+ */
+static PHP_MSHUTDOWN_FUNCTION(opencreport) {
+	sleep(1);
+
+	return SUCCESS;
+}
+/* }}} */
+
+
 /* {{{ PHP_RINIT_FUNCTION
  */
 static PHP_RINIT_FUNCTION(opencreport) {
@@ -7037,7 +7047,7 @@ zend_module_entry opencreport_module_entry = {
 	"opencreport",
 	opencreport_functions,
 	PHP_MINIT(opencreport),
-	NULL,
+	PHP_MSHUTDOWN(opencreport),
 	PHP_RINIT(opencreport),
 	PHP_RSHUTDOWN(opencreport),
 	PHP_MINFO(opencreport),
