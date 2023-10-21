@@ -6153,6 +6153,7 @@ ZEND_FUNCTION(rlib_add_resultset_follower_n_to_1) {
 		if (err) {
 			zend_throw_error(NULL, "rlib_add_resultset_follower_n_to_1: expression parse error: %s\nrlib_add_resultset_follower_n_to_1: expression was: %s\n", err, match->str);
 			ocrpt_strfree(err);
+			ocrpt_mem_string_free(match, true);
 		}
 		RETURN_FALSE;
 	}
