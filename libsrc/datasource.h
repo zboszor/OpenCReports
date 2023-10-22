@@ -47,9 +47,6 @@ struct ocrpt_query {
 	struct ocrpt_query *leader;
 	ocrpt_list *followers;		/* list of ocrpt_query structures */
 	ocrpt_list *followers_n_to_1;	/* list of ocrpt_query_follower structures */
-
-	bool next_failed;
-	bool navigation_failed;
 };
 
 struct ocrpt_query_follower {

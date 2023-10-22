@@ -234,10 +234,8 @@ static void ocrpt_navigate_start_private(ocrpt_query *q) {
 	assert(q->source->o);
 
 	qr = ocrpt_query_get_result(q, &cols);
-	if (!qr || !cols) {
-		q->navigation_failed = true;
+	if (!qr || !cols)
 		return;
-	}
 
 	if (q->source->input && q->source->input->rewind)
 		q->source->input->rewind(q);
