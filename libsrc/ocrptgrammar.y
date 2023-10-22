@@ -51,6 +51,7 @@ static ocrpt_expr *newstring(yyscan_t yyscanner, ocrpt_string *s);
 static ocrpt_expr *newnumber(yyscan_t yyscanner, ocrpt_string *n);
 static ocrpt_expr *newident(yyscan_t yyscanner, int ident_type, ocrpt_string *query, ocrpt_string *name, bool dotprefixed);
 static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, ocrpt_list *l);
+static ocrpt_expr *makefuncexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt_list *l);
 
 %}
 
@@ -102,9 +103,6 @@ exp:
 							}
 	| ANYIDENT				{	$$ = $1; }
 	| ANYIDENT '(' arglist ')' {
-								base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
-								ocrpt_string *fname = $1->name;
-
 								yyset_lloc(&@1, yyscanner);
 
 								/*
@@ -113,17 +111,12 @@ exp:
 								 * Only a function call is expected that way,
 								 * that a domain-qualified or dot-prefixed
 								 * identifier cannot satisfy. An invalid function
-								 * name will be caught by newexpr().
+								 * name will be caught by newexpr() in makefuncexpr().
 								 */
 								if ($1->query || $1->dotprefixed)
 									parser_yyerror("syntax error");
 
-								$1->name = NULL;
-								extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, $1);
-								ocrpt_expr_free($1);
-								if ($1 == extra->last_expr)
-									extra->last_expr = NULL;
-								$$ = newexpr(yyscanner, fname, $3);
+								$$ = makefuncexpr(yyscanner, $1, $3);
 							}
 	| '(' exp ')'			{
 								yyset_lloc(&@1, yyscanner);
@@ -248,14 +241,7 @@ exp:
 										 */
 										const ocrpt_function *f = ocrpt_function_get(extra->o, $1->name->str);
 										if (f) {
-											ocrpt_string *fname = $1->name;
-
-											$1->name = NULL;
-											extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, $1);
-											ocrpt_expr_free($1);
-											if ($1 == extra->last_expr)
-												extra->last_expr = NULL;
-											$$ = newexpr(yyscanner, fname, $4);
+											$$ = makefuncexpr(yyscanner, $1, $4);
 										} else {
 											ocrpt_list *list = $4;
 											ocrpt_expr *paren = (ocrpt_expr *)list->data;
@@ -271,14 +257,7 @@ exp:
 								} else if ($1->query || $1->dotprefixed) {
 									parser_yyerror("invalid function name");
 								} else {
-									ocrpt_string *fname = $1->name;
-
-									$1->name = NULL;
-									extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, $1);
-									ocrpt_expr_free($1);
-									if ($1 == extra->last_expr)
-										extra->last_expr = NULL;
-									$$ = newexpr(yyscanner, fname, $4);
+									$$ = makefuncexpr(yyscanner, $1, $4);
 								}
 							}
 	| '(' exp ')' IMPLMUL DCONST
@@ -638,4 +617,16 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, ocrpt_list *
 	ocrpt_list_free(l);
 
 	return e;
+}
+
+static ocrpt_expr *makefuncexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt_list *l) {
+	base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
+	ocrpt_string *fname = func->name;
+
+	func->name = NULL;
+	extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, func);
+	ocrpt_expr_free(func);
+	if (func == extra->last_expr)
+		extra->last_expr = NULL;
+	return newexpr(yyscanner, fname, l);
 }
