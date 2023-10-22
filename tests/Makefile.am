@@ -36,6 +36,10 @@ TESTS = \
 	odbc_xml4_test \
 	follower_circular_test \
 	follower_invalidref_test \
+	follower_test1_test follower_test2_test \
+	follower_test3_test follower_test4_test \
+	follower_test5_test follower_test6_test \
+	follower_test7_test follower_test8_test \
 	rownum_test \
 	part_test part_xml_test \
 	locale_test \

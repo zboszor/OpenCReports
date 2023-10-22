@@ -1,0 +1,62 @@
+Break triggers
+Row #0
+Query: 'data':
+	Col #0: 'id': string value: 1
+	Col #1: 'first_name': string value: Bob
+	Col #2: 'last_name': string value: Doan
+	Col #3: 'color': string value: blue
+	Col #4: 'group': string value: 1
+	Col #5: 'breakfast': string value: Green Eggs And Spam I Am I Am
+Query: 'more_data':
+	Col #0: 'id': string value: 1
+	Col #1: 'initials': string value: WRD
+
+Row #1
+Query: 'data':
+	Col #0: 'id': string value: 2
+	Col #1: 'first_name': string value: Eric
+	Col #2: 'last_name': string value: Eburuschkin
+	Col #3: 'color': string value: green
+	Col #4: 'group': string value: 1
+	Col #5: 'breakfast': string value: Green Eggs And Spam I Am I Am
+Query: 'more_data':
+	Col #0: 'id': string value: 2
+	Col #1: 'initials': string value: ERB
+
+Break triggers
+Row #2
+Query: 'data':
+	Col #0: 'id': string value: 3
+	Col #1: 'first_name': string value: Mike
+	Col #2: 'last_name': string value: Roth
+	Col #3: 'color': string value: yellow
+	Col #4: 'group': string value: 2
+	Col #5: 'breakfast': string value: Green Eggs And Spam I Am I Am
+Query: 'more_data':
+	Col #0: 'id': string value: NULL
+	Col #1: 'initials': string value: NULL
+
+Row #3
+Query: 'data':
+	Col #0: 'id': string value: 4
+	Col #1: 'first_name': string value: Bob
+	Col #2: 'last_name': string value: Kratz
+	Col #3: 'color': string value: pink
+	Col #4: 'group': string value: 2
+	Col #5: 'breakfast': string value: Green Eggs And Spam I Am I Am
+Query: 'more_data':
+	Col #0: 'id': string value: 4
+	Col #1: 'initials': string value: RK
+
+Row #4
+Query: 'data':
+	Col #0: 'id': string value: 5
+	Col #1: 'first_name': string value: Steve
+	Col #2: 'last_name': string value: Tilden
+	Col #3: 'color': string value: purple
+	Col #4: 'group': string value: 2
+	Col #5: 'breakfast': string value: Green Eggs And Spam I Am I Am
+Query: 'more_data':
+	Col #0: 'id': string value: NULL
+	Col #1: 'initials': string value: NULL
+
