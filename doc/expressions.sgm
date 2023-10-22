@@ -1029,6 +1029,32 @@ a+++++b
 				of the operand.
 			</para>
 		</sect2>
+		<sect2 id="evalfunc">
+			<title>eval()</title>
+			<para>
+				It takes one string operand, which must be an expression
+				string. The expression is parsed. If it's correct, it is
+				inserted into the parent expression in place of the
+				function call. If there is a syntax error, the error is
+				re-thrown for the main expression.
+			</para>
+			<para>
+				This is a pseudo-function. The grammar detects its usage
+				and converts the embedded expression string into a regular
+				subexpression, like if it was inside parenthesis in the
+				parent expression contents. This allows the subexpression
+				to be optimized in the parent expression context.
+			</para>
+			<para>
+				Fox example, the expression <literal>3 * eval('1 + 2')</literal>
+				is optimized into the numeric constant <literal>9</literal>.
+			</para>
+			<para>
+				Note, that the grammar transformation only takes place if
+				there is no user defined function with the same name.
+				In this case, the user defined function is used.
+			</para>
+		</sect2>
 		<sect2 id="factorialfunc">
 			<title>factorial()</title>
 			<para>
@@ -1519,6 +1545,13 @@ a+++++b
 				is converted to a string with the specified integer and
 				decimal numeric digits, according to the second and third
 				operands.
+			</para>
+		</sect2>
+		<sect2 id="strlenfunc">
+			<title>strlen()</title>
+			<para>
+				It takes one string operand. The function returns
+				the number of (UTF-8) characters in the string.
 			</para>
 		</sect2>
 		<sect2 id="subfunc">
