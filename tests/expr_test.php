@@ -137,6 +137,7 @@ $exprs = [
 	"upper('árvíztűrő tükörfúrógép')",
 	"proper('ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP')",
 	"proper('árvíztűrő tükörfúrógép')",
+	"strlen('árvíztűrő tükörfúrógép')",
 
 	/* String arithmetics NULL tests */
 	"left('a', nulln())",
@@ -145,6 +146,7 @@ $exprs = [
 	"right('a', nulln())",
 	"right(nulls(), 1)",
 	"right(nulls(), nulln())",
+	"strlen(nulls())",
 
 	/* val() conversions */
 	"val('1.5')",

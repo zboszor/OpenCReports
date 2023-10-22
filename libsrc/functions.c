@@ -3599,6 +3599,40 @@ OCRPT_STATIC_FUNCTION(ocrpt_str) {
 	e->result[e->o->residx]->string->len = len;
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_strlen) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+		return;
+	}
+
+	if (!e->ops[0]->result[e->o->residx]) {
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+		return;
+	}
+
+	if (e->ops[0]->result[e->o->residx]->type == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(e, e->ops[0]->result[e->o->residx]->string->str);
+		return;
+	}
+
+	if (e->ops[0]->result[e->o->residx]->type != OCRPT_RESULT_STRING) {
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+		return;
+	}
+
+	ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
+
+	if (e->ops[0]->result[e->o->residx]->isnull) {
+		e->result[e->o->residx]->isnull = true;
+		return;
+	}
+
+	int len = 0;
+
+	ocrpt_utf8forward(e->ops[0]->result[e->o->residx]->string->str, -1, &len, -1, NULL);
+	mpfr_set_ui(e->result[e->o->residx]->number, len, e->o->rndmode);
+}
+
 OCRPT_STATIC_FUNCTION(ocrpt_format) {
 	uint32_t i;
 
@@ -3937,6 +3971,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "stodt",		ocrpt_stodt,	NULL,	1,	false,	false,	false,	false },
 	{ "stodtsql",	ocrpt_stodt,	NULL,	1,	false,	false,	false,	false },
 	{ "str",		ocrpt_str,	NULL,		3,	false,	false,	false,	false },
+	{ "strlen",		ocrpt_strlen,	NULL,	1,	false,	false,	false,	false },
 	{ "sub",		ocrpt_sub,	NULL,	-1,	false,	false,	false,	false },
 	{ "tan",		ocrpt_tan,	NULL,	1,	false,	false,	false,	false },
 	{ "timeof",		ocrpt_timeof,	NULL,	1,	false,	false,	false,	false },

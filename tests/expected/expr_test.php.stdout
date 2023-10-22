@@ -733,6 +733,13 @@ expr optimized: (string)Árvíztűrő tükörfúrógép
 expr nodes: 1
 (string)Árvíztűrő tükörfúrógép
 
+string: strlen('árvíztűrő tükörfúrógép')
+expr reprinted: strlen((string)árvíztűrő tükörfúrógép)
+expr nodes: 2
+expr optimized: 22.000000
+expr nodes: 1
+(number)22.000000
+
 string: left('a', nulln())
 expr reprinted: left((string)a,nulln())
 expr nodes: 3
@@ -774,6 +781,13 @@ expr nodes: 3
 expr optimized: (string)NULL
 expr nodes: 1
 (string)NULL
+
+string: strlen(nulls())
+expr reprinted: strlen(nulls())
+expr nodes: 2
+expr optimized: NULL
+expr nodes: 1
+(number)NULL
 
 string: val('1.5')
 expr reprinted: val((string)1.5)
