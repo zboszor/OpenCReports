@@ -462,12 +462,27 @@ static ocrpt_expr *ocrpt_expr_parse_internal(opencreport *o, ocrpt_report *r, co
 	ocrpt_list_free(yyextra.parsed_arglist);
 	ocrpt_list_free(yyextra.parsed_exprs);
 
+	bool found_on_o_list = false;
+	ocrpt_list *l;
+
+	for (l = o->exprs; l && !found_on_o_list; l = l->next)
+		if (yyextra.last_expr == l->data)
+			found_on_o_list = true;
+
 	if (r && !r->executing && !r->dont_add_exprs) {
-		r->exprs = ocrpt_list_end_append(r->exprs, &r->exprs_last, yyextra.last_expr);
-		yyextra.last_expr->result_index = r->num_expressions++;
-		yyextra.last_expr->result_index_set = true;
+		bool found_on_r_list = false;
+		for (l = r->exprs; l && !found_on_r_list; l = l->next)
+			if (yyextra.last_expr == l->data)
+				found_on_r_list = true;
+
+		if (!found_on_o_list && !found_on_r_list) {
+			r->exprs = ocrpt_list_end_append(r->exprs, &r->exprs_last, yyextra.last_expr);
+			yyextra.last_expr->result_index = r->num_expressions++;
+			yyextra.last_expr->result_index_set = true;
+		}
 	} else {
-		o->exprs = ocrpt_list_end_append(o->exprs, &o->exprs_last, yyextra.last_expr);
+		if (!found_on_o_list)
+			o->exprs = ocrpt_list_end_append(o->exprs, &o->exprs_last, yyextra.last_expr);
 		yyextra.last_expr->result_index = -1;
 	}
 
