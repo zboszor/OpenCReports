@@ -173,6 +173,14 @@ int main(int argc, char **argv) {
 		"nulln()",
 		"nulls()",
 
+		/* Embedded expression string evaluation tests */
+		"eval('1+2')",
+		"eval('1+2') + 3",
+		"3 + eval('1+2')",
+		"eval('upper(\"árvíztűrő tükörfúrógép\")')",
+		"eval('identifier')",
+		"eval('1 1')", /* intentional syntax error */
+
 		/* Error tests */
 		"error('custom error')",
 	};

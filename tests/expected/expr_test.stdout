@@ -866,6 +866,43 @@ expr optimized: (string)NULL
 expr nodes: 1
 (string)NULL
 
+string: eval('1+2')
+expr reprinted: add(1.000000,2.000000)
+expr nodes: 3
+expr optimized: 3.000000
+expr nodes: 1
+(number)3.000000
+
+string: eval('1+2') + 3
+expr reprinted: add(add(1.000000,2.000000),3.000000)
+expr nodes: 5
+expr optimized: 6.000000
+expr nodes: 1
+(number)6.000000
+
+string: 3 + eval('1+2')
+expr reprinted: add(3.000000,add(1.000000,2.000000))
+expr nodes: 5
+expr optimized: 6.000000
+expr nodes: 1
+(number)6.000000
+
+string: eval('upper("árvíztűrő tükörfúrógép")')
+expr reprinted: upper((string)árvíztűrő tükörfúrógép)
+expr nodes: 2
+expr optimized: (string)ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP
+expr nodes: 1
+(string)ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP
+
+string: eval('identifier')
+expr reprinted: .'identifier'
+expr nodes: 1
+expr optimized: .'identifier'
+expr nodes: 1
+
+string: eval('1 1')
+syntax error at or near "1 1" at or near "eval('1 1')"
+
 string: error('custom error')
 expr reprinted: error((string)custom error)
 expr nodes: 2

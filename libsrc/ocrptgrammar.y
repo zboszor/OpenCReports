@@ -52,6 +52,8 @@ static ocrpt_expr *newnumber(yyscan_t yyscanner, ocrpt_string *n);
 static ocrpt_expr *newident(yyscan_t yyscanner, int ident_type, ocrpt_string *query, ocrpt_string *name, bool dotprefixed);
 static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, ocrpt_list *l);
 static ocrpt_expr *makefuncexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt_list *l);
+static ocrpt_expr *parseembeddedexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt_list *l);
+static ocrpt_expr *ocrpt_expr_parse_internal(opencreport *o, ocrpt_report *r, const char *expr_string, char **err);
 
 %}
 
@@ -116,7 +118,8 @@ exp:
 								if ($1->query || $1->dotprefixed)
 									parser_yyerror("syntax error");
 
-								$$ = makefuncexpr(yyscanner, $1, $3);
+								if (!($$ = parseembeddedexpr(yyscanner, $1, $3)))
+									$$ = makefuncexpr(yyscanner, $1, $3);
 							}
 	| '(' exp ')'			{
 								yyset_lloc(&@1, yyscanner);
@@ -242,7 +245,7 @@ exp:
 										const ocrpt_function *f = ocrpt_function_get(extra->o, $1->name->str);
 										if (f) {
 											$$ = makefuncexpr(yyscanner, $1, $4);
-										} else {
+										} else if (!($$ = parseembeddedexpr(yyscanner, $1, $4))) {
 											ocrpt_list *list = $4;
 											ocrpt_expr *paren = (ocrpt_expr *)list->data;
 
@@ -629,4 +632,64 @@ static ocrpt_expr *makefuncexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt_list
 	if (func == extra->last_expr)
 		extra->last_expr = NULL;
 	return newexpr(yyscanner, fname, l);
+}
+
+static ocrpt_expr *parseembeddedexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt_list *l) {
+	base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
+	char *fname = func->name->str;
+
+	/* Not an "eval" function */
+	if (strcmp(fname, "eval") != 0)
+		return NULL;
+
+	/* It's an "eval" function but user-defined. */
+	const ocrpt_function *f = ocrpt_function_get(extra->o, fname);
+	if (f)
+		return NULL;
+
+	/* Argument list is not a single argument */
+	if (ocrpt_list_length(l) != 1)
+		return NULL;
+
+	const ocrpt_expr *arg1 = l->data;
+	/* First argument is not a string constant */
+	if (!ocrpt_expr_is_sconst(arg1))
+		return NULL;
+
+	char *err = NULL;
+	ocrpt_expr *e = ocrpt_expr_parse_internal(extra->o, extra->r, arg1->result[extra->o->residx]->string->str, &err);
+
+	extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, func);
+	ocrpt_expr_free(func);
+
+	for (ocrpt_list *ptr = l; ptr; ptr = ptr->next) {
+		ocrpt_expr *le = (ocrpt_expr *)ptr->data;
+
+		extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, le);
+		ocrpt_expr_free(le);
+	}
+
+	ocrpt_list_free(extra->parsed_arglist);
+	extra->parsed_arglist = NULL;
+	extra->last_expr = NULL;
+
+	if (!e) {
+		char *err1 = alloca(strlen(err) + 1);
+		strcpy(err1, err);
+		ocrpt_strfree(err);
+		parser_yyerror(err1);
+	}
+
+	extra->last_expr = e;
+	extra->parsed_exprs = ocrpt_list_prepend(extra->parsed_exprs, e);
+
+	/*
+	 * ocrpt_expr_parse_internal() already added the expression
+	 * to o->exprs but the current parser will add it again.
+	 * Remove it from the list to avoid a potential use-after-free
+	 * in ocrpt_free().
+	 */
+	extra->o->exprs = ocrpt_list_end_remove(extra->o->exprs, &extra->o->exprs_last, e);
+
+	return e;
 }
