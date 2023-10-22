@@ -359,21 +359,13 @@ lekérdezés.oszlop_név</programlisting>
 						<xref linkend="variables"/>.
 					</para>
 				</sect4>
-				<sect4 id="fieldformat">
-					<title>Format string value</title>
+				<sect4 id="outputformatname">
+					<title>Report output format value</title>
 					<para>
 						<programlisting>r.format</programlisting>
-						Similarly to the field value a.k.a.
-						<literal>r.value</literal>, the field description
-						has an an optional expression for its formatting
-						in the form of
-						<literal>&lt;field format="..." /&gt;</literal>.
-					</para>
-					<para>
-						This internal variable may be used by other
-						expressions. It has very few use cases, if any.
-						It only exists for compatibility with RLIB that
-						has this internal variable.
+						This variable returns the current output format
+						name as a string. For example: <literal>PDF</literal>,
+						<literal>HTML</literal>, etc.
 					</para>
 				</sect4>
 				<sect4 id="exprself" xreflabel="Expression self reference">

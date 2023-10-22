@@ -124,6 +124,8 @@ struct opencreport {
 	/* The result of r.pageno and r.totpages */
 	ocrpt_result *pageno;
 	ocrpt_result *totpages;
+	/* The result of r.format */
+	ocrpt_result *rptformat;
 
 	/* Locale specific data */
 	char *textdomain;

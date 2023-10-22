@@ -733,15 +733,12 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 				} else
 					ocrpt_expr_make_error_result(e, "invalid usage of r.detailcnt");
 			} else if (strcmp(e->name->str, "format") == 0) {
-				if (orig_e->rvalue && orig_e->rvalue->format) {
-					for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
-						if (!e->result[i]) {
-							e->result[i] = orig_e->rvalue->format->result[i];
-							ocrpt_expr_set_result_owned(e, i, false);
-						}
+				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+					if (!e->result[i]) {
+						e->result[i] = orig_e->o->rptformat;
+						ocrpt_expr_set_result_owned(e, i, false);
 					}
-				} else
-					ocrpt_expr_make_error_result(e, "invalid usage of r.format");
+				}
 			} else {
 				/* No such identifier, turn it into a string. */
 				ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);

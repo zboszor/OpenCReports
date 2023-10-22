@@ -100,6 +100,10 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 
 	/* Default to PDF output */
 	o->output_format = OCRPT_OUTPUT_PDF;
+	o->rptformat = ocrpt_result_new(o);
+	o->rptformat->type = OCRPT_RESULT_STRING;
+	o->rptformat->string = ocrpt_mem_string_new_with_len("PDF", 8);
+	o->rptformat->string_owned = true;
 
 	o->paper = system_paper;
 	o->prec = OCRPT_MPFR_PRECISION_BITS;
@@ -226,6 +230,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	ocrpt_result_free(o->current_timestamp);
 	ocrpt_result_free(o->pageno);
 	ocrpt_result_free(o->totpages);
+	ocrpt_result_free(o->rptformat);
 
 	ocrpt_mem_string_free(o->output_buffer, true);
 	if (o->content_type)
@@ -1442,6 +1447,27 @@ DLL_EXPORT_SYM void ocrpt_set_output_format(opencreport *o, ocrpt_format_type fo
 	if (!o)
 		return;
 	o->output_format = format;
+	o->rptformat->string->len = 0;
+	switch (format) {
+	case OCRPT_OUTPUT_PDF:
+		ocrpt_mem_string_append_printf(o->rptformat->string, "PDF");
+		break;
+	case OCRPT_OUTPUT_HTML:
+		ocrpt_mem_string_append_printf(o->rptformat->string, "HTML");
+		break;
+	case OCRPT_OUTPUT_TXT:
+		ocrpt_mem_string_append_printf(o->rptformat->string, "TXT");
+		break;
+	case OCRPT_OUTPUT_CSV:
+		ocrpt_mem_string_append_printf(o->rptformat->string, "CSV");
+		break;
+	case OCRPT_OUTPUT_XML:
+		ocrpt_mem_string_append_printf(o->rptformat->string, "XML");
+		break;
+	case OCRPT_OUTPUT_JSON:
+		ocrpt_mem_string_append_printf(o->rptformat->string, "JSON");
+		break;
+	}
 }
 
 DLL_EXPORT_SYM char *ocrpt_canonicalize_path(const char *path) {
