@@ -167,6 +167,25 @@ $exprs = [
 	"nulln()",
 	"nulls()",
 
+	/* Embedded expression string evaluation tests */
+	"eval('1+2')",
+	"eval('1+2') + 3",
+	"3 + eval('1+2')",
+	"eval('1+2') * 3",
+	"3 * eval('1+2')",
+	"eval('upper(" . '"' . "árvíztűrő tükörfúrógép" . '"' . ")')",
+	"eval('identifier')",
+	"eval('1 1')", /* intentional syntax error */
+
+	"eval ('1+2')",
+	"eval ('1+2') + 3",
+	"3 + eval ('1+2')",
+	"eval ('1+2') * 3",
+	"3 * eval ('1+2')",
+	"eval ('upper(" . '"' . "árvíztűrő tükörfúrógép" . '"' . ")')",
+	"eval ('identifier')",
+	"eval ('1 1')", /* intentional syntax error */
+
 	/* Error tests */
 	"error('custom error')",
 ];
@@ -174,7 +193,7 @@ $exprs = [
 foreach ($exprs as &$str) {
 	echo "string: " . $str . PHP_EOL;
 	$e = $o->expr_parse($str);
-	if ($e instanceof OpenCReport\Expr) {
+	if ($e instanceof OpenCReport\Expr && !is_null($e)) {
 		echo "expr reprinted: "; flush();
 		$e->print();
 		echo "expr nodes: " . $e->nodes() . PHP_EOL;
@@ -185,7 +204,8 @@ foreach ($exprs as &$str) {
 		echo "expr nodes: " . $e->nodes() . PHP_EOL;
 
 		$r = $e->eval();
-		$r->print();
+		if (!is_null($r))
+			$r->print();
 	} else {
 		echo $o->expr_error() . PHP_EOL;
 	}
