@@ -19,6 +19,7 @@ config.status
 config.sub
 depcomp
 INSTALL
+lex.yy.c
 libtool
 aclocal.m4
 install-sh
