@@ -37,7 +37,6 @@ void ocrpt_layout_compute_text(opencreport *o, ocrpt_text *le) {
 	bool has_translate = false;
 	bool has_format = false;
 	bool has_value = false;
-	bool string_value = false;
 
 	if (o->textdomain && le->translate && le->translate->result[o->residx] && le->translate->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->translate->result[o->residx]->number_initialized) {
 		has_translate = !!mpfr_get_si(le->translate->result[o->residx]->number, o->rndmode);
@@ -72,41 +71,37 @@ void ocrpt_layout_compute_text(opencreport *o, ocrpt_text *le) {
 		rstring->len = 0;
 	}
 
-	if (has_value) {
-		if (has_format) {
-			if (has_translate) {
-				locale_t locale = uselocale(o->locale);
-				ocrpt_mem_string_append_printf(fstring, "%s", dgettext(o->textdomain, le->format->result[o->residx]->string->str));
-				uselocale(locale);
-			} else
-				ocrpt_mem_string_append_printf(fstring, "%s", le->format->result[o->residx]->string->str);
-		} else {
-			switch (le->value->result[o->residx]->type) {
-			case OCRPT_RESULT_STRING:
-			case OCRPT_RESULT_ERROR:
-				ocrpt_mem_string_append_printf(fstring, "%s", "%s");
-				string_value = true;
-				break;
-			case OCRPT_RESULT_NUMBER:
-				ocrpt_mem_string_append_printf(fstring, "%s", "%d");
-				break;
-			case OCRPT_RESULT_DATETIME:
-				ocrpt_mem_string_append_printf(fstring, "%s", nl_langinfo_l(D_FMT, o->locale));
-				break;
-			}
-		}
-	}
-
-	if (string_value) {
+	if (has_format) {
 		if (has_translate) {
 			locale_t locale = uselocale(o->locale);
-			ocrpt_mem_string_append_printf(string, "%s", dgettext(o->textdomain, le->value->result[o->residx]->string->str));
+			ocrpt_mem_string_append_printf(fstring, "%s", dgettext(o->textdomain, le->format->result[o->residx]->string->str));
 			uselocale(locale);
 		} else
-			ocrpt_mem_string_append_printf(string, "%s", le->value->result[o->residx]->string->str);
-		ocrpt_format_string_literal(o, NULL, rstring, fstring, string);
-	} else if (has_value)
+			ocrpt_mem_string_append_printf(fstring, "%s", le->format->result[o->residx]->string->str);
 		ocrpt_format_string(o, NULL, rstring, fstring, &le->value, 1);
+	} else if (has_value) {
+		switch (le->value->result[o->residx]->type) {
+		case OCRPT_RESULT_STRING:
+		case OCRPT_RESULT_ERROR:
+			ocrpt_mem_string_append_printf(fstring, "%s", "%s");
+			if (has_translate) {
+				locale_t locale = uselocale(o->locale);
+				ocrpt_mem_string_append_printf(string, "%s", dgettext(o->textdomain, le->value->result[o->residx]->string->str));
+				uselocale(locale);
+			} else
+				ocrpt_mem_string_append_printf(string, "%s", le->value->result[o->residx]->string->str);
+			ocrpt_format_string_literal(o, NULL, rstring, fstring, string);
+			break;
+		case OCRPT_RESULT_NUMBER:
+			ocrpt_mem_string_append_printf(fstring, "%s", "%d");
+			ocrpt_format_string(o, NULL, rstring, fstring, &le->value, 1);
+			break;
+		case OCRPT_RESULT_DATETIME:
+			ocrpt_mem_string_append_printf(fstring, "%s", nl_langinfo_l(D_FMT, o->locale));
+			ocrpt_format_string(o, NULL, rstring, fstring, &le->value, 1);
+			break;
+		}
+	}
 
 	assert(rstring);
 }

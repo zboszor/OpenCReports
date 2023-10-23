@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <table>
+      <tr>
+        <td width="813.09">
+          <report>
+            <report_header>
+              <output>
+                <line>
+                  <data width="401.00" font_point="11.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Test Report (Normal) AND THE REPORT FORMAT IS: </data>
+                  <data width="66.00" font_point="11.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">XML</data>
+                  <data width="33.00" font_point="11.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">3</data>
+                </line>
+                <line>
+                  <data width="813.09" font_point="11.00" font_face="Courier" bold="1" italics="0" align="left" bgcolor="#ffffff" color="#000000">Test Report (Bold)</data>
+                </line>
+                <line>
+                  <data width="813.09" font_point="11.00" font_face="Courier" bold="0" italics="1" align="left" bgcolor="#ffffff" color="#000000">Test Report (Italics)</data>
+                </line>
+                <line>
+                  <data width="813.09" font_point="11.00" font_face="Courier" bold="1" italics="1" align="left" bgcolor="#ffffff" color="#000000">Test Report (Bold and Italics)</data>
+                </line>
+                <line>
+                  <data width="43.00" font_point="11.00" font_face="Courier" bold="1" italics="1" align="left" bgcolor="#ffffff" color="#000000">BOO: </data>
+                  <data width="66.00" font_point="11.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">mike is a silly pants</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">First Name</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Last Name</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Color</data>
+                </line>
+              </output>
+            </field_headers>
+            <break_header name="break0">
+              <output>
+                <line>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffff00" color="#000000">Bob</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffff00" color="#000000">Doan</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">blue</data>
+                  <data width="81.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Initials: WRD</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffff00" color="#000000">Eric</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffff00" color="#000000">Eburuschkin</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">green</data>
+                  <data width="81.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Initials: ERB</data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="break0">
+              <output>
+                <line>
+                  <data width="63.00" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">FOOTER</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                </line>
+              </output>
+            </break_footer>
+            <break_header name="break0">
+              <output>
+                <line>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">2</data>
+                </line>
+              </output>
+            </break_header>
+            <field_details>
+              <output>
+                <line>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffff00" color="#000000">Mike</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffff00" color="#000000">Roth</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">yellow</data>
+                  <data width="81.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Initials: </data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffff00" color="#000000">Bob</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffff00" color="#000000">Kratz</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">pink</data>
+                  <data width="81.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Initials: RK</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffff00" color="#000000">Steve</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffff00" color="#000000">Tilden</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">purple</data>
+                  <data width="81.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Initials: </data>
+                </line>
+              </output>
+            </field_details>
+            <break_footer name="break0">
+              <output>
+                <line>
+                  <data width="63.00" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">FOOTER</data>
+                  <data width="108.01" font_point="9.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">2</data>
+                </line>
+              </output>
+            </break_footer>
+          </report>
+        </td>
+      </tr>
+    </table>
+    <part_page_footer>
+      <output>
+        <line>
+          <data width="46.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Page: </data>
+          <data width="21.60" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+        </line>
+      </output>
+    </part_page_footer>
+  </part>
+</ocrpt>

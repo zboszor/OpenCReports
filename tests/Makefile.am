@@ -193,7 +193,13 @@ LAYOUT_TESTS = \
 	break_suppressblank_test \
 	layout_follower_test3_test \
 	layout_follower_test5_test \
-	layout_follower_test6_test
+	layout_follower_test6_test \
+	layout_follower_test32_test \
+	layout_follower_test52_test \
+	layout_follower_test62_test \
+	layout_follower_test33_test \
+	layout_follower_test53_test \
+	layout_follower_test63_test
 
 LAYOUT_CSV_TESTS = \
 	layout_xml17_csv1_test \
