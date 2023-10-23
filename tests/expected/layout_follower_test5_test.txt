@@ -1,0 +1,16 @@
+Test Report (Normal) AND THE REPORT FORMAT IS: TXT       3    
+Test Report (Bold)
+Test Report (Italics)
+Test Report (Bold and Italics)
+BOO: mike is a 
+First Name           Last Name            Color               
+1                   
+Bob                  Doan                 blue                 WRD  
+Eric                 Eburuschkin          green                ERB  
+FOOTER1                   
+2                   
+Mike                 Roth                 yellow                    
+Bob                  Kratz                pink                      
+Steve                Tilden               purple                    
+FOOTER2                   
+Page:   1

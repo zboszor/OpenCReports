@@ -190,7 +190,10 @@ LAYOUT_TESTS = \
 	header_query_test \
 	header_query2_test \
 	page_header_footer_vars_test \
-	break_suppressblank_test
+	break_suppressblank_test \
+	layout_follower_test3_test \
+	layout_follower_test5_test \
+	layout_follower_test6_test
 
 LAYOUT_CSV_TESTS = \
 	layout_xml17_csv1_test \

@@ -46,7 +46,7 @@ void ocrpt_layout_compute_text(opencreport *o, ocrpt_text *le) {
 	if (le->format && le->format->result[o->residx] && le->format->result[o->residx]->type == OCRPT_RESULT_STRING && le->format->result[o->residx]->string)
 		has_format = true;
 
-	if (le->value && le->value->result[o->residx] &&
+	if (le->value && le->value->result[o->residx] && !le->value->result[o->residx]->isnull &&
 		(
 			(le->value->result[o->residx]->type == OCRPT_RESULT_STRING && le->value->result[o->residx]->string) ||
 			(le->value->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->value->result[o->residx]->number_initialized) ||
