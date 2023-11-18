@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE report >
+<OpenCReport>
 <Report orientation="landscape">
 	<Detail>
 		<FieldHeaders>
@@ -26,3 +27,4 @@
 		</FieldDetails>
 	</Detail>
 </Report>
+</OpenCReport>
