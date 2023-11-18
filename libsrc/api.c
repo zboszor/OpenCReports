@@ -539,6 +539,9 @@ static void ocrpt_execute_evaluate_global_params(opencreport *o) {
 	for (ocrpt_list *ql = o->queries; ql; ql = ql->next) {
 		ocrpt_query *q = (ocrpt_query *)ql->data;
 
+		if (q->leader)
+			continue;
+
 		ocrpt_query_navigate_start(q);
 		ocrpt_query_navigate_next(q);
 	}
@@ -654,6 +657,9 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 	 */
 	for (ocrpt_list *ql = o->queries; ql; ql = ql->next) {
 		ocrpt_query *q = (ocrpt_query *)ql->data;
+
+		if (q->leader)
+			continue;
 
 		ocrpt_query_navigate_start(q);
 		ocrpt_query_navigate_next(q);

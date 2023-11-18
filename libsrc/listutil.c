@@ -128,6 +128,8 @@ DLL_EXPORT_SYM ocrpt_list *ocrpt_list_end_remove(ocrpt_list *l, ocrpt_list **end
 	if (!e)
 		return l;
 
+	size_t len = l->len;
+
 	if (prev) {
 		prev->next = e->next;
 
@@ -145,15 +147,17 @@ DLL_EXPORT_SYM ocrpt_list *ocrpt_list_end_remove(ocrpt_list *l, ocrpt_list **end
 	}
 
 	if (l)
-		l->len--;
+		l->len = len - 1;
 
 	ocrpt_mem_free(e);
+
 
 	return l;
 }
 
 DLL_EXPORT_SYM ocrpt_list *ocrpt_list_remove(ocrpt_list *l, const void *data) {
-	return ocrpt_list_end_remove(l, NULL, data);
+	ocrpt_list *end = NULL;
+	return ocrpt_list_end_remove(l, &end, data);
 }
 
 DLL_EXPORT_SYM ocrpt_list *ocrpt_list_next(ocrpt_list *l) {

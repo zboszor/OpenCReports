@@ -1,0 +1,18 @@
+Boss name                      Sidekick name                  Sidekick's sidekick name      
+Snow White                     Doc                                                          
+Snow White                     Dopey                                                        
+Snow White                     Sneezy                         Coughy                        
+Snow White                     Sneezy                         Crippley                      
+Snow White                     Happy                                                        
+Snow White                     Bashful                                                      
+Snow White                     Sleepy                                                       
+Snow White                     Grumpy                                                       
+Batman                         Robin                                                        
+Cinderella                     Fairy Godmother                Prince Charming               
+Cinderella                     Fairy Godmother                Shrek                         
+Cinderella                     Mice                                                         
+Cinderella                     Pidgeons                                                     
+Hansel                         Gretel                                                       
+Little Red Riding Hood                                                                      
+Robin Hood                     Little John                    Will Scarlet                  
+Robin Hood                     Little John                    Brother Tuck                  

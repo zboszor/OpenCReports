@@ -11,6 +11,10 @@
 #include "output.h"
 #include "color.h"
 
+#ifndef UNUSED
+#define UNUSED __attribute__((unused))
+#endif
+
 enum ocrpt_var_type_bit {
 	OCRPT_VARIABLE_EXPRESSION_BIT = (1 << OCRPT_VARIABLE_EXPRESSION),
 	OCRPT_VARIABLE_COUNT_BIT = (1 << OCRPT_VARIABLE_COUNT),
@@ -144,6 +148,7 @@ struct opencreport {
 	/* Alternating datasource row result index  */
 	unsigned int residx:3;
 	unsigned int output_format:3;
+	bool n_to_1_lists_invalid:1;
 	bool precalculate:1;
 	bool size_in_points:1;
 	bool noquery_show_nodata:1;

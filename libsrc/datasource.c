@@ -138,46 +138,37 @@ void ocrpt_query_free0(ocrpt_query *q) {
 	if (!q)
 		return;
 
-	opencreport *o = q->source->o;
-	ocrpt_list *ptr;
-
-	for (ptr = o->queries; ptr; ptr = ptr->next) {
-		ocrpt_query *q1 = (ocrpt_query *)ptr->data;
-		ocrpt_query_follower *f = NULL;
-
-		if (q1 == q)
-			continue;
-
-		q1->followers = ocrpt_list_remove(q1->followers, q);
-
-		for (ocrpt_list *ptr1 = q1->followers_n_to_1; ptr1; ptr1 = ptr1->next) {
-			ocrpt_query_follower *f0 = (ocrpt_query_follower *)ptr1->data;
-
-			if (f0->follower == q) {
-				ocrpt_expr_free(f0->expr);
-				f = f0;
-				break;
-			}
-		}
-		if (f) {
-			q1->followers_n_to_1 = ocrpt_list_remove(q1->followers_n_to_1, f);
-			ocrpt_mem_free(f);
-		}
+	if (q->leader) {
+		q->leader->followers_n_to_1 = ocrpt_list_remove(q->leader->followers_n_to_1, q);
+		q->leader->followers = ocrpt_list_remove(q->leader->followers, q);
 	}
 
 	if (q->source && q->source->input && q->source->input->free)
 		q->source->input->free(q);
 
 	ocrpt_expr_free(q->rownum);
+	ocrpt_expr_free(q->match);
 	ocrpt_query_result_free(q);
 	ocrpt_strfree(q->name);
 	q->name = NULL;
-	ocrpt_list_free(q->followers);
-	for (ptr = q->followers_n_to_1; ptr; ptr = ptr->next) {
-		ocrpt_query_follower *f = (ocrpt_query_follower *)ptr->data;
-		ocrpt_expr_free(f->expr);
+
+	ocrpt_list *l;
+
+	for (l = q->followers; l; l = l->next) {
+		ocrpt_query *q1 = (ocrpt_query *)l->data;
+		q1->leader = NULL;
 	}
-	ocrpt_list_free_deep(q->followers_n_to_1, ocrpt_mem_free);
+	ocrpt_list_free(q->followers);
+
+	for (l = q->followers_n_to_1; l; l = l->next) {
+		ocrpt_query *q1 = (ocrpt_query *)l->data;
+		q1->leader = NULL;
+		q1->leader_is_n_1 = false;
+	}
+	ocrpt_list_free(q->followers_n_to_1);
+
+	ocrpt_list_free(q->global_followers_n_to_1);
+
 	ocrpt_mem_free(q);
 }
 
@@ -361,10 +352,10 @@ static bool ocrpt_query_follower_circular(ocrpt_query *leader, ocrpt_query *foll
 	}
 
 	for (ptr = leader->followers_n_to_1; ptr; ptr = ptr->next) {
-		ocrpt_query_follower *fptr = (ocrpt_query_follower *)ptr->data;
-		if (fptr->follower == follower)
+		ocrpt_query *f = (ocrpt_query *)ptr->data;
+		if (f == follower)
 			return false;
-		if (!ocrpt_query_follower_circular(fptr->follower, follower))
+		if (!ocrpt_query_follower_circular(f, follower))
 			return false;
 	}
 
@@ -377,10 +368,10 @@ static bool ocrpt_query_follower_circular(ocrpt_query *leader, ocrpt_query *foll
 	}
 
 	for (ptr = follower->followers_n_to_1; ptr; ptr = ptr->next) {
-		ocrpt_query_follower *fptr = (ocrpt_query_follower *)ptr->data;
-		if (fptr->follower == leader)
+		ocrpt_query *f = (ocrpt_query *)ptr->data;
+		if (f == leader)
 			return false;
-		if (!ocrpt_query_follower_circular(fptr->follower, leader))
+		if (!ocrpt_query_follower_circular(f, leader))
 			return false;
 	}
 
@@ -423,6 +414,11 @@ static bool ocrpt_query_follower_validity(ocrpt_query *leader, ocrpt_query *foll
 		return false;
 	}
 
+	if (follower->leader) {
+		ocrpt_err_printf("Follower ('%s') is already a follower of '%s'\n", follower->name, follower->leader->name);
+		return false;
+	}
+
 	return true;
 }
 
@@ -447,28 +443,35 @@ DLL_EXPORT_SYM bool ocrpt_query_add_follower_n_to_1(ocrpt_query *leader, ocrpt_q
 		}
 	}
 
-	ocrpt_query_follower *fo = ocrpt_mem_malloc(sizeof(ocrpt_query_follower));
-	if (!fo) {
+	int32_t len = ocrpt_list_length(leader->followers_n_to_1);
+	leader->followers_n_to_1 = ocrpt_list_append(leader->followers_n_to_1, follower);
+
+	if (len >= ocrpt_list_length(leader->followers_n_to_1)) {
 		ocrpt_expr_free(match);
 		return false;
-	}
-
-	fo->follower = follower;
-	fo->expr = match;
-
-	int32_t len = ocrpt_list_length(leader->followers_n_to_1);
-	leader->followers_n_to_1 = ocrpt_list_append(leader->followers_n_to_1, fo);
-	bool ret = (len < ocrpt_list_length(leader->followers_n_to_1));
-
-	if (!ret) {
-		ocrpt_expr_free(match);
-		ocrpt_mem_free(fo);
 	}
 
 	ocrpt_expr_optimize(match);
 	ocrpt_expr_resolve(match);
 
-	return ret;
+	follower->leader = leader;
+	follower->leader_is_n_1 = true;
+	follower->match = match;
+
+	if (follower->followers_n_to_1) {
+		if (ocrpt_list_length(leader->followers_n_to_1) > 0) {
+			ocrpt_list *ptr = ocrpt_list_last(leader->followers_n_to_1);
+			ptr->next = follower->followers_n_to_1;
+			leader->followers_n_to_1->len += ocrpt_list_length(follower->followers_n_to_1);
+		} else
+			leader->followers_n_to_1 = follower->followers_n_to_1;
+
+		follower->followers_n_to_1 = NULL;
+	}
+
+	leader->source->o->n_to_1_lists_invalid = true;
+
+	return true;
 }
 
 DLL_EXPORT_SYM bool ocrpt_query_add_follower(ocrpt_query *leader, ocrpt_query *follower) {
@@ -477,5 +480,39 @@ DLL_EXPORT_SYM bool ocrpt_query_add_follower(ocrpt_query *leader, ocrpt_query *f
 
 	int32_t len = ocrpt_list_length(leader->followers);
 	leader->followers = ocrpt_list_append(leader->followers, follower);
-	return (len < ocrpt_list_length(leader->followers));
+	if (len >= ocrpt_list_length(leader->followers))
+		return false;
+
+	follower->leader = leader;
+	follower->leader_is_n_1 = false;
+
+	return true;
+}
+
+static void ocrpt_query_finalize_followers0(ocrpt_query *topq, ocrpt_query *q) {
+	ocrpt_list *ptr;
+
+	for (ptr = q->followers_n_to_1; ptr; ptr = ptr->next) {
+		ocrpt_query *q1 = (ocrpt_query *)ptr->data;
+
+		topq->global_followers_n_to_1 = ocrpt_list_prepend(topq->global_followers_n_to_1, q1);
+	}
+
+	for (ptr = q->followers; ptr; ptr = ptr->next)
+		ocrpt_query_finalize_followers0(topq, (ocrpt_query *)ptr->data);
+
+	for (ptr = q->followers_n_to_1; ptr; ptr = ptr->next)
+		ocrpt_query_finalize_followers0(topq, (ocrpt_query *)ptr->data);
+}
+
+void ocrpt_query_finalize_followers(ocrpt_query *q) {
+	if (!q->source->o->n_to_1_lists_invalid && q->global_followers_n_to_1)
+		return;
+
+	ocrpt_list_free(q->global_followers_n_to_1);
+	q->global_followers_n_to_1 = NULL;
+
+	ocrpt_query_finalize_followers0(q, q);
+
+	q->source->o->n_to_1_lists_invalid = false;
 }

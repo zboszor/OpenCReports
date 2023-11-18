@@ -29,10 +29,6 @@
 #include "memutil.h"
 #include "datasource.h"
 
-#ifndef UNUSED
-#define UNUSED __attribute__((unused))
-#endif
-
 struct ocrpt_array_results {
 	const char **data;
 	const int32_t *types; /* for enum ocrpt_result_type elements */

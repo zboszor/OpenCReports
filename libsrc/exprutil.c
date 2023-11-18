@@ -27,10 +27,6 @@
 #include "datasource.h"
 #include "parts.h"
 
-#ifndef UNUSED
-#define UNUSED __attribute__((unused))
-#endif
-
 void ocrpt_result_print_internal(ocrpt_result *r, ocrpt_printf_func func);
 
 ocrpt_expr *newblankexpr(opencreport *o, ocrpt_report *r, enum ocrpt_expr_type type, uint32_t n_ops) {
@@ -573,8 +569,7 @@ static bool ocrpt_resolve_ident(ocrpt_expr *e, ocrpt_query *q) {
 	}
 
 	for (ql = q->followers_n_to_1; !found && ql; ql = ql->next) {
-		ocrpt_query_follower *fo = (ocrpt_query_follower *)ql->data;
-		found = ocrpt_resolve_ident(e, fo->follower);
+		found = ocrpt_resolve_ident(e, (ocrpt_query *)ql->data);
 		if (found)
 			break;
 	}

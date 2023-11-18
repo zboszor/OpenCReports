@@ -435,6 +435,14 @@ void ocrpt_query_navigate_start(ocrpt_query *q);
  */
 bool ocrpt_query_navigate_next(ocrpt_query *q);
 /*
+ * Move to previous row in the query row cache
+ */
+void ocrpt_query_navigate_use_prev_row(ocrpt_query *q);
+/*
+ * Move to next row in the query row cache
+ */
+void ocrpt_query_navigate_use_next_row(ocrpt_query *q);
+/*
  * Set the global function pointer to resolve array and type array
  */
 typedef void (*ocrpt_query_discover_func)(const char *, void **, int32_t *, int32_t *, const char *, void **, int32_t *);
