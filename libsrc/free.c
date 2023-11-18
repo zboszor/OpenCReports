@@ -167,9 +167,9 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 					ocrpt_mem_string_free(le->value_str, true);
 					ocrpt_mem_string_free(le->result_str, true);
 					break;
-				case OCRPT_OUTPUT_LE_IMAGE: {
-					ocrpt_image *img = (ocrpt_image *)le;
+				case OCRPT_OUTPUT_LE_IMAGE:
 					if (free_subexprs) {
+						ocrpt_image *img = (ocrpt_image *)le;
 						ocrpt_expr_free(img->suppress);
 						ocrpt_expr_free(img->value);
 						ocrpt_expr_free(img->imgtype);
@@ -180,7 +180,6 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 						ocrpt_expr_free(img->text_width);
 					}
 					break;
-				}
 				case OCRPT_OUTPUT_LE_BARCODE:
 					/* TODO */
 					break;

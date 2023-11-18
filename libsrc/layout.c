@@ -116,6 +116,7 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 
 	for (ocrpt_list *l = line->elements; l; l = l->next) {
 		ocrpt_text *elem = (ocrpt_text *)l->data;
+		ocrpt_image *img = (ocrpt_image *)elem;
 
 		switch (elem->le_type) {
 		case OCRPT_OUTPUT_LE_TEXT:
@@ -137,8 +138,7 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 
 			output->has_memo = output->has_memo || (elem->memo && (elem->lines > 1));
 			break;
-		case OCRPT_OUTPUT_LE_IMAGE: {
-			ocrpt_image *img = (ocrpt_image *)elem;
+		case OCRPT_OUTPUT_LE_IMAGE:
 			img->start = next_start;
 
 			ocrpt_layout_image_setup(o, p, pr, pd, r, output, line, img, page_width, img->start, page_position);
@@ -156,7 +156,6 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 			next_start += img->image_text_width;
 
 			break;
-		}
 		case OCRPT_OUTPUT_LE_BARCODE:
 			/* TODO */
 			break;
