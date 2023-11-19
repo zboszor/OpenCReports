@@ -2,16 +2,11 @@
 
 OpenCReports is a reporting library based on ideas from RLIB
 (https://github.com/SICOM/rlib) but having a complete
-reimplementation and licensed under LGPLv3 under verbal
-consent from the original authors:
-
-* Bobby Doan <bdoan@sicom.com>
-* Christian Betz <cbetz@sicom.com>
+reimplementation and licensed under LGPLv3.
 
 ## Currently missing features
 
 * language bindings other than C and PHP
-* output formats other than PDF
 * graphing and barcodes (Graph, Chart and Barcode XML elements)
 
 ## Roadmap
