@@ -55,6 +55,7 @@ static ocrpt_expr *newvectormatchexpr(yyscan_t yyscanner, ocrpt_string *fname, o
 static ocrpt_expr *makefuncexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt_list *l);
 static ocrpt_expr *parseembeddedexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt_list *l);
 static ocrpt_expr *ocrpt_expr_parse_internal(opencreport *o, ocrpt_report *r, const char *expr_string, char **err);
+static ocrpt_list *addtoargliststack(ocrpt_list *l, void *ptr);
 
 %}
 
@@ -406,8 +407,7 @@ argelems:
 								base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
 								ocrpt_list *l = ocrpt_makelist1($1);
 
-								if (extra->parsed_arglist)
-									extra->parsed_arglist_stack = ocrpt_list_prepend(extra->parsed_arglist_stack, extra->parsed_arglist);
+								extra->parsed_arglist_stack = addtoargliststack(extra->parsed_arglist_stack, extra->parsed_arglist);
 
 								$$ = extra->parsed_arglist = l;
 							}
@@ -415,8 +415,8 @@ argelems:
 								base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
 								ocrpt_list *l = ocrpt_list_append($1, $3);
 
-								if (extra->parsed_arglist && l != extra->parsed_arglist)
-									extra->parsed_arglist_stack = ocrpt_list_prepend(extra->parsed_arglist_stack, extra->parsed_arglist);
+								if (l != extra->parsed_arglist)
+									extra->parsed_arglist_stack = addtoargliststack(extra->parsed_arglist_stack, extra->parsed_arglist);
 
 								$$ = extra->parsed_arglist = l;
 							}
@@ -426,16 +426,15 @@ arglist:
 	/* empty */				{
 								base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
 
-								if (extra->parsed_arglist)
-									extra->parsed_arglist_stack = ocrpt_list_prepend(extra->parsed_arglist_stack, extra->parsed_arglist);
+								extra->parsed_arglist_stack = addtoargliststack(extra->parsed_arglist_stack, extra->parsed_arglist);
 
 								$$ = extra->parsed_arglist = NULL;
 							}
 	| argelems				{
 								base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
 
-								if (extra->parsed_arglist && $1 != extra->parsed_arglist)
-									extra->parsed_arglist_stack = ocrpt_list_prepend(extra->parsed_arglist_stack, extra->parsed_arglist);
+								if ($1 != extra->parsed_arglist)
+									extra->parsed_arglist_stack = addtoargliststack(extra->parsed_arglist_stack, extra->parsed_arglist);
 
 								$$ = extra->parsed_arglist = $1;
 							}
@@ -823,4 +822,17 @@ static ocrpt_expr *parseembeddedexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt
 	extra->o->exprs = ocrpt_list_end_remove(extra->o->exprs, &extra->o->exprs_last, e);
 
 	return e;
+}
+
+static ocrpt_list *addtoargliststack(ocrpt_list *l, void *ptr) {
+	if (!ptr)
+		return l;
+
+	bool found = false;
+
+	for (ocrpt_list *l1 = l; l1 && !found; l1 = l1->next)
+		if (l1->data == ptr)
+			found = true;
+
+	return found ? l : ocrpt_list_prepend(l, ptr);
 }
