@@ -1,0 +1,7 @@
+Boss name                      Sidekick name                  Sidekick's sidekick name      
+Snow White                     Doc                                                          
+Batman                         Robin                                                        
+Cinderella                     Fairy Godmother                Prince Charming               
+Hansel                         Gretel                                                       
+Little Red Riding Hood                                                                      
+Robin Hood                     Little John                    Will Scarlet                  

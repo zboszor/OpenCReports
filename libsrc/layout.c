@@ -1923,6 +1923,29 @@ DLL_EXPORT_SYM void ocrpt_set_size_unit(opencreport *o, const char *expr_string)
 	}
 }
 
+DLL_EXPORT_SYM void ocrpt_set_follower_match_single(opencreport *o, const char *expr_string) {
+	if (!o)
+		return;
+
+	ocrpt_expr_free(o->follower_match_single_expr);
+	o->follower_match_single_expr = NULL;
+	if (expr_string) {
+		char *err = NULL;
+		o->follower_match_single_expr = ocrpt_expr_parse(o, expr_string, &err);
+		if (err) {
+			ocrpt_err_printf("ocrpt_set_follower_match_single: %s\n", err);
+			ocrpt_strfree(err);
+		}
+	}
+}
+
+DLL_EXPORT_SYM void ocrpt_set_follower_match_single_direct(opencreport *o, bool value) {
+	if (!o)
+		return;
+
+	o->follower_match_single = value;
+}
+
 DLL_EXPORT_SYM void ocrpt_part_set_iterations(ocrpt_part *p, const char *expr_string) {
 	if (!p)
 		return;

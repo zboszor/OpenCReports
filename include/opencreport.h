@@ -856,6 +856,8 @@ bool ocrpt_break_add_trigger_cb(ocrpt_break *br, ocrpt_break_trigger_cb func, vo
 void ocrpt_set_size_unit(opencreport *o, const char *expr_string);
 void ocrpt_set_noquery_show_nodata(opencreport *o, const char *expr_string);
 void ocrpt_set_report_height_after_last(opencreport *o, const char *expr_string);
+void ocrpt_set_follower_match_single(opencreport *o, const char *expr_string);
+void ocrpt_set_follower_match_single_direct(opencreport *o, bool value);
 
 void ocrpt_part_set_iterations(ocrpt_part *p, const char *expr_string);
 void ocrpt_part_set_font_name(ocrpt_part *p, const char *expr_string);

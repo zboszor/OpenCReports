@@ -266,6 +266,26 @@
 				Default is <literal>false</literal>.
 			</para>
 		</sect2>
+		<sect2 id="xmlfollowermatchsingle" xreflabel="Follower match single attribute">
+			<title>Follower match single</title>
+			<para>
+				When set to <literal>false</literal>, N:1 followers behave
+				fully like <literal>LEFT OUTER JOIN</literal> in SQL,
+				with duplicating data from the primary query if multiple
+				matching rows exist in followers. When set to
+				<literal>true</literal>, only the first matching row is used.
+				The latter approximates the RLIB implementation.
+				<programlisting>&lt;OpenCReport follower_match_single="yes"&gt;
+&lt;OpenCReport follower_match_single="no"&gt;</programlisting>
+			</para>
+			<para>
+				Default is <literal>false</literal>, unless the report XML
+				descriptor uses either <literal>&lt;Part&gt;</literal> or
+				<literal>&lt;Report&gt;</literal> as the toplevel XML node.
+				In the latter case, this attribute is automatically set
+				to <literal>true</literal>.
+			</para>
+		</sect2>
 		<sect2 id="precbits">
 			<title>Precision bits</title>
 			<para>

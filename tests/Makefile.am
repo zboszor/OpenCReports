@@ -43,6 +43,9 @@ TESTS = \
 	follower_recursive_n_1_test \
 	follower_recursive_n_1_v2_test \
 	follower_recursive_n_1_v3_test \
+	follower_recursive_n_1_match_single_test \
+	follower_recursive_n_1_match_single_v2_test \
+	follower_recursive_n_1_match_single_v3_test \
 	rownum_test \
 	part_test part_xml_test \
 	locale_test \
@@ -203,7 +206,8 @@ LAYOUT_TESTS = \
 	layout_follower_test33_test \
 	layout_follower_test53_test \
 	layout_follower_test63_test \
-	layout_follower_recursive_n_1_test
+	layout_follower_recursive_n_1_test \
+	layout_follower_recursive_n_1_match_single_test
 
 LAYOUT_CSV_TESTS = \
 	layout_xml17_csv1_test \

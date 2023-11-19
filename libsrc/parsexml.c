@@ -1052,7 +1052,7 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 	r->noquery_show_nodata = called_from_ocrpt_node;
 
 	xmlChar *font_name, *font_size;
-	xmlChar *size_unit, *noquery_show_nodata, *report_height_after_last;
+	xmlChar *size_unit, *noquery_show_nodata, *report_height_after_last, *follower_match_single;
 	xmlChar *orientation, *top_margin, *bottom_margin, *left_margin, *right_margin;
 	xmlChar *paper_type, *iterations, *suppress, *suppress_pageheader_firstpage;
 	xmlChar *query, *field_header_priority, *height;
@@ -1066,6 +1066,7 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		{ { "size_unit" }, &size_unit },
 		{ { "noquery_show_nodata" }, &noquery_show_nodata },
 		{ { "report_height_after_last" }, &report_height_after_last },
+		{ { "follower_match_single" }, &follower_match_single },
 		{ { "orientation" }, &orientation },
 		{ { "top_margin", "topMargin" }, &top_margin },
 		{ { "bottom_margin", "bottomMargin" }, &bottom_margin },
@@ -1102,6 +1103,10 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 
 	if (!o->report_height_after_last_expr && report_height_after_last)
 		ocrpt_set_report_height_after_last(o, (char *)report_height_after_last);
+
+	/* Simulate/approximate RLIB's buggy behaviour */
+	if (!called_from_ocrpt_node)
+		ocrpt_set_follower_match_single(o, follower_match_single ? (char *)follower_match_single : "yes");
 
 	if (font_name)
 		ocrpt_report_set_font_name(r, (char *)font_name);
@@ -1451,7 +1456,7 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader, bool 
 	ocrpt_part *p = ocrpt_part_new(o);
 
 	xmlChar *font_name, *font_size;
-	xmlChar *size_unit, *noquery_show_nodata, *report_height_after_last;
+	xmlChar *size_unit, *noquery_show_nodata, *report_height_after_last, *follower_match_single;
 	xmlChar *orientation, *top_margin, *bottom_margin, *left_margin, *right_margin;
 	xmlChar *paper_type, *iterations, *suppress, *suppress_pageheader_firstpage;
 	struct {
@@ -1463,6 +1468,7 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader, bool 
 		{ { "size_unit" }, &size_unit },
 		{ { "noquery_show_nodata" }, &noquery_show_nodata },
 		{ { "report_height_after_last" }, &report_height_after_last },
+		{ { "follower_match_single" }, &follower_match_single },
 		{ { "orientation" }, &orientation },
 		{ { "top_margin", "topMargin" }, &top_margin },
 		{ { "bottom_margin", "bottomMargin" }, &bottom_margin },
@@ -1492,6 +1498,10 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader, bool 
 
 	if (!o->report_height_after_last_expr && report_height_after_last)
 		ocrpt_set_report_height_after_last(o, (char *)report_height_after_last);
+
+	/* Simulate/approximate RLIB's buggy behaviour */
+	if (!called_from_ocrpt_node)
+		ocrpt_set_follower_match_single(o, follower_match_single ? (char *)follower_match_single : "yes");
 
 	if (!p->font_name_expr && font_name)
 		ocrpt_part_set_font_name(p, (char *)font_name);
@@ -1616,7 +1626,7 @@ static void ocrpt_parse_paths_node(opencreport *o, xmlTextReaderPtr reader) {
 
 static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader) {
 	xmlChar *size_unit, *noquery_show_nodata, *report_height_after_last;
-	xmlChar *precision_bits, *rounding_mode;
+	xmlChar *follower_match_single, *precision_bits, *rounding_mode;
 	xmlChar *locale, *xlate_domain, *xlate_dir;
 
 	struct {
@@ -1626,6 +1636,7 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 		{ "size_unit", &size_unit },
 		{ "noquery_show_nodata", &noquery_show_nodata },
 		{ "report_height_after_last", &report_height_after_last },
+		{ "follower_match_single", &follower_match_single },
 		{ "precision_bits", &precision_bits },
 		{ "rounding_mode", &rounding_mode },
 		{ "locale", &locale },
@@ -1646,6 +1657,9 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 
 	if (!o->report_height_after_last_expr && report_height_after_last)
 		ocrpt_set_report_height_after_last(o, (char *)report_height_after_last);
+
+	if (!o->follower_match_single_expr && follower_match_single)
+		ocrpt_set_follower_match_single(o, (char *)follower_match_single);
 
 	if (!o->precision_expr && precision_bits)
 		ocrpt_set_numeric_precision_bits(o, (char *)precision_bits);

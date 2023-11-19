@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE report >
+<Report orientation="landscape">
+	<Detail>
+		<FieldHeaders>
+			<Output>
+				<Line>
+					<literal width="30">Boss name</literal>
+					<literal width="1"/>
+					<literal width="30">Sidekick name</literal>
+					<literal width="1"/>
+					<literal width="30">Sidekick's sidekick name</literal>
+				</Line>
+			</Output>
+		</FieldHeaders>		
+		<FieldDetails>
+			<Output>
+				<Line>
+					<field value="data.name" width="30" align="left" />
+					<literal width="1"/>
+					<field value="more_data.name" width="30" align="left" />
+					<literal width="1"/>
+					<field value="moar_data.name" width="30" align="left" />
+				</Line>
+			</Output>
+		</FieldDetails>
+	</Detail>
+</Report>

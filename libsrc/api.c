@@ -566,6 +566,11 @@ static void ocrpt_execute_evaluate_global_params(opencreport *o) {
 	if (o->report_height_after_last_expr)
 		o->report_height_after_last = !!ocrpt_expr_get_long(o->report_height_after_last_expr);
 
+	ocrpt_expr_resolve(o->follower_match_single_expr);
+	ocrpt_expr_optimize(o->follower_match_single_expr);
+	if (o->follower_match_single_expr)
+		o->follower_match_single = !!ocrpt_expr_get_long(o->follower_match_single_expr);
+
 	ocrpt_expr_resolve(o->precision_expr);
 	ocrpt_expr_optimize(o->precision_expr);
 	if (o->precision_expr) {

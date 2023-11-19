@@ -3,6 +3,7 @@
 	size_unit CDATA #IMPLIED
 	noquery_show_nodata CDATA #IMPLIED
 	report_height_after_last CDATA #IMPLIED
+	follower_match_single CDATA #IMPLIED
 	precision_bits CDATA #IMPLIED
 	rounding_mode (nearest|to_minus_inf|to_inf|to_zero|away_from_zero|faithful) "nearest"
 	locale CDATA #IMPLIED
@@ -45,6 +46,9 @@
 	fontSize CDATA #IMPLIED
 	font_size CDATA #IMPLIED
 	size_unit CDATA #IMPLIED
+	noquery_show_nodata CDATA #IMPLIED
+	report_height_after_last CDATA #IMPLIED
+	follower_match_single CDATA #IMPLIED
 	orientation CDATA #IMPLIED
 	topMargin CDATA #IMPLIED
 	top_margin CDATA #IMPLIED
@@ -84,6 +88,9 @@
 	fontSize CDATA #IMPLIED
 	font_size CDATA #IMPLIED
 	size_unit CDATA #IMPLIED
+	noquery_show_nodata CDATA #IMPLIED
+	report_height_after_last CDATA #IMPLIED
+	follower_match_single CDATA #IMPLIED
 	orientation CDATA #IMPLIED
 	topMargin CDATA #IMPLIED
 	top_margin CDATA #IMPLIED

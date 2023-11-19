@@ -1884,6 +1884,28 @@ ocrpt_set_report_height_after_last(opencreport *o,
                                    const char *expr_string);</programlisting>
 					</para>
 				</sect4>
+				<sect4 id="followermatchsingle">
+					<title>Set "follower match single" option</title>
+					<para>
+						See <xref linkend="xmlfollowermatchsingle"/>.
+						The expression string should evaluate to
+						a boolean value.
+						<programlisting>void
+ocrpt_set_follower_match_single(opencreport *o,
+                                const char *expr_string);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="followermatchsingledirect">
+					<title>Set "follower match single" option directly</title>
+					<para>
+						See above and <xref linkend="xmlfollowermatchsingle"/>.
+						The  difference is that the modified behaviour
+						is set directly and immediately. Used by unit tests.
+						<programlisting>void
+ocrpt_set_follower_match_single_direct(opencreport *o,
+                                       bool value);</programlisting>
+					</para>
+				</sect4>
 			</sect3>
 			<sect3 id="partopts">
 				<title>Report part options</title>

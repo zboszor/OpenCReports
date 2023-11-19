@@ -238,6 +238,8 @@ DLL_EXPORT_SYM bool ocrpt_query_navigate_next(ocrpt_query *q) {
 					if (n_to_1_has_row) {
 						if (n_to_1_matched) {
 							q->n_to_1_matched = true;
+							if (q->source->o->follower_match_single)
+								q->n_to_1_started = false;
 							return true;
 						}
 					}
@@ -261,6 +263,8 @@ DLL_EXPORT_SYM bool ocrpt_query_navigate_next(ocrpt_query *q) {
 				if (ended && ((!all_isdone && !had_match) || (all_isdone && !had_match && !q->n_to_1_matched))) {
 					if (ended && !all_isdone && !had_match)
 						q->n_to_1_matched = true;
+					if (q->source->o->follower_match_single)
+						q->n_to_1_started = false;
 					return true;
 				}
 			} while (!all_isdone);
