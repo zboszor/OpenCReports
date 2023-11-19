@@ -901,6 +901,29 @@ ocrpt_query_navigate_start(ocrpt_query *q);</programlisting>
 ocrpt_query_navigate_next(ocrpt_query *q);</programlisting>
 				</para>
 			</sect3>
+			<sect3 id="useprevnextrow">
+				<title><literal>Navigate use previous/next row</literal></title>
+				<para>
+					These functions expose an implementation
+					detail of the data traversal in OpenCReports.
+					There is a 3-row data cache in which there is
+					always the current row. One past row is kept
+					so e.g. break boundaries can be detected and
+					there is one row read-ahead to detect the
+					end-of-data condition early. These functions
+					allow to switch back and forth in the 3-row
+					data cache, making the previous or next row the
+					"current" one momentarily. The query must always
+					be the primary query of the report. Used by
+					unit tests that don't use
+					<literal>ocrpt_execute()</literal>.
+					<programlisting>void
+ocrpt_query_navigate_use_prev_row(ocrpt_query *q);
+
+void
+ocrpt_query_navigate_use_next_row(ocrpt_query *q);</programlisting>
+				</para>
+			</sect3>
 			<sect3 id="arraydiscoveryfunc" xreflabel="Array discovery function">
 				<title><literal>API specific array discovery function</literal></title>
 				<para>

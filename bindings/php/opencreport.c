@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
+
 #include <opencreport.h>
 
 /* {{{ REGISTER_OPENCREPORT_CLASS_CONST_LONG */
@@ -1483,6 +1484,30 @@ PHP_METHOD(opencreport, set_report_height_after_last) {
 	ocrpt_set_report_height_after_last(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
+PHP_METHOD(opencreport, set_follower_match_single) {
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_set_follower_match_single(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport, set_follower_match_single_direct) {
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+	zend_bool value = false;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_BOOL(value);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_set_follower_match_single_direct(oo->o, value);
+}
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_opencreport___construct, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
@@ -1669,6 +1694,14 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_report_height_af
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_follower_match_single, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_follower_match_single_direct, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, value, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry opencreport_class_methods[] = {
 	/*
 	 * High level API
@@ -1735,6 +1768,8 @@ static const zend_function_entry opencreport_class_methods[] = {
 	PHP_ME(opencreport, set_size_unit, arginfo_opencreport_set_size_unit, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, set_noquery_show_nodata, arginfo_opencreport_set_noquery_show_nodata, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, set_report_height_after_last, arginfo_opencreport_set_report_height_after_last, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport, set_follower_match_single, arginfo_opencreport_set_follower_match_single, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport, set_follower_match_single_direct, arginfo_opencreport_set_follower_match_single_direct, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 
@@ -1872,6 +1907,24 @@ PHP_METHOD(opencreport_query, navigate_next) {
 	RETURN_BOOL(ocrpt_query_navigate_next(qo->q));
 }
 
+PHP_METHOD(opencreport_query, navigate_use_prev_row) {
+	zval *object = ZEND_THIS;
+	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_query_navigate_use_prev_row(qo->q);
+}
+
+PHP_METHOD(opencreport_query, navigate_use_next_row) {
+	zval *object = ZEND_THIS;
+	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_query_navigate_use_next_row(qo->q);
+}
+
 PHP_METHOD(opencreport_query, add_follower) {
 	zval *object = ZEND_THIS;
 	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(object);
@@ -1932,6 +1985,12 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_navigate_next, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_navigate_use_prev_row, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_navigate_use_next_row, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_add_follower, 0, 1, _IS_BOOL, 0)
 ZEND_ARG_OBJ_INFO(0, follower, OpenCReport\\Query, 0)
 ZEND_END_ARG_INFO()
@@ -1948,6 +2007,8 @@ static const zend_function_entry opencreport_query_class_methods[] = {
 	PHP_ME(opencreport_query, get_result, arginfo_opencreport_query_get_result, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_query, navigate_start, arginfo_opencreport_query_navigate_start, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_query, navigate_next, arginfo_opencreport_query_navigate_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_query, navigate_use_prev_row, arginfo_opencreport_query_navigate_use_prev_row, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_query, navigate_use_next_row, arginfo_opencreport_query_navigate_use_next_row, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_query, add_follower, arginfo_opencreport_query_add_follower, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_query, add_follower_n_to_1, arginfo_opencreport_query_add_follower_n_to_1, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_query, free, arginfo_opencreport_query_free, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)

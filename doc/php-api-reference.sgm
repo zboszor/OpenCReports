@@ -166,6 +166,10 @@
                      string $expr_string): void;
     public final set_report_height_after_last(
                      string $expr_string): void;
+    public final set_follower_match_single(
+                     string $expr_string): void;
+    public final set_follower_match_single_direct(
+                     bool $value): void;
 }</programlisting>
 		</para>
 	</sect1>
@@ -833,6 +837,18 @@ OpenCReport::set_report_height_after_last(
                      string $expr_string): void;</programlisting>
 				</para>
 			</sect3>
+			<sect3 id="phppartsetfms">
+				<title>Set "follower match single" property</title>
+				<para>
+					See <xref linkend="xmlfollowermatchsingle"/>.
+					<programlisting>public final
+OpenCReport::set_follower_match_single(
+                     string $expr_string): void;
+public final
+OpenCReport::set_follower_match_single_direct(
+                     bool $value): void;</programlisting>
+				</para>
+			</sect3>
 		</sect2>
 		<sect2 id="phpcallbackmethods">
 			<title>Callback related methods</title>
@@ -1069,6 +1085,9 @@ OpenCReport\Datasource::set_encoding(string $encoding): void;</programlisting>
     public final navigate_start(): void;
     public final navigate_next(): bool;
 
+    public final navigate_use_prev_row(): void;
+    public final navigate_use_next_row(): void;
+
     public final add_follower(
                      OpenCReport\Query $follower):
                      bool;
@@ -1108,6 +1127,36 @@ OpenCReport\Query::navigate_start(): void;</programlisting>
 				to the next valid row.
 				<programlisting>public final
 OpenCReport\Query::navigate_next(): bool;</programlisting>
+			</para>
+			<para>
+				Usually queries do not have a uniform
+				way to report the total number of rows,
+				although some datasource types may have
+				such a facility. Instead, they can report
+				that the dataset has ended.
+			</para>
+		</sect2>
+		<sect2 id="phpquerynavuseprevnextrow">
+			<title>Navigate use previous/next row</title>
+			<para>
+				These functions expose an implementation
+				detail of the data traversal in OpenCReports.
+				There is a 3-row data cache in which there is
+				always the current row. One past row is kept
+				so e.g. break boundaries can be detected and
+				there is one row read-ahead to detect the
+				end-of-data condition early. These functions
+				allow to switch back and forth in the 3-row
+				data cache, making the previous or next row the
+				"current" one momentarily. The query must always
+				be the primary query of the report. Used by
+				unit tests that don't use
+				<literal>ocrpt_execute()</literal>.
+				<programlisting>public final
+OpenCReport\Query::navigate_use_prev_row(): bool;
+
+public final
+OpenCReport\Query::navigate_use_next_row(): bool;</programlisting>
 			</para>
 			<para>
 				Usually queries do not have a uniform
