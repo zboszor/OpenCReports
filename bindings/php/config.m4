@@ -31,7 +31,7 @@ if test "$PHP_OPENCREPORTS" != "no"; then
 	OPENCREPORTS_LIBS="`$PKG_CONFIG --libs opencreports`"
 	AC_DEFINE_UNQUOTED(PHP_OPENCREPORT_VERSION,["m4_normalize(m4_include([../../VERSION]))"],[OpenCReports version])
 
-	CFLAGS="-Wall -Werror $CFLAGS"
+	CFLAGS="-Wall -Werror $CFLAGS $OPENCREPORTS_CFLAGS"
 	LDFLAGS="$OPENCREPORTS_LIBS $LDFLAGS"
 
 	PHP_NEW_EXTENSION(opencreports, [opencreport.c], $ext_shared)
