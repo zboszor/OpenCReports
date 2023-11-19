@@ -61,6 +61,7 @@ typedef struct base_yy_extra_type {
 	ocrpt_list *tokens;
 	ocrpt_list *parsed_exprs;
 	ocrpt_list *parsed_arglist;
+	ocrpt_list *parsed_arglist_stack;
 	char *err;
 } base_yy_extra_type;
 

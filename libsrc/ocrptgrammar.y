@@ -51,6 +51,7 @@ static ocrpt_expr *newstring(yyscan_t yyscanner, ocrpt_string *s);
 static ocrpt_expr *newnumber(yyscan_t yyscanner, ocrpt_string *n);
 static ocrpt_expr *newident(yyscan_t yyscanner, int ident_type, ocrpt_string *query, ocrpt_string *name, bool dotprefixed);
 static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, ocrpt_list *l);
+static ocrpt_expr *newvectormatchexpr(yyscan_t yyscanner, ocrpt_string *fname, ocrpt_list *vec1, ocrpt_list *vec2);
 static ocrpt_expr *makefuncexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt_list *l);
 static ocrpt_expr *parseembeddedexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt_list *l);
 static ocrpt_expr *ocrpt_expr_parse_internal(opencreport *o, ocrpt_report *r, const char *expr_string, char **err);
@@ -171,9 +172,47 @@ exp:
 								yyset_lloc(&@1, yyscanner);
 								$$ = newexpr(yyscanner, $2, ocrpt_makelist($1, $3, NULL));
 							}
+	| '[' arglist ']' CMPEQ '[' arglist ']'
+							{
+								if (ocrpt_list_length($2) == 0) {
+									yyset_lloc(&@1, yyscanner);
+									parser_yyerror("empty vector");
+								}
+
+								if (ocrpt_list_length($6) == 0) {
+									yyset_lloc(&@5, yyscanner);
+									parser_yyerror("empty vector");
+								}
+
+								if (ocrpt_list_length($2) != ocrpt_list_length($6)) {
+									yyset_lloc(&@1, yyscanner);
+									parser_yyerror("different vector size");
+								}
+
+								$$ = newvectormatchexpr(yyscanner, $4, $2, $6);
+							}
 	| exp CMP exp			{
 								yyset_lloc(&@1, yyscanner);
 								$$ = newexpr(yyscanner, $2, ocrpt_makelist($1, $3, NULL));
+							}
+	| '[' arglist ']' CMP '[' arglist ']'
+							{
+								if (ocrpt_list_length($2) == 0) {
+									yyset_lloc(&@1, yyscanner);
+									parser_yyerror("empty vector");
+								}
+
+								if (ocrpt_list_length($6) == 0) {
+									yyset_lloc(&@5, yyscanner);
+									parser_yyerror("empty vector");
+								}
+
+								if (ocrpt_list_length($2) != ocrpt_list_length($6)) {
+									yyset_lloc(&@1, yyscanner);
+									parser_yyerror("different vector size");
+								}
+
+								$$ = newvectormatchexpr(yyscanner, $4, $2, $6);
 							}
 	| exp BSHIFT exp		{
 								yyset_lloc(&@1, yyscanner);
@@ -364,18 +403,42 @@ ANYIDENT:
 
 argelems:
 	exp						{
+								base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
 								ocrpt_list *l = ocrpt_makelist1($1);
-								$$ = parser_yyget_extra(yyscanner)->parsed_arglist = l;
+
+								if (extra->parsed_arglist)
+									extra->parsed_arglist_stack = ocrpt_list_prepend(extra->parsed_arglist_stack, extra->parsed_arglist);
+
+								$$ = extra->parsed_arglist = l;
 							}
 	| argelems ',' exp		{
+								base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
 								ocrpt_list *l = ocrpt_list_append($1, $3);
-								$$ = parser_yyget_extra(yyscanner)->parsed_arglist = l;
+
+								if (extra->parsed_arglist && l != extra->parsed_arglist)
+									extra->parsed_arglist_stack = ocrpt_list_prepend(extra->parsed_arglist_stack, extra->parsed_arglist);
+
+								$$ = extra->parsed_arglist = l;
 							}
 	;
 
 arglist:
-	/* empty */				{ $$ = parser_yyget_extra(yyscanner)->parsed_arglist = NULL; }
-	| argelems				{ $$ = parser_yyget_extra(yyscanner)->parsed_arglist = $1; }
+	/* empty */				{
+								base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
+
+								if (extra->parsed_arglist)
+									extra->parsed_arglist_stack = ocrpt_list_prepend(extra->parsed_arglist_stack, extra->parsed_arglist);
+
+								$$ = extra->parsed_arglist = NULL;
+							}
+	| argelems				{
+								base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
+
+								if (extra->parsed_arglist && $1 != extra->parsed_arglist)
+									extra->parsed_arglist_stack = ocrpt_list_prepend(extra->parsed_arglist_stack, extra->parsed_arglist);
+
+								$$ = extra->parsed_arglist = $1;
+							}
 	;
 
 %%
@@ -389,6 +452,7 @@ void parser_init(base_yy_extra_type *yyext, opencreport *o, ocrpt_report *r) {
 	yyext->tokens = NULL;
 	yyext->parsed_exprs = NULL;
 	yyext->parsed_arglist = NULL;
+	yyext->parsed_arglist_stack = NULL;
 	yyext->o = o;
 	yyext->r = r;
 	yyext->err = NULL;
@@ -440,6 +504,13 @@ static ocrpt_expr *ocrpt_expr_parse_internal(opencreport *o, ocrpt_report *r, co
 		ocrpt_list_free_deep(yyextra.tokens, (ocrpt_mem_free_t)ocrpt_grammar_free_token);
 		ocrpt_list_free(yyextra.parsed_arglist);
 
+		for (ptr = yyextra.parsed_arglist_stack; ptr; ptr = ptr->next) {
+			ocrpt_list *arglist = (ocrpt_list *)ptr->data;
+
+			ocrpt_list_free(arglist);
+		}
+		ocrpt_list_free(yyextra.parsed_arglist_stack);
+
 		for (ptr = yyextra.parsed_exprs; ptr; ptr = ptr->next) {
 			ocrpt_expr *e = (ocrpt_expr *)ptr->data;
 			if (yyextra.last_expr == e)
@@ -460,6 +531,12 @@ static ocrpt_expr *ocrpt_expr_parse_internal(opencreport *o, ocrpt_report *r, co
 
 	ocrpt_list_free_deep(yyextra.tokens, (ocrpt_mem_free_t)ocrpt_grammar_free_token);
 	ocrpt_list_free(yyextra.parsed_arglist);
+	for (ocrpt_list *ptr = yyextra.parsed_arglist_stack; ptr; ptr = ptr->next) {
+		ocrpt_list *arglist = (ocrpt_list *)ptr->data;
+
+		ocrpt_list_free(arglist);
+	}
+	ocrpt_list_free(yyextra.parsed_arglist_stack);
 	ocrpt_list_free(yyextra.parsed_exprs);
 
 	bool found_on_o_list = false;
@@ -632,7 +709,46 @@ static ocrpt_expr *newexpr(yyscan_t yyscanner, ocrpt_string *fname, ocrpt_list *
 	}
 
 	extra->parsed_arglist = NULL;
+	extra->parsed_arglist_stack = ocrpt_list_remove(extra->parsed_arglist_stack, l);
 	ocrpt_list_free(l);
+
+	return e;
+}
+
+static ocrpt_expr *newvectormatchexpr(yyscan_t yyscanner, ocrpt_string *fname, ocrpt_list *vec1, ocrpt_list *vec2) {
+	base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
+	ocrpt_expr *e;
+
+	if (ocrpt_list_length(vec1) == 1) {
+		ocrpt_string *fname1 = ocrpt_mem_string_new(fname->str, true);
+		ocrpt_list *eql = ocrpt_makelist(vec1->data, vec2->data, NULL);
+
+		extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, vec1->data);
+		extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, vec2->data);
+
+		e = newexpr(yyscanner, fname1, eql);
+	} else {
+		ocrpt_list *l1, *l2, *l_and = NULL, *l_and_end;
+		for (l1 = vec1, l2 = vec2; l1; l1 = l1->next, l2 = l2->next) {
+			ocrpt_string *fname1 = ocrpt_mem_string_new(fname->str, true);
+			ocrpt_list *eql = ocrpt_makelist(l1->data, l2->data, NULL);
+			ocrpt_expr *eqe = newexpr(yyscanner, fname1, eql);
+
+			extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, l1->data);
+			extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, l2->data);
+
+			l_and = ocrpt_list_end_append(l_and, &l_and_end, eqe);
+		}
+
+		ocrpt_string *fname1 = ocrpt_mem_string_new("land", true);
+		e = newexpr(yyscanner, fname1, l_and);
+	}
+
+	extra->parsed_arglist_stack = ocrpt_list_remove(extra->parsed_arglist_stack, vec1);
+	extra->parsed_arglist_stack = ocrpt_list_remove(extra->parsed_arglist_stack, vec2);
+	ocrpt_list_free(vec1);
+	ocrpt_list_free(vec2);
+	extra->parsed_arglist = NULL;
 
 	return e;
 }

@@ -194,6 +194,17 @@ int main(int argc, char **argv) {
 		"eval ('identifier')",
 		"eval ('1 1')", /* intentional syntax error */
 
+		/* Vector matching tests */
+		"[] = [1]", /* intentional syntax error */
+		"[1] = []", /* intentional syntax error */
+		"[1,2] = [1]", /* intentional syntax error */
+		"[1] = [1,2]", /* intentional syntax error */
+		"[1] = [1]",
+		"[1,2] = [1,2]", /* true */
+		"[1,2] = [1,3]", /* false */
+		"[1,2] != [1,3]", /* false */
+		"[1,2] <= [1,3]", /* true */
+
 		/* Error tests */
 		"error('custom error')",
 	};

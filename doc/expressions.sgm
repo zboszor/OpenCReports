@@ -560,6 +560,26 @@ yes.no
 				greater-or-equal (<literal>&gt;=</literal>).
 			</para>
 		</sect2>
+		<sect2 id="veccmpops">
+			<title>Vector comparison operators</title>
+			<para>
+				Vector comparison uses the following syntax, with
+				<literal>op</literal> being any of the equality,
+				inequality or other comparison operators.
+				<programlisting>[ expa1, expa2, ... ] op [ expb1, expb2, ... ]</programlisting>
+			</para>
+			<para>
+				This is a shortcut for:
+				<programlisting>(expa1 op expb1) and (expa2 op expb2) and ...</programlisting>
+			</para>
+			<para>
+				Please, note that because of the mechanical conversion
+				from the vector form to the expanded logic operator form,
+				the following two lines have different meaning:
+				<programlisting>not ([ expa1, expa2, ... ] = [ expb1, expb2, ... ])
+				[ expa1, expa2, ... ] != [ expb1, expb2, ... ]</programlisting>
+			</para>
+		</sect2>
 		<sect2 id="shiftops">
 			<title>Bitwise shifts</title>
 			<para>
