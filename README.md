@@ -1,6 +1,6 @@
 # OpenCReports
 
-OpenCReports is a reporting library based on ideas from RLIB
+OpenCReports is a report generator engine based on ideas from RLIB
 (https://github.com/SICOM/rlib) but having a complete
 reimplementation and licensed under LGPLv3.
 
