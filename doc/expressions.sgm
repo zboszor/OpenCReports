@@ -550,6 +550,31 @@ yes.no
 				The inequality comparison operator can be written as
 				<literal>&lt;&gt;</literal> or <literal>!=</literal>.
 			</para>
+			<sect3 id="vecteqneops">
+				<title>Equality and inequality comparison operators on vectors</title>
+				<para>
+					Vector equality and inequality comparisons
+					have the same precedence as scalar comparisons.
+					These are not vectors in the mathematical sense,
+					but a comma separated list of scalars inside
+					brackets (<literal>[ ... ]</literal>), with
+					<literal>op</literal> being any of the above
+					operators:
+					<programlisting>[ expa1, expa2, ... ] op [ expb1, expb2, ... ]</programlisting>
+				</para>
+				<para>
+					Such comparisons are expanded into a logic operator
+					form:
+					<programlisting>(expa1 op expb1) and (expa2 op expb2) and ...</programlisting>
+				</para>
+				<para>
+					Please, note that because of the mechanical conversion
+					from the vector form to the expanded logic operator form,
+					the following two lines have different meaning:
+					<programlisting>not ([ expa1, expa2, ... ] = [ expb1, expb2, ... ])
+					[ expa1, expa2, ... ] != [ expb1, expb2, ... ]</programlisting>
+				</para>
+			</sect3>
 		</sect2>
 		<sect2 id="cmpops">
 			<title>Other comparison operators</title>
@@ -559,26 +584,16 @@ yes.no
 				greater-than (<literal>&gt;</literal>) and
 				greater-or-equal (<literal>&gt;=</literal>).
 			</para>
-		</sect2>
-		<sect2 id="veccmpops">
-			<title>Vector comparison operators</title>
-			<para>
-				Vector comparison uses the following syntax, with
-				<literal>op</literal> being any of the equality,
-				inequality or other comparison operators.
-				<programlisting>[ expa1, expa2, ... ] op [ expb1, expb2, ... ]</programlisting>
-			</para>
-			<para>
-				This is a shortcut for:
-				<programlisting>(expa1 op expb1) and (expa2 op expb2) and ...</programlisting>
-			</para>
-			<para>
-				Please, note that because of the mechanical conversion
-				from the vector form to the expanded logic operator form,
-				the following two lines have different meaning:
-				<programlisting>not ([ expa1, expa2, ... ] = [ expb1, expb2, ... ])
-				[ expa1, expa2, ... ] != [ expb1, expb2, ... ]</programlisting>
-			</para>
+			<sect3 id="vectcmpops">
+				<title>Other comparison operators on vectors</title>
+				<para>
+					Vector comparisons using <literal>&lt;</literal>,
+					<literal>&gt;</literal>, etc. operators have
+					the same precedence as their scalar counterpart.
+					These are also expanded into the logic form, see
+					<xref linkend="vecteqneops"/> above.
+				</para>
+			</sect3>
 		</sect2>
 		<sect2 id="shiftops">
 			<title>Bitwise shifts</title>
