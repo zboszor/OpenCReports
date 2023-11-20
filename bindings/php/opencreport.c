@@ -14,7 +14,6 @@
 #include "php_opencreport.h"
 #include <errno.h>
 #include <stdio.h>
-#include <unistd.h>
 
 #include <opencreport.h>
 
@@ -5521,9 +5520,39 @@ static char *opencreport_estrndup(const char *s, size_t size) {
 }
 
 /* {{{ PHP_MINIT_FUNCTION */
+static char dummy_report_xml[] =
+	"<?xml version=\"1.0\"?>"
+	"<!DOCTYPE report>"
+	"<Report><Detail><FieldDetails><Output><Line>"
+	"<field value=\"x\"/>"
+	"</Line></Output></FieldDetails></Detail></Report>";
+
+#define DUMMY_REPORT_ROWS 1
+#define DUMMY_REPORT_COLS 1
+
+const char *dummy_report_array[DUMMY_REPORT_ROWS + 1][DUMMY_REPORT_COLS] = {
+	{ "x" }, { "1" }
+};
+
 static PHP_MINIT_FUNCTION(opencreport)
 {
 	zend_class_entry ce;
+
+	/*
+	 * Perform a dummy report run so the module doesn't crash
+	 * when unloaded too quickly.
+	 */
+	opencreport *o = ocrpt_init();
+	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "array");
+
+	ocrpt_query_add_array(ds, "data", (const char **)dummy_report_array, DUMMY_REPORT_ROWS, DUMMY_REPORT_COLS, NULL, 0);
+	ocrpt_parse_xml_from_buffer(o, dummy_report_xml, sizeof(dummy_report_xml) - 1);
+	ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);
+	ocrpt_execute(o);
+	ocrpt_free(o);
+	/*
+	 * End of workaround
+	 */
 
 	ocrpt_query_set_discover_func(php_opencreport_query_discover_array);
 	ocrpt_env_set_query_func(php_opencreport_env_query);
@@ -5817,8 +5846,6 @@ static PHP_MINIT_FUNCTION(opencreport)
 /* {{{ PHP_MSHUTDOWN_FUNCTION
  */
 static PHP_MSHUTDOWN_FUNCTION(opencreport) {
-	sleep(1);
-
 	return SUCCESS;
 }
 /* }}} */
