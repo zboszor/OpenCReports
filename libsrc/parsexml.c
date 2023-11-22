@@ -1095,18 +1095,34 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		}
 	}
 
-	if (!o->size_unit_expr && size_unit)
-		ocrpt_set_size_unit(o, (char *)size_unit);
+	if (!o->size_unit_expr) {
+		if (!called_from_ocrpt_node)
+			ocrpt_set_size_unit(o, size_unit ? (char *)size_unit : "'rlib'");
+		else if (size_unit)
+			ocrpt_set_size_unit(o, (char *)size_unit);
+	}
 
-	if (!o->noquery_show_nodata_expr && noquery_show_nodata)
-		ocrpt_set_noquery_show_nodata(o, (char *)noquery_show_nodata);
+	if (!o->noquery_show_nodata_expr) {
+		if (!called_from_ocrpt_node)
+			ocrpt_set_noquery_show_nodata(o, noquery_show_nodata ? (char *)noquery_show_nodata : "no");
+		else if (noquery_show_nodata)
+			ocrpt_set_noquery_show_nodata(o, (char *)noquery_show_nodata);
+	}
 
-	if (!o->report_height_after_last_expr && report_height_after_last)
-		ocrpt_set_report_height_after_last(o, (char *)report_height_after_last);
+	if (!o->report_height_after_last_expr) {
+		if (!called_from_ocrpt_node)
+			ocrpt_set_report_height_after_last(o, report_height_after_last ? (char *)report_height_after_last : "no");
+		else if (report_height_after_last)
+			ocrpt_set_report_height_after_last(o, (char *)report_height_after_last);
+	}
 
 	/* Simulate/approximate RLIB's buggy behaviour */
-	if (!called_from_ocrpt_node)
-		ocrpt_set_follower_match_single(o, follower_match_single ? (char *)follower_match_single : "yes");
+	if (!o->follower_match_single_expr) {
+		if (!called_from_ocrpt_node)
+			ocrpt_set_follower_match_single(o, follower_match_single ? (char *)follower_match_single : "yes");
+		else if (follower_match_single)
+			ocrpt_set_follower_match_single(o, (char *)follower_match_single);
+	}
 
 	if (font_name)
 		ocrpt_report_set_font_name(r, (char *)font_name);
@@ -1490,18 +1506,34 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader, bool 
 		}
 	}
 
-	if (!o->size_unit_expr && size_unit)
-		ocrpt_set_size_unit(o, (char *)size_unit);
+	if (!o->size_unit_expr) {
+		if (!called_from_ocrpt_node)
+			ocrpt_set_size_unit(o, size_unit ? (char *)size_unit : "'rlib'");
+		else if (size_unit)
+			ocrpt_set_size_unit(o, (char *)size_unit);
+	}
 
-	if (!o->noquery_show_nodata_expr && noquery_show_nodata)
-		ocrpt_set_noquery_show_nodata(o, (char *)noquery_show_nodata);
+	if (!o->noquery_show_nodata_expr) {
+		if (!called_from_ocrpt_node)
+			ocrpt_set_noquery_show_nodata(o, noquery_show_nodata ? (char *)noquery_show_nodata : "no");
+		else if (noquery_show_nodata)
+			ocrpt_set_noquery_show_nodata(o, (char *)noquery_show_nodata);
+	}
 
-	if (!o->report_height_after_last_expr && report_height_after_last)
-		ocrpt_set_report_height_after_last(o, (char *)report_height_after_last);
+	if (!o->report_height_after_last_expr) {
+		if (!called_from_ocrpt_node)
+			ocrpt_set_report_height_after_last(o, report_height_after_last ? (char *)report_height_after_last : "no");
+		else if (report_height_after_last)
+			ocrpt_set_report_height_after_last(o, (char *)report_height_after_last);
+	}
 
 	/* Simulate/approximate RLIB's buggy behaviour */
-	if (!called_from_ocrpt_node)
-		ocrpt_set_follower_match_single(o, follower_match_single ? (char *)follower_match_single : "yes");
+	if (!o->follower_match_single_expr) {
+		if (!called_from_ocrpt_node)
+			ocrpt_set_follower_match_single(o, follower_match_single ? (char *)follower_match_single : "yes");
+		else if (follower_match_single)
+			ocrpt_set_follower_match_single(o, (char *)follower_match_single);
+	}
 
 	if (!p->font_name_expr && font_name)
 		ocrpt_part_set_font_name(p, (char *)font_name);
@@ -1649,17 +1681,17 @@ static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader
 	for (i = 0; xmlattrs[i].attrp; i++)
 		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
 
-	if (!o->size_unit_expr && size_unit)
-		ocrpt_set_size_unit(o, (char *)size_unit);
+	if (!o->size_unit_expr)
+		ocrpt_set_size_unit(o, size_unit ? (char *)size_unit : "'rlib'");
 
-	if (!o->noquery_show_nodata_expr && noquery_show_nodata)
-		ocrpt_set_noquery_show_nodata(o, (char *)noquery_show_nodata);
+	if (!o->noquery_show_nodata_expr)
+		ocrpt_set_noquery_show_nodata(o, noquery_show_nodata ? (char *)noquery_show_nodata : "yes");
 
-	if (!o->report_height_after_last_expr && report_height_after_last)
-		ocrpt_set_report_height_after_last(o, (char *)report_height_after_last);
+	if (!o->report_height_after_last_expr)
+		ocrpt_set_report_height_after_last(o, report_height_after_last ? (char *)report_height_after_last : "no");
 
-	if (!o->follower_match_single_expr && follower_match_single)
-		ocrpt_set_follower_match_single(o, (char *)follower_match_single);
+	if (!o->follower_match_single_expr)
+		ocrpt_set_follower_match_single(o, follower_match_single ? (char *)follower_match_single : "no");
 
 	if (!o->precision_expr && precision_bits)
 		ocrpt_set_numeric_precision_bits(o, (char *)precision_bits);
