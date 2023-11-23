@@ -118,7 +118,7 @@ void ocrpt_common_set_font_sizes(opencreport *o, const char *font, double wanted
 	pango_font_description_free(font_description);
 }
 
-void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double total_width) {
+void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, bool last, double total_width) {
 	common_private_data *priv = o->output_private;
 	const char *font;
 	double size, w;
@@ -274,6 +274,9 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 			/* This assumes pango_layout_set_text() was called previously */
 			pango_layout_get_extents(le->layout, NULL, &logical_rect);
 			w = (double)logical_rect.width / PANGO_SCALE;
+
+			if (last && w < total_width - le->start)
+				w = total_width - le->start;
 		}
 
 		le->width_computed = w;

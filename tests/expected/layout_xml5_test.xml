@@ -9,7 +9,7 @@
               <output>
                 <line>
                   <data width="194.00" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Yabba dabba doo header </data>
-                  <data width="141.00" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">average age: 19.58</data>
+                  <data width="372.48" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">average age: 19.58</data>
                 </line>
               </output>
             </report_header>
@@ -190,7 +190,7 @@
               <output>
                 <line>
                   <data width="186.00" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Yabba dabba doo footer </data>
-                  <data width="141.00" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">average age: 19.58</data>
+                  <data width="380.48" font_point="14.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">average age: 19.58</data>
                 </line>
               </output>
             </report_footer>

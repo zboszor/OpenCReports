@@ -122,10 +122,11 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 		case OCRPT_OUTPUT_LE_TEXT:
 			ocrpt_layout_compute_text(o, elem);
 
-			if (o->output_functions.get_text_sizes)
-				o->output_functions.get_text_sizes(o, p, pr, pd, r, output, line, elem, page_width - ((pd && pd->border_width_expr) ? 2 * pd->border_width: 0.0));
-
 			elem->start = next_start;
+
+			if (o->output_functions.get_text_sizes)
+				o->output_functions.get_text_sizes(o, p, pr, pd, r, output, line, elem, l->next == NULL,  page_width - ((pd && pd->border_width_expr) ? 2 * pd->border_width: 0.0));
+
 			next_start += elem->width_computed;
 
 			if (line->ascent < elem->ascent)

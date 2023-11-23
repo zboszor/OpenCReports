@@ -6,7 +6,7 @@
         <line>
           <data width="89.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Fruit count </data>
           <data width="9.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0</data>
-          <data width="251.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> (carry over from previous page)</data>
+          <data width="468.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> (carry over from previous page)</data>
         </line>
       </output>
     </part_page_header>
@@ -770,7 +770,7 @@
         <line>
           <data width="89.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Fruit count </data>
           <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1044</data>
-          <data width="98.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> (total count)</data>
+          <data width="441.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> (total count)</data>
         </line>
       </output>
     </part_page_footer>

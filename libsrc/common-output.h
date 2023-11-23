@@ -30,7 +30,7 @@ static inline unsigned char ocrpt_common_color_value(double component) {
 }
 
 void ocrpt_common_set_font_sizes(opencreport *o, const char *font, double wanted_font_size, bool bold, bool italic, double *result_font_size, double *result_font_width);
-void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double total_width);
+void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, bool last, double total_width);
 void ocrpt_common_init(opencreport *o, size_t privsz, size_t datasz, size_t outbufsz);
 void ocrpt_common_finalize(opencreport *o);
 

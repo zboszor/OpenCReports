@@ -3060,6 +3060,11 @@ report_height_after_last="no"</programlisting>
 					font name and font size of the field.
 				</para>
 				<para>
+					When the field is the last one in the
+					<literal>&lt;Line&gt;</literal>, then its width
+					will be the remaining page or column width.
+				</para>
+				<para>
 					If set, the width's unit depends on the
 					<xref linkend="sizeunit"/>.
 				</para>
