@@ -310,6 +310,12 @@ rlib_spool($r);
 			<para>
 				The program code uses this file contents
 				from <literal>example2.xml</literal>.
+				Note that the <literal>&lt;Datasources&gt;</literal>
+				and <literal>&lt;Queries&gt;</literal> nodes
+				that describe the database access and the query
+				in the previous example are missing here.
+				The equivalent code was added to the different
+				program codes above.
 				<programlisting>&lt;?xml version="1.0"?&gt;
 &lt;!DOCTYPE OpenCReport SYSTEM "opencreport.dtd"&gt;
 &lt;OpenCReport&gt;
