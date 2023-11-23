@@ -1,3 +1,4 @@
+<?php
 $r = rlib_init();
 
 rlib_add_report($r, "layout_ocrpt_fixed_part_test.xml");

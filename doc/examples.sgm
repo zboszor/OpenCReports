@@ -104,7 +104,8 @@ int main(int argc, char **argv) {
 			<title>PHP program code</title>
 			<para>
 				Here's the equivalent program code in PHP.
-				<programlisting>$o = new OpenCReport();
+				<programlisting>&lt;?php
+$o = new OpenCReport();
 
 if (!$o-&gt;parse_xml("example1.xml")) {
     echo "XML parse error" . PHP_EOL;
@@ -120,7 +121,8 @@ $o-&gt;spool();</programlisting>
 			<para>
 				Here's the equivalent program code in PHP,
 				using the RLIB compatibility functions.
-				<programlisting>$r = rlib_init();
+				<programlisting>&lt;?php
+$r = rlib_init();
 
 rlib_add_report($r, "example1.xml");
 

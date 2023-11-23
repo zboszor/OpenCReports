@@ -1,3 +1,4 @@
+<?php
 $o = new OpenCReport();
 
 if (!$o->parse_xml("example1.xml")) {
