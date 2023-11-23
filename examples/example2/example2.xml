@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+    <Report query="q">
+        <PageHeader>
+            <Output>
+                <Line>
+                    <literal width="20">The Flintstones</literal>
+                    <field value="printf('Page %d / %d', r.pageno, r.totpages)" align="right" />
+                </Line>
+            </Output>
+        </PageHeader>
+
+        <PageFooter>
+            <Output>
+                <Line>
+                    <literal>The Flintstones</literal>
+                    <field value="printf('Page %d / %d', r.pageno, r.totpages)" align="right" />
+                </Line>
+            </Output>
+        </PageFooter>
+
+        <Detail>
+            <FieldHeaders>
+                <Output>
+                    <Line>
+                        <literal width="4" align="'right'">ID</literal>
+                        <literal width="1"/>
+                        <literal width="20">Name</literal>
+                        <literal width="1"/>
+                        <literal width="8" align="'center'">Property</literal>
+                        <literal width="1"/>
+                        <literal width="6">Age</literal>
+                        <literal width="1"/>
+                        <literal width="5" align="'center'">Adult</literal>
+                    </Line>
+                </Output>
+            </FieldHeaders>
+
+            <FieldDetails>
+                <Output>
+                    <Line>
+                        <field width="4" align="right" value="id" />
+                        <literal width="1"/>
+                        <field width="20" value="name" />
+                        <literal width="1"/>
+                        <field width="8" align="'center'" value="property" />
+                        <literal width="1"/>
+                        <field width="6" align="'right'" value="age" format="'%.2d'" />
+                        <literal width="1"/>
+                        <field value="adult ? 'yes' : 'no'" width="5" align="'center'"/>
+                    </Line>
+                </Output>
+            </FieldDetails>
+        </Detail>
+    </Report>
+</OpenCReport>

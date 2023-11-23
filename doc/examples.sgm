@@ -124,8 +124,6 @@ $o-&gt;spool();</programlisting>
 				<programlisting>&lt;?php
 $r = rlib_init();
 
-rlib_add_report($r, "example1.xml");
-
 if (!rlib_add_report($r, "example1.xml")) {
     echo "XML parse error" . PHP_EOL;
     exit(0);
@@ -215,6 +213,167 @@ rlib_spool($r);</programlisting>
 						<imagedata fileref="images/example1.png" align="center" />
 					</imageobject>
 				</inlinemediaobject>
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="example2">
+		<title>Simple report example with data access in code</title>
+		<para>
+			This example below is mostly the same as the
+			previous one, with one exception: the database
+			access is done from program code instead of
+			putting it into the report XML description file.
+		</para>
+		<sect2 id="example2data">
+			<title>Data</title>
+			<para>
+				As the same data is used as in the previous example,
+				it's not duplicated here.
+			</para>
+		</sect2>
+		<sect2 id="example2codec">
+			<title>C program code</title>
+			<para>
+				The program code adds the datasource and
+				the query before loading the report XML
+				description. The order of these are not
+				important, as the <literal>ocrpt_execute()</literal>
+				call performs matching expressions with
+				query column names internally.
+				<programlisting>#include &lt;stdio.h&gt;
+#include &lt;opencreport.h&gt;
+
+int main(int argc, char **argv) {
+    opencreport *o = ocrpt_init();
+    ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+
+    ocrpt_query_add_postgresql(ds, "q", "select * from flintstones;");
+
+    if (!ocrpt_parse_xml(o, "example2.xml")) {
+        printf("XML parse error\n");
+        ocrpt_free(o);
+        return 0;
+    }
+
+    ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);
+    ocrpt_execute(o);
+    ocrpt_spool(o);
+    ocrpt_free(o);
+
+    return 0;
+}</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example2codephp">
+			<title>PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP.
+				<programlisting>&lt;?php
+$o = new OpenCReport();
+$ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+
+$ds-&gt;query_add("q", "select * from flintstones;");
+
+if (!$o-&gt;parse_xml("example2.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+$o-&gt;execute();
+$o-&gt;spool();
+</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example2codephprlib">
+			<title>RLIB compatible PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP,
+				using the RLIB compatibility functions.
+				<programlisting>&lt;?php
+$r = rlib_init();
+
+rlib_add_datasource_postgres($r, "pgsql", "dbname=ocrpttest user=ocrpt");
+rlib_add_query_as($r, "pgsql", "select * from flintstones;", "q");
+
+if (!rlib_add_report($r, "example2.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+rlib_execute($r);
+rlib_spool($r);
+</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example2xml">
+			<title>Report description</title>
+			<para>
+				The program code uses this file contents
+				from <literal>example2.xml</literal>.
+				<programlisting>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE OpenCReport SYSTEM "opencreport.dtd"&gt;
+&lt;OpenCReport&gt;
+    &lt;Report query="q"&gt;
+        &lt;PageHeader&gt;
+            &lt;Output&gt;
+                &lt;Line&gt;
+                    &lt;literal width="20"&gt;The Flintstones&lt;/literal&gt;
+                    &lt;field value="printf('Page %d / %d', r.pageno, r.totpages)" align="right" /&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/PageHeader&gt;
+
+        &lt;PageFooter&gt;
+            &lt;Output&gt;
+                &lt;Line&gt;
+                    &lt;literal&gt;The Flintstones&lt;/literal&gt;
+                    &lt;field value="printf('Page %d / %d', r.pageno, r.totpages)" align="right" /&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/PageFooter&gt;
+
+        &lt;Detail&gt;
+            &lt;FieldHeaders&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;literal width="4" align="'right'"&gt;ID&lt;/literal&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;literal width="20"&gt;Name&lt;/literal&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;literal width="8" align="'center'"&gt;Property&lt;/literal&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;literal width="6"&gt;Age&lt;/literal&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;literal width="5" align="'center'"&gt;Adult&lt;/literal&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/FieldHeaders&gt;
+
+            &lt;FieldDetails&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;field width="4" align="right" value="id" /&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;field width="20" value="name" /&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;field width="8" align="'center'" value="property" /&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;field width="6" align="'right'" value="age" format="'%.2d'" /&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;field value="adult ? 'yes' : 'no'" width="5" align="'center'"/&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/FieldDetails&gt;
+        &lt;/Detail&gt;
+    &lt;/Report&gt;
+&lt;/OpenCReport&gt;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example2pdf">
+			<title>Report PDF result</title>
+			<para>
+				The result is identical to the previous example,
+				it's not duplicated here.
 			</para>
 		</sect2>
 	</sect1>
