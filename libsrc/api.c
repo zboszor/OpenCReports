@@ -1680,7 +1680,9 @@ DLL_EXPORT_SYM void ocrpt_resolve_search_paths(opencreport *o) {
 		if (p->expr && !p->path) {
 			ocrpt_expr_resolve(p->expr);
 			ocrpt_expr_optimize(p->expr);
-			p->path = ocrpt_mem_strdup(ocrpt_expr_get_string(p->expr)->str);
+			const ocrpt_string *s = ocrpt_expr_get_string(p->expr);
+			if (s)
+				p->path = ocrpt_mem_strdup(s->str);
 		}
 	}
 }
