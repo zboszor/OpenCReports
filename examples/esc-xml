@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# --- replace
+# '&' with '&amp;'      :       's~\&~\&amp;~g'
+# '<' with '&lt;'       :       's~<~\&lt;~g'
+# '>' with '&gt;'       :       's~>~\&gt;~g'
+# '"' with '&quot'      :       's~\"~\&quot;~g'
+
+# --- First replace all existing '&' signs.
+# --- Prevents an original '<' first changed into '&lt;' ending up as '&amp;lt;'
+
+sed -e 's~&~\&amp;~g' -e 's~<~\&lt;~g'  -e  's~>~\&gt;~g'
+
+#  's~&~\&amp;~g'
+#
+#       s               search and replace
+#       ~               our custom delimiter indicating start of search pattern
+#       &               a '&' 
+#       ~               end of search pattern, start of replacement
+#
+#       \&              a "&" escaped with "\" ( in replacement "&" means: matched pattern )
+#       amp             followed by a 'a', 'm' and 'p'
+#       ;               and a ';'
+#
+#       ~               end of replacement
+#       g               the search and replace globally: don't stop at first occurrence,
+#                       but check the whole line

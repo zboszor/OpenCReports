@@ -10,6 +10,7 @@ SGMLFILES = \
 	formatting.sgm \
 	c-api-reference.sgm \
 	php-api-reference.sgm \
+	examples.sgm \
 	license.sgm \
 	jadetex.cfg
 
@@ -22,7 +23,7 @@ HTML = OpenCReports.html html
 
 all: $(PDF) $(HTML)
 
-IMAGES = images/namedcolors.svg
+IMAGES = images/namedcolors.svg images/example1.png
 XMLINCLUDE = --path . --path $(srcdir)
 XSLTPROCFLAGS = --stringparam ocrpt.version '$(VERSION)'
 XSLTPROC_HTML_FLAGS = --param website.stylesheet 1
@@ -56,6 +57,6 @@ endif
 
 EXTRA_DIST = $(SGMLFILES)
 
-CLEANFILES = OpenCReports-A4.pdf OpenCReports-US.pdf html-stamp OpenCReports.html html/*
+CLEANFILES = OpenCReports-A4.pdf OpenCReports-US.pdf html-stamp OpenCReports.html html/*.html
 
 endif

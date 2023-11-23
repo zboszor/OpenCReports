@@ -53,7 +53,8 @@ doc/OpenCReports.html
 doc/html-stamp
 doc/OpenCReports.sgm
 doc/*.pdf
-doc/html
+doc/html/*.html
+doc/html/*.svg
 
 # Test results
 tests/expected/*.png

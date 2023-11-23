@@ -9,6 +9,7 @@
 <!ENTITY formatting SYSTEM "formatting.sgm">
 <!ENTITY c-api-reference SYSTEM "c-api-reference.sgm">
 <!ENTITY php-api-reference SYSTEM "php-api-reference.sgm">
+<!ENTITY examples SYSTEM "examples.sgm">
 <!ENTITY license SYSTEM "license.sgm">
 ]>
 <book>
@@ -39,5 +40,6 @@
 	&formatting;
 	&c-api-reference;
 	&php-api-reference;
+	&examples;
 	&license;
 </book>

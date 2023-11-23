@@ -1,0 +1,219 @@
+<chapter id="examples" xreflabel="Examples">
+	<title>Examples</title>
+	<sect1 id="example1">
+		<title>Simple report example</title>
+		<para>
+			This example below uses a PostgreSQL query
+			to generate a report in PDF output format,
+			with many settings used as default:
+			<itemizedlist>
+				<listitem override="bullet">
+					<para>
+						Courier font
+					</para>
+				</listitem>
+				<listitem override="bullet">
+					<para>
+						12 points font size
+					</para>
+				</listitem>
+				<listitem override="bullet">
+					<para>
+						automatically calculated field width
+						where it's not specified (note the
+						header and footer fields)
+					</para>
+				</listitem>
+				<listitem override="bullet">
+					<para>
+						black font color
+					</para>
+				</listitem>
+				<listitem override="bullet">
+					<para>
+						white background
+					</para>
+				</listitem>
+				<listitem override="bullet">
+					<para>
+						default paper size
+					</para>
+					<para>
+						Note that this particular default setting
+						depends on your location, or rather, the
+						computer's country settings. For example,
+						the U.S. uses the Letter page size as default.
+						On the other hand, most of Europe uses the A4
+						page size.
+					</para>
+				</listitem>
+			</itemizedlist>
+			and so on.
+		</para>
+		<sect2 id="example1data">
+			<title>Data</title>
+			<para>
+				Data is created as follows in a database called
+				<literal>ocrpttest</literal> using the user
+				<literal>ocrpt</literal>
+				<programlisting>create table flintstones (id serial, name text, property text, age int, adult bool);
+insert into flintstones (name, property, age, adult)
+values
+('Fred Flintstone','strong',31,true),
+('Wilma Flintstone','charming',28,true),
+('Pebbles Flintstone','young',0.5,false);</programlisting>
+			</para>
+			<para>
+				The data looks like this when queried:
+				<programlisting>ocrpttest=&gt; select * from flintstones;
+ id |        name        | property | age | adult 
+----+--------------------+----------+-----+-------
+  1 | Fred Flintstone    | strong   |  31 | t
+  2 | Wilma Flintstone   | charming |  28 | t
+  3 | Pebbles Flintstone | young    |   1 | f
+(3 rows)</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example1codec">
+			<title>C program code</title>
+			<para>
+				The program code uses a minimalistic approach,
+				putting everything into the report XML instead.
+				<programlisting>#include &lt;stdio.h&gt;
+#include &lt;opencreport.h&gt;
+
+int main(int argc, char **argv) {
+    opencreport *o = ocrpt_init();
+
+    if (!ocrpt_parse_xml(o, "example1.xml")) {
+        printf("XML parse error\n");
+        ocrpt_free(o);
+        return 0;
+    }
+
+    ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);
+    ocrpt_execute(o);
+    ocrpt_spool(o);
+    ocrpt_free(o);
+
+    return 0;
+}</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example1codephp">
+			<title>PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP.
+				<programlisting>$o = new OpenCReport();
+
+if (!$o-&gt;parse_xml("example1.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+$o-&gt;execute();
+$o-&gt;spool();</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example1codephprlib">
+			<title>RLIB compatible PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP,
+				using the RLIB compatibility functions.
+				<programlisting>$r = rlib_init();
+
+rlib_add_report($r, "example1.xml");
+
+if (!rlib_add_report($r, "example1.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+rlib_execute($r);
+rlib_spool($r);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example1xml">
+			<title>Report description</title>
+			<para>
+				The program code uses this file contents
+				from <literal>example1.xml</literal>.
+				<programlisting>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE OpenCReport SYSTEM "opencreport.dtd"&gt;
+&lt;OpenCReport&gt;
+    &lt;Datasources&gt;
+        &lt;Datasource name="pgsql" type="postgresql" dbname="ocrpttest" user="ocrpt" /&gt;
+    &lt;/Datasources&gt;
+
+    &lt;Queries&gt;
+        &lt;Query name="q" datasource="pgsql"&gt;select * from flintstones;&lt;/Query&gt;
+    &lt;/Queries&gt;
+
+    &lt;Report query="q"&gt;
+        &lt;PageHeader&gt;
+            &lt;Output&gt;
+                &lt;Line&gt;
+                    &lt;literal width="20"&gt;The Flintstones&lt;/literal&gt;
+                    &lt;field value="printf('Page %d / %d', r.pageno, r.totpages)" align="right" /&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/PageHeader&gt;
+
+        &lt;PageFooter&gt;
+            &lt;Output&gt;
+                &lt;Line&gt;
+                    &lt;literal&gt;The Flintstones&lt;/literal&gt;
+                    &lt;field value="printf('Page %d / %d', r.pageno, r.totpages)" align="right" /&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/PageFooter&gt;
+
+        &lt;Detail&gt;
+            &lt;FieldHeaders&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;literal width="4" align="'right'"&gt;ID&lt;/literal&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;literal width="20"&gt;Name&lt;/literal&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;literal width="8" align="'center'"&gt;Property&lt;/literal&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;literal width="6"&gt;Age&lt;/literal&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;literal width="5" align="'center'"&gt;Adult&lt;/literal&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/FieldHeaders&gt;
+
+            &lt;FieldDetails&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;field width="4" align="right" value="id" /&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;field width="20" value="name" /&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;field width="8" align="'center'" value="property" /&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;field width="6" align="'right'" value="age" format="'%.2d'" /&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;field value="adult ? 'yes' : 'no'" width="5" align="'center'"/&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/FieldDetails&gt;
+        &lt;/Detail&gt;
+    &lt;/Report&gt;
+&lt;/OpenCReport&gt;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example1pdf">
+			<title>Report PDF result</title>
+			<para>
+				<inlinemediaobject>
+					<imageobject>
+						<imagedata fileref="images/example1.png" align="center" />
+					</imageobject>
+				</inlinemediaobject>
+			</para>
+		</sect2>
+	</sect1>
+</chapter>

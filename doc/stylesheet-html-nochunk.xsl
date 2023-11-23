@@ -21,4 +21,15 @@
   <xsl:copy-of select="document($filename)"/>
 </xsl:template>
 
+<!-- embed PNG images into output file -->
+<xsl:template match="imagedata[@format='PNG']">
+  <xsl:variable name="filename">
+    <xsl:call-template name="mediaobject.filename">
+      <xsl:with-param name="object" select=".."/>
+    </xsl:call-template>
+  </xsl:variable>
+
+  <xsl:copy-of select="document($filename)"/>
+</xsl:template>
+
 </xsl:stylesheet>
