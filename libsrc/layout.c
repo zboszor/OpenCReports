@@ -366,7 +366,9 @@ static void ocrpt_layout_image_setup(opencreport *o, ocrpt_part *p, ocrpt_part_r
 		}
 	}
 
-	if (!imgf) {
+	if (imgf)
+		image->img_file = imgf;
+	else {
 		imgf = ocrpt_mem_malloc(sizeof(ocrpt_image_file));
 		memset(imgf, 0, sizeof(ocrpt_image_file));
 		imgf->name = img_filename;
