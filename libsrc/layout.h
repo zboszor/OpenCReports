@@ -175,6 +175,7 @@ static inline void ocrpt_layout_output_init(ocrpt_output *output) {
 	output->has_memo = false;
 	output->iter = output->output_list;
 	output->current_image = NULL;
+	output->current_image_width = 0.0;
 
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;

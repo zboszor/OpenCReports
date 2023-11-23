@@ -268,6 +268,7 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 				w *= l->font_width;
 		} else if (ocrpt_list_length(l->elements) == 1) {
 			w = total_width;
+			w -= output->current_image_width;
 		} else {
 			PangoRectangle logical_rect;
 
@@ -277,6 +278,8 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 
 			if (last && w < total_width - le->start)
 				w = total_width - le->start;
+
+			w -= output->current_image_width;
 		}
 
 		le->width_computed = w;

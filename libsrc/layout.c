@@ -778,12 +778,16 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 			}
 
 			ocrpt_layout_image_setup(o, p, pr, pd, r, output, NULL, img, page_width, page_indent, page_position);
+			output->current_image_width = img->image_width;
 			break;
 		}
 		case OCRPT_OUTPUT_IMAGEEND:
+			output->current_image_width = 0.0;
 			break;
 		}
 	}
+
+	output->current_image_width = 0.0;
 }
 
 static inline void get_height_exceeded(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, double old_page_position, double new_page_position, bool *height_exceeded, bool *pd_height_exceeded, bool *r_height_exceeded) {
