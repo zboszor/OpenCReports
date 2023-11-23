@@ -280,8 +280,7 @@ if (!$o-&gt;parse_xml("example2.xml")) {
 }
 
 $o-&gt;execute();
-$o-&gt;spool();
-</programlisting>
+$o-&gt;spool();</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="example2codephprlib">
@@ -301,8 +300,7 @@ if (!rlib_add_report($r, "example2.xml")) {
 }
 
 rlib_execute($r);
-rlib_spool($r);
-</programlisting>
+rlib_spool($r);</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="example2xml">
@@ -380,6 +378,204 @@ rlib_spool($r);
 			<para>
 				The result is identical to the previous example,
 				it's not duplicated here.
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="example3">
+		<title>Colors, images, horizontal lines and fonts</title>
+		<para>
+			This example below shows that reports may be more
+			exciting, with colors and images and other visual
+			elements and settings.
+		</para>
+		<sect2 id="example3data">
+			<title>Data</title>
+			<para>
+				Data is created as follows in the same database
+				as the first example.
+				<programlisting>create table flintstones2
+(id serial primary key, name text, filename text);
+
+insert into flintstones2 (name, filename)
+values
+('Fred Flintstone', 'FredFlintstone.png'),
+('Wilma Flintstone', 'WilmaFlintstone.png'),
+('Pebbles Flintstone', 'PebblesFlintstone.png'),
+('Barney Rubble', 'BarneyRubble.png'),
+('Betty Rubble', 'BettyRubble.png'),
+('Bamm-Bamm Rubble', 'BammBammRubble.png'),
+('The Great Gazoo', 'TheGreatGazoo.png');</programlisting>
+			</para>
+			<para>
+				The data looks like this when queried:
+				<programlisting>ocrpttest=&gt; select * from flintstones2;
+ id |        name        |       filename        
+----+--------------------+-----------------------
+  1 | Fred Flintstone    | FredFlintstone.png
+  2 | Wilma Flintstone   | WilmaFlintstone.png
+  3 | Pebbles Flintstone | PebblesFlintstone.png
+  4 | Barney Rubble      | BarneyRubble.png
+  5 | Betty Rubble       | BettyRubble.png
+  6 | Bamm-Bamm Rubble   | BammBammRubble.png
+  7 | The Great Gazoo    | TheGreatGazoo.png
+(7 rows)</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example3codec">
+			<title>C program code</title>
+			<para>
+				The program code is almost identical to the
+				second example with the database connection
+				and the query added to program code, but
+				it loads a different report XML description.
+				<programlisting>#include &lt;stdio.h&gt;
+#include &lt;opencreport.h&gt;
+
+int main(int argc, char **argv) {
+    opencreport *o = ocrpt_init();
+    ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+
+    ocrpt_query_add_postgresql(ds, "q", "select * from flintstones2;");
+
+    if (!ocrpt_parse_xml(o, "example3.xml")) {
+        printf("XML parse error\n");
+        ocrpt_free(o);
+        return 0;
+    }
+
+    ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);
+    ocrpt_execute(o);
+    ocrpt_spool(o);
+    ocrpt_free(o);
+
+    return 0;
+}</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example3codephp">
+			<title>PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP.
+				<programlisting>&lt;?php
+$o = new OpenCReport();
+$ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+
+$ds-&gt;query_add("q", "select * from flintstones2;");
+
+if (!$o-&gt;parse_xml("example3.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+$o-&gt;execute();
+$o-&gt;spool();</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example3codephprlib">
+			<title>RLIB compatible PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP,
+				using the RLIB compatibility functions.
+				<programlisting>&lt;?php
+$r = rlib_init();
+
+rlib_add_datasource_postgres($r, "pgsql", "dbname=ocrpttest user=ocrpt");
+rlib_add_query_as($r, "pgsql", "select * from flintstones2;", "q");
+
+if (!rlib_add_report($r, "example3.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+rlib_execute($r);
+rlib_spool($r);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example3xml">
+			<title>Report description</title>
+			<para>
+				The program code uses this file contents
+				from <literal>example3.xml</literal>.
+			</para>
+			<para>
+				Note the new settings:
+				<literal>fontName="..."</literal>,
+				<literal>fontSize="..."</literal>,
+				<literal>bold="..."</literal>,
+				<literal>italic="..."</literal>,
+				<literal>color="..."</literal>,
+				<literal>bgcolor="..."</literal>
+				and others.
+			</para>
+			<para>
+				Also note that the <literal>value="..."</literal>
+				setting indicates the file names that are used with
+				<literal>&lt;Image&gt;</literal> elements in the
+				report XML description. These files must be
+				present in the report application work directory,
+				or can be found in <xref linkend="searchpaths"/>
+				added either in the report XML description or via
+				programming code.
+				<programlisting>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE OpenCReport SYSTEM "opencreport.dtd"&gt;
+&lt;OpenCReport&gt;
+    &lt;Report query="q"&gt;
+        &lt;PageHeader&gt;
+            &lt;Output&gt;
+                &lt;Image width="227" height="92" value="'A_Flintstones_logo.png'" /&gt;
+                &lt;Line&gt;
+                    &lt;field fontName="'Arial'" fontSize="20" value="printf('Page %d / %d', r.pageno, r.totpages)" align="right" /&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/PageHeader&gt;
+
+        &lt;PageFooter&gt;
+            &lt;Output&gt;
+                &lt;Image width="227" height="92" value="'A_Flintstones_logo.png'" /&gt;
+                &lt;Line&gt;
+                    &lt;field fontName="'Times New Roman'" fontSize="20" value="printf('Page %d / %d', r.pageno, r.totpages)" align="right" /&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/PageFooter&gt;
+
+        &lt;Detail&gt;
+            &lt;FieldHeaders&gt;
+                &lt;Output&gt;
+                    &lt;HorizontalLine size="2" color="'black'" /&gt;
+                    &lt;HorizontalLine size="2" color="'green'" /&gt;
+                    &lt;Line bgcolor="'green'" bold="yes" fontSize="18"&gt;
+                        &lt;literal fontName="'Petaluma Script'" width="7" align="'center'"&gt;Picture&lt;/literal&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;literal fontName="'Carlito'" italic="yes"&gt;Name&lt;/literal&gt;
+                    &lt;/Line&gt;
+                    &lt;HorizontalLine size="2" color="'green'" /&gt;
+                    &lt;HorizontalLine size="2" color="'black'" /&gt;
+                    &lt;HorizontalLine size="2" color="'white'" /&gt;
+                &lt;/Output&gt;
+            &lt;/FieldHeaders&gt;
+
+            &lt;FieldDetails&gt;
+                &lt;Output&gt;
+                    &lt;Line fontSize="18"&gt;
+                        &lt;Image textWidth="7" bgcolor="'yellow'" align="'center'" value="filename" /&gt;
+                        &lt;literal width="1" bgcolor="'yellow'" /&gt;
+                        &lt;field color="'red'" bgcolor="'yellow'" value="name" /&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/FieldDetails&gt;
+        &lt;/Detail&gt;
+    &lt;/Report&gt;
+&lt;/OpenCReport&gt;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example3pdf">
+			<title>Report PDF result</title>
+			<para>
+				<inlinemediaobject>
+					<imageobject>
+						<imagedata fileref="images/example3.png" align="center" />
+					</imageobject>
+				</inlinemediaobject>
 			</para>
 		</sect2>
 	</sect1>

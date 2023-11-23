@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+    <Report query="q">
+        <PageHeader>
+            <Output>
+                <Image width="227" height="92" value="'A_Flintstones_logo.png'" />
+                <Line>
+                    <field fontName="'Arial'" fontSize="20" value="printf('Page %d / %d', r.pageno, r.totpages)" align="right" />
+                </Line>
+            </Output>
+        </PageHeader>
+
+        <PageFooter>
+            <Output>
+                <Image width="227" height="92" value="'A_Flintstones_logo.png'" />
+                <Line>
+                    <field fontName="'Times New Roman'" fontSize="20" value="printf('Page %d / %d', r.pageno, r.totpages)" align="right" />
+                </Line>
+            </Output>
+        </PageFooter>
+
+        <Detail>
+            <FieldHeaders>
+                <Output>
+                    <HorizontalLine size="2" color="'black'" />
+                    <HorizontalLine size="2" color="'green'" />
+                    <Line bgcolor="'green'" bold="yes" fontSize="18">
+                        <literal fontName="'Petaluma Script'" width="7" align="'center'">Picture</literal>
+                        <literal width="1"/>
+                        <literal fontName="'Carlito'" italic="yes">Name</literal>
+                    </Line>
+                    <HorizontalLine size="2" color="'green'" />
+                    <HorizontalLine size="2" color="'black'" />
+                    <HorizontalLine size="2" color="'white'" />
+                </Output>
+            </FieldHeaders>
+
+            <FieldDetails>
+                <Output>
+                    <Line fontSize="18">
+                        <Image textWidth="7" bgcolor="'yellow'" align="'center'" value="filename" />
+                        <literal width="1" bgcolor="'yellow'" />
+                        <field color="'red'" bgcolor="'yellow'" value="name" />
+                    </Line>
+                </Output>
+            </FieldDetails>
+        </Detail>
+    </Report>
+</OpenCReport>
