@@ -358,7 +358,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 				/* Use the previous row data temporarily */
 				o->residx = ocrpt_expr_prev_residx(o->residx);
 
-				if (o->precalculate && !last_row)
+				if (o->precalculate)
 					ocrpt_variables_add_precalculated_results(r, brl_start, last_row);
 
 				/* Switch back to the current row data */
@@ -367,7 +367,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 				for (brl = brl_start; brl; brl = brl->next)
 					ocrpt_break_reset_vars((ocrpt_break *)brl->data);
 
-				if (!o->precalculate && !last_row)
+				if (!o->precalculate)
 					ocrpt_variables_advance_precalculated_results(r, brl_start);
 			}
 		}
@@ -475,11 +475,6 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_layout_output_init(&r->fielddetails);
 		ocrpt_layout_output(o, p, pr, pd, r, NULL, &r->fielddetails, rows, newpage, page_indent, page_position, old_page_position);
 
-		if (o->precalculate && last_row) {
-			ocrpt_variables_add_precalculated_results(r, r->breaks, last_row);
-			ocrpt_report_expressions_add_delayed_results(r);
-		}
-
 		have_row = !last_row;
 		o->residx = ocrpt_expr_next_residx(o->residx);
 	}
@@ -487,6 +482,11 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 	if (rows) {
 		/* Use the previous row data temporarily */
 		o->residx = ocrpt_expr_prev_residx(o->residx);
+
+		if (o->precalculate) {
+			ocrpt_variables_add_precalculated_results(r, r->breaks, true);
+			ocrpt_report_expressions_add_delayed_results(r);
+		}
 
 		for (ocrpt_list *brl = r->breaks_reverse; brl; brl = brl->next) {
 			ocrpt_break *br = (ocrpt_break *)brl->data;

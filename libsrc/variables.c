@@ -372,21 +372,28 @@ void ocrpt_variables_advance_precalculated_results(ocrpt_report *r, ocrpt_list *
 	for (ocrpt_list *l = r->variables; l; l = l->next) {
 		ocrpt_var *var = (ocrpt_var *)l->data;
 		if (var->precalculate) {
-			if (!var->precalc_rptr)
-				var->precalc_rptr = var->precalc_results;
-			else if (var->br) {
-				ocrpt_list *brl;
-				bool var_br_triggered = false;
+			if (var->br) {
+				if (!var->precalc_rptr)
+					var->precalc_rptr = var->precalc_results;
+				else {
+					ocrpt_list *brl;
+					bool var_br_triggered = false;
 
-				for (brl = brl_start; brl; brl = brl->next) {
-					if (var->br == brl->data) {
-						var_br_triggered = true;
-						break;
+					for (brl = brl_start; brl; brl = brl->next) {
+						if (var->br == brl->data) {
+							var_br_triggered = true;
+							break;
+						}
 					}
-				}
 
-				if (var_br_triggered)
-					var->precalc_rptr = var->precalc_rptr->next;
+					if (var_br_triggered && var->precalc_rptr->next)
+						var->precalc_rptr = var->precalc_rptr->next;
+				}
+			} else {
+				ocrpt_list *l1;
+				for (l1 = var->precalc_results; l1 && l1->next; l1 = l1->next)
+					;
+				var->precalc_rptr = l1;
 			}
 		}
 	}
