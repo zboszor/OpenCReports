@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+    <Report query="q1">
+        <Detail>
+            <FieldHeaders>
+                <Output>
+                    <HorizontalLine size="2" color="'black'" />
+                    <HorizontalLine size="2" color="'white'" />
+                    <Line bold="yes">
+                        <literal width="20">First name</literal>
+                        <literal width="20">Last name</literal>
+                    </Line>
+                    <HorizontalLine size="2" color="'white'" />
+                    <HorizontalLine size="2" color="'black'" />
+                    <HorizontalLine size="2" color="'white'" />
+                </Output>
+            </FieldHeaders>
+
+            <FieldDetails>
+                <Output>
+                    <Line>
+                        <field width="20" value="q1.firstname" />
+                        <field width="20" value="q2.lastname" />
+                    </Line>
+                </Output>
+            </FieldDetails>
+        </Detail>
+    </Report>
+</OpenCReport>

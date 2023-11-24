@@ -631,7 +631,7 @@ int main(int argc, char **argv) {
     opencreport *o = ocrpt_init();
     ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
 
-    ocrpt_query_add_postgresql(ds, "q", "select * from flintstones2;");
+    ocrpt_query_add_postgresql(ds, "q", "select * from flintstones3;");
 
     if (!ocrpt_parse_xml(o, "example4.xml")) {
         printf("XML parse error\n");
@@ -656,7 +656,7 @@ int main(int argc, char **argv) {
 $o = new OpenCReport();
 $ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
 
-$ds-&gt;query_add("q", "select * from flintstones2;");
+$ds-&gt;query_add("q", "select * from flintstones3;");
 
 if (!$o-&gt;parse_xml("example4.xml")) {
     echo "XML parse error" . PHP_EOL;
@@ -676,7 +676,7 @@ $o-&gt;spool();</programlisting>
 $r = rlib_init();
 
 rlib_add_datasource_postgres($r, "pgsql", "dbname=ocrpttest user=ocrpt");
-rlib_add_query_as($r, "pgsql", "select * from flintstones2;", "q");
+rlib_add_query_as($r, "pgsql", "select * from flintstones3;", "q");
 
 if (!rlib_add_report($r, "example4.xml")) {
     echo "XML parse error" . PHP_EOL;
@@ -776,6 +776,645 @@ rlib_spool($r);</programlisting>
 						<imagedata fileref="images/example4.png" align="center" />
 					</imageobject>
 				</inlinemediaobject>
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="example5">
+		<title>Follower queries</title>
+		<para>
+			This example below exercises a basic follower query along
+			with the main query.
+			For more information, see <xref linkend="followerqueries"/>.
+		</para>
+		<sect2 id="example5data">
+			<title>Data</title>
+			<para>
+				Data is created as follows in the same database
+				using the same user as the first example.
+				<programlisting>create table flintstones4 (id serial, firstname text);
+create table flintstones5 (id serial, lastname text);
+
+insert into flintstones4 (firstname)
+values
+('Fred'),
+('Wilma'),
+('Pebbles'),
+('Barney'),
+('Betty'),
+('Bamm-Bamm'),
+('The Great');
+
+insert into flintstones5 (lastname)
+values
+('Flintstone'),
+('Flintstone'),
+('Flintstone'),
+('Rubble'),
+('Rubble'),
+('Rubble'),
+('Gazoo');</programlisting>
+			</para>
+			<para>
+				The data looks like this when queried:
+				<programlisting>ocrpttest=&gt; select * from flintstones4;
+ id | firstname 
+----+-----------
+  1 | Fred
+  2 | Wilma
+  3 | Pebbles
+  4 | Barney
+  5 | Betty
+  6 | Bamm-Bamm
+  7 | The Great
+(7 rows)
+
+ocrpttest=&gt; select * from flintstones5;
+ id |  lastname  
+----+------------
+  1 | Flintstone
+  2 | Flintstone
+  3 | Flintstone
+  4 | Rubble
+  5 | Rubble
+  6 | Rubble
+  7 | Gazoo
+(7 rows)</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example5codec">
+			<title>C program code</title>
+			<para>
+				The program code adds the two queries and
+				establishes the follower link between them.
+				<programlisting>#include &lt;stdio.h&gt;
+#include &lt;opencreport.h&gt;
+
+int main(int argc, char **argv) {
+    opencreport *o = ocrpt_init();
+    ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+    ocrpt_query *q1 = ocrpt_query_add_postgresql(ds, "q1", "select * from flintstones4;");
+    ocrpt_query *q2 = ocrpt_query_add_postgresql(ds, "q2", "select * from flintstones5;");
+
+    ocrpt_query_add_follower(q1, q2);
+
+    if (!ocrpt_parse_xml(o, "example5.xml")) {
+        printf("XML parse error\n");
+        ocrpt_free(o);
+        return 0;
+    }
+
+    ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);
+    ocrpt_execute(o);
+    ocrpt_spool(o);
+    ocrpt_free(o);
+
+    return 0;
+}</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example5codephp">
+			<title>PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP.
+				<programlisting>&lt;?php
+$o = new OpenCReport();
+$ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+$q1 = $ds-&gt;query_add("q1", "select * from flintstones4;");
+$q2 = $ds-&gt;query_add("q2", "select * from flintstones5;");
+
+$q1-&gt;add_follower($q2);
+
+if (!$o-&gt;parse_xml("example5.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+$o-&gt;execute();
+$o-&gt;spool();</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example5codephprlib">
+			<title>RLIB compatible PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP,
+				using the RLIB compatibility functions.
+				<programlisting>&lt;?php
+$r = rlib_init();
+
+rlib_add_datasource_postgres($r, "pgsql", "dbname=ocrpttest user=ocrpt");
+
+rlib_add_query_as($r, "pgsql", "select * from flintstones4;", "q1");
+rlib_add_query_as($r, "pgsql", "select * from flintstones5;", "q2");
+
+rlib_add_resultset_follower($r, "q1", "q2");
+
+if (!rlib_add_report($r, "example5.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+rlib_execute($r);
+rlib_spool($r);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example5xml">
+			<title>Report description</title>
+			<para>
+				The program code uses this file contents
+				from <literal>example5.xml</literal>.
+			</para>
+			<para>
+				Note that when using multiple queries in the same
+				report, column names may be identical. Because
+				of this, using <literal>queryname.columnname</literal>
+				will indicate which one is needed. When using
+				<literal>columnname</literal> then it will mean
+				the first query's column.
+				<programlisting>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE OpenCReport SYSTEM "opencreport.dtd"&gt;
+&lt;OpenCReport&gt;
+    &lt;Report query="q1"&gt;
+        &lt;Detail&gt;
+            &lt;FieldHeaders&gt;
+                &lt;Output&gt;
+                    &lt;HorizontalLine size="2" color="'black'" /&gt;
+                    &lt;HorizontalLine size="2" color="'white'" /&gt;
+                    &lt;Line bold="yes"&gt;
+                        &lt;literal width="20"&gt;First name&lt;/literal&gt;
+                        &lt;literal width="20"&gt;Last name&lt;/literal&gt;
+                    &lt;/Line&gt;
+                    &lt;HorizontalLine size="2" color="'white'" /&gt;
+                    &lt;HorizontalLine size="2" color="'black'" /&gt;
+                    &lt;HorizontalLine size="2" color="'white'" /&gt;
+                &lt;/Output&gt;
+            &lt;/FieldHeaders&gt;
+
+            &lt;FieldDetails&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;field width="20" value="q1.firstname" /&gt;
+                        &lt;field width="20" value="q2.lastname" /&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/FieldDetails&gt;
+        &lt;/Detail&gt;
+    &lt;/Report&gt;
+&lt;/OpenCReport&gt;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example5pdf">
+			<title>Report PDF result</title>
+			<para>
+				<inlinemediaobject>
+					<imageobject>
+						<imagedata fileref="images/example5.png" align="center" />
+					</imageobject>
+				</inlinemediaobject>
+			</para>
+			<para>
+				Note that compared to
+				<ulink url="https://github.com/SICOM/rlib">RLIB</ulink>,
+				<literal>OpenCReports</literal> may or may not
+				produce the same output. This is due to the incomplete
+				and faulty implementation of follower queries in
+				<literal>RLIB</literal>.
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="example6">
+		<title>N:1 follower queries</title>
+		<para>
+			This example below exercises two N:1 (N-to-one) follower queries
+			along with the main query.
+			For more information, see <xref linkend="followerqueries"/>.
+		</para>
+		<sect2 id="example6data">
+			<title>Data</title>
+			<para>
+				Data is created as follows in the same database
+				using the same user as the first example.
+				<programlisting>create table data (id serial unique, name text);
+
+create table more_data (
+id serial unique,
+boss_id int,
+name text,
+foreign key (boss_id) references data (id));
+
+create table moar_data (
+sk_id int,
+name text,
+foreign key (sk_id) references more_data (id));
+
+insert into data (name)
+values
+('Snow White'),
+('Batman'),
+('Cinderella'),
+('Hansel'),
+('Little Red Riding Hood'),
+('Robin Hood');
+
+insert into more_data (boss_id, name)
+values
+(1, 'Doc'),
+(1, 'Dopey'),
+(1, 'Sneezy'),
+(1, 'Happy'),
+(1, 'Bashful'),
+(1, 'Sleepy'),
+(1, 'Grumpy'),
+(2, 'Robin'),
+(3, 'Fairy Godmother'),
+(3, 'Mice'),
+(3, 'Pidgeons'),
+(4, 'Gretel'),
+(6, 'Little John');
+
+insert into moar_data (sk_id, name)
+values
+(3, 'Coughy'),
+(3, 'Crippley'),
+(9, 'Prince Charming'),
+(9, 'Shrek'),
+(13, 'Will Scarlet'),
+(13, 'Brother Tuck');</programlisting>
+			</para>
+			<para>
+				The query that the N:1 followers in this report simulate is:
+				<programlisting>ocrpttest=&gt; select * from data left outer join more_data on (data.id = more_data.boss_id)
+ocrpttest-> left outer join moar_data on (more_data.id = moar_data.sk_id)
+ocrpttest-> order by data.id, more_data.id;
+ id |          name          | id | boss_id |      name       | sk_id |      name       
+----+------------------------+----+---------+-----------------+-------+-----------------
+  1 | Snow White             |  1 |       1 | Doc             |       | 
+  1 | Snow White             |  2 |       1 | Dopey           |       | 
+  1 | Snow White             |  3 |       1 | Sneezy          |     3 | Coughy
+  1 | Snow White             |  3 |       1 | Sneezy          |     3 | Crippley
+  1 | Snow White             |  4 |       1 | Happy           |       | 
+  1 | Snow White             |  5 |       1 | Bashful         |       | 
+  1 | Snow White             |  6 |       1 | Sleepy          |       | 
+  1 | Snow White             |  7 |       1 | Grumpy          |       | 
+  2 | Batman                 |  8 |       2 | Robin           |       | 
+  3 | Cinderella             |  9 |       3 | Fairy Godmother |     9 | Shrek
+  3 | Cinderella             |  9 |       3 | Fairy Godmother |     9 | Prince Charming
+  3 | Cinderella             | 10 |       3 | Mice            |       | 
+  3 | Cinderella             | 11 |       3 | Pidgeons        |       | 
+  4 | Hansel                 | 12 |       4 | Gretel          |       | 
+  5 | Little Red Riding Hood |    |         |                 |       | 
+  6 | Robin Hood             | 13 |       6 | Little John     |    13 | Will Scarlet
+  6 | Robin Hood             | 13 |       6 | Little John     |    13 | Brother Tuck
+(17 rows)</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example6codec">
+			<title>C program code</title>
+			<para>
+				The program code adds the three queries and establishes
+				the follower links between them. Note that the match
+				expressions can be anything, just like in SQL using
+				the <literal>LEFT OUTER JOIN ON ( ... )</literal> clause.
+				<programlisting>#include &lt;stdio.h&gt;
+#include &lt;opencreport.h&gt;
+
+int main(int argc, char **argv) {
+    opencreport *o = ocrpt_init();
+    ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+    ocrpt_query *q1 = ocrpt_query_add_postgresql(ds, "q1", "select * from data;");
+    ocrpt_query *q2 = ocrpt_query_add_postgresql(ds, "q2", "select * from more_data;");
+    ocrpt_query *q3 = ocrpt_query_add_postgresql(ds, "q3", "select * from moar_data;");
+
+    ocrpt_expr *match = ocrpt_expr_parse(o, "q1.id = q2.boss_id", NULL);
+    ocrpt_query_add_follower_n_to_1(q1, q2, match);
+
+    ocrpt_expr *match2 = ocrpt_expr_parse(o, "q2.id = q3.sk_id", NULL);
+    ocrpt_query_add_follower_n_to_1(q2, q3, match2);
+
+    if (!ocrpt_parse_xml(o, "example6.xml")) {
+        printf("XML parse error\n");
+        ocrpt_free(o);
+        return 0;
+    }
+
+    ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);
+    ocrpt_execute(o);
+    ocrpt_spool(o);
+    ocrpt_free(o);
+
+    return 0;
+}}</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example6codephp">
+			<title>PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP.
+				<programlisting>&lt;?php
+$o = new OpenCReport();
+$ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+$q1 = $ds-&gt;query_add("q1", "select * from data;");
+$q2 = $ds-&gt;query_add("q2", "select * from more_data;");
+$q3 = $ds-&gt;query_add("q3", "select * from moar_data;");
+
+$match1 = $o-&gt;expr_parse("q1.id = q2.boss_id");
+$q1-&gt;add_follower_n_to_1($q2, $match1);
+
+$match2 = $o-&gt;expr_parse("q2.id = q3.sk_id");
+$q2-&gt;add_follower_n_to_1($q3, $match2);
+
+if (!$o-&gt;parse_xml("example6.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+$o-&gt;execute();
+$o-&gt;spool();</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example6codephprlib">
+			<title>RLIB compatible PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP,
+				using the RLIB compatibility functions.
+				Note that the RLIB compatible API is more limited
+				as it expects a single field name matching.
+				<programlisting>&lt;?php
+$r = rlib_init();
+
+rlib_add_datasource_postgres($r, "pgsql", "dbname=ocrpttest user=ocrpt");
+rlib_add_query_as($r, "pgsql", "select * from data;", "q1");
+rlib_add_query_as($r, "pgsql", "select * from more_data;", "q2");
+rlib_add_query_as($r, "pgsql", "select * from moar_data;", "q3");
+
+rlib_add_resultset_follower_n_to_1($r, "q1", "id", "q2", "boss_id");
+rlib_add_resultset_follower_n_to_1($r, "q2", "id", "q3", "sk_id");
+
+if (!rlib_add_report($r, "example6.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+rlib_execute($r);
+rlib_spool($r);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example6xml">
+			<title>Report description</title>
+			<para>
+				The program code uses this file contents
+				from <literal>example6.xml</literal>.
+			</para>
+			<para>
+				Note that when using multiple queries in the same
+				report, column names may be identical. Because
+				of this, using <literal>queryname.columnname</literal>
+				will indicate which one is needed. When using
+				<literal>columnname</literal> then it will mean
+				the first query's column.
+				<programlisting>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE report &gt;
+&lt;OpenCReport&gt;
+&lt;Report orientation="landscape"&gt;
+    &lt;Detail&gt;
+        &lt;FieldHeaders&gt;
+            &lt;Output&gt;
+                &lt;Line&gt;
+                    &lt;literal width="30"&gt;Boss name&lt;/literal&gt;
+                    &lt;literal width="1"/&gt;
+                    &lt;literal width="30"&gt;Sidekick name&lt;/literal&gt;
+                    &lt;literal width="1"/&gt;
+                    &lt;literal width="30"&gt;Sidekick's sidekick name&lt;/literal&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/FieldHeaders&gt;
+        &lt;FieldDetails&gt;
+            &lt;Output&gt;
+                &lt;Line&gt;
+                    &lt;field value="q1.name" width="30" align="left" /&gt;
+                    &lt;literal width="1"/&gt;
+                    &lt;field value="q2.name" width="30" align="left" /&gt;
+                    &lt;literal width="1"/&gt;
+                    &lt;field value="q3.name" width="30" align="left" /&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/FieldDetails&gt;
+    &lt;/Detail&gt;
+&lt;/Report&gt;
+&lt;/OpenCReport&gt;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example6pdf">
+			<title>Report PDF result</title>
+			<para>
+				<inlinemediaobject>
+					<imageobject>
+						<imagedata fileref="images/example6.png" align="center" />
+					</imageobject>
+				</inlinemediaobject>
+			</para>
+			<para>
+				Note that compared to
+				<ulink url="https://github.com/SICOM/rlib">RLIB</ulink>,
+				<literal>OpenCReports</literal> likely do not
+				produce the same output. This is due to the incomplete
+				and faulty implementation of follower queries in
+				<literal>RLIB</literal>. <literal>OpenCReports</literal>
+				faithfully implements <literal>LEFT OUTER JOIN</literal>.
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="example7">
+		<title>N:1 follower queries (RLIB compatibility limits)</title>
+		<para>
+			This example below exercises two N:1 (N-to-one) follower queries
+			along with the main query.
+			For more information, see <xref linkend="followerqueries"/>.
+		</para>
+		<sect2 id="example7data">
+			<title>Data</title>
+			<para>
+				The same data is used as in the previous example.
+			</para>
+			<para>
+				The query that the RLIB compatible method for
+				N:1 followers in this report simulates is:
+				<programlisting>ocrpttest=&gt; select * from data
+ocrpttest-> left outer join lateral (select * from more_data
+ocrpttest->      where data.id = more_data.boss_id
+ocrpttest->      order by more_data.id limit 1) x on (true)
+ocrpttest-> left outer join lateral (select * from moar_data
+ocrpttest->      where x.id = moar_data.sk_id
+ocrpttest->      order by moar_data.sk_id limit 1) y on (true);
+ id |          name          | id | boss_id |      name       | sk_id |      name       
+----+------------------------+----+---------+-----------------+-------+-----------------
+  1 | Snow White             |  1 |       1 | Doc             |       | 
+  2 | Batman                 |  8 |       2 | Robin           |       | 
+  3 | Cinderella             |  9 |       3 | Fairy Godmother |     9 | Prince Charming
+  4 | Hansel                 | 12 |       4 | Gretel          |       | 
+  5 | Little Red Riding Hood |    |         |                 |       | 
+  6 | Robin Hood             | 13 |       6 | Little John     |    13 | Will Scarlet
+(6 rows)</programlisting>
+			</para>
+			<para>
+				Note the amount of hoops the SQL query has
+				to jump through to implement the <literal>LIMIT 1</literal>
+				clause on both lateral derived queries that results
+				in limiting the number of rows to the main query's
+				number of rows.
+			</para>
+		</sect2>
+		<sect2 id="example7codec">
+			<title>C program code</title>
+			<para>
+				The program code is identical to the previous example,
+				except that it uses a different report XML description.
+				<programlisting>#include &lt;stdio.h&gt;
+#include &lt;opencreport.h&gt;
+
+int main(int argc, char **argv) {
+    opencreport *o = ocrpt_init();
+    ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+    ocrpt_query *q1 = ocrpt_query_add_postgresql(ds, "q1", "select * from data;");
+    ocrpt_query *q2 = ocrpt_query_add_postgresql(ds, "q2", "select * from more_data;");
+    ocrpt_query *q3 = ocrpt_query_add_postgresql(ds, "q3", "select * from moar_data;");
+
+    ocrpt_expr *match = ocrpt_expr_parse(o, "q1.id = q2.boss_id", NULL);
+    ocrpt_query_add_follower_n_to_1(q1, q2, match);
+
+    ocrpt_expr *match2 = ocrpt_expr_parse(o, "q2.id = q3.sk_id", NULL);
+    ocrpt_query_add_follower_n_to_1(q2, q3, match2);
+
+    if (!ocrpt_parse_xml(o, "example7.xml")) {
+        printf("XML parse error\n");
+        ocrpt_free(o);
+        return 0;
+    }
+
+    ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);
+    ocrpt_execute(o);
+    ocrpt_spool(o);
+    ocrpt_free(o);
+
+    return 0;
+}}</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example7codephp">
+			<title>PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP.
+				<programlisting>&lt;?php
+$o = new OpenCReport();
+$ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+$q1 = $ds-&gt;query_add("q1", "select * from data;");
+$q2 = $ds-&gt;query_add("q2", "select * from more_data;");
+$q3 = $ds-&gt;query_add("q3", "select * from moar_data;");
+
+$match1 = $o-&gt;expr_parse("q1.id = q2.boss_id");
+$q1-&gt;add_follower_n_to_1($q2, $match1);
+
+$match2 = $o-&gt;expr_parse("q2.id = q3.sk_id");
+$q2-&gt;add_follower_n_to_1($q3, $match2);
+
+if (!$o-&gt;parse_xml("example7.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+$o-&gt;execute();
+$o-&gt;spool();</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example7codephprlib">
+			<title>RLIB compatible PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP,
+				using the RLIB compatibility functions.
+				Note that the RLIB compatible API is more limited
+				as it expects a single field name matching.
+				<programlisting>&lt;?php
+$r = rlib_init();
+
+rlib_add_datasource_postgres($r, "pgsql", "dbname=ocrpttest user=ocrpt");
+rlib_add_query_as($r, "pgsql", "select * from data;", "q1");
+rlib_add_query_as($r, "pgsql", "select * from more_data;", "q2");
+rlib_add_query_as($r, "pgsql", "select * from moar_data;", "q3");
+
+rlib_add_resultset_follower_n_to_1($r, "q1", "id", "q2", "boss_id");
+rlib_add_resultset_follower_n_to_1($r, "q2", "id", "q3", "sk_id");
+
+if (!rlib_add_report($r, "example7.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+rlib_execute($r);
+rlib_spool($r);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example7xml">
+			<title>Report description</title>
+			<para>
+				The program code uses this file contents
+				from <literal>example7.xml</literal>.
+				It is different in one detail from the previous
+				example: the toplevel XML node is
+				<literal>&lt;Report&gt;</literal> instead of
+				<literal>&lt;OpenCReport&gt;</literal>.
+				This results in the RLIB compatibility flag
+				to be enabled automatically. See the
+				<xref linkend="xmlfollowermatchsingle"/>
+				or the equivalent calls in the C and PHP API
+				documentation) to be enabled automatically.
+				<programlisting>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE report &gt;
+&lt;Report orientation="landscape"&gt;
+    &lt;Detail&gt;
+        &lt;FieldHeaders&gt;
+            &lt;Output&gt;
+                &lt;Line&gt;
+                    &lt;literal width="30"&gt;Boss name&lt;/literal&gt;
+                    &lt;literal width="1"/&gt;
+                    &lt;literal width="30"&gt;Sidekick name&lt;/literal&gt;
+                    &lt;literal width="1"/&gt;
+                    &lt;literal width="30"&gt;Sidekick's sidekick name&lt;/literal&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/FieldHeaders&gt;
+        &lt;FieldDetails&gt;
+            &lt;Output&gt;
+                &lt;Line&gt;
+                    &lt;field value="q1.name" width="30" align="left" /&gt;
+                    &lt;literal width="1"/&gt;
+                    &lt;field value="q2.name" width="30" align="left" /&gt;
+                    &lt;literal width="1"/&gt;
+                    &lt;field value="q3.name" width="30" align="left" /&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/FieldDetails&gt;
+    &lt;/Detail&gt;
+&lt;/Report&gt;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example7pdf">
+			<title>Report PDF result</title>
+			<para>
+				<inlinemediaobject>
+					<imageobject>
+						<imagedata fileref="images/example7.png" align="center" />
+					</imageobject>
+				</inlinemediaobject>
+			</para>
+			<para>
+				Note that compared to
+				<ulink url="https://github.com/SICOM/rlib">RLIB</ulink>,
+				<literal>OpenCReports</literal> likely do not
+				produce the same output. This is due to the incomplete
+				and faulty implementation of follower queries in
+				<literal>RLIB</literal>. <literal>OpenCReports</literal>
+				faithfully implements <literal>LEFT OUTER JOIN</literal>
+				with limiting the number of dependent matching rows to 1
+				that <emphasis>approximates</emphasis> the RLIB behaviour.
 			</para>
 		</sect2>
 	</sect1>
