@@ -23,7 +23,7 @@ HTML = OpenCReports.html html
 
 all: $(PDF) $(HTML)
 
-IMAGES = images/namedcolors.svg images/example1.png
+IMAGES = images/namedcolors.svg images/example1.png images/example3.png
 XMLINCLUDE = --path . --path $(srcdir)
 XSLTPROCFLAGS = --stringparam ocrpt.version '$(VERSION)'
 XSLTPROC_HTML_FLAGS = --param website.stylesheet 1
