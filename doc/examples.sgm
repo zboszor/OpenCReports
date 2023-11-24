@@ -579,4 +579,204 @@ rlib_spool($r);</programlisting>
 			</para>
 		</sect2>
 	</sect1>
+	<sect1 id="example4">
+		<title>Report variables and breaks</title>
+		<para>
+			This example below exercises report variables and breaks.
+			Breaks use changes in a data series, like a different
+			last name. For more information, see <xref linkend="breaksnode"/>.
+		</para>
+		<sect2 id="example4data">
+			<title>Data</title>
+			<para>
+				Data is created as follows in the same database
+				using the same user as the first example.
+				<programlisting>create table flintstones3 (id serial, firstname text, lastname text, age int);
+
+insert into flintstones3 (firstname, lastname, age)
+values
+('Fred', 'Flintstone', 31),
+('Wilma', 'Flintstone', 28),
+('Pebbles', 'Flintstone', 2),
+('Barney', 'Rubble', 28),
+('Betty', 'Rubble', 27),
+('Bamm-Bamm', 'Rubble', 2),
+('The Great', 'Gazoo', 600);</programlisting>
+			</para>
+			<para>
+				The data looks like this when queried:
+				<programlisting>ocrpttest=&gt; select * from flintstones3;
+ id | firstname |  lastname  | age 
+----+-----------+------------+-----
+  1 | Fred      | Flintstone |  31
+  2 | Wilma     | Flintstone |  28
+  3 | Pebbles   | Flintstone |   2
+  4 | Barney    | Rubble     |  28
+  5 | Betty     | Rubble     |  27
+  6 | Bamm-Bamm | Rubble     |   2
+  7 | The Great | Gazoo      | 600
+(7 rows)</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example4codec">
+			<title>C program code</title>
+			<para>
+				The program code is identical to the second and
+				third examples, except that it uses a different
+				report XML description.
+				<programlisting>#include &lt;stdio.h&gt;
+#include &lt;opencreport.h&gt;
+
+int main(int argc, char **argv) {
+    opencreport *o = ocrpt_init();
+    ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+
+    ocrpt_query_add_postgresql(ds, "q", "select * from flintstones2;");
+
+    if (!ocrpt_parse_xml(o, "example4.xml")) {
+        printf("XML parse error\n");
+        ocrpt_free(o);
+        return 0;
+    }
+
+    ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);
+    ocrpt_execute(o);
+    ocrpt_spool(o);
+    ocrpt_free(o);
+
+    return 0;
+}</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example4codephp">
+			<title>PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP.
+				<programlisting>&lt;?php
+$o = new OpenCReport();
+$ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+
+$ds-&gt;query_add("q", "select * from flintstones2;");
+
+if (!$o-&gt;parse_xml("example4.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+$o-&gt;execute();
+$o-&gt;spool();</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example4codephprlib">
+			<title>RLIB compatible PHP program code</title>
+			<para>
+				Here's the equivalent program code in PHP,
+				using the RLIB compatibility functions.
+				<programlisting>&lt;?php
+$r = rlib_init();
+
+rlib_add_datasource_postgres($r, "pgsql", "dbname=ocrpttest user=ocrpt");
+rlib_add_query_as($r, "pgsql", "select * from flintstones2;", "q");
+
+if (!rlib_add_report($r, "example4.xml")) {
+    echo "XML parse error" . PHP_EOL;
+    exit(0);
+}
+
+rlib_execute($r);
+rlib_spool($r);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example4xml">
+			<title>Report description</title>
+			<para>
+				The program code uses this file contents
+				from <literal>example4.xml</literal>.
+				<programlisting>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE OpenCReport SYSTEM "opencreport.dtd"&gt;
+&lt;OpenCReport&gt;
+    &lt;Report query="q"&gt;
+        &lt;Variables&gt;
+            &lt;Variable name="var1" value="id" type="count" /&gt;
+            &lt;Variable name="var2" value="age" type="average" precalculate="yes" resetonbreak="family" /&gt;
+            &lt;Variable name="var3" value="age" type="average" precalculate="yes" /&gt;
+            &lt;Variable name="var4" value="age" type="sum" /&gt;
+            &lt;Variable name="var5" value="age" type="sum" precalculate="yes" /&gt;
+        &lt;/Variables&gt;
+
+        &lt;Breaks&gt;
+            &lt;Break name="family"&gt;
+                &lt;BreakFields&gt;
+                    &lt;BreakField value="lastname" /&gt;
+                &lt;/BreakFields&gt;
+            &lt;/Break&gt;
+        &lt;/Breaks&gt;
+
+        &lt;Detail&gt;
+            &lt;FieldHeaders&gt;
+                &lt;Output&gt;
+                    &lt;HorizontalLine size="2" color="'black'" /&gt;
+                    &lt;HorizontalLine size="2" color="'white'" /&gt;
+                    &lt;Line bold="yes"&gt;
+                        &lt;literal width="2" align="'center'"&gt;ID&lt;/literal&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;literal width="20"&gt;Name&lt;/literal&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;literal width="8" align="'right'"&gt;Age&lt;/literal&gt;
+                        &lt;literal width="8" align="'right'"&gt;Count&lt;/literal&gt;
+                        &lt;literal width="8" align="'right'"&gt;Avg age&lt;/literal&gt;
+                        &lt;literal width="8" align="'right'"&gt;Avg age&lt;/literal&gt;
+                        &lt;literal width="8" align="'right'"&gt;Age sum&lt;/literal&gt;
+                        &lt;literal width="8" align="'right'"&gt;Age sum&lt;/literal&gt;
+                    &lt;/Line&gt;
+                    &lt;Line bold="yes"&gt;
+                        &lt;literal width="2"/&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;literal width="20"/&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;literal width="8"/&gt;
+                        &lt;literal width="8"/&gt;
+                        &lt;literal width="8" align="'right'"&gt;per fam&lt;/literal&gt;
+                        &lt;literal width="8" align="'right'"&gt;global&lt;/literal&gt;
+                        &lt;literal width="8" align="'right'"&gt;running&lt;/literal&gt;
+                        &lt;literal width="8" align="'right'"&gt;total&lt;/literal&gt;
+                    &lt;/Line&gt;
+                    &lt;HorizontalLine size="2" color="'white'" /&gt;
+                    &lt;HorizontalLine size="2" color="'black'" /&gt;
+                    &lt;HorizontalLine size="2" color="'white'" /&gt;
+                &lt;/Output&gt;
+            &lt;/FieldHeaders&gt;
+
+            &lt;FieldDetails&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;field width="2" align="'right'" value="id" /&gt;
+                        &lt;literal width="1" /&gt;
+                        &lt;field width="20" value="firstname + ' ' + lastname" /&gt;
+                        &lt;literal width="1"/&gt;
+                        &lt;field width="8" value="age" format="'%.2d'" align="'right'" /&gt;
+                        &lt;field width="8" value="v.var1" format="'%.2d'" align="'right'" /&gt;
+                        &lt;field width="8" value="v.var2" format="'%.2d'" align="'right'" /&gt;
+                        &lt;field width="8" value="v.var3" format="'%.2d'" align="'right'" /&gt;
+                        &lt;field width="8" value="v.var4" format="'%.2d'" align="'right'" /&gt;
+                        &lt;field width="8" value="v.var5" format="'%.2d'" align="'right'" /&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/FieldDetails&gt;
+        &lt;/Detail&gt;
+    &lt;/Report&gt;
+&lt;/OpenCReport&gt;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="example4pdf">
+			<title>Report PDF result</title>
+			<para>
+				<inlinemediaobject>
+					<imageobject>
+						<imagedata fileref="images/example4.png" align="center" />
+					</imageobject>
+				</inlinemediaobject>
+			</para>
+		</sect2>
+	</sect1>
 </chapter>

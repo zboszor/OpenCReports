@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+    <Report query="q">
+        <Variables>
+            <Variable name="var1" value="id" type="count" />
+            <Variable name="var2" value="age" type="average" precalculate="yes" resetonbreak="family" />
+            <Variable name="var3" value="age" type="average" precalculate="yes" />
+            <Variable name="var4" value="age" type="sum" />
+            <Variable name="var5" value="age" type="sum" precalculate="yes" />
+        </Variables>
+
+        <Breaks>
+            <Break name="family">
+                <BreakFields>
+                    <BreakField value="lastname" />
+                </BreakFields>
+            </Break>
+        </Breaks>
+
+        <Detail>
+            <FieldHeaders>
+                <Output>
+                    <HorizontalLine size="2" color="'black'" />
+                    <HorizontalLine size="2" color="'white'" />
+                    <Line bold="yes">
+                        <literal width="2" align="'center'">ID</literal>
+                        <literal width="1"/>
+                        <literal width="20">Name</literal>
+                        <literal width="1"/>
+                        <literal width="8" align="'right'">Age</literal>
+                        <literal width="8" align="'right'">Count</literal>
+                        <literal width="8" align="'right'">Avg age</literal>
+                        <literal width="8" align="'right'">Avg age</literal>
+                        <literal width="8" align="'right'">Age sum</literal>
+                        <literal width="8" align="'right'">Age sum</literal>
+                    </Line>
+                    <Line bold="yes">
+                        <literal width="2"/>
+                        <literal width="1"/>
+                        <literal width="20"/>
+                        <literal width="1"/>
+                        <literal width="8"/>
+                        <literal width="8"/>
+                        <literal width="8" align="'right'">per fam</literal>
+                        <literal width="8" align="'right'">global</literal>
+                        <literal width="8" align="'right'">running</literal>
+                        <literal width="8" align="'right'">total</literal>
+                    </Line>
+                    <HorizontalLine size="2" color="'white'" />
+                    <HorizontalLine size="2" color="'black'" />
+                    <HorizontalLine size="2" color="'white'" />
+                </Output>
+            </FieldHeaders>
+
+            <FieldDetails>
+                <Output>
+                    <Line>
+                        <field width="2" align="'right'" value="id" />
+                        <literal width="1" />
+                        <field width="20" value="firstname + ' ' + lastname" />
+                        <literal width="1"/>
+                        <field width="8" value="age" format="'%.2d'" align="'right'" />
+                        <field width="8" value="v.var1" format="'%.2d'" align="'right'" />
+                        <field width="8" value="v.var2" format="'%.2d'" align="'right'" />
+                        <field width="8" value="v.var3" format="'%.2d'" align="'right'" />
+                        <field width="8" value="v.var4" format="'%.2d'" align="'right'" />
+                        <field width="8" value="v.var5" format="'%.2d'" align="'right'" />
+                    </Line>
+                </Output>
+            </FieldDetails>
+        </Detail>
+    </Report>
+</OpenCReport>
