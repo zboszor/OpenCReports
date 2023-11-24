@@ -172,7 +172,7 @@ static inline void ocrpt_html_escape_data(opencreport *o, ocrpt_text *le) {
 		ocrpt_mem_string_append(priv->base.data, "&nbsp;");
 }
 
-static void ocrpt_html_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double page_width, double page_indent, double y) {
+static void ocrpt_html_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, bool last, double page_width, double page_indent, double y) {
 	html_private_data *priv = o->output_private;
 
 	if (pd && (le->start > pd->real_width))
@@ -260,7 +260,7 @@ static const char *ocrpt_html_truncate_file_prefix(html_private_data *priv, cons
 	return filename;
 }
 
-static void ocrpt_html_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_width, double page_indent, double x, double y, double w, double h) {
+static void ocrpt_html_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, bool last, double page_width, double page_indent, double x, double y, double w, double h) {
 	html_private_data *priv = o->output_private;
 	ocrpt_image_file *img_file = img->img_file;
 

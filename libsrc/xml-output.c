@@ -221,7 +221,7 @@ static void ocrpt_xml_start_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_r
 	}
 }
 
-static void ocrpt_xml_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double page_width, double page_indent, double y) {
+static void ocrpt_xml_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, bool last, double page_width, double page_indent, double y) {
 	xml_private_data *priv = o->output_private;
 
 	ocrpt_xml_get_current_output(priv, p, r, br, output);
@@ -278,7 +278,7 @@ static void ocrpt_xml_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 	}
 }
 
-static void ocrpt_xml_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_width, double page_indent, double x, double y, double w, double h) {
+static void ocrpt_xml_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, bool last, double page_width, double page_indent, double x, double y, double w, double h) {
 	xml_private_data *priv = o->output_private;
 
 	xmlNodePtr outn = ocrpt_xml_get_current_output(priv, p, r, br, output);

@@ -19,7 +19,7 @@ static void ocrpt_txt_end_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row
 	ocrpt_mem_string_append(o->output_buffer, "\n");
 }
 
-static void ocrpt_txt_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double page_width, double page_indent, double y) {
+static void ocrpt_txt_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, bool last, double page_width, double page_indent, double y) {
 	txt_private_data *priv = o->output_private;
 	int startpos = le->pline ? pango_layout_line_get_start_index(le->pline) : 0;
 	int length = le->pline ? pango_layout_line_get_length(le->pline) : 0;
@@ -97,7 +97,7 @@ static void ocrpt_txt_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		le->pline = NULL;
 }
 
-static void ocrpt_txt_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_width, double page_indent, double x, double y, double w, double h) {
+static void ocrpt_txt_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, bool last, double page_width, double page_indent, double x, double y, double w, double h) {
 	txt_private_data *priv = o->output_private;
 	double size;
 	uint32_t nspc, i;

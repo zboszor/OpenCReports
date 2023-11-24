@@ -64,7 +64,7 @@ static inline void ocrpt_cairo_create(opencreport *o) {
 	}
 }
 
-static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, double page_width, double page_indent, double x, double y, double w, double h) {
+static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, bool last, double page_width, double page_indent, double x, double y, double w, double h) {
 	pdf_private_data *priv = o->output_private;
 	ocrpt_image_file *img_file = img->img_file;
 
@@ -83,12 +83,12 @@ static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	cairo_save(priv->cr);
 
 	/*
-	 * The background filler is 0.1 points wider.
-	 * This way, there's no lines between the line elements.
+	 * The background filler is 0.2 points wider.
+	 * This way, there's no lines between the line elements or lines.
 	 */
 	cairo_set_source_rgb(priv->cr, img->bg.r, img->bg.g, img->bg.b);
 	cairo_set_line_width(priv->cr, 0.0);
-	cairo_rectangle(priv->cr, x, y, w + 0.1, h);
+	cairo_rectangle(priv->cr, x, y, w + (last ? 0.0 : 0.2), h + 0.2);
 	cairo_fill(priv->cr);
 
 	cairo_restore(priv->cr);
@@ -132,7 +132,7 @@ static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	cairo_restore(priv->cr);
 }
 
-static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, double page_width, double page_indent, double y) {
+static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, bool last, double page_width, double page_indent, double y) {
 	pdf_private_data *priv = o->output_private;
 
 	ocrpt_cairo_create(o);
@@ -145,13 +145,20 @@ static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 	else if (l->bgcolor && l->bgcolor->result[o->residx] && l->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && l->bgcolor->result[o->residx]->string)
 		ocrpt_get_color(l->bgcolor->result[o->residx]->string->str, &bgcolor, true);
 
+	double rest_start = 0.0;
+	double rest_width = 0.0;
+	if (last) {
+		rest_start = le->start + le->width_computed;
+		rest_width = page_width - rest_start;
+	}
+
 	cairo_set_source_rgb(priv->cr, bgcolor.r, bgcolor.g, bgcolor.b);
 	cairo_set_line_width(priv->cr, 0.0);
 	/*
-	 * The background filler is 0.1 points wider.
-	 * This way, there's no lines between the line elements.
+	 * The background filler is 0.2 points wider.
+	 * This way, there's no lines between the line elements or lines.
 	 */
-	cairo_rectangle(priv->cr, page_indent + le->start, y, le->width_computed + 0.1, l->line_height);
+	cairo_rectangle(priv->cr, page_indent + le->start, y, le->width_computed + (last ? 0.0 : 0.2), l->line_height + 0.2);
 	cairo_fill(priv->cr);
 
 	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
@@ -208,6 +215,19 @@ static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 			cairo_tag_end(priv->cr, CAIRO_TAG_LINK);
 	}
 
+	if (last && le->start + le->width_computed < page_width) {
+		ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
+
+		cairo_set_source_rgb(priv->cr, bgcolor.r, bgcolor.g, bgcolor.b);
+		cairo_set_line_width(priv->cr, 0.0);
+		/*
+		 * The background filler is 0.2 points wider.
+		 * This way, there's no lines between the line elements or lines.
+		 */
+		cairo_rectangle(priv->cr, page_indent + rest_start, y, rest_width, l->line_height + 0.2);
+		cairo_fill(priv->cr);
+	}
+
 	cairo_restore(priv->cr);
 
 	if (l->current_line + 1 < le->lines) {
@@ -252,7 +272,13 @@ static void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 
 	cairo_set_source_rgb(priv->cr, color.r, color.g, color.b);
 	cairo_set_line_width(priv->cr, 0.0);
-	cairo_rectangle(priv->cr, page_indent + indent, page_position, length, size);
+	double wider = 0.0;
+	if (output->iter->next) {
+		ocrpt_output_element *oe = (ocrpt_output_element *)output->iter->next->data;
+		if (oe->type != OCRPT_OUTPUT_HLINE)
+			wider = 0.2;
+	}
+	cairo_rectangle(priv->cr, page_indent + indent, page_position, length, size + wider);
 	cairo_fill(priv->cr);
 }
 

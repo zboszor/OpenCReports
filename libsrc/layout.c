@@ -177,13 +177,13 @@ static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_pa
 			switch (elem->le_type) {
 			case OCRPT_OUTPUT_LE_TEXT:
 				if ((!o->output_functions.support_any_font || (elem->start < page_width)) && o->output_functions.draw_text)
-					o->output_functions.draw_text(o, p, pr, pd, r, br, output, line, elem, page_width, page_indent, *page_position);
+					o->output_functions.draw_text(o, p, pr, pd, r, br, output, line, elem, (l->next == NULL), page_width, page_indent, *page_position);
 				break;
 			case OCRPT_OUTPUT_LE_IMAGE: {
 				ocrpt_image *img = (ocrpt_image *)elem;
 
 				if ((!o->output_functions.support_any_font || (img->start < page_width)) && o->output_functions.draw_image)
-					o->output_functions.draw_image(o, p, pr, pd, r, br, output, line, img, page_width, page_indent, page_indent + img->start, *page_position, img->image_text_width, line->line_height);
+					o->output_functions.draw_image(o, p, pr, pd, r, br, output, line, img, (l->next == NULL), page_width, page_indent, page_indent + img->start, *page_position, img->image_text_width, line->line_height);
 				break;
 			}
 			case OCRPT_OUTPUT_LE_BARCODE:
@@ -397,9 +397,9 @@ static void ocrpt_layout_image_setup(opencreport *o, ocrpt_part *p, ocrpt_part_r
 	}
 }
 
-static void ocrpt_layout_image(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_image *image, double page_width, double page_indent, double *page_position) {
+static void ocrpt_layout_image(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_image *image, bool last, double page_width, double page_indent, double *page_position) {
 	if (draw && o->output_functions.draw_image && image->img_file)
-		o->output_functions.draw_image(o, p, pr, pd, r, br, output, NULL, image, page_width, page_indent, page_indent, *page_position, image->image_width, image->image_height);
+		o->output_functions.draw_image(o, p, pr, pd, r, br, output, NULL, image, last, page_width, page_indent, page_indent, *page_position, image->image_width, image->image_height);
 
 	output->old_page_position = *page_position;
 	output->current_image = image;
@@ -856,7 +856,7 @@ bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 			if (img->suppress_image)
 				break;
 
-			ocrpt_layout_image(draw, o, p, pr, pd, r, br, output, img, page_width, page_indent, page_position);
+			ocrpt_layout_image(draw, o, p, pr, pd, r, br, output, img, false, page_width, page_indent, page_position);
 			break;
 		}
 		case OCRPT_OUTPUT_IMAGEEND:
