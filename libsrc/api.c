@@ -328,6 +328,9 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 
 	ocrpt_expr_init_iterative_results(r->detailcnt, OCRPT_RESULT_NUMBER);
 
+	for (ocrpt_list *vl = r->variables; vl; vl = vl->next)
+		ocrpt_variable_reset((ocrpt_var *)vl->data);
+
 	while (have_row) {
 		ocrpt_list *brl;
 		bool last_row = !ocrpt_query_navigate_next(r->query);
