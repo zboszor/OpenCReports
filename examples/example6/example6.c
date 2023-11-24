@@ -4,9 +4,9 @@
 int main(int argc, char **argv) {
     opencreport *o = ocrpt_init();
     ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
-    ocrpt_query *q1 = ocrpt_query_add_postgresql(ds, "q1", "select * from data;");
-    ocrpt_query *q2 = ocrpt_query_add_postgresql(ds, "q2", "select * from more_data;");
-    ocrpt_query *q3 = ocrpt_query_add_postgresql(ds, "q3", "select * from moar_data;");
+    ocrpt_query *q1 = ocrpt_query_add_postgresql(ds, "q1", "select * from data order by id;");
+    ocrpt_query *q2 = ocrpt_query_add_postgresql(ds, "q2", "select * from more_data order by id;");
+    ocrpt_query *q3 = ocrpt_query_add_postgresql(ds, "q3", "select * from moar_data order by sk_id;");
 
     ocrpt_expr *match = ocrpt_expr_parse(o, "q1.id = q2.boss_id", NULL);
     ocrpt_query_add_follower_n_to_1(q1, q2, match);

@@ -1080,9 +1080,9 @@ ocrpttest-> order by data.id, more_data.id;
 int main(int argc, char **argv) {
     opencreport *o = ocrpt_init();
     ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
-    ocrpt_query *q1 = ocrpt_query_add_postgresql(ds, "q1", "select * from data;");
-    ocrpt_query *q2 = ocrpt_query_add_postgresql(ds, "q2", "select * from more_data;");
-    ocrpt_query *q3 = ocrpt_query_add_postgresql(ds, "q3", "select * from moar_data;");
+    ocrpt_query *q1 = ocrpt_query_add_postgresql(ds, "q1", "select * from data order by id;");
+    ocrpt_query *q2 = ocrpt_query_add_postgresql(ds, "q2", "select * from more_data order by id;");
+    ocrpt_query *q3 = ocrpt_query_add_postgresql(ds, "q3", "select * from moar_data order by sk_id;");
 
     ocrpt_expr *match = ocrpt_expr_parse(o, "q1.id = q2.boss_id", NULL);
     ocrpt_query_add_follower_n_to_1(q1, q2, match);
@@ -1112,9 +1112,9 @@ int main(int argc, char **argv) {
 				<programlisting>&lt;?php
 $o = new OpenCReport();
 $ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
-$q1 = $ds-&gt;query_add("q1", "select * from data;");
-$q2 = $ds-&gt;query_add("q2", "select * from more_data;");
-$q3 = $ds-&gt;query_add("q3", "select * from moar_data;");
+$q1 = $ds-&gt;query_add("q1", "select * from data order by id;");
+$q2 = $ds-&gt;query_add("q2", "select * from more_data order by id;");
+$q3 = $ds-&gt;query_add("q3", "select * from moar_data order by sk_id;");
 
 $match1 = $o-&gt;expr_parse("q1.id = q2.boss_id");
 $q1-&gt;add_follower_n_to_1($q2, $match1);
@@ -1142,9 +1142,9 @@ $o-&gt;spool();</programlisting>
 $r = rlib_init();
 
 rlib_add_datasource_postgres($r, "pgsql", "dbname=ocrpttest user=ocrpt");
-rlib_add_query_as($r, "pgsql", "select * from data;", "q1");
-rlib_add_query_as($r, "pgsql", "select * from more_data;", "q2");
-rlib_add_query_as($r, "pgsql", "select * from moar_data;", "q3");
+rlib_add_query_as($r, "pgsql", "select * from data order by id;", "q1");
+rlib_add_query_as($r, "pgsql", "select * from more_data order by id;", "q2");
+rlib_add_query_as($r, "pgsql", "select * from moar_data order by sk_id;", "q3");
 
 rlib_add_resultset_follower_n_to_1($r, "q1", "id", "q2", "boss_id");
 rlib_add_resultset_follower_n_to_1($r, "q2", "id", "q3", "sk_id");
@@ -1274,9 +1274,9 @@ ocrpttest->      order by moar_data.sk_id limit 1) y on (true);
 int main(int argc, char **argv) {
     opencreport *o = ocrpt_init();
     ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
-    ocrpt_query *q1 = ocrpt_query_add_postgresql(ds, "q1", "select * from data;");
-    ocrpt_query *q2 = ocrpt_query_add_postgresql(ds, "q2", "select * from more_data;");
-    ocrpt_query *q3 = ocrpt_query_add_postgresql(ds, "q3", "select * from moar_data;");
+    ocrpt_query *q1 = ocrpt_query_add_postgresql(ds, "q1", "select * from data order by id;");
+    ocrpt_query *q2 = ocrpt_query_add_postgresql(ds, "q2", "select * from more_data order by id;");
+    ocrpt_query *q3 = ocrpt_query_add_postgresql(ds, "q3", "select * from moar_data order by sk_id;");
 
     ocrpt_expr *match = ocrpt_expr_parse(o, "q1.id = q2.boss_id", NULL);
     ocrpt_query_add_follower_n_to_1(q1, q2, match);
@@ -1306,9 +1306,9 @@ int main(int argc, char **argv) {
 				<programlisting>&lt;?php
 $o = new OpenCReport();
 $ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
-$q1 = $ds-&gt;query_add("q1", "select * from data;");
-$q2 = $ds-&gt;query_add("q2", "select * from more_data;");
-$q3 = $ds-&gt;query_add("q3", "select * from moar_data;");
+$q1 = $ds-&gt;query_add("q1", "select * from data order by id;");
+$q2 = $ds-&gt;query_add("q2", "select * from more_data order by id;");
+$q3 = $ds-&gt;query_add("q3", "select * from moar_data order by sk_id;");
 
 $match1 = $o-&gt;expr_parse("q1.id = q2.boss_id");
 $q1-&gt;add_follower_n_to_1($q2, $match1);
@@ -1336,9 +1336,9 @@ $o-&gt;spool();</programlisting>
 $r = rlib_init();
 
 rlib_add_datasource_postgres($r, "pgsql", "dbname=ocrpttest user=ocrpt");
-rlib_add_query_as($r, "pgsql", "select * from data;", "q1");
-rlib_add_query_as($r, "pgsql", "select * from more_data;", "q2");
-rlib_add_query_as($r, "pgsql", "select * from moar_data;", "q3");
+rlib_add_query_as($r, "pgsql", "select * from data order by id;", "q1");
+rlib_add_query_as($r, "pgsql", "select * from more_data order by id;", "q2");
+rlib_add_query_as($r, "pgsql", "select * from moar_data order by sk_id;", "q3");
 
 rlib_add_resultset_follower_n_to_1($r, "q1", "id", "q2", "boss_id");
 rlib_add_resultset_follower_n_to_1($r, "q2", "id", "q3", "sk_id");
