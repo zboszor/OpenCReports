@@ -1365,7 +1365,7 @@ rlib_spool($r);</programlisting>
 				to be enabled automatically. See the
 				<xref linkend="xmlfollowermatchsingle"/>
 				or the equivalent calls in the C and PHP API
-				documentation) to be enabled automatically.
+				documentation.
 				<programlisting>&lt;?xml version="1.0"?&gt;
 &lt;!DOCTYPE report &gt;
 &lt;Report orientation="landscape"&gt;
