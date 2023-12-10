@@ -462,7 +462,7 @@ static void ocrpt_grammar_free_token(ocrpt_string *token) {
 }
 
 static ocrpt_expr *ocrpt_expr_parse_internal(opencreport *o, ocrpt_report *r, const char *expr_string, char **err) {
-	yyscan_t yyscanner;
+	yyscan_t yyscanner = NULL;
 	base_yy_extra_type yyextra;
 	int yyresult = 1;
 
@@ -494,7 +494,7 @@ static ocrpt_expr *ocrpt_expr_parse_internal(opencreport *o, ocrpt_report *r, co
 	}
 
 	/* Clean up (release memory) */
-	scanner_finish(yyscanner);
+	scanner_finish(&yyscanner);
 
 	if (yyresult) {
 		ocrpt_list *ptr;

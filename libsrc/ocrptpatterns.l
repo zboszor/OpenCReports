@@ -436,6 +436,7 @@ static ocrpt_string *litbufdup(yyscan_t yyscanner) {
 	struct yyguts_t *yyg = (struct yyguts_t *)yyscanner;
 	int llen = yyextra->literallen;
 	ocrpt_string *new = ocrpt_mem_string_new_with_len(yyextra->literalbuf, llen);
+	yyextra->literallen = 0;
 	return new;
 }
 
@@ -512,12 +513,22 @@ yyscan_t scanner_init(const char *str, core_yy_extra_type *yyext) {
 /*
  * Called after parsing is done to clean up after scanner_init()
  */
-void scanner_finish(yyscan_t yyscanner) {
-	struct yyguts_t *yyg = (struct yyguts_t *)yyscanner;
+void scanner_finish(yyscan_t *yyscanner) {
+	if (!yyscanner)
+		return;
+
+	yyscan_t scanner = *yyscanner;
+	if (!scanner)
+		return;
+
+	struct yyguts_t *yyg = (struct yyguts_t *)scanner;
 
 	ocrpt_mem_free(yyextra->scanbuf);
+	yyextra->scanbuf = NULL;
 	ocrpt_mem_free(yyextra->literalbuf);
-	yylex_destroy(yyscanner);
+	yyextra->literalbuf = NULL;
+	yylex_destroy(scanner);
+	*yyscanner = NULL;
 }
 
 void *yyalloc(yy_size_t size, yyscan_t yyscanner) {

@@ -69,7 +69,7 @@ typedef struct base_yy_extra_type {
 
 /* Entry points in ocrptpatterns.l */
 extern yyscan_t scanner_init(const char *str, core_yy_extra_type *yyext);
-extern void scanner_finish(yyscan_t yyscanner);
+extern void scanner_finish(yyscan_t *yyscanner);
 extern int yylex(YYSTYPE *yylval_param, YYLTYPE *yylloc_param, yyscan_t yyscanner);
 extern void yyset_lloc(YYLTYPE *  yylloc_param , yyscan_t yyscanner);
 YYSTYPE *yyget_lval(yyscan_t yyscanner);
