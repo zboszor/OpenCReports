@@ -398,22 +398,9 @@ xdinside		[^"]*
 
 %%
 
-/*
- * Arrange access to yyextra for subroutines of the main yylex() function.
- * We expect each subroutine to have a yyscanner parameter.  Rather than
- * use the yyget_xxx functions, which might or might not get inlined by the
- * compiler, we cheat just a bit and cast yyscanner to the right type.
- */
-#undef yyextra
-#define yyextra  (((struct yyguts_t *) yyscanner)->yyextra_r)
-
-/* Likewise for a couple of other things we need. */
-#undef yylloc
-#define yylloc  (((struct yyguts_t *) yyscanner)->yylloc_r)
-#undef yyleng
-#define yyleng  (((struct yyguts_t *) yyscanner)->yyleng_r)
-
 static void addlit(char *ytext, int yleng, yyscan_t yyscanner) {
+	struct yyguts_t *yyg = (struct yyguts_t *)yyscanner;
+
 	/* enlarge buffer if needed */
 	if ((yyextra->literallen + yleng) >= yyextra->literalalloc) {
 		do {
@@ -427,6 +414,8 @@ static void addlit(char *ytext, int yleng, yyscan_t yyscanner) {
 }
 
 static void addlitchar(unsigned char ychar, yyscan_t yyscanner) {
+	struct yyguts_t *yyg = (struct yyguts_t *)yyscanner;
+
 	/* enlarge buffer if needed */
 	if ((yyextra->literallen + 1) >= yyextra->literalalloc) {
 		yyextra->literalalloc *= 2;
@@ -441,6 +430,7 @@ static void addlitchar(unsigned char ychar, yyscan_t yyscanner) {
  * Create an ocrpt_mem_malloc'd copy of literalbuf, adding a trailing null.
  */
 static ocrpt_string *litbufdup(yyscan_t yyscanner) {
+	struct yyguts_t *yyg = (struct yyguts_t *)yyscanner;
 	int llen = yyextra->literallen;
 	ocrpt_string *new = ocrpt_mem_string_new_with_len(yyextra->literalbuf, llen);
 	return new;
@@ -458,6 +448,7 @@ static ocrpt_string *litbufdup(yyscan_t yyscanner) {
  * be misleading!
  */
 void scanner_yyerror(const char *message, yyscan_t yyscanner) {
+	struct yyguts_t *yyg = (struct yyguts_t *)yyscanner;
 	const char *loc = yyextra->scanbuf + *yylloc;
 	char *err = NULL;
 
@@ -519,6 +510,8 @@ yyscan_t scanner_init(const char *str, core_yy_extra_type *yyext) {
  * Called after parsing is done to clean up after scanner_init()
  */
 void scanner_finish(yyscan_t yyscanner) {
+	struct yyguts_t *yyg = (struct yyguts_t *)yyscanner;
+
 	ocrpt_mem_free(yyextra->scanbuf);
 	ocrpt_mem_free(yyextra->literalbuf);
 	yylex_destroy(yyscanner);
