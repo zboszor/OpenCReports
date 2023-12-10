@@ -24,13 +24,16 @@
  //%option nodefault
 %option case-insensitive
 %option noinput
+%option nounput
 %option noyywrap
+%option noyyalloc
+%option noyyrealloc
+%option noyyfree
 %option warn
 
 %{
 
 /* Suppress the defined-but-unused function warning  */
-#define YY_NO_UNPUT 1
 static void yynoreturn yy_fatal_error ( const char* msg , yyscan_t yyscanner ) __attribute__((unused));
 
 #define SET_YYLLOC()  (*(yylloc) = yytext - yyextra->scanbuf)
@@ -515,4 +518,28 @@ void scanner_finish(yyscan_t yyscanner) {
 	ocrpt_mem_free(yyextra->scanbuf);
 	ocrpt_mem_free(yyextra->literalbuf);
 	yylex_destroy(yyscanner);
+}
+
+void *yyalloc(yy_size_t size, yyscan_t yyscanner) {
+	struct yyguts_t *yyg = (struct yyguts_t *)yyscanner;
+
+	(void)yyg;
+
+	return ocrpt_mem_malloc(size);
+}
+
+void *yyrealloc(void *ptr, yy_size_t size, yyscan_t yyscanner) {
+	struct yyguts_t *yyg = (struct yyguts_t *)yyscanner;
+
+	(void)yyg;
+
+	return ocrpt_mem_realloc(ptr, size);
+}
+
+void yyfree(void *ptr, yyscan_t yyscanner) {
+	struct yyguts_t *yyg = (struct yyguts_t *)yyscanner;
+
+	(void)yyg;
+
+	ocrpt_mem_free(ptr);
 }
