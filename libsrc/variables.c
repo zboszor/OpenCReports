@@ -389,7 +389,7 @@ void ocrpt_variables_advance_precalculated_results(ocrpt_report *r, ocrpt_list *
 					if (var_br_triggered && var->precalc_rptr->next)
 						var->precalc_rptr = var->precalc_rptr->next;
 				}
-			} else {
+			} else if (var->precalc_results && !var->precalc_rptr) {
 				ocrpt_list *l1;
 				for (l1 = var->precalc_results; l1 && l1->next; l1 = l1->next)
 					;
