@@ -60,6 +60,19 @@ make
 sudo make install
 ```
 
+### Build OpenCReports PHP module
+
+OpenCReports contains a PHP module that supports PHP 7.0 or newer versions.
+It can be built after the OpenCReports engine is built and installed.
+
+```
+cd bindings/php
+phpize
+./configure
+make
+sudo make install
+```
+
 ## Run the unit tests
 
 Create a test database in both a locally running PostgreSQL server and
@@ -70,8 +83,9 @@ cat tests/mariadb/create.sql | mysql -u root mysql
 psql -f tests/postgresql/create.sql -U postgres postgres
 ```
 
-There are a lot of unit tests, so build them first, possibly with
-as many jobs as the number of CPUs in your system.
+There are a lot of unit tests for the engine itself also written in C,
+so build them first, possibly with as many jobs as the number of CPUs
+in your computer.
 
 ```
 make -j16 -C tests
@@ -96,10 +110,16 @@ There are some slow database tests:
 make -C tests slow-test
 ```
 
-This command runs all the tests:
+This command runs all the above in one go:
 
 ```
 make -C tests all-test
+```
+
+There are also PHP binding tests:
+
+```
+make -C tests php-test
 ```
 
 Author: Zoltán Böszörményi <zboszor@gmail.com>
