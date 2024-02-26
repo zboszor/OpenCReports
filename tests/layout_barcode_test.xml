@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Report>
+		<Detail>
+			<FieldHeaders>
+				<Output>
+					<Line>
+						<literal width="4" align="'right'">ID</literal>
+						<literal width="1" bgcolor="'red'"/>
+						<literal width="20">String</literal>
+						<literal width="1" bgcolor="'red'"/>
+						<literal width="20" align="'center'">Barcode</literal>
+						<literal width="1" bgcolor="'red'"/>
+					</Line>
+					<HorizontalLine color="'red'" />
+				</Output>
+			</FieldHeaders>
+
+			<FieldDetails>
+				<Output>
+					<Line>
+						<field width="4" align="right" value="id" />
+						<literal width="1" bgcolor="'red'"/>
+						<field width="20" value="bc" />
+						<literal width="1" bgcolor="'red'"/>
+						<Barcode width="20" value="bc" type="type" />
+						<literal width="1" bgcolor="'red'"/>
+					</Line>
+					<HorizontalLine color="'red'" />
+				</Output>
+			</FieldDetails>
+		</Detail>
+	</Report>
+</OpenCReport>

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <table>
+      <tr>
+        <td width="566.48">
+          <report>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">ID</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">String</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">Barcode</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789010</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="ean-13">123456789010</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789011</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="ean-13">123456789011</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789012</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="ean-13">123456789012</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789013</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="ean-13">123456789013</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">5</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789010A</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code39">123456789010A</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">6</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789011B</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code39">123456789011B</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">7</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789012C</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code39">123456789012C</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">8</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789013D</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code39">123456789013D</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">9</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789010Aa</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code128b">123456789010Aa</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">10</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789011Ba</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code128b">123456789011Ba</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">11</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789012Ca</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code128b">123456789012Ca</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">12</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789013Da</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code128b">123456789013Da</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">13</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789010</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code128c">123456789010</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">14</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789011</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code128c">123456789011</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">15</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789012</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code128c">123456789012</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">16</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789013</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code128c">123456789013</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">17</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789010Aa</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code128">123456789010Aa</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">18</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789011Ba</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code128">123456789011Ba</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">19</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789012Ca</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code128">123456789012Ca</barcode>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">20</data>
+                  <data width="144.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">123456789013Da</data>
+                  <barcode width="144.00" height="23.00" bgcolor="#ffffff" color="#000000" type="code128">123456789013Da</barcode>
+                </line>
+              </output>
+            </field_details>
+          </report>
+        </td>
+      </tr>
+    </table>
+  </part>
+</ocrpt>

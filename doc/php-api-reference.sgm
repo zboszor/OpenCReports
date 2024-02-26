@@ -2943,10 +2943,12 @@ OpenCReport\Output::set_suppress(
 			<para>
 				Add a (text) line to the output section.
 				A line may have children elements, like
-				<literal>OpenCReport\Text</literal> and
-				<literal>OpenCReport\Image</literal>.
-				(See <xref linkend="phptextclass"/> and <xref
-				linkend="phpimageclass"/>.)
+				<literal>OpenCReport\Text</literal>,
+				<literal>OpenCReport\Image</literal> and
+				<literal>OpenCReport\Barcode</literal>.
+				(See <xref linkend="phptextclass"/>, <xref
+				linkend="phpimageclass"/> and
+				<xref linkend="phpbarcodeclass"/>.)
 				For class methods of <literal>OpenCReport\Line</literal>,
 				see <xref linkend="phplineclass"/>.
 				<programlisting>public final
@@ -2971,12 +2973,28 @@ OpenCReport\Output::add_hline():
 			<para>
 				Add an image to the output section.
 				The image will indent every subsequent
-				elements in the section, except other images.
+				elements in the section, except other images
+				and barcodes (see below).
 				For class methods of <literal>OpenCReport\Image</literal>,
 				see <xref linkend="phplineclass"/>.
 				<programlisting>public final
 OpenCReport\Output::add_image():
                      ?OpenCReport\Image;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpoutputaddbarcode">
+			<title>Add a barcode</title>
+			<para>
+				Add a barcode to the output section.
+				The barcode behaves just like an image,
+				i.e. it will indent every subsequent
+				elements in the section, except other images
+				and barcodes.
+				For class methods of <literal>OpenCReport\Barcode</literal>,
+				see <xref linkend="phplineclass"/>.
+				<programlisting>public final
+OpenCReport\Output::add_barcode():
+                     ?OpenCReport\Barcode;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpoutputaddimageend">
@@ -3020,6 +3038,9 @@ OpenCReport\Output::add_image_end(): void;</programlisting>
 
     public final add_image():
                      ?OpenCReport\Image;
+
+    public final add_barcode():
+                     ?OpenCReport\Barcode;
 }</programlisting>
 		</para>
 		<sect2 id="phplinesetfontname">
@@ -3597,6 +3618,137 @@ OpenCReport\Text::set_memo_wrap_chars(
 				See <xref linkend="memorowlimit"/>
 				<programlisting>public final
 OpenCReport\Text::set_memo_max_lines(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="phpbarcodeclass">
+		<title>The OpenCReport\Barcode class</title>
+		<para>
+			<programlisting>class OpenCReport\Barcode {
+    public final set_value(
+                     ?string $expr_string = null): void;
+
+    public final set_value_delayed(
+                     ?string $expr_string = null): void;
+
+    public final set_type(
+                     ?string $expr_string = null): void;
+
+    public final set_width(
+                     ?string $expr_string = null): void;
+
+    public final set_height(
+                     ?string $expr_string = null): void;
+
+    public final set_color(
+                     ?string $expr_string = null): void;
+
+    public final set_bgcolor(
+                     ?string $expr_string = null): void;
+}</programlisting>
+		</para>
+		<sect2 id="phpbarcodesetvalue">
+			<title>Set the barcode value</title>
+			<para>
+				Set the barcode's value from
+				an expression string. The expression
+				must evaluate to a string, whose
+				value is the string to be encoded
+				as a barcode.
+				<programlisting>public final
+OpenCReport\Barcode::set_value(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpbarcodesetvaluedelayed">
+			<title>Set the barcode value delayed</title>
+			<para>
+				Set the barcode's value delayed from
+				an expression string. The expression
+				must evaluate to a boolean value.
+				<programlisting>public final
+OpenCReport\Barcode::set_value_delayed(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpbarcodesettype">
+			<title>Set the barcode type</title>
+			<para>
+				Set the barcode type.
+				<programlisting>public final
+OpenCReport\Barcode::set_type(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+			<para>
+				The type may be optional, in which
+				case it's autodetected and the barcode
+				is rendered in the format that first
+				allows the <literal>value</literal> string
+				to be rendered. Possible types (in the order of
+				autodetection) are:
+				<literal>upc-a</literal>,
+				<literal>ean-13</literal>,
+				<literal>upc-e</literal>,
+				<literal>ean-8</literal>,
+				<literal>isbn</literal>,
+				<literal>code39</literal>,
+				<literal>code39ext</literal>,
+				<literal>code128b</literal>,
+				<literal>code128c</literal>, or
+				<literal>code128</literal>.
+				If <literal>type</literal> is specified,
+				the <literal>value</literal> is
+				rendered in that barcode type if
+				the string is valid for the type.
+				If <literal>value</literal> is invalid
+				for the specified <literal>type</literal>,
+				or autodetection fails, because the
+				<literal>value</literal> is invalid
+				for any of the above listed types,
+				the barcode is not rendered.
+			</para>
+		</sect2>
+		<sect2 id="phpbarcodesetwidth">
+			<title>Set the barcode width</title>
+			<para>
+				Set the barcode image width.
+				<programlisting>public final
+OpenCReport\Barcode::set_width(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+			<para>
+				The width is set according to
+				<xref linkend="sizeunit"/>,
+				either in points (1/72th inch) or
+				in (monospace) font width units
+				set by <literal>&lt;Line&gt;</literal>.
+			</para>
+		</sect2>
+		<sect2 id="phpbarcodesetheight">
+			<title>Set the barcode height</title>
+			<para>
+				Set the barcode image height.
+				<programlisting>public final
+OpenCReport\Barcode::set_height(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpbarcodesetcolor">
+			<title>Set the barcode image line color</title>
+			<para>
+				Set the barcode image line color.
+				<programlisting>public final
+OpenCReport\Barcode::set_color(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpbarcodesetbgcolor">
+			<title>Set the barcode image background color</title>
+			<para>
+				Set the barcode image background color.
+				<programlisting>public final
+OpenCReport\Barcode::set_bgcolor(
                      ?string $expr_string = null): void;</programlisting>
 			</para>
 		</sect2>

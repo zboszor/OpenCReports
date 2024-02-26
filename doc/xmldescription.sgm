@@ -2779,6 +2779,16 @@ report_height_after_last="no"</programlisting>
 &lt;/Output</programlisting>
 				</para>
 			</sect3>
+			<sect3 id="outpbarcode">
+				<title>Barcode</title>
+				<para>
+					A barcode.
+					See <xref linkend="barcodenode"/>.
+					<programlisting>&lt;Output&gt;
+    &lt;Barcode ... /&gt;
+&lt;/Output</programlisting>
+				</para>
+			</sect3>
 			<sect3 id="outpimgend">
 				<title>Image end</title>
 				<para>
@@ -2942,6 +2952,19 @@ report_height_after_last="no"</programlisting>
 				</para>
 				<para>
 					See the <xref linkend="imagenode"/> below.
+				</para>
+			</sect3>
+			<sect3 id="linebarcode">
+				<title>Barcode element</title>
+				<para>
+					A <literal>&lt;Barcode&gt;</literal> is accepted
+					as a line element.
+					<programlisting>&lt;Line&gt;
+    &lt;Barcode value="expression..." ... /&gt;
+&lt;/Line&gt;</programlisting>
+				</para>
+				<para>
+					See the <xref linkend="barcodenode"/> below.
 				</para>
 			</sect3>
 		</sect2>
@@ -3660,6 +3683,191 @@ report_height_after_last="no"</programlisting>
     &lt;ImageEnd/&gt;
 &lt;/Output</programlisting>
 		</para>
+	</sect1>
+	<sect1 id="barcodenode" xreflabel="Barcode node">
+		<title>Barcode element</title>
+		<para>
+			This line or output element renders a barcode in various formats.
+			<programlisting>&lt;Line&gt;
+    &lt;Barcode value="expression..." ... /&gt;
+&lt;/Line&gt;</programlisting>
+		</para>
+		<para>
+			The <literal>Barcode</literal> does not have child nodes,
+			only attributes.
+		</para>
+		<sect2 id="barcodeatts">
+			<title>Barcode element attributes</title>
+			<sect3 id="bcvalueattr" xreflabel="Barcode string value">
+				<title>Value</title>
+				<para>
+					The string value to be encoded as barcode.
+					<programlisting>&lt;Line&gt;
+    &lt;Barcode value="'1234567890128'" /&gt;
+&lt;/Line&gt;</programlisting>
+				</para>
+				<para>
+					The value is parsed as an expression
+					from the <literal>value</literal> attribute.
+					See <xref linkend="expressions"/>.
+				</para>
+			</sect3>
+			<sect3 id="barcodedelayed">
+				<title>Delayed (precalculated) value</title>
+				<para>
+					This setting indicates whether the value is
+					"precalculated", i.e. the value for the last
+					row in the data set is used, or it would be
+					the actual value for the current row in the
+					data set.
+					<programlisting>&lt;Barcode delayed="yes" /&gt;
+&lt;Barcode precalculate="yes" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>false</literal>.
+				</para>
+				<para>
+					This setting is only applicable for
+					line elements in the
+					<xref linkend="outputnode"/> node in
+					<literal>&lt;ReportHeader&gt;</literal>,
+					<literal>&lt;ReportFooter&gt;</literal>,
+					<literal>&lt;Fieldheaders&gt;</literal>
+					<literal>&lt;FieldDetails&gt;</literal>,
+					since they are the ones under the
+					<literal>&lt;Report&gt;</literal> scope
+					with a query.
+				</para>
+			</sect3>
+			<sect3 id="barcodetypeattr" xreflabel="Barcode type attribute">
+				<title>Barcode type</title>
+				<para>
+					The format string is used to format the
+					<literal>value</literal> to be displayed
+					in the generated output. For example, to
+					print a number with two decimal places:
+					<programlisting>&lt;Barcode value="'123456789012'" type="'ean-13'" /&gt;</programlisting>
+				</para>
+				<para>
+					The type may be optional, in which
+					case it's autodetected and the barcode
+					is rendered in the format that first
+					allows the <literal>value</literal> string
+					to be rendered. Possible types (in the order of
+					autodetection) are:
+					<literal>upc-a</literal>,
+					<literal>ean-13</literal>,
+					<literal>upc-e</literal>,
+					<literal>ean-8</literal>,
+					<literal>isbn</literal>,
+					<literal>code39</literal>,
+					<literal>code39ext</literal>,
+					<literal>code128b</literal>,
+					<literal>code128c</literal>, or
+					<literal>code128</literal>.
+					If <literal>type</literal> is specified,
+					the <literal>value</literal> is
+					rendered in that barcode type if
+					the string is valid for the type.
+					If the <literal>value</literal> is invalid
+					for the specified <literal>type</literal>,
+					or autodetection fails, because the
+					<literal>value</literal> is invalid
+					for any of the above listed types,
+					the barcode is not rendered.
+				</para>
+			</sect3>
+			<sect3 id="barcodewidth" xreflabel="Barcode element width">
+				<title>Width</title>
+				<para>
+					The field width.
+					<programlisting>&lt;Barcode value="'...'" width="6" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is unset, i.e. the field width
+					is implicitly set to the rendered width (in points)
+					of the barcode's inherent encoding width.
+				</para>
+				<para>
+					If set, the barcode is scaled to the specified width.
+					Its unit depends on the <xref linkend="sizeunit"/>.
+				</para>
+				<para>
+					When the field is the last one in the
+					<literal>&lt;Line&gt;</literal> and its width
+					is unset, then depending on the remaining width
+					of the line, the barcode is either rendered as is,
+					or it's scaled to the remaining width.
+				</para>
+				<para>
+					When the <xref linkend="sizeunit"/> is set to
+					<literal>rlib</literal>, the field width is measured
+					in number of characters that is set for the
+					<literal>&lt;Line&gt;</literal>.
+				</para>
+			</sect3>
+			<sect3 id="barcodeheight" xreflabel="Barcode element height">
+				<title>Height</title>
+				<para>
+					The field height.
+					<programlisting>&lt;Barcode value="'...'" height="6" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is unset, i.e. the barcode height
+					is implicitly controlled by the text in the line
+					or the font height set for the line.
+				</para>
+				<para>
+					If set, and it's larger than the text in the line,
+					the barcode height controls the line height, with
+					empty space added before and after the text elements
+					vertically. is scaled to the specified width.
+					Its unit depends on the <xref linkend="sizeunit"/>.
+				</para>
+				<para>
+					When the field is the last one in the
+					<literal>&lt;Line&gt;</literal> and its width
+					is unset, then depending on the remaining width
+					of the line, the barcode is either rendered as is
+					(if the remaining width is larger), or it's
+					scaled down to the remaining width.
+				</para>
+				<para>
+					When the <xref linkend="sizeunit"/> is set to
+					<literal>rlib</literal>, the field width is measured
+					in number of characters that is set for the
+					<literal>&lt;Line&gt;</literal>.
+				</para>
+			</sect3>
+			<sect3 id="barcodecolor">
+				<title>Barcode color</title>
+				<para>
+					This color is used to render the barcode's bars.
+					It's accepted with both American and  British spelling.
+					<programlisting>&lt;Barcode color="'blue'"&gt;
+&lt;Barcode colour="'blue'"&gt;</programlisting>
+				</para>
+				<para>
+					Default is what's set for <xref linkend="linenode"/>,
+					otherwise <literal>black</literal>.
+					See <xref linkend="colorspec"/>.
+				</para>
+			</sect3>
+			<sect3 id="barcodebgcolor">
+				<title>Barcode background color</title>
+				<para>
+					This color is used to render the background
+					(the "gaps") in the barcode. It's accepted
+					with both American and  British spelling.
+					<programlisting>&lt;Barcode bgcolor="'blue'"&gt;
+&lt;Barcode bgcolour="'blue'"&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>white</literal>.
+					See <xref linkend="colorspec"/>.
+				</para>
+			</sect3>
+		</sect2>
 	</sect1>
 	<sect1 id="colorspec" xreflabel="Color specification">
 		<title>Color specification</title>

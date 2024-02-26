@@ -53,6 +53,9 @@ typedef struct ocrpt_hline ocrpt_hline;
 struct ocrpt_image;
 typedef struct ocrpt_image ocrpt_image;
 
+struct ocrpt_barcode;
+typedef struct ocrpt_barcode ocrpt_barcode;
+
 struct ocrpt_paper {
 	const char *name;
 	double width;
@@ -957,6 +960,17 @@ void ocrpt_image_set_height(ocrpt_image *image, const char *expr_string);
 void ocrpt_image_set_alignment(ocrpt_image *image, const char *expr_string);
 void ocrpt_image_set_bgcolor(ocrpt_image *image, const char *expr_string);
 void ocrpt_image_set_text_width(ocrpt_image *image, const char *expr_string);
+
+ocrpt_barcode *ocrpt_output_add_barcode(ocrpt_output *output);
+ocrpt_barcode *ocrpt_line_add_barcode(ocrpt_line *line);
+
+void ocrpt_barcode_set_value(ocrpt_barcode *bc, const char *expr_string);
+void ocrpt_barcode_set_value_delayed(ocrpt_barcode *bc, const char *expr_string);
+void ocrpt_barcode_set_type(ocrpt_barcode *bc, const char *expr_string);
+void ocrpt_barcode_set_width(ocrpt_barcode *bc, const char *expr_string);
+void ocrpt_barcode_set_height(ocrpt_barcode *bc, const char *expr_string);
+void ocrpt_barcode_set_color(ocrpt_barcode *bc, const char *expr_string);
+void ocrpt_barcode_set_bgcolor(ocrpt_barcode *bc, const char *expr_string);
 
 void ocrpt_output_add_image_end(ocrpt_output *output);
 

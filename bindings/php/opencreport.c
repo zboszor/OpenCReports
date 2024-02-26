@@ -62,6 +62,7 @@ static zend_object_handlers opencreport_line_object_handlers;
 static zend_object_handlers opencreport_hline_object_handlers;
 static zend_object_handlers opencreport_image_object_handlers;
 static zend_object_handlers opencreport_text_object_handlers;
+static zend_object_handlers opencreport_barcode_object_handlers;
 
 /* Class entries */
 zend_class_entry *opencreport_ce;
@@ -81,6 +82,7 @@ zend_class_entry *opencreport_line_ce;
 zend_class_entry *opencreport_hline_ce;
 zend_class_entry *opencreport_image_ce;
 zend_class_entry *opencreport_text_ce;
+zend_class_entry *opencreport_barcode_ce;
 
 static zend_object *opencreport_object_new(zend_class_entry *class_type) /* {{{ */
 {
@@ -381,6 +383,21 @@ static zend_object *opencreport_text_object_new(zend_class_entry *class_type) /*
 	object_properties_init(&intern->zo, class_type);
 
 	intern->zo.handlers = &opencreport_text_object_handlers;
+
+	return &intern->zo;
+}
+/* }}} */
+
+static zend_object *opencreport_barcode_object_new(zend_class_entry *class_type) /* {{{ */
+{
+	php_opencreport_barcode_object *intern;
+
+	intern = zend_object_alloc(sizeof(php_opencreport_barcode_object), class_type);
+
+	zend_object_std_init(&intern->zo, class_type);
+	object_properties_init(&intern->zo, class_type);
+
+	intern->zo.handlers = &opencreport_barcode_object_handlers;
 
 	return &intern->zo;
 }
@@ -4431,6 +4448,23 @@ PHP_METHOD(opencreport_output, add_image_end) {
 	ocrpt_output_add_image_end(oo->output);
 }
 
+PHP_METHOD(opencreport_output, add_barcode) {
+	zval *object = ZEND_THIS;
+	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
+	ocrpt_barcode *bc;
+	php_opencreport_barcode_object *bco;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	bc = ocrpt_output_add_barcode(oo->output);
+	if (!bc)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_barcode_ce);
+	bco = Z_OPENCREPORT_BARCODE_P(return_value);
+	bco->bc = bc;
+}
+
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_output_set_suppress, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
@@ -4574,6 +4608,23 @@ PHP_METHOD(opencreport_line, add_image) {
 	imo->image = im;
 }
 
+PHP_METHOD(opencreport_line, add_barcode) {
+	zval *object = ZEND_THIS;
+	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+	ocrpt_barcode *bc;
+	php_opencreport_barcode_object *bco;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	bc = ocrpt_line_add_barcode(lo->line);
+	if (!bc)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_barcode_ce);
+	bco = Z_OPENCREPORT_BARCODE_P(return_value);
+	bco->bc = bc;
+}
+
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_font_name, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
@@ -4608,6 +4659,9 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_line_add_image, 0, 0, OpenCReport\\Image, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_line_add_barcode, 0, 0, OpenCReport\\Barcode, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry opencreport_line_class_methods[] = {
 	PHP_ME(opencreport_line, set_font_name, arginfo_opencreport_line_set_font_name, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_line, set_font_size, arginfo_opencreport_line_set_font_size, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -4618,6 +4672,7 @@ static const zend_function_entry opencreport_line_class_methods[] = {
 	PHP_ME(opencreport_line, set_bgcolor, arginfo_opencreport_line_set_bgcolor, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_line, add_text, arginfo_opencreport_line_add_text, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_line, add_image, arginfo_opencreport_line_add_image, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_line, add_barcode, arginfo_opencreport_line_add_barcode, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 
@@ -5157,6 +5212,129 @@ static const zend_function_entry opencreport_text_class_methods[] = {
 	PHP_ME(opencreport_text, set_memo, arginfo_opencreport_text_set_memo, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_text, set_memo_wrap_chars, arginfo_opencreport_text_set_memo_wrap_chars, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_text, set_memo_max_lines, arginfo_opencreport_text_set_memo_max_lines, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_FE_END
+};
+
+PHP_METHOD(opencreport_barcode, set_value) {
+	zval *object = ZEND_THIS;
+	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_barcode_set_value(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_barcode, set_value_delayed) {
+	zval *object = ZEND_THIS;
+	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_barcode_set_value_delayed(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_barcode, set_type) {
+	zval *object = ZEND_THIS;
+	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_barcode_set_type(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_barcode, set_width) {
+	zval *object = ZEND_THIS;
+	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_barcode_set_width(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_barcode, set_height) {
+	zval *object = ZEND_THIS;
+	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_barcode_set_height(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_barcode, set_color) {
+	zval *object = ZEND_THIS;
+	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_barcode_set_color(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+PHP_METHOD(opencreport_barcode, set_bgcolor) {
+	zval *object = ZEND_THIS;
+	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_barcode_set_bgcolor(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_value, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_value_delayed, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_type, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_width, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_height, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_color, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_bgcolor, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+static const zend_function_entry opencreport_barcode_class_methods[] = {
+	PHP_ME(opencreport_barcode, set_value, arginfo_opencreport_barcode_set_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_barcode, set_value_delayed, arginfo_opencreport_barcode_set_value_delayed, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_barcode, set_type, arginfo_opencreport_barcode_set_type, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_barcode, set_width, arginfo_opencreport_barcode_set_width, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_barcode, set_height, arginfo_opencreport_barcode_set_height, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_barcode, set_color, arginfo_opencreport_barcode_set_color, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_barcode, set_bgcolor, arginfo_opencreport_barcode_set_bgcolor, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 
@@ -5815,6 +5993,21 @@ static PHP_MINIT_FUNCTION(opencreport)
 #else
 	opencreport_text_ce->serialize = zend_class_serialize_deny;
 	opencreport_text_ce->unserialize = zend_class_unserialize_deny;
+#endif
+
+	memcpy(&opencreport_barcode_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Barcode", opencreport_barcode_class_methods);
+	ce.create_object = opencreport_barcode_object_new;
+	opencreport_barcode_object_handlers.offset = XtOffsetOf(php_opencreport_barcode_object, zo);
+	opencreport_barcode_object_handlers.clone_obj = NULL;
+	opencreport_barcode_object_handlers.compare = zend_objects_not_comparable;
+	opencreport_barcode_ce = zend_register_internal_class(&ce);
+	opencreport_barcode_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	opencreport_barcode_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
+	opencreport_barcode_ce->serialize = zend_class_serialize_deny;
+	opencreport_barcode_ce->unserialize = zend_class_unserialize_deny;
 #endif
 
 	REGISTER_OPENCREPORT_CLASS_CONST_LONG("EXPR_RESULTS", OCRPT_EXPR_RESULTS);

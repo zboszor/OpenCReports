@@ -23,7 +23,8 @@ enum ocrpt_output_type {
 	OCRPT_OUTPUT_LINE,
 	OCRPT_OUTPUT_HLINE,
 	OCRPT_OUTPUT_IMAGE,
-	OCRPT_OUTPUT_IMAGEEND
+	OCRPT_OUTPUT_IMAGEEND,
+	OCRPT_OUTPUT_BARCODE
 };
 typedef enum ocrpt_output_type ocrpt_output_type;
 
@@ -33,6 +34,11 @@ enum ocrpt_output_line_element_type {
 	OCRPT_OUTPUT_LE_BARCODE
 };
 typedef enum ocrpt_output_line_element_type ocrpt_output_line_element_type;
+
+struct ocrpt_line_element {
+	ocrpt_output_line_element_type le_type;
+};
+typedef struct ocrpt_line_element ocrpt_line_element;
 
 struct ocrpt_text {
 	ocrpt_output_line_element_type le_type;
@@ -154,6 +160,30 @@ struct ocrpt_image {
 	ocrpt_expr *bgcolor;
 	ocrpt_expr *text_width;
 	ocrpt_image_file *img_file;
+};
+
+struct ocrpt_barcode {
+	union {
+		ocrpt_output_type type;
+		ocrpt_output_line_element_type le_type;
+	};
+	double start;
+	double vertical_gap;
+	double barcode_width;
+	double barcode_height;
+	ocrpt_color colorval;
+	ocrpt_color bgcolorval;
+	ocrpt_output *output;
+	ocrpt_expr *value; /* string to encode into barcode */
+	ocrpt_expr *delayed;
+	ocrpt_expr *bctype; /* 'upc-a', 'upc-e', 'ean-13', 'ean-8', 'code39', 'code128b', 'code128c', 'code128' */
+	ocrpt_expr *width;
+	ocrpt_expr *height;
+	ocrpt_expr *color;
+	ocrpt_expr *bgcolor;
+	ocrpt_string *encoded;
+	ocrpt_string *priv;
+	size_t encoded_width;
 };
 
 struct ocrpt_output_element {

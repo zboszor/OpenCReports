@@ -207,7 +207,9 @@ LAYOUT_TESTS = \
 	layout_follower_test53_test \
 	layout_follower_test63_test \
 	layout_follower_recursive_n_1_test \
-	layout_follower_recursive_n_1_match_single_test
+	layout_follower_recursive_n_1_match_single_test \
+	layout_barcode1_test \
+	layout_barcode1_code_test
 
 LAYOUT_CSV_TESTS = \
 	layout_xml17_csv1_test \
@@ -261,7 +263,9 @@ PHP_LAYOUT_TESTS = \
 	layout_xml40_test \
 	layout_xml41_test \
 	layout_code41_test \
-	layout_xml42_test
+	layout_xml42_test \
+	layout_barcode1_test \
+	layout_barcode1_code_test
 
 if ENABLE_XLATE_TESTS
 

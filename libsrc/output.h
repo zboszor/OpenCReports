@@ -45,6 +45,7 @@ struct ocrpt_output_functions {
 	void (*get_text_sizes)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_output *, ocrpt_line *, ocrpt_text *, bool, double);
 	void (*draw_text)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_break *, ocrpt_output *, ocrpt_line *, ocrpt_text *, bool, double, double, double);
 	void (*draw_image)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_break *, ocrpt_output *, ocrpt_line *, ocrpt_image *, bool, double, double, double, double, double, double);
+	void (*draw_barcode)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_break *, ocrpt_output *, ocrpt_line *, ocrpt_barcode *, bool, double, double, double, double, double, double);
 	void (*draw_imageend)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_break *, ocrpt_output *);
 	void (*draw_rectangle)(opencreport *, ocrpt_part *, ocrpt_part_row *, ocrpt_part_column *, ocrpt_report *, ocrpt_color *, double, double, double, double, double);
 	void (*finalize)(opencreport *o);

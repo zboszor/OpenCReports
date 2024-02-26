@@ -34,6 +34,7 @@
 extern char cwdpath[PATH_MAX];
 
 static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, xmlTextReaderPtr reader);
+static void ocrpt_parse_output_barcode_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, xmlTextReaderPtr reader);
 
 static void processNode(xmlTextReaderPtr reader) __attribute__((unused));
 static void processNode(xmlTextReaderPtr reader) {
@@ -651,6 +652,8 @@ static void ocrpt_parse_output_line_node(opencreport *o, ocrpt_report *r, ocrpt_
 				ocrpt_parse_output_line_element_node(o, r, line, true, reader);
 			else if (!strcmp((char *)name, "Image"))
 				ocrpt_parse_output_image_node(o, r, output, line, reader);
+			else if (!strcmp((char *)name, "Barcode"))
+				ocrpt_parse_output_barcode_node(o, r, output, line, reader);
 		}
 
 		xmlFree(name);
@@ -748,6 +751,51 @@ static void ocrpt_parse_output_imageend_node(opencreport *o, ocrpt_report *r, oc
 	ocrpt_ignore_child_nodes(o, reader, -1, "ImageEnd");
 }
 
+static void ocrpt_parse_output_barcode_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, xmlTextReaderPtr reader) {
+	ocrpt_barcode *bc;
+	xmlChar *value, *delayed, *type, *width, *height, *color, *bgcolor;
+	struct {
+		char *attrs[3];
+		xmlChar **attrp;
+	} xmlattrs[] = {
+		{ { "value" }, &value },
+		{ { "delayed", "precalculate" }, &delayed },
+		{ { "type" }, &type },
+		{ { "width" }, &width },
+		{ { "height" }, &height },
+		{ { "color" }, &color },
+		{ { "bgcolor" }, &bgcolor },
+		{ { NULL }, NULL },
+	};
+	int32_t i, j;
+
+	for (i = 0; xmlattrs[i].attrp; i++) {
+		for (j = 0; xmlattrs[i].attrs[j]; j++) {
+			*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs[j]);
+			if (*xmlattrs[i].attrp)
+				break;
+		}
+	}
+
+	if (line)
+		bc = ocrpt_line_add_barcode(line);
+	else
+		bc = ocrpt_output_add_barcode(output);
+
+	ocrpt_barcode_set_value(bc, (char *)value);
+	ocrpt_barcode_set_value_delayed(bc, (char *)delayed);
+	ocrpt_barcode_set_type(bc, (char *)type);
+	ocrpt_barcode_set_width(bc, (char *)width);
+	ocrpt_barcode_set_height(bc, (char *)height);
+	ocrpt_barcode_set_color(bc, (char *)color);
+	ocrpt_barcode_set_bgcolor(bc, (char *)bgcolor);
+
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
+
+	ocrpt_ignore_child_nodes(o, reader, -1, "Barcode");
+}
+
 static void ocrpt_parse_output_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
 	xmlChar *suppress;
 	struct {
@@ -792,6 +840,8 @@ static void ocrpt_parse_output_node(opencreport *o, ocrpt_report *r, ocrpt_outpu
 				ocrpt_parse_output_image_node(o, r, output, NULL, reader);
 			else if (!strcmp((char *)name, "ImageEnd"))
 				ocrpt_parse_output_imageend_node(o, r, output, reader);
+			else if (!strcmp((char *)name, "Barcode"))
+				ocrpt_parse_output_barcode_node(o, r, output, NULL, reader);
 		}
 
 		xmlFree(name);

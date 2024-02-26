@@ -6,6 +6,7 @@
 
 #include <config.h>
 
+#include <ctype.h>
 #include <cairo.h>
 #include <cairo-pdf.h>
 #include <cairo-svg.h>
@@ -18,6 +19,7 @@
 #include "exprutil.h"
 #include "layout.h"
 #include "parts.h"
+#include "barcode.h"
 #include "pdf-output.h"
 
 static cairo_surface_t *ocrpt_pdf_new_page(opencreport *o, const ocrpt_paper *paper, bool landscape) {
@@ -125,6 +127,92 @@ static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 		}
 
 		cairo_paint(priv->cr);
+
+		cairo_restore(priv->cr);
+	}
+
+	cairo_restore(priv->cr);
+}
+
+static void ocrpt_pdf_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_barcode *bc, bool last, double page_width, double page_indent, double x, double y, double w, double h) {
+	if (bc->barcode_width == 0.0)
+		return;
+
+	pdf_private_data *priv = o->output_private;
+
+	ocrpt_cairo_create(o);
+
+	cairo_save(priv->cr);
+
+	if (pd && (page_indent + pd->column_width < x + w)) {
+		cairo_rectangle(priv->cr, x, y, x + w - page_indent - pd->column_width, h);
+		cairo_clip(priv->cr);
+	}
+
+	cairo_save(priv->cr);
+
+	ocrpt_color bg, fg;
+
+	char *color_name = NULL;
+	if (bc->color && bc->color->result[o->residx] && bc->color->result[o->residx]->type == OCRPT_RESULT_STRING && bc->color->result[o->residx]->string)
+		color_name = bc->color->result[o->residx]->string->str;
+
+	ocrpt_get_color(color_name, &fg, false);
+
+	if (bc->encoded_width > 0) {
+		color_name = NULL;
+		if (bc->bgcolor && bc->bgcolor->result[o->residx] && bc->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && bc->bgcolor->result[o->residx]->string)
+			color_name = bc->bgcolor->result[o->residx]->string->str;
+
+		ocrpt_get_color(color_name, &bg, true);
+	}
+
+	/*
+	 * The background filler is 0.2 points wider.
+	 * This way, there's no lines between the line elements or lines.
+	 */
+	cairo_set_source_rgb(priv->cr, bg.r, bg.g, bg.b);
+	cairo_set_line_width(priv->cr, 0.0);
+	cairo_rectangle(priv->cr, x, y, w + (last ? 0.0 : 0.2), h + 0.2);
+	cairo_fill(priv->cr);
+
+	cairo_restore(priv->cr);
+
+	if (bc->encoded_width > 0 && (!line || !line->current_line)) {
+		cairo_save(priv->cr);
+
+		int32_t first_space = bc->encoded->str[0] - '0';
+
+		if (!line) {
+			cairo_translate(priv->cr, x, y);
+			cairo_scale(priv->cr, w / ((bc->encoded_width - first_space) + 20.0), h / bc->barcode_height);
+		} else {
+			double w1 = h * bc->barcode_width / bc->barcode_height;
+
+			cairo_translate(priv->cr, x, y);
+			cairo_scale(priv->cr, w1 / ((bc->encoded_width - first_space) + 20.0), h / bc->barcode_height);
+		}
+
+		int32_t pos = 10;
+
+		for (int32_t bar = 1; bar < bc->encoded->len; bar++) {
+			char e = bc->encoded->str[bar];
+
+			/* special cases, ignore */
+			if (e == '+' || e == '-')
+				continue;
+
+			int32_t width = isdigit(e) ? width = e - '0' : e - 'a' + 1;
+
+			if (bar % 2) {
+				cairo_set_source_rgb(priv->cr, fg.r, fg.g, fg.b);
+				cairo_set_line_width(priv->cr, 0.0);
+				cairo_rectangle(priv->cr, pos, 0.0, (double)width - INK_SPREADING_TOLERANCE, bc->barcode_height);
+				cairo_fill(priv->cr);
+			}
+
+			pos += width;
+		}
 
 		cairo_restore(priv->cr);
 	}
@@ -352,6 +440,7 @@ void ocrpt_pdf_init(opencreport *o) {
 	o->output_functions.get_text_sizes = ocrpt_common_get_text_sizes;
 	o->output_functions.draw_text = ocrpt_pdf_draw_text;
 	o->output_functions.draw_image = ocrpt_pdf_draw_image;
+	o->output_functions.draw_barcode = ocrpt_pdf_draw_barcode;
 	o->output_functions.draw_rectangle = ocrpt_pdf_draw_rectangle;
 	o->output_functions.finalize = ocrpt_pdf_finalize;
 	o->output_functions.supports_page_break = true;

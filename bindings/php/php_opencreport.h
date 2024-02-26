@@ -224,4 +224,15 @@ static inline php_opencreport_text_object *php_opencreport_text_from_obj(zend_ob
 
 #define Z_OPENCREPORT_TEXT_P(zv) php_opencreport_text_from_obj(Z_OBJ_P((zv)))
 
+typedef struct _php_opencreport_barcode_object {
+	ocrpt_barcode *bc;
+	zend_object zo;
+} php_opencreport_barcode_object;
+
+static inline php_opencreport_barcode_object *php_opencreport_barcode_from_obj(zend_object *obj) {
+	return (php_opencreport_barcode_object *)((char *)(obj) - XtOffsetOf(php_opencreport_barcode_object, zo));
+}
+
+#define Z_OPENCREPORT_BARCODE_P(zv) php_opencreport_barcode_from_obj(Z_OBJ_P((zv)))
+
 #endif /* PHP_OPENCREPORT_H */

@@ -43,7 +43,7 @@ libopencreport_la_SOURCES = \
 	parts.c variables.c strfmon.c datetime.c formatting.c \
 	layout.c color.c common-output.c pdf-output.c \
 	html-output.c txt-output.c xml-output.c csv-output.c \
-	json-output.c
+	json-output.c barcode.c
 
 libopencreport_la_LIBADD = \
 	libopencreport_grammar.la \

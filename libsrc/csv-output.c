@@ -79,6 +79,38 @@ static void ocrpt_csv_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	priv->column_index++;
 }
 
+static void ocrpt_csv_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_barcode *bc, bool last, double page_width, double page_indent, double x, double y, double w, double h) {
+	csv_private_data *priv = o->output_private;
+
+	if (!line)
+		return;
+
+	if (priv->column_index)
+		ocrpt_mem_string_append(o->output_buffer, o->csv_delimiter ? o->csv_delimiter : ",");
+
+	if (bc->value) {
+		if (o->no_quotes) {
+			if (bc->value->result[o->residx] && (bc->value->result[o->residx]->type == OCRPT_RESULT_STRING || bc->value->result[o->residx]->type == OCRPT_RESULT_ERROR))
+				ocrpt_mem_string_append_len(o->output_buffer, bc->value->result[o->residx]->string->str, bc->value->result[o->residx]->string->len);
+		} else if (o->only_quote_strings) {
+			/*
+			 * The field has a value set.
+			 * Quote it if it's a string or string-like value.
+			 */
+			if (bc->value->result[o->residx] && (bc->value->result[o->residx]->type == OCRPT_RESULT_STRING || bc->value->result[o->residx]->type == OCRPT_RESULT_ERROR)) {
+				size_t len = csv_write(priv->base.data->str, priv->base.data->allocated_len, bc->value->result[o->residx]->string->str, bc->value->result[o->residx]->string->len);
+				ocrpt_mem_string_append_len(o->output_buffer, priv->base.data->str, len);
+			} else
+				ocrpt_mem_string_append_len(o->output_buffer, bc->value->result[o->residx]->string->str, bc->value->result[o->residx]->string->len);
+		} else {
+			size_t len = csv_write(priv->base.data->str, priv->base.data->allocated_len, bc->value->result[o->residx]->string->str, bc->value->result[o->residx]->string->len);
+			ocrpt_mem_string_append_len(o->output_buffer, priv->base.data->str, len);
+		}
+	}
+
+	priv->column_index++;
+}
+
 static void ocrpt_csv_finalize(opencreport *o) {
 	ocrpt_common_finalize(o);
 
@@ -95,6 +127,7 @@ void ocrpt_csv_init(opencreport *o) {
 	o->output_functions.start_data_row = ocrpt_csv_start_data_row;
 	o->output_functions.end_data_row = ocrpt_csv_end_data_row;
 	o->output_functions.draw_image = ocrpt_csv_draw_image;
+	o->output_functions.draw_barcode = ocrpt_csv_draw_barcode;
 	o->output_functions.draw_text = ocrpt_csv_draw_text;
 	o->output_functions.finalize = ocrpt_csv_finalize;
 }

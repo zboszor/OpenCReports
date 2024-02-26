@@ -11,7 +11,7 @@ reimplementation and licensed under LGPLv3.
 
 ## Roadmap
 
-* 0.9: Graph / Chart / Barcode in PDF (full feature parity with RLIB, with many extras)
+* 0.9: Graph and Chart support in PDF (full feature parity with RLIB, with many extras)
 * 1.0: GUI to create either code or XML
 * 1.1: Possibly port the reporting library part to Windows and Android, GUI to Windows
 

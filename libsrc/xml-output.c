@@ -293,6 +293,55 @@ static void ocrpt_xml_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	}
 }
 
+static void ocrpt_xml_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_barcode *bc, bool last, double page_width, double page_indent, double x, double y, double w, double h) {
+	xml_private_data *priv = o->output_private;
+
+	xmlNodePtr outn = ocrpt_xml_get_current_output(priv, p, r, br, output);
+
+	if (outn) {
+		xmlNodePtr barc;
+
+		if (bc->value && bc->value->result[o->residx] && bc->value->result[o->residx]->type == OCRPT_RESULT_STRING)
+			barc = xmlNewTextChild(priv->line, NULL, BAD_CAST "barcode", BAD_CAST bc->value->result[o->residx]->string->str);
+		else
+			barc = xmlNewDocNode(priv->doc, NULL, BAD_CAST "barcode", NULL);
+
+		if (line)
+			xmlAddChild(priv->line, barc);
+		else
+			xmlAddChild(outn, barc);
+
+		priv->base.data->len = 0;
+		ocrpt_mem_string_append_printf(priv->base.data, "%.2lf", bc->barcode_width);
+		xmlSetProp(barc, BAD_CAST "width", BAD_CAST priv->base.data->str);
+
+		priv->base.data->len = 0;
+		ocrpt_mem_string_append_printf(priv->base.data, "%.2lf", bc->barcode_height);
+		xmlSetProp(barc, BAD_CAST "height", BAD_CAST priv->base.data->str);
+
+		ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
+		if (bc->bgcolor && bc->bgcolor->result[o->residx] && bc->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && bc->bgcolor->result[o->residx]->string)
+			ocrpt_get_color(bc->bgcolor->result[o->residx]->string->str, &bgcolor, true);
+		priv->base.data->len = 0;
+		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(bgcolor.r), ocrpt_common_color_value(bgcolor.g), ocrpt_common_color_value(bgcolor.b));
+		xmlSetProp(barc, BAD_CAST "bgcolor", BAD_CAST priv->base.data->str);
+
+		ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
+		if (bc->color && bc->color->result[o->residx] && bc->color->result[o->residx]->type == OCRPT_RESULT_STRING && bc->color->result[o->residx]->string)
+			ocrpt_get_color(bc->color->result[o->residx]->string->str, &color, true);
+		priv->base.data->len = 0;
+		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(color.r), ocrpt_common_color_value(color.g), ocrpt_common_color_value(color.b));
+		xmlSetProp(barc, BAD_CAST "color", BAD_CAST priv->base.data->str);
+
+		priv->base.data->len = 0;
+		if (bc->bctype && bc->bctype->result[o->residx] && bc->bctype->result[o->residx]->type == OCRPT_RESULT_STRING)
+			ocrpt_mem_string_append_printf(priv->base.data, "%s", bc->bctype->result[o->residx]->string->str);
+		else
+			ocrpt_mem_string_append_printf(priv->base.data, "%s", "auto");
+		xmlSetProp(barc, BAD_CAST "type", BAD_CAST priv->base.data->str);
+	}
+}
+
 static void ocrpt_xml_finalize(opencreport *o) {
 	xml_private_data *priv = o->output_private;
 
@@ -331,6 +380,7 @@ void ocrpt_xml_init(opencreport *o) {
 	o->output_functions.start_output = ocrpt_xml_start_output;
 	o->output_functions.start_data_row = ocrpt_xml_start_data_row;
 	o->output_functions.draw_image = ocrpt_xml_draw_image;
+	o->output_functions.draw_barcode = ocrpt_xml_draw_barcode;
 	o->output_functions.set_font_sizes = ocrpt_common_set_font_sizes;
 	o->output_functions.get_text_sizes = ocrpt_common_get_text_sizes;
 	o->output_functions.draw_text = ocrpt_xml_draw_text;

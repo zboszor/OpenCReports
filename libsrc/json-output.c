@@ -285,6 +285,50 @@ static void ocrpt_json_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 	}
 }
 
+static void ocrpt_json_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_barcode *bc, bool last, double page_width, double page_indent, double x, double y, double w, double h) {
+	json_private_data *priv = o->output_private;
+
+	yajl_gen_map_open(priv->yajl_gen);
+
+	yajl_gen_string(priv->yajl_gen, (ystr)"type", 4);
+	yajl_gen_string(priv->yajl_gen, (ystr)"barcode", 7);
+
+	yajl_gen_string(priv->yajl_gen, (ystr)"width", 5);
+	yajl_gen_double(priv->yajl_gen, bc->barcode_width);
+
+	yajl_gen_string(priv->yajl_gen, (ystr)"height", 6);
+	yajl_gen_double(priv->yajl_gen, bc->barcode_height);
+
+	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
+	if (bc->bgcolor && bc->bgcolor->result[o->residx] && bc->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && bc->bgcolor->result[o->residx]->string)
+		ocrpt_get_color(bc->bgcolor->result[o->residx]->string->str, &bgcolor, true);
+
+	priv->base.data->len = 0;
+	ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(bgcolor.r), ocrpt_common_color_value(bgcolor.g), ocrpt_common_color_value(bgcolor.b));
+	yajl_gen_string(priv->yajl_gen, (ystr)"bgcolor", 7);
+	yajl_gen_string(priv->yajl_gen, (ystr)priv->base.data->str, priv->base.data->len);
+
+	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
+	if (bc->color && bc->color->result[o->residx] && bc->color->result[o->residx]->type == OCRPT_RESULT_STRING && bc->color->result[o->residx]->string)
+		ocrpt_get_color(bc->color->result[o->residx]->string->str, &color, true);
+	priv->base.data->len = 0;
+	ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(color.r), ocrpt_common_color_value(color.g), ocrpt_common_color_value(color.b));
+	yajl_gen_string(priv->yajl_gen, (ystr)"color", 5);
+	yajl_gen_string(priv->yajl_gen, (ystr)priv->base.data->str, priv->base.data->len);
+
+
+	yajl_gen_string(priv->yajl_gen, (ystr)"value", 5);
+	if (bc->value && bc->value->result[o->residx] && bc->value->result[o->residx]->type == OCRPT_RESULT_STRING)
+		yajl_gen_string(priv->yajl_gen, (ystr)bc->value->result[o->residx]->string->str, bc->value->result[o->residx]->string->len);
+	else
+		yajl_gen_string(priv->yajl_gen, (ystr)"", 0);
+
+	yajl_gen_map_close(priv->yajl_gen);
+
+	if (!line)
+		priv->image_indent = w;
+}
+
 static void ocrpt_json_draw_imageend(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *out) {
 	json_private_data *priv = o->output_private;
 
@@ -395,6 +439,7 @@ void ocrpt_json_init(opencreport *o) {
 	o->output_functions.start_data_row = ocrpt_json_start_data_row;
 	o->output_functions.end_data_row = ocrpt_json_end_data_row;
 	o->output_functions.draw_image = ocrpt_json_draw_image;
+	o->output_functions.draw_barcode = ocrpt_json_draw_barcode;
 	o->output_functions.draw_imageend = ocrpt_json_draw_imageend;
 	o->output_functions.set_font_sizes = ocrpt_common_set_font_sizes;
 	o->output_functions.get_text_sizes = ocrpt_common_get_text_sizes;

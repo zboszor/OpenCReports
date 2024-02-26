@@ -143,6 +143,45 @@ static void ocrpt_txt_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	}
 }
 
+static void ocrpt_txt_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_barcode *bc, bool last, double page_width, double page_indent, double x, double y, double w, double h) {
+	txt_private_data *priv = o->output_private;
+	double size;
+	uint32_t nspc, i;
+
+	if (line) {
+		nspc = round(w / line->font_width);
+
+		if ((nspc + 1) > priv->base.data->allocated_len)
+			ocrpt_mem_string_resize(priv->base.data, nspc + 1);
+
+		for (i = 0; i < nspc; i++)
+			priv->base.data->str[i] = ' ';
+		priv->base.data->str[nspc] = 0;
+		priv->base.data->len = nspc;
+
+		ocrpt_mem_string_append_len(o->output_buffer, priv->base.data->str, priv->base.data->len);
+	} else {
+		if (r && r->font_size_expr)
+			size = r->font_width;
+		else if (p && p->font_size_expr)
+			size = p->font_width;
+		else
+			size = OCRPT_DEFAULT_FONT_SIZE;
+
+		nspc = round(w / size);
+
+		if ((nspc + 1) > priv->bgimagepfx->allocated_len)
+			ocrpt_mem_string_resize(priv->bgimagepfx, nspc + 1);
+
+		for (i = 0; i < nspc; i++)
+			priv->bgimagepfx->str[i] = ' ';
+		priv->bgimagepfx->str[nspc] = 0;
+		priv->bgimagepfx->len = nspc;
+
+		fprintf(stderr, "%s: setting %ld spaces to line indentation\n", __func__, priv->bgimagepfx->len);
+	}
+}
+
 static void ocrpt_txt_draw_imageend(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output) {
 	txt_private_data *priv = o->output_private;
 
@@ -178,6 +217,7 @@ void ocrpt_txt_init(opencreport *o) {
 	o->output_functions.end_output = ocrpt_txt_end_output;
 	o->output_functions.end_data_row = ocrpt_txt_end_data_row;
 	o->output_functions.draw_image = ocrpt_txt_draw_image;
+	o->output_functions.draw_barcode = ocrpt_txt_draw_barcode;
 	o->output_functions.draw_imageend = ocrpt_txt_draw_imageend;
 	o->output_functions.draw_text = ocrpt_txt_draw_text;
 	o->output_functions.finalize = ocrpt_txt_finalize;

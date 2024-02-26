@@ -2693,6 +2693,143 @@ ocrpt_hline_set_color(ocrpt_hline *hline,
 					</para>
 				</sect4>
 			</sect3>
+			<sect3 id="outputaddbarcode">
+				<title>Add a barcode to an output section</title>
+				<para>
+					<programlisting>ocrpt_barcode *
+ocrpt_output_add_barcode(ocrpt_output *output);</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="textaddbarcode">
+				<title>Add a barcode to a text line</title>
+				<para>
+					<programlisting>ocrpt_barcode *
+ocrpt_line_add_barcode(ocrpt_line *line);</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="barcodesettings">
+				<title>Barcode settings</title>
+				<sect4 id="barcodesetvalue">
+					<title>Set barcode value</title>
+					<para>
+						Set the barcode's value from
+						an expression string. The expression
+						must evaluate to a string, whose
+						value is the string to be encoded
+						as a barcode.
+						<programlisting>void
+ocrpt_barcode_set_value(ocrpt_barcode *bc,
+                        const char *expr_string);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="barcodesetvaluedelayed">
+					<title>Set barcode value delayed</title>
+					<para>
+						Set the barcode's value delayed from
+						an expression string. The expression
+						must evaluate to a boolean value.
+						<programlisting>void
+ocrpt_barcode_set_value_delayed(ocrpt_barcode *bc,
+                                const char *expr_string);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="barcodesettype">
+					<title>Set barcode type</title>
+					<para>
+						Set the barcode's type from
+						an expression string.
+						<programlisting>void
+ocrpt_barcode_set_type(ocrpt_barcode *bc,
+                       const char *expr_string);</programlisting>
+					</para>
+					<para>
+						The type may be optional, in which
+						case it's autodetected and the barcode
+						is rendered in the format that first
+						allows the <literal>value</literal> string
+						to be rendered. Possible types (in the order of
+						autodetection) are:
+						<literal>upc-a</literal>,
+						<literal>ean-13</literal>,
+						<literal>upc-e</literal>,
+						<literal>ean-8</literal>,
+						<literal>isbn</literal>,
+						<literal>code39</literal>,
+						<literal>code39ext</literal>,
+						<literal>code128b</literal>
+						<literal>code128c</literal>, or
+						<literal>code128</literal>.
+						If <literal>type</literal> is specified,
+						the <literal>value</literal> is
+						rendered in that barcode type if
+						the string is valid for the type.
+						If <literal>value</literal> is invalid
+						for the specified <literal>type</literal>,
+						or autodetection fails, because the
+						<literal>value</literal> is invalid
+						for any of the above listed types,
+						the barcode is not rendered.
+					</para>
+				</sect4>
+				<sect4 id="barcodesetwidth">
+					<title>Set barcode width</title>
+					<para>
+						Set the barcode's width from
+						an expression string.
+						<programlisting>void
+ocrpt_barcode_set_width(ocrpt_barcode *bc,
+                        const char *expr_string);</programlisting>
+					</para>
+					<para>
+						The width is set according to
+						<xref linkend="sizeunit"/>,
+						either in points (1/72th inch) or
+						in (monospace) font width units
+						set by <literal>&lt;Line&gt;</literal>.
+					</para>
+				</sect4>
+				<sect4 id="barcodesetheight">
+					<title>Set barcode width</title>
+					<para>
+						Set the barcode's height from
+						an expression string.
+						<programlisting>void
+ocrpt_barcode_set_height(ocrpt_barcode *bc,
+                         const char *expr_string);</programlisting>
+					</para>
+					<para>
+						This setting is always in points, i.e.
+						1/72th of an inch. The line height will
+						be determined by greatest height
+						of all the <literal>&lt;field&gt;</literal>,
+						<literal>&lt;literal&gt;</literal> and
+						<literal>&lt;Barcode&gt;</literal> fields
+						in the same <literal>&lt;Line&gt;</literal>
+						in a way that the elements of the same line
+						will appear (approximately) centered vertically.
+					</para>
+				</sect4>
+				<sect4 id="barcodesetcolor">
+					<title>Set barcode line color</title>
+					<para>
+						Set the barcode's line color from
+						an expression string.
+						<programlisting>void
+ocrpt_barcode_set_color(ocrpt_barcode *bc,
+                         const char *expr_string);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="barcodesetbgcolor">
+					<title>Set barcode background color</title>
+					<para>
+						Set the barcode's background color from
+						an expression string.
+						<programlisting>void
+ocrpt_barcode_set_bgcolor(ocrpt_barcode *bc,
+                         const char *expr_string);</programlisting>
+					</para>
+				</sect4>
+			</sect3>
 			<sect3 id="outputaddimage">
 				<title>Add an image to an output section</title>
 				<para>

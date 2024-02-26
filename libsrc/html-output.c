@@ -6,6 +6,7 @@
 
 #include <config.h>
 
+#include <ctype.h>
 #include <string.h>
 #include <unistd.h>
 #include <utf8proc.h>
@@ -328,6 +329,162 @@ static void ocrpt_html_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 	}
 }
 
+static cairo_status_t ocrpt_html_write_png(void *closure, const unsigned char *data, unsigned int length) {
+	html_private_data *priv = closure;
+
+	ocrpt_mem_string_append_len_binary(priv->png, (const char *)data, length);
+
+	return CAIRO_STATUS_SUCCESS;
+}
+
+static const unsigned char base64_table[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+static void ocrpt_html_base64_encode(html_private_data *priv) {
+	ocrpt_string *b64;
+	unsigned char *pos;
+	const unsigned char *end, *in;
+	size_t olen;
+
+	olen = priv->png->len * 4 / 3 + 4 + 1; /* 3-byte blocks to 4-byte + nul termination */
+	if (olen < priv->png->len)
+		return; /* integer overflow */
+
+	b64 = ocrpt_mem_string_resize(priv->pngbase64, olen);
+	if (b64) {
+		if (!priv->pngbase64)
+			priv->pngbase64 = b64;
+		priv->pngbase64->len = 0;
+	} else {
+		if (priv->pngbase64)
+			priv->pngbase64->len = 0;
+		return;
+	}
+
+	end = (unsigned char *)priv->png->str + priv->png->len;
+	in = (unsigned char *)priv->png->str;
+	pos = (unsigned char *)priv->pngbase64->str;
+
+	while (end - in >= 3) {
+		*pos++ = base64_table[in[0] >> 2];
+		*pos++ = base64_table[((in[0] & 0x03) << 4) | (in[1] >> 4)];
+		*pos++ = base64_table[((in[1] & 0x0f) << 2) | (in[2] >> 6)];
+		*pos++ = base64_table[in[2] & 0x3f];
+		in += 3;
+	}
+
+	if (end - in) {
+		*pos++ = base64_table[in[0] >> 2];
+		if (end - in == 1) {
+			*pos++ = base64_table[(in[0] & 0x03) << 4];
+			*pos++ = '=';
+		} else {
+			*pos++ = base64_table[((in[0] & 0x03) << 4) | (in[1] >> 4)];
+			*pos++ = base64_table[(in[1] & 0x0f) << 2];
+		}
+		*pos++ = '=';
+	}
+
+	*pos = '\0';
+	priv->pngbase64->len = (char *)pos - priv->pngbase64->str;
+}
+
+static void ocrpt_html_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_barcode *bc, bool last, double page_width, double page_indent, double x, double y, double w, double h) {
+	html_private_data *priv = o->output_private;
+	int32_t first_space = bc->encoded->str[0] - '0';
+	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, bc->encoded_width - first_space + 20.0, bc->barcode_height);
+	cairo_t *cr = cairo_create(surface);
+
+	ocrpt_color bg, fg;
+
+	char *color_name = NULL;
+	if (bc->color && bc->color->result[o->residx] && bc->color->result[o->residx]->type == OCRPT_RESULT_STRING && bc->color->result[o->residx]->string)
+		color_name = bc->color->result[o->residx]->string->str;
+
+	ocrpt_get_color(color_name, &fg, false);
+
+	if (bc->encoded_width > 0) {
+		color_name = NULL;
+		if (bc->bgcolor && bc->bgcolor->result[o->residx] && bc->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && bc->bgcolor->result[o->residx]->string)
+			color_name = bc->bgcolor->result[o->residx]->string->str;
+
+		ocrpt_get_color(color_name, &bg, true);
+	}
+
+	cairo_save(cr);
+
+	cairo_set_source_rgb(cr, bg.r, bg.g, bg.b);
+	cairo_set_line_width(cr, 0.0);
+	cairo_rectangle(cr, 0, 0, bc->barcode_width - 1, bc->barcode_height - 1);
+	cairo_fill(cr);
+
+	cairo_restore(cr);
+
+	if (bc->encoded_width > 0 && (!line || !line->current_line)) {
+		cairo_save(cr);
+
+		int32_t pos = 10;
+
+		for (int32_t bar = 1; bar < bc->encoded->len; bar++) {
+			char e = bc->encoded->str[bar];
+
+			/* special cases, ignore */
+			if (e == '+' || e == '-')
+				continue;
+
+			int32_t width = isdigit(e) ? width = e - '0' : e - 'a' + 1;
+
+			if (bar % 2) {
+				cairo_set_source_rgb(cr, fg.r, fg.g, fg.b);
+				cairo_set_line_width(cr, 0.0);
+				cairo_rectangle(cr, pos, 0.0, (double)width, bc->barcode_height - 1);
+				cairo_fill(cr);
+			}
+
+			pos += width;
+		}
+
+		cairo_restore(cr);
+	}
+
+	cairo_destroy(cr);
+
+	priv->png->len = 0;
+	cairo_surface_write_to_png_stream(surface, ocrpt_html_write_png, priv);
+
+	ocrpt_html_base64_encode(priv);
+
+	cairo_surface_destroy(surface);
+
+	if (line) {
+		ocrpt_mem_string_append_printf(o->output_buffer,
+											"<span style=\"width: %.2lfpt; height: %.2lfpt; "
+											"text-align: start; "
+											"align-items: start; "
+											"justify-content: start; \">",
+											w, h);
+
+		if (!line->current_line) {
+			ocrpt_mem_string_append_printf(o->output_buffer,
+											"<img src=\"data:image/png;base64,%s\" style=\"width: 100%%; height: 100%%; \">",
+											priv->pngbase64->str);
+		} else
+			ocrpt_mem_string_append(o->output_buffer, "&nbsp;");
+
+		ocrpt_mem_string_append(o->output_buffer, "</span>");
+	} else {
+		ocrpt_mem_string_append(o->output_buffer,
+											"<!--image closing section--></section>\n");
+		ocrpt_mem_string_append_printf(o->output_buffer,
+											"<!--image start section--><section style=\"clear: both; width: %.2lfpt; \">\n",
+											pd->real_width);
+		ocrpt_mem_string_append_printf(o->output_buffer,
+										"<img src=\"%s\" style=\"float: left; width: %.2lfpt; height: %.2lfpt; \" alt=\"background image\">\n",
+										priv->pngbase64->str, w, h);
+
+		priv->image_indent = w;
+	}
+}
+
 static void ocrpt_html_draw_imageend(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output) {
 	html_private_data *priv = o->output_private;
 
@@ -345,6 +502,8 @@ static void ocrpt_html_finalize(opencreport *o) {
 	ocrpt_mem_string_append(o->output_buffer, "</body></html>\n");
 
 	ocrpt_mem_free(priv->cwd);
+	ocrpt_mem_string_free(priv->png, true);
+	ocrpt_mem_string_free(priv->pngbase64, true);
 
 	ocrpt_common_finalize(o);
 
@@ -373,6 +532,7 @@ void ocrpt_html_init(opencreport *o) {
 	o->output_functions.get_text_sizes = ocrpt_common_get_text_sizes;
 	o->output_functions.draw_text = ocrpt_html_draw_text;
 	o->output_functions.draw_image = ocrpt_html_draw_image;
+	o->output_functions.draw_barcode = ocrpt_html_draw_barcode;
 	o->output_functions.draw_imageend = ocrpt_html_draw_imageend;
 	o->output_functions.finalize = ocrpt_html_finalize;
 	o->output_functions.reopen_tags_across_pages = true;
@@ -393,6 +553,9 @@ void ocrpt_html_init(opencreport *o) {
 		} else
 			priv->cwdlen = strlen(priv->cwd);
 	}
+
+	priv->png = ocrpt_mem_string_new_with_len(NULL, 1024);
+	priv->pngbase64 = ocrpt_mem_string_new_with_len(NULL, 4096);
 
 	ocrpt_mem_string_append(o->output_buffer, "<!DOCTYPE html>\n");
 	ocrpt_mem_string_append(o->output_buffer, "<html lang=\"en\">\n");

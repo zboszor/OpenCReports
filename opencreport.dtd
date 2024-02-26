@@ -119,10 +119,10 @@
 <!ELEMENT PageHeader (Output)* >
 <!ELEMENT ReportFooter (Output)* >
 <!ELEMENT PageFooter (Output)* >
-<!ELEMENT Output (Line | HorizontalLine | Image)* >
+<!ELEMENT Output (Line | HorizontalLine | Image | Barcode | ImageEnd)* >
 <!ATTLIST Output
     suppress CDATA #IMPLIED >
-<!ELEMENT Line (field | literal | Image)* >
+<!ELEMENT Line (field | literal | Image | Barcode)* >
 <!ATTLIST Line
 	fontName CDATA #IMPLIED
 	font_name CDATA #IMPLIED
@@ -201,6 +201,15 @@
 	bgcolor CDATA #IMPLIED
 	text_width CDATA #REQUIRED
 	textWidth CDATA #REQUIRED >
+<!ATTLIST Barcode
+	value CDATA #REQUIRED
+	delayed CDATA #IMPLIED
+	precalculate CDATA #IMPLIED
+	type CDATA #IMPLIED
+	width CDATA #REQUIRED
+	height CDATA #IMPLIED
+	color CDATA #IMPLIED
+	bgcolor CDATA #IMPLIED >
 <!ELEMENT Detail (FieldHeaders?, FieldDetails?) >
 <!ELEMENT FieldHeaders (Output)* >
 <!ELEMENT FieldDetails (Output)* >

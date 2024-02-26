@@ -131,13 +131,33 @@ void ocrpt_image_free(const void *ptr) {
 	ocrpt_mem_free(ptr);
 }
 
+static void ocrpt_free_image(ocrpt_image *img) {
+	ocrpt_expr_free(img->suppress);
+	ocrpt_expr_free(img->value);
+	ocrpt_expr_free(img->imgtype);
+	ocrpt_expr_free(img->width);
+	ocrpt_expr_free(img->height);
+	ocrpt_expr_free(img->align);
+	ocrpt_expr_free(img->bgcolor);
+	ocrpt_expr_free(img->text_width);
+}
+
+static void ocrpt_free_barcode(ocrpt_barcode *bc) {
+	ocrpt_expr_free(bc->value);
+	ocrpt_expr_free(bc->bctype);
+	ocrpt_expr_free(bc->width);
+	ocrpt_expr_free(bc->height);
+	ocrpt_expr_free(bc->color);
+	ocrpt_expr_free(bc->bgcolor);
+}
+
 void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs) {
 	for (ocrpt_list *l = output->output_list; l; l = l->next) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)l->data;
+
 		switch (oe->type) {
-		case OCRPT_OUTPUT_LINE: {
-			ocrpt_line *line = (ocrpt_line *)oe;
-			for (ocrpt_list *l = line->elements; l; l = l->next) {
+		case OCRPT_OUTPUT_LINE:
+			for (ocrpt_list *l = ((ocrpt_line *)oe)->elements; l; l = l->next) {
 				ocrpt_text *le = (ocrpt_text *)l->data;
 
 				switch (le->le_type) {
@@ -168,25 +188,29 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 					ocrpt_mem_string_free(le->result_str, true);
 					break;
 				case OCRPT_OUTPUT_LE_IMAGE:
-					if (free_subexprs) {
-						ocrpt_image *img = (ocrpt_image *)le;
-						ocrpt_expr_free(img->suppress);
-						ocrpt_expr_free(img->value);
-						ocrpt_expr_free(img->imgtype);
-						ocrpt_expr_free(img->width);
-						ocrpt_expr_free(img->height);
-						ocrpt_expr_free(img->align);
-						ocrpt_expr_free(img->bgcolor);
-						ocrpt_expr_free(img->text_width);
-					}
+					if (free_subexprs)
+						ocrpt_free_image((ocrpt_image *)le);
 					break;
 				case OCRPT_OUTPUT_LE_BARCODE:
-					/* TODO */
+					if (free_subexprs)
+						ocrpt_free_barcode((ocrpt_barcode *)le);
+
+					{
+						ocrpt_barcode *bc = (ocrpt_barcode *)le;
+
+						ocrpt_mem_string_free(bc->encoded, true);
+						bc->encoded = NULL;
+						ocrpt_mem_string_free(bc->priv, true);
+						bc->priv = NULL;
+					}
 					break;
+				default:
+					assert(0);
 				}
 				ocrpt_mem_free(l->data);
 			}
 			if (free_subexprs) {
+				ocrpt_line *line = (ocrpt_line *)oe;
 				ocrpt_expr_free(line->font_name);
 				ocrpt_expr_free(line->font_size);
 				ocrpt_expr_free(line->color);
@@ -195,9 +219,8 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 				ocrpt_expr_free(line->italic);
 				ocrpt_expr_free(line->suppress);
 			}
-			ocrpt_list_free(line->elements);
+			ocrpt_list_free(((ocrpt_line *)oe)->elements);
 			break;
-		}
 		case OCRPT_OUTPUT_HLINE:
 			if (free_subexprs) {
 				ocrpt_hline *hline = (ocrpt_hline *)oe;
@@ -211,21 +234,25 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 			}
 			break;
 		case OCRPT_OUTPUT_IMAGE:
-			if (free_subexprs) {
-				ocrpt_image *img = (ocrpt_image *)oe;
-
-				ocrpt_expr_free(img->suppress);
-				ocrpt_expr_free(img->value);
-				ocrpt_expr_free(img->imgtype);
-				ocrpt_expr_free(img->width);
-				ocrpt_expr_free(img->height);
-				ocrpt_expr_free(img->align);
-				ocrpt_expr_free(img->bgcolor);
-				ocrpt_expr_free(img->text_width);
-			}
+			if (free_subexprs)
+				ocrpt_free_image((ocrpt_image *)oe);
 			break;
 		case OCRPT_OUTPUT_IMAGEEND:
 			break;
+		case OCRPT_OUTPUT_BARCODE:
+			if (free_subexprs)
+				ocrpt_free_barcode((ocrpt_barcode *)oe);
+			{
+				ocrpt_barcode *bc = (ocrpt_barcode *)oe;
+
+				ocrpt_mem_string_free(bc->encoded, true);
+				bc->encoded = NULL;
+				ocrpt_mem_string_free(bc->priv, true);
+				bc->priv = NULL;
+			}
+			break;
+		default:
+			assert(0);
 		}
 
 		ocrpt_mem_free(oe);
