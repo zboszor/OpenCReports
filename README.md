@@ -7,7 +7,7 @@ reimplementation and licensed under LGPLv3.
 ## Currently missing features
 
 * language bindings other than C and PHP
-* graphing and barcodes (Graph, Chart and Barcode XML elements)
+* graphing (Graph, Chart XML elements)
 
 ## Roadmap
 
