@@ -177,8 +177,6 @@ static void ocrpt_txt_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row
 			priv->bgimagepfx->str[i] = ' ';
 		priv->bgimagepfx->str[nspc] = 0;
 		priv->bgimagepfx->len = nspc;
-
-		fprintf(stderr, "%s: setting %ld spaces to line indentation\n", __func__, priv->bgimagepfx->len);
 	}
 }
 
