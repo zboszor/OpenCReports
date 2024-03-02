@@ -302,7 +302,7 @@ static void ocrpt_xml_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row
 		xmlNodePtr barc;
 
 		if (bc->value && bc->value->result[o->residx] && bc->value->result[o->residx]->type == OCRPT_RESULT_STRING)
-			barc = xmlNewTextChild(priv->line, NULL, BAD_CAST "barcode", BAD_CAST bc->value->result[o->residx]->string->str);
+			barc = xmlNewDocNode(priv->doc, NULL, BAD_CAST "barcode", BAD_CAST bc->value->result[o->residx]->string->str);
 		else
 			barc = xmlNewDocNode(priv->doc, NULL, BAD_CAST "barcode", NULL);
 
