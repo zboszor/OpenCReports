@@ -48,6 +48,8 @@ libsrc/cairotest
 libsrc/*.pdf
 
 # Documentation
+doc/OpenCReports-A4.fo
+doc/OpenCReports-US.fo
 doc/OpenCReports-full.xml
 doc/OpenCReports.html
 doc/html-stamp
