@@ -3632,6 +3632,9 @@ OpenCReport\Text::set_memo_max_lines(
     public final set_value_delayed(
                      ?string $expr_string = null): void;
 
+    public final set_suppress(
+                     ?string $expr_string = null): void;
+
     public final set_type(
                      ?string $expr_string = null): void;
 
