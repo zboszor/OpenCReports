@@ -63,13 +63,13 @@ typedef struct ocrpt_output_functions ocrpt_output_functions;
 
 struct ocrpt_output {
 	double old_page_position;
-	double current_image_width;
 	opencreport *o;
 	ocrpt_report *r;
 	ocrpt_list *output_list;
 	ocrpt_list *iter;
 	ocrpt_expr *suppress;
 	ocrpt_image *current_image;
+	ocrpt_barcode *current_barcode;
 	bool suppress_output:1;
 	bool has_memo:1;
 	bool height_exceeded:1;

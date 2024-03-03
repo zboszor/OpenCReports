@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <table>
+      <tr>
+        <td width="566.48">
+          <report>
+            <no_data>
+              <output>
+                <barcode width="100.00" height="100.00" bgcolor="#ffffff" color="#000000" type="ean-13">123456789012</barcode>
+                <line>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="1" italics="0" align="left" bgcolor="#0000ff" color="#ff0000">There</data>
+                  <data width="21.60" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#000000" color="#ffffff">is</data>
+                  <data width="21.60" font_point="12.00" font_face="Courier" bold="0" italics="1" align="center" bgcolor="#008080" color="#00ff00">no</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#c0c0c0" color="#00ffff">data</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#008000" color="#ff00ff">here.</data>
+                </line>
+                <line>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="1" italics="0" align="left" bgcolor="#0000ff" color="#ff0000">There</data>
+                  <data width="21.60" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#000000" color="#ffffff">is</data>
+                  <data width="21.60" font_point="12.00" font_face="Courier" bold="0" italics="1" align="center" bgcolor="#008080" color="#00ff00">no</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#c0c0c0" color="#00ffff">data</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#008000" color="#ff00ff">here.</data>
+                </line>
+                <barcode width="100.00" height="100.00" bgcolor="#ffffff" color="#000000" type="ean-13">987654321098</barcode>
+                <line>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="1" italics="0" align="left" bgcolor="#0000ff" color="#ff0000">There</data>
+                  <data width="21.60" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#000000" color="#ffffff">is</data>
+                  <data width="21.60" font_point="12.00" font_face="Courier" bold="0" italics="1" align="center" bgcolor="#008080" color="#00ff00">no</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#c0c0c0" color="#00ffff">data</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#008000" color="#ff00ff">here.</data>
+                </line>
+                <line>
+                  <data width="43.20" font_point="12.00" font_face="Courier" bold="1" italics="0" align="left" bgcolor="#0000ff" color="#ff0000">There</data>
+                  <data width="21.60" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#000000" color="#ffffff">is</data>
+                  <data width="21.60" font_point="12.00" font_face="Courier" bold="0" italics="1" align="center" bgcolor="#008080" color="#00ff00">no</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#c0c0c0" color="#00ffff">data</data>
+                  <data width="36.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#008000" color="#ff00ff">here.</data>
+                </line>
+              </output>
+            </no_data>
+          </report>
+        </td>
+      </tr>
+    </table>
+  </part>
+</ocrpt>

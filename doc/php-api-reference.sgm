@@ -3672,6 +3672,21 @@ OpenCReport\Barcode::set_value_delayed(
                      ?string $expr_string = null): void;</programlisting>
 			</para>
 		</sect2>
+		<sect2 id="phpbarcodesetsuppress">
+			<title>Set the barcode suppression</title>
+			<para>
+				Set the barcode's suppression value from
+				an expression string. The expression
+				must evaluate to a boolean value.
+				<programlisting>public final
+OpenCReport\Barcode::set_suppress(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+			<para>
+				Default value is <literal>false</literal>,
+				i.e. no suppression.
+			</para>
+		</sect2>
 		<sect2 id="phpbarcodesettype">
 			<title>Set the barcode type</title>
 			<para>

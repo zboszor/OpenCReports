@@ -15,6 +15,8 @@ struct html_private_data {
 	char *cwd;
 	size_t cwdlen;
 	double image_indent;
+	double image_height;
+	double curr_pos_from_last_image;
 	ocrpt_string *png;
 	ocrpt_string *pngbase64;
 };

@@ -84,7 +84,16 @@ static void ocrpt_html_start_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_
 }
 
 static void ocrpt_html_end_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l) {
+	html_private_data *priv = o->output_private;
+
 	ocrpt_mem_string_append(o->output_buffer, "</p>\n");
+
+	/*
+	 * Cheat a little in accounting for line heights.
+	 * Lines (despite everything is in "pt") have gaps between them.
+	 * Add two pt for every line finished.
+	 */
+	priv->curr_pos_from_last_image += l->line_height + 2.0;
 }
 
 static void ocrpt_html_add_new_page_epilogue(opencreport *o) {
@@ -179,9 +188,16 @@ static void ocrpt_html_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	if (pd && (le->start > pd->real_width))
 		return;
 
+
 	ocrpt_mem_string_append_printf(o->output_buffer,
 									"<span style=\"line-height: %.2lfpt; ",
 									l->line_height);
+
+	if (l->elements->data == le && priv->image_indent > 0.0 && priv->curr_pos_from_last_image >= priv->image_height)
+		ocrpt_mem_string_append_printf(o->output_buffer,
+									"margin-left: %.2lfpt; ",
+									priv->image_indent);
+
 	if (le->width) {
 		bool text_fits = (pd && (le->start + le->width_computed < pd->column_width)) || !pd;
 		ocrpt_mem_string_append_printf(o->output_buffer,
@@ -326,6 +342,8 @@ static void ocrpt_html_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 											ocrpt_html_truncate_file_prefix(priv, img->img_file->name), w, h);
 
 		priv->image_indent = w;
+		priv->image_height = h;
+		priv->curr_pos_from_last_image = 0.0;
 	}
 }
 
@@ -394,21 +412,18 @@ static void ocrpt_html_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, bc->encoded_width - first_space + 20.0, bc->barcode_height);
 	cairo_t *cr = cairo_create(surface);
 
-	ocrpt_color bg, fg;
+	ocrpt_color bg = { 1.0, 1.0, 1.0 };
+	ocrpt_color fg = { 0.0, 0.0, 0.0 };
 
-	char *color_name = NULL;
 	if (bc->color && bc->color->result[o->residx] && bc->color->result[o->residx]->type == OCRPT_RESULT_STRING && bc->color->result[o->residx]->string)
-		color_name = bc->color->result[o->residx]->string->str;
+		ocrpt_get_color(bc->color->result[o->residx]->string->str, &fg, false);
+	else if (line && line->color && line->color->result[o->residx] && line->color->result[o->residx]->type == OCRPT_RESULT_STRING && line->color->result[o->residx]->string)
+		ocrpt_get_color(line->color->result[o->residx]->string->str, &fg, false);
 
-	ocrpt_get_color(color_name, &fg, false);
-
-	if (bc->encoded_width > 0) {
-		color_name = NULL;
-		if (bc->bgcolor && bc->bgcolor->result[o->residx] && bc->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && bc->bgcolor->result[o->residx]->string)
-			color_name = bc->bgcolor->result[o->residx]->string->str;
-
-		ocrpt_get_color(color_name, &bg, true);
-	}
+	if (bc->bgcolor && bc->bgcolor->result[o->residx] && bc->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && bc->bgcolor->result[o->residx]->string)
+		ocrpt_get_color(bc->bgcolor->result[o->residx]->string->str, &bg, true);
+	else if (line && line->bgcolor && line->bgcolor->result[o->residx] && line->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && line->bgcolor->result[o->residx]->string)
+		ocrpt_get_color(line->bgcolor->result[o->residx]->string->str, &bg, false);
 
 	cairo_save(cr);
 
@@ -478,10 +493,12 @@ static void ocrpt_html_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 											"<!--image start section--><section style=\"clear: both; width: %.2lfpt; \">\n",
 											pd->real_width);
 		ocrpt_mem_string_append_printf(o->output_buffer,
-										"<img src=\"%s\" style=\"float: left; width: %.2lfpt; height: %.2lfpt; \" alt=\"background image\">\n",
+										"<img src=\"data:image/png;base64,%s\" style=\"float: left; width: %.2lfpt; height: %.2lfpt; \" alt=\"background image\">\n",
 										priv->pngbase64->str, w, h);
 
 		priv->image_indent = w;
+		priv->image_height = h;
+		priv->curr_pos_from_last_image = 0.0;
 	}
 }
 

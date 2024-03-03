@@ -2733,6 +2733,21 @@ ocrpt_barcode_set_value_delayed(ocrpt_barcode *bc,
                                 const char *expr_string);</programlisting>
 					</para>
 				</sect4>
+				<sect4 id="barcodesetsuppress">
+					<title>Set barcode suppression</title>
+					<para>
+						Set the barcode's suppression value from
+						an expression string. The expression
+						must evaluate to a boolean value.
+						<programlisting>void
+ocrpt_barcode_set_suppress(ocrpt_barcode *bc,
+                           const char *expr_string);</programlisting>
+					</para>
+					<para>
+						Default value is <literal>false</literal>,
+						i.e. no suppression.
+					</para>
+				</sect4>
 				<sect4 id="barcodesettype">
 					<title>Set barcode type</title>
 					<para>

@@ -204,6 +204,7 @@
 <!ATTLIST Barcode
 	value CDATA #REQUIRED
 	delayed CDATA #IMPLIED
+	suppress CDATA #IMPLIED
 	precalculate CDATA #IMPLIED
 	type CDATA #IMPLIED
 	width CDATA #REQUIRED

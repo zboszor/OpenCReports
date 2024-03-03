@@ -268,7 +268,16 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 				w *= l->font_width;
 		} else if (ocrpt_list_length(l->elements) == 1) {
 			w = total_width;
-			w -= output->current_image_width;
+
+			double diff;
+			if (output->current_image)
+				diff = output->current_image->image_width;
+			else if (output->current_barcode)
+				diff = output->current_barcode->barcode_width;
+			else
+				diff = 0.0;
+
+			w -= diff;
 		} else {
 			PangoRectangle logical_rect;
 
@@ -279,7 +288,15 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 			if (last && w < total_width - le->start)
 				w = total_width - le->start;
 
-			w -= output->current_image_width;
+			double diff;
+			if (output->current_image)
+				diff = output->current_image->image_width;
+			else if (output->current_barcode)
+				diff = output->current_barcode->barcode_width;
+			else
+				diff = 0.0;
+
+			w -= diff;
 		}
 
 		le->width_computed = w;

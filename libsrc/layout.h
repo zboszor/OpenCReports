@@ -167,6 +167,8 @@ struct ocrpt_barcode {
 		ocrpt_output_type type;
 		ocrpt_output_line_element_type le_type;
 	};
+	bool in_line:1;
+	bool suppress_bc:1;
 	double start;
 	double vertical_gap;
 	double barcode_width;
@@ -176,6 +178,7 @@ struct ocrpt_barcode {
 	ocrpt_output *output;
 	ocrpt_expr *value; /* string to encode into barcode */
 	ocrpt_expr *delayed;
+	ocrpt_expr *suppress;
 	ocrpt_expr *bctype; /* 'upc-a', 'upc-e', 'ean-13', 'ean-8', 'code39', 'code128b', 'code128c', 'code128' */
 	ocrpt_expr *width;
 	ocrpt_expr *height;
@@ -205,7 +208,7 @@ static inline void ocrpt_layout_output_init(ocrpt_output *output) {
 	output->has_memo = false;
 	output->iter = output->output_list;
 	output->current_image = NULL;
-	output->current_image_width = 0.0;
+	output->current_barcode = NULL;
 
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;

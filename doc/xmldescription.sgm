@@ -3698,6 +3698,28 @@ report_height_after_last="no"</programlisting>
 		</para>
 		<sect2 id="barcodeatts">
 			<title>Barcode element attributes</title>
+			<sect3 id="bcsuppressattr" xreflabel="Barcode suppression">
+				<title>Suppress</title>
+				<para>
+					<literal>&lt;Barcode&gt;</literal> elements
+					in <literal>&lt;Output&gt;</literal> may be
+					suppressed.
+					<programlisting>&lt;Line&gt;
+    &lt;Barcode suppress="yes" ... /&gt;
+&lt;/Line&gt;</programlisting>
+				</para>
+				<para>
+					Default value is <literal>false</literal>,
+					i.e. no suppression.
+				</para>
+				<para>
+					The expression for <literal>suppress</literal>
+					must be a constant expression. An environment
+					variable (since it can't - or shouldn't - change
+					during the report execution) is considered
+					constant. See <xref linkend="expressions"/>.
+				</para>
+			</sect3>
 			<sect3 id="bcvalueattr" xreflabel="Barcode string value">
 				<title>Value</title>
 				<para>

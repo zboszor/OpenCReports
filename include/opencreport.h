@@ -966,6 +966,7 @@ ocrpt_barcode *ocrpt_line_add_barcode(ocrpt_line *line);
 
 void ocrpt_barcode_set_value(ocrpt_barcode *bc, const char *expr_string);
 void ocrpt_barcode_set_value_delayed(ocrpt_barcode *bc, const char *expr_string);
+void ocrpt_barcode_set_suppress(ocrpt_barcode *bc, const char *expr_string);
 void ocrpt_barcode_set_type(ocrpt_barcode *bc, const char *expr_string);
 void ocrpt_barcode_set_width(ocrpt_barcode *bc, const char *expr_string);
 void ocrpt_barcode_set_height(ocrpt_barcode *bc, const char *expr_string);

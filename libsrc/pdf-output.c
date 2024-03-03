@@ -151,21 +151,18 @@ static void ocrpt_pdf_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row
 
 	cairo_save(priv->cr);
 
-	ocrpt_color bg, fg;
+	ocrpt_color bg = { 1.0, 1.0, 1.0 };
+	ocrpt_color fg = { 0.0, 0.0, 0.0 };
 
-	char *color_name = NULL;
 	if (bc->color && bc->color->result[o->residx] && bc->color->result[o->residx]->type == OCRPT_RESULT_STRING && bc->color->result[o->residx]->string)
-		color_name = bc->color->result[o->residx]->string->str;
+		ocrpt_get_color(bc->color->result[o->residx]->string->str, &fg, false);
+	else if (line && line->bgcolor && line->bgcolor->result[o->residx] && line->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && line->bgcolor->result[o->residx]->string)
+		ocrpt_get_color(line->bgcolor->result[o->residx]->string->str, &fg, false);
 
-	ocrpt_get_color(color_name, &fg, false);
-
-	if (bc->encoded_width > 0) {
-		color_name = NULL;
-		if (bc->bgcolor && bc->bgcolor->result[o->residx] && bc->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && bc->bgcolor->result[o->residx]->string)
-			color_name = bc->bgcolor->result[o->residx]->string->str;
-
-		ocrpt_get_color(color_name, &bg, true);
-	}
+	if (bc->bgcolor && bc->bgcolor->result[o->residx] && bc->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && bc->bgcolor->result[o->residx]->string)
+		ocrpt_get_color(bc->bgcolor->result[o->residx]->string->str, &bg, true);
+	else if (line && line->bgcolor && line->bgcolor->result[o->residx] && line->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && line->bgcolor->result[o->residx]->string)
+		ocrpt_get_color(line->bgcolor->result[o->residx]->string->str, &bg, true);
 
 	/*
 	 * The background filler is 0.2 points wider.

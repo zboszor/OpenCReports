@@ -209,7 +209,11 @@ LAYOUT_TESTS = \
 	layout_follower_recursive_n_1_test \
 	layout_follower_recursive_n_1_match_single_test \
 	layout_barcode1_test \
-	layout_barcode1_code_test
+	layout_barcode1_code_test \
+	layout_barcode2_test \
+	layout_barcode3_test \
+	layout_barcode4_test \
+	layout_xml3_ver2_test
 
 LAYOUT_CSV_TESTS = \
 	layout_xml17_csv1_test \

@@ -456,6 +456,44 @@ static void ocrpt_layout_image(bool draw, opencreport *o, ocrpt_part *p, ocrpt_p
 	output->current_image = image;
 }
 
+static void ocrpt_layout_barcode_setup(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, ocrpt_barcode *bc, double page_width, double page_indent, double *page_position) {
+	bc->suppress_bc = false;
+
+	/* Don't render the barcode if the value, the width or the height are not set. */
+	if (!bc->value || !bc->value->result[o->residx] || bc->value->result[o->residx]->type != OCRPT_RESULT_STRING || !bc->value->result[o->residx]->string) {
+		bc->suppress_bc = true;
+		return;
+	}
+
+	if (!bc->width || !bc->width->result[o->residx] || bc->width->result[o->residx]->type != OCRPT_RESULT_NUMBER || !bc->width->result[o->residx]->number_initialized) {
+		if (!bc->in_line) {
+			bc->suppress_bc = true;
+			return;
+		}
+		bc->barcode_width = 0.0;
+	} else
+		bc->barcode_width = mpfr_get_d(bc->width->result[o->residx]->number, o->rndmode);
+
+	if (!bc->height || !bc->height->result[o->residx] || bc->height->result[o->residx]->type != OCRPT_RESULT_NUMBER || !bc->height->result[o->residx]->number_initialized) {
+		if (!bc->in_line) {
+			bc->suppress_bc = true;
+			return;
+		}
+		bc->barcode_height = 0.0;
+	} else
+		bc->barcode_height = mpfr_get_d(bc->height->result[o->residx]->number, o->rndmode);
+}
+
+static void ocrpt_layout_barcode(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_barcode *bc, bool last, double page_width, double page_indent, double *page_position) {
+	if (draw && o->output_functions.draw_barcode) {
+		ocrpt_barcode_encode(o, bc);
+		o->output_functions.draw_barcode(o, p, pr, pd, r, br, output, NULL, bc, last, page_width, page_indent, page_indent, *page_position, bc->barcode_width, bc->barcode_height);
+	}
+
+	output->old_page_position = *page_position;
+	output->current_barcode = bc;
+}
+
 static void ocrpt_layout_imageend(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output) {
 	if (draw && o->output_functions.draw_imageend)
 		o->output_functions.draw_imageend(o, p, pr, pd, r, br, output);
@@ -639,6 +677,11 @@ static void ocrpt_layout_output_resolve_barcode(ocrpt_barcode *bc) {
 	ocrpt_expr_resolve(bc->value);
 	ocrpt_expr_optimize(bc->value);
 
+	ocrpt_expr_resolve(bc->delayed);
+	ocrpt_expr_optimize(bc->delayed);
+	if (bc->delayed)
+		ocrpt_expr_set_delayed(bc->value, !!ocrpt_expr_get_long(bc->delayed));
+
 	ocrpt_expr_resolve(bc->bctype);
 	ocrpt_expr_optimize(bc->bctype);
 
@@ -803,13 +846,15 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
+		ocrpt_line *l = (ocrpt_line *)oe;
+		ocrpt_hline *hl = (ocrpt_hline *)oe;
+		ocrpt_image *img = (ocrpt_image *)oe;
+		ocrpt_barcode *bc = (ocrpt_barcode *)oe;
 		const char *font_name;
 		double font_size;
 
 		switch (oe->type) {
-		case OCRPT_OUTPUT_LINE: {
-			ocrpt_line *l = (ocrpt_line *)oe;
-
+		case OCRPT_OUTPUT_LINE:
 			l->suppress_line = false;
 			if (l->suppress && l->suppress->result[o->residx] && l->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->suppress->result[o->residx]->number_initialized) {
 				long suppress = mpfr_get_si(l->suppress->result[o->residx]->number, o->rndmode);
@@ -839,13 +884,12 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 				o->output_functions.set_font_sizes(o, font_name, font_size, false, false, &l->fontsz, &l->font_width);
 			if (output->current_image)
 				ocrpt_layout_line_get_text_sizes(o, p, pr, pd, r, output, l, page_width - output->current_image->image_width, page_position);
+			else if (output->current_barcode)
+				ocrpt_layout_line_get_text_sizes(o, p, pr, pd, r, output, l, page_width - output->current_barcode->barcode_width, page_position);
 			else
 				ocrpt_layout_line_get_text_sizes(o, p, pr, pd, r, output, l, page_width, page_position);
 			break;
-		}
-		case OCRPT_OUTPUT_HLINE: {
-			ocrpt_hline *hl = (ocrpt_hline *)oe;
-
+		case OCRPT_OUTPUT_HLINE:
 			hl->suppress_hline = false;
 			if (hl->suppress && hl->suppress->result[o->residx] && hl->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && hl->suppress->result[o->residx]->number_initialized) {
 				long suppress = mpfr_get_si(hl->suppress->result[o->residx]->number, o->rndmode);
@@ -871,11 +915,9 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 			if (o->output_functions.set_font_sizes)
 				o->output_functions.set_font_sizes(o, font_name, font_size, false, false, NULL, &hl->font_width);
 			break;
-		}
-		case OCRPT_OUTPUT_IMAGE: {
-			ocrpt_image *img = (ocrpt_image *)oe;
-
+		case OCRPT_OUTPUT_IMAGE:
 			output->current_image = NULL;
+			output->current_barcode = NULL;
 			img->suppress_image = false;
 			if (img->suppress && img->suppress->result[o->residx] && img->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && img->suppress->result[o->residx]->number_initialized) {
 				long suppress = mpfr_get_si(img->suppress->result[o->residx]->number, o->rndmode);
@@ -887,19 +929,26 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 			}
 
 			ocrpt_layout_image_setup(o, p, pr, pd, r, output, NULL, img, page_width, page_indent, page_position);
-			output->current_image_width = img->image_width;
 			break;
-		}
 		case OCRPT_OUTPUT_IMAGEEND:
-			output->current_image_width = 0.0;
 			break;
 		case OCRPT_OUTPUT_BARCODE:
-			/* TODO */
+			output->current_image = NULL;
+			output->current_barcode = NULL;
+			bc->suppress_bc = false;
+			if (bc->suppress && bc->suppress->result[o->residx] && bc->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && bc->suppress->result[o->residx]->number_initialized) {
+				long suppress = mpfr_get_si(bc->suppress->result[o->residx]->number, o->rndmode);
+
+				if (suppress) {
+					bc->suppress_bc = true;
+					break;
+				}
+			}
+
+			ocrpt_layout_barcode_setup(o, p, pr, pd, r, output, NULL, bc, page_width, page_indent, page_position);
 			break;
 		}
 	}
-
-	output->current_image_width = 0.0;
 }
 
 static inline void get_height_exceeded(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, double old_page_position, double new_page_position, bool *height_exceeded, bool *pd_height_exceeded, bool *r_height_exceeded) {
@@ -908,12 +957,25 @@ static inline void get_height_exceeded(opencreport *o, ocrpt_part *p, ocrpt_part
 	*r_height_exceeded = o->output_functions.supports_report_height && r && r->height_expr && (r->remaining_height < (new_page_position - old_page_position));
 }
 
+void ocrpt_layout_output_adjust_page_position(ocrpt_output *output, double *page_position) {
+	if (output->current_image) {
+		if (*page_position < output->old_page_position + output->current_image->image_height)
+			*page_position = output->old_page_position + output->current_image->image_height;
+	} else if (output->current_barcode) {
+		if (*page_position < output->old_page_position + output->current_barcode->barcode_height)
+			*page_position = output->old_page_position + output->current_barcode->barcode_height;
+	}
+}
+
 bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, double page_width, double page_indent, double *page_position) {
 	if (output->suppress_output)
 		return false;
 
 	for (; output->iter; output->iter = output->iter->next) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)output->iter->data;
+		ocrpt_hline *hl = (ocrpt_hline *)oe;
+		ocrpt_image *img = (ocrpt_image *)oe;
+		ocrpt_barcode *bc = (ocrpt_barcode *)oe;
 
 		switch (oe->type) {
 		case OCRPT_OUTPUT_LINE: {
@@ -939,6 +1001,8 @@ bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 
 				if (output->current_image)
 					ocrpt_layout_line(draw, o, p, pr, pd, r, br, output, l, page_width - output->current_image->image_width, page_indent + output->current_image->image_width, page_position);
+				else if (output->current_barcode)
+					ocrpt_layout_line(draw, o, p, pr, pd, r, br, output, l, page_width - output->current_barcode->barcode_width, page_indent + output->current_barcode->barcode_width, page_position);
 				else
 					ocrpt_layout_line(draw, o, p, pr, pd, r, br, output, l, page_width, page_indent, page_position);
 			}
@@ -946,46 +1010,49 @@ bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 			l->current_line = 0;
 			break;
 		}
-		case OCRPT_OUTPUT_HLINE: {
-			ocrpt_hline *hl = (ocrpt_hline *)oe;
-
+		case OCRPT_OUTPUT_HLINE:
 			if (hl->suppress_hline)
 				break;
 
 			if (output->current_image)
 				ocrpt_layout_hline(draw, o, p, pr, pd, r, br, output, hl, page_width - output->current_image->image_width, page_indent + output->current_image->image_width, page_position);
+			else if (output->current_barcode)
+				ocrpt_layout_hline(draw, o, p, pr, pd, r, br, output, hl, page_width - output->current_barcode->barcode_width, page_indent + output->current_barcode->barcode_width, page_position);
 			else
 				ocrpt_layout_hline(draw, o, p, pr, pd, r, br, output, hl, page_width, page_indent, page_position);
 			break;
-		}
-		case OCRPT_OUTPUT_IMAGE: {
-			ocrpt_image *img = (ocrpt_image *)oe;
-
-			if (output->current_image)
-				*page_position = output->old_page_position + output->current_image->image_height;
+		case OCRPT_OUTPUT_IMAGE:
+			ocrpt_layout_output_adjust_page_position(output, page_position);
 
 			output->current_image = NULL;
+			output->current_barcode = NULL;
 			if (img->suppress_image)
 				break;
 
 			ocrpt_layout_image(draw, o, p, pr, pd, r, br, output, img, false, page_width, page_indent, page_position);
 			break;
-		}
 		case OCRPT_OUTPUT_IMAGEEND:
-			if (output->current_image)
-				*page_position = output->old_page_position + output->current_image->image_height;
+			ocrpt_layout_output_adjust_page_position(output, page_position);
 
 			output->current_image = NULL;
+			output->current_barcode = NULL;
 
 			ocrpt_layout_imageend(draw, o, p, pr, pd, r, br, output);
 			break;
 		case OCRPT_OUTPUT_BARCODE:
+			ocrpt_layout_output_adjust_page_position(output, page_position);
+
+			output->current_image = NULL;
+			output->current_barcode = NULL;
+			if (bc->suppress_bc)
+				break;
+
+			ocrpt_layout_barcode(draw, o, p, pr, pd, r, br, output, bc, false, page_width, page_indent, page_position);
 			break;
 		}
 	}
 
-	if (output->current_image)
-		*page_position = output->old_page_position + output->current_image->image_height;
+	ocrpt_layout_output_adjust_page_position(output, page_position);
 
 	output->current_image = NULL;
 
@@ -1515,6 +1582,7 @@ DLL_EXPORT_SYM ocrpt_barcode *ocrpt_line_add_barcode(ocrpt_line *line) {
 	memset(bc, 0, sizeof(ocrpt_barcode));
 	bc->le_type = OCRPT_OUTPUT_LE_BARCODE;
 	bc->output = line->output;
+	bc->in_line = true;
 	line->elements = ocrpt_list_append(line->elements, bc);
 
 	return bc;
@@ -1900,6 +1968,16 @@ DLL_EXPORT_SYM void ocrpt_barcode_set_value_delayed(ocrpt_barcode *bc, const cha
 		ocrpt_expr_free(bc->delayed);
 
 	bc->delayed = expr_string ? ocrpt_layout_expr_parse(bc->output->o, bc->output->r, expr_string, true, false) : NULL;
+}
+
+DLL_EXPORT_SYM void ocrpt_barcode_set_suppress(ocrpt_barcode *bc, const char *expr_string) {
+	if (!bc)
+		return;
+
+	if (bc->suppress)
+		ocrpt_expr_free(bc->suppress);
+
+	bc->suppress = expr_string ? ocrpt_layout_expr_parse(bc->output->o, bc->output->r, expr_string, true, false) : NULL;
 }
 
 DLL_EXPORT_SYM void ocrpt_barcode_set_type(ocrpt_barcode *bc, const char *expr_string) {

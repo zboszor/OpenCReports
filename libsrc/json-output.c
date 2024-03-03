@@ -316,7 +316,6 @@ static void ocrpt_json_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 	yajl_gen_string(priv->yajl_gen, (ystr)"color", 5);
 	yajl_gen_string(priv->yajl_gen, (ystr)priv->base.data->str, priv->base.data->len);
 
-
 	yajl_gen_string(priv->yajl_gen, (ystr)"value", 5);
 	if (bc->value && bc->value->result[o->residx] && bc->value->result[o->residx]->type == OCRPT_RESULT_STRING)
 		yajl_gen_string(priv->yajl_gen, (ystr)bc->value->result[o->residx]->string->str, bc->value->result[o->residx]->string->len);

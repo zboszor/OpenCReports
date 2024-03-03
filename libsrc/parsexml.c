@@ -753,13 +753,14 @@ static void ocrpt_parse_output_imageend_node(opencreport *o, ocrpt_report *r, oc
 
 static void ocrpt_parse_output_barcode_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, xmlTextReaderPtr reader) {
 	ocrpt_barcode *bc;
-	xmlChar *value, *delayed, *type, *width, *height, *color, *bgcolor;
+	xmlChar *value, *delayed, *suppress, *type, *width, *height, *color, *bgcolor;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
 	} xmlattrs[] = {
 		{ { "value" }, &value },
 		{ { "delayed", "precalculate" }, &delayed },
+		{ { "suppress" }, &suppress },
 		{ { "type" }, &type },
 		{ { "width" }, &width },
 		{ { "height" }, &height },
@@ -784,6 +785,7 @@ static void ocrpt_parse_output_barcode_node(opencreport *o, ocrpt_report *r, ocr
 
 	ocrpt_barcode_set_value(bc, (char *)value);
 	ocrpt_barcode_set_value_delayed(bc, (char *)delayed);
+	ocrpt_barcode_set_suppress(bc, (char *)suppress);
 	ocrpt_barcode_set_type(bc, (char *)type);
 	ocrpt_barcode_set_width(bc, (char *)width);
 	ocrpt_barcode_set_height(bc, (char *)height);

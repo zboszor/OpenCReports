@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="0" cols="5" />
+	</Queries>
+	<Report fontSize="12">
+		<NoData>
+			<Output>
+				<HorizontalLine size="1" color="'Black'" />
+				<HorizontalLine size="1" length="14" color="'aqua'" />
+				<HorizontalLine size="1" length="14" color="'blue'" />
+				<HorizontalLine size="1" length="14" color="'bobkratz'" />
+				<HorizontalLine size="1" color="'everton'" />
+				<HorizontalLine size="1" length="14" color="'Fuchsia'" />
+				<HorizontalLine size="1" length="14" color="'Gray'" />
+				<HorizontalLine size="1" length="14" color="'Green'" />
+				<HorizontalLine size="1" color="'Lime'" />
+				<HorizontalLine size="1" length="14" color="'Maroon'" />
+				<HorizontalLine size="1" length="14" color="'Navy'" />
+				<HorizontalLine size="1" length="14" color="'Olive'" />
+				<HorizontalLine size="1" color="'Purple'" />
+				<HorizontalLine size="1" length="14" color="'Red'" />
+				<HorizontalLine size="1" length="14" color="'Silver'" />
+				<HorizontalLine size="1" length="14" color="'Teal'" />
+				<HorizontalLine size="1" length="14" color="'White'" />
+				<HorizontalLine size="1" color="'Yellow'" />
+				<HorizontalLine size="1" color="'Black'" />
+				<Barcode value="'123456789012'" type="'ean-13'" width="100" height="100" />
+				<Line>
+					<field value="'There'" width="6" color="'Red'" bgcolor="'Blue'" bold="yes" />
+					<literal width="3" align="'right'" color="'White'" bgcolor="'Black'" >is</literal>
+					<field value="'no'" width="3" align="'center'" color="'Lime'" bgcolor="'Teal'" italic="yes" />
+					<literal width="5" color="'Aqua'" bgcolor="'Silver'" >data</literal>
+					<field value="'here.'" width="5" color="'Fuchsia'" bgcolor="'Green'"  />
+				</Line>
+				<HorizontalLine size="1" color="'Black'" />
+				<Line>
+					<field value="'There'" width="6" color="'Red'" bgcolor="'Blue'" bold="yes" />
+					<literal width="3" align="'right'" color="'White'" bgcolor="'Black'" >is</literal>
+					<field value="'no'" width="3" align="'center'" color="'Lime'" bgcolor="'Teal'" italic="yes" />
+					<literal width="5" color="'Aqua'" bgcolor="'Silver'" >data</literal>
+					<field value="'here.'" width="5" color="'Fuchsia'" bgcolor="'Green'"  />
+				</Line>
+				<Barcode value="'987654321098'" type="'ean-13'" width="100" height="100" />
+				<Line>
+					<field value="'There'" width="6" color="'Red'" bgcolor="'Blue'" bold="yes" />
+					<literal width="3" align="'right'" color="'White'" bgcolor="'Black'" >is</literal>
+					<field value="'no'" width="3" align="'center'" color="'Lime'" bgcolor="'Teal'" italic="yes" />
+					<literal width="5" color="'Aqua'" bgcolor="'Silver'" >data</literal>
+					<field value="'here.'" width="5" color="'Fuchsia'" bgcolor="'Green'"  />
+				</Line>
+				<HorizontalLine size="1" color="'Black'" />
+				<Line>
+					<field value="'There'" width="6" color="'Red'" bgcolor="'Blue'" bold="yes" />
+					<literal width="3" align="'right'" color="'White'" bgcolor="'Black'" >is</literal>
+					<field value="'no'" width="3" align="'center'" color="'Lime'" bgcolor="'Teal'" italic="yes" />
+					<literal width="5" color="'Aqua'" bgcolor="'Silver'" >data</literal>
+					<field value="'here.'" width="5" color="'Fuchsia'" bgcolor="'Green'"  />
+				</Line>
+				<HorizontalLine size="1" length="1000" color="'Purple'" />
+			</Output>
+		</NoData>
+	</Report>
+</OpenCReport>
