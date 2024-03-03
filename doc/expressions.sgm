@@ -1249,19 +1249,19 @@ a+++++b
 		<sect2 id="logfunc">
 			<title>log()</title>
 			<para>
-				Natural logarithm. It takes one nueric operand.
+				Natural logarithm. It takes one numeric operand.
 			</para>
 		</sect2>
 		<sect2 id="log10func">
 			<title>log10()</title>
 			<para>
-				Base-10 logarithm. It takes one nueric operand.
+				Base-10 logarithm. It takes one numeric operand.
 			</para>
 		</sect2>
 		<sect2 id="log2func">
 			<title>log2()</title>
 			<para>
-				Base-2 logarithm. It takes one nueric operand.
+				Base-2 logarithm. It takes one numeric operand.
 			</para>
 		</sect2>
 		<sect2 id="lorfunc">
