@@ -973,8 +973,8 @@ a+++++b
 			<title>dec()</title>
 			<para>
 				Decrement by one. It takes one numeric operand.
-				The operator <literal>++</literal> is the shortcut for it,
-				either in prefix or postfix uses.
+				The operator <literal>--</literal> is the shortcut for it,
+				either as prefix or postfix operator.
 			</para>
 		</sect2>
 		<sect2 id="dimfunc">
@@ -1180,8 +1180,8 @@ a+++++b
 			<title>inc()</title>
 			<para>
 				Increment by one. It takes one numeric operand.
-				The operator <literal>--</literal> is the shortcut for it,
-				either in prefix or postfix uses.
+				The operator <literal>++</literal> is the shortcut for it,
+				either as prefix or postfix operator.
 			</para>
 		</sect2>
 		<sect2 id="intervalfunc">
