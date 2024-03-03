@@ -67,24 +67,23 @@
 				the high and low level APIs allows a balance anywhere
 				between the two extremes. For example, load the report
 				description, which contains the complete layout, and pass
-				database access details via program code. RLIB's API and
-				report description allowed neither extremes, it relied on
-				the report description to provide the layout, with the
-				data access added from programming code.
+				database access details via program code. As a comparison,
+				RLIB's API and report description allowed neither extremes:
+				it relied on the report description to provide the layout,
+				with data access added from programming code.
 			</para>
 		</sect2>
 		<sect2 id="strictparser">
 			<title>Strict expression parser</title>
 			<para>
 				OpenCReports uses a Flex/Bison based expression parser.
-				The expression grammar doesn't allow buggy expressions.
+				The expression grammar doesn't allow incorrect expressions.
 				See the <xref linkend="expressions"/> chapter.
 			</para>
 			<para>
 				RLIB's expression parser was a custom implementation
-				which was slightly fragile and forgiving. For example,
-				it allowed unclosed parentheses at the end of an
-				expression.
+				which was slightly fragile and forgiving to certain
+				types of typing errors.
 			</para>
 		</sect2>
 		<sect2 id="expropt">
@@ -133,14 +132,14 @@
 			<para>
 				OpenCReports exclusively uses UTF-8 for strings.
 				Input data must be in UTF-8 and output formats
-				also use UTF-8.
+				also use UTF-8. This allows text from different
+				languages appear in the same report, provided that
+				an applicable font is available.
 			</para>
 			<para>
 				RLIB could have been built with or without UTF-8 support.
-				The build that disabled UTF-8 support relied on
-				single byte character set encodings and conversion
-				between them. That wasn't always reliable. Since that
-				time, multibyte character encodings have won.
+				Mixing string from different languages using single-byte
+				encodings (e.g. Latin-1 and Latin-2) is ambiguous at best.
 			</para>
 		</sect2>
 		<sect2 id="highprecnumerics">
