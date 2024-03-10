@@ -78,9 +78,7 @@ static void ocrpt_html_end_output(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 }
 
 static void ocrpt_html_start_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, double page_indent, double y) {
-	ocrpt_mem_string_append_printf(o->output_buffer,
-										"<p style=\"line-height: %.2lfpt; \">",
-										l->line_height);
+	ocrpt_mem_string_append_printf(o->output_buffer, "<p>");
 }
 
 static void ocrpt_html_end_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l) {
@@ -88,12 +86,7 @@ static void ocrpt_html_end_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 
 	ocrpt_mem_string_append(o->output_buffer, "</p>\n");
 
-	/*
-	 * Cheat a little in accounting for line heights.
-	 * Lines (despite everything is in "pt") have gaps between them.
-	 * Add two pt for every line finished.
-	 */
-	priv->curr_pos_from_last_image += l->line_height + 2.0;
+	priv->curr_pos_from_last_image += l->line_height;
 }
 
 static void ocrpt_html_add_new_page_epilogue(opencreport *o) {
