@@ -250,6 +250,90 @@ expr optimized: 0.000000
 expr nodes: 1
 (number)0.000000
 
+string: a+++++b
+expr reprinted: add(inc(inc(.'a')),.'b')
+expr nodes: 5
+expr optimized: add(inc(inc(.'a')),.'b')
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: a-++++b
+expr reprinted: sub(.'a',inc(inc(.'b')))
+expr nodes: 5
+expr optimized: sub(.'a',inc(inc(.'b')))
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: a--+++b
+expr reprinted: add(inc(dec(.'a')),.'b')
+expr nodes: 5
+expr optimized: add(inc(dec(.'a')),.'b')
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: a---++b
+expr reprinted: sub(dec(.'a'),inc(.'b'))
+expr nodes: 5
+expr optimized: sub(dec(.'a'),inc(.'b'))
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: a----+b
+expr reprinted: add(dec(dec(.'a')),.'b')
+expr nodes: 5
+expr optimized: add(dec(dec(.'a')),.'b')
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: a-----b
+expr reprinted: sub(dec(dec(.'a')),.'b')
+expr nodes: 5
+expr optimized: sub(dec(dec(.'a')),.'b')
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: a++++-b
+expr reprinted: sub(inc(inc(.'a')),.'b')
+expr nodes: 5
+expr optimized: sub(inc(inc(.'a')),.'b')
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: a+++--b
+expr reprinted: add(inc(.'a'),dec(.'b'))
+expr nodes: 5
+expr optimized: add(inc(.'a'),dec(.'b'))
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: a++---b
+expr reprinted: sub(dec(inc(.'a')),.'b')
+expr nodes: 5
+expr optimized: sub(dec(inc(.'a')),.'b')
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: a+----b
+expr reprinted: add(.'a',dec(dec(.'b')))
+expr nodes: 5
+expr optimized: add(.'a',dec(dec(.'b')))
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: a+--++b
+expr reprinted: add(.'a',dec(inc(.'b')))
+expr nodes: 5
+expr optimized: add(.'a',dec(inc(.'b')))
+expr nodes: 5
+(ERROR)invalid operand(s)
+
+string: a++-++b
+expr reprinted: sub(inc(.'a'),inc(.'b'))
+expr nodes: 5
+expr optimized: sub(inc(.'a'),inc(.'b'))
+expr nodes: 5
+(ERROR)invalid operand(s)
+
 string: 6 / 3 / 2 
 expr reprinted: div(div(6.000000,3.000000),2.000000)
 expr nodes: 5

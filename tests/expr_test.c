@@ -58,6 +58,18 @@ int main(int argc, char **argv) {
 		"++1",
 		"1--",
 		"--1",
+		"a+++++b",
+		"a-++++b",
+		"a--+++b",
+		"a---++b",
+		"a----+b",
+		"a-----b",
+		"a++++-b",
+		"a+++--b",
+		"a++---b",
+		"a+----b",
+		"a+--++b",
+		"a++-++b",
 
 		/* Identical operators (optimizer test) */
 		"6 / 3 / 2 ",	/* 1 */
