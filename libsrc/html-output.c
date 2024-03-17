@@ -439,7 +439,7 @@ static void ocrpt_html_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 			if (e == '+' || e == '-')
 				continue;
 
-			int32_t width = isdigit(e) ? width = e - '0' : e - 'a' + 1;
+			int32_t width = isdigit(e) ? e - '0' : e - 'a' + 1;
 
 			if (bar % 2) {
 				cairo_set_source_rgb(cr, fg.r, fg.g, fg.b);
