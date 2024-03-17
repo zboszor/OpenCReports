@@ -1,6 +1,6 @@
 /*
  * OpenCReports PHP module header
- * Copyright (C) 2019-2023 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2024 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.PHP in the toplevel directory.
  */
 
