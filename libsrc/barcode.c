@@ -49,7 +49,7 @@ static bool ocrpt_check_ean_addon(ocrpt_string *barcode, char **space, size_t *l
 
 	if (*space) {
 		size_t len0 = *space - barcode->str;
-		size_t addon0 = *len - len0 - 1;
+		size_t addon0 = barcode->len - len0 - 1;
 
 		if (len)
 			*len = len0;
