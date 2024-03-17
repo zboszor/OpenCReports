@@ -14,6 +14,8 @@ OCRPT_STATIC_FUNCTION(my_inc) {
 		return;
 	}
 
+	ocrpt_result *rs;
+
 	switch (ocrpt_result_get_type(ocrpt_expr_operand_get_result(e, 0))) {
 	case OCRPT_RESULT_NUMBER:
 		ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
@@ -21,7 +23,7 @@ OCRPT_STATIC_FUNCTION(my_inc) {
 		ocrpt_expr_set_long(e, 1L);
 		break;
 	case OCRPT_RESULT_ERROR:
-		ocrpt_result *rs = ocrpt_expr_operand_get_result(e, 0);
+		rs = ocrpt_expr_operand_get_result(e, 0);
 		ocrpt_expr_make_error_result(e, rs ? ocrpt_result_get_string(rs)->str : "invalid operand(s)");
 		break;
 	case OCRPT_RESULT_STRING:
@@ -38,6 +40,8 @@ OCRPT_STATIC_FUNCTION(my_dec) {
 		return;
 	}
 
+	ocrpt_result *rs;
+
 	switch (ocrpt_result_get_type(ocrpt_expr_operand_get_result(e, 0))) {
 	case OCRPT_RESULT_NUMBER:
 		ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
@@ -45,7 +49,7 @@ OCRPT_STATIC_FUNCTION(my_dec) {
 		ocrpt_expr_set_long(e, 0L);
 		break;
 	case OCRPT_RESULT_ERROR:
-		ocrpt_result *rs = ocrpt_expr_operand_get_result(e, 0);
+		rs = ocrpt_expr_operand_get_result(e, 0);
 		ocrpt_expr_make_error_result(e, rs ? ocrpt_result_get_string(rs)->str : "invalid operand(s)");
 		break;
 	case OCRPT_RESULT_STRING:

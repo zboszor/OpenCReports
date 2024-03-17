@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
 	ocrpt_query *q = ocrpt_query_add_odbc(ds, "a", "SELECT * FROM flintstones");
 	ocrpt_query *q2 = ocrpt_query_add_odbc(ds2, "b", "SELECT * FROM rubbles");
 	int32_t cols, cols2, i, row;
-	ocrpt_query_result *qr = ocrpt_query_get_result(q, &cols);
+	ocrpt_query_result *qr UNUSED = ocrpt_query_get_result(q, &cols);
 	ocrpt_query_result *qr2;
 	ocrpt_expr *match;
 	char *err;

@@ -12,8 +12,8 @@
 
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
-	ocrpt_part *p1;
-	ocrpt_part *p2;
+	ocrpt_part *p1 UNUSED;
+	ocrpt_part *p2 UNUSED;
 	ocrpt_part_row *pr1;
 	ocrpt_part_row *pr2;
 	ocrpt_part_column *pd1;

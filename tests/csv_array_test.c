@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
 	ocrpt_datasource *ds = ocrpt_datasource_add_csv(o, "csv");
 	ocrpt_datasource *ds2 = ocrpt_datasource_add_array(o, "array");
 	ocrpt_query *q, *q2;
-	ocrpt_query_result *qr, *qr2;
+	ocrpt_query_result *qr, *qr2 UNUSED;
 	ocrpt_expr *id, *name, *age, *adult, *match;
 	char *err;
 	int32_t cols, cols2, row, i;

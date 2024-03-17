@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds, *ds2;
 	ocrpt_query *q, *q2;
-	ocrpt_query_result *qr, *qr2;
+	ocrpt_query_result *qr UNUSED, *qr2 UNUSED;
 	int32_t cols, cols2, row, i;
 
 	if (!ocrpt_parse_xml(o, "csvquery.xml")) {
