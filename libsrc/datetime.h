@@ -1,6 +1,6 @@
 /*
  * Datetime utilities
- * Copyright (C) 2023-2023 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2023-2024 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 #ifndef _DATETIME_H_

@@ -1,6 +1,6 @@
 %top{
 /*
- * Copyright (C) 2019-2022 Zoltán Böszörményi
+ * Copyright (C) 2019-2024 Zoltán Böszörményi
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
