@@ -927,27 +927,23 @@ static void ocrpt_break_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr r
 	ocrpt_break *br;
 	bool have_breakfield = false;
 	struct {
-		char *attr;
+		char *attrs[3];
 		xmlChar **attrp;
 	} xmlattrs[] = {
-		{ "name", &brname },
-#if 0
-		/*
-		 * "newpage" is a write-only setting in RLIB.
-		 * OpenCReports accepts it in opencreport.dtd
-		 * and just ignore it here, leaving this as
-		 * code documentation.
-		 */
-		{ "newpage", &newpage },
-#endif
-		{ "headernewpage", &headernewpage },
-		{ "suppressblank", &suppressblank },
-		{ NULL, NULL },
+		{ { "name" }, &brname },
+		{ { "headernewpage", "newpage" }, &headernewpage },
+		{ { "suppressblank" }, &suppressblank },
+		{ { NULL }, NULL },
 	};
-	int32_t i;
+	int32_t i, j;
 
-	for (i = 0; xmlattrs[i].attrp; i++)
-		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attr);
+	for (i = 0; xmlattrs[i].attrp; i++) {
+		for (j = 0; xmlattrs[i].attrs[j]; j++) {
+			*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs[j]);
+			if (*xmlattrs[i].attrp)
+				break;
+		}
+	}
 
 	if (!brname) {
 		ocrpt_err_printf("nameless break is useless, not adding to report\n");
@@ -1001,7 +997,7 @@ static void ocrpt_break_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr r
 	}
 
 	out:
-	for (i = 0; xmlattrs[i].attr; i++)
+	for (i = 0; xmlattrs[i].attrp; i++)
 		xmlFree(*xmlattrs[i].attrp);
 }
 
