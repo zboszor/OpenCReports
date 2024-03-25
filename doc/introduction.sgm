@@ -4,28 +4,29 @@
 		<title>The predecessor: RLIB</title>
 		<para>
 			The idea to write <ulink url="https://github.com/zboszor/OpenCReports">OpenCReports</ulink>
-			started with my getting acqauinted with <ulink url="https://github.com/SICOM/rlib">RLIB</ulink>
+			started with my getting acqauinted with <ulink url="https://sourceforge.net/projects/rlib/">RLIB</ulink>
 			in 2005 and working with it (and on it) for a very long time,
 			with the original implementors finally losing interest in
-			developing RLIB further. This was around 2018. Even the
-			original documentation site for RLIB was retired. But
-			thanks to the Internet Archive,
+			developing RLIB further. This was around
+			2018. Even the original documentation site for RLIB was retired.
+			But thanks to the Internet Archive,
 			<ulink url="https://web.archive.org/web/20131116192438/http://newrlib.sicom.com/~rlib/index.php/Main_Page">it may still be read</ulink>
 		</para>
 		<para>
-			To overcome some of the shortcomings seen in RLIB,
-			its <emphasis>ideas</emphasis> were used for a completely
+			To overcome some of the shortcomings seen in
+			RLIB, its <emphasis>ideas</emphasis> were used for a completely
 			new implementation with high level of compatibility
 			to the original.
 		</para>
 		<para>
-			RLIB is a report generator library, so is OpenCReports.
-			In this documentation, a lot of references contain
-			comparisons to RLIB.
+			RLIB is a report generator library,
+			so is OpenCReports. In this documentation,
+			a lot of references contain comparisons to
+			RLIB.
 		</para>
 		<para>
-			The name OpenCReports came from the fact that it's
-			implemented in the C programming language in an
+			The name OpenCReports came from the fact
+			that it's implemented in the C programming language in an
 			open way, and using a free software license.
 		</para>
 	</sect1>
@@ -70,7 +71,8 @@
 				database access details via program code. As a comparison,
 				RLIB's API and report description allowed neither extremes:
 				it relied on the report description to provide the layout,
-				with data access added from programming code.
+				with data access and other supplementary details controlled
+				from programming code.
 			</para>
 		</sect2>
 		<sect2 id="strictparser">
@@ -79,11 +81,6 @@
 				OpenCReports uses a Flex/Bison based expression parser.
 				The expression grammar doesn't allow incorrect expressions.
 				See the <xref linkend="expressions"/> chapter.
-			</para>
-			<para>
-				RLIB's expression parser was a custom implementation
-				which was slightly fragile and forgiving to certain
-				types of typing errors.
 			</para>
 		</sect2>
 		<sect2 id="expropt">
@@ -94,12 +91,8 @@
 				values. For example, in <literal>a*2/3</literal>
 				the part <literal>2/3</literal> is two constants
 				in a division. This is precomputed into a single
-				constant as an optimization.
-			</para>
-			<para>
-				RLIB didn't contain automatic optimizations.
-				It relied on manual optimizations, like using
-				<xref linkend="variables"/>.
+				constant as an optimization. Naturally, only
+				mathematically valid optimizations are performed.
 			</para>
 		</sect2>
 		<sect2 id="repvars">
@@ -109,6 +102,25 @@
 				for calculating sums, minimum, maximum and average values
 				or custom defined ones. See <xref linkend="variables"/>
 			</para>
+			<para>
+				Report variables can also be used as manual expression
+				optimization. A common subexpression can be moved to
+				a report variable from multiple expressions,
+				which in turn is computed once, and its result is used
+				in the expressions referencing it.
+			</para>
+		</sect2>
+		<sect2 id="repbreaks">
+			<title>Report breaks</title>
+			<para>
+				A report break is a form of data grouping based on
+				value changes. A break (break boundary) occurs when the
+				value of a watched expression value changes from one
+				data row to the next. OpenCReports supports report breaks
+				defined on arbitrary expressions. Report variables can
+				reset their value on break boundaries. See
+				<xref linkend="breaks"/> and <xref linkend="breaksnode"/>.
+			</para>
 		</sect2>
 		<sect2 id="setoffuncs">
 			<title>Extensive and extensible set of functions</title>
@@ -116,10 +128,6 @@
 				OpenCReports has many operators and functions to
 				be used in expressions. See <xref linkend="opsandfunc"/>
 				in the <xref linkend="expressions"/> chapter.
-			</para>
-			<para>
-				In fact, OpenCReports has all the operators and
-				functions that RLIB also had, with many additions.
 			</para>
 			<para>
 				Custom functions can also be added to a report by
@@ -136,42 +144,13 @@
 				languages appear in the same report, provided that
 				an applicable font is available.
 			</para>
-			<para>
-				RLIB could have been built with or without UTF-8 support.
-				Mixing string from different languages using single-byte
-				encodings (e.g. Latin-1 and Latin-2) is ambiguous at best.
-			</para>
 		</sect2>
 		<sect2 id="highprecnumerics">
 			<title>High precision numeric data type</title>
 			<para>
-				For historic record, RLIB was designed for the US
-				and slower machines. It used a fixed point numeric
-				representation. For the US, with its strong currency
-				and prices expressed in low numbers, this was an
-				acceptable design decision. But for countries, whose
-				currencies are a few orders of magnitude weaker and
-				conversely, the prices are similarly higher, the fixed
-				point numeric value range was easily overflown, leading
-				to wrong data in the report output.
-			</para>
-			<para>
-				Another potential problem with the fixed point numeric
-				representation was that converting numbers from the
-				input data to this internal representation always and
-				unconditionally rounded down. This can be demonstrated
-				with a carefully constructed (small) data set that would
-				add up exactly to 100% both on paper and with using the
-				IEEE-754 <literal>double</literal> data type, it would
-				only add up to 99.99% with RLIB's internal numeric
-				representation.
-			</para>
-			<para>
-				To avoid these kind of problems, OpenCReports uses
-				GNU MPFR floating point values with 256-bit precision
-				by default. This allows storing very large and very small
-				numbers. E.g. this allows computations even with late
-				stage
+				OpenCReports uses a high precision numeric data type.
+				This allows scientific computation or monetary
+				calculations even with late stage
 				<ulink url="https://en.wikipedia.org/wiki/Hyperinflation">hyperinflation</ulink>
 				prices.
 				See <xref linkend="numericconstants"/> in
@@ -183,41 +162,20 @@
 		<sect2 id="datetimetypes">
 			<title>Datetime and interval data types</title>
 			<para>
-				OpenCReports differentiates between timestamp and
-				time interval data types, with the latter allowing
-				adding or subtracting a custom time period to and from
-				timestamp data. See <xref linkend="datetimeconstants"/>
-				in the <xref linkend="expressions"/> chapter.
+				OpenCReports handles both timestamp and time interval
+				data types. The latter allows adding or subtracting a
+				custom time period to and from timestamp data.
+				See <xref linkend="datetimeconstants"/> in the
+				<xref linkend="expressions"/> chapter.
 			</para>
 		</sect2>
 		<sect2 id="autoconv">
 			<title>Automatic input data conversion</title>
 			<para>
 				For maximum portability, databases provide their
-				data in strings. They also provide metadata that
-				describes the data type of every column in the
-				data record.
-			</para>
-			<para>
-				RLIB relied on explicit data conversion functions,
-				like <literal>val()</literal> and
-				<literal>stodt()</literal>.
-			</para>
-			<para>
-				OpenCReports discovers the columns' data type
-				and applies the conversion automatically. For
-				RLIB compatibility, the conversion functions
-				pass through values as is if they are already
-				converted. For example, the <literal>val()</literal>
-				function accepts an operand with both string and
-				numeric data types. In the former case the conversion
-				to numeric is performed, but if the operand is
-				already numeric, no further conversion takes place.
-				This is user friendly in two aspects: the conversion
-				function is not necessary when implementing a new
-				report, and an already existing RLIB report (that
-				contains such conversion functions for the input data)
-				may be used as is.
+				data in strings. They also indicate the column type.
+				OpenCReports detects the columns' data type
+				and applies the conversion automatically.
 			</para>
 		</sect2>
 		<sect2 id="alignments">
@@ -225,123 +183,47 @@
 			<para>
 				In the report output, fields may have a fixed width in
 				which they are displayed. Some field values are longer
-				that the field width. When displaying them in a single
-				row, fields may be left-, right- or center-aligned.
-				With the PDF output, this means pixel-perfect alignment
-				with the parts of the field value that don't fit masked
-				off visually. RLIB aligned the data actually truncated
-				to fit into the field width.
+				than the field width. When displaying them in a single
+				row, fields may be left-, right- or center-aligned
+				to show the interesting part of the value or for visual
+				reasons.
 			</para>
 			<para>
 				Fields longer than the designated width may be wrapped
 				either at word or character boundaries. This way, they
-				become multi-row fields. RLIB called them "memo" fields
-				and the XML report description in OpenCReports also
-				uses the same naming for the flags dealing with this
-				detail. Multi-row fields are configurable regading word
-				or character wrapping, or they may be limited to print
-				only a certain amount of lines. Memo fields can break
-				over column or page boundaries.
-			</para>
-			<para>
-				OpenCReports have some differences from RLIB regards to
-				memo fields.
-			</para>
-			<para>
-				Thanks to Pango rendering, when using character wrapping,
-				hyphenation is done.
-			</para>
-			<para>
-				The second extension over RLIB is that
-				<literal>justified</literal> alignment can also be
-				used for multi-line fields. This is also thanks to
-				Pango. When <literal>justified</literal> alignment is
-				used, all lines but the last are justified. Therefore,
-				<literal>justified</literal> alignment is equivalent to
-				<literal>left</literal> alignment for single line fields.
-			</para>
-		</sect2>
-		<sect2 id="repbreaks">
-			<title>Report breaks</title>
-			<para>
-				OpenCReports supports report breaks defined on arbitrary
-				expressions. Breaks occur when the expression value
-				changes, when stepping from one data set row to the next.
-				See <xref linkend="breaks"/> and <xref linkend="breaksnode"/>
+				become multi-row fields. Multi-row fields are also called
+				"memo" fields. Such fields may wrap lines at word boundaries
+				or break words at some character. Multi-row fields have
+				configurable line number limits. Memo fields can break
+				over to the next column or to the next page. Hyphenation
+				is done automatically when using character wrapping. Memo
+				fields may also use <emphasis>justified</emphasis> alignment.
 			</para>
 		</sect2>
 		<sect2 id="multicolrep">
 			<title>Multi-column reports</title>
 			<para>
-				OpenCReports, just like RLIB, supports both single-column
-				and multi-column report layout.
-			</para>
-			<para>
-				If a report is "narrow", so more columns would fit on
-				the same page, the report may be set to use multiple
-				columns on the same page.
+				OpenCReports supports both single- and multi-column layout
+				in its PDF output format. Other output formats may only
+				use single-column layout.
 			</para>
 		</sect2>
 		<sect2 id="layoutdetails">
-			<title>Layout details</title>
+			<title>Miscellaneous layout details</title>
 			<para>
-				In RLIB, sizing of layout details are a mix of units,
-				making it harder to design the report layout:
-				<itemizedlist>
-					<listitem override="bullet">
-						<para>
-							field widths and report heights are in
-							number of characters
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							width of lines are in points (1/72th inch)
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							width of gaps between columns of a
-							multi-column report is in inches
-						</para>
-					</listitem>
-				</itemizedlist>
+				OpenCReports implements an RLIB compatibility mode for
+				sizing report layout details, which uses a mix of units,
+				mostly based on character widths (making it dependent on
+				the font size used) mixed with points (1/72th inch) for
+				some report elements.
 			</para>
 			<para>
-				OpenCReports faithfully reimplements these
-				for compatibility.
+				OpenCReports also has a new, consistent size calculation
+				method where everything is measured in points (1/72th inch).
 			</para>
 			<para>
-				However, there are problems with field widths
-				calculated in number of characters. Widths using
-				a 12 point font is not the same as widths using
-				a 20 point font. Also, font width and height are
-				usually not identical. Some fonts are lean, with
-				their width smaller than their height. RLIB expected
-				that fonts are using the same character width and
-				height. For this reason, RLIB only supported a small
-				variety of monospace fonts.
-			</para>
-			<para>
-				Also, character widths for proportional fonts differ.
-				Field width expressed in number of characters cannot
-				be exact when using  proportional fonts. For this reason,
-				RLIB didn't support proportional fonts at all.
-			</para>
-			<para>
-				OpenCReports extended upon these ideas, so individual
-				fields in a text line may use custom font settings
-				while keeping the field width calculation identical
-				to RLIB, which ends with the font parameters set for
-				the text line. In OpenCReports, the fields' custom font
-				settings (font name and size) don't influence the field
-				width. Using this method, OpenCReports may use proportional
-				fonts even with using the RLIB compatible size settings.
-			</para>
-			<para>
-				On top of that, OpenCReports also has a new, consistent
-				size calculation method where everything is measured in
-				points.
+				OpenCReports supports both fixed and proportional fonts
+				even with using the RLIB compatible size settings.
 			</para>
 		</sect2>
 		<sect2 id="outputformats">
@@ -349,110 +231,6 @@
 			<para>
 				OpenCReports supports several output formats:
 				PDF, HTML, CSV, TXT, XML and JSON.
-			</para>
-			<para>
-				By using the excellent drawing possibilities of
-				Cairo coupled with Pango for text rendering,
-				OpenCReports supports generating the report in
-				PDF format. PDF is the definitive output format
-				in OpenCReports, as in it supports every feature
-				described in <xref linkend="xmldescriptor"/>, such as
-				<itemizedlist>
-					<listitem override="bullet">
-						<para>
-							page breaks (PDF is a multi-page format)
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							all four page margins: top, bottom, left, right
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							column breaks, multi-column reports
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							report column width and height
-						</para>
-					</listitem>
-				</itemizedlist>
-			</para>
-			<para>
-				When using the HTML output format, OpenCReports
-				attempts to imitate the PDF drawing capabilities
-				using CSS. However, there are inevitable differences.
-				<itemizedlist>
-					<listitem override="bullet">
-						<para>
-							The HTML output doesn't support page breaks.
-							HTML is rendered as a continuous flow of text
-							and other elements. As a consequence,
-							<literal>r.pageno</literal> and
-							<literal>r.totpages</literal> are both 1
-							for the whole output.
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							HTML output doesn't support column breaks.
-							As a consequence, a multi-column report layout
-							is rendered differently from PDF.
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							When a data row's column does not fit into the
-							width specified by the page margins or the
-							report column's width, it is rendered in the
-							remaining width differently from PDF. While PDF
-							uses the whole field width to render the data
-							field contents and uses bounding box to clip
-							the invisible part, CSS uses the remaining width
-							specified by either the margins or the report
-							column width to render the field. Left, right
-							and center alignment of the field is done
-							according to the remaining width for the field.
-						</para>
-					</listitem>
-				</itemizedlist>
-			</para>
-			<para>
-				When rendering field data wider than their
-				field widths, both the PDF and the HTML output drivers
-				use clipping (bounding box) to hide parts of the
-				field, fitting them into the designated area
-				<emphasis>visually</emphasis>. Actual field data is
-				not truncated. In some viewer applications
-				(e.g. in Poppler based PDF viewers) a visibly
-				truncated field's whole text can be selected,
-				copied and pasted elsewhere to be viewed in its
-				entirety. Field data in HTML behave the same way
-				in browsers.
-			</para>
-			<para>
-				OpenCReports also supports CSV, XML and JSON as
-				output formats that don't truncate field data.
-				These are plaintext formats with their own internal
-				format. CSV is usually used for importing into office
-				applications or databases. In general, these formats
-				are used in applications where loss of data may
-				not be tolerated. These formats don't support page or
-				column breaks. CSV does not have a way to express
-				multiple inner reports in a table in the same report run.
-			</para>
-			<para>
-				OpenCReports also supports TXT (plaintext) as output
-				format, that approximates RLIB's TXT output.
-				This format may truncate field data because it expects
-				monospace font and character based field widths;
-				and fields in this format cannot be presented separately
-				like in other formats. The TXT format doesn't support
-				page or column breaks. Its rendering ignores font name
-				and font size settings and renders everything internally
-				using a monospace font at 12 point font size.
 			</para>
 		</sect2>
 		<sect2 id="unittests">

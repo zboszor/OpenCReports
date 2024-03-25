@@ -3,7 +3,7 @@
 	<sect1 id="groupingdata">
 		<title>Grouping data</title>
 		<para>
-			<literal>OpenCReports</literal>, being a report generator,
+			OpenCReports, being a report generator,
 			works on tabular data: the data consists of ordered (named)
 			columns and ordered or unordered rows.
 		</para>

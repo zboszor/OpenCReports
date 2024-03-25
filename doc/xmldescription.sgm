@@ -5,7 +5,7 @@
 		<para>
 			<ulink url="https://github.com/zboszor/OpenCReports">OpenCReports</ulink>
 			uses an
-			<ulink url="https://github.com/SICOM/rlib">RLIB</ulink>-compatible
+			<ulink url="https://sourceforge.net/projects/rlib/">RLIB</ulink>-compatible
 			report description with extensions.
 		</para>
 		<para>
@@ -91,19 +91,11 @@
 				wouldn't allow identifier references at that location.
 			</para>
 			<para>
-				For example, the datasource name may be declared this way:
-				<programlisting>&lt;Datasource name="mysource" ... /&gt;</programlisting>
-				where the name is a literal string. Or this way:
-				<programlisting>&lt;Datasource name="'mysource'" ... /&gt;</programlisting>
-				where the name is a string expression. (Note the
-				extra quotes.) Or even this way:
-				<programlisting>&lt;Datasource name="&amp;quot;mysource&amp;quot;" ... /&gt;</programlisting>
-				where name is a string expression which uses the
-				<literal>"</literal> double quote character which
-				must be "escaped" according to XML rules. This last
-				variant is less readable than the first two.
-				Nevertheless, it is usable and it works, so machine
-				generated XML files may also be used.
+				For example, the datasource name may be declared using either
+				of the three examples below:
+				<programlisting>&lt;Datasource name="mysource" ... /&gt;
+&lt;Datasource name="'mysource'" ... /&gt;
+&lt;Datasource name="&amp;quot;mysource&amp;quot;" ... /&gt;</programlisting>
 			</para>
 			<para>
 				The first form is a regular XML string value.
@@ -115,8 +107,8 @@
 			</para>
 			<para>
 				The second form is a single quoted OpenCReports
-				string constant. The parsed string constant's
-				value is used.
+				string constant. The value of the string constant
+				(i.e. <literal>mysource</literal>) is used.
 			</para>
 			<para>
 				The third form is a double quoted OpenCReports
@@ -124,10 +116,11 @@
 				character must be substituted with
 				<literal>&amp;quot;</literal> because they are
 				reserved for quoting the attribute values.
-				The parsed string constant's value is used.
+				The value of the string constant (i.e.
+				<literal>mysource</literal>) is used.
 				(This substitution is called "string escaping"
-				and various other formats require some kind of
-				substutition for reserved characters.)
+				and various other formats besides XML require some
+				kind of substutition for reserved characters.)
 			</para>
 			<para>
 				To make the XML easier to read, the second form
@@ -156,13 +149,14 @@
 				The <literal>size_unit</literal> attribute
 				specifies report behaviour for size related
 				settings:
-				<programlisting>&lt;OpenCReport size_unit="rlib"&gt;
-&lt;OpenCReport size_unit="points"&gt;</programlisting>
+				<programlisting>&lt;OpenCReport size_unit="'rlib'"&gt;
+&lt;OpenCReport size_unit="'points'"&gt;</programlisting>
 			</para>
 			<para>
 				Default is <literal>rlib</literal>
-				which is the legacy RLIB behavior, with the
-				known inconsistency in size related settings:
+				which is the legacy RLIB behavior, where
+				sizing of layout details are a mix of units,
+				making it harder to design the report layout:
 				<itemizedlist>
 					<listitem override="bullet">
 						<para>
@@ -207,58 +201,81 @@
 				</itemizedlist>
 			</para>
 			<para>
-				Note that the default setting (as in RLIB)
-				only ever expected monospace fonts that have the
-				same width for every character. It also expected that
-				the character height is identical to the character
-				width. The latter detail is false for many monospace
-				fonts, i.e. their height is usually greater than
-				their width.
+				Note that RLIB only expected monospace
+				fonts that have the same width for every character. It also
+				expected that the character height is identical to the
+				character width. The latter expectation is false for many
+				monospace fonts, i.e. their height is usually greater than
+				their width. Also, there are problems with field widths
+				calculated in number of characters. Widths using
+				a 12 point font (for example, used for regular text)
+				is not the same as widths using a 20 point font
+				used for text in a header line. Due to this, width of header
+				and data lines will not align properly and it will show
+				when using background color for both of them.
 			</para>
 			<para>
 				With proportional fonts (where the width of
 				characters depend on their image, i.e. an "i" is
 				thinner than an "m") width of text fields cannot
-				reliably be set in "number of characters" because
-				it's not an exact value. There is a workaround for
-				this in <literal>OpenCReports</literal> but it's
-				an over-engineered solution and isn't available
-				in RLIB so it's not backward compatible either.
-				But it's there if someone wants to port reports
-				from RLIB and only make superficial changes.
+				reliably be set in a "number of characters" unit
+				because it's not an exact value. There is a workaround
+				for this in OpenCReports but it isn't available
+				in RLIB so it's not backward compatible.
 				See <xref linkend="textelemwidth"/>.
 			</para>
 			<para>
 				When <literal>size_unit</literal> is set to
 				<literal>points</literal>, all size related
 				settings in the report are in points,
-				a.k.a. 1/72th inch. Straightforward and consistent.
+				a.k.a. 1/72th inch. It's consistent and avoids the
+				above described issues.
 			</para>
 		</sect2>
 		<sect2 id="noqueryshownodata" xreflabel="No query show NoData attribute">
 			<title>No query show NoData</title>
 			<para>
-				This controls whether <xref linkend="nodatanode"/>
-				is shown when the report's <xref linkend="queryattr"/>
-				is set to a non-existing query name.
+				The report uses data from <xref linkend="queries"/>
+				through the report's <xref linkend="queryattr"/>.
+				When a query provides no data rows, an alternative section
+				called <xref linkend="nodatanode"/> with static information
+				may be shown instead if it exists in the report.
+				The report uses the first query declared in
+				<xref linkend="queries"/> if it's not explicitly set
+				via <xref linkend="queryattr"/>.
+			</para>
+			<para>
+				RLIB had a trick to disable showing the
+				<xref linkend="nodatanode"/>. This was enabled by
+				specifying a query name that does not exist.
+				This option controls the layout behaviour for that case.
 				<programlisting>&lt;OpenCReport noquery_show_nodata="yes"&gt;
 &lt;OpenCReport noquery_show_nodata="no"&gt;</programlisting>
 			</para>
 			<para>
-				Default is <literal>true</literal> when
-				<literal>OpenCReport</literal> is the toplevel node,
-				<literal>false</literal> when either
-				<literal>&lt;Part&gt;</literal> or <literal>&lt;Report&gt;</literal>
+				Default is <literal>true</literal> (or <literal>yes</literal>)
+				when <literal>&lt;OpenCReport&gt;</literal> is the toplevel node,
+				<literal>false</literal> (or <literal>no</literal>) when
+				either <literal>&lt;Part&gt;</literal> or
+				<literal>&lt;Report&gt;</literal>
 				is the toplevel node for RLIB compatibility.
-				See <xref linkend="nodatanode"/>.
 			</para>
 		</sect2>
 		<sect2 id="reportheightafterlast" xreflabel="Report height after last attribute">
 			<title>Report height after last</title>
 			<para>
-				It controls whether report height is applied
+				A report may specify its height through
+				<xref linkend="reportheight"/>.
+				Multiple <literal>&lt;Report&gt;</literal>
+				nodes may exist in the same
+				<literal>&lt;pd&gt;</literal> section.
+				For more information, see <xref linkend="partcol"/>
+				and <xref linkend="report"/>.
+			</para>
+			<para>
+				This option controls whether report height is applied
 				after the last <literal>&lt;Report&gt;</literal>
-				in the <literal>&lt;pd&gt;</literal> node.
+				in the same <literal>&lt;pd&gt;</literal> node.
 				<programlisting>&lt;OpenCReport report_height_after_last="yes"&gt;
 &lt;OpenCReport report_height_after_last="no"&gt;</programlisting>
 			</para>
@@ -268,6 +285,11 @@
 		</sect2>
 		<sect2 id="xmlfollowermatchsingle" xreflabel="Follower match single attribute">
 			<title>Follower match single</title>
+			<para>
+				<xref linkend="queries"/> may be daisy-chained together
+				as <xref linkend="followerqueries"/> in two ways, regular
+				and N:1 followers. See the links for details.
+			</para>
 			<para>
 				When set to <literal>false</literal>, N:1 followers behave
 				fully like <literal>LEFT OUTER JOIN</literal> in SQL,
@@ -279,18 +301,19 @@
 &lt;OpenCReport follower_match_single="no"&gt;</programlisting>
 			</para>
 			<para>
-				Default is <literal>false</literal>, unless the report XML
-				descriptor uses either <literal>&lt;Part&gt;</literal> or
-				<literal>&lt;Report&gt;</literal> as the toplevel XML node.
-				In the latter case, this attribute is automatically set
-				to <literal>true</literal>.
+				Default is <literal>yes</literal> in RLIB compatibility
+				mode, i.e. when either <literal>&lt;Part&gt;</literal> or
+				<literal>&lt;Report&gt;</literal> are used as the
+				toplevel XML node for the report description.
+				Otherwise the default is <literal>no</literal>.
 			</para>
 		</sect2>
 		<sect2 id="precbits">
 			<title>Precision bits</title>
 			<para>
 				This controls the precision for numeric computations.
-				<programlisting>&lt;OpenCReport precision_bits="256"&gt;</programlisting>
+				For more information, see <xref linkend="expressions"/>
+				<programlisting>&lt;OpenCReport precision_bits="512"&gt;</programlisting>
 			</para>
 			<para>
 				Default is <literal>256</literal>.
@@ -316,11 +339,11 @@
 			</para>
 			<para>
 				Default is <literal>nearest</literal>.
-				According to the MPFR documentation,
+				Note that according to the MPFR documentation,
 				<literal>faithful</literal> is experimental.
 			</para>
 		</sect2>
-		<sect2 id="locale">
+		<sect2 id="locale" xreflabel="Locale">
 			<title>Locale</title>
 			<para>
 				This controls the language settings, like the decimal
@@ -342,7 +365,8 @@
     translation_directory="/path/to/translation/files"&gt;</programlisting>
 			</para>
 			<para>
-				Translation is based on GNU Gettext.
+				Translation is based on
+				<ulink url="https://www.gnu.org/software/gettext/">GNU Gettext</ulink>.
 				A subdirectory tree is expected under the specified
 				translation directory in the form of
 				<literal>locale/LC_MESSAGES</literal> (e.g.:
@@ -356,17 +380,15 @@
 	<sect1 id="searchpaths" xreflabel="Search paths">
 		<title>Paths</title>
 		<para>
-			Some report descriptiom elements (like
-			<literal>&lt;load&gt;</literal> and
+			Some report description elements reference file.
+			Such elements are <literal>&lt;load&gt;</literal> and
 			<literal>&lt;Image&gt;</literal>, see
-			<xref linkend="loadedreport"/> and <xref linkend="imagenode"/>)
-			reference files. By default, these files must
-			be in the same directory as the report XML
-			description file, or in the current working
+			<xref linkend="loadedreport"/> and <xref linkend="imagenode"/>.
+			By default, these files must be in the same directory
+			as the report XML description file, or in the current working
 			directory for the application using OpenCReports.
-			To lift this limitation, and allow organizing files
-			in a more logical manner, a search path or
-			multiple search paths may be added.
+			To lift this limitation and to allow organizing files,
+			a search path or multiple search paths may be added.
 			For files referenced with relative paths, the
 			search paths will be used in their order of
 			declaration. Search paths and the relative file
@@ -434,7 +456,7 @@
     optionfile="myconn.cnf" group="myconn" /&gt;</programlisting>
 			</para>
 			<para>
-				In the second case, the configuration file <literal>myconn.cnf</literal>
+				In the last case, the configuration file <literal>myconn.cnf</literal>
 				would contain something like this:
 				<programlisting>[myconn]
 !include /etc/my.cnf
@@ -965,8 +987,9 @@ SELECT * FROM some_table
 		<sect2 id="followerqueries" xreflabel="Follower queries">
 			<title>Follower queries</title>
 			<para>
-				Multiple queries may be declared. But by default,
-				only the first one is actually used by a report.
+				Multiple queries may be declared for a report.
+				But by default, only the first one is actually
+				used by a report.
 			</para>
 			<para>
 				Secondary queries may be associated with the
@@ -1060,17 +1083,39 @@ SELECT * FROM some_table
 				</para>
 			</sect3>
 		</sect2>
+		<sect2 id="independentqueries" xreflabel="Independent queries">
+			<title>Independent queries</title>
+			<para>
+				Multiple queries may be declared in a report
+				XML description. If a query is neither set as a follower
+				for a previously declared query, nor set as a
+				<literal>&lt;Report&gt;</literal>'s main query via the
+				<literal>query="..."</literal> attribute, then it is an
+				independent query.
+			</para>
+			<para>
+				Independent queries will stay on their first row
+				during the run of <literal>&lt;Report&gt;</literal>s.
+			</para>
+			<para>
+				Column references of independent queries may be used
+				by node attributes that would need a constant expression
+				otherwise.
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="parts" xreflabel="Report parts">
 		<title>Report parts</title>
 		<para>
-			A report XML may contain multiple actual reports.
-			Such a <literal>&lt;Part&gt;</literal> may be
+			An OpenCReports XML description may consists of multiple
+			separate reports. This is achieved by so called
+			"report parts". Such a <literal>&lt;Part&gt;</literal> may be
 			under the toplevel <literal>&lt;OpenCReport&gt;</literal>
 			node, in which case multiple report parts may exist
-			in the same XML, or it may be the toplevel node of
+			in the same XML. It may also be the toplevel node of
 			the XML. In the latter case, only a single
-			<literal>&lt;Part&gt;</literal>	may exist in the XML.
+			<literal>&lt;Part&gt;</literal> may be present in
+			the XML description.
 			<programlisting>&lt;Part&gt;
     &lt;pr&gt;
         &lt;pd&gt;
@@ -1118,6 +1163,15 @@ SELECT * FROM some_table
 		</para>
 		<sect2 id="partattribs" xreflabel="Part attributes">
 			<title>Part attributes</title>
+			<para>
+				Note that any attribute setting below may only use
+				constant expressions or an query column reference
+				from <xref linkend="independentqueries"/>.
+				An environment variable (since it can't - or shouldn't -
+				change during the report execution) is considered constant.
+				See <xref linkend="expressions"/>. This allows external
+				control for the attributes in question.
+			</para>
 			<sect3 id="partfontname" xreflabel="Part font name">
 				<title>Font name</title>
 				<para>
@@ -1127,8 +1181,8 @@ SELECT * FROM some_table
 					It may be specified in two forms, the first one
 					is the preferred name, the second is for RLIB
 					compatibility:
-					<programlisting>&lt;Part font_name="Arial"&gt;
-&lt;Part fontName="Arial"&gt;</programlisting>
+					<programlisting>&lt;Part font_name="'Arial'"&gt;
+&lt;Part fontName="'Arial'"&gt;</programlisting>
 				</para>
 				<para>
 					If both forms are specified, <literal>font_name</literal>
@@ -1164,9 +1218,8 @@ SELECT * FROM some_table
 					Shortcut for the <xref linkend="sizeunit"/> in
 					<literal>&lt;OpenCReport&gt;</literal> when
 					<literal>&lt;Part&gt;</literal> is the toplevel node.
-					<programlisting>&lt;Part size_unit="default"&gt;
-&lt;Part size_unit="rlib"&gt;
-&lt;Part size_unit="points"&gt;</programlisting>
+					<programlisting>&lt;Part size_unit="'rlib'"&gt;
+&lt;Part size_unit="'points'"&gt;</programlisting>
 				</para>
 				<para>
 					When <literal>&lt;OpenCReport&gt;</literal> is the
@@ -1180,8 +1233,8 @@ SELECT * FROM some_table
 					Shortcut for <xref linkend="noqueryshownodata"/> in
 					<literal>&lt;OpenCReport&gt;</literal> when
                     <literal>&lt;Part&gt;</literal> is the toplevel node.
-					<programlisting>noquery_show_nodata="yes"
-noquery_show_nodata="no"</programlisting>
+					<programlisting>&lt;Part noquery_show_nodata="yes"&gt;
+&lt;Part noquery_show_nodata="no"&gt;</programlisting>
 				</para>
 				<para>
 					See default in <xref linkend="noqueryshownodata"/>
@@ -1194,8 +1247,8 @@ noquery_show_nodata="no"</programlisting>
 					Shortcut for <xref linkend="reportheightafterlast"/> in
 					<literal>&lt;OpenCReport&gt;</literal> when
 					<literal>&lt;Part&gt;</literal> is the toplevel node.
-					<programlisting>report_height_after_last="yes"
-report_height_after_last="no"</programlisting>
+					<programlisting>&lt;Part report_height_after_last="yes"&gt;
+&lt;Part report_height_after_last="no"&gt;</programlisting>
 				</para>
 				<para>
 					See default in <xref linkend="reportheightafterlast"/>
@@ -1207,8 +1260,8 @@ report_height_after_last="no"</programlisting>
 				<para>
 					Page orientation for the whole
 					<literal>&lt;Part&gt;</literal>.
-					<programlisting>&lt;Part orientation="portrait"&gt;
-&lt;Part orientation="landscape"&gt;</programlisting>
+					<programlisting>&lt;Part orientation="'portrait'"&gt;
+&lt;Part orientation="'landscape'"&gt;</programlisting>
 				</para>
 				<para>
 					Default is portrait orientation.
@@ -1223,8 +1276,7 @@ report_height_after_last="no"</programlisting>
 					right margins of the page. Every setting
 					exist in two forms: the RLIB compatible
 					"lowerCamelCase" variant and the all lowercase
-					with underscore. The lowecase-with-underscore
-					variants are the preferred ones.
+					with underscore. The latter variants are preferred.
 					<programlisting>&lt;Part top_margin="0.2"&gt;
 &lt;Part topMargin="0.2"&gt;
 &lt;Part bottom_margin="0.2"&gt;
@@ -1235,10 +1287,10 @@ report_height_after_last="no"</programlisting>
 &lt;Part rightMargin="0.2"&gt;</programlisting>
 				</para>
 				<para>
-					When <literal>size_unit="rlib"</literal> is in effect
+					When <literal>size_unit="'rlib'"</literal> is in effect
 					(the default case) the margin unit is inches.
 					The margin unit is points (1/72th inches) when
-					<literal>size_unit="points"</literal> is in effect.
+					<literal>size_unit="'points'"</literal> is in effect.
 				</para>
 				<para>
 					Default values for the top, bottom, left and right
@@ -1256,9 +1308,9 @@ report_height_after_last="no"</programlisting>
 					<literal>&lt;Part&gt;</literal>. It exists in
 					two forms: the RLIB compatible "lowerCamelCase"
 					variant and the all lowercase with underscore.
-					The lowecase-with-underscore variant is preferred.
-					<programlisting>&lt;Part paper_type="A4"&gt;
-&lt;Part paperType="A4"&gt;</programlisting>
+					The latter variant is preferred.
+					<programlisting>&lt;Part paper_type="'A4'"&gt;
+&lt;Part paperType="'A4'"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is the current system paper type
@@ -1284,27 +1336,22 @@ report_height_after_last="no"</programlisting>
 					Default value is 1.
 				</para>
 				<para>
-					Note that <literal>&lt;Part&gt;</literal>s and
-					every iteration of one starts on a new page.
+					Note that a <literal>&lt;Part&gt;</literal> and
+					every iteration of it start on a new page.
+					This is one way to print multiple copies
+					of a report and encode it into the output,
+					e.g. in the PDF file.
 				</para>
 			</sect3>
 			<sect3 id="partsuppress" xreflabel="Part suppress attribute">
 				<title>Suppress</title>
 				<para>
 					Report parts may be suppressed.
-					<programlisting>&lt;Part suppress="yes"&gt;
-&lt;Part suppress="val(m.suppress_part)"&gt;</programlisting>
+					<programlisting>&lt;Part suppress="yes"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>false</literal>,
 					i.e. no suppression.
-				</para>
-				<para>
-					The expression for <literal>suppress</literal>
-					must be a constant expression. An environment
-					variable (since it can't - or shouldn't - change
-					during the report execution) is considered
-					constant. See <xref linkend="expressions"/>.
 				</para>
 			</sect3>
 			<sect3 id="suppresspageheaderfirstpage" xreflabel="Suppress page header on the first page">
@@ -1330,21 +1377,23 @@ report_height_after_last="no"</programlisting>
 		<sect2 id="partsubsecs">
 			<title>Part subsections</title>
 			<para>
-				As described in <xref linkend="parts"/>,
-				a <literal>&lt;Part&gt;</literal> may contain
+				As described at the beginning of this section
+				(see <xref linkend="parts"/>), a
+				<literal>&lt;Part&gt;</literal> may contain
 				one or more report rows (<literal>&lt;pr&gt;</literal>)
 				which in turn may contain one or more columns
 				(<literal>&lt;pr&gt;</literal>). See
 				<xref linkend="partrow"/> and <xref linkend="partcol"/>.
+				Apart from these, global page headers and footers
+				may also be used for report parts.
 			</para>
 			<sect3 id="pageheader" xreflabel="Page header">
 				<title>Page header</title>
 				<para>
 					This is the description of the page header.
 					It contains an <xref linkend="outputnode"/>.
-					The same node can be used as a child of
-					<literal>&lt;Report&gt;</literal>, see
-					the difference in <xref linkend="reportpageheader"/>
+					The expressions in it cannot reference query columns.
+					See also <xref linkend="reportpageheader"/>.
 					<programlisting>&lt;Part&gt;
     &lt;PageHeader&gt;
         &lt;Output&gt;
@@ -1359,9 +1408,8 @@ report_height_after_last="no"</programlisting>
 				<para>
 					This is the description of the page footer.
 					It contains an <xref linkend="outputnode"/>.
-					The same node can be used as a child of
-					<literal>&lt;Report&gt;</literal>, see
-					the difference in <xref linkend="reportpagefooter"/>
+					The expressions in it cannot reference query columns.
+					See also <xref linkend="reportpagefooter"/>.
 					<programlisting>&lt;Part&gt;
     &lt;PageFooter&gt;
         &lt;Output&gt;
@@ -1383,14 +1431,6 @@ report_height_after_last="no"</programlisting>
     &lt;/pr&gt;
 &lt;/Part&gt;</programlisting>
 				</para>
-				<sect4 id="partrowsubsecs">
-					<title>Part row subsections</title>
-					<para>
-						There's only one node type which is a
-						subsection of <literal>&lt;Part&gt;</literal>.
-						See <xref linkend="partcol"/>.
-					</para>
-				</sect4>
 			</sect3>
 		</sect2>
 	</sect1>
@@ -1406,15 +1446,24 @@ report_height_after_last="no"</programlisting>
 		</para>
 		<sect2 id="partrowatts">
 			<title>Part row attributes</title>
+			<para>
+				Note that any attribute setting below may only use
+				constant expressions or an query column reference
+				from <xref linkend="independentqueries"/>.
+				An environment variable (since it can't - or shouldn't -
+				change during the report execution) is considered constant.
+				See <xref linkend="expressions"/>. This allows external
+				control for the attributes in question.
+			</para>
 			<sect3 id="partrowlayout" xreflabel="Part row layout attribute">
 				<title>Layout</title>
 				<para>
-					The <literal>layout</literal> attribute exists mainly
+					The <literal>layout</literal> attribute exists only
 					for RLIB compatibility, it's ignored.
 					It accepts two values: <literal>flow</literal> and
 					<literal>fixed</literal>.
-					<programlisting>&lt;pr layout="flow"&gt;
-&lt;pr layout="fixed"&gt;</programlisting>
+					<programlisting>&lt;pr layout="'flow'"&gt;
+&lt;pr layout="'fixed'"&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="partrownewpage" xreflabel="Part row new page attribute">
@@ -1434,19 +1483,11 @@ report_height_after_last="no"</programlisting>
 				<title>Suppress</title>
 				<para>
 					Report rows may be suppressed.
-					<programlisting>&lt;pr suppress="yes"&gt;
-&lt;pr suppress="val(m.suppress_row)"&gt;</programlisting>
+					<programlisting>&lt;pr suppress="yes"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>false</literal>,
 					i.e. no suppression.
-				</para>
-				<para>
-					The expression for <literal>suppress</literal>
-					must be a constant expression. An environment
-					variable (since it can't - or shouldn't - change
-					during the report execution) is considered
-					constant. See <xref linkend="expressions"/>.
 				</para>
 			</sect3>
 		</sect2>
@@ -1484,10 +1525,19 @@ report_height_after_last="no"</programlisting>
 		</para>
 		<sect2 id="partcolatts">
 			<title>Part column attributes</title>
+			<para>
+				Note that any attribute setting below may only use
+				constant expressions or an query column reference
+				from <xref linkend="independentqueries"/>.
+				An environment variable (since it can't - or shouldn't -
+				change during the report execution) is considered constant.
+				See <xref linkend="expressions"/>. This allows external
+				control for the attributes in question.
+			</para>
 			<sect3 id="partcolwidth" xreflabel="Part column width attribute">
 				<title>Width</title>
 				<para>
-					Width of the part column.
+					Width of the part column. Optional.
 					<programlisting>&lt;pd width="60"&gt;</programlisting>
 				</para>
 				<para>
@@ -1509,8 +1559,9 @@ report_height_after_last="no"</programlisting>
 					Columns without explicitly specified width are
 					dynamically sized according to
 					<xref linkend="papertype"/>,
-					<xref linkend="marginsettings"/>
-					and columns with explicitly specified width.
+					<xref linkend="marginsettings"/> and other
+					columns in the same <xref linkend="partrow"/>
+					that do have explicitly set width.
 				</para>
 				<para>
 					Columns that exceed the total page width
@@ -1619,19 +1670,11 @@ report_height_after_last="no"</programlisting>
 				<title>Suppress</title>
 				<para>
 					Report columns may be suppressed.
-					<programlisting>&lt;pd suppress="yes"&gt;
-&lt;pd suppress="val(m.suppress_column)"&gt;</programlisting>
+					<programlisting>&lt;pd suppress="yes"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>false</literal>,
 					i.e. no suppression.
-				</para>
-				<para>
-					The expression for <literal>suppress</literal>
-					must be a constant expression. An environment
-					variable (since it can't - or shouldn't - change
-					during the report execution) is considered
-					constant. See <xref linkend="expressions"/>.
 				</para>
 			</sect3>
 		</sect2>
@@ -1640,7 +1683,8 @@ report_height_after_last="no"</programlisting>
 		<title>Report</title>
 		<para>
 			This section may occur in a wider context or
-			standalone in an XML description file.
+			standalone in an OpenCReports XML report
+			description file.
 		</para>
 		<para>
 			Example XML skeleton structure with
@@ -1690,6 +1734,15 @@ report_height_after_last="no"</programlisting>
 		</para>
 		<sect2 id="reportattribs" xreflabel="Report attributes">
 			<title>Report attributes</title>
+			<para>
+				Note that any attribute setting below may only use
+				constant expressions or an query column reference
+				from <xref linkend="independentqueries"/>.
+				An environment variable (since it can't - or shouldn't -
+				change during the report execution) is considered constant.
+				See <xref linkend="expressions"/>. This allows external
+				control for the attributes in question.
+			</para>
 			<sect3 id="reportfontname" xreflabel="Report font name">
 				<title>Font name</title>
 				<para>
@@ -1699,8 +1752,8 @@ report_height_after_last="no"</programlisting>
 					It may be specified in two forms, the first one
 					is the preferred name, the second is for RLIB
 					compatibility:
-					<programlisting>&lt;Report font_name="Arial"&gt;
-&lt;Report fontName="Arial"&gt;</programlisting>
+					<programlisting>&lt;Report font_name="'Arial'"&gt;
+&lt;Report fontName="'Arial'"&gt;</programlisting>
 				</para>
 				<para>
 					If both forms are specified, <literal>font_name</literal>
@@ -1740,9 +1793,8 @@ report_height_after_last="no"</programlisting>
 					Shortcut for the <xref linkend="sizeunit"/> in
 					<literal>&lt;OpenCReport&gt;</literal> when
 					<literal>&lt;Report&gt;</literal> is the toplevel node.
-					<programlisting>&lt;Report size_unit="default"&gt;
-&lt;Report size_unit="rlib"&gt;
-&lt;Report size_unit="points"&gt;</programlisting>
+					<programlisting>&lt;Report size_unit="'rlib'"&gt;
+&lt;Report size_unit="'points'"&gt;</programlisting>
 				</para>
 				<para>
 					When <literal>&lt;OpenCReport&gt;</literal> or
@@ -1786,8 +1838,8 @@ report_height_after_last="no"</programlisting>
 					for the implicitly created parent
 					<literal>&lt;Part&gt;</literal> node when
 					<literal>&lt;Report&gt;</literal> is standalone.
-					<programlisting>&lt;Report orientation="portrait"&gt;
-&lt;Report orientation="landscape"&gt;</programlisting>
+					<programlisting>&lt;Report orientation="'portrait'"&gt;
+&lt;Report orientation="'landscape'"&gt;</programlisting>
 				</para>
 				<para>
 					Default is portrait orientation.
@@ -1821,10 +1873,10 @@ report_height_after_last="no"</programlisting>
 &lt;Report rightMargin="0.2"&gt;</programlisting>
 				</para>
 				<para>
-					When <literal>size_unit="rlib"</literal> is in effect
+					When <literal>size_unit="'rlib'"</literal> is in effect
 					(the default case) the margin unit is inches.
 					The margin unit is points (1/72th inches) when
-					<literal>size_unit="points"</literal> is in effect.
+					<literal>size_unit="'points'"</literal> is in effect.
 				</para>
 				<para>
 					Default values for the top, bottom, left and right
@@ -1850,8 +1902,8 @@ report_height_after_last="no"</programlisting>
 					two forms: the RLIB compatible "lowerCamelCase"
 					variant and the all lowercase with underscore.
 					The lowecase-with-underscore variant is preferred.
-					<programlisting>&lt;Part paper_type="A4"&gt;
-&lt;Part paperType="A4"&gt;</programlisting>
+					<programlisting>&lt;Part paper_type="'A4'"&gt;
+&lt;Part paperType="'A4'"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is the current system paper type
@@ -1898,7 +1950,7 @@ report_height_after_last="no"</programlisting>
 					specified height. If the report would run longer
 					than the specified height, it gets truncated.
 					When the report fits in the specified height,
-					the next report's starts with the remaining height
+					the next report starts with the remaining height
 					added as padding before it.
 				</para>
 				<para>
@@ -1946,19 +1998,11 @@ report_height_after_last="no"</programlisting>
 				<title>Suppress</title>
 				<para>
 					Reports may be suppressed.
-					<programlisting>&lt;Report suppress="yes"&gt;
-&lt;Report suppress="val(m.suppress_report)"&gt;</programlisting>
+					<programlisting>&lt;Report suppress="yes"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>false</literal>,
 					i.e. no suppression.
-				</para>
-				<para>
-					The expression for <literal>suppress</literal>
-					must be a constant expression. An environment
-					variable (since it can't - or shouldn't - change
-					during the report execution) is considered
-					constant. See <xref linkend="expressions"/>.
 				</para>
 			</sect3>
 			<sect3 id="sph">
@@ -1992,6 +2036,31 @@ report_height_after_last="no"</programlisting>
 					Default value is unset, i.e. use the first
 					query from the list of <xref linkend="queries"/>.
 				</para>
+				<para>
+					Column references of the report's primary query
+					and its follower queries may be used in
+					<xref linkend="expressions"/> of
+					<xref linkend="outputnode"/> sections in
+					a <literal>&lt;Report&gt;</literal> node:
+					<xref linkend="reportpageheader"/>,
+					<xref linkend="reportpagefooter"/>,
+					<xref linkend="repheader"/>,
+					<xref linkend="repfooter"/>,
+					<literal>&lt;FieldHeaders&gt;</literal> and
+					<literal>&lt;FieldDetails&gt;</literal> in
+					<xref linkend="detailnode"/>,
+					and also in <xref linkend="breaknode"/>s and
+					<xref linkend="variablenode"/>s.
+				</para>
+				<para>
+					When a query is empty (i.e. it doesn't have data rows)
+					then the <xref linkend="nodatanode"/> will be shown.
+				</para>
+				<para>
+					When the query name is set to a non-existing query,
+					then the appearance of the <xref linkend="nodatanode"/>
+					is controlled by <xref linkend="noqueryshownodata"/>.
+				</para>
 			</sect3>
 			<sect3 id="reportfhpriority" xreflabel="Report field header priority attribute">
 				<title>Field header priority</title>
@@ -1999,7 +2068,8 @@ report_height_after_last="no"</programlisting>
 					Set the field header priority for the report versus
 					break (header and footer) priority. This setting
 					selects which report detail is encompassing the other.
-					<programlisting>&lt;Report field_header_priority="low"&gt;</programlisting>
+					<programlisting>&lt;Report field_header_priority="'low'"&gt;
+&lt;Report field_header_priority="'high'"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>high</literal>. In this
@@ -2116,9 +2186,9 @@ report_height_after_last="no"</programlisting>
 					<xref linkend="pageheader"/> in the implicitly
 					created <literal>&lt;Part&gt;</literal>
 					node when <literal>&lt;Report&gt;</literal> is standalone.
-					Except that report expressions are allowed when
-					it's a child node of <literal>&lt;Report&gt;</literal>
-					instead of <literal>&lt;Part&gt;</literal>.
+					Except that report query column references are also
+					allowed in expressions instead of only constants and
+					column references of <xref linkend="independentqueries"/>.
 					It contains an <xref linkend="outputnode"/>.
 					<programlisting>&lt;Report&gt;
     &lt;PageHeader&gt;
@@ -2145,9 +2215,9 @@ report_height_after_last="no"</programlisting>
 					<xref linkend="pagefooter"/> in the implicitly
 					created <literal>&lt;Part&gt;</literal>
 					node when <literal>&lt;Report&gt;</literal> is standalone.
-					Except that report expressions are allowed when
-					it's a child node of <literal>&lt;Report&gt;</literal>
-					instead of <literal>&lt;Part&gt;</literal>.
+					Except that report query column references are also
+					allowed in expressions instead of only constants and
+					column references of <xref linkend="independentqueries"/>.
 					It contains an <xref linkend="outputnode"/>.
 					<programlisting>&lt;Report&gt;
     &lt;PageFooter&gt;
@@ -2167,11 +2237,11 @@ report_height_after_last="no"</programlisting>
 					A warning is issued in this case.
 				</para>
 			</sect3>
-			<sect3 id="repheader">
+			<sect3 id="repheader" xreflabel="Report header">
 				<title>Report header</title>
 				<para>
 					This is the description of the report header that is
-					emitted at the start of the report.
+					print at the beginning of the report.
 					It contains an <xref linkend="outputnode"/>.
 					<programlisting>&lt;Report&gt;
     &lt;ReportHeader&gt;
@@ -2182,11 +2252,11 @@ report_height_after_last="no"</programlisting>
 &lt;/Part&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3 id="repfooter">
+			<sect3 id="repfooter" xreflabel="Report footer">
 				<title>Report footer</title>
 				<para>
 					This is the description of the report footer that is
-					emitted at the end of the report.
+					printed at the end of the report.
 					It contains an <xref linkend="outputnode"/>.
 					<programlisting>&lt;Report&gt;
     &lt;ReportFooter&gt;
@@ -2303,9 +2373,8 @@ report_height_after_last="no"</programlisting>
 	<sect1 id="loadedreport" xreflabel="Loaded report">
 		<title>Loaded report</title>
 		<para>
-			It is like an inline report, but the
-			<xref linkend="report"/> is loaded from
-			a different file.
+			It is like an inline <xref linkend="report"/> it is
+			loaded from a different file.
 		</para>
 		<sect2 id="lrepatts">
 			<title>Loaded Report attributes</title>
@@ -2318,26 +2387,19 @@ report_height_after_last="no"</programlisting>
 			<sect3 id="queryattr" xreflabel="Query attribute">
 				<title>Query</title>
 				<para>
-					The <literal>query</literal> attribute overrides
-					the same attribute of <literal>&lt;Report&gt;</literal>.
+					This attribute overrides the
+					<xref linkend="queryattr"/> of
+					<literal>&lt;Report&gt;</literal>.
 					This way, the report in the separate file can be reused
 					for a different data set.
 					<programlisting>&lt;load query="query1" /&gt;</programlisting>
-				</para>
-				<para>
-					When the <xref linkend="noqueryshownodata"/> is set and the
-					<xref linkend="reportqueryname"/> is set to
-					a non-existing name in the global list of
-					<xref linkend="queries"/>, the
-					<literal>&lt;NoData&gt;</literal> section
-					is not displayed.
 				</para>
 			</sect3>
 			<sect3 id="lrepiter">
 				<title>Iterations</title>
 				<para>
-					The <literal>iterations</literal> attribute overrides
-					the same attribute of <literal>&lt;Report&gt;</literal>.
+					This attribute overrides the
+					<xref linkend="reportiter"/> of <literal>&lt;Report&gt;</literal>.
 					<programlisting>&lt;load iterations="5" /&gt;</programlisting>
 				</para>
 			</sect3>
@@ -2405,13 +2467,15 @@ report_height_after_last="no"</programlisting>
 &lt;Variable value="q1.field" type="highest"/&gt;
 &lt;Variable value="q1.field" type="lowest"/&gt;
 
-&lt;Variable value="q1.field" type="custom"/&gt;</programlisting>
+&lt;Variable type="custom" ... /&gt;</programlisting>
 				</para>
 				<para>
-					Default type is <literal>expression</literal>,
-					this is just a shortcut for the value expression
-					that saves both typing and time to generate the
-					report.
+					Default type is <literal>expression</literal>.
+					This is just a shortcut for the computed value
+					of the expression that saves both typing (in other
+					expressions referencing this variable) and time
+					to generate the report. This can be considered
+					a manual optimization.
 				</para>
 				<para>
 					The <literal>count</literal> and
@@ -2419,8 +2483,8 @@ report_height_after_last="no"</programlisting>
 					types count the number of expression
 					results for the data set. The former
 					leaves out NULL values, the latter includes them.
-					This is equivalent to COUNT(field) and COUNT(*)
-					in SQL.
+					This is equivalent to <literal>COUNT(field)</literal>
+					and <literal>COUNT(*)</literal> in SQL.
 				</para>
 				<para>
 					The <literal>sum</literal> variable type
@@ -2499,9 +2563,11 @@ report_height_after_last="no"</programlisting>
 			<sect3 id="resetonbreak" xreflabel="Reset on break attribute">
 				<title>Reset on break</title>
 				<para>
-					A variable may reset on break boundaries to the
-					<literal>baseexpr</literal> value. See
-					<xref linkend="breaknode"/> and <xref linkend="breaks"/>
+					A variable may be reset on break boundaries to the
+					base expression value, e.g. 0 for
+					<literal>count</literal> and other pre-defined variable
+					types. See <xref linkend="breaknode"/> and
+					<xref linkend="breaks"/>.
 					<programlisting>&lt;Variable resetonbreak="break1" /&gt;</programlisting>
 				</para>
 				<para>
@@ -2511,18 +2577,14 @@ report_height_after_last="no"</programlisting>
 			<sect3 id="precalcvarattr" xreflabel="Precalculate attribute">
 				<title>Precalculate (delayed)</title>
 				<para>
-					A variable may work two ways. One is to generate an
-					immediate value that is either derived from the current
-					row, or derived from the current and previous rows.
-					Say, for a variable of the <literal>average</literal>
-					type, the value of the variable for the 5th row
-					is the average value of the base expression of the
-					first 5 rows.
+					A variable may work two ways. The first way is to
+					generate an immediate value that is valid for the current
+					row. See <xref linkend="expressions"/>. An expression
+					may reference the value computed for previous data row,
+					see <xref linkend="exprself"/>.
 				</para>
 				<para>
-					The other way is <xref linkend="precalcvar"/>,
-					that are derived from either the last data row or
-					all rows, and supply that value for every data row.
+					The other way is <xref linkend="precalcvar"/>.
 					The attribute is accepted under two names:
 					<programlisting>&lt;Variable precalculate="yes" /&gt;
 &lt;Variable delayed="yes" /&gt;</programlisting>
@@ -2531,29 +2593,20 @@ report_height_after_last="no"</programlisting>
 					Default is <literal>no</literal>.
 				</para>
 				<para>
-					<literal>precalculate="yes"</literal> (or
-					<literal>delayed="yes"</literal> may be combined
-					with <literal>resetonbreak="..."</literal>.
-					In this case, a precalculated value is
-					computed for the break periods separately.
+					A precalculated variable may also use the
+					<xref linkend="resetonbreak"/>. In this case,
+					the precalculated value is computed for each
+					break period separately.
 				</para>
 				<para>
-					Precalculated variables may be used to show values in
-					<literal>&lt;ReportHeader&gt;</literal>,
-					<literal>&lt;ReportFooter&gt;</literal>,
-					<literal>&lt;FieldHeaders&gt;</literal>,
-					<literal>&lt;FieldDetails&gt;</literal>,
-					<literal>&lt;BreakHeader&gt;</literal> and
-					<literal>&lt;BreakFooter&gt;</literal>
-					but not in
-					<literal>&lt;PageHeader&gt;</literal> and
-					<literal>&lt;PageFooter&gt;</literal>.
-					The reason for this is that the former headers,
-					footers and details are in
-					<literal>&lt;Report&gt;</literal> scope with a query.
-					On the other hand, the latter two are in
-					<literal>&lt;Part&gt;</literal> scope that don't know
-					about queries.
+					Precalculated variables may be used to show totals in
+					e.g. <xref linkend="repheader"/>,
+					in <literal>&lt;FieldHeaders&gt;</literal> in
+					<xref linkend="detailnode"/>,
+					in <xref linkend="breakheadernode"/>
+					and in
+					<xref linkend="reportpageheader"/>,
+					among other places.
 				</para>
 			</sect3>
 		</sect2>
@@ -2592,6 +2645,26 @@ report_height_after_last="no"</programlisting>
     &lt;/BreakFields&gt;
 &lt;/Break&gt;</programlisting>
 		</para>
+		<para>
+			The order in which <literal>Break</literal> nodes are listed
+			matters for two reasons.
+		</para>
+		<para>
+			The primary reason is that break fields are
+			hierarchical. The break fields listed earlier
+			are higher in the hierarchy. If a break field
+			earlier in the list triggers, all subsequent
+			break fields also trigger implicitly.
+		</para>
+		<para>
+			The second reason is a consequence of the
+			previous one: emitting the
+			<xref linkend="breakheadernode"/>s
+			occur in the order of the list.
+			For logical reasons,
+			<xref linkend="breakfooternode"/>s
+			are in reverse order.
+		</para>
 		<sect2 id="breakatts">
 			<title>Break attributes</title>
 			<sect3 id="breakname">
@@ -2603,28 +2676,26 @@ report_height_after_last="no"</programlisting>
 					<programlisting>&lt;Break name="break1" /&gt;</programlisting>
 				</para>
 			</sect3>
-			<sect3 id="breaknp">
-				<title>Newpage</title>
-				<para>
-					Accepted as part of RLIB compatibility.
-					Not implemented. (Same as in RLIB.)
-					<programlisting>&lt;Break newpage="yes" /&gt;</programlisting>
-				</para>
-			</sect3>
 			<sect3 id="breakhnp">
 				<title>Header on new page</title>
 				<para>
-					Moves the <programlisting>&lt;BreakHeader&gt;</programlisting>
-					to a new page.
-					<programlisting>&lt;Break headernewpage="yes" /&gt;</programlisting>
+					After a break boundary, the header starts on a new page.
+					Accepted in two variants:
+					<programlisting>&lt;Break headernewpage="yes" /&gt;
+&lt;Break newpage="yes" /&gt;</programlisting>
+				</para>
+				<para>
+					The <literal>newpage="yes"</literal> variant is
+					parsed but ignored in RLIB.
 				</para>
 			</sect3>
 			<sect3 id="breaksb">
 				<title>Suppress break header and footer for blank break fields</title>
 				<para>
 					Suppress break header and footer in case
-					any of the break fields are either <literal>NULL</literal> value
-					or an empty string, if the break field is of the string type.
+					any of the break fields' values are either
+					<literal>NULL</literal> or an empty string,
+					if the break field is of the string type.
 					<programlisting>&lt;Break suppressblank="yes" /&gt;</programlisting>
 				</para>
 			</sect3>
@@ -2634,9 +2705,9 @@ report_height_after_last="no"</programlisting>
 			<sect3 id="breakheadernode" xreflabel="BreakHeader">
 				<title>BreakHeader</title>
 				<para>
-					The break header is emitted before the new data row
-					if there's a change for the values in the set of
-					break fields.
+					The break header is printed before the new data row
+					if it causes a break, i.e. the values in the set of
+					break fields changed from one row to the next.
 					It contains an <xref linkend="outputnode"/> child node.
 					<programlisting>&lt;BreakHeader&gt;
     &lt;Output&gt;
@@ -2648,9 +2719,10 @@ report_height_after_last="no"</programlisting>
 			<sect3 id="breakfooternode" xreflabel="BreakFooter">
 				<title>BreakFooter</title>
 				<para>
-					The break header is emitted after the previous data row
-					if there's a change for the values in the set of
-					break fields.
+					The break header is printed after the previous data row
+					if it causes a break, i.e. the values in the set of
+					break fields changed from one row to the next. Also
+					before the first row in the data set.
 					It contains an <xref linkend="outputnode"/> child node.
 					<programlisting>&lt;BreakHeader&gt;
     &lt;Output&gt;
@@ -2686,29 +2758,10 @@ report_height_after_last="no"</programlisting>
 					<para>
 						There must be at least one
 						<literal>&lt;BreakField&gt;</literal> node
-						listed. When mode than one break fields
+						listed. When more than one break fields
 						are listed, then all of them are watched
-						for changes.
-					</para>
-					<para>
-						The order in which they are listed matters
-						for two reasons.
-					</para>
-					<para>
-						The primary reason is that break fields are
-						hierarchical. The break fields listed earlier
-						are higher in the hierarchy. If a break field
-						earlier in the list triggers, all subsequent
-						break fields also trigger implicitly.
-					</para>
-					<para>
-						The second reason is a consequence of the
-						previous one: emitting the
-						<xref linkend="breakheadernode"/>s
-						occur in the order of the list.
-						For logical reasons,
-						<xref linkend="breakfooternode"/>s
-						are in reverse order.
+						for value changes. If any of them changes,
+						a break boundary occurs for the break.
 					</para>
 				</sect4>
 			</sect3>
@@ -2719,25 +2772,25 @@ report_height_after_last="no"</programlisting>
 		<para>
 			The <literal>&lt;Output&gt;</literal> node is used
 			by many previously mentioned sections. This is the
-			generic node that described how details are displayed
+			generic node that describes how details are displayed
 			in reports.
 		</para>
 		<sect2 id="outputatts">
 			<title>Output attributes</title>
+			<para>
+				Note that <xref linkend="expressions"/> in attribute
+				settings below depend on the parent node context.
+				Some may only use constant expressions or query column
+				references from <xref linkend="independentqueries"/>.
+				<literal>&lt;Output&gt;</literal> nodes in
+				<literal>&lt;Report&gt;</literal> context may also
+				use report query column references.
+			</para>
 			<sect3 id="outpsuppress">
 				<title>Suppress</title>
 				<para>
 					Output nodes may be suppressed as a whole.
-					<programlisting>&lt;Output suppress="yes"&gt;
-&lt;Output suppress="val(m.suppress_output)"&gt;</programlisting>
-				</para>
-				<para>
-					If it's in a report's
-					<literal>&lt;FieldDetails&gt;</literal> node,
-					the suppression may depend on query data.
-					See <xref linkend="detailnode"/> and
-					<xref linkend="expressions"/>.
-					<programlisting>&lt;Output suppress="query1.suppress_row"&gt;</programlisting>
+					<programlisting>&lt;Output suppress="yes"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>false</literal>,
@@ -2792,7 +2845,7 @@ report_height_after_last="no"</programlisting>
 			<sect3 id="outpimgend">
 				<title>Image end</title>
 				<para>
-					Terminator for a previous image.
+					Terminator for a previous image or barcode node.
 					See <xref linkend="imageendnode"/>.
 					<programlisting>&lt;Output&gt;
     &lt;ImageEnd/&gt;
@@ -2813,6 +2866,15 @@ report_height_after_last="no"</programlisting>
 		</para>
 		<sect2 id="lineatts">
 			<title>Line attributes</title>
+			<para>
+				Note that <xref linkend="expressions"/> in attribute
+				settings below depend on the parent node context.
+				Some may only use constant expressions or query column
+				references from <xref linkend="independentqueries"/>.
+				Child nodes of <literal>&lt;Output&gt;</literal> nodes in
+				<literal>&lt;Report&gt;</literal> context may also
+				use report query column references.
+			</para>
 			<sect3 id="linefontname" xreflabel="Line font name">
 				<title>Font name</title>
 				<para>
@@ -2822,8 +2884,8 @@ report_height_after_last="no"</programlisting>
 					It may be specified in two forms, the first one
 					is the preferred name, the second is for RLIB
 					compatibility:
-					<programlisting>&lt;Line font_name="Arial"&gt;
-&lt;Line fontName="Arial"&gt;</programlisting>
+					<programlisting>&lt;Line font_name="'Arial'"&gt;
+&lt;Line fontName="'Arial'"&gt;</programlisting>
 				</para>
 				<para>
 					If both forms are specified, <literal>font_name</literal>
@@ -2832,8 +2894,8 @@ report_height_after_last="no"</programlisting>
 				<para>
 					Default font name is what's set (in decreasing priority)
 					in <xref linkend="reportfontname"/> or
-					<xref linkend="partfontname"/>. If none of them is set,
-					it's <literal>Courier</literal>.
+					<xref linkend="partfontname"/>.
+					If none of them is set, it's <literal>Courier</literal>.
 				</para>
 			</sect3>
 			<sect3 id="linefontsize" xreflabel="Line font size">
@@ -2854,8 +2916,8 @@ report_height_after_last="no"</programlisting>
 				<para>
 					Default font name is what's set (in decreasing priority)
 					in <xref linkend="reportfontsize"/> or
-					<xref linkend="partfontsize"/>. If none of them is set,
-					it's <literal>12</literal>.
+					<xref linkend="partfontsize"/>.
+					If none of them is set, it's <literal>12</literal>.
 				</para>
 			</sect3>
 			<sect3 id="lineboldattr" xreflabel="Line bold attribute">
@@ -2887,9 +2949,7 @@ report_height_after_last="no"</programlisting>
 					<literal>&lt;Output&gt;</literal> node is in
 					<literal>&lt;FieldDetails&gt;</literal>, the
 					expression may be derived from a query field.
-					<programlisting>&lt;Line suppress="yes"&gt;
-&lt;Line suppress="val(m.suppress_line)"&gt;
-&lt;Line suppress="query1.suppress_line"&gt;</programlisting>
+					<programlisting>&lt;Line suppress="yes"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>false</literal>,
@@ -2900,7 +2960,7 @@ report_height_after_last="no"</programlisting>
 				<title>Text color</title>
 				<para>
 					This color is used to render text. It's accepted
-					with both American and  British spelling.
+					with both American and British spelling.
 					<programlisting>&lt;Line color="'blue'"&gt;
 &lt;Line colour="'blue'"&gt;</programlisting>
 				</para>
@@ -2929,6 +2989,7 @@ report_height_after_last="no"</programlisting>
 			<sect3 id="linetxtelem">
 				<title>Text element</title>
 				<para>
+					See the <xref linkend="textelemnode"/>.
 					Two variants are accepted.
 					<programlisting>&lt;Line&gt;
     &lt;field value="expression..." ... /&gt;
@@ -2937,34 +2998,25 @@ report_height_after_last="no"</programlisting>
     &lt;literal ... &gt;Literal text&lt;/literal&gt;
 &lt;/Line&gt;</programlisting>
 				</para>
-				<para>
-					See the <xref linkend="textelemnode"/> below.
-				</para>
 			</sect3>
 			<sect3 id="lineimg">
 				<title>Image element</title>
 				<para>
 					An <literal>&lt;Image&gt;</literal> is accepted
-					as a line element.
+					as a line element. See the <xref linkend="imagenode"/>.
 					<programlisting>&lt;Line&gt;
     &lt;Image value="expression..." ... /&gt;
 &lt;/Line&gt;</programlisting>
-				</para>
-				<para>
-					See the <xref linkend="imagenode"/> below.
 				</para>
 			</sect3>
 			<sect3 id="linebarcode">
 				<title>Barcode element</title>
 				<para>
 					A <literal>&lt;Barcode&gt;</literal> is accepted
-					as a line element.
+					as a line element. See the <xref linkend="barcodenode"/>.
 					<programlisting>&lt;Line&gt;
     &lt;Barcode value="expression..." ... /&gt;
 &lt;/Line&gt;</programlisting>
-				</para>
-				<para>
-					See the <xref linkend="barcodenode"/> below.
 				</para>
 			</sect3>
 		</sect2>
@@ -2991,6 +3043,15 @@ report_height_after_last="no"</programlisting>
 		</para>
 		<sect2 id="textelematts">
 			<title>Text element attributes</title>
+			<para>
+				Note that <xref linkend="expressions"/> in attribute
+				settings below depend on the parent node context.
+				Some may only use constant expressions or query column
+				references from <xref linkend="independentqueries"/>.
+				Child nodes of <literal>&lt;Output&gt;</literal> nodes in
+				<literal>&lt;Report&gt;</literal> context may also
+				use report query column references.
+			</para>
 			<sect3 id="elemvalueattr" xreflabel="Text element value">
 				<title>Value</title>
 				<para>
@@ -3021,9 +3082,11 @@ report_height_after_last="no"</programlisting>
 				<para>
 					This setting indicates whether the value is
 					"precalculated", i.e. the value for the last
-					row in the data set is used, or it would be
-					the actual value for the current row in the
-					data set.
+					row in the data set is used for every row.
+					It is equivalent to referencing an
+					<xref linkend="exprvar"/> with
+					<literal>precalculate="yes"</literal> and
+					without <literal>resetonbreak</literal>.
 					<programlisting>&lt;field delayed="yes" /&gt;
 &lt;field precalculate="yes" /&gt;</programlisting>
 				</para>
@@ -3034,22 +3097,15 @@ report_height_after_last="no"</programlisting>
 					This setting is only applicable for
 					line elements in the
 					<xref linkend="outputnode"/> node in
-					<literal>&lt;ReportHeader&gt;</literal>,
-					<literal>&lt;ReportFooter&gt;</literal>,
-					<literal>&lt;Fieldheaders&gt;</literal>
-					<literal>&lt;FieldDetails&gt;</literal>,
-					since they are the ones under the
-					<literal>&lt;Report&gt;</literal> scope
-					with a query.
+					<literal>&lt;Report&gt;</literal> context.
 				</para>
 				<para>
-					Note that in <literal>OpenCReports</literal>,
-					an expression may mix references to precalculated
-					variables with non-precalculated variables and
-					query field references. The result will use the
-					precalculated value only for the precalculated
-					variables. Other references will use values derived
-					from the current row in the data set.
+					Note that in OpenCReports, an expression may mix
+					references to precalculated variables with
+					non-precalculated variables and query field references.
+					The result will use the precalculated value only for
+					the precalculated variables. Other references will
+					use values derived from the current row in the data set.
 					This is an extension over RLIB.
 				</para>
 			</sect3>
@@ -3108,13 +3164,14 @@ report_height_after_last="no"</programlisting>
 				</para>
 				<para>
 					<xref linkend="textelemfontname"/> and
-					<xref linkend="textelemfontsize"/> DO NOT influence
-					the font width used to determine the field width.
+					<xref linkend="textelemfontsize"/>
+					<emphasis>do not influence</emphasis>
+					the field width calculation.
 				</para>
 				<para>
 					This allows using uniquely set font name and size for
 					individual text elements, including proportional
-					fonts.
+					fonts, using the RLIB compatible field width settings.
 				</para>
 				<para>
 					When using different font names or font sizes for
@@ -3133,7 +3190,7 @@ report_height_after_last="no"</programlisting>
 					formatted value (as text) is aligned inside the
 					specified field width.
 					<programlisting>&lt;field value="3" format="'%.2d'"
-      width="6" align="'center' /"&gt;</programlisting>
+       width="6" align="'center'" /&gt;</programlisting>
 				</para>
 				<para>
 					The alignment values may be
@@ -3144,29 +3201,27 @@ report_height_after_last="no"</programlisting>
 				</para>
 				<para>
 					Justified alignment is like left alignment,
-					but for a multi-line field all lines but the
-					last are justified. This is best used With
-					the default word wrapping. In this case,
-					the spacing between words is enlarged.
-					<literal>justified</literal> and
-					<literal>left</literal> behave the same
-					for regular single-line fields.
+					but for <xref linkend="memo"/>s,
+					all lines but the last are justified.
+					This is best used with the default word wrapping.
+					In this case, the spacing between words is enlarged.
+					<literal>justified</literal> and <literal>left</literal>
+					behave the same for single-line fields.
 				</para>
 				<para>
 					Default is <literal>left</literal>.
 				</para>
 				<para>
-					<literal>OpenCReports</literal> decoupled
+					OpenCReports decoupled
 					the data from displaying it. For example,
 					with the PDF output, the text element is not
 					truncated to the element width. Instead,
 					pixel perfect alignment is used together
 					with masking the parts of the value with
-					a bounding box. This is a deviation from
-					RLIB where data was approximately truncated,
-					because it was designed with monospace fonts
-					in mind, and widths were specified in number
-					of characters.
+					a bounding box. This is an improvement over
+					RLIB where data was truncated (in every output
+					formats) because it was designed for using only
+					monospace fonts.
 				</para>
 			</sect3>
 			<sect3 id="textcolor">
@@ -3193,7 +3248,8 @@ report_height_after_last="no"</programlisting>
 &lt;Line bgcolour="'blue'"&gt;</programlisting>
 				</para>
 				<para>
-					Default is <literal>white</literal>.
+					Default is what's set for <xref linkend="linenode"/>,
+					otherwise <literal>white</literal>.
 					See <xref linkend="colorspec"/>.
 				</para>
 			</sect3>
@@ -3205,15 +3261,19 @@ report_height_after_last="no"</programlisting>
 					It may be specified in two forms, the first one
 					is the preferred name, the second is for RLIB
 					compatibility:
-					<programlisting>&lt;Part font_name="Arial"&gt;
-&lt;Part fontName="Arial"&gt;</programlisting>
+					<programlisting>&lt;Part font_name="'Arial'"&gt;
+&lt;Part fontName="'Arial'"&gt;</programlisting>
 				</para>
 				<para>
 					If both forms are specified, <literal>font_name</literal>
 					is used.
 				</para>
 				<para>
-					Default font name is <literal>Courier</literal>.
+					Default font name is what's set (in decreasing priority)
+					in <xref linkend="linefontname"/>,
+					<xref linkend="reportfontname"/> or
+					<xref linkend="partfontname"/>.
+					If none of them is set, it's <literal>Courier</literal>.
 				</para>
 			</sect3>
 			<sect3 id="textelemfontsize" xreflabel="Text element font size">
@@ -3232,7 +3292,11 @@ report_height_after_last="no"</programlisting>
 					is used.
 				</para>
 				<para>
-					Default font size is 12.
+					Default font name is what's set (in decreasing priority)
+					in <xref linkend="linefontsize"/>,
+					<xref linkend="reportfontsize"/> or
+					<xref linkend="partfontsize"/>.
+					If none of them is set, it's <literal>12</literal>.
 				</para>
 			</sect3>
 			<sect3 id="textbold">
@@ -3278,7 +3342,7 @@ report_height_after_last="no"</programlisting>
 					Default is no weblink.
 				</para>
 			</sect3>
-			<sect3 id="memo">
+			<sect3 id="memo" xreflabel="Multi-line (memo) field">
 				<title>Multi-line (memo) field</title>
 				<para>
 					This attribute allows breaking long text fields
@@ -3310,9 +3374,8 @@ report_height_after_last="no"</programlisting>
 					is wrapped at word boundaries.
 				</para>
 				<para>
-					In <literal>OpenCReports</literal>, character
-					wrapping adds hyphenation, thanks to Pango rendering.
-					This is a deviation from RLIB.
+					In OpenCReports, character wrapping adds hyphenation.
+					This is an improvement over RLIB.
 				</para>
 			</sect3>
 			<sect3 id="memorowlimit">
@@ -3326,17 +3389,13 @@ report_height_after_last="no"</programlisting>
 				<para>
 					Default is no limit.
 				</para>
-				<para>
-					In <literal>OpenCReports</literal>, character
-					wrapping adds hyphenation, thanks to Pango rendering.
-					This is a deviation from RLIB.
-				</para>
 			</sect3>
 			<sect3 id="textxlate">
 				<title>Translation</title>
 				<para>
 					This attribute allows the text element to
-					be translated to a different language.
+					be translated to a specified language or locale.
+					See <xref linkend="locale"/>.
 					<programlisting>&lt;field value="'This is a field'"
        translate="yes" /&gt;</programlisting>
 				</para>
@@ -3350,8 +3409,8 @@ report_height_after_last="no"</programlisting>
 				</para>
 				<para>
 					OpenCReports will attempt to translate
-					both the format string and the text element's
-					value. For example, if the format string
+					both the format string (if specified) and the text
+					element's value. For example, if the format string
 					has a translated variant in the translations,
 					then this formatted result will be translated:
 					<programlisting>&lt;field value="q.apples"
@@ -3362,7 +3421,7 @@ report_height_after_last="no"</programlisting>
 					Default is <literal>no</literal>.
 				</para>
 				<para>
-					And alternative way is to use the translation
+					An alternative way is to use the translation
 					functions directly in the field expression.
 					See <xref linkend="translatefunc"/>
 					and <xref linkend="translate2func"/>.
@@ -3391,6 +3450,15 @@ report_height_after_last="no"</programlisting>
 		</para>
 		<sect2 id="hlineatts">
 			<title>HorizontalLine attributes</title>
+			<para>
+				Note that <xref linkend="expressions"/> in attribute
+				settings below depend on the parent node context.
+				Some may only use constant expressions or query column
+				references from <xref linkend="independentqueries"/>.
+				Child nodes of <literal>&lt;Output&gt;</literal> nodes in
+				<literal>&lt;Report&gt;</literal> context may also
+				use report query column references.
+			</para>
 			<sect3 id="hlinewidth">
 				<title>Line width</title>
 				<para>
@@ -3467,9 +3535,7 @@ report_height_after_last="no"</programlisting>
 					<literal>&lt;Output&gt;</literal> node is in
 					<literal>&lt;FieldDetails&gt;</literal>, the
 					expression may be derived from a query field.
-					<programlisting>&lt;HorizontalLine suppress="yes /"&gt;
-&lt;HorizontalLine suppress="val(m.suppress_hline)" /&gt;
-&lt;HorizontalLine suppress="query1.suppress_hline" /&gt;</programlisting>
+					<programlisting>&lt;HorizontalLine suppress="yes" /&gt;</programlisting>
 				</para>
 				<para>
 					Default value is <literal>false</literal>,
@@ -3499,7 +3565,7 @@ report_height_after_last="no"</programlisting>
 	<sect1 id="imagenode" xreflabel="Image node">
 		<title>Image</title>
 		<para>
-			An image to draw on the page, either on its own
+			An image to draw on the page, either on its own,
 			which controls indentation for subsequent elements:
 			<programlisting>&lt;Output&gt;
     &lt;Image ... /&gt;
@@ -3523,6 +3589,15 @@ report_height_after_last="no"</programlisting>
 		</para>
 		<sect2 id="imageatts">
 			<title>Image attributes</title>
+			<para>
+				Note that <xref linkend="expressions"/> in attribute
+				settings below depend on the parent node context.
+				Some may only use constant expressions or query column
+				references from <xref linkend="independentqueries"/>.
+				Child nodes of <literal>&lt;Output&gt;</literal> nodes in
+				<literal>&lt;Report&gt;</literal> context may also
+				use report query column references.
+			</para>
 			<sect3 id="imagefname">
 				<title>File name</title>
 				<para>
@@ -3540,11 +3615,7 @@ report_height_after_last="no"</programlisting>
 				<para>
 					The image may be suppressed.
 					<programlisting>&lt;Image value="'filename.jpg'"
-       suppress="yes" /&gt;
-&lt;Image value="'filename.jpg'"
-       suppress="m.suppress_image" /&gt;
-&lt;Image value="'filename.jpg'"
-       suppress="query1.suppress_image" /&gt;</programlisting>
+       suppress="yes" /&gt;</programlisting>
 				</para>
 				<para>
 					Default is <literal>false</literal>,
@@ -3678,7 +3749,8 @@ report_height_after_last="no"</programlisting>
 			This node doesn't have any attributes or
 			child nodes. Its purpose is to reset
 			indentation caused by a previous
-			<xref linkend="imagenode"/>.
+			<xref linkend="imagenode"/> or
+			<xref linkend="barcodenode"/>.
 			<programlisting>&lt;Output&gt;
     &lt;ImageEnd/&gt;
 &lt;/Output</programlisting>
@@ -3698,6 +3770,15 @@ report_height_after_last="no"</programlisting>
 		</para>
 		<sect2 id="barcodeatts">
 			<title>Barcode element attributes</title>
+			<para>
+				Note that <xref linkend="expressions"/> in attribute
+				settings below depend on the parent node context.
+				Some may only use constant expressions or query column
+				references from <xref linkend="independentqueries"/>.
+				Child nodes of <literal>&lt;Output&gt;</literal> nodes in
+				<literal>&lt;Report&gt;</literal> context may also
+				use report query column references.
+			</para>
 			<sect3 id="bcsuppressattr" xreflabel="Barcode suppression">
 				<title>Suppress</title>
 				<para>
@@ -3844,7 +3925,8 @@ report_height_after_last="no"</programlisting>
 					the barcode height controls the line height, with
 					empty space added before and after the text elements
 					vertically. is scaled to the specified width.
-					Its unit depends on the <xref linkend="sizeunit"/>.
+					It's measured in <literal>points</literal>, i.e. 1/72th
+					of an inch.
 				</para>
 				<para>
 					When the field is the last one in the
@@ -3853,12 +3935,6 @@ report_height_after_last="no"</programlisting>
 					of the line, the barcode is either rendered as is
 					(if the remaining width is larger), or it's
 					scaled down to the remaining width.
-				</para>
-				<para>
-					When the <xref linkend="sizeunit"/> is set to
-					<literal>rlib</literal>, the field width is measured
-					in number of characters that is set for the
-					<literal>&lt;Line&gt;</literal>.
 				</para>
 			</sect3>
 			<sect3 id="barcodecolor">
@@ -3885,7 +3961,8 @@ report_height_after_last="no"</programlisting>
 &lt;Barcode bgcolour="'blue'"&gt;</programlisting>
 				</para>
 				<para>
-					Default is <literal>white</literal>.
+					Default is what's set for <xref linkend="linenode"/>,
+					otherwise <literal>white</literal>.
 					See <xref linkend="colorspec"/>.
 				</para>
 			</sect3>

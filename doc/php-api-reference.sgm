@@ -3,7 +3,7 @@
 	<sect1 id="phpmodule">
 		<title>The OpenCReports PHP module</title>
 		<para>
-			<literal>OpenCReports</literal> comes with a PHP module,
+			OpenCReports comes with a PHP module,
 			which must be enabled in the PHP configuration:
 			<programlisting>extension=opencreports.so</programlisting>
 		</para>

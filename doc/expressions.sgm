@@ -14,6 +14,38 @@
 			and operators deal with numbers.
 		</para>
 		<para>
+			For historic record, RLIB was designed for the US
+			and for slower computers. It used a fixed point numeric
+			representation. For the US, with its strong currency
+			and prices expressed in low numbers, this was an
+			acceptable design decision. But for countries, where
+			currencies are a few orders of magnitude weaker and
+			conversely, the prices are similarly higher, the fixed
+			point numeric value range was easily overflown (especially
+			in report variables that added values), leading
+			to wrong data in the report output.
+		</para>
+		<para>
+			Another potential problem with the fixed point numeric
+			representation was that converting numbers from the
+			input data to this internal representation always and
+			unconditionally rounded down. The numeric error (i.e.
+			the difference between regular floating point values and
+			the fixed point representation) can be demonstrated even
+			with small data sets that add up percentages.
+		</para>
+		<para>
+			OpenCReports uses GNU MPFR floating point values with
+			256-bit precision by default. This allows handling very large
+			and very small numbers and directly consuming the SQL
+			<literal>numeric</literal> and <literal>decimal</literal>
+			types, or using <literal>bcmath</literal> numerics in PHP.
+			This also allows scientific computation or monetary
+			calculations even with late stage
+			<ulink url="https://en.wikipedia.org/wiki/Hyperinflation">hyperinflation</ulink>
+			prices.
+		</para>
+		<para>
 			A <literal>string</literal> expression's result is a
 			string. Strings can be concatenated or otherwise processed
 			by string functions.
@@ -155,7 +187,7 @@ false</programlisting>
 			expressions, reports are actually run (and layed out)
 			twice. The second run uses the precalculated values
 			from the first run. Because of this,
-			<literal>OpenCReports</literal> allows mixing precalculated
+			OpenCReports allows mixing precalculated
 			<xref linkend="variables"/> and non-precalculated
 			variables and subexpressions in the same expression.
 			The result is intuitively expected.

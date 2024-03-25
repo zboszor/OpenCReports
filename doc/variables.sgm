@@ -7,7 +7,7 @@
 			<xref linkend="expressions"/>.
 		</para>
 		<para>
-			In <literal>OpenCReports</literal>, there are a few
+			In OpenCReports, there are a few
 			variable types:
 			<itemizedlist>
 				<listitem override="bullet">
@@ -37,7 +37,7 @@
 			See <xref linkend="breaks"/> and the <xref linkend="resetonbreak"/>.
 		</para>
 	</sect1>
-	<sect1 id="exprvar" xreflabel="Expression variables">
+	<sect1 id="exprvar" xreflabel="Expression variable">
 		<title>Expression variables</title>
 		<para>
 			For basic expressions, the value of a variable is
@@ -271,7 +271,7 @@
 	<sect1 id="customvar" xreflabel="Custom variables">
 		<title>Custom variables</title>
 		<para>
-			As seen in <xref linkend="exprvar"/> above,
+			As seen in <xref linkend="exprvar"/>s above,
 			variables are not mysterious. They can be
 			iterative or non-iterative and their operation
 			can be spelled out. On the other hand, the
@@ -355,14 +355,18 @@
 			variables come in.
 		</para>
 		<para>
-			Setting a variable to be precalculated is done
-			by the <literal>precalculate="yes"</literal>
-			attribute. <literal>delayed="yes"</literal> is also
-			accepted as an alias. Such a variable (or, actually,
-			its value) can be displayed in e.g.
-			<literal>&lt;ReportHeader&gt;</literal>
-			which is shown upfront before any report details to
-			inform the reader without looking at the last page.
+			A variable can be set to be precalculated via the
+			<xref linkend="precalcvarattr"/>.
+		</para>
+		<para>
+			A report run goes through the data set twice.
+			At the end of the first run, the value of precalculated
+			variables computed for the last row are kept. In the
+			second run, the same value is supplied for every data row.
+			Such a variable (or, actually, its value) can be displayed
+			in e.g. <literal>&lt;ReportHeader&gt;</literal> which is
+			shown before any report details to inform the reader
+			without looking at the last page.
 			<programlisting>&lt;Report&gt;
     &lt;Variables&gt;
         &lt;Variable

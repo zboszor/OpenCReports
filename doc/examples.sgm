@@ -973,11 +973,11 @@ rlib_spool($r);</programlisting>
 			</para>
 			<para>
 				Note that compared to
-				<ulink url="https://github.com/SICOM/rlib">RLIB</ulink>,
-				<literal>OpenCReports</literal> may or may not
+				<ulink url="https://sourceforge.net/projects/rlib/">RLIB</ulink>,
+				OpenCReports may or may not
 				produce the same output. This is due to the incomplete
 				and faulty implementation of follower queries in
-				<literal>RLIB</literal>.
+				RLIB.
 			</para>
 		</sect2>
 	</sect1>
@@ -1214,11 +1214,11 @@ rlib_spool($r);</programlisting>
 			</para>
 			<para>
 				Note that compared to
-				<ulink url="https://github.com/SICOM/rlib">RLIB</ulink>,
-				<literal>OpenCReports</literal> likely do not
+				<ulink url="https://sourceforge.net/projects/rlib/">RLIB</ulink>,
+				OpenCReports likely do not
 				produce the same output. This is due to the incomplete
 				and faulty implementation of follower queries in
-				<literal>RLIB</literal>. <literal>OpenCReports</literal>
+				RLIB. OpenCReports
 				faithfully implements <literal>LEFT OUTER JOIN</literal>.
 			</para>
 		</sect2>
@@ -1407,11 +1407,11 @@ rlib_spool($r);</programlisting>
 			</para>
 			<para>
 				Note that compared to
-				<ulink url="https://github.com/SICOM/rlib">RLIB</ulink>,
-				<literal>OpenCReports</literal> likely do not
+				<ulink url="https://sourceforge.net/projects/rlib/">RLIB</ulink>,
+				OpenCReports likely do not
 				produce the same output. This is due to the incomplete
 				and faulty implementation of follower queries in
-				<literal>RLIB</literal>. <literal>OpenCReports</literal>
+				RLIB. OpenCReports
 				faithfully implements <literal>LEFT OUTER JOIN</literal>
 				with limiting the number of dependent matching rows to 1
 				that <emphasis>approximates</emphasis> the RLIB behaviour.
