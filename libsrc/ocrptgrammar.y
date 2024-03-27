@@ -366,13 +366,9 @@ ANYIDENT:
 								yyset_lloc(&@1, yyscanner);
 								if (strcmp($1->str, "m") == 0)
 									$$ = newident(yyscanner, OCRPT_EXPR_MVAR, $1, $3, false);
-								else if (strcmp($1->str, "r") == 0) {
-									if (strcasecmp($3->str, "lineno") == 0) {
-										ocrpt_string *s = ocrpt_mem_string_new_with_len("rownum", 6);
-										$$ = newexpr(yyscanner, s, NULL);
-									} else
-										$$ = newident(yyscanner, OCRPT_EXPR_RVAR, $1, $3, false);
-								} else if (strcmp($1->str, "v") == 0)
+								else if (strcmp($1->str, "r") == 0)
+									$$ = newident(yyscanner, OCRPT_EXPR_RVAR, $1, $3, false);
+								else if (strcmp($1->str, "v") == 0)
 									$$ = newident(yyscanner, OCRPT_EXPR_VVAR, $1, $3, false);
 								else
 									$$ = newident(yyscanner, OCRPT_EXPR_IDENT, $1, $3, false);
@@ -381,13 +377,9 @@ ANYIDENT:
 								yyset_lloc(&@1, yyscanner);
 								if (strcmp($1->str, "m") == 0)
 									$$ = newident(yyscanner, OCRPT_EXPR_MVAR, $1, $3, false);
-								else if (strcmp($1->str, "r") == 0) {
-									if (strcasecmp($3->str, "lineno") == 0) {
-										ocrpt_string *s = ocrpt_mem_string_new_with_len("rownum", 6);
-										$$ = newexpr(yyscanner, s, NULL);
-									} else
-										$$ = newident(yyscanner, OCRPT_EXPR_RVAR, $1, $3, false);
-								} else if (strcmp($1->str, "v") == 0)
+								else if (strcmp($1->str, "r") == 0)
+									$$ = newident(yyscanner, OCRPT_EXPR_RVAR, $1, $3, false);
+								else if (strcmp($1->str, "v") == 0)
 									$$ = newident(yyscanner, OCRPT_EXPR_VVAR, $1, $3, false);
 								else
 									$$ = newident(yyscanner, OCRPT_EXPR_IDENT, $1, $3, false);

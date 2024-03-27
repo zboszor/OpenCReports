@@ -620,7 +620,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 				 * original expression before ocrpt_expr_resolve() because
 				 * only the caller may know the intended type.
 				 *
-				 * The intended use cases are breakrownumber("breakname")
+				 * The intended use cases are brrownum("breakname")
 				 * and iterative variables like sum and others.
 				 */
 				orig_e->iterative = true;
@@ -704,10 +704,15 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 						ocrpt_expr_set_result_owned(e, i, false);
 					}
 				}
-			} else if (strcmp(e->name->str, "lineno") == 0) {
-				/* This is aliased in the grammar. */
-				assert(!"lineno cannot occur here");
-				abort();
+			} else if (strcmp(e->name->str, "lineno") == 0 && e->r) {
+				if (e->r->query && e->r->query->rownum) {
+					for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+						if (!e->result[i] && e->r->query->rownum->result[i]) {
+							e->result[i] = e->r->query->rownum->result[i];
+							ocrpt_expr_set_result_owned(e, i, false);
+						}
+					}
+				}
 			} else if (strcmp(e->name->str, "detailcnt") == 0) {
 				if (e->r) {
 					ocrpt_list *l;
@@ -997,7 +1002,16 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 		break;
 
 	case OCRPT_EXPR_RVAR:
-		if (strcmp(e->name->str, "self") == 0) {
+		if (strcmp(e->name->str, "lineno") == 0) {
+			if (e->r->query && e->r->query->rownum) {
+				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+					if (!e->result[i] && e->r->query->rownum->result[i]) {
+						e->result[i] = e->r->query->rownum->result[i];
+						ocrpt_expr_set_result_owned(e, i, false);
+					}
+				}
+			}
+		} else if (strcmp(e->name->str, "self") == 0) {
 			/* Do nothing - r.self references the VVAR's previous value */
 		} else if (strcmp(e->name->str, "baseexpr") == 0) {
 			assert(e->var);
