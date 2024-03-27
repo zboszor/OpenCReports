@@ -577,6 +577,25 @@ static bool ocrpt_resolve_ident(ocrpt_expr *e, ocrpt_query *q) {
 	return found;
 }
 
+static void ocrpt_expr_convert_to_string_const(ocrpt_expr *e, char *domain, char *sep, char *name, bool warn) {
+	ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
+	ocrpt_mem_string_append_printf(e->result[e->o->residx]->string, "%s%s%s", domain, sep, name);
+	e->result[e->o->residx]->string_owned = true;
+	e->result[ocrpt_expr_next_residx(e->o->residx)] = e->result[e->o->residx];
+	e->result[ocrpt_expr_next_residx(ocrpt_expr_next_residx(e->o->residx))] = e->result[e->o->residx];
+
+	ocrpt_mem_string_free(e->query, true);
+	e->query = NULL;
+	ocrpt_mem_string_free(e->name, true);
+	e->name = NULL;
+	e->dotprefixed = false;
+
+	e->type = OCRPT_EXPR_STRING;
+
+	if (warn)
+		ocrpt_err_printf("invalid field reference: '%s', converted to string literal\n", e->result[e->o->residx]->string->str);
+}
+
 void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask, bool warn) {
 	int32_t i;
 
@@ -685,8 +704,6 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 							ocrpt_expr_set_result_owned(e, i, false);
 						}
 					}
-				} else {
-					ocrpt_expr_make_error_result(e, "invalid usage of r.value");
 				}
 			} else if (strcmp(e->name->str, "totpages") == 0) {
 				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
@@ -741,22 +758,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 				}
 			} else {
 				/* No such identifier, turn it into a string. */
-				ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
-				ocrpt_mem_string_append_printf(e->result[e->o->residx]->string, "r.%s", e->name->str);
-				e->result[e->o->residx]->string_owned = true;
-				e->result[ocrpt_expr_next_residx(e->o->residx)] = e->result[e->o->residx];
-				e->result[ocrpt_expr_next_residx(ocrpt_expr_next_residx(e->o->residx))] = e->result[e->o->residx];
-
-				ocrpt_mem_string_free(e->query, true);
-				e->query = NULL;
-				ocrpt_mem_string_free(e->name, true);
-				e->name = NULL;
-				e->dotprefixed = false;
-
-				e->type = OCRPT_EXPR_STRING;
-
-				if (warn)
-					ocrpt_err_printf("invalid field reference: '%s', converted to string literal\n", e->result[e->o->residx]->string->str);
+				ocrpt_expr_convert_to_string_const(e, "r", ".", e->name->str, warn);
 			}
 		}
 
@@ -775,22 +777,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 				}
 				if (!ptr) {
 					/* No such identifier, turn it into a string. */
-					ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
-					ocrpt_mem_string_append_printf(e->result[e->o->residx]->string, "v.%s", e->name->str);
-					e->result[e->o->residx]->string_owned = true;
-					e->result[ocrpt_expr_next_residx(e->o->residx)] = e->result[e->o->residx];
-					e->result[ocrpt_expr_next_residx(ocrpt_expr_next_residx(e->o->residx))] = e->result[e->o->residx];
-
-					ocrpt_mem_string_free(e->query, true);
-					e->query = NULL;
-					ocrpt_mem_string_free(e->name, true);
-					e->name = NULL;
-					e->dotprefixed = false;
-
-					e->type = OCRPT_EXPR_STRING;
-
-					if (warn)
-						ocrpt_err_printf("invalid field reference: '%s', converted to string literal\n", e->result[e->o->residx]->string->str);
+					ocrpt_expr_convert_to_string_const(e, "v", ".", e->name->str, warn);
 				}
 			}
 		}
@@ -814,22 +801,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 
 			if (!found) {
 				/* No such identifier, turn it into a string. */
-				ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
-				ocrpt_mem_string_append_printf(e->result[e->o->residx]->string, "%s%s%s", (e->query ? e->query->str : ""), ((e->query || e->dotprefixed) ? "." : ""), e->name->str);
-				e->result[e->o->residx]->string_owned = true;
-				e->result[ocrpt_expr_next_residx(e->o->residx)] = e->result[e->o->residx];
-				e->result[ocrpt_expr_next_residx(ocrpt_expr_next_residx(e->o->residx))] = e->result[e->o->residx];
-
-				ocrpt_mem_string_free(e->query, true);
-				e->query = NULL;
-				ocrpt_mem_string_free(e->name, true);
-				e->name = NULL;
-				e->dotprefixed = false;
-
-				e->type = OCRPT_EXPR_STRING;
-
-				if (warn)
-					ocrpt_err_printf("invalid field reference: '%s', converted to string literal\n", e->result[e->o->residx]->string->str);
+				ocrpt_expr_convert_to_string_const(e, e->query ? e->query->str : "", (e->query || e->dotprefixed) ? "." : "", e->name->str, warn);
 			}
 		}
 		break;
@@ -1010,6 +982,17 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 						ocrpt_expr_set_result_owned(e, i, false);
 					}
 				}
+			}
+		} else if (strcmp(e->name->str, "value") == 0) {
+			if (orig_e->rvalue) {
+				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+					if (!e->result[i] && orig_e->rvalue->result[i]) {
+						e->result[i] = orig_e->rvalue->result[i];
+						ocrpt_expr_set_result_owned(e, i, false);
+					}
+				}
+			} else {
+				ocrpt_expr_make_error_result(e, "invalid usage of r.value");
 			}
 		} else if (strcmp(e->name->str, "self") == 0) {
 			/* Do nothing - r.self references the VVAR's previous value */
