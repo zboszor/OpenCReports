@@ -644,8 +644,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 				 */
 				orig_e->iterative = true;
 				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
-					if (!e->result[i]) {
-						assert(orig_e->result[ocrpt_expr_prev_residx(i)]);
+					if (!e->result[i] && orig_e->result[ocrpt_expr_prev_residx(i)]) {
 						e->result[i] = orig_e->result[ocrpt_expr_prev_residx(i)];
 						ocrpt_expr_set_result_owned(e, i, false);
 					}
@@ -698,8 +697,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 			} else if (strcmp(e->name->str, "value") == 0) {
 				if (orig_e->rvalue) {
 					for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
-						if (!e->result[i]) {
-							assert(orig_e->rvalue->result[i]);
+						if (!e->result[i] && orig_e->rvalue->result[i]) {
 							e->result[i] = orig_e->rvalue->result[i];
 							ocrpt_expr_set_result_owned(e, i, false);
 						}
