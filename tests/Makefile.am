@@ -73,7 +73,8 @@ TESTS = \
 	canonicalize_path_test \
 	find_file_test \
 	color_test \
-	quoted_ident_test
+	quoted_ident_test \
+	r_lineno_test
 
 PHP_TESTS = \
 	grammar_test expr_test function_test \
