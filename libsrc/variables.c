@@ -127,7 +127,9 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r, enum ocrpt_re
 /*
  * Create a named report variable
  *
- * Possible types are: expression, count, countall, sum, average, lowest, highest
+ * Possible types are: expression, count, countall, sum,
+ * average, averageall, lowest, highest
+ *
  * All types (except count and countall) need a base expression.
  *
  * Returns ocrpt_var pointer or NULL in case of an error
@@ -171,30 +173,30 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 		break;
 	case OCRPT_VARIABLE_SUM:
 		exprstr = ocrpt_mem_string_new_printf("(%s%s%s == 1 ? 0 : r.self) + (isnull(r.baseexpr) ? 0 : r.baseexpr)",
-						reset_on_break_name ? "brrownum('" : "rownum(",
+						reset_on_break_name ? "brrownum('" : "r.lineno",
 						reset_on_break_name ? reset_on_break_name : "",
-						reset_on_break_name ? "')" : ")");
+						reset_on_break_name ? "')" : "");
 
 		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, NULL, NULL, exprstr->str, reset_on_break_name);
 		ocrpt_mem_string_free(exprstr, true);
 		break;
 	case OCRPT_VARIABLE_AVERAGE:
 		exprstr = ocrpt_mem_string_new_printf("(%s%s%s == 1 ? 0 : r.self) + (isnull(r.baseexpr) ? 0 : r.baseexpr)",
-						reset_on_break_name ? "brrownum('" : "rownum(",
+						reset_on_break_name ? "brrownum('" : "r.lineno",
 						reset_on_break_name ? reset_on_break_name : "",
-						reset_on_break_name ? "')" : ")");
+						reset_on_break_name ? "')" : "");
 		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, exprstr->str, "r.self + (isnull(r.baseexpr) ? 0 : 1)", "r.intermedexpr / r.intermed2expr", reset_on_break_name);
 		ocrpt_mem_string_free(exprstr, true);
 		break;
 	case OCRPT_VARIABLE_AVERAGEALL:
 		exprstr = ocrpt_mem_string_new_printf("(%s%s%s == 1 ? 0 : r.self) + (isnull(r.baseexpr) ? 0 : r.baseexpr)",
-						reset_on_break_name ? "brrownum('" : "rownum(",
+						reset_on_break_name ? "brrownum('" : "r.lineno",
 						reset_on_break_name ? reset_on_break_name : "",
-						reset_on_break_name ? "')" : ")");
+						reset_on_break_name ? "')" : "");
 		expr1str = ocrpt_mem_string_new_printf("r.intermedexpr / %s%s%s",
-						reset_on_break_name ? "brrownum('" : "rownum(",
+						reset_on_break_name ? "brrownum('" : "r.lineno",
 						reset_on_break_name ? reset_on_break_name : "",
-						reset_on_break_name ? "')" : ")");
+						reset_on_break_name ? "')" : "");
 		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, exprstr->str, NULL, expr1str->str, reset_on_break_name);
 		ocrpt_mem_string_free(exprstr, true);
 		ocrpt_mem_string_free(expr1str, true);
@@ -210,9 +212,9 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 									"(r.self < (r.baseexpr) ? r.self : (r.baseexpr))"
 								")"
 							")",
-						reset_on_break_name ? "brrownum('" : "rownum(",
+						reset_on_break_name ? "brrownum('" : "r.lineno",
 						reset_on_break_name ? reset_on_break_name : "",
-						reset_on_break_name ? "')" : ")");
+						reset_on_break_name ? "')" : "");
 		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, NULL, NULL, exprstr->str, reset_on_break_name);
 		ocrpt_mem_string_free(exprstr, true);
 		break;
@@ -227,9 +229,9 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 									"(r.self > (r.baseexpr) ? r.self : (r.baseexpr))"
 								")"
 							")",
-						reset_on_break_name ? "brrownum('" : "rownum(",
+						reset_on_break_name ? "brrownum('" : "r.lineno",
 						reset_on_break_name ? reset_on_break_name : "",
-						reset_on_break_name ? "')" : ")");
+						reset_on_break_name ? "')" : "");
 		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, NULL, NULL, exprstr->str, reset_on_break_name);
 		ocrpt_mem_string_free(exprstr, true);
 		break;

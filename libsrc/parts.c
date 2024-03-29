@@ -95,7 +95,7 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_part_column_new_report(ocrpt_part_column *pd)
 	r->fielddetails.o = pd->o;
 	r->fielddetails.r = r;
 
-	r->query_rownum = ocrpt_report_expr_parse(r, "rownum()", NULL);
+	r->query_rownum = ocrpt_report_expr_parse(r, "r.lineno", NULL);
 
 	r->detailcnt = ocrpt_report_expr_parse(r, "r.self + 1", NULL);
 	ocrpt_expr_init_iterative_results(r->detailcnt, OCRPT_RESULT_NUMBER);
