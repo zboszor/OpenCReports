@@ -63,6 +63,7 @@ int main(int argc, char **argv) {
 
 	/* There is only one ocrpt_report pointer in o->parts, extract it. */
 	ocrpt_report *r = get_first_report(o);
+	ocrpt_report_set_main_query(r, q);
 
 	for (i = 0; i < N_TEST_VARS; i++)
 		e[i] = ocrpt_report_expr_parse(r, test_vars[i], NULL);

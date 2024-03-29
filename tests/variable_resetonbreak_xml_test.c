@@ -65,6 +65,7 @@ int main(int argc, char **argv) {
 
 	/* There is only one ocrpt_report pointer in o->parts, extract it. */
 	ocrpt_report *r = get_first_report(o);
+	ocrpt_report_set_main_query(r, q);
 
 	/* There is only one break in the report, extract it */
 	ocrpt_list *brl = NULL;
