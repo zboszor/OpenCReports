@@ -991,18 +991,18 @@ OCRPT_STATIC_FUNCTION(ocrpt_val) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_isnull) {
-	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
 
-	if (e->ops[0]->result[e->o->residx]->type == OCRPT_RESULT_ERROR) {
+	if (e->ops[0]->result[e->o->residx] && e->ops[0]->result[e->o->residx]->type == OCRPT_RESULT_ERROR) {
 		ocrpt_expr_make_error_result(e, e->ops[0]->result[e->o->residx]->string->str);
 		return;
 	}
 
 	ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
-	mpfr_set_ui(e->result[e->o->residx]->number, e->ops[0]->result[e->o->residx]->isnull, e->o->rndmode);
+	mpfr_set_ui(e->result[e->o->residx]->number, !e->ops[0]->result[e->o->residx] || e->ops[0]->result[e->o->residx]->isnull, e->o->rndmode);
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_null) {
