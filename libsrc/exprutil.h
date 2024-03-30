@@ -123,6 +123,7 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var);
 bool ocrpt_expr_get_precalculate(ocrpt_expr *e);
 void ocrpt_report_expressions_add_delayed_results(ocrpt_report *r);
 void ocrpt_expr_init_iterative_results(ocrpt_expr *e, enum ocrpt_result_type type);
+void ocrpt_expr_set_plain_iterative_to_null(ocrpt_report *r);
 
 static inline void ocrpt_expr_set_result_owned(ocrpt_expr *e, unsigned int which, bool owned) {
 	switch (which) {

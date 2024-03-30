@@ -328,6 +328,8 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 
 	ocrpt_expr_init_iterative_results(r->detailcnt, OCRPT_RESULT_NUMBER);
 
+	ocrpt_expr_set_plain_iterative_to_null(r);
+
 	for (ocrpt_list *vl = r->variables; vl; vl = vl->next)
 		ocrpt_variable_reset((ocrpt_var *)vl->data);
 

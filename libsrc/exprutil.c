@@ -993,7 +993,11 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 				ocrpt_expr_make_error_result(e, "invalid usage of r.value");
 			}
 		} else if (strcmp(e->name->str, "self") == 0) {
-			/* Do nothing - r.self references the VVAR's previous value */
+			orig_e->iterative = true;
+			if (!e->result[e->o->residx] && orig_e->result[ocrpt_expr_prev_residx(e->o->residx)]) {
+				e->result[e->o->residx] = orig_e->result[ocrpt_expr_prev_residx(e->o->residx)];
+				ocrpt_expr_set_result_owned(e, e->o->residx, false);
+			}
 		} else if (strcmp(e->name->str, "baseexpr") == 0) {
 			assert(e->var);
 			if (e->var->baseexpr) {
@@ -1573,5 +1577,56 @@ void ocrpt_expr_init_iterative_results(ocrpt_expr *e, enum ocrpt_result_type typ
 			default:
 				break;
 			}
+	}
+}
+
+static bool ocrpt_expr_is_plain_iterative_worker(ocrpt_expr *e, ocrpt_expr *orig_e) {
+	if (!e || !orig_e || !orig_e->iterative)
+		return false;
+
+	bool ret = false;
+	int32_t i;
+
+	switch (e->type) {
+	case OCRPT_EXPR:
+		for (i = 0; i < e->n_ops; i++) {
+			bool subexp_plain_iter = ocrpt_expr_is_plain_iterative_worker(e->ops[i], orig_e);
+			ret = ret || subexp_plain_iter;
+		}
+		break;
+
+	case OCRPT_EXPR_RVAR:
+		if (strcmp(e->name->str, "self") == 0) {
+			bool self_is_plain = (e->var == NULL);
+			ret = ret || self_is_plain;
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	return ret;
+}
+
+static bool ocrpt_expr_is_plain_iterative(ocrpt_report *r, ocrpt_expr *e) {
+	if (!e->iterative)
+		return false;
+
+	if (e == r->detailcnt || e == r->query_rownum)
+		return false;
+
+	return ocrpt_expr_is_plain_iterative_worker(e, e);
+}
+
+void ocrpt_expr_set_plain_iterative_to_null(ocrpt_report *r) {
+	for (ocrpt_list *el = r->exprs; el; el = el->next) {
+		ocrpt_expr *e = (ocrpt_expr *)el->data;
+
+		if (ocrpt_expr_is_plain_iterative(r, e)) {
+			for (int32_t i = 0; i < OCRPT_EXPR_RESULTS; i++)
+				if (e->result[i])
+					e->result[i]->isnull = true;
+		}
 	}
 }
