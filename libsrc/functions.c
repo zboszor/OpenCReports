@@ -1243,7 +1243,9 @@ OCRPT_STATIC_FUNCTION(ocrpt_left) {
 	int32_t l, len;
 	uint32_t i;
 
-	if (e->n_ops != 2 || e->ops[0]->result[e->o->residx]->type != OCRPT_RESULT_STRING || e->ops[1]->result[e->o->residx]->type != OCRPT_RESULT_NUMBER) {
+	if (e->n_ops != 2 ||
+			!e->ops[0]->result[e->o->residx] ||  e->ops[0]->result[e->o->residx]->type != OCRPT_RESULT_STRING ||
+			!e->ops[1]->result[e->o->residx] || e->ops[1]->result[e->o->residx]->type != OCRPT_RESULT_NUMBER) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -1284,7 +1286,9 @@ OCRPT_STATIC_FUNCTION(ocrpt_right) {
 	int32_t l, start;
 	uint32_t i;
 
-	if (e->n_ops != 2 || e->ops[0]->result[e->o->residx]->type != OCRPT_RESULT_STRING || e->ops[1]->result[e->o->residx]->type != OCRPT_RESULT_NUMBER) {
+	if (e->n_ops != 2 ||
+			!e->ops[0]->result[e->o->residx] || e->ops[0]->result[e->o->residx]->type != OCRPT_RESULT_STRING ||
+			!e->ops[1]->result[e->o->residx] ||  e->ops[1]->result[e->o->residx]->type != OCRPT_RESULT_NUMBER) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -1325,9 +1329,10 @@ OCRPT_STATIC_FUNCTION(ocrpt_mid) {
 	int32_t ofs, l, start, len;
 	uint32_t i;
 
-	if (e->n_ops != 3 || e->ops[0]->result[e->o->residx]->type != OCRPT_RESULT_STRING ||
-			e->ops[1]->result[e->o->residx]->type != OCRPT_RESULT_NUMBER ||
-			e->ops[2]->result[e->o->residx]->type != OCRPT_RESULT_NUMBER) {
+	if (e->n_ops != 3 ||
+			!e->ops[0]->result[e->o->residx] || e->ops[0]->result[e->o->residx]->type != OCRPT_RESULT_STRING ||
+			!e->ops[1]->result[e->o->residx] || e->ops[1]->result[e->o->residx]->type != OCRPT_RESULT_NUMBER ||
+			!e->ops[2]->result[e->o->residx] || e->ops[2]->result[e->o->residx]->type != OCRPT_RESULT_NUMBER) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2053,7 +2058,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_lower) {
 	ocrpt_string *string;
 	ocrpt_string *sstring;
 
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2105,7 +2110,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_upper) {
 	ocrpt_string *string;
 	ocrpt_string *sstring;
 
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2157,7 +2162,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_proper) {
 	ocrpt_string *string;
 	ocrpt_string *sstring;
 
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2214,6 +2219,11 @@ OCRPT_STATIC_FUNCTION(ocrpt_rownum) {
 	}
 
 	if (e->n_ops == 1) {
+		if (!e->ops[0]->result[e->o->residx]) {
+			ocrpt_expr_make_error_result(e, "invalid operand(s)");
+			return;
+		}
+
 		if (e->ops[0]->result[e->o->residx]->type == OCRPT_RESULT_ERROR) {
 			ocrpt_expr_make_error_result(e, e->ops[0]->result[e->o->residx]->string->str);
 			return;
@@ -2255,7 +2265,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_rownum) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_brrownum) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2296,7 +2306,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_brrownum) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_stodt) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2330,7 +2340,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_stodt) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_dtos) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2410,7 +2420,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_now) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_year) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2437,7 +2447,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_year) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_month) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2464,7 +2474,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_month) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_day) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2490,7 +2500,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_day) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_dim) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2518,7 +2528,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_dim) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_wiy) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2546,7 +2556,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_wiy) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_wiy1) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2576,7 +2586,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_wiy1) {
 OCRPT_STATIC_FUNCTION(ocrpt_wiyo) {
 	uint32_t i;
 
-	if (e->n_ops != 2) {
+	if (e->n_ops != 2 || !e->ops[0]->result[e->o->residx] || !e->ops[1]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2644,7 +2654,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_wiyo) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_stdwiy) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2672,7 +2682,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_stdwiy) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_dateof) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2708,7 +2718,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_dateof) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_timeof) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2746,7 +2756,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_timeof) {
 OCRPT_STATIC_FUNCTION(ocrpt_chgdateof) {
 	uint32_t i;
 
-	if (e->n_ops != 2) {
+	if (e->n_ops != 2 || !e->ops[0]->result[e->o->residx] || !e->ops[1]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2788,7 +2798,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_chgdateof) {
 OCRPT_STATIC_FUNCTION(ocrpt_chgtimeof) {
 	uint32_t i;
 
-	if (e->n_ops != 2) {
+	if (e->n_ops != 2 || !e->ops[0]->result[e->o->residx] || !e->ops[1]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2828,7 +2838,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_chgtimeof) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_gettimeinsecs) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2857,7 +2867,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_gettimeinsecs) {
 OCRPT_STATIC_FUNCTION(ocrpt_settimeinsecs) {
 	uint32_t i;
 
-	if (e->n_ops != 2) {
+	if (e->n_ops != 2 || !e->ops[0]->result[e->o->residx] || !e->ops[1]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2909,23 +2919,23 @@ OCRPT_STATIC_FUNCTION(ocrpt_interval) {
 		return;
 	}
 
-	for (i = 0; i < e->n_ops; i++) {
-		if (e->ops[i]->result[e->o->residx]->type == OCRPT_RESULT_ERROR) {
-			ocrpt_expr_make_error_result(e, e->ops[i]->result[e->o->residx]->string->str);
-			return;
-		}
-	}
-
 	if (e->n_ops == 6) {
 		for (i = 0; i < e->n_ops; i++) {
-			if (e->ops[i]->result[e->o->residx]->type != OCRPT_RESULT_NUMBER) {
+			if (!e->ops[i]->result[e->o->residx] || e->ops[i]->result[e->o->residx]->type != OCRPT_RESULT_NUMBER) {
 				ocrpt_expr_make_error_result(e, "invalid operand(s)");
 				return;
 			}
 		}
 	} else {
-		if (e->ops[0]->result[e->o->residx]->type != OCRPT_RESULT_STRING) {
+		if (!e->ops[0]->result[e->o->residx] || e->ops[0]->result[e->o->residx]->type != OCRPT_RESULT_STRING) {
 			ocrpt_expr_make_error_result(e, "invalid operand(s)");
+			return;
+		}
+	}
+
+	for (i = 0; i < e->n_ops; i++) {
+		if (e->ops[i]->result[e->o->residx]->type == OCRPT_RESULT_ERROR) {
+			ocrpt_expr_make_error_result(e, e->ops[i]->result[e->o->residx]->string->str);
 			return;
 		}
 	}
@@ -2962,12 +2972,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_interval) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_cos) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -2993,12 +2998,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_cos) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_sin) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3024,12 +3024,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_sin) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_tan) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3055,12 +3050,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_tan) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_acos) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3086,12 +3076,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_acos) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_asin) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3117,12 +3102,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_asin) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_atan) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3148,12 +3128,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_atan) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_sec) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3179,12 +3154,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_sec) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_csc) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3210,12 +3180,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_csc) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_cot) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3241,12 +3206,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_cot) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_log) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3272,12 +3232,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_log) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_log2) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3303,12 +3258,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_log2) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_log10) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3334,12 +3284,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_log10) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_exp) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3365,12 +3310,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_exp) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_exp2) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3396,12 +3336,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_exp2) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_exp10) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3427,12 +3362,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_exp10) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_sqr) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3458,12 +3388,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_sqr) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_sqrt) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3600,12 +3525,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_str) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_strlen) {
-	if (e->n_ops != 1) {
-		ocrpt_expr_make_error_result(e, "invalid operand(s)");
-		return;
-	}
-
-	if (!e->ops[0]->result[e->o->residx]) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3790,7 +3710,7 @@ OCRPT_STATIC_FUNCTION(ocrpt_printf) {
 }
 
 OCRPT_STATIC_FUNCTION(ocrpt_xlate) {
-	if (e->n_ops != 1) {
+	if (e->n_ops != 1 || !e->ops[0]->result[e->o->residx]) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		return;
 	}
@@ -3976,7 +3896,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "tan",		ocrpt_tan,	NULL,	1,	false,	false,	false,	false },
 	{ "timeof",		ocrpt_timeof,	NULL,	1,	false,	false,	false,	false },
 	{ "translate",	ocrpt_xlate,	NULL,	1,	false,	false,	false,	false },
-	{ "translate2",	ocrpt_xlate2,	NULL,	1,	false,	false,	false,	false },
+	{ "translate2",	ocrpt_xlate2,	NULL,	3,	false,	false,	false,	false },
 	{ "trunc",		ocrpt_trunc,	NULL,	1,	false,	false,	false,	false },
 	{ "tstod",		ocrpt_stodt,	NULL,	1,	false,	false,	false,	false },
 	{ "uminus",		ocrpt_uminus,	NULL,	1,	false,	false,	false,	false },
