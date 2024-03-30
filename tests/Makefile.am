@@ -74,7 +74,8 @@ TESTS = \
 	find_file_test \
 	color_test \
 	quoted_ident_test \
-	r_lineno_test
+	r_lineno_test \
+	r_value_test
 
 PHP_TESTS = \
 	grammar_test expr_test function_test \

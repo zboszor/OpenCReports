@@ -1,0 +1,64 @@
+Normal expression creation and evaluation order:
+expr:
+(number)1.000000
+r.value + 1:
+(number)2.000000
+
+expr:
+(number)2.000000
+r.value + 1:
+(number)3.000000
+
+expr:
+(number)3.000000
+r.value + 1:
+(number)4.000000
+
+Bad expression creation and evaluation order:
+expr:
+(number)1.000000
+r.value + 1:
+(number)2.000000
+
+expr:
+(number)2.000000
+r.value + 1:
+(number)3.000000
+
+expr:
+(number)3.000000
+r.value + 1:
+(number)4.000000
+
+Good expression creation and evaluation order:
+expr:
+(number)1.000000
+r.value + 1:
+(number)2.000000
+
+expr:
+(number)2.000000
+r.value + 1:
+(number)3.000000
+
+expr:
+(number)3.000000
+r.value + 1:
+(number)4.000000
+
+Bad expression creation and evaluation order:
+expr:
+(number)1.000000
+r.value + 1:
+(number)NULL
+
+expr:
+(number)2.000000
+r.value + 1:
+(number)NULL
+
+expr:
+(number)3.000000
+r.value + 1:
+(number)NULL
+
