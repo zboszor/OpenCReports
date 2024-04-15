@@ -6,6 +6,10 @@
 #ifndef _OPENCREPORT_H_
 #define _OPENCREPORT_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <locale.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -1162,5 +1166,9 @@ void ocrpt_mem_string_append_len_binary(ocrpt_string *string, const char *str, c
 void ocrpt_mem_string_append(ocrpt_string *string, const char *str);
 void ocrpt_mem_string_append_c(ocrpt_string *string, const char c);
 void ocrpt_mem_string_append_printf(ocrpt_string *string, const char *format, ...);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _OPENCREPORT_H_ */
