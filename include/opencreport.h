@@ -6,6 +6,8 @@
 #ifndef _OPENCREPORT_H_
 #define _OPENCREPORT_H_
 
+#include <mpfr.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -15,7 +17,6 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <mpfr.h>
 #include <time.h>
 
 struct opencreport;
