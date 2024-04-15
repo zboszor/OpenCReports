@@ -31,7 +31,7 @@ static const char *initials[3][2] = {
 
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "array");
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, "array", "array", NULL);
 	ocrpt_query *q, *q2;
 	ocrpt_query_result *qr, *qr2;
 	ocrpt_expr *match;

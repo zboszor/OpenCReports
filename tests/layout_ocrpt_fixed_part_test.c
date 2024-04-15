@@ -72,7 +72,7 @@ void precalc_done_cb(opencreport *o, void *data) {
 
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "local_array");
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, "local_array", "array", NULL);
 
 	/* For m.sillypants in the report */
 	setenv("sillypants", "5", 1);

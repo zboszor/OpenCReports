@@ -81,7 +81,7 @@ static void test_newrow_cb(opencreport *o, ocrpt_report *r, void *ptr) {
 
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "array");
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, "array", "array", NULL);
 	ocrpt_expr *match, *match2;
 	struct rowdata rd = { .row = 0 };
 

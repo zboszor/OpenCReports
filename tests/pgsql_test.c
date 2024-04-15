@@ -10,7 +10,12 @@
 
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+	struct ocrpt_input_connect_parameter conn_params[] = {
+		{ .param_name = "dbname", .param_value = "ocrpttest" },
+		{ .param_name = "user", .param_value = "ocrpt" },
+		{ NULL }
+	};
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, "pgsql", "postgresql", conn_params);
 
 	printf("Connecting to PostgreSQL database was %ssuccessful\n", (ds ? "" : "NOT "));
 

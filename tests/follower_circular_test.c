@@ -30,7 +30,7 @@ static const char *array2[ROWS1 + 1][COLS] = {
 
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "array");
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, "array", "array", NULL);
 	ocrpt_query *a, *b, *c, *d;
 	ocrpt_expr *match_ab, *match_bc, *match_ac, *match_cd;
 	bool retval;

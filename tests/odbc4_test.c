@@ -10,7 +10,11 @@
 
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_add_odbc2(o, "odbc", "DSN=ocrpttest2;UID=ocrpt");
+	struct ocrpt_input_connect_parameter conn_params[] = {
+		{ .param_name = "connstr", .param_value = "DSN=ocrpttest2;UID=ocrpt" },
+		{ NULL }
+	};
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, "odbc", "odbc", conn_params);
 
 	printf("Connecting to ODBC database was %ssuccessful\n", (ds ? "" : "NOT "));
 

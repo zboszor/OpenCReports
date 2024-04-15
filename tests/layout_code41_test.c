@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 
 	ocrpt_add_search_path(o, csrcdir);
 
-	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "myarray");
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, "myarray", "array", NULL);
 	ocrpt_query *q = ocrpt_query_add_array(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS1);
 
 	ocrpt_part *p = ocrpt_part_new(o);

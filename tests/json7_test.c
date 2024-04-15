@@ -12,7 +12,7 @@
 
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_add_json(o, "json");
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, "json", "json", NULL);
 	ocrpt_query *q;
 
 	q = ocrpt_query_add_file(ds, "a", JSONFILE, NULL, 0);

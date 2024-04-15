@@ -31,7 +31,7 @@ static const char *array2[ROWS1 + 1][COLS] = {
 
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "array");
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, "array", "array", NULL);
 	ocrpt_query *q, *q2;
 	ocrpt_query_result *qr, *qr2;
 	ocrpt_expr *id, *rownum1, *rownum2, *rownum3, *match;

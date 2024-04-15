@@ -35,9 +35,15 @@ int main(int argc, char **argv) {
 	ocrpt_report *r;
 	struct rowdata rd = { .rownum = 0 };
 
-	ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+	struct ocrpt_input_connect_parameter conn_params[] = {
+		{ .param_name = "dbname", .param_value = "ocrpttest" },
+		{ .param_name = "user", .param_value = "ocrpt" },
+		{ NULL }
+	};
+
+	ds = ocrpt_datasource_add(o, "pgsql", "postgresql", conn_params);
 	if (!ds) {
-		fprintf(stderr, "ocrpt_datasource_add_postgresql failed\n");
+		fprintf(stderr, "ocrpt_datasource_add failed\n");
 		return 1;
 	}
 	q = ocrpt_query_add_sql(ds, "a", "select '0.0000001'::numeric as num from generate_series(1," ROWS_STR ");");

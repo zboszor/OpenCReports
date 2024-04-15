@@ -52,7 +52,7 @@ void free_exprs(opencreport *o, ocrpt_report *r) {
 
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_add_json(o, "json");
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, "json", "json", NULL);
 	ocrpt_query *q;
 	ocrpt_query_result *qr;
 	int32_t cols, row, i;

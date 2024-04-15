@@ -27,7 +27,7 @@ static const int32_t coltypes[COLS] = { OCRPT_RESULT_STRING };
 
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "array");
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, "array", "array", NULL);
 	ocrpt_query *q;
 	ocrpt_query_result *qr;
 	ocrpt_report *r;

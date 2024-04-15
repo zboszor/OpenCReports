@@ -10,7 +10,12 @@
 
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_add_mariadb(o, "mariadb", NULL, NULL, "ocrpttest", "ocrpt", NULL, NULL);
+	struct ocrpt_input_connect_parameter conn_params[] = {
+		{ .param_name = "dbname", .param_value = "ocrpttest" },
+		{ .param_name = "user", .param_value = "ocrpt" },
+		{ NULL }
+	};
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, "mariadb", "mariadb", conn_params);
 
 	printf("Connecting to MariaDB database was %ssuccessful\n", (ds ? "" : "NOT "));
 
