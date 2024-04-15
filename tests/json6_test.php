@@ -8,7 +8,7 @@
 $JSONFILE = "jsonquery6.json";
 
 $o = new OpenCReport();
-$ds = $o->datasource_add_json("json");
+$ds = $o->datasource_add("json", "json");
 $q = $ds->query_add("a", $JSONFILE);
 if (is_null($q)) {
 	echo $JSONFILE . " parsing failed (good, it's intentional)" . PHP_EOL;

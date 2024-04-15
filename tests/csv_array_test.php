@@ -18,8 +18,8 @@ $array2 = [
 ];
 
 $o = new OpenCReport();
-$ds = $o->datasource_add_csv("csv");
-$ds2 = $o->datasource_add_array("array");
+$ds = $o->datasource_add("csv", "csv");
+$ds2 = $o->datasource_add("array", "array");
 
 create_exprs($o, false);
 

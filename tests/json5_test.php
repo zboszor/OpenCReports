@@ -8,7 +8,7 @@
 require_once 'test_common.php';
 
 $o = new OpenCReport();
-$ds = $o->datasource_add_json("json");
+$ds = $o->datasource_add("json", "json");
 $q = $ds->query_add("a", "jsonquery5.json");
 if (!($q instanceof OpenCReport\Query))
 	exit(0);

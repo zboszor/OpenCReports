@@ -19,7 +19,7 @@ $coltypes = [
 ];
 
 $o = new OpenCReport();
-$ds = $o->datasource_add_array("array");
+$ds = $o->datasource_add("array", "array");
 
 /* Standalone "result" object to test copying expression results */
 $rs = $o->result_new();

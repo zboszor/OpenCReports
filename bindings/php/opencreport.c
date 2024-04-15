@@ -630,299 +630,60 @@ PHP_METHOD(opencreport, set_locale) {
 	ocrpt_set_locale(oo->o, ZSTR_VAL(locale));
 }
 
-PHP_METHOD(opencreport, datasource_add_array) {
+PHP_METHOD(opencreport, datasource_add) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_string *source_name;
+	zend_string *source_type;
+	HashTable *source_params = NULL;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
+	ocrpt_input_connect_parameter *conn_params = NULL;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
 		RETURN_THROWS();
 	}
 
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 3)
 		Z_PARAM_STR(source_name);
-	ZEND_PARSE_PARAMETERS_END();
-
-	ds = ocrpt_datasource_add_array(oo->o, ZSTR_VAL(source_name));
-	if (!ds)
-		RETURN_NULL();
-
-	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
-	dso->ds = ds;
-}
-
-PHP_METHOD(opencreport, datasource_add_csv) {
-	zval *object = ZEND_THIS;
-	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *source_name;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
-
-	if (!oo->o) {
-		zend_throw_error(NULL, "OpenCReport object was freed");
-		RETURN_THROWS();
-	}
-
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_STR(source_name);
-	ZEND_PARSE_PARAMETERS_END();
-
-	ds = ocrpt_datasource_add_csv(oo->o, ZSTR_VAL(source_name));
-	if (!ds)
-		RETURN_NULL();
-
-	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
-	dso->ds = ds;
-}
-
-PHP_METHOD(opencreport, datasource_add_json) {
-	zval *object = ZEND_THIS;
-	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *source_name;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
-
-	if (!oo->o) {
-		zend_throw_error(NULL, "OpenCReport object was freed");
-		RETURN_THROWS();
-	}
-
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_STR(source_name);
-	ZEND_PARSE_PARAMETERS_END();
-
-	ds = ocrpt_datasource_add_json(oo->o, ZSTR_VAL(source_name));
-	if (!ds)
-		RETURN_NULL();
-
-	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
-	dso->ds = ds;
-}
-
-PHP_METHOD(opencreport, datasource_add_xml) {
-	zval *object = ZEND_THIS;
-	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *source_name;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
-
-	if (!oo->o) {
-		zend_throw_error(NULL, "OpenCReport object was freed");
-		RETURN_THROWS();
-	}
-
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_STR(source_name);
-	ZEND_PARSE_PARAMETERS_END();
-
-	ds = ocrpt_datasource_add_xml(oo->o, ZSTR_VAL(source_name));
-	if (!ds)
-		RETURN_NULL();
-
-	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
-	dso->ds = ds;
-}
-
-PHP_METHOD(opencreport, datasource_add_postgresql) {
-	zval *object = ZEND_THIS;
-	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *source_name;
-	zend_string *host = NULL, *port = NULL, *dbname = NULL;
-	zend_string *user = NULL, *password = NULL;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
-
-	if (!oo->o) {
-		zend_throw_error(NULL, "OpenCReport object was freed");
-		RETURN_THROWS();
-	}
-
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 6, 6)
-		Z_PARAM_STR(source_name);
-		Z_PARAM_STR_EX(host, 1, 0);
-		Z_PARAM_STR_EX(port, 1, 0);
-		Z_PARAM_STR_EX(dbname, 1, 0);
-		Z_PARAM_STR_EX(user, 1, 0);
-		Z_PARAM_STR_EX(password, 1, 0);
-	ZEND_PARSE_PARAMETERS_END();
-
-	ds = ocrpt_datasource_add_postgresql(
-				oo->o, ZSTR_VAL(source_name),
-				host ? ZSTR_VAL(host) : NULL,
-				port ? ZSTR_VAL(port) : NULL,
-				dbname ? ZSTR_VAL(dbname) : NULL,
-				user ? ZSTR_VAL(user) : NULL,
-				password ? ZSTR_VAL(password) : NULL);
-	if (!ds)
-		RETURN_NULL();
-
-	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
-	dso->ds = ds;
-}
-
-PHP_METHOD(opencreport, datasource_add_postgresql2) {
-	zval *object = ZEND_THIS;
-	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *source_name;
-	zend_string *connection_info = NULL;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
-
-	if (!oo->o) {
-		zend_throw_error(NULL, "OpenCReport object was freed");
-		RETURN_THROWS();
-	}
-
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
-		Z_PARAM_STR(source_name);
-		Z_PARAM_STR_EX(connection_info, 1, 0);
-	ZEND_PARSE_PARAMETERS_END();
-
-	ds = ocrpt_datasource_add_postgresql2(
-				oo->o, ZSTR_VAL(source_name),
-				connection_info ? ZSTR_VAL(connection_info) : NULL);
-	if (!ds)
-		RETURN_NULL();
-
-	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
-	dso->ds = ds;
-}
-
-PHP_METHOD(opencreport, datasource_add_mariadb) {
-	zval *object = ZEND_THIS;
-	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *source_name;
-	zend_string *host = NULL, *port = NULL, *dbname = NULL;
-	zend_string *user = NULL, *password = NULL, *unix_socket = NULL;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
-
-	if (!oo->o) {
-		zend_throw_error(NULL, "OpenCReport object was freed");
-		RETURN_THROWS();
-	}
-
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 7, 7)
-		Z_PARAM_STR(source_name);
-		Z_PARAM_STR_EX(host, 1, 0);
-		Z_PARAM_STR_EX(port, 1, 0);
-		Z_PARAM_STR_EX(dbname, 1, 0);
-		Z_PARAM_STR_EX(user, 1, 0);
-		Z_PARAM_STR_EX(password, 1, 0);
-		Z_PARAM_STR_EX(unix_socket, 1, 0);
-	ZEND_PARSE_PARAMETERS_END();
-
-	ds = ocrpt_datasource_add_mariadb(
-				oo->o, ZSTR_VAL(source_name),
-				host ? ZSTR_VAL(host) : NULL,
-				port ? ZSTR_VAL(port) : NULL,
-				dbname ? ZSTR_VAL(dbname) : NULL,
-				user ? ZSTR_VAL(user) : NULL,
-				password ? ZSTR_VAL(password) : NULL,
-				unix_socket ? ZSTR_VAL(unix_socket) : NULL);
-	if (!ds)
-		RETURN_NULL();
-
-	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
-	dso->ds = ds;
-}
-
-PHP_METHOD(opencreport, datasource_add_mariadb2) {
-	zval *object = ZEND_THIS;
-	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *source_name;
-	zend_string *option_file = NULL, *group = NULL;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
-
-	if (!oo->o) {
-		zend_throw_error(NULL, "OpenCReport object was freed");
-		RETURN_THROWS();
-	}
-
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
-		Z_PARAM_STR(source_name);
-		Z_PARAM_STR_EX(option_file, 1, 0);
-		Z_PARAM_STR_EX(group, 1, 0);
-	ZEND_PARSE_PARAMETERS_END();
-
-	ds = ocrpt_datasource_add_mariadb2(
-				oo->o, ZSTR_VAL(source_name),
-				option_file ? ZSTR_VAL(option_file) : NULL,
-				group ? ZSTR_VAL(group) : NULL);
-	if (!ds)
-		RETURN_NULL();
-
-	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
-	dso->ds = ds;
-}
-
-PHP_METHOD(opencreport, datasource_add_odbc) {
-	zval *object = ZEND_THIS;
-	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *source_name;
-	zend_string *dbname = NULL, *user = NULL, *password = NULL;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
-
-	if (!oo->o) {
-		zend_throw_error(NULL, "OpenCReport object was freed");
-		RETURN_THROWS();
-	}
-
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 4)
-		Z_PARAM_STR(source_name);
-		Z_PARAM_STR_EX(dbname, 1, 0);
+		Z_PARAM_STR(source_type);
 		Z_PARAM_OPTIONAL;
-		Z_PARAM_STR_EX(user, 1, 0);
-		Z_PARAM_STR_EX(password, 1, 0);
+		Z_PARAM_ARRAY_HT_OR_NULL(source_params);
 	ZEND_PARSE_PARAMETERS_END();
 
-	ds = ocrpt_datasource_add_odbc(
-				oo->o, ZSTR_VAL(source_name),
-				dbname ? ZSTR_VAL(dbname) : NULL,
-				user ? ZSTR_VAL(user) : NULL,
-				password ? ZSTR_VAL(password) : NULL);
-	if (!ds)
-		RETURN_NULL();
+	if (source_params) {
+		uint32_t n_elements = zend_hash_num_elements(source_params);
 
-	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
-	dso->ds = ds;
-}
+		if (n_elements) {
+			HashPosition source_param_pos;
+			uint32_t n_params = 0, pos = 0;
 
-PHP_METHOD(opencreport, datasource_add_odbc2) {
-	zval *object = ZEND_THIS;
-	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *source_name;
-	zend_string *connection_info = NULL;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
+			conn_params = ocrpt_mem_malloc((n_elements + 1) * sizeof(ocrpt_input_connect_parameter));
+			memset(conn_params, 0, (n_elements + 1) * sizeof(ocrpt_input_connect_parameter));
 
-	if (!oo->o) {
-		zend_throw_error(NULL, "OpenCReport object was freed");
-		RETURN_THROWS();
+			for (zend_hash_internal_pointer_reset_ex(source_params, &source_param_pos); pos < n_elements; pos++, zend_hash_move_forward_ex(source_params, &source_param_pos)) {
+				zval key, *value;
+
+				zend_hash_get_current_key_zval_ex(source_params, &key, &source_param_pos);
+				if (Z_TYPE(key) != IS_STRING)
+					continue;
+
+				value = zend_hash_get_current_data_ex(source_params, &source_param_pos);
+				if (Z_TYPE_P(value) != IS_STRING)
+					continue;
+
+				conn_params[n_params].param_name = Z_STRVAL(key);
+				conn_params[n_params].param_value = Z_STRVAL_P(value);
+				n_params++;
+			}
+		}
 	}
 
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
-		Z_PARAM_STR(source_name);
-		Z_PARAM_STR_EX(connection_info, 1, 0);
-	ZEND_PARSE_PARAMETERS_END();
+	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), ZSTR_VAL(source_type), conn_params);
 
-	ds = ocrpt_datasource_add_odbc2(
-				oo->o, ZSTR_VAL(source_name),
-				connection_info ? ZSTR_VAL(connection_info) : NULL);
+	ocrpt_mem_free(conn_params);
+
 	if (!ds)
 		RETURN_NULL();
 
@@ -1576,54 +1337,10 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_locale, 0, 1, IS
 ZEND_ARG_TYPE_INFO(0, locale, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_array, 0, 1, OpenCReport\\Datasource, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add, 0, 2, OpenCReport\\Datasource, 1)
 ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_file, 0, 1, OpenCReport\\Datasource, 1)
-ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_postgresql, 0, 6, OpenCReport\\Datasource, 1)
-ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 1)
-ZEND_ARG_TYPE_INFO(0, port, IS_STRING, 1)
-ZEND_ARG_TYPE_INFO(0, dbname, IS_STRING, 1)
-ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 1)
-ZEND_ARG_TYPE_INFO(0, password, IS_STRING, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_postgresql2, 0, 2, OpenCReport\\Datasource, 1)
-ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, connection_info, IS_STRING, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_mariadb, 0, 7, OpenCReport\\Datasource, 1)
-ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 1)
-ZEND_ARG_TYPE_INFO(0, port, IS_STRING, 1)
-ZEND_ARG_TYPE_INFO(0, dbname, IS_STRING, 1)
-ZEND_ARG_TYPE_INFO(0, user, IS_STRING, 1)
-ZEND_ARG_TYPE_INFO(0, password, IS_STRING, 1)
-ZEND_ARG_TYPE_INFO(0, unix_socket, IS_STRING, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_mariadb2, 0, 3, OpenCReport\\Datasource, 1)
-ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, option_file, IS_STRING, 1)
-ZEND_ARG_TYPE_INFO(0, group, IS_STRING, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_odbc, 0, 2, OpenCReport\\Datasource, 1)
-ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, dbname, IS_STRING, 1)
-ZEND_ARG_VARIADIC_TYPE_INFO(0, user, IS_STRING, 1)
-ZEND_ARG_VARIADIC_TYPE_INFO(0, password, IS_STRING, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_add_odbc2, 0, 2, OpenCReport\\Datasource, 1)
-ZEND_ARG_TYPE_INFO(0, source_name, IS_STRING, 0)
-ZEND_ARG_TYPE_INFO(0, connection_info, IS_STRING, 1)
+ZEND_ARG_TYPE_INFO(0, source_type, IS_STRING, 0)
+ZEND_ARG_VARIADIC_TYPE_INFO(0, source_params, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_datasource_get, 0, 1, OpenCReport\\Datasource, 1)
@@ -1742,16 +1459,7 @@ static const zend_function_entry opencreport_class_methods[] = {
 	PHP_ME(opencreport, bindtextdomain, arginfo_opencreport_bindtextdomain, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, set_locale, arginfo_opencreport_set_locale, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* Datasource and query related methods */
-	PHP_ME(opencreport, datasource_add_array, arginfo_opencreport_datasource_add_array, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport, datasource_add_csv, arginfo_opencreport_datasource_add_file, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport, datasource_add_json, arginfo_opencreport_datasource_add_file, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport, datasource_add_xml, arginfo_opencreport_datasource_add_file, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport, datasource_add_postgresql, arginfo_opencreport_datasource_add_postgresql, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport, datasource_add_postgresql2, arginfo_opencreport_datasource_add_postgresql2, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport, datasource_add_mariadb, arginfo_opencreport_datasource_add_mariadb, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport, datasource_add_mariadb2, arginfo_opencreport_datasource_add_mariadb2, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport, datasource_add_odbc, arginfo_opencreport_datasource_add_odbc, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport, datasource_add_odbc2, arginfo_opencreport_datasource_add_odbc2, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport, datasource_add, arginfo_opencreport_datasource_add, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, datasource_get, arginfo_opencreport_datasource_get, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, query_get, arginfo_opencreport_query_get, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, query_refresh, arginfo_array_query_refresh, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL | ZEND_ACC_STATIC)
@@ -1823,27 +1531,13 @@ PHP_METHOD(opencreport_ds, query_add) {
 		}
 
 		q = ocrpt_query_add_array(dso->ds, ZSTR_VAL(name), array_x, rows, cols, types_x, types_cols);
-	} else if (ocrpt_datasource_is_csv(dso->ds)) {
+	} else if (ocrpt_datasource_is_file(dso->ds)) {
 		if (coltypes && ZSTR_LEN(coltypes) > 0)
 			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, ZSTR_VAL(coltypes), &types_x, &types_cols);
 
-		q = ocrpt_query_add_csv(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), types_x, types_cols);
-	} else if (ocrpt_datasource_is_json(dso->ds)) {
-		if (coltypes && ZSTR_LEN(coltypes) > 0)
-			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, ZSTR_VAL(coltypes), &types_x, &types_cols);
-
-		q = ocrpt_query_add_json(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), types_x, types_cols);
-	} else if (ocrpt_datasource_is_xml(dso->ds)) {
-		if (coltypes && ZSTR_LEN(coltypes) > 0)
-			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, ZSTR_VAL(coltypes), &types_x, &types_cols);
-
-		q = ocrpt_query_add_xml(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), types_x, types_cols);
-	} else if (ocrpt_datasource_is_postgresql(dso->ds)) {
-		q = ocrpt_query_add_postgresql(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
-	} else if (ocrpt_datasource_is_mariadb(dso->ds)) {
-		q = ocrpt_query_add_mariadb(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
-	} else if (ocrpt_datasource_is_odbc(dso->ds)) {
-		q = ocrpt_query_add_odbc(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
+		q = ocrpt_query_add_file(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), types_x, types_cols);
+	} else if (ocrpt_datasource_is_sql(dso->ds)) {
+		q = ocrpt_query_add_sql(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
 	} else
 		RETURN_NULL();
 
@@ -6379,18 +6073,10 @@ ZEND_FUNCTION(rlib_add_query_as) {
 	if (ocrpt_datasource_is_array(ds)) {
 		ocrpt_query_discover_array(ZSTR_VAL(array_or_file_or_sql), &array_x, &rows, &cols, NULL, NULL, NULL);
 		q = ocrpt_query_add_array(ds, ZSTR_VAL(name), array_x, rows, cols, NULL, 0);
-	} else if (ocrpt_datasource_is_csv(ds))
-		q = ocrpt_query_add_csv(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), NULL, 0);
-	else if (ocrpt_datasource_is_json(ds))
-		q = ocrpt_query_add_json(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), NULL, 0);
-	else if (ocrpt_datasource_is_xml(ds))
-		q = ocrpt_query_add_xml(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), NULL, 0);
-	else if (ocrpt_datasource_is_postgresql(ds))
-		q = ocrpt_query_add_postgresql(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
-	else if (ocrpt_datasource_is_mariadb(ds))
-		q = ocrpt_query_add_mariadb(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
-	else if (ocrpt_datasource_is_odbc(ds))
-		q = ocrpt_query_add_odbc(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
+	} else if (ocrpt_datasource_is_file(ds))
+		q = ocrpt_query_add_file(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), NULL, 0);
+	else if (ocrpt_datasource_is_sql(ds))
+		q = ocrpt_query_add_sql(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
 	else
 		RETURN_NULL();
 

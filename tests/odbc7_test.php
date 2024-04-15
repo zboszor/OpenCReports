@@ -9,8 +9,14 @@ require_once 'test_common.php';
 
 $o = new OpenCReport();
 
-$ds = $o->datasource_add_odbc("odbc", "ocrpttest2", "ocrpt", NULL);
-$ds2 = $o->datasource_add_odbc("odbc2", "ocrpttest2", "ocrpt", NULL);
+$conn_params = [
+	"dbname" => "ocrpttest2",
+	"user" => "ocrpt"
+];
+
+$ds = $o->datasource_add("odbc", "odbc", $conn_params);
+$ds2 = $o->datasource_add("odbc2", "odbc", $conn_params);
+
 $q = $ds->query_add("a", "SELECT * FROM flintstones");
 $q2 = $ds2->query_add("b", "SELECT * FROM rubbles");
 

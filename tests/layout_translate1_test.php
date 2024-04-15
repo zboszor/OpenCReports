@@ -30,7 +30,7 @@ $localedir = OpenCReport::canonicalize_path($abs_builddir) . "/locale";
 $o->bindtextdomain("translate_test", $localedir);
 $o->set_locale("hu_HU");
 
-$ds = $o->datasource_add_array("myarray");
+$ds = $o->datasource_add("myarray", "array");
 $q = $ds->query_add("a", "array", "coltypes");
 
 $p = $o->part_new();

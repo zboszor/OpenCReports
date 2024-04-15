@@ -9,7 +9,7 @@ require_once 'test_common.php';
 
 $o = new OpenCReport();
 
-$ds = $o->datasource_add_xml("xml");
+$ds = $o->datasource_add("xml", "xml");
 
 create_exprs($o, false);
 

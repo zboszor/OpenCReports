@@ -34,7 +34,7 @@ $o = new OpenCReport();
 
 $o->add_search_path($srcdir);
 
-$ds = $o->datasource_add_array("myarray");
+$ds = $o->datasource_add("myarray", "array");
 $q = $ds->query_add("a", "array", "coltypes");
 
 $p = $o->part_new();

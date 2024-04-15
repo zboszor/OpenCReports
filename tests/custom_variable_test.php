@@ -23,7 +23,7 @@ $coltypes = [ OpenCReport::RESULT_STRING ];
 
 $o = new OpenCReport();
 
-$ds = $o->datasource_add_array("array");
+$ds = $o->datasource_add("array", "array");
 
 $r = $o->part_new()->row_new()->column_new()->report_new();
 

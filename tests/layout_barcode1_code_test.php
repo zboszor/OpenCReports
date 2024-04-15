@@ -30,7 +30,7 @@ $array = [
 ];
 
 $o = new OpenCReport();
-$ds = $o->datasource_add_array("array");
+$ds = $o->datasource_add("array", "array");
 $q = $ds->query_add("data", "array");
 
 $p = $o->part_new();

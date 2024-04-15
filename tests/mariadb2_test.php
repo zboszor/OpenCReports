@@ -7,6 +7,11 @@
 
 $o = new OpenCReport();
 
-$ds = $o->datasource_add_mariadb2("mariadb", "./mariadb/ocrpt.cnf", "ocrpt");
+$conn_params = [
+	"optionfile" => "./mariadb/ocrpt.cnf",
+	"group" => "ocrpt"
+];
+
+$ds = $o->datasource_add("mariadb", "mariadb", $conn_params);
 
 echo "Connecting to MariaDB database was " . ($ds instanceof OpenCReport\Datasource ? "" : "NOT ") . "successful" . PHP_EOL;

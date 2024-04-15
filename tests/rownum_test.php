@@ -26,7 +26,7 @@ $array2 = [
 
 $o = new OpenCReport();
 
-$ds = $o->datasource_add_array("array");
+$ds = $o->datasource_add("array", "array");
 
 $id = 0;
 create_expr($o, $id, "id");

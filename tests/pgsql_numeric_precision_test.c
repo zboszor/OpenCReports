@@ -40,9 +40,9 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "ocrpt_datasource_add_postgresql failed\n");
 		return 1;
 	}
-	q = ocrpt_query_add_postgresql(ds, "a", "select '0.0000001'::numeric as num from generate_series(1," ROWS_STR ");");
+	q = ocrpt_query_add_sql(ds, "a", "select '0.0000001'::numeric as num from generate_series(1," ROWS_STR ");");
 	if (!q) {
-		fprintf(stderr, "ocrpt_query_add_postgresql failed\n");
+		fprintf(stderr, "ocrpt_query_add_sql failed\n");
 		return 1;
 	}
 

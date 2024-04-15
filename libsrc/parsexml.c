@@ -166,29 +166,17 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 	if (ds) {
 		int32_t ct_cols_i = cols_i;
 
-		if (ds->input == &ocrpt_array_input) {
+		if (ocrpt_datasource_is_sql(ds))
+			q = ocrpt_query_add_sql(ds, name_s, value_s);
+		else if (ocrpt_datasource_is_file(ds)) {
+			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, coltypes_s, &coltypesptr, &ct_cols_i);
+			q = ocrpt_query_add_file(ds, name_s, value_s, coltypesptr, ct_cols_i);
+		} else if (ocrpt_datasource_is_array(ds)) {
 			ocrpt_query_discover_array(value_s, &arrayptr, &rows_i, &cols_i, coltypes_s, &coltypesptr, &ct_cols_i);
 			if (arrayptr)
 				q = ocrpt_query_add_array(ds, name_s, arrayptr, rows_i, cols_i, coltypesptr, ct_cols_i);
 			else
 				ocrpt_err_printf("Cannot determine array pointer for array query\n");
-		} else if (ds->input == &ocrpt_csv_input) {
-			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, coltypes_s, &coltypesptr, &ct_cols_i);
-			q = ocrpt_query_add_csv(ds, name_s, value_s, coltypesptr, ct_cols_i);
-		} else if (ds->input == &ocrpt_json_input) {
-			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, coltypes_s, &coltypesptr, &ct_cols_i);
-			q = ocrpt_query_add_json(ds, name_s, value_s, coltypesptr, ct_cols_i);
-		} else if (ds->input == &ocrpt_xml_input) {
-			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, coltypes_s, &coltypesptr, &ct_cols_i);
-			q = ocrpt_query_add_xml(ds, name_s, value_s, coltypesptr, ct_cols_i);
-		} else if (ds->input == &ocrpt_postgresql_input)
-			q = ocrpt_query_add_postgresql(ds, name_s, value_s);
-		else if (ds->input == &ocrpt_mariadb_input)
-			q = ocrpt_query_add_mariadb(ds, name_s, value_s);
-		else if (ds->input == &ocrpt_odbc_input)
-			q = ocrpt_query_add_odbc(ds, name_s, value_s);
-		else {
-			/* TODO: externally defined  input driver */
 		}
 	}
 
@@ -254,17 +242,9 @@ static void ocrpt_parse_queries_node(opencreport *o, xmlTextReaderPtr reader) {
 }
 
 static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader) {
-	xmlChar *name, *type, *host, *unix_socket;
-	xmlChar *port, *dbname, *user, *password;
-	xmlChar *connstr, *optionfile, *group, *encoding;
-	ocrpt_expr *name_e, *type_e, *host_e, *unix_socket_e;
-	ocrpt_expr *port_e, *dbname_e, *user_e, *password_e;
-	ocrpt_expr *connstr_e, *optionfile_e, *group_e, *encoding_e;
-	char *name_s, *type_s, *host_s, *unix_socket_s;
-	char *port_s, *dbname_s, *user_s, *password_s;
-	char *connstr_s, *optionfile_s, *group_s, *encoding_s;
-	int32_t port_i, i;
-	ocrpt_datasource *ds = NULL;
+	xmlChar *name, *type, *encoding;
+	ocrpt_expr *name_e, *type_e, *encoding_e;
+	char *name_s, *type_s, *encoding_s;
 
 	struct {
 		char *attrs;
@@ -272,6 +252,8 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 	} xmlattrs[] = {
 		{ "name", &name },
 		{ "type", &type },
+		{ "encoding", &encoding },
+#if 0
 		{ "host", &host },
 		{ "unix_socket", &unix_socket },
 		{ "port", &port },
@@ -281,82 +263,104 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 		{ "connstr", &connstr },
 		{ "optionfile", &optionfile },
 		{ "group", &group },
-		{ "encoding", &encoding },
+#endif
 		{ NULL, NULL },
 	};
+
+	int32_t i;
 
 	for (i = 0; xmlattrs[i].attrp; i++)
 		*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs);
 
 	get_string(o, name);
 	get_string(o, type);
-
-	get_string(o, host);
-	get_string(o, unix_socket);
-
-	port_s = NULL;
-	get_int(o, port);
-	if (port_i) {
-		port_s = alloca(32);
-		sprintf(port_s, "%d", port_i);
-	}
-
-	/*
-	 * Don't report parse errors for database connection details,
-	 * they are sensitive information.
-	 */
-	get_string(o, dbname);
-	get_string(o, user);
-	get_string(o, password);
-	get_string(o, connstr);
-	get_string(o, optionfile);
-	get_string(o, group);
 	get_string(o, encoding);
 
-	if (name_s && type_s) {
-		if (!strcmp(type_s, "array"))
-			ds = ocrpt_datasource_add_array(o, name_s);
-		else if (!strcmp(type_s, "csv"))
-			ds = ocrpt_datasource_add_csv(o, name_s);
-		else if (!strcmp(type_s, "json"))
-			ds = ocrpt_datasource_add_json(o, name_s);
-		else if (!strcmp(type_s, "xml"))
-			ds = ocrpt_datasource_add_xml(o, name_s);
-		else if (!strcmp(type_s, "postgresql")) {
-			if (connstr_s)
-				ds = ocrpt_datasource_add_postgresql2(o, name_s, connstr_s);
-			else
-				ds = ocrpt_datasource_add_postgresql(o, name_s, unix_socket_s ? unix_socket_s : host_s, port_s, dbname_s, user_s, password_s);
-		} else if (!strcmp(type_s, "mariadb") || !strcmp(type_s, "mysql")) {
-			if (group_s)
-				ds = ocrpt_datasource_add_mariadb2(o, name_s, optionfile_s, group_s);
-			else
-				ds = ocrpt_datasource_add_mariadb(o, name_s, host_s, port_s, dbname_s, user_s, password_s, unix_socket_s);
-		} else if (!strcmp(type_s, "odbc")) {
-			if (connstr_s)
-				ds = ocrpt_datasource_add_odbc2(o, name_s, connstr_s);
-			else
-				ds = ocrpt_datasource_add_odbc(o, name_s, dbname_s, user_s, password_s);
+	if (!name_s || !type_s)
+		goto error_out;
+
+	const ocrpt_input *input = ocrpt_input_get(type_s);
+
+	if (!input)
+		goto error_out;
+
+	int conn_params_n = 0;
+	ocrpt_input_connect_parameter *conn_params = NULL;
+
+	for (i = 0; input->connect_parameters && input->connect_parameters[i]; i++) {
+		const ocrpt_input_connect_parameter *iconnparams = input->connect_parameters[i];
+		for (uint32_t j = 0; iconnparams[j].param_name; j++)
+			conn_params_n++;
+	}
+
+	if (conn_params_n > 0) {
+		conn_params = ocrpt_mem_malloc((conn_params_n + 1) * sizeof(ocrpt_input_connect_parameter));
+		if (!conn_params)
+			goto error_out;
+
+		memset(conn_params, 0, (conn_params_n + 1) * sizeof(ocrpt_input_connect_parameter));
+
+		conn_params_n = 0;
+		for (i = 0; input->connect_parameters && input->connect_parameters[i]; i++) {
+			const ocrpt_input_connect_parameter *iconnparams = input->connect_parameters[i];
+
+			for (uint32_t j = 0; iconnparams[j].param_name; j++) {
+				bool found = false;
+
+				for (uint32_t k = 0; k < conn_params_n && conn_params[k].param_name; k++) {
+					if (strcasecmp(iconnparams[j].param_name, conn_params[k].param_name) == 0)
+						found = true;
+				}
+
+				if (!found) {
+					conn_params[conn_params_n].param_name = iconnparams[j].param_name;
+
+					xmlChar *value = xmlTextReaderGetAttribute(reader, (const xmlChar *)iconnparams[j].param_name);
+					if (value) {
+						ocrpt_expr *value_e = NULL;
+						char *value_s = NULL;
+						int32_t value_i;
+
+						if (strcasecmp(iconnparams[j].param_name, "port") == 0) {
+							/* "port" is accepted as a numeric value */
+							get_int(o, value);
+							if (value_i) {
+								value_s = alloca(32);
+								sprintf(value_s, "%d", value_i);
+							}
+						} else {
+							get_string(o, value);
+						}
+
+						conn_params[conn_params_n].param_value = ocrpt_mem_strdup(value_s);
+						conn_params_n++;
+
+						xmlFree(value);
+						ocrpt_expr_free(value_e);
+					}
+				}
+			}
 		}
 	}
+
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, name_s, type_s, conn_params);
 
 	if (encoding && encoding_s && ds)
 		ocrpt_datasource_set_encoding(ds, encoding_s);
 
+	for (i = 0; conn_params && i < conn_params_n; i++)
+		ocrpt_mem_free(conn_params[i].param_value);
+
+	ocrpt_mem_free(conn_params);
+
+	error_out:
+
+	/* Free fixed expected atttributes */
 	for (i = 0; xmlattrs[i].attrp; i++)
 		xmlFree(*xmlattrs[i].attrp);
 
 	ocrpt_expr_free(name_e);
 	ocrpt_expr_free(type_e);
-	ocrpt_expr_free(host_e);
-	ocrpt_expr_free(unix_socket_e);
-	ocrpt_expr_free(port_e);
-	ocrpt_expr_free(dbname_e);
-	ocrpt_expr_free(user_e);
-	ocrpt_expr_free(password_e);
-	ocrpt_expr_free(connstr_e);
-	ocrpt_expr_free(optionfile_e);
-	ocrpt_expr_free(group_e);
 	ocrpt_expr_free(encoding_e);
 
 	ocrpt_ignore_child_nodes(o, reader, -1, "Datasource");

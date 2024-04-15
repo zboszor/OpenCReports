@@ -7,6 +7,8 @@
 
 $o = new OpenCReport();
 
-$ds = $o->datasource_add_postgresql2("pgsql", "dbname=ocrpttest user=ocrpt");
+$conn_params = [ "connstr" => "dbname=ocrpttest user=ocrpt" ];
+
+$ds = $o->datasource_add("pgsql", "postgresql", $conn_params);
 
 echo "Connecting to PostgreSQL database was " . ($ds instanceof OpenCReport\Datasource ? "" : "NOT ") . "successful" . PHP_EOL;

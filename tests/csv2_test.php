@@ -12,7 +12,7 @@ $coltypes = [
 ];
 
 $o = new OpenCReport();
-$ds = $o->datasource_add_csv("csv");
+$ds = $o->datasource_add("csv", "csv");
 
 create_exprs($o, false);
 

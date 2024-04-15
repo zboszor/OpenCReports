@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 	ocrpt_query_result *qr;
 	int32_t cols, row, i;
 
-	q = ocrpt_query_add_json(ds, "a", "jsonquery.json", coltypes, COLS);
+	q = ocrpt_query_add_file(ds, "a", "jsonquery.json", coltypes, COLS);
 	if (!q) {
 		ocrpt_free(o);
 		return 0;

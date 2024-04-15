@@ -25,9 +25,15 @@ function test_newrow_cb(OpenCReport $o, OpenCReport\Report $r) {
 }
 
 $o = new OpenCReport();
-$ds = $o->datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+
+$conn_params = [
+	"dbname" => "ocrpttest",
+	"user" => "ocrpt"
+];
+
+$ds = $o->datasource_add("pgsql", "postgresql", $conn_params);
 if (is_null($ds)) {
-	echo "ocrpt_datasource_add_postgresql failed" . PHP_EOL;
+	echo "ocrpt_datasource_add failed" . PHP_EOL;
 	exit(0);
 }
 

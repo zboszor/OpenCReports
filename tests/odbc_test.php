@@ -7,6 +7,11 @@
 
 $o = new OpenCReport();
 
-$ds = $o->datasource_add_odbc("odbc", "ocrpttest1", "ocrpt", NULL);
+$conn_params = [
+	"dbname" => "ocrpttest1",
+	"user" => "ocrpt"
+];
+
+$ds = $o->datasource_add("odbc", "odbc", $conn_params);
 
 echo "Connecting to ODBC database was " . ($ds instanceof OpenCReport\Datasource ? "" : "NOT ") . "successful" . PHP_EOL;

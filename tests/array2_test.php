@@ -20,7 +20,7 @@ $coltypes = [
 
 $o = new OpenCReport();
 
-$ds = $o->datasource_add_array("array");
+$ds = $o->datasource_add("array", "array");
 
 /* Latin1 -> UTF-8, a NOP for plain ASCII characters */
 $ds->set_encoding("ISO-8859-1");

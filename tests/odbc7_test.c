@@ -13,8 +13,8 @@ int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add_odbc(o, "odbc", "ocrpttest2", "ocrpt", NULL);
 	ocrpt_datasource *ds2 = ocrpt_datasource_add_odbc(o, "odbc2", "ocrpttest2", "ocrpt", NULL);
-	ocrpt_query *q = ocrpt_query_add_odbc(ds, "a", "SELECT * FROM flintstones");
-	ocrpt_query *q2 = ocrpt_query_add_odbc(ds2, "b", "SELECT * FROM rubbles");
+	ocrpt_query *q = ocrpt_query_add_sql(ds, "a", "SELECT * FROM flintstones");
+	ocrpt_query *q2 = ocrpt_query_add_sql(ds2, "b", "SELECT * FROM rubbles");
 	int32_t cols, cols2, i, row;
 	ocrpt_query_result *qr UNUSED = ocrpt_query_get_result(q, &cols);
 	ocrpt_query_result *qr2;

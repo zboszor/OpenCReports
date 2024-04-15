@@ -23,8 +23,83 @@
 #include "datetime.h"
 #include "fallthrough.h"
 
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const ocrpt_input *input) {
-	if (!o || !source_name || !*source_name || !input)
+static pthread_mutex_t input_register_mutex = PTHREAD_MUTEX_INITIALIZER;
+ocrpt_input **ocrpt_inputs = NULL;
+int32_t n_ocrpt_inputs = 0;
+
+static int inputsortname(const void *key1, const void *key2) {
+	return strcasecmp((*(const ocrpt_input **)key1)->names[0], (*(const ocrpt_input **)key2)->names[0]);
+}
+
+DLL_EXPORT_SYM bool ocrpt_input_register(const ocrpt_input * const input) {
+	if (!input || !input->names || !input->names[0])
+		return false;
+
+	/*
+	 * Check presence of crucial functions in the input.
+	 * Optional ones are ->connect, ->clone, ->set_encoding and ->free
+	 */
+	if (!input->describe || !input->rewind || !input->next || !input->populate_result || !input->isdone)
+		return false;
+
+	pthread_mutex_lock(&input_register_mutex);
+
+	for (int32_t i = 0; i < n_ocrpt_inputs; i++) {
+		/* A previously registered datasource input type can be replaced */
+		for (int32_t j = 0; ocrpt_inputs[i]->names[j]; j++) {
+			for (int32_t k = 0; input->names[k]; k++) {
+				if (strcasecmp(ocrpt_inputs[i]->names[j], input->names[k]) == 0) {
+					ocrpt_inputs[i] = (ocrpt_input *)input;
+					pthread_mutex_unlock(&input_register_mutex);
+					return true;
+				}
+			}
+		}
+	}
+
+	ocrpt_input **new_inputs = ocrpt_mem_realloc(ocrpt_inputs, (n_ocrpt_inputs + 1) * sizeof(ocrpt_input *));
+
+	if (!new_inputs) {
+		pthread_mutex_unlock(&input_register_mutex);
+		return false;
+	}
+
+	ocrpt_inputs = new_inputs;
+	ocrpt_inputs[n_ocrpt_inputs] = (ocrpt_input *)input;
+	n_ocrpt_inputs++;
+
+	qsort(ocrpt_inputs, n_ocrpt_inputs, sizeof(ocrpt_input *), inputsortname);
+
+	pthread_mutex_unlock(&input_register_mutex);
+
+	return true;
+}
+
+DLL_EXPORT_SYM const ocrpt_input * const ocrpt_input_get(const char *name) {
+	const ocrpt_input *input = NULL;
+
+	pthread_mutex_lock(&input_register_mutex);
+
+	for (int32_t i = 0; i < n_ocrpt_inputs; i++) {
+		for (int32_t j = 0; ocrpt_inputs[i]->names[j]; j++) {
+			if (strcasecmp(ocrpt_inputs[i]->names[j], name) == 0) {
+				input = ocrpt_inputs[i];
+				break;
+			}
+		}
+	}
+
+	pthread_mutex_unlock(&input_register_mutex);
+
+	return input;
+}
+
+DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const char *type, const ocrpt_input_connect_parameter *conn_params) {
+	if (!o || !source_name || !*source_name || !type)
+		return NULL;
+
+	const ocrpt_input *input = ocrpt_input_get(type);
+	if (!input)
 		return NULL;
 
 	ocrpt_datasource *s = ocrpt_datasource_get(o, source_name);
@@ -44,9 +119,32 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char
 	s->o = o;
 	s->input = input;
 
+	bool connected = input->connect ? input->connect(s, conn_params) : true;
+
+	if (!connected) {
+		ocrpt_strfree(s->name);
+		ocrpt_mem_free(s);;
+		return NULL;
+	}
+
 	o->datasources = ocrpt_list_append(o->datasources, s);
 
 	return s;
+}
+
+DLL_EXPORT_SYM void ocrpt_datasource_set_private(ocrpt_datasource *ds, void *priv) {
+	if (!ds)
+		return;
+
+	/* Be careful overwriting it. */
+	ds->priv = priv;
+}
+
+DLL_EXPORT_SYM void *ocrpt_datasource_get_private(ocrpt_datasource *ds) {
+	if (!ds)
+		return NULL;
+
+	return ds->priv;
 }
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_get(opencreport *o, const char *source_name) {
@@ -105,6 +203,23 @@ ocrpt_query *ocrpt_query_alloc(const ocrpt_datasource *source, const char *name)
 	}
 
 	return q;
+}
+
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_file(ocrpt_datasource *source,
+												const char *name, const char *filename,
+												const int32_t *types,
+												int32_t types_cols) {
+	if (!source || !source->input || !source->input->query_add_file || !name || !filename)
+		return NULL;
+
+	return source->input->query_add_file(source, name, filename, types, types_cols);
+}
+
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_sql(ocrpt_datasource *source, const char *name, const char *querystr) {
+	if (!source || !source->input || !source->input->query_add_sql || !name || !querystr)
+		return NULL;
+
+	return source->input->query_add_sql(source, name, querystr);
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_get(opencreport *o, const char *name) {

@@ -26,15 +26,32 @@ typedef struct ocrpt_datasource ocrpt_datasource;
 struct ocrpt_query_result;
 typedef struct ocrpt_query_result ocrpt_query_result;
 
+struct ocrpt_input_connect_parameter {
+	char *param_name;
+	union {
+		bool optional;
+		char *param_value;
+	};
+};
+typedef struct ocrpt_input_connect_parameter ocrpt_input_connect_parameter;
+
 struct ocrpt_input {
-	void (*describe)(ocrpt_query *, ocrpt_query_result **, int32_t *);
-	void (*rewind)(ocrpt_query *);
-	bool (*next)(ocrpt_query *);
-	bool (*populate_result)(ocrpt_query *);
-	bool (*isdone)(ocrpt_query *);
-	void (*free)(ocrpt_query *);
-	bool (*set_encoding)(ocrpt_datasource *, const char *);
-	void (*close)(const ocrpt_datasource *);
+	const char **names; /* mandatory, NULL terminated array with potentially multiple names */
+	/* Both of below are set or both are NULL */
+	const ocrpt_input_connect_parameter **connect_parameters; /* optional */
+	bool (*connect)(ocrpt_datasource *, const ocrpt_input_connect_parameter *); /* optional */
+	/* One of the three below must be set */
+	ocrpt_query *(*query_add_sql)(ocrpt_datasource *, const char *, const char *); /* optional */
+	ocrpt_query *(*query_add_file)(ocrpt_datasource *, const char *, const char *, const int32_t *, int32_t); /* optional */
+	ocrpt_query *(*query_add_array)(ocrpt_datasource *, const char *, const char **, int32_t, int32_t, const int32_t *, int32_t); /* optional */
+	void (*describe)(ocrpt_query *, ocrpt_query_result **, int32_t *); /* mandatory */
+	void (*rewind)(ocrpt_query *); /* mandatory */
+	bool (*next)(ocrpt_query *); /* mandatory */
+	bool (*populate_result)(ocrpt_query *); /* mandatory */
+	bool (*isdone)(ocrpt_query *); /* mandatory */
+	void (*free)(ocrpt_query *); /* optional */
+	bool (*set_encoding)(ocrpt_datasource *, const char *); /* optional */
+	void (*close)(const ocrpt_datasource *); /* optional */
 };
 typedef struct ocrpt_input ocrpt_input;
 
@@ -254,6 +271,22 @@ locale_t ocrpt_get_locale(opencreport *o);
  */
 ssize_t ocrpt_mpfr_strfmon(opencreport *o, char * __restrict s, size_t maxsize, const char * __restrict format, ...);
 
+/**********************************
+ * Input driver related functions *
+ **********************************/
+
+/*
+ * Register an input driver
+ *
+ * The structure must contain all mandatory elements,
+ * see the declaration of struct ocrpt_input.
+ */
+bool ocrpt_input_register(const ocrpt_input * const input);
+/*
+ * Get the input driver structure using its type name
+ */
+const ocrpt_input * const ocrpt_input_get(const char *name);
+
 /******************************************
  * Datasource and query related functions *
  ******************************************/
@@ -265,10 +298,6 @@ ssize_t ocrpt_mpfr_strfmon(opencreport *o, char * __restrict s, size_t maxsize, 
  * "array" is automatically added to an opencreport structure.
  */
 ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, const char *source_name);
-/*
- * Query whether the datasource is array based
- */
-bool ocrpt_datasource_is_array(ocrpt_datasource *source);
 /*
  * Add an array query using the datasource pointer
  *
@@ -287,46 +316,13 @@ ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source,
  */
 ocrpt_datasource *ocrpt_datasource_add_csv(opencreport *o, const char *source_name);
 /*
- * Query whether the datasource is CSV based
- */
-bool ocrpt_datasource_is_csv(ocrpt_datasource *source);
-/*
- * Add a CSV query
- */
-ocrpt_query *ocrpt_query_add_csv(ocrpt_datasource *source,
-									const char *name, const char *filename,
-									const int32_t *types,
-									int32_t types_cols);
-/*
  * Add a JSON datasource
  */
 ocrpt_datasource *ocrpt_datasource_add_json(opencreport *o, const char *source_name);
 /*
- * Query whether the datasource is JSON based
- */
-bool ocrpt_datasource_is_json(ocrpt_datasource *source);
-/*
- * Add a JSON query
- */
-ocrpt_query *ocrpt_query_add_json(ocrpt_datasource *source,
-									const char *name, const char *filename,
-									const int32_t *types,
-									int32_t types_cols);
-/*
  * Add an XML datasource
  */
 ocrpt_datasource *ocrpt_datasource_add_xml(opencreport *o, const char *source_name);
-/*
- * Query whether the datasource is XML based
- */
-bool ocrpt_datasource_is_xml(ocrpt_datasource *source);
-/*
- * Add a XML query
- */
-ocrpt_query *ocrpt_query_add_xml(ocrpt_datasource *source,
-									const char *name, const char *filename,
-									const int32_t *types,
-									int32_t types_cols);
 /*
  * Add a PostgreSQL datasource using separate connection parameters
  */
@@ -337,14 +333,6 @@ ocrpt_datasource *ocrpt_datasource_add_postgresql(opencreport *o, const char *so
  * Add a PostgreSQL datasource using a connection info string
  */
 ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o, const char *source_name, const char *conninfo);
-/*
- * Query whether the datasource is PostgreSQL based
- */
-bool ocrpt_datasource_is_postgresql(ocrpt_datasource *source);
-/*
- * Add a PostgreSQL query
- */
-ocrpt_query *ocrpt_query_add_postgresql(ocrpt_datasource *source, const char *name, const char *querystr);
 /*
  * Add a MariaDB/MySQL datasource using separate connection parameters
  */
@@ -357,14 +345,6 @@ ocrpt_datasource *ocrpt_datasource_add_mariadb(opencreport *o, const char *sourc
  */
 ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, const char *source_name, const char *optionfile, const char *group);
 /*
- * Query whether the datasource is MariaDB based
- */
-bool ocrpt_datasource_is_mariadb(ocrpt_datasource *source);
-/*
- * Add a MariaDB/MySQL query
- */
-ocrpt_query *ocrpt_query_add_mariadb(ocrpt_datasource *source, const char *name, const char *querystr);
-/*
  * Add an ODBC datasource using separate connection parameters
  */
 ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const char *source_name,
@@ -374,22 +354,41 @@ ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const char *source_n
  */
 ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, const char *source_name, const char *conninfo);
 /*
- * Query whether the datasource is ODBC based
+ * Add a file based (CSV, XML, JSON) query
  */
-bool ocrpt_datasource_is_odbc(ocrpt_datasource *source);
+ocrpt_query *ocrpt_query_add_file(ocrpt_datasource *source,
+									const char *name, const char *filename,
+									const int32_t *types,
+									int32_t types_cols);
 /*
- * Add an ODBC query
+ * Add an SQL based (PostgreSQL, MariaDB, ODBC) query
  */
-ocrpt_query *ocrpt_query_add_odbc(ocrpt_datasource *source, const char *name, const char *querystr);
+ocrpt_query *ocrpt_query_add_sql(ocrpt_datasource *source, const char *name, const char *querystr);
+/*
+ * Query whether the datasource is array based
+ */
+bool ocrpt_datasource_is_array(ocrpt_datasource *source);
+/*
+ * Query whether the datasource is file based
+ */
+bool ocrpt_datasource_is_file(ocrpt_datasource *source);
+/*
+ * Query whether the datasource is SQL based
+ */
+bool ocrpt_datasource_is_sql(ocrpt_datasource *source);
 /*
  * Find the datasource using its name
  */
 ocrpt_datasource *ocrpt_datasource_get(opencreport *o, const char *source_name);
 /*
- * Add a custom datasource not covered by
- * the currently implemented sources.
+ * Add a custom datasource using its registered type name
  */
-ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const ocrpt_input *input);
+ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const char *type, const ocrpt_input_connect_parameter *conn_params);
+/*
+ * Helper functions for custom datasources
+ */
+void ocrpt_datasource_set_private(ocrpt_datasource *ds, void *priv);
+void *ocrpt_datasource_get_private(ocrpt_datasource *ds);
 /*
  * Set the input encoding for a datasource
  */

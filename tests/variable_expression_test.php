@@ -20,7 +20,7 @@ $coltypes = [
 
 $o = new OpenCReport();
 
-$ds = $o->datasource_add_array("array");
+$ds = $o->datasource_add("array", "array");
 
 $p = $o->part_new();
 $pr = $p->row_new();

@@ -74,7 +74,7 @@ function precalc_done_cb(OpenCReport $o) {
 }
 
 $o = new OpenCReport();
-$ds = $o->datasource_add_array("local_array");
+$ds = $o->datasource_add("local_array", "array");
 
 /* For m.sillypants in the report */
 $sillypants = "5";

@@ -1972,6 +1972,14 @@ static void initialize_ocrpt(void) {
 
 	ocrpt_init_color();
 
+	ocrpt_input_register(&ocrpt_array_input);
+	ocrpt_input_register(&ocrpt_csv_input);
+	ocrpt_input_register(&ocrpt_xml_input);
+	ocrpt_input_register(&ocrpt_json_input);
+	ocrpt_input_register(&ocrpt_mariadb_input);
+	ocrpt_input_register(&ocrpt_postgresql_input);
+	ocrpt_input_register(&ocrpt_odbc_input);
+
 	LIBXML_TEST_VERSION;
 	xmlInitParser();
 }

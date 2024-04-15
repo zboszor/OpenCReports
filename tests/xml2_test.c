@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
 	err = NULL;
 	adult = ocrpt_expr_parse(o, "a.adult", &err);
 
-	q = ocrpt_query_add_xml(ds, "a", "xmldata2.xml", coltypes, COLS);
+	q = ocrpt_query_add_file(ds, "a", "xmldata2.xml", coltypes, COLS);
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)
