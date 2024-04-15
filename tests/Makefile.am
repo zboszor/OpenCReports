@@ -10,8 +10,11 @@ LIBS = $(top_builddir)/libsrc/libopencreport.la
 $(top_builddir)/libsrc/libopencreport.la:
 	$(MAKE) -C $(top_builddir)/libsrc libopencreport.la
 
+compiler_cc_test_SOURCES = compiler_cc_test.cc
+
 TESTS = \
 	compiler_test \
+	compiler_cc_test \
 	grammar_test expr_test function_test \
 	expr_format_test \
 	environment_test environment2_test \
