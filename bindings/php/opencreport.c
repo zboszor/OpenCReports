@@ -5432,7 +5432,7 @@ static PHP_MINIT_FUNCTION(opencreport)
 	 * when unloaded too quickly.
 	 */
 	opencreport *o = ocrpt_init();
-	ocrpt_datasource *ds = ocrpt_datasource_add_array(o, "array");
+	ocrpt_datasource *ds = ocrpt_datasource_add(o, "array", "array", NULL);
 
 	ocrpt_query_add_array(ds, "data", (const char **)dummy_report_array, DUMMY_REPORT_ROWS, DUMMY_REPORT_COLS, NULL, 0);
 	ocrpt_parse_xml_from_buffer(o, dummy_report_xml, sizeof(dummy_report_xml) - 1);
@@ -5848,14 +5848,15 @@ ZEND_FUNCTION(rlib_add_datasource_mysql) {
 		RETURN_THROWS();
 	}
 
-	ds = ocrpt_datasource_add_mariadb(
-				oo->o, ZSTR_VAL(source_name),
-				host ? ZSTR_VAL(host) : NULL,
-				NULL /* port */,
-				dbname ? ZSTR_VAL(dbname) : NULL,
-				user ? ZSTR_VAL(user) : NULL,
-				password ? ZSTR_VAL(password) : NULL,
-				NULL /* unix_socket */);
+	struct ocrpt_input_connect_parameter conn_params[] = {
+		{ .param_name = "host", .param_value = host ? ZSTR_VAL(host) : NULL },
+		{ .param_name = "dbname", .param_value = dbname ? ZSTR_VAL(dbname) : NULL },
+		{ .param_name = "user", .param_value = user ? ZSTR_VAL(user) : NULL },
+		{ .param_name = "password", .param_value = password ? ZSTR_VAL(password) : NULL },
+		{ NULL }
+	};
+
+	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "mariadb", conn_params);
 	if (!ds)
 		RETURN_NULL();
 
@@ -5886,10 +5887,13 @@ ZEND_FUNCTION(rlib_add_datasource_mysql_from_group) {
 		RETURN_THROWS();
 	}
 
-	ds = ocrpt_datasource_add_mariadb2(
-				oo->o, ZSTR_VAL(source_name),
-				option_file ? ZSTR_VAL(option_file) : NULL,
-				group ? ZSTR_VAL(group) : NULL);
+	struct ocrpt_input_connect_parameter conn_params[] = {
+		{ .param_name = "optionfile", .param_value = option_file ? ZSTR_VAL(option_file) : NULL },
+		{ .param_name = "group", .param_value = group ? ZSTR_VAL(group) : NULL },
+		{ NULL }
+	};
+
+	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "mariadb", conn_params);
 	if (!ds)
 		RETURN_NULL();
 
@@ -5918,9 +5922,12 @@ ZEND_FUNCTION(rlib_add_datasource_postgres) {
 		RETURN_THROWS();
 	}
 
-	ds = ocrpt_datasource_add_postgresql2(
-				oo->o, ZSTR_VAL(source_name),
-				connection_info ? ZSTR_VAL(connection_info) : NULL);
+	struct ocrpt_input_connect_parameter conn_params[] = {
+		{ .param_name = "connstr", .param_value = connection_info ? ZSTR_VAL(connection_info) : NULL },
+		{ NULL }
+	};
+
+	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "postgresql", conn_params);
 	if (!ds)
 		RETURN_NULL();
 
@@ -5952,11 +5959,14 @@ ZEND_FUNCTION(rlib_add_datasource_odbc) {
 		RETURN_THROWS();
 	}
 
-	ds = ocrpt_datasource_add_odbc(
-				oo->o, ZSTR_VAL(source_name),
-				dbname ? ZSTR_VAL(dbname) : NULL,
-				user ? ZSTR_VAL(user) : NULL,
-				password ? ZSTR_VAL(password) : NULL);
+	struct ocrpt_input_connect_parameter conn_params[] = {
+		{ .param_name = "dbname", .param_value = dbname ? ZSTR_VAL(dbname) : NULL },
+		{ .param_name = "user", .param_value = user ? ZSTR_VAL(user) : NULL },
+		{ .param_name = "password", .param_value = password ? ZSTR_VAL(password) : NULL },
+		{ NULL }
+	};
+
+	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "odbc", conn_params);
 	if (!ds)
 		RETURN_NULL();
 
@@ -5983,7 +5993,7 @@ ZEND_FUNCTION(rlib_add_datasource_array) {
 		RETURN_THROWS();
 	}
 
-	ds = ocrpt_datasource_add_array(oo->o, ZSTR_VAL(source_name));
+	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "array", NULL);
 	if (!ds)
 		RETURN_NULL();
 
@@ -6010,7 +6020,7 @@ ZEND_FUNCTION(rlib_add_datasource_xml) {
 		RETURN_THROWS();
 	}
 
-	ds = ocrpt_datasource_add_xml(oo->o, ZSTR_VAL(source_name));
+	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "xml", NULL);
 	if (!ds)
 		RETURN_NULL();
 
@@ -6037,7 +6047,7 @@ ZEND_FUNCTION(rlib_add_datasource_csv) {
 		RETURN_THROWS();
 	}
 
-	ds = ocrpt_datasource_add_csv(oo->o, ZSTR_VAL(source_name));
+	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "csv", NULL);
 	if (!ds)
 		RETURN_NULL();
 
