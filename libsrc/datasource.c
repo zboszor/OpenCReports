@@ -132,6 +132,18 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char
 	return s;
 }
 
+DLL_EXPORT_SYM opencreport *ocrpt_datasource_get_opencreport(const ocrpt_datasource *ds) {
+	return ds ? ds->o : NULL;
+}
+
+DLL_EXPORT_SYM const char *ocrpt_datasource_get_name(const ocrpt_datasource *ds) {
+	return ds ? ds->name : NULL;
+}
+
+DLL_EXPORT_SYM const ocrpt_input *ocrpt_datasource_get_input(const ocrpt_datasource *ds) {
+	return ds ? ds->input : NULL;
+}
+
 DLL_EXPORT_SYM void ocrpt_datasource_set_private(ocrpt_datasource *ds, void *priv) {
 	if (!ds)
 		return;
@@ -140,11 +152,8 @@ DLL_EXPORT_SYM void ocrpt_datasource_set_private(ocrpt_datasource *ds, void *pri
 	ds->priv = priv;
 }
 
-DLL_EXPORT_SYM void *ocrpt_datasource_get_private(ocrpt_datasource *ds) {
-	if (!ds)
-		return NULL;
-
-	return ds->priv;
+DLL_EXPORT_SYM void *ocrpt_datasource_get_private(const ocrpt_datasource *ds) {
+	return ds ? ds->priv : NULL;
 }
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_get(opencreport *o, const char *source_name) {
@@ -175,7 +184,7 @@ DLL_EXPORT_SYM void ocrpt_datasource_set_encoding(ocrpt_datasource *source, cons
  * - a valid pointer if the query space was successfully
  *   allocated and added to o->queries
  */
-ocrpt_query *ocrpt_query_alloc(const ocrpt_datasource *source, const char *name) {
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_alloc(const ocrpt_datasource *source, const char *name) {
 	int32_t llen;
 
 	if (!source)
@@ -186,6 +195,13 @@ ocrpt_query *ocrpt_query_alloc(const ocrpt_datasource *source, const char *name)
 
 	q->name = ocrpt_mem_strdup(name);
 	if (!q->name) {
+		ocrpt_mem_free(q);
+		return NULL;
+	}
+
+	q->rownum = ocrpt_expr_parse(source->o, "r.rownum", NULL);
+	if (!q->rownum) {
+		ocrpt_mem_free(q->name);
 		ocrpt_mem_free(q);
 		return NULL;
 	}
@@ -203,6 +219,26 @@ ocrpt_query *ocrpt_query_alloc(const ocrpt_datasource *source, const char *name)
 	}
 
 	return q;
+}
+
+DLL_EXPORT_SYM char *ocrpt_query_get_name(const ocrpt_query *query) {
+	return (query ? query->name : NULL);
+}
+
+DLL_EXPORT_SYM ocrpt_datasource *ocrpt_query_get_source(const ocrpt_query *query) {
+	return (query ? (ocrpt_datasource *)query->source : NULL);
+}
+
+DLL_EXPORT_SYM void ocrpt_query_set_private(ocrpt_query *query, const void *priv) {
+	if (!query)
+		return;
+
+	/* Be careful overwriting it. */
+	query->priv = (void *)priv;
+}
+
+DLL_EXPORT_SYM void *ocrpt_query_get_private(const ocrpt_query *query) {
+	return (query ? query->priv : NULL);
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_file(ocrpt_datasource *source,
@@ -630,4 +666,16 @@ void ocrpt_query_finalize_followers(ocrpt_query *q) {
 	ocrpt_query_finalize_followers0(q, q);
 
 	q->source->o->n_to_1_lists_invalid = false;
+}
+
+DLL_EXPORT_SYM bool ocrpt_datasource_is_array(ocrpt_datasource *source) {
+	return source && source->input && source->input->query_add_array;
+}
+
+DLL_EXPORT_SYM bool ocrpt_datasource_is_file(ocrpt_datasource *source) {
+	return source && source->input && source->input->query_add_file;
+}
+
+DLL_EXPORT_SYM bool ocrpt_datasource_is_sql(ocrpt_datasource *source) {
+	return source && source->input && source->input->query_add_sql;
 }

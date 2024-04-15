@@ -100,9 +100,10 @@ static bool ocrpt_postgresql_connect(ocrpt_datasource *source, const ocrpt_input
 	const char *values[8] = { "UTF-8", NULL, NULL, NULL };
 	char *appname;
 
-	int32_t len = snprintf(NULL, 0, PACKAGE_STRING " datasource %s", source->name);
+	const char *dsname = ocrpt_datasource_get_name(source);
+	int32_t len = snprintf(NULL, 0, PACKAGE_STRING " datasource %s", dsname);
 	appname = alloca(len + 1);
-	snprintf(appname, len + 1, PACKAGE_STRING " datasource %s", source->name);
+	snprintf(appname, len + 1, PACKAGE_STRING " datasource %s", dsname);
 	values[PG_APPNAMEIDX] = appname;
 
 	for (i = 0; params[i].param_name; i++) {
@@ -149,13 +150,14 @@ static ocrpt_query *ocrpt_postgresql_query_add(ocrpt_datasource *source, const c
 	snprintf(cursor, len + 1, "DECLARE \"%s\" SCROLL CURSOR WITH HOLD FOR %s", name, querystr);
 	cursor[len] = 0;
 
-	PGresult *res = PQexec(source->priv, cursor);
+	PGconn *conn = (PGconn *)ocrpt_datasource_get_private(source);
+	PGresult *res = PQexec(conn, cursor);
 	switch (PQresultStatus(res)) {
 	case PGRES_COMMAND_OK:
 	case PGRES_NONFATAL_ERROR:
 		break;
 	default:
-		ocrpt_err_printf("failed to execute query: %s\nwith error message: %s", querystr, PQerrorMessage(source->priv));
+		ocrpt_err_printf("failed to execute query: %s\nwith error message: %s", querystr, PQerrorMessage(conn));
 		PQclear(res);
 		return NULL;
 	}
@@ -177,29 +179,30 @@ static ocrpt_query *ocrpt_postgresql_query_add(ocrpt_datasource *source, const c
 	result->fetchquery = ocrpt_mem_strdup(cursor);
 	result->chunk = -1;
 	result->row = -1;
-	query->priv = result;
-
-	query->rownum = ocrpt_expr_parse(source->o, "r.rownum", NULL);
+	ocrpt_query_set_private(query, result);
 
 	return query;
 
 	out_error:
 
 	snprintf(cursor, len + 1, "CLOSE \"%s\"", name);
-	res = PQexec(source->priv, cursor);
+	res = PQexec(conn, cursor);
 	PQclear(res);
 	return NULL;
 }
 
 static void ocrpt_postgresql_describe(ocrpt_query *query, ocrpt_query_result **qresult, int32_t *cols) {
-	ocrpt_postgresql_results *result = query->priv;
+	ocrpt_postgresql_results *result = ocrpt_query_get_private(query);
+	ocrpt_datasource *source = ocrpt_query_get_source(query);
+	PGconn *conn = ocrpt_datasource_get_private(source);
+	opencreport *o = ocrpt_datasource_get_opencreport(source);
 
 	if (!result->result) {
 		PGresult *res;
 		ocrpt_query_result *qr;
 		int32_t i;
 
-		res = PQdescribePortal(query->source->priv, query->name);
+		res = PQdescribePortal(conn, ocrpt_query_get_name(query));
 		if (PQresultStatus(res) != PGRES_COMMAND_OK) {
 			PQclear(res);
 			if (qresult)
@@ -260,16 +263,18 @@ static void ocrpt_postgresql_describe(ocrpt_query *query, ocrpt_query_result **q
 				break;
 			}
 
+
+
 			for (int j = 0; j < OCRPT_EXPR_RESULTS; j++) {
 				int32_t idx = j * result->cols + i;
 
 				qr[idx].name = PQfname(res, i);
-				qr[idx].result.o = query->source->o;
+				qr[idx].result.o = o;
 				qr[idx].result.type = type;
 				qr[idx].result.orig_type = type;
 
 				if (qr[idx].result.type == OCRPT_RESULT_NUMBER) {
-					mpfr_init2(qr[idx].result.number, query->source->o->prec);
+					mpfr_init2(qr[idx].result.number, ocrpt_get_numeric_precision_bits(o));
 					qr[idx].result.number_initialized = true;
 				}
 
@@ -288,7 +293,9 @@ static void ocrpt_postgresql_describe(ocrpt_query *query, ocrpt_query_result **q
 }
 
 static PGresult *ocrpt_postgresql_fetch(ocrpt_query *query) {
-	ocrpt_postgresql_results *result = query->priv;
+	ocrpt_postgresql_results *result = ocrpt_query_get_private(query);
+	ocrpt_datasource *source = ocrpt_query_get_source(query);
+	PGconn *conn = ocrpt_datasource_get_private(source);
 	PGresult *res;
 
 	if (result->res) {
@@ -296,7 +303,7 @@ static PGresult *ocrpt_postgresql_fetch(ocrpt_query *query) {
 		result->res = NULL;
 	}
 
-	res = PQexec(query->source->priv, result->fetchquery);
+	res = PQexec(conn, result->fetchquery);
 	if (PQresultStatus(res) != PGRES_TUPLES_OK) {
 		PQclear(res);
 		return NULL;
@@ -310,7 +317,9 @@ static PGresult *ocrpt_postgresql_fetch(ocrpt_query *query) {
 }
 
 static void ocrpt_postgresql_rewind(ocrpt_query *query) {
-	ocrpt_postgresql_results *result = query->priv;
+	ocrpt_postgresql_results *result = ocrpt_query_get_private(query);
+	ocrpt_datasource *source = ocrpt_query_get_source(query);
+	PGconn *conn = ocrpt_datasource_get_private(source);
 
 	if (result->chunk > 0) {
 		if (!result->rewindquery) {
@@ -324,7 +333,7 @@ static void ocrpt_postgresql_rewind(ocrpt_query *query) {
 		}
 
 		if (result->rewindquery) {
-			PGresult *res = PQexec(query->source->priv, result->rewindquery);
+			PGresult *res = PQexec(conn, result->rewindquery);
 			PQclear(res);
 		}
 
@@ -341,7 +350,7 @@ static void ocrpt_postgresql_rewind(ocrpt_query *query) {
 }
 
 static bool ocrpt_postgresql_populate_result(ocrpt_query *query) {
-	struct ocrpt_postgresql_results *result = query->priv;
+	struct ocrpt_postgresql_results *result = ocrpt_query_get_private(query);
 	int32_t i;
 
 	if (result->isdone || result->row < 0) {
@@ -361,7 +370,7 @@ static bool ocrpt_postgresql_populate_result(ocrpt_query *query) {
 }
 
 static bool ocrpt_postgresql_next(ocrpt_query *query) {
-	ocrpt_postgresql_results *result = query->priv;
+	ocrpt_postgresql_results *result = ocrpt_query_get_private(query);
 
 	if (result->isdone)
 		return false;
@@ -376,13 +385,15 @@ static bool ocrpt_postgresql_next(ocrpt_query *query) {
 }
 
 static bool ocrpt_postgresql_isdone(ocrpt_query *query) {
-	ocrpt_postgresql_results *result = query->priv;
+	ocrpt_postgresql_results *result = ocrpt_query_get_private(query);
 
 	return result->isdone;
 }
 
 static void ocrpt_postgresql_free(ocrpt_query *query) {
-	ocrpt_postgresql_results *result = query->priv;
+	ocrpt_postgresql_results *result = ocrpt_query_get_private(query);
+	ocrpt_datasource *source = ocrpt_query_get_source(query);
+	PGconn *conn = ocrpt_datasource_get_private(source);
 	PGresult *res;
 	char *cursor;
 	int32_t len;
@@ -397,15 +408,15 @@ static void ocrpt_postgresql_free(ocrpt_query *query) {
 	len = snprintf(cursor, len + 1, "CLOSE \"%s\"", query->name);
 	cursor[len] = 0;
 
-	res = PQexec(query->source->priv, cursor);
+	res = PQexec(conn, cursor);
 	PQclear(res);
 
 	ocrpt_mem_free(result);
-	query->priv = NULL;
+	ocrpt_query_set_private(query, NULL);
 }
 
 static void ocrpt_postgresql_close(const ocrpt_datasource *ds) {
-	PGconn *conn = ds->priv;
+	PGconn *conn = ocrpt_datasource_get_private(ds);
 
 	PQfinish(conn);
 }
@@ -530,13 +541,16 @@ static bool ocrpt_mariadb_connect(ocrpt_datasource *source, const ocrpt_input_co
 }
 
 static ocrpt_query_result *ocrpt_mariadb_describe_early(ocrpt_query *query) {
-	ocrpt_mariadb_results *result = query->priv;
+	ocrpt_mariadb_results *result = ocrpt_query_get_private(query);
+	ocrpt_datasource *source = ocrpt_query_get_source(query);
+	opencreport *o = ocrpt_datasource_get_opencreport(source);
+	MYSQL *mysql = ocrpt_datasource_get_private(source);
 	MYSQL_FIELD *field;
 	ocrpt_query_result *qr;
 	int32_t i;
 
 	result->rows = mysql_num_rows(result->res);
-	result->cols = mysql_field_count(query->source->priv);
+	result->cols = mysql_field_count(mysql);
 	result->row = -1LL;
 	result->isdone = false;
 
@@ -590,12 +604,12 @@ static ocrpt_query_result *ocrpt_mariadb_describe_early(ocrpt_query *query) {
 			} else
 				qr[idx].name = qr[i].name;
 
-			qr[idx].result.o = query->source->o;
+			qr[idx].result.o = o;
 			qr[idx].result.type = type;
 			qr[idx].result.orig_type = type;
 
 			if (qr[idx].result.type == OCRPT_RESULT_NUMBER) {
-				mpfr_init2(qr[idx].result.number, query->source->o->prec);
+				mpfr_init2(qr[idx].result.number, ocrpt_get_numeric_precision_bits(o));
 				qr[idx].result.number_initialized = true;
 			}
 
@@ -610,11 +624,13 @@ static ocrpt_query *ocrpt_mariadb_query_add(ocrpt_datasource *source, const char
 	if (!source || !name || !*name || !querystr || !*querystr)
 		return NULL;
 
-	int32_t ret = mysql_query(source->priv, querystr);
+	MYSQL *mysql = ocrpt_datasource_get_private(source);
+
+	int32_t ret = mysql_query(mysql, querystr);
 	if (ret)
 		return NULL;
 
-	MYSQL_RES *res = mysql_store_result(source->priv);
+	MYSQL_RES *res = mysql_store_result(mysql);
 	if (!res)
 		return NULL;
 
@@ -634,8 +650,7 @@ static ocrpt_query *ocrpt_mariadb_query_add(ocrpt_datasource *source, const char
 	memset(result, 0, sizeof(ocrpt_mariadb_results));
 
 	result->res = res;
-	query->priv = result;
-	query->rownum = ocrpt_expr_parse(source->o, "r.rownum", NULL);
+	ocrpt_query_set_private(query, result);
 	result->result = ocrpt_mariadb_describe_early(query);
 	if (!result->result) {
 		mysql_free_result(res);
@@ -647,7 +662,7 @@ static ocrpt_query *ocrpt_mariadb_query_add(ocrpt_datasource *source, const char
 }
 
 static void ocrpt_mariadb_describe(ocrpt_query *query, ocrpt_query_result **qresult, int32_t *cols) {
-	ocrpt_mariadb_results *result = query->priv;
+	ocrpt_mariadb_results *result = ocrpt_query_get_private(query);
 
 	if (qresult)
 		*qresult = result->result;
@@ -656,13 +671,13 @@ static void ocrpt_mariadb_describe(ocrpt_query *query, ocrpt_query_result **qres
 }
 
 static void ocrpt_mariadb_rewind(ocrpt_query *query) {
-	ocrpt_mariadb_results *result = query->priv;
+	ocrpt_mariadb_results *result = ocrpt_query_get_private(query);
 	result->row = -1LL;
 	result->isdone = false;
 }
 
 static bool ocrpt_mariadb_populate_result(ocrpt_query *query) {
-	ocrpt_mariadb_results *result = query->priv;
+	ocrpt_mariadb_results *result = ocrpt_query_get_private(query);
 	MYSQL_ROW row;
 	unsigned long *len;
 	int32_t i;
@@ -683,7 +698,7 @@ static bool ocrpt_mariadb_populate_result(ocrpt_query *query) {
 }
 
 static bool ocrpt_mariadb_next(ocrpt_query *query) {
-	ocrpt_mariadb_results *result = query->priv;
+	ocrpt_mariadb_results *result = ocrpt_query_get_private(query);
 
 	if (result->isdone)
 		return false;
@@ -695,20 +710,20 @@ static bool ocrpt_mariadb_next(ocrpt_query *query) {
 }
 
 static bool ocrpt_mariadb_isdone(ocrpt_query *query) {
-	ocrpt_mariadb_results *result = query->priv;
+	ocrpt_mariadb_results *result = ocrpt_query_get_private(query);
 
 	return result->isdone;
 }
 
 static void ocrpt_mariadb_free(ocrpt_query *query) {
-	ocrpt_mariadb_results *result = query->priv;
+	ocrpt_mariadb_results *result = ocrpt_query_get_private(query);
 
 	mysql_free_result(result->res);
 	ocrpt_mem_free(result);
 }
 
 static void ocrpt_mariadb_close(const ocrpt_datasource *ds) {
-	MYSQL *mysql = ds->priv;
+	MYSQL *mysql = ocrpt_datasource_get_private(ds);
 
 	mysql_close(mysql);
 }
@@ -750,7 +765,8 @@ typedef struct ocrpt_odbc_results ocrpt_odbc_results;
 
 static void ocrpt_odbc_print_diag(ocrpt_query *query, const char *stmt, SQLRETURN ret) __attribute__((unused));
 static void ocrpt_odbc_print_diag(ocrpt_query *query, const char *stmt, SQLRETURN ret) {
-	ocrpt_odbc_private *priv = query->source->priv;
+	ocrpt_datasource *source = ocrpt_query_get_source(query);
+	ocrpt_odbc_private *priv = ocrpt_datasource_get_private(source);
 	SQLINTEGER err;
 	SQLSMALLINT mlen;
 	char state[6];
@@ -885,7 +901,9 @@ static bool ocrpt_odbc_connect(ocrpt_datasource *source, const ocrpt_input_conne
 }
 
 static ocrpt_query_result *ocrpt_odbc_describe_early(ocrpt_query *query) {
-	ocrpt_odbc_results *result = query->priv;
+	ocrpt_odbc_results *result = ocrpt_query_get_private(query);
+	ocrpt_datasource *source = ocrpt_query_get_source(query);
+	opencreport *o = ocrpt_datasource_get_opencreport(source);
 	ocrpt_query_result *qr;
 	ocrpt_list *last_row;
 	int32_t i;
@@ -992,12 +1010,12 @@ static ocrpt_query_result *ocrpt_odbc_describe_early(ocrpt_query *query) {
 		for (j = 0; j < OCRPT_EXPR_RESULTS; j++) {
 			int32_t idx = j * result->cols + i;
 
-			qr[idx].result.o = query->source->o;
+			qr[idx].result.o = o;
 			qr[idx].result.type = type;
 			qr[idx].result.orig_type = type;
 
 			if (qr[idx].result.type == OCRPT_RESULT_NUMBER) {
-				mpfr_init2(qr[idx].result.number, query->source->o->prec);
+				mpfr_init2(qr[idx].result.number, ocrpt_get_numeric_precision_bits(o));
 				qr[idx].result.number_initialized = true;
 			}
 
@@ -1038,12 +1056,7 @@ static ocrpt_query *ocrpt_odbc_query_add(ocrpt_datasource *source, const char *n
 	if (!source || !name || !*name || !querystr || !*querystr)
 		return NULL;
 
-	if (source->input != &ocrpt_odbc_input) {
-		ocrpt_err_printf("datasource is not an ODBC source\n");
-		return NULL;
-	}
-
-	ocrpt_odbc_private *priv = source->priv;
+	ocrpt_odbc_private *priv = ocrpt_datasource_get_private(source);
 
 	SQLHSTMT stmt;
 	SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_STMT, priv->dbc, &stmt);
@@ -1076,8 +1089,8 @@ static ocrpt_query *ocrpt_odbc_query_add(ocrpt_datasource *source, const char *n
 
 	result->stmt = stmt;
 	result->atstart = true;
-	query->priv = result;
-	query->rownum = ocrpt_expr_parse(source->o, "r.rownum", NULL);
+	ocrpt_query_set_private(query, result);
+
 	result->result = ocrpt_odbc_describe_early(query);
 
 	if (!result->result) {
@@ -1090,7 +1103,7 @@ static ocrpt_query *ocrpt_odbc_query_add(ocrpt_datasource *source, const char *n
 }
 
 static void ocrpt_odbc_describe(ocrpt_query *query, ocrpt_query_result **qresult, int32_t *cols) {
-	ocrpt_odbc_results *result = query->priv;
+	ocrpt_odbc_results *result = ocrpt_query_get_private(query);
 
 	if (qresult)
 		*qresult = result->result;
@@ -1099,7 +1112,7 @@ static void ocrpt_odbc_describe(ocrpt_query *query, ocrpt_query_result **qresult
 }
 
 static void ocrpt_odbc_rewind(ocrpt_query *query) {
-	ocrpt_odbc_results *result = query->priv;
+	ocrpt_odbc_results *result = ocrpt_query_get_private(query);
 
 	result->atstart = true;
 	result->isdone = false;
@@ -1107,8 +1120,9 @@ static void ocrpt_odbc_rewind(ocrpt_query *query) {
 }
 
 static bool ocrpt_odbc_populate_result(ocrpt_query *query) {
-	ocrpt_odbc_results *result = query->priv;
-	ocrpt_odbc_private *priv = query->source->priv;
+	ocrpt_odbc_results *result = ocrpt_query_get_private(query);
+	ocrpt_datasource *source = ocrpt_query_get_source(query);
+	ocrpt_odbc_private *priv = ocrpt_datasource_get_private(source);
 	int32_t i;
 	ocrpt_list *cur_col;
 
@@ -1127,7 +1141,7 @@ static bool ocrpt_odbc_populate_result(ocrpt_query *query) {
 }
 
 static bool ocrpt_odbc_next(ocrpt_query *query) {
-	ocrpt_odbc_results *result = query->priv;
+	ocrpt_odbc_results *result = ocrpt_query_get_private(query);
 
 	if (result->isdone)
 		return false;
@@ -1142,13 +1156,13 @@ static bool ocrpt_odbc_next(ocrpt_query *query) {
 }
 
 static bool ocrpt_odbc_isdone(ocrpt_query *query) {
-	ocrpt_odbc_results *result = query->priv;
+	ocrpt_odbc_results *result = ocrpt_query_get_private(query);
 
 	return result->isdone;
 }
 
 static void ocrpt_odbc_free(ocrpt_query *query) {
-	ocrpt_odbc_results *result = query->priv;
+	ocrpt_odbc_results *result = ocrpt_query_get_private(query);
 	ocrpt_list *row;
 
 	for (row = (ocrpt_list *)result->rows; row; row = row->next) {
@@ -1171,7 +1185,7 @@ static void ocrpt_odbc_free(ocrpt_query *query) {
 }
 
 static bool ocrpt_odbc_set_encoding(ocrpt_datasource *ds, const char *encoding) {
-	ocrpt_odbc_private *priv = ds->priv;
+	ocrpt_odbc_private *priv = ocrpt_datasource_get_private(ds);
 
 	if (priv->encoder != (iconv_t)-1)
 		iconv_close(priv->encoder);
@@ -1180,7 +1194,7 @@ static bool ocrpt_odbc_set_encoding(ocrpt_datasource *ds, const char *encoding) 
 }
 
 static void ocrpt_odbc_close(const ocrpt_datasource *ds) {
-	ocrpt_odbc_private *priv = ds->priv;
+	ocrpt_odbc_private *priv = ocrpt_datasource_get_private(ds);
 
 	SQLDisconnect(priv->dbc);
 	SQLFreeHandle(SQL_HANDLE_DBC, priv->dbc);
@@ -1188,6 +1202,7 @@ static void ocrpt_odbc_close(const ocrpt_datasource *ds) {
 	if (priv->encoder != (iconv_t)-1)
 		iconv_close(priv->encoder);
 	ocrpt_mem_free(priv);
+	ocrpt_datasource_set_private((ocrpt_datasource *)ds, NULL);
 }
 
 static const char *ocrpt_odbc_input_names[] = { "odbc", NULL };
@@ -1212,7 +1227,3 @@ const ocrpt_input ocrpt_odbc_input = {
 	.set_encoding = ocrpt_odbc_set_encoding,
 	.close = ocrpt_odbc_close
 };
-
-DLL_EXPORT_SYM bool ocrpt_datasource_is_sql(ocrpt_datasource *source) {
-	return source && source->input && source->input->query_add_sql;
-}

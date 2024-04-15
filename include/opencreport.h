@@ -234,6 +234,7 @@ void ocrpt_set_output_parameter(opencreport *o, const char *param, const char *v
  * Numeric fine-tuning
  */
 void ocrpt_set_numeric_precision_bits(opencreport *o, const char *expr_string);
+mpfr_prec_t ocrpt_get_numeric_precision_bits(opencreport *o);
 void ocrpt_set_rounding_mode(opencreport *o, const char *expr_string);
 
 /****************************
@@ -300,10 +301,13 @@ ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, 
  */
 ocrpt_datasource *ocrpt_datasource_get(opencreport *o, const char *source_name);
 /*
- * Helper functions for custom datasources
+ * Helper functions to implement a datasource
  */
+opencreport *ocrpt_datasource_get_opencreport(const ocrpt_datasource *ds);
+const char *ocrpt_datasource_get_name(const ocrpt_datasource *ds);
+const ocrpt_input *ocrpt_datasource_get_input(const ocrpt_datasource *ds);
 void ocrpt_datasource_set_private(ocrpt_datasource *ds, void *priv);
-void *ocrpt_datasource_get_private(ocrpt_datasource *ds);
+void *ocrpt_datasource_get_private(const ocrpt_datasource *ds);
 /*
  * Set the input encoding for a datasource
  */
@@ -336,6 +340,14 @@ ocrpt_query *ocrpt_query_add_file(ocrpt_datasource *source,
  * Add an SQL based (e.g. PostgreSQL, MariaDB, ODBC) query
  */
 ocrpt_query *ocrpt_query_add_sql(ocrpt_datasource *source, const char *name, const char *querystr);
+/*
+ * Helper functions to implement a datasource query
+ */
+ocrpt_query *ocrpt_query_alloc(const ocrpt_datasource *source, const char *name);
+char *ocrpt_query_get_name(const ocrpt_query *query);
+ocrpt_datasource *ocrpt_query_get_source(const ocrpt_query *query);
+void ocrpt_query_set_private(ocrpt_query *query, const void *priv);
+void *ocrpt_query_get_private(const ocrpt_query *query);
 /*
  * Query whether the datasource is array based
  */

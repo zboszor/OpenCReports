@@ -65,8 +65,6 @@ struct ocrpt_query {
 	bool n_to_1_matched:1;
 };
 
-ocrpt_query *ocrpt_query_alloc(const ocrpt_datasource *source, const char *name);
-
 void ocrpt_query_result_set_values_null(ocrpt_query *q);
 void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_t conv, const char *str, size_t len);
 

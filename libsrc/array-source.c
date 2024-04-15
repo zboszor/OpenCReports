@@ -49,7 +49,9 @@ static bool ocrpt_array_connect(ocrpt_datasource *ds, const ocrpt_input_connect_
 }
 
 static void ocrpt_array_describe(ocrpt_query *query, ocrpt_query_result **qresult, int32_t *cols) {
-	struct ocrpt_array_results *result = query->priv;
+	struct ocrpt_array_results *result = ocrpt_query_get_private(query);
+	ocrpt_datasource *source = ocrpt_query_get_source(query);
+	opencreport *o = ocrpt_datasource_get_opencreport(source);
 	int32_t i;
 
 	if (!result->result) {
@@ -67,7 +69,7 @@ static void ocrpt_array_describe(ocrpt_query *query, ocrpt_query_result **qresul
 
 		for (i = 0; i < result->cols; i++) {
 			for (int j = 0; j < OCRPT_EXPR_RESULTS; j++) {
-				qr[j * result->cols + i].result.o = query->source->o;
+				qr[j * result->cols + i].result.o = o;
 				qr[j * result->cols + i].name = result->data[i];
 
 				enum ocrpt_result_type type;
@@ -79,7 +81,7 @@ static void ocrpt_array_describe(ocrpt_query *query, ocrpt_query_result **qresul
 				qr[j * result->cols + i].result.orig_type = type;
 
 				if (qr[i].result.type == OCRPT_RESULT_NUMBER) {
-					mpfr_init2(qr[j * result->cols + i].result.number, query->source->o->prec);
+					mpfr_init2(qr[j * result->cols + i].result.number, ocrpt_get_numeric_precision_bits(o));
 					qr[j * result->cols + i].result.number_initialized = true;
 				}
 
@@ -130,9 +132,7 @@ static ocrpt_query *array_query_add(const ocrpt_datasource *source, const char *
 	priv->atstart = true;
 	priv->isdone = false;
 	priv->free_types = free_types;
-	query->priv = priv;
-
-	query->rownum = ocrpt_expr_parse(source->o, "r.rownum", NULL);
+	ocrpt_query_set_private(query, priv);
 
 	return query;
 }
@@ -145,7 +145,7 @@ static ocrpt_query *ocrpt_array_query_add(ocrpt_datasource *source,
 }
 
 static void ocrpt_array_rewind(ocrpt_query *query) {
-	struct ocrpt_array_results *result = query->priv;
+	struct ocrpt_array_results *result = ocrpt_query_get_private(query);
 
 	if (result == NULL)
 		return;
@@ -156,8 +156,8 @@ static void ocrpt_array_rewind(ocrpt_query *query) {
 }
 
 static bool ocrpt_array_populate_result(ocrpt_query *query) {
-	const struct ocrpt_datasource *source = query->source;
-	struct ocrpt_array_results *result = query->priv;
+	struct ocrpt_datasource *source = ocrpt_query_get_source(query);
+	struct ocrpt_array_results *result = ocrpt_query_get_private(query);
 	int32_t i;
 
 	if (result->atstart || result->isdone) {
@@ -170,14 +170,14 @@ static bool ocrpt_array_populate_result(ocrpt_query *query) {
 		const char *str = result->data[dataidx];
 		int32_t len = str ? strlen(str) : 0;
 
-		ocrpt_query_result_set_value(query, i, (str == NULL), source->priv, str, len);
+		ocrpt_query_result_set_value(query, i, (str == NULL), ocrpt_datasource_get_private(source), str, len);
 	}
 
 	return true;
 }
 
 static bool ocrpt_array_next(ocrpt_query *query) {
-	struct ocrpt_array_results *result = query->priv;
+	struct ocrpt_array_results *result = ocrpt_query_get_private(query);
 
 	if (result == NULL)
 		return false;
@@ -190,7 +190,7 @@ static bool ocrpt_array_next(ocrpt_query *query) {
 }
 
 static bool ocrpt_array_isdone(ocrpt_query *query) {
-	struct ocrpt_array_results *result = query->priv;
+	struct ocrpt_array_results *result = ocrpt_query_get_private(query);
 
 	if (result == NULL)
 		return true;
@@ -199,23 +199,29 @@ static bool ocrpt_array_isdone(ocrpt_query *query) {
 }
 
 static void ocrpt_array_free(ocrpt_query *query) {
-	struct ocrpt_array_results *result = query->priv;
+	if (!query)
+		return;
+
+	struct ocrpt_array_results *result = ocrpt_query_get_private(query);
 
 	ocrpt_mem_free(result);
-	query->priv = NULL;
+	ocrpt_query_set_private(query, NULL);
 }
 
 static bool ocrpt_array_set_encoding(ocrpt_datasource *ds, const char *encoding) {
-	iconv_t c = ds->priv;
+	iconv_t c = ocrpt_datasource_get_private(ds);
 
 	if (c != (iconv_t)-1)
 		iconv_close(c);
-	ds->priv = iconv_open("UTF-8", encoding);
-	return (ds->priv != (iconv_t) -1);
+
+	c = iconv_open("UTF-8", encoding);
+	ocrpt_datasource_set_private(ds, c);
+
+	return (c != (iconv_t)-1);
 }
 
 void ocrpt_array_close(const ocrpt_datasource *ds) {
-	iconv_t c =	ds->priv;
+	iconv_t c =	ocrpt_datasource_get_private((ocrpt_datasource *)ds);
 
 	if (c != (iconv_t)-1)
 		iconv_close(c);
@@ -238,15 +244,16 @@ const ocrpt_input ocrpt_array_input = {
 	.close = ocrpt_array_close
 };
 
-DLL_EXPORT_SYM bool ocrpt_datasource_is_array(ocrpt_datasource *source) {
-	return source && source->input && source->input->query_add_array;
-}
-
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const int32_t *types, int32_t types_cols) {
-	if (!source || !source->input || !source->input->query_add_array || !name || !array)
+	if (!source || !name || !array)
 		return NULL;
 
-	return source->input->query_add_array(source, name, array, rows, cols, types, types_cols);
+	const ocrpt_input *input = ocrpt_datasource_get_input(source);
+
+	if (!input || !input->query_add_array)
+		return NULL;
+
+	return input->query_add_array(source, name, array, rows, cols, types, types_cols);
 }
 
 DLL_EXPORT_SYM ocrpt_query_discover_func ocrpt_query_discover_array = ocrpt_query_discover_array_c;
@@ -285,7 +292,7 @@ static void ocrpt_file_free(ocrpt_query *query) {
 	if (!query)
 		return;
 
-	struct ocrpt_array_results *result = query->priv;
+	struct ocrpt_array_results *result = ocrpt_query_get_private(query);
 	int32_t i;
 	int32_t max = (result->rows + 1) * result->cols;
 
@@ -295,8 +302,8 @@ static void ocrpt_file_free(ocrpt_query *query) {
 	if (result->free_types)
 		ocrpt_mem_free(result->types);
 	ocrpt_mem_free(result->data);
-	ocrpt_mem_free(query->priv);
-	query->priv = NULL;
+	ocrpt_mem_free(result);
+	ocrpt_query_set_private(query, NULL);
 }
 
 /*
@@ -386,20 +393,11 @@ static void ocrpt_file_query_free(ocrpt_file_query *fq, bool in_error) {
 		ocrpt_list_free_deep(fq->rowlist, (ocrpt_mem_free_t)ocrpt_list_free);
 }
 
-DLL_EXPORT_SYM bool ocrpt_datasource_is_csv(ocrpt_datasource *source) {
-	return source->input == &ocrpt_csv_input;
-}
-
 static ocrpt_query *ocrpt_csv_query_add(ocrpt_datasource *source,
 										const char *name, const char *filename,
 										const int32_t *types, int32_t types_cols) {
 	if (!source || !name || !filename)
 		return NULL;
-
-	if (source->input != &ocrpt_csv_input) {
-		ocrpt_err_printf("datasource is not csv\n");
-		return NULL;
-	}
 
 	struct stat st;
 	struct csv_parser csv;
@@ -716,21 +714,12 @@ static yajl_callbacks ocrpt_yajl_cb = {
 	ocrpt_yajl_end_array
 };
 
-DLL_EXPORT_SYM bool ocrpt_datasource_is_json(ocrpt_datasource *source) {
-	return source->input == &ocrpt_json_input;
-}
-
 static ocrpt_query *ocrpt_json_query_add(ocrpt_datasource *source,
 										const char *name, const char *filename,
 										const int32_t *types,
 										int32_t types_cols) {
 	if (!source || !name || !filename)
 		return NULL;
-
-	if (source->input != &ocrpt_json_input) {
-		ocrpt_err_printf("datasource is not json\n");
-		return NULL;
-	}
 
 	struct stat st;
 	char *buf;
@@ -1112,21 +1101,12 @@ static int32_t ocrpt_parse_data_node(opencreport *o, xmlTextReaderPtr reader, oc
 	return !err;
 }
 
-DLL_EXPORT_SYM bool ocrpt_datasource_is_xml(ocrpt_datasource *source) {
-	return source->input == &ocrpt_xml_input;
-}
-
 static ocrpt_query *ocrpt_xml_query_add(ocrpt_datasource *source,
 										const char *name, const char *filename,
 										const int32_t *types,
 										int32_t types_cols) {
 	if (!source || !name || !filename)
 		return NULL;
-
-	if (source->input != &ocrpt_xml_input) {
-		ocrpt_err_printf("datasource is not json\n");
-		return NULL;
-	}
 
 	const char **array;
 	ocrpt_query *retval;
@@ -1156,7 +1136,7 @@ static ocrpt_query *ocrpt_xml_query_add(ocrpt_datasource *source,
 			/* ignore - xmllint validation is enough */
 		} else if (nodetype == XML_READER_TYPE_ELEMENT && depth == 0) {
 			if (!strcmp((char *)name, "data"))
-				ret = ocrpt_parse_data_node(source->o, reader, &fq);
+				ret = ocrpt_parse_data_node(ocrpt_datasource_get_opencreport(source), reader, &fq);
 			else {
 				err = 1;
 				ret = 0;
@@ -1240,7 +1220,3 @@ const ocrpt_input ocrpt_xml_input = {
 	.set_encoding = ocrpt_array_set_encoding,
 	.close = ocrpt_array_close
 };
-
-DLL_EXPORT_SYM bool ocrpt_datasource_is_file(ocrpt_datasource *source) {
-	return source && source->input && source->input->query_add_file;
-}

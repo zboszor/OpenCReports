@@ -261,7 +261,21 @@ DLL_EXPORT_SYM void ocrpt_set_numeric_precision_bits(opencreport *o, const char 
 			ocrpt_err_printf("ocrpt_set_numeric_precision_bits: %s\n", err);
 			ocrpt_strfree(err);
 		}
-	}
+
+		ocrpt_expr_resolve(o->precision_expr);
+		ocrpt_expr_optimize(o->precision_expr);
+		if (o->precision_expr) {
+			ocrpt_result *prec = ocrpt_expr_get_result(o->precision_expr);
+			if (ocrpt_result_isnumber(prec))
+			o->prec = ocrpt_expr_get_long(o->precision_expr);
+		} else
+			o->prec = OCRPT_MPFR_PRECISION_BITS;
+	} else
+		o->prec = OCRPT_MPFR_PRECISION_BITS;
+}
+
+DLL_EXPORT_SYM mpfr_prec_t ocrpt_get_numeric_precision_bits(opencreport *o) {
+	return o ? o->prec : OCRPT_MPFR_PRECISION_BITS;
 }
 
 DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, const char *expr_string) {
