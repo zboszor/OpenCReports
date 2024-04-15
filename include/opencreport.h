@@ -292,12 +292,26 @@ const ocrpt_input * const ocrpt_input_get(const char *name);
  ******************************************/
 
 /*
- * Add an array datasource
- *
- * Calling this is optional, as an array datasource called
- * "array" is automatically added to an opencreport structure.
+ * Add a custom datasource using its registered type name
  */
-ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, const char *source_name);
+ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const char *type, const ocrpt_input_connect_parameter *conn_params);
+/*
+ * Find the datasource using its name
+ */
+ocrpt_datasource *ocrpt_datasource_get(opencreport *o, const char *source_name);
+/*
+ * Helper functions for custom datasources
+ */
+void ocrpt_datasource_set_private(ocrpt_datasource *ds, void *priv);
+void *ocrpt_datasource_get_private(ocrpt_datasource *ds);
+/*
+ * Set the input encoding for a datasource
+ */
+void ocrpt_datasource_set_encoding(ocrpt_datasource *source, const char *encoding);
+/*
+ * Free a datasource from the opencreport structure it was added to
+ */
+void ocrpt_datasource_free(ocrpt_datasource *source);
 /*
  * Add an array query using the datasource pointer
  *
@@ -312,56 +326,14 @@ ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source,
 									const int32_t *types,
 									int32_t types_cols);
 /*
- * Add a CSV datasource
- */
-ocrpt_datasource *ocrpt_datasource_add_csv(opencreport *o, const char *source_name);
-/*
- * Add a JSON datasource
- */
-ocrpt_datasource *ocrpt_datasource_add_json(opencreport *o, const char *source_name);
-/*
- * Add an XML datasource
- */
-ocrpt_datasource *ocrpt_datasource_add_xml(opencreport *o, const char *source_name);
-/*
- * Add a PostgreSQL datasource using separate connection parameters
- */
-ocrpt_datasource *ocrpt_datasource_add_postgresql(opencreport *o, const char *source_name,
-												const char *host, const char *port, const char *dbname,
-												const char *user, const char *password);
-/*
- * Add a PostgreSQL datasource using a connection info string
- */
-ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o, const char *source_name, const char *conninfo);
-/*
- * Add a MariaDB/MySQL datasource using separate connection parameters
- */
-ocrpt_datasource *ocrpt_datasource_add_mariadb(opencreport *o, const char *source_name,
-												const char *host, const char *port, const char *dbname,
-												const char *user, const char *password, const char *unix_socket);
-/*
- * Add a MariaDB/MySQL datasource using an option file and group settings
- * If the option file is NULL, the default option files are used.
- */
-ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, const char *source_name, const char *optionfile, const char *group);
-/*
- * Add an ODBC datasource using separate connection parameters
- */
-ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const char *source_name,
-											const char *dbname, const char *user, const char *password);
-/*
- * Add an ODBC datasource using a connection info string
- */
-ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, const char *source_name, const char *conninfo);
-/*
- * Add a file based (CSV, XML, JSON) query
+ * Add a file based (e.g. CSV, XML, JSON) query
  */
 ocrpt_query *ocrpt_query_add_file(ocrpt_datasource *source,
 									const char *name, const char *filename,
 									const int32_t *types,
 									int32_t types_cols);
 /*
- * Add an SQL based (PostgreSQL, MariaDB, ODBC) query
+ * Add an SQL based (e.g. PostgreSQL, MariaDB, ODBC) query
  */
 ocrpt_query *ocrpt_query_add_sql(ocrpt_datasource *source, const char *name, const char *querystr);
 /*
@@ -376,27 +348,6 @@ bool ocrpt_datasource_is_file(ocrpt_datasource *source);
  * Query whether the datasource is SQL based
  */
 bool ocrpt_datasource_is_sql(ocrpt_datasource *source);
-/*
- * Find the datasource using its name
- */
-ocrpt_datasource *ocrpt_datasource_get(opencreport *o, const char *source_name);
-/*
- * Add a custom datasource using its registered type name
- */
-ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const char *type, const ocrpt_input_connect_parameter *conn_params);
-/*
- * Helper functions for custom datasources
- */
-void ocrpt_datasource_set_private(ocrpt_datasource *ds, void *priv);
-void *ocrpt_datasource_get_private(ocrpt_datasource *ds);
-/*
- * Set the input encoding for a datasource
- */
-void ocrpt_datasource_set_encoding(ocrpt_datasource *source, const char *encoding);
-/*
- * Free a datasource from the opencreport structure it was added to
- */
-void ocrpt_datasource_free(ocrpt_datasource *source);
 /*
  * Find a query using its name
  */

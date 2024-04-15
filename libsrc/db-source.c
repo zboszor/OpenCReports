@@ -433,36 +433,6 @@ const ocrpt_input ocrpt_postgresql_input = {
 	.close = ocrpt_postgresql_close
 };
 
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql(opencreport *o, const char *source_name,
-																const char *host, const char *port, const char *dbname,
-																const char *user, const char *password) {
-	if (!o || !source_name)
-		return NULL;
-
-	ocrpt_input_connect_parameter params[] = {
-		{ .param_name = "dbname", .param_value = (char *)dbname },
-		{ .param_name = "host", .param_value = (char *)host },
-		{ .param_name = "port", .param_value = (char *)port },
-		{ .param_name = "user", .param_value = (char *)user },
-		{ .param_name = "password", .param_value = (char *)password },
-		{ .param_name = NULL }
-	};
-
-	return ocrpt_datasource_add(o, source_name, "postgresql", params);
-}
-
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_postgresql2(opencreport *o, const char *source_name, const char *conninfo) {
-	if (!o || !source_name)
-		return NULL;
-
-	ocrpt_input_connect_parameter params[] = {
-		{ .param_name = "connstr", .param_value = (char *)conninfo },
-		{ .param_name = NULL }
-	};
-
-	return ocrpt_datasource_add(o, source_name, "postgresql", params);
-}
-
 struct ocrpt_mariadb_results {
 	ocrpt_query_result *result;
 	MYSQL_RES *res;
@@ -758,37 +728,6 @@ const ocrpt_input ocrpt_mariadb_input = {
 	.free = ocrpt_mariadb_free,
 	.close = ocrpt_mariadb_close
 };
-
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_mariadb(opencreport *o, const char *source_name,
-																const char *host, const char *port, const char *dbname,
-																const char *user, const char *password, const char *unix_socket) {
-	if (!o || !source_name)
-		return NULL;
-
-	ocrpt_input_connect_parameter params[] = {
-		{ .param_name = "dbname", .param_value = (char *)dbname },
-		{ .param_name = "host", .param_value = (char *)host },
-		{ .param_name = "port", .param_value = (char *)port },
-		{ .param_name = "user", .param_value = (char *)user },
-		{ .param_name = "password", .param_value = (char *)password },
-		{ .param_name = NULL }
-	};
-
-	return ocrpt_datasource_add(o, source_name, "mariadb", params);
-}
-
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_mariadb2(opencreport *o, const char *source_name, const char *optionfile, const char *group) {
-	if (!o || !source_name)
-		return NULL;
-
-	ocrpt_input_connect_parameter params[] = {
-		{ .param_name = "optionfile", .param_value = (char *)optionfile },
-		{ .param_name = "group", .param_value = (char *)group },
-		{ .param_name = NULL }
-	};
-
-	return ocrpt_datasource_add(o, source_name, "mariadb", params);
-}
 
 struct ocrpt_odbc_private {
 	SQLHENV env;
@@ -1273,33 +1212,6 @@ const ocrpt_input ocrpt_odbc_input = {
 	.set_encoding = ocrpt_odbc_set_encoding,
 	.close = ocrpt_odbc_close
 };
-
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc(opencreport *o, const char *source_name,
-															const char *dbname, const char *user, const char *password) {
-	if (!o || !source_name)
-		return NULL;
-
-	ocrpt_input_connect_parameter params[] = {
-		{ .param_name = "dbname", .param_value = (char *)dbname },
-		{ .param_name = "user", .param_value = (char *)user },
-		{ .param_name = "password", .param_value = (char *)password },
-		{ .param_name = NULL }
-	};
-
-	return ocrpt_datasource_add(o, source_name, "odbc", params);
-}
-
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_odbc2(opencreport *o, const char *source_name, const char *conninfo) {
-	if (!o || !source_name)
-		return NULL;
-
-	ocrpt_input_connect_parameter params[] = {
-		{ .param_name = "connstr", .param_value = (char *)conninfo },
-		{ .param_name = NULL }
-	};
-
-	return ocrpt_datasource_add(o, source_name, "odbc", params);
-}
 
 DLL_EXPORT_SYM bool ocrpt_datasource_is_sql(ocrpt_datasource *source) {
 	return source && source->input && source->input->query_add_sql;

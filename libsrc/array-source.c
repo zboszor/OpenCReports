@@ -238,13 +238,6 @@ const ocrpt_input ocrpt_array_input = {
 	.close = ocrpt_array_close
 };
 
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_array(opencreport *o, const char *source_name) {
-	if (!o || !source_name)
-		return NULL;
-
-	return ocrpt_datasource_add(o, source_name, "array", NULL);
-}
-
 DLL_EXPORT_SYM bool ocrpt_datasource_is_array(ocrpt_datasource *source) {
 	return source && source->input && source->input->query_add_array;
 }
@@ -304,13 +297,6 @@ static void ocrpt_file_free(ocrpt_query *query) {
 	ocrpt_mem_free(result->data);
 	ocrpt_mem_free(query->priv);
 	query->priv = NULL;
-}
-
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_csv(opencreport *o, const char *source_name) {
-	if (!o || !source_name)
-		return NULL;
-
-	return ocrpt_datasource_add(o, source_name, "csv", NULL);
 }
 
 /*
@@ -518,13 +504,6 @@ const ocrpt_input ocrpt_csv_input = {
 	.set_encoding = ocrpt_array_set_encoding,
 	.close = ocrpt_array_close
 };
-
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_json(opencreport *o, const char *source_name) {
-	if (!o || !source_name)
-		return NULL;
-
-	return ocrpt_datasource_add(o, source_name, "json", NULL);
-}
 
 static int ocrpt_yajl_null(void *ctx) {
 	return false;
@@ -849,13 +828,6 @@ const ocrpt_input ocrpt_json_input = {
 	.set_encoding = ocrpt_array_set_encoding,
 	.close = ocrpt_array_close
 };
-
-DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add_xml(opencreport *o, const char *source_name) {
-	if (!o || !source_name)
-		return NULL;
-
-	return ocrpt_datasource_add(o, source_name, "xml", NULL);
-}
 
 static int32_t ocrpt_parse_col_node(opencreport *o, xmlTextReaderPtr reader, ocrpt_file_query *fq) {
 	int32_t ret, depth, nodetype;
