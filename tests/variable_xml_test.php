@@ -50,6 +50,7 @@ $qr = $q->get_result();
 
 /* There is only one ocrpt_report pointer in o->parts, extract it. */
 $r = get_first_report($o);
+$r->set_main_query($q);
 
 $e = [];
 
