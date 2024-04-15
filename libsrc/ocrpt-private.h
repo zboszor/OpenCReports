@@ -163,45 +163,6 @@ struct opencreport {
 	bool xml_rlib_compat:1;
 };
 
-struct ocrpt_result {
-	opencreport *o;
-	/* Original lexer token or (computed) string value for expression */
-	ocrpt_string *string;
-	/* Converted numeric constant or computed numeric value for expression */
-	mpfr_t number;
-	/* Datetime value */
-	struct tm datetime;
-	/* Group indicators together as bitfields for space saving */
-	enum ocrpt_result_type type:2;
-	enum ocrpt_result_type orig_type:2;
-	bool number_initialized:1;
-	bool string_owned:1;
-	bool date_valid:1;
-	bool time_valid:1;
-	bool interval:1;
-	bool isnull:1;
-	/*
-	 * Date +/- month carry bits for handling invalid day-of-month.
-	 * E.g. yyyy-01-31 + 1 month -> yyyy-02-31 which is an invalid date.
-	 * How to handle this? Neither truncating to the last day of the month
-	 * (i.e. yyyy-02-28), nor automatically wrapping over to the beginning
-	 * of the next month (e.g. yyyy-03-03) are semantically valid.
-	 * Instead, truncate to last day of month but keep the surplus days
-	 * as carry bits. The next addition would also add the carry bits to
-	 * the day-of-month value, which would make adding 1 month to a date
-	 * associative, in other words these should be equivalent:
-	 * (yyyy-01-31 +  1 month) + 1 month
-	 *  yyyy-01-31 + (1 month  + 1 month)
-	 */
-	uint32_t day_carry:2;
-};
-
-struct ocrpt_query_result {
-	const char *name;
-	bool name_allocated;
-	ocrpt_result result;
-};
-
 /* Default print debugger functions */
 extern ocrpt_printf_func ocrpt_std_printf;
 extern ocrpt_printf_func ocrpt_err_printf;
