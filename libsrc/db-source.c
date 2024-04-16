@@ -358,7 +358,7 @@ static bool ocrpt_postgresql_populate_result(ocrpt_query *query) {
 		return false;
 	}
 
-	for (i = 0; i < query->cols; i++) {
+	for (i = 0; i < result->cols; i++) {
 		bool isnull = PQgetisnull(result->res, result->row, i);
 		const char *str = PQgetvalue(result->res, result->row, i);
 		int32_t len = PQgetlength(result->res, result->row, i);
@@ -691,7 +691,7 @@ static bool ocrpt_mariadb_populate_result(ocrpt_query *query) {
 	row = mysql_fetch_row(result->res);
 	len = mysql_fetch_lengths(result->res);
 
-	for (i = 0; i < query->cols; i++)
+	for (i = 0; i < result->cols; i++)
 		ocrpt_query_result_set_value(query, i, (row[i] == NULL), (iconv_t)-1, row[i], len[i]);
 
 	return true;
@@ -1131,7 +1131,7 @@ static bool ocrpt_odbc_populate_result(ocrpt_query *query) {
 		return !result->isdone;
 	}
 
-	for (i = 0, cur_col = (ocrpt_list *)result->cur_row->data; i < query->cols; i++, cur_col = cur_col->next) {
+	for (i = 0, cur_col = (ocrpt_list *)result->cur_row->data; i < result->cols; i++, cur_col = cur_col->next) {
 		ocrpt_string *str = (ocrpt_string *)cur_col->data;
 
 		ocrpt_query_result_set_value(query, i, (str == NULL), priv->encoder, str ? str->str : NULL, str ? str->len : 0);

@@ -163,8 +163,8 @@ static bool ocrpt_array_populate_result(ocrpt_query *query) {
 		return !result->isdone;
 	}
 
-	for (i = 0; i < query->cols; i++) {
-		int32_t dataidx = result->current_row * query->cols + i;
+	for (i = 0; i < result->cols; i++) {
+		int32_t dataidx = result->current_row * result->cols + i;
 		const char *str = result->data[dataidx];
 		int32_t len = str ? strlen(str) : 0;
 
