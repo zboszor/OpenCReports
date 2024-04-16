@@ -114,8 +114,6 @@ static ocrpt_query *array_query_add(const ocrpt_datasource *source, const char *
 	if (!query)
 		return NULL;
 
-	query->cols = cols;
-
 	struct ocrpt_array_results *priv = ocrpt_mem_malloc(sizeof(struct ocrpt_array_results));
 	if (!priv) {
 		ocrpt_query_free(query);
