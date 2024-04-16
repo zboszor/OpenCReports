@@ -9,7 +9,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <iconv.h>
 
 #include "opencreport.h"
 
@@ -64,9 +63,6 @@ struct ocrpt_query {
 	bool n_to_1_started:1;	/* track rows in n:1 followers */
 	bool n_to_1_matched:1;
 };
-
-void ocrpt_query_result_set_values_null(ocrpt_query *q);
-void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_t conv, const char *str, size_t len);
 
 void ocrpt_query_free0(ocrpt_query *q);
 

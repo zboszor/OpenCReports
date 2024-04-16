@@ -13,7 +13,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
-#include <iconv.h>
 
 #include "opencreport.h"
 #include "ocrpt-private.h"
@@ -351,7 +350,7 @@ DLL_EXPORT_SYM ocrpt_query_result *ocrpt_query_get_result(ocrpt_query *q, int32_
 	return (q->result ? &q->result[q->source->o->residx * q->cols] : NULL);
 }
 
-void ocrpt_query_result_set_values_null(ocrpt_query *q) {
+DLL_EXPORT_SYM void ocrpt_query_result_set_values_null(ocrpt_query *q) {
 	opencreport *o = q->source->o;
 	int32_t base = o->residx * q->cols;
 	int32_t i;
@@ -362,7 +361,7 @@ void ocrpt_query_result_set_values_null(ocrpt_query *q) {
 	}
 }
 
-void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_t conv, const char *str, size_t len) {
+DLL_EXPORT_SYM void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_t conv, const char *str, size_t len) {
 	opencreport *o = q->source->o;
 	int32_t base = o->residx * q->cols;
 	ocrpt_result *r = &q->result[base + i].result;

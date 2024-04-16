@@ -18,6 +18,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
+#include <iconv.h>
 
 struct opencreport;
 typedef struct opencreport opencreport;
@@ -404,6 +405,12 @@ bool ocrpt_datasource_is_sql(ocrpt_datasource *source);
  * Find a query using its name
  */
 ocrpt_query *ocrpt_query_get(opencreport *o, const char *name);
+/*
+ * Helper functions to implement a datasource
+ */
+void ocrpt_query_result_set_values_null(ocrpt_query *q);
+void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool isnull, iconv_t conv, const char *str, size_t len);
+
 /*
  * Return the query result array and the number of columns in it
  *
