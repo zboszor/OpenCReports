@@ -1513,8 +1513,6 @@ PHP_METHOD(opencreport_ds, query_add) {
 	zend_string *name, *array_or_file_or_sql, *coltypes = NULL;
 	ocrpt_query *q;
 	php_opencreport_query_object *qo;
-	void *array_x, *types_x = NULL;
-	int32_t rows, cols, types_cols = 0;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 3)
 		Z_PARAM_STR(name);
@@ -1523,22 +1521,19 @@ PHP_METHOD(opencreport_ds, query_add) {
 		Z_PARAM_STR_EX(coltypes, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
 
-	if (ocrpt_datasource_is_array(dso->ds)) {
-		if (coltypes && ZSTR_LEN(coltypes) > 0) {
-			ocrpt_query_discover_array(ZSTR_VAL(array_or_file_or_sql), &array_x, &rows, &cols, ZSTR_VAL(coltypes), &types_x, &types_cols);
-		} else {
-			ocrpt_query_discover_array(ZSTR_VAL(array_or_file_or_sql), &array_x, &rows, &cols, NULL, NULL, NULL);
-		}
-
-		q = ocrpt_query_add_array(dso->ds, ZSTR_VAL(name), array_x, rows, cols, types_x, types_cols);
+	if (ocrpt_datasource_is_sql(dso->ds)) {
+		q = ocrpt_query_add_sql(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
 	} else if (ocrpt_datasource_is_file(dso->ds)) {
+		void *types_x = NULL;
+		int32_t types_cols = 0;
+
 		if (coltypes && ZSTR_LEN(coltypes) > 0)
 			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, ZSTR_VAL(coltypes), &types_x, &types_cols);
 
 		q = ocrpt_query_add_file(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), types_x, types_cols);
-	} else if (ocrpt_datasource_is_sql(dso->ds)) {
-		q = ocrpt_query_add_sql(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
-	} else
+	} else if (ocrpt_datasource_is_symbolic_array(dso->ds))
+		q = ocrpt_query_add_symbolic_array(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), 0, 0, coltypes ? ZSTR_VAL(coltypes) : NULL, 0);
+	else
 		RETURN_NULL();
 
 	if (!q)
@@ -5408,7 +5403,6 @@ static char *opencreport_estrndup(const char *s, size_t size) {
 	return estrndup(s, size);
 }
 
-/* {{{ PHP_MINIT_FUNCTION */
 static char dummy_report_xml[] =
 	"<?xml version=\"1.0\"?>"
 	"<!DOCTYPE report>"
@@ -5423,6 +5417,7 @@ const char *dummy_report_array[DUMMY_REPORT_ROWS + 1][DUMMY_REPORT_COLS] = {
 	{ "x" }, { "1" }
 };
 
+/* {{{ PHP_MINIT_FUNCTION */
 static PHP_MINIT_FUNCTION(opencreport)
 {
 	zend_class_entry ce;
@@ -6061,8 +6056,6 @@ ZEND_FUNCTION(rlib_add_query_as) {
 	zend_string *source_name, *array_or_file_or_sql, *name;
 	ocrpt_query *q;
 	php_opencreport_query_object *qo;
-	void *array_x;
-	int32_t rows, cols;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 4, 4)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
@@ -6080,13 +6073,12 @@ ZEND_FUNCTION(rlib_add_query_as) {
 
 	ocrpt_datasource *ds = ocrpt_datasource_get(oo->o, ZSTR_VAL(source_name));
 
-	if (ocrpt_datasource_is_array(ds)) {
-		ocrpt_query_discover_array(ZSTR_VAL(array_or_file_or_sql), &array_x, &rows, &cols, NULL, NULL, NULL);
-		q = ocrpt_query_add_array(ds, ZSTR_VAL(name), array_x, rows, cols, NULL, 0);
-	} else if (ocrpt_datasource_is_file(ds))
-		q = ocrpt_query_add_file(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), NULL, 0);
-	else if (ocrpt_datasource_is_sql(ds))
+	if (ocrpt_datasource_is_sql(ds))
 		q = ocrpt_query_add_sql(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
+	else if (ocrpt_datasource_is_file(ds))
+		q = ocrpt_query_add_file(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), NULL, 0);
+	else if (ocrpt_datasource_is_symbolic_array(ds))
+		q = ocrpt_query_add_symbolic_array(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), 0, 0, NULL, 0);
 	else
 		RETURN_NULL();
 

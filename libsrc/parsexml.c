@@ -108,7 +108,6 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 	char *follower_for_s, *follower_expr_s, *coltypes_s;
 	int32_t cols_i, rows_i;
 
-	void *arrayptr, *coltypesptr;
 	ocrpt_datasource *ds;
 	ocrpt_query *q = NULL, *lq = NULL;
 	int ret, depth, nodetype;
@@ -164,20 +163,16 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 
 	ds = ocrpt_datasource_get(o, datasource_s);
 	if (ds) {
-		int32_t ct_cols_i = cols_i;
-
 		if (ocrpt_datasource_is_sql(ds))
 			q = ocrpt_query_add_sql(ds, name_s, value_s);
 		else if (ocrpt_datasource_is_file(ds)) {
+			void *coltypesptr;
+			int32_t ct_cols_i = cols_i;
+
 			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, coltypes_s, &coltypesptr, &ct_cols_i);
 			q = ocrpt_query_add_file(ds, name_s, value_s, coltypesptr, ct_cols_i);
-		} else if (ocrpt_datasource_is_array(ds)) {
-			ocrpt_query_discover_array(value_s, &arrayptr, &rows_i, &cols_i, coltypes_s, &coltypesptr, &ct_cols_i);
-			if (arrayptr)
-				q = ocrpt_query_add_array(ds, name_s, arrayptr, rows_i, cols_i, coltypesptr, ct_cols_i);
-			else
-				ocrpt_err_printf("Cannot determine array pointer for array query\n");
-		}
+		} else if (ocrpt_datasource_is_symbolic_array(ds))
+			q = ocrpt_query_add_symbolic_array(ds, name_s, value_s, rows_i, cols_i, coltypes_s, coltypes_s ? cols_i : 0);
 	}
 
 	if (q) {

@@ -142,6 +142,17 @@ static ocrpt_query *ocrpt_array_query_add(ocrpt_datasource *source,
 	return array_query_add(source, name, array, rows, cols, types, types_cols, false);
 }
 
+static ocrpt_query *ocrpt_array_query_add_symbolic(ocrpt_datasource *source,
+										const char *name,
+										const char *array_name, int32_t rows, int32_t cols,
+										const char *types_name, int32_t types_cols) {
+	void *array = NULL, *types = NULL;
+
+	ocrpt_query_discover_array(array_name, &array, rows <= 0 ? &rows : NULL, cols <= 0 ? &cols : NULL, types_name, &types, (types_name && types_cols <= 0) ? &types_cols : NULL);
+
+	return array_query_add(source, name, array, rows, cols, types, types_cols, false);
+}
+
 static void ocrpt_array_rewind(ocrpt_query *query) {
 	struct ocrpt_array_results *result = ocrpt_query_get_private(query);
 
@@ -231,6 +242,7 @@ const ocrpt_input ocrpt_array_input = {
 	.names = ocrpt_array_input_names,
 	.connect = ocrpt_array_connect,
 	.query_add_array = ocrpt_array_query_add,
+	.query_add_symbolic_array = ocrpt_array_query_add_symbolic,
 	.describe = ocrpt_array_describe,
 	.query_add_array = ocrpt_array_query_add,
 	.rewind = ocrpt_array_rewind,
@@ -241,18 +253,6 @@ const ocrpt_input ocrpt_array_input = {
 	.set_encoding = ocrpt_array_set_encoding,
 	.close = ocrpt_array_close
 };
-
-DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const int32_t *types, int32_t types_cols) {
-	if (!source || !name || !array)
-		return NULL;
-
-	const ocrpt_input *input = ocrpt_datasource_get_input(source);
-
-	if (!input || !input->query_add_array)
-		return NULL;
-
-	return input->query_add_array(source, name, array, rows, cols, types, types_cols);
-}
 
 DLL_EXPORT_SYM ocrpt_query_discover_func ocrpt_query_discover_array = ocrpt_query_discover_array_c;
 

@@ -98,10 +98,11 @@ struct ocrpt_input {
 	/* Both of below are set or both are NULL */
 	const ocrpt_input_connect_parameter **connect_parameters; /* optional */
 	bool (*connect)(ocrpt_datasource *, const ocrpt_input_connect_parameter *); /* optional */
-	/* One of the three below must be set */
+	/* One of the four below must be set */
 	ocrpt_query *(*query_add_sql)(ocrpt_datasource *, const char *, const char *); /* optional */
 	ocrpt_query *(*query_add_file)(ocrpt_datasource *, const char *, const char *, const int32_t *, int32_t); /* optional */
 	ocrpt_query *(*query_add_array)(ocrpt_datasource *, const char *, const char **, int32_t, int32_t, const int32_t *, int32_t); /* optional */
+	ocrpt_query *(*query_add_symbolic_array)(ocrpt_datasource *, const char *, const char *, int32_t, int32_t, const char *, int32_t); /* optional */
 	void (*describe)(ocrpt_query *, ocrpt_query_result **, int32_t *); /* mandatory */
 	void (*rewind)(ocrpt_query *); /* mandatory */
 	bool (*next)(ocrpt_query *); /* mandatory */
@@ -358,7 +359,7 @@ void ocrpt_datasource_set_encoding(ocrpt_datasource *source, const char *encodin
  */
 void ocrpt_datasource_free(ocrpt_datasource *source);
 /*
- * Add an array query using the datasource pointer
+ * Add a C array query using the datasource pointer
  *
  * The array's first row contains the header names
  * and the number of rows is the number of data rows,
@@ -369,6 +370,23 @@ ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source,
 									const char *name, const char **array,
 									int32_t rows, int32_t cols,
 									const int32_t *types,
+									int32_t types_cols);
+/*
+ * Add a "symbolic" array query using the datasource pointer
+ *
+ * The array is automatically discovered by the datasource driver
+ * from its name.
+ *
+ * The array's first row contains the header names
+ * and the number of rows is the number of data rows,
+ * i.e. it's one less than the actual number of rows
+ * in array.
+ */
+ocrpt_query *ocrpt_query_add_symbolic_array(ocrpt_datasource *source,
+									const char *name,
+									const char *array_name,
+									int32_t rows, int32_t cols,
+									const char *types_name,
 									int32_t types_cols);
 /*
  * Add a file based (e.g. CSV, XML, JSON) query
@@ -393,6 +411,11 @@ void *ocrpt_query_get_private(const ocrpt_query *query);
  * Query whether the datasource is array based
  */
 bool ocrpt_datasource_is_array(ocrpt_datasource *source);
+/*
+ * Query whether the datasource is "symbolic" array based
+ * (i.e. the array is passed via its name as opposed to pointer)
+ */
+bool ocrpt_datasource_is_symbolic_array(ocrpt_datasource *source);
 /*
  * Query whether the datasource is file based
  */
