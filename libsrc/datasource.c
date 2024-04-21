@@ -706,3 +706,22 @@ DLL_EXPORT_SYM bool ocrpt_datasource_is_file(ocrpt_datasource *source) {
 DLL_EXPORT_SYM bool ocrpt_datasource_is_sql(ocrpt_datasource *source) {
 	return source && source->input && source->input->query_add_sql;
 }
+
+DLL_EXPORT_SYM bool ocrpt_query_refresh(opencreport *o) {
+	if (!o)
+		return true;
+
+	bool ret = true;
+
+	for (ocrpt_list *ql = o->queries; ql; ql = ql->next) {
+		ocrpt_query *q = (ocrpt_query *)ql->data;
+
+		if (q->source->input->refresh) {
+			bool success = q->source->input->refresh(q);
+
+			ret = ret && success;
+		}
+	}
+
+	return ret;
+}

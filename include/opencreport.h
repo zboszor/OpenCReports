@@ -104,6 +104,7 @@ struct ocrpt_input {
 	ocrpt_query *(*query_add_array)(ocrpt_datasource *, const char *, const char **, int32_t, int32_t, const int32_t *, int32_t); /* optional */
 	ocrpt_query *(*query_add_symbolic_array)(ocrpt_datasource *, const char *, const char *, int32_t, int32_t, const char *, int32_t); /* optional */
 	void (*describe)(ocrpt_query *, ocrpt_query_result **, int32_t *); /* mandatory */
+	bool (*refresh)(ocrpt_query *); /* optional */
 	void (*rewind)(ocrpt_query *); /* mandatory */
 	bool (*next)(ocrpt_query *); /* mandatory */
 	bool (*populate_result)(ocrpt_query *); /* mandatory */
@@ -461,6 +462,10 @@ bool ocrpt_query_add_follower_n_to_1(ocrpt_query *leader, ocrpt_query *follower,
  * Free a query and remove it from follower references
  */
 void ocrpt_query_free(ocrpt_query *q);
+/*
+ * Refresh contents of every query
+ */
+bool ocrpt_query_refresh(opencreport *o);
 /*
  * Start query navigation from the beginning of the resultset
  */
