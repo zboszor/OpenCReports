@@ -70,7 +70,7 @@ function precalc_done_cb(OpenCReport $o) {
 	$yields[3][1] = "1";
 	$yields[3][2] = "190";
 
-	OpenCReport::query_refresh();
+	$o->query_refresh();
 }
 
 $o = new OpenCReport();

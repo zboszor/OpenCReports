@@ -71,7 +71,8 @@ function precalc_done_cb() {
 	$yields[3][1] = "1";
 	$yields[3][2] = "190";
 
-	rlib_query_refresh();
+	global $r;
+	rlib_query_refresh($r);
 }
 
 $r = rlib_init();
