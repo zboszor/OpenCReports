@@ -480,7 +480,7 @@ void ocrpt_query_navigate_use_next_row(ocrpt_query *q);
 /*
  * Set the global function pointer to resolve array and type array
  */
-typedef void (*ocrpt_query_discover_func)(const char *, void **, int32_t *, int32_t *, const char *, void **, int32_t *);
+typedef void (*ocrpt_query_discover_func)(const char *, void **, int32_t *, int32_t *, const char *, void **, int32_t *, bool *);
 void ocrpt_query_set_discover_func(ocrpt_query_discover_func func);
 /*
  * Default discovery function for data and type arrays
@@ -489,7 +489,7 @@ extern ocrpt_query_discover_func ocrpt_query_discover_array;
 /*
  * Discovery function for data and type arrays
  */
-void ocrpt_query_discover_array_c(const char *arrayname, void **array, int32_t *rows, int32_t *cols, const char *typesname, void **types, int32_t *types_cols);
+void ocrpt_query_discover_array_c(const char *arrayname, void **array, int32_t *rows, int32_t *cols, const char *typesname, void **types, int32_t *types_cols, bool *free_types);
 /*
  * Set the print debugger function
  */

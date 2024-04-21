@@ -168,9 +168,14 @@ static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
 		else if (ocrpt_datasource_is_file(ds)) {
 			void *coltypesptr;
 			int32_t ct_cols_i = cols_i;
+			bool free_types = false;
 
-			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, coltypes_s, &coltypesptr, &ct_cols_i);
+			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, coltypes_s, &coltypesptr, &ct_cols_i, &free_types);
+
 			q = ocrpt_query_add_file(ds, name_s, value_s, coltypesptr, ct_cols_i);
+
+			if (free_types)
+				ocrpt_mem_free(coltypesptr);
 		} else if (ocrpt_datasource_is_symbolic_array(ds))
 			q = ocrpt_query_add_symbolic_array(ds, name_s, value_s, rows_i, cols_i, coltypes_s, coltypes_s ? cols_i : 0);
 	}

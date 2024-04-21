@@ -31,8 +31,9 @@ int main(int argc, char **argv) {
 	ocrpt_expr *id, *name, *age, *adult;
 	char *err;
 	int32_t cols, row, i;
+	bool free_types UNUSED = false;
 
-	ocrpt_query_discover_array("array", &arrayptr, NULL, NULL, "coltypes", &coltypesptr, NULL);
+	ocrpt_query_discover_array("array", &arrayptr, NULL, NULL, "coltypes", &coltypesptr, NULL, &free_types);
 	printf("Discovered array pointer: %sidentical\n", arrayptr == array ? "" : "NOT ");
 	printf("Discovered coltypes pointer: %sidentical\n", coltypesptr == coltypes ? "" : "NOT ");
 

@@ -1526,11 +1526,15 @@ PHP_METHOD(opencreport_ds, query_add) {
 	} else if (ocrpt_datasource_is_file(dso->ds)) {
 		void *types_x = NULL;
 		int32_t types_cols = 0;
+		bool free_types = false;
 
 		if (coltypes && ZSTR_LEN(coltypes) > 0)
-			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, ZSTR_VAL(coltypes), &types_x, &types_cols);
+			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, ZSTR_VAL(coltypes), &types_x, &types_cols, &free_types);
 
 		q = ocrpt_query_add_file(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), types_x, types_cols);
+
+		if (free_types)
+			ocrpt_mem_free(types_x);
 	} else if (ocrpt_datasource_is_symbolic_array(dso->ds))
 		q = ocrpt_query_add_symbolic_array(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), 0, 0, coltypes ? ZSTR_VAL(coltypes) : NULL, 0);
 	else
@@ -5048,13 +5052,9 @@ static HashTable *php_opencreport_arrays;
 
 struct php_opencreport_array {
 	zend_string *arrayname;
-	union {
-		char **array;
-		int32_t *types;
-	} a;
+	char **array;
 	uint32_t rows;
 	uint32_t cols;
-	bool types;
 };
 
 static void php_opencreport_array_dtor(zval *data) {
@@ -5062,14 +5062,10 @@ static void php_opencreport_array_dtor(zval *data) {
 
 	zend_string_release(arr->arrayname);
 
-	if (arr->types)
-		ocrpt_mem_free(arr->a.types);
-	else {
-		for (int32_t row = 0; row <= arr->rows; row++)
-			for (int32_t col = 0; col < arr->cols; col++)
-				ocrpt_mem_free(arr->a.array[(row * arr->cols) + col]);
-		ocrpt_mem_free(arr->a.array);
-	}
+	for (int32_t row = 0; row <= arr->rows; row++)
+		for (int32_t col = 0; col < arr->cols; col++)
+			ocrpt_mem_free(arr->array[(row * arr->cols) + col]);
+	ocrpt_mem_free(arr->array);
 
 	ocrpt_mem_free(arr);
 }
@@ -5094,7 +5090,7 @@ static zval *php_opencreport_get_array(const char *arrayname) {
 	return zv;
 }
 
-static void php_opencreport_query_discover_array(const char *arrayname, void **array, int32_t *rows, int32_t *cols, const char *typesname, void **types, int32_t *types_cols) {
+static void php_opencreport_query_discover_array(const char *arrayname, void **array, int32_t *rows, int32_t *cols, const char *typesname, void **types, int32_t *types_cols, bool *free_types) {
 	if (arrayname && *arrayname) {
 		zend_string *zarrayname = zend_string_init(arrayname, strlen(arrayname), 0);
 		struct php_opencreport_array *arr = (struct php_opencreport_array *)zend_hash_find_ptr(php_opencreport_arrays, zarrayname);
@@ -5123,11 +5119,10 @@ static void php_opencreport_query_discover_array(const char *arrayname, void **a
 				if (sz > 0) {
 					arr = ocrpt_mem_malloc(sizeof(struct php_opencreport_array));
 					arr->arrayname = zarrayname;
-					arr->a.array = ocrpt_mem_malloc(sz);
-					memset(arr->a.array, 0, sz);
+					arr->array = ocrpt_mem_malloc(sz);
+					memset(arr->array, 0, sz);
 					arr->rows = a_rows - 1; /* discount the header row */
 					arr->cols = a_cols;
-					arr->types = false;
 
 					int32_t row, col;
 
@@ -5154,7 +5149,7 @@ static void php_opencreport_query_discover_array(const char *arrayname, void **a
 								data_result = Z_STRVAL(copy);
 							}
 
-							arr->a.array[(row * a_cols) + col] = ocrpt_mem_strdup(data_result);
+							arr->array[(row * a_cols) + col] = ocrpt_mem_strdup(data_result);
 						}
 					}
 
@@ -5167,7 +5162,7 @@ static void php_opencreport_query_discover_array(const char *arrayname, void **a
 		}
 
 		if (array)
-			*array = arr ? arr->a.array : NULL;
+			*array = arr ? arr->array : NULL;
 		if (rows)
 			*rows = arr ? arr->rows : 0;
 		if (cols)
@@ -5184,81 +5179,69 @@ static void php_opencreport_query_discover_array(const char *arrayname, void **a
 			*cols = 0;
 	}
 
-	if (typesname && *typesname) {
-		zend_string *ztypesname = zend_string_init(typesname, strlen(typesname), 0);
-		struct php_opencreport_array *typ = (struct php_opencreport_array *)zend_hash_find_ptr(php_opencreport_arrays, ztypesname);
+	if (!typesname || !*typesname || !types)
+		goto out_error;
 
-		if (!typ) {
-			zval *zv_types = php_opencreport_get_array(typesname);
+	zval *zv_types = php_opencreport_get_array(typesname);
+	if (!zv_types)
+		goto out_error;
 
-			if (zv_types) {
-				HashTable *htab1;
-				HashPosition htab1p;
-				int32_t t_cols;
+	HashTable *htab1 = Z_ARRVAL_P(zv_types);
+	HashPosition htab1p;
 
-				htab1 = Z_ARRVAL_P(zv_types);
-				t_cols = zend_hash_num_elements(htab1);
+	int32_t t_cols = zend_hash_num_elements(htab1);
+	if (t_cols <= 0)
+		goto out_error;
 
-				int32_t sz = t_cols * sizeof(int32_t);
-				if (sz > 0) {
-					typ = ocrpt_mem_malloc(sizeof(struct php_opencreport_array));
-					typ->arrayname = ztypesname;
-					typ->a.types = ocrpt_mem_malloc(sz);
-					memset(typ->a.types, 0, sz);
-					typ->rows = 1;
-					typ->cols = t_cols;
-					typ->types = true;
+	int32_t sz = t_cols * sizeof(int32_t);
+	*types = ocrpt_mem_malloc(sz);
+	if (!*types)
+		goto out_error;
 
-					int32_t col;
+	memset(*types, 0, sz);
 
-					for (col = 0, zend_hash_internal_pointer_reset_ex(htab1, &htab1p); col < t_cols; col++, zend_hash_move_forward_ex(htab1, &htab1p)) {
-						zval *cell = zend_hash_get_current_data_ex(htab1, &htab1p);
-						int32_t data_result;
+	int32_t col;
+	for (col = 0, zend_hash_internal_pointer_reset_ex(htab1, &htab1p); col < t_cols; col++, zend_hash_move_forward_ex(htab1, &htab1p)) {
+		zval *cell = zend_hash_get_current_data_ex(htab1, &htab1p);
+		int32_t data_result;
 
-						if (Z_TYPE_P(cell) == IS_LONG) {
-							zend_long l = Z_LVAL_P(cell);
-							if (l >= OCRPT_RESULT_ERROR && l <= OCRPT_RESULT_DATETIME)
-								data_result = l;
-							else
-								data_result = OCRPT_RESULT_STRING;
-						} else if (Z_TYPE_P(cell) == IS_STRING) {
-							char *s = Z_STRVAL_P(cell);
+		if (Z_TYPE_P(cell) == IS_LONG) {
+			zend_long l = Z_LVAL_P(cell);
+			if (l >= OCRPT_RESULT_ERROR && l <= OCRPT_RESULT_DATETIME)
+				data_result = l;
+			else
+				data_result = OCRPT_RESULT_STRING;
+		} else if (Z_TYPE_P(cell) == IS_STRING) {
+			char *s = Z_STRVAL_P(cell);
 
-							if (strcasecmp(s, "number") == 0 || strcasecmp(s, "numeric") == 0)
-								data_result = OCRPT_RESULT_NUMBER;
-							else if (strcasecmp(s, "datetime") == 0)
-								data_result = OCRPT_RESULT_DATETIME;
-							else /* if (strcasecmp(s, "string") == 0) */
-								data_result = OCRPT_RESULT_STRING;
-						} else {
-							/* Handle error? */
-							data_result = OCRPT_RESULT_STRING;
-						}
-
-						typ->a.types[col] = data_result;
-					}
-
-					zval ztyp;
-					ZVAL_PTR(&ztyp, typ);
-
-					zend_hash_add_new(php_opencreport_arrays, ztypesname, &ztyp);
-				}
-			}
+			if (strcasecmp(s, "number") == 0 || strcasecmp(s, "numeric") == 0)
+				data_result = OCRPT_RESULT_NUMBER;
+			else if (strcasecmp(s, "datetime") == 0)
+				data_result = OCRPT_RESULT_DATETIME;
+			else /* if (strcasecmp(s, "string") == 0) */
+				data_result = OCRPT_RESULT_STRING;
+		} else {
+			/* Handle error? */
+			data_result = OCRPT_RESULT_STRING;
 		}
 
-		if (types)
-			*types = typ ? typ->a.types : NULL;
-		if (types_cols)
-			*types_cols = typ ? typ->cols : 0;
-
-		if (!typ)
-			zend_string_release(ztypesname);
-	} else {
-		if (types)
-			*types = NULL;
-		if (types_cols)
-			*types_cols = 0;
+		((int32_t *)(*types))[col] = data_result;
 	}
+
+	if (types_cols)
+		*types_cols = t_cols;
+	if (free_types)
+		*free_types = true;
+	return;
+
+	out_error:
+
+	if (types)
+		*types = NULL;
+	if (types_cols)
+		*types_cols = 0;
+	if (free_types)
+		*free_types = false;
 }
 
 static void php_opencreport_query_refresh_array(void) {
@@ -5269,10 +5252,6 @@ static void php_opencreport_query_refresh_array(void) {
 	for (i = 0, zend_hash_internal_pointer_reset_ex(php_opencreport_arrays, &arrayp); i < arrays; i++, zend_hash_move_forward_ex(php_opencreport_arrays, &arrayp)) {
 		zval *cell = zend_hash_get_current_data_ex(php_opencreport_arrays, &arrayp);
 		struct php_opencreport_array *arr = Z_PTR_P(cell);
-
-		/* Ignore 1D "column types" arrays */
-		if (arr->types)
-			continue;
 
 		zval *zv_array = php_opencreport_get_array(ZSTR_VAL(arr->arrayname));
 
@@ -5329,8 +5308,8 @@ static void php_opencreport_query_refresh_array(void) {
 						data_result = Z_STRVAL(copy);
 					}
 
-					ocrpt_mem_free(arr->a.array[(row * a_cols) + col]);
-					arr->a.array[(row * a_cols) + col] = ocrpt_mem_strdup(data_result);
+					ocrpt_mem_free(arr->array[(row * a_cols) + col]);
+					arr->array[(row * a_cols) + col] = ocrpt_mem_strdup(data_result);
 				}
 			}
 		}

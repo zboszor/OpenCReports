@@ -40,7 +40,6 @@ struct ocrpt_array_results {
 	int32_t current_row;
 	bool atstart:1;
 	bool isdone:1;
-	bool free_types:1;
 };
 
 static bool ocrpt_array_connect(ocrpt_datasource *ds, const ocrpt_input_connect_parameter *conn_params UNUSED) {
@@ -100,8 +99,7 @@ static void ocrpt_array_describe(ocrpt_query *query, ocrpt_query_result **qresul
 
 static ocrpt_query *array_query_add(const ocrpt_datasource *source, const char *name,
 									const char **array, int32_t rows, int32_t cols,
-									const int32_t *types, int32_t types_cols,
-									bool free_types) {
+									const int32_t *types, int32_t types_cols) {
 	if (!source || !name || !array)
 		return NULL;
 
@@ -114,8 +112,23 @@ static ocrpt_query *array_query_add(const ocrpt_datasource *source, const char *
 	if (!query)
 		return NULL;
 
+	int32_t *types_copy = NULL;
+	int32_t types_cols_copy = (types ? (types_cols > 0 ? types_cols : cols) : 0);
+
+	if (types && (types_cols_copy > 0)) {
+		types_copy = ocrpt_mem_malloc(types_cols_copy * sizeof(int32_t));
+
+		if (!types_copy) {
+			ocrpt_query_free(query);
+			return NULL;
+		}
+
+		memcpy(types_copy, types, types_cols_copy * sizeof(int32_t));
+	}
+
 	struct ocrpt_array_results *priv = ocrpt_mem_malloc(sizeof(struct ocrpt_array_results));
 	if (!priv) {
+		ocrpt_mem_free(types_copy);
 		ocrpt_query_free(query);
 		return NULL;
 	}
@@ -124,12 +137,11 @@ static ocrpt_query *array_query_add(const ocrpt_datasource *source, const char *
 	priv->rows = rows;
 	priv->cols = cols;
 	priv->data = array;
-	priv->types = types;
-	priv->types_cols = (types ? (types_cols > 0 ? types_cols : cols) : 0);
+	priv->types = types_copy;
+	priv->types_cols = types_cols_copy;
 	priv->current_row = 0;
 	priv->atstart = true;
 	priv->isdone = false;
-	priv->free_types = free_types;
 	ocrpt_query_set_private(query, priv);
 
 	return query;
@@ -139,7 +151,7 @@ static ocrpt_query *ocrpt_array_query_add(ocrpt_datasource *source,
 										const char *name,
 										const char **array, int32_t rows, int32_t cols,
 										const int32_t *types, int32_t types_cols) {
-	return array_query_add(source, name, array, rows, cols, types, types_cols, false);
+	return array_query_add(source, name, array, rows, cols, types, types_cols);
 }
 
 static ocrpt_query *ocrpt_array_query_add_symbolic(ocrpt_datasource *source,
@@ -147,10 +159,16 @@ static ocrpt_query *ocrpt_array_query_add_symbolic(ocrpt_datasource *source,
 										const char *array_name, int32_t rows, int32_t cols,
 										const char *types_name, int32_t types_cols) {
 	void *array = NULL, *types = NULL;
+	bool free_types = false;
 
-	ocrpt_query_discover_array(array_name, &array, rows <= 0 ? &rows : NULL, cols <= 0 ? &cols : NULL, types_name, &types, (types_name && types_cols <= 0) ? &types_cols : NULL);
+	ocrpt_query_discover_array(array_name, &array, rows <= 0 ? &rows : NULL, cols <= 0 ? &cols : NULL, types_name, &types, (types_name && types_cols <= 0) ? &types_cols : NULL, &free_types);
 
-	return array_query_add(source, name, array, rows, cols, types, types_cols, false);
+	ocrpt_query *query = array_query_add(source, name, array, rows, cols, types, types_cols);
+
+	if (free_types)
+		ocrpt_mem_free(types);
+
+	return query;
 }
 
 static void ocrpt_array_rewind(ocrpt_query *query) {
@@ -263,7 +281,7 @@ DLL_EXPORT_SYM void ocrpt_query_set_discover_func(ocrpt_query_discover_func func
 	ocrpt_query_discover_array = func;
 }
 
-DLL_EXPORT_SYM void ocrpt_query_discover_array_c(const char *arrayname, void **array, int32_t *rows UNUSED, int32_t *cols UNUSED, const char *typesname, void **types, int32_t *types_cols UNUSED) {
+DLL_EXPORT_SYM void ocrpt_query_discover_array_c(const char *arrayname, void **array, int32_t *rows UNUSED, int32_t *cols UNUSED, const char *typesname, void **types, int32_t *types_cols UNUSED, bool *free_types) {
 	void *handle = dlopen(NULL, RTLD_NOW);
 
 	if (array) {
@@ -284,6 +302,13 @@ DLL_EXPORT_SYM void ocrpt_query_discover_array_c(const char *arrayname, void **a
 	}
 
 	dlclose(handle);
+
+	/*
+	 * The allocation and freeing of the "types" array is under
+	 * application control.
+	 */
+	if (free_types)
+		*free_types = false;
 }
 
 static void ocrpt_file_free(ocrpt_query *query) {
@@ -297,8 +322,7 @@ static void ocrpt_file_free(ocrpt_query *query) {
 	for (i = 0; i < max; i++)
 		ocrpt_mem_free(result->data[i]);
 
-	if (result->free_types)
-		ocrpt_mem_free(result->types);
+	ocrpt_mem_free(result->types);
 	ocrpt_mem_free(result->data);
 	ocrpt_mem_free(result);
 	ocrpt_query_set_private(query, NULL);
@@ -478,7 +502,7 @@ static ocrpt_query *ocrpt_csv_query_add(ocrpt_datasource *source,
 			array[row * fq.cols + col] = NULL;
 	}
 
-	retval = array_query_add(source, name, array, fq.rows - 1, fq.cols, types, types_cols, false);
+	retval = array_query_add(source, name, array, fq.rows - 1, fq.cols, types, types_cols);
 
 	ocrpt_file_query_free(&fq, false);
 
@@ -791,11 +815,10 @@ static ocrpt_query *ocrpt_json_query_add(ocrpt_datasource *source,
 			array[row * fq.cols + col] = NULL;
 	}
 
-	retval = array_query_add(source, name, array, fq.rows - 1, fq.cols, (fq.coltypesset ? fq.types : types), (fq.coltypesset ? fq.cols : types_cols), fq.coltypesset);
+	retval = array_query_add(source, name, array, fq.rows - 1, fq.cols, (fq.coltypesset ? fq.types : types), (fq.coltypesset ? fq.cols : types_cols));
 
 	ocrpt_file_query_free(&fq, false);
-	if (fq.types && !fq.coltypesset)
-		ocrpt_mem_free(fq.types);
+	ocrpt_mem_free(fq.types);
 
 	return retval;
 }
@@ -1194,11 +1217,10 @@ static ocrpt_query *ocrpt_xml_query_add(ocrpt_datasource *source,
 		}
 	}
 
-	retval = array_query_add(source, name, array, fq.rows, fq.cols, (fq.coltypesset ? fq.types : types), (fq.coltypesset ? fq.cols : types_cols), fq.coltypesset);
+	retval = array_query_add(source, name, array, fq.rows, fq.cols, (fq.coltypesset ? fq.types : types), (fq.coltypesset ? fq.cols : types_cols));
 
 	ocrpt_file_query_free(&fq, false);
-	if (fq.types && !fq.coltypesset)
-		ocrpt_mem_free(fq.types);
+	ocrpt_mem_free(fq.types);
 
 	return retval;
 }
