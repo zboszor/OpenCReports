@@ -5070,24 +5070,46 @@ static void php_opencreport_array_dtor(zval *data) {
 	ocrpt_mem_free(arr);
 }
 
-static zval *php_opencreport_get_array(const char *arrayname) {
-	int unref_count;
-	zval *zv = zend_hash_str_find(&EG(symbol_table), arrayname, strlen(arrayname));
+static zval *php_opencreport_get_zval_direct(zval *zv) {
 	if (zv == NULL)
 		return NULL;
 
-	/* Prevent an infinite loop with unref_count */
-	for (unref_count = 0; unref_count < 3 && Z_TYPE_P(zv) != IS_ARRAY; unref_count++) {
-		if (EXPECTED(Z_TYPE_P(zv) == IS_INDIRECT))
+	/*
+	 * This loop is not infinite.
+	 * The maze of indirection and references may be deep,
+	 * but not endless.
+	 */
+	for (int type = Z_TYPE_P(zv); type == IS_INDIRECT || type == IS_REFERENCE; type = Z_TYPE_P(zv)) {
+		switch (type) {
+		case IS_INDIRECT:
 			zv = Z_INDIRECT_P(zv);
-		if (EXPECTED(Z_TYPE_P(zv) == IS_REFERENCE))
+			type = Z_TYPE_P(zv);
+			break;
+		case IS_REFERENCE:
 			zv = Z_REFVAL_P(zv);
+			type = Z_TYPE_P(zv);
+			break;
+		default:
+			break;
+		}
 	}
 
-	if (UNEXPECTED(Z_TYPE_P(zv) != IS_ARRAY))
+	return zv;
+}
+
+static zval *php_opencreport_get_zval_of_type_raw(zval *zv, int expected_type) {
+	zv = php_opencreport_get_zval_direct(zv);
+
+	return (zv && (Z_TYPE_P(zv) == expected_type)) ? zv : NULL;
+}
+
+static zval *php_opencreport_get_zval_of_type(const char *name, int expected_type) {
+	if (!name || !*name)
 		return NULL;
 
-	return zv;
+	zval *zv = zend_hash_str_find(&EG(symbol_table), name, strlen(name));
+
+	return php_opencreport_get_zval_of_type_raw(zv, expected_type);
 }
 
 static void php_opencreport_query_discover_array(const char *arrayname, void **array, int32_t *rows, int32_t *cols, const char *typesname, void **types, int32_t *types_cols, bool *free_types) {
@@ -5096,7 +5118,7 @@ static void php_opencreport_query_discover_array(const char *arrayname, void **a
 		struct php_opencreport_array *arr = (struct php_opencreport_array *)zend_hash_find_ptr(php_opencreport_arrays, zarrayname);
 
 		if (!arr) {
-			zval *zv_array = php_opencreport_get_array(arrayname);
+			zval *zv_array = php_opencreport_get_zval_of_type(arrayname, IS_ARRAY);
 
 			if (zv_array) {
 				HashTable *htab1;
@@ -5182,7 +5204,7 @@ static void php_opencreport_query_discover_array(const char *arrayname, void **a
 	if (!typesname || !*typesname || !types)
 		goto out_error;
 
-	zval *zv_types = php_opencreport_get_array(typesname);
+	zval *zv_types = php_opencreport_get_zval_of_type(typesname, IS_ARRAY);
 	if (!zv_types)
 		goto out_error;
 
@@ -5253,7 +5275,7 @@ static void php_opencreport_query_refresh_array(void) {
 		zval *cell = zend_hash_get_current_data_ex(php_opencreport_arrays, &arrayp);
 		struct php_opencreport_array *arr = Z_PTR_P(cell);
 
-		zval *zv_array = php_opencreport_get_array(ZSTR_VAL(arr->arrayname));
+		zval *zv_array = php_opencreport_get_zval_of_type(ZSTR_VAL(arr->arrayname), IS_ARRAY);
 
 		if (zv_array) {
 			HashTable *htab1;
