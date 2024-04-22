@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
 	char *err;
 	int32_t cols, cols2, row, i;
 
-	q = ocrpt_query_add_array(ds, "data", (const char **)array, ROWS, COLS, NULL, 0);
+	q = ocrpt_query_add_data(ds, "data", (const char **)array, ROWS, COLS, NULL, 0);
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)
@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 
 	printf("--- TESTING FOLLOWER ---\n\n");
 
-	q2 = ocrpt_query_add_array(ds, "more_data", (const char **)initials, ROWS1, COLS1, NULL, 0);
+	q2 = ocrpt_query_add_data(ds, "more_data", (const char **)initials, ROWS1, COLS1, NULL, 0);
 	ocrpt_query_add_follower(q, q2);
 
 	row = 0;
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
 
 	printf("--- TESTING FOLLOWER N:1 ---\n\n");
 
-	q2 = ocrpt_query_add_array(ds, "more_data", (const char **)initials, ROWS1, COLS1, NULL, 0);
+	q2 = ocrpt_query_add_data(ds, "more_data", (const char **)initials, ROWS1, COLS1, NULL, 0);
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	err = NULL;
 	match = ocrpt_expr_parse(o, "rownum('data') = rownum('more_data')", &err);

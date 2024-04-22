@@ -36,9 +36,9 @@ int main(int argc, char **argv) {
 	bool retval;
 
 	printf("added query a\n\n");
-	a = ocrpt_query_add_array(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
+	a = ocrpt_query_add_data(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 	printf("added query b\n\n");
-	b = ocrpt_query_add_array(ds, "b", (const char **)array2, ROWS1, COLS, coltypes, COLS);
+	b = ocrpt_query_add_data(ds, "b", (const char **)array2, ROWS1, COLS, coltypes, COLS);
 
 	printf("adding N:1 follower a -> b with v.var expression, should fail\n");
 	match = ocrpt_expr_parse(o, "v.var", NULL);

@@ -85,9 +85,9 @@ int main(int argc, char **argv) {
 	ocrpt_expr *match, *match2;
 	struct rowdata rd = { .row = 0 };
 
-	rd.q = ocrpt_query_add_array(ds, "data", (const char **)array, ROWS, COLS, NULL, 0);
-	rd.q2 = ocrpt_query_add_array(ds, "more_data", (const char **)sidekicks, ROWS1, COLS1, NULL, 0);
-	rd.q3 = ocrpt_query_add_array(ds, "moar_data", (const char **)sidekicks2, ROWS2, COLS2, NULL, 0);
+	rd.q = ocrpt_query_add_data(ds, "data", (const char **)array, ROWS, COLS, NULL, 0);
+	rd.q2 = ocrpt_query_add_data(ds, "more_data", (const char **)sidekicks, ROWS1, COLS1, NULL, 0);
+	rd.q3 = ocrpt_query_add_data(ds, "moar_data", (const char **)sidekicks2, ROWS2, COLS2, NULL, 0);
 
 	match = ocrpt_expr_parse(o, "data.id = more_data.boss_id", NULL);
 	if (!ocrpt_query_add_follower_n_to_1(rd.q, rd.q2, match)) {

@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
 	err = ocrpt_expr_parse(o, "error('Error')", NULL);
 	ocrpt_expr_print(err);
 
-	q = ocrpt_query_add_array(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
+	q = ocrpt_query_add_data(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 
 	ocrpt_expr_resolve(id);
 	ocrpt_expr_resolve(name);

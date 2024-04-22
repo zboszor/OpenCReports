@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add(o, "array", "array", NULL);
 
-	ocrpt_query_add_array(ds, "data", (const char **)array, ROWS, COLS, NULL, 0);
+	ocrpt_query_add_data(ds, "data", (const char **)array, ROWS, COLS, NULL, 0);
 
 	ocrpt_part *p = ocrpt_part_new(o);
 	ocrpt_part_row *pr = ocrpt_part_new_row(p);

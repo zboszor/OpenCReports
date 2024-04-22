@@ -57,9 +57,9 @@ const char *sidekicks2[ROWS2 + 1][COLS2] = {
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add(o, "array", "array", NULL);
-	ocrpt_query *q = ocrpt_query_add_array(ds, "data", (const char **)array, ROWS, COLS, NULL, 0);
-	ocrpt_query *q2 = ocrpt_query_add_array(ds, "more_data", (const char **)sidekicks, ROWS1, COLS1, NULL, 0);
-	ocrpt_query *q3 = ocrpt_query_add_array(ds, "moar_data", (const char **)sidekicks2, ROWS2, COLS2, NULL, 0);
+	ocrpt_query *q = ocrpt_query_add_data(ds, "data", (const char **)array, ROWS, COLS, NULL, 0);
+	ocrpt_query *q2 = ocrpt_query_add_data(ds, "more_data", (const char **)sidekicks, ROWS1, COLS1, NULL, 0);
+	ocrpt_query *q3 = ocrpt_query_add_data(ds, "moar_data", (const char **)sidekicks2, ROWS2, COLS2, NULL, 0);
 	ocrpt_expr *match, *match2;
 	uint32_t row;
 

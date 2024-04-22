@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 	int32_t cols, row, i;
 	bool free_types UNUSED = false;
 
-	ocrpt_query_discover_array("array", &arrayptr, NULL, NULL, "coltypes", &coltypesptr, NULL, &free_types);
+	ocrpt_query_discover_data("array", &arrayptr, NULL, NULL, "coltypes", &coltypesptr, NULL, &free_types);
 	printf("Discovered array pointer: %sidentical\n", arrayptr == array ? "" : "NOT ");
 	printf("Discovered coltypes pointer: %sidentical\n", coltypesptr == coltypes ? "" : "NOT ");
 
@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
 	err = NULL;
 	adult = ocrpt_expr_parse(o, "a.adult", &err);
 
-	q = ocrpt_query_add_array(ds, "a", (const char **)arrayptr, ROWS, COLS, coltypesptr, COLS);
+	q = ocrpt_query_add_data(ds, "a", (const char **)arrayptr, ROWS, COLS, coltypesptr, COLS);
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)

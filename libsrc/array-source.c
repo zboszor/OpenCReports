@@ -161,7 +161,7 @@ static ocrpt_query *ocrpt_array_query_add_symbolic(ocrpt_datasource *source,
 	void *array = NULL, *types = NULL;
 	bool free_types = false;
 
-	ocrpt_query_discover_array(array_name, &array, rows <= 0 ? &rows : NULL, cols <= 0 ? &cols : NULL, types_name, &types, (types_name && types_cols <= 0) ? &types_cols : NULL, &free_types);
+	ocrpt_query_discover_data(array_name, &array, rows <= 0 ? &rows : NULL, cols <= 0 ? &cols : NULL, types_name, &types, (types_name && types_cols <= 0) ? &types_cols : NULL, &free_types);
 
 	ocrpt_query *query = array_query_add(source, name, array, rows, cols, types, types_cols);
 
@@ -260,10 +260,9 @@ static const char *ocrpt_array_input_names[] = { "array", NULL };
 const ocrpt_input ocrpt_array_input = {
 	.names = ocrpt_array_input_names,
 	.connect = ocrpt_array_connect,
-	.query_add_array = ocrpt_array_query_add,
-	.query_add_symbolic_array = ocrpt_array_query_add_symbolic,
+	.query_add_data = ocrpt_array_query_add,
+	.query_add_symbolic_data = ocrpt_array_query_add_symbolic,
 	.describe = ocrpt_array_describe,
-	.query_add_array = ocrpt_array_query_add,
 	.rewind = ocrpt_array_rewind,
 	.next = ocrpt_array_next,
 	.populate_result = ocrpt_array_populate_result,
@@ -273,16 +272,16 @@ const ocrpt_input ocrpt_array_input = {
 	.close = ocrpt_array_close
 };
 
-DLL_EXPORT_SYM ocrpt_query_discover_func ocrpt_query_discover_array = ocrpt_query_discover_array_c;
+DLL_EXPORT_SYM ocrpt_query_discover_func ocrpt_query_discover_data = ocrpt_query_discover_data_c;
 
 DLL_EXPORT_SYM void ocrpt_query_set_discover_func(ocrpt_query_discover_func func) {
 	if (!func)
 		return;
 
-	ocrpt_query_discover_array = func;
+	ocrpt_query_discover_data = func;
 }
 
-DLL_EXPORT_SYM void ocrpt_query_discover_array_c(const char *arrayname, void **array, int32_t *rows UNUSED, int32_t *cols UNUSED, const char *typesname, void **types, int32_t *types_cols UNUSED, bool *free_types) {
+DLL_EXPORT_SYM void ocrpt_query_discover_data_c(const char *arrayname, void **array, int32_t *rows UNUSED, int32_t *cols UNUSED, const char *typesname, void **types, int32_t *types_cols UNUSED, bool *free_types) {
 	void *handle = dlopen(NULL, RTLD_NOW);
 
 	if (array) {

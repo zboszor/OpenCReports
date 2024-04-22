@@ -36,9 +36,9 @@ int main(int argc, char **argv) {
 	bool retval;
 
 	printf("added query a\n\n");
-	a = ocrpt_query_add_array(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
+	a = ocrpt_query_add_data(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 	printf("added query b\n\n");
-	b = ocrpt_query_add_array(ds, "b", (const char **)array2, ROWS1, COLS, coltypes, COLS);
+	b = ocrpt_query_add_data(ds, "b", (const char **)array2, ROWS1, COLS, coltypes, COLS);
 
 	printf("adding N:1 follower a -> b, should succeed\n");
 	match_ab = ocrpt_expr_parse(o, "a.id = b.id", NULL);
@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
 	retval = ocrpt_query_add_follower(b, c);
 	printf("added follower b -> c, retval %d\n\n", retval);
 
-	c = ocrpt_query_add_array(ds, "c", (const char **)array2, ROWS1, COLS, coltypes, COLS);
+	c = ocrpt_query_add_data(ds, "c", (const char **)array2, ROWS1, COLS, coltypes, COLS);
 	printf("added query c\n\n");
 
 	printf("adding N:1 follower b -> c, should succeed\n");
@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
 	retval = ocrpt_query_add_follower(a, c);
 	printf("added follower a -> c, retval %d\n\n", retval);
 
-	d = ocrpt_query_add_array(ds, "d", (const char **)array2, ROWS1, COLS, coltypes, COLS);
+	d = ocrpt_query_add_data(ds, "d", (const char **)array2, ROWS1, COLS, coltypes, COLS);
 	printf("added query d\n\n");
 
 	printf("adding follower c -> d, should succeed\n");

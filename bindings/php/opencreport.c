@@ -1535,14 +1535,14 @@ PHP_METHOD(opencreport_ds, query_add) {
 		bool free_types = false;
 
 		if (coltypes && ZSTR_LEN(coltypes) > 0)
-			ocrpt_query_discover_array(NULL, NULL, NULL, NULL, ZSTR_VAL(coltypes), &types_x, &types_cols, &free_types);
+			ocrpt_query_discover_data(NULL, NULL, NULL, NULL, ZSTR_VAL(coltypes), &types_x, &types_cols, &free_types);
 
 		q = ocrpt_query_add_file(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), types_x, types_cols);
 
 		if (free_types)
 			ocrpt_mem_free(types_x);
-	} else if (ocrpt_datasource_is_symbolic_array(dso->ds))
-		q = ocrpt_query_add_symbolic_array(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), 0, 0, coltypes ? ZSTR_VAL(coltypes) : NULL, 0);
+	} else if (ocrpt_datasource_is_symbolic_data(dso->ds))
+		q = ocrpt_query_add_symbolic_data(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), 0, 0, coltypes ? ZSTR_VAL(coltypes) : NULL, 0);
 	else
 		RETURN_NULL();
 
@@ -5551,7 +5551,7 @@ void php_opencreport_array_close(const ocrpt_datasource *ds) {
 static const ocrpt_input php_opencreport_array_input = {
 	.names = php_opencreport_array_input_names,
 	.connect = php_opencreport_array_connect,
-	.query_add_symbolic_array = php_opencreport_array_query_add_symbolic,
+	.query_add_symbolic_data = php_opencreport_array_query_add_symbolic,
 	.describe = php_opencreport_array_describe,
 	.refresh = php_opencreport_array_refresh,
 	.rewind = php_opencreport_array_rewind,
@@ -5590,7 +5590,7 @@ static PHP_MINIT_FUNCTION(opencreport)
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add(o, "array", "array", NULL);
 
-	ocrpt_query_add_array(ds, "data", (const char **)dummy_report_array, DUMMY_REPORT_ROWS, DUMMY_REPORT_COLS, NULL, 0);
+	ocrpt_query_add_data(ds, "data", (const char **)dummy_report_array, DUMMY_REPORT_ROWS, DUMMY_REPORT_COLS, NULL, 0);
 	ocrpt_parse_xml_from_buffer(o, dummy_report_xml, sizeof(dummy_report_xml) - 1);
 	ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);
 	ocrpt_execute(o);
@@ -6237,8 +6237,8 @@ ZEND_FUNCTION(rlib_add_query_as) {
 		q = ocrpt_query_add_sql(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
 	else if (ocrpt_datasource_is_file(ds))
 		q = ocrpt_query_add_file(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), NULL, 0);
-	else if (ocrpt_datasource_is_symbolic_array(ds))
-		q = ocrpt_query_add_symbolic_array(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), 0, 0, NULL, 0);
+	else if (ocrpt_datasource_is_symbolic_data(ds))
+		q = ocrpt_query_add_symbolic_data(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql), 0, 0, NULL, 0);
 	else
 		RETURN_NULL();
 

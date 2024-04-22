@@ -63,7 +63,7 @@ Expression is different from previous row
 
 --- TESTING FOLLOWER ---
 
-ocrpt_query_add_array q2: successful
+ocrpt_query_add_data q2: successful
 Row #0
 Query: 'a':
 	Col #0: 'id': string value: NULL (converted to number: 1.000000)
@@ -129,7 +129,7 @@ Evaluated: (number)1.000000
 
 --- TESTING FOLLOWER N:1 ---
 
-ocrpt_query_add_array q2: successful
+ocrpt_query_add_data q2: successful
 Row #0
 Query: 'a':
 	Col #0: 'id': string value: NULL (converted to number: 1.000000)

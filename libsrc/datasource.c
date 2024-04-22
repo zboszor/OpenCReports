@@ -240,28 +240,28 @@ DLL_EXPORT_SYM void *ocrpt_query_get_private(const ocrpt_query *query) {
 	return (query ? query->priv : NULL);
 }
 
-DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const int32_t *types, int32_t types_cols) {
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_data(ocrpt_datasource *source, const char *name, const char **array, int32_t rows, int32_t cols, const int32_t *types, int32_t types_cols) {
 	if (!source || !name || !array)
 		return NULL;
 
 	const ocrpt_input *input = ocrpt_datasource_get_input(source);
 
-	if (!input || !input->query_add_array)
+	if (!input || !input->query_add_data)
 		return NULL;
 
-	return input->query_add_array(source, name, array, rows, cols, types, types_cols);
+	return input->query_add_data(source, name, array, rows, cols, types, types_cols);
 }
 
-DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_symbolic_array(ocrpt_datasource *source, const char *name, const char *array_name, int32_t rows, int32_t cols, const char *types_name, int32_t types_cols) {
+DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_symbolic_data(ocrpt_datasource *source, const char *name, const char *array_name, int32_t rows, int32_t cols, const char *types_name, int32_t types_cols) {
 	if (!source || !name || !array_name)
 		return NULL;
 
 	const ocrpt_input *input = ocrpt_datasource_get_input(source);
 
-	if (!input || !input->query_add_symbolic_array)
+	if (!input || !input->query_add_symbolic_data)
 		return NULL;
 
-	return input->query_add_symbolic_array(source, name, array_name, rows, cols, types_name, types_cols);
+	return input->query_add_symbolic_data(source, name, array_name, rows, cols, types_name, types_cols);
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_file(ocrpt_datasource *source,
@@ -691,12 +691,12 @@ void ocrpt_query_finalize_followers(ocrpt_query *q) {
 	q->source->o->n_to_1_lists_invalid = false;
 }
 
-DLL_EXPORT_SYM bool ocrpt_datasource_is_array(ocrpt_datasource *source) {
-	return source && source->input && source->input->query_add_array;
+DLL_EXPORT_SYM bool ocrpt_datasource_is_data(ocrpt_datasource *source) {
+	return source && source->input && source->input->query_add_data;
 }
 
-DLL_EXPORT_SYM bool ocrpt_datasource_is_symbolic_array(ocrpt_datasource *source) {
-	return source && source->input && source->input->query_add_symbolic_array;
+DLL_EXPORT_SYM bool ocrpt_datasource_is_symbolic_data(ocrpt_datasource *source) {
+	return source && source->input && source->input->query_add_symbolic_data;
 }
 
 DLL_EXPORT_SYM bool ocrpt_datasource_is_file(ocrpt_datasource *source) {

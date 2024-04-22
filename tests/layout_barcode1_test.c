@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add(o, "array", "array", NULL);
 
-	ocrpt_query_add_array(ds, "data", (const char **)array, ROWS, COLS, NULL, 0);
+	ocrpt_query_add_data(ds, "data", (const char **)array, ROWS, COLS, NULL, 0);
 
 	if (!ocrpt_parse_xml(o, "layout_barcode_test.xml")) {
 		printf("XML parse error\n");

@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 	ocrpt_add_search_path(o, csrcdir);
 
 	ocrpt_datasource *ds = ocrpt_datasource_add(o, "myarray", "array", NULL);
-	ocrpt_query *q = ocrpt_query_add_array(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS1);
+	ocrpt_query *q = ocrpt_query_add_data(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS1);
 
 	ocrpt_part *p = ocrpt_part_new(o);
 	ocrpt_part_set_paper_by_name(p, "A4");

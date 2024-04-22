@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 	err = NULL;
 	adult = ocrpt_expr_parse(o, "a.adult", &err);
 
-	q = ocrpt_query_add_array(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
+	q = ocrpt_query_add_data(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)
@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
 
 	printf("--- TESTING FOLLOWER ---\n\n");
 
-	q2 = ocrpt_query_add_array(ds, "b", (const char **)array2, ROWS1, COLS, coltypes, COLS);
+	q2 = ocrpt_query_add_data(ds, "b", (const char **)array2, ROWS1, COLS, coltypes, COLS);
 	ocrpt_query_add_follower(q, q2);
 
 	row = 0;
@@ -153,7 +153,7 @@ int main(int argc, char **argv) {
 
 	printf("--- TESTING FOLLOWER N:1 ---\n\n");
 
-	q2 = ocrpt_query_add_array(ds, "b", (const char **)array2, ROWS1, COLS, coltypes, COLS);
+	q2 = ocrpt_query_add_data(ds, "b", (const char **)array2, ROWS1, COLS, coltypes, COLS);
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	err = NULL;
 	match = ocrpt_expr_parse(o, "a.id = b.id", &err);

@@ -34,8 +34,8 @@ const char *initials[ROWS1 + 1][COLS1] = {
 int main(int argc, char **argv) {
 	opencreport *o = ocrpt_init();
 	ocrpt_datasource *ds = ocrpt_datasource_add(o, "array", "array", NULL);
-	ocrpt_query *q = ocrpt_query_add_array(ds, "data", (const char **)array, ROWS, COLS, NULL, 0);
-	ocrpt_query *q2 = ocrpt_query_add_array(ds, "more_data", (const char **)initials, ROWS1, COLS1, NULL, 0);
+	ocrpt_query *q = ocrpt_query_add_data(ds, "data", (const char **)array, ROWS, COLS, NULL, 0);
+	ocrpt_query *q2 = ocrpt_query_add_data(ds, "more_data", (const char **)initials, ROWS1, COLS1, NULL, 0);
 	ocrpt_expr *match;
 
 	match = ocrpt_expr_parse(o, "data.id = more_data.id", NULL);

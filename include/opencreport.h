@@ -101,8 +101,8 @@ struct ocrpt_input {
 	/* One of the four below must be set */
 	ocrpt_query *(*query_add_sql)(ocrpt_datasource *, const char *, const char *); /* optional */
 	ocrpt_query *(*query_add_file)(ocrpt_datasource *, const char *, const char *, const int32_t *, int32_t); /* optional */
-	ocrpt_query *(*query_add_array)(ocrpt_datasource *, const char *, const char **, int32_t, int32_t, const int32_t *, int32_t); /* optional */
-	ocrpt_query *(*query_add_symbolic_array)(ocrpt_datasource *, const char *, const char *, int32_t, int32_t, const char *, int32_t); /* optional */
+	ocrpt_query *(*query_add_data)(ocrpt_datasource *, const char *, const char **, int32_t, int32_t, const int32_t *, int32_t); /* optional */
+	ocrpt_query *(*query_add_symbolic_data)(ocrpt_datasource *, const char *, const char *, int32_t, int32_t, const char *, int32_t); /* optional */
 	void (*describe)(ocrpt_query *, ocrpt_query_result **, int32_t *); /* mandatory */
 	bool (*refresh)(ocrpt_query *); /* optional */
 	void (*rewind)(ocrpt_query *); /* mandatory */
@@ -367,8 +367,8 @@ void ocrpt_datasource_free(ocrpt_datasource *source);
  * i.e. it's one less than the actual number of rows
  * in array.
  */
-ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source,
-									const char *name, const char **array,
+ocrpt_query *ocrpt_query_add_data(ocrpt_datasource *source,
+									const char *name, const char **data,
 									int32_t rows, int32_t cols,
 									const int32_t *types,
 									int32_t types_cols);
@@ -383,9 +383,9 @@ ocrpt_query *ocrpt_query_add_array(ocrpt_datasource *source,
  * i.e. it's one less than the actual number of rows
  * in array.
  */
-ocrpt_query *ocrpt_query_add_symbolic_array(ocrpt_datasource *source,
+ocrpt_query *ocrpt_query_add_symbolic_data(ocrpt_datasource *source,
 									const char *name,
-									const char *array_name,
+									const char *data_name,
 									int32_t rows, int32_t cols,
 									const char *types_name,
 									int32_t types_cols);
@@ -411,12 +411,12 @@ void *ocrpt_query_get_private(const ocrpt_query *query);
 /*
  * Query whether the datasource is array based
  */
-bool ocrpt_datasource_is_array(ocrpt_datasource *source);
+bool ocrpt_datasource_is_data(ocrpt_datasource *source);
 /*
  * Query whether the datasource is "symbolic" array based
  * (i.e. the array is passed via its name as opposed to pointer)
  */
-bool ocrpt_datasource_is_symbolic_array(ocrpt_datasource *source);
+bool ocrpt_datasource_is_symbolic_data(ocrpt_datasource *source);
 /*
  * Query whether the datasource is file based
  */
@@ -490,11 +490,11 @@ void ocrpt_query_set_discover_func(ocrpt_query_discover_func func);
 /*
  * Default discovery function for data and type arrays
  */
-extern ocrpt_query_discover_func ocrpt_query_discover_array;
+extern ocrpt_query_discover_func ocrpt_query_discover_data;
 /*
  * Discovery function for data and type arrays
  */
-void ocrpt_query_discover_array_c(const char *arrayname, void **array, int32_t *rows, int32_t *cols, const char *typesname, void **types, int32_t *types_cols, bool *free_types);
+void ocrpt_query_discover_data_c(const char *arrayname, void **array, int32_t *rows, int32_t *cols, const char *typesname, void **types, int32_t *types_cols, bool *free_types);
 /*
  * Set the print debugger function
  */

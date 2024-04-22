@@ -103,8 +103,8 @@ int main(int argc, char **argv) {
 
 	printf("--- TESTING FOLLOWER ---\n\n");
 
-	q2 = ocrpt_query_add_array(ds2, "b", (const char **)array2, ROWS, COLS, coltypes, COLS);
-	printf("ocrpt_query_add_array q2: %s\n", q2 == NULL ? "failed" : "successful");
+	q2 = ocrpt_query_add_data(ds2, "b", (const char **)array2, ROWS, COLS, coltypes, COLS);
+	printf("ocrpt_query_add_data q2: %s\n", q2 == NULL ? "failed" : "successful");
 	ocrpt_query_add_follower(q, q2);
 
 	row = 0;
@@ -147,8 +147,8 @@ int main(int argc, char **argv) {
 
 	printf("--- TESTING FOLLOWER N:1 ---\n\n");
 
-	q2 = ocrpt_query_add_array(ds2, "b", (const char **)array2, ROWS, COLS, coltypes, COLS);
-	printf("ocrpt_query_add_array q2: %s\n", q2 == NULL ? "failed" : "successful");
+	q2 = ocrpt_query_add_data(ds2, "b", (const char **)array2, ROWS, COLS, coltypes, COLS);
+	printf("ocrpt_query_add_data q2: %s\n", q2 == NULL ? "failed" : "successful");
 	qr2 = ocrpt_query_get_result(q2, &cols2);
 	err = NULL;
 	match = ocrpt_expr_parse(o, "a.id = b.id", &err);

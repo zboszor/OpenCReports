@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 	err = NULL;
 	adult = ocrpt_expr_parse(o, "a.adult", &err);
 
-	q = ocrpt_query_add_array(ds, "A", (const char **)array, ROWS, COLS, coltypes, COLS);
+	q = ocrpt_query_add_data(ds, "A", (const char **)array, ROWS, COLS, coltypes, COLS);
 	qr = ocrpt_query_get_result(q, &cols);
 	printf("Query columns:\n");
 	for (i = 0; i < cols; i++)
