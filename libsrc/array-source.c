@@ -281,16 +281,16 @@ DLL_EXPORT_SYM void ocrpt_query_set_discover_func(ocrpt_query_discover_func func
 	ocrpt_query_discover_data = func;
 }
 
-DLL_EXPORT_SYM void ocrpt_query_discover_data_c(const char *arrayname, void **array, int32_t *rows UNUSED, int32_t *cols UNUSED, const char *typesname, void **types, int32_t *types_cols UNUSED, bool *free_types) {
+DLL_EXPORT_SYM void ocrpt_query_discover_data_c(const char *dataname, void **data, int32_t *rows UNUSED, int32_t *cols UNUSED, const char *typesname, void **types, int32_t *types_cols UNUSED, bool *free_types) {
 	void *handle = dlopen(NULL, RTLD_NOW);
 
-	if (array) {
-		if (arrayname && *arrayname) {
+	if (data) {
+		if (dataname && *dataname) {
 			dlerror();
-			*array = dlsym(handle, arrayname);
+			*data = dlsym(handle, dataname);
 			dlerror();
 		} else
-			*array = NULL;
+			*data = NULL;
 	}
 	if (types) {
 		if (typesname && *typesname) {

@@ -360,12 +360,7 @@ void ocrpt_datasource_set_encoding(ocrpt_datasource *source, const char *encodin
  */
 void ocrpt_datasource_free(ocrpt_datasource *source);
 /*
- * Add a C array query using the datasource pointer
- *
- * The array's first row contains the header names
- * and the number of rows is the number of data rows,
- * i.e. it's one less than the actual number of rows
- * in array.
+ * Add a C data query using the datasource pointer
  */
 ocrpt_query *ocrpt_query_add_data(ocrpt_datasource *source,
 									const char *name, const char **data,
@@ -373,15 +368,10 @@ ocrpt_query *ocrpt_query_add_data(ocrpt_datasource *source,
 									const int32_t *types,
 									int32_t types_cols);
 /*
- * Add a "symbolic" array query using the datasource pointer
+ * Add a "symbolic" data query using the datasource pointer
  *
- * The array is automatically discovered by the datasource driver
- * from its name.
- *
- * The array's first row contains the header names
- * and the number of rows is the number of data rows,
- * i.e. it's one less than the actual number of rows
- * in array.
+ * The data and types symbols are automatically discovered
+ * by the datasource driver from their name.
  */
 ocrpt_query *ocrpt_query_add_symbolic_data(ocrpt_datasource *source,
 									const char *name,
@@ -409,12 +399,12 @@ ocrpt_datasource *ocrpt_query_get_source(const ocrpt_query *query);
 void ocrpt_query_set_private(ocrpt_query *query, const void *priv);
 void *ocrpt_query_get_private(const ocrpt_query *query);
 /*
- * Query whether the datasource is array based
+ * Query whether the datasource is data based
  */
 bool ocrpt_datasource_is_data(ocrpt_datasource *source);
 /*
- * Query whether the datasource is "symbolic" array based
- * (i.e. the array is passed via its name as opposed to pointer)
+ * Query whether the datasource is "symbolic" data based
+ * (i.e. the data is passed via its name as opposed to a pointer)
  */
 bool ocrpt_datasource_is_symbolic_data(ocrpt_datasource *source);
 /*
@@ -483,18 +473,18 @@ void ocrpt_query_navigate_use_prev_row(ocrpt_query *q);
  */
 void ocrpt_query_navigate_use_next_row(ocrpt_query *q);
 /*
- * Set the global function pointer to resolve array and type array
+ * Set the global function pointer to resolve symbols
  */
 typedef void (*ocrpt_query_discover_func)(const char *, void **, int32_t *, int32_t *, const char *, void **, int32_t *, bool *);
 void ocrpt_query_set_discover_func(ocrpt_query_discover_func func);
 /*
- * Default discovery function for data and type arrays
+ * Default discovery function for data and type symbols
  */
 extern ocrpt_query_discover_func ocrpt_query_discover_data;
 /*
- * Discovery function for data and type arrays
+ * Discovery function for data and type symbols
  */
-void ocrpt_query_discover_data_c(const char *arrayname, void **array, int32_t *rows, int32_t *cols, const char *typesname, void **types, int32_t *types_cols, bool *free_types);
+void ocrpt_query_discover_data_c(const char *dataname, void **data, int32_t *rows, int32_t *cols, const char *typesname, void **types, int32_t *types_cols, bool *free_types);
 /*
  * Set the print debugger function
  */
