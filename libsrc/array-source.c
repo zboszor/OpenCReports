@@ -231,6 +231,7 @@ static void ocrpt_array_free(ocrpt_query *query) {
 
 	struct ocrpt_array_results *result = ocrpt_query_get_private(query);
 
+	ocrpt_mem_free(result->types);
 	ocrpt_mem_free(result);
 	ocrpt_query_set_private(query, NULL);
 }
