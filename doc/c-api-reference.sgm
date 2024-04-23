@@ -973,8 +973,8 @@ ocrpt_query_discover_array_c(const char *arrayname,
 					the array and the column types array name without
 					the related dimensions, i.e. the <literal>rows</literal>
 					and <literal>cols</literal> specifiers in
-					<xref linkend="arrayqueries"/> and
-					<xref linkend="filequeries"/>.
+					<xref linkend="xmlarrayqueries"/> and
+					<xref linkend="xmlfilequeries"/>.
 				</para>
 			</sect3>
 		</sect2>

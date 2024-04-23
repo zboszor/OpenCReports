@@ -3,10 +3,11 @@ if ENABLE_DOCS
 SGMLFILES = \
 	OpenCReports.sgm \
 	introduction.sgm \
-	xmldescription.sgm \
-	breaks.sgm \
-	variables.sgm \
+	dsandqueries.sgm \
 	expressions.sgm \
+	variables.sgm \
+	breaks.sgm \
+	xmldescription.sgm \
 	formatting.sgm \
 	c-api-reference.sgm \
 	php-api-reference.sgm \

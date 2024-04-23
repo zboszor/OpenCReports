@@ -2,11 +2,12 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
 	"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
 <!ENTITY introduction SYSTEM "introduction.sgm">
+<!ENTITY dsandqueries SYSTEM "dsandqueries.sgm">
 <!ENTITY expressions SYSTEM "expressions.sgm">
-<!ENTITY xmldescription SYSTEM "xmldescription.sgm">
-<!ENTITY breaks SYSTEM "breaks.sgm">
 <!ENTITY variables SYSTEM "variables.sgm">
+<!ENTITY breaks SYSTEM "breaks.sgm">
 <!ENTITY formatting SYSTEM "formatting.sgm">
+<!ENTITY xmldescription SYSTEM "xmldescription.sgm">
 <!ENTITY c-api-reference SYSTEM "c-api-reference.sgm">
 <!ENTITY php-api-reference SYSTEM "php-api-reference.sgm">
 <!ENTITY examples SYSTEM "examples.sgm">
@@ -33,11 +34,12 @@
 	</bookinfo>
 
 	&introduction;
-	&xmldescription;
+	&dsandqueries;
 	&expressions;
-	&breaks;
 	&variables;
+	&breaks;
 	&formatting;
+	&xmldescription;
 	&c-api-reference;
 	&php-api-reference;
 	&examples;

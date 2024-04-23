@@ -1,0 +1,503 @@
+<chapter id="dsandqueries" xreflabel="Data sources and queries">
+	<title>Data sources and queries</title>
+	<sect1 id="datasources" xreflabel="Data sources">
+		<title>Data sources</title>
+		<para>
+			OpenCReport separates data access into two entities:
+			a data source driver and a query.
+		</para>
+		<para>
+			OpenCReports supports diverse data sources:
+			<itemizedlist>
+				<listitem override="bullet">
+					<para>
+						<xref linkend="sqldatasources"/>
+					</para>
+				</listitem>
+				<listitem override="bullet">
+					<para>
+						<xref linkend="filedatasources"/>
+					</para>
+				</listitem>
+				<listitem override="bullet">
+					<para>
+						<xref linkend="datadatasource"/>
+					</para>
+				</listitem>
+				<listitem override="bullet">
+					<para>
+						<xref linkend="appdefinedds"/>
+					</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+		<sect2 id="sqldatasources" xreflabel="SQL based data sources">
+			<title>SQL based data sources</title>
+			<para>
+				SQL is the acronym for Standard Query Language.
+				Many database software comply with the standard
+				to a certain extent. The standard is occasionally
+				revised, and a certain database software version
+				complies to a specific version of the standard
+				to a certain extent.
+			</para>
+			<para>
+				In general, database software are designed to
+				store massive amounts of data and retrieve it
+				as fast as possible. Database software and its data
+				can be accessed through a network connection
+				(even if it's installed in the same machine) or
+				a faster local connection if both the database server
+				and client are installed on the same computer.
+			</para>
+			<para>
+				The SQL based data sources OpenCReports natively
+				supports are:
+				<itemizedlist>
+					<listitem override="bullet">
+						<para>
+							<ulink url="https://mariadb.org/">MariaDB</ulink>
+							and <ulink url="https://www.mysql.com/">MySQL</ulink>
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<ulink url="https://www.postgresql.org/">PostgreSQL</ulink>
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							Any SQL database server with a compliant
+							<ulink url="https://learn.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc">ODBC</ulink>
+							driver
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<sect3 id="mariadbsource" xreflabel="MariaDB/MySQL data source">
+				<title>MariaDB/MySQL data source</title>
+				<para>
+					<ulink url="https://mariadb.org/">MariaDB</ulink>
+					is a fork of <ulink url="https://www.mysql.com/">MySQL</ulink>
+					developing in a different direction but still
+					maintaining strong compatibility with each other.
+					The database client library is compatible with both,
+					therefore OpenCReports supports both with the same
+					driver.
+				</para>
+			</sect3>
+			<sect3 id="postgressource" xreflabel="PostgreSQL data source">
+				<title>PostgreSQL data source</title>
+				<para>
+					<ulink url="https://www.postgresql.org/">PostgreSQL</ulink>
+					(in their own words) is The World's Most Advanced Open
+					Source Relational Database. OpenCReports supports using
+					PostgreSQL.
+				</para>
+				<para>
+					The PostgreSQL datasource driver in OpenCReports is
+					especially economic with memory by using a
+					<ulink url="https://www.postgresql.org/docs/current/sql-declare.html"><literal>WITH HOLD cursor</literal></ulink>
+					and the PostgreSQL specific
+					<ulink url="https://www.postgresql.org/docs/current/sql-fetch.html"><literal>FETCH count</literal></ulink>
+					SQL statement to retrieve a specified number of rows in
+					one round, as opposed to retrieving every row in one
+					round that most database software supports.
+				</para>
+				<para>
+					This makes the report run slower for longer query results
+					compared to other databases, but allows generating the report
+					from extremely large datasets when other databases may
+					fail due to memory exhaustion.
+				</para>
+			</sect3>
+			<sect3 id="odbcsource" xreflabel="ODBC data source">
+				<title>ODBC data source</title>
+				<para>
+					OpenCReports supports using a generic ODBC connection
+					to any database servers using a compliant client driver.
+					OpenCReports uses a standard ODBC manager library,
+					so it is able to use any ODBC DSN (Data Source Name)
+					configured for the system or the user.
+				</para>
+			</sect3>
+			<sect3 id="sqldsnotes">
+				<title>Special note for SQL datasources</title>
+				<para>
+					The database client libraries for MariaDB,
+					PostgreSQL and ODBC return all the query rows
+					from the database server at once by default.
+					As such, it is possible that a long query result
+					doesn't fit into the computer memory.
+				</para>
+				<para>
+					The report needs to traverse the query result twice
+					to pre-compute "delayed" values (see
+					<xref linkend="precalcexpr"/> and
+					<xref linkend="precalcvar"/>),
+					so it needs to be able to rewind the data set
+					once it was read to the end.
+				</para>
+				<para>
+					The alternative API in MariaDB to load the rows one by
+					one doesn't allow rewinding, so it's not usable
+					for the report's purposes.
+				</para>
+				<para>
+					It is only PostgreSQL that allows using an
+					<emphasis>SQL cursor</emphasis> as a standalone entity,
+					i.e. outside SQL procedures as defined by the SQL
+					standard. This PostgreSQL extension to the standard
+					allows saving memory in such a way that it allows
+					processing very long query results. Behind the scenes,
+					a <literal>WITH HOLD</literal> cursor is used and
+					1024 rows are loaded in one go from the server.
+				</para>
+			</sect3>
+		</sect2>
+		<sect2 id="filedatasources" xreflabel="File based data sources">
+			<title>File based data sources</title>
+			<para>
+				The file based data sources OpenCReports supports are:
+				<itemizedlist>
+					<listitem override="bullet">
+						<para>
+							<ulink url="https://en.wikipedia.org/wiki/Comma-separated_values">Comma-separated values</ulink>
+							a.k.a. <literal>CSV</literal>
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<ulink url="https://en.wikipedia.org/wiki/XML">eXtensible Markup Language</ulink>
+							a.k.a. <literal>XML</literal>
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<ulink url="https://en.wikipedia.org/wiki/JSON">JavaScript Object Notation</ulink>
+							a.k.a. <literal>JSON</literal>
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				The <literal>XML</literal> and <literal>JSON</literal>
+				file types expect the data presented in a certain
+				structure <emphasis>syntax</emphasis>. The
+				<emphasis>semantics</emphasis> is application defined.
+				The expected format for these file types are described
+				below.
+			</para>
+			<sect3 id="csvds" xreflabel="CSV file type">
+				<title>CSV file type</title>
+				<para>
+					CSV ("Comma Separated Values") is a simple tabulated
+					file format. Every line must have the same number of
+					columns, the values are separated by commas.
+					The first line in the file contains the column names.
+				</para>
+				<para>
+					Using only the CSV file, the data type cannot be
+					determined. Because of this, every column is assumed
+					to be a string, regardless if the values themselves
+					are quoted or not in the file. Data conversion functions
+					must be used, see for example <xref linkend="valfunc"/>,
+					<xref linkend="stodtfunc"/> and
+					<xref linkend="intervalfunc"/>.
+				</para>
+				<para>
+					Using either report XML description or programming code,
+					an optional set of type indicators may be added along
+					with the CSV input file, so the explicit conversion
+					functions may be omitted from expressions using the data.
+				</para>
+			</sect3>
+			<sect3 id="jsonds" xreflabel="JSON file type">
+				<title>JSON file type</title>
+				<para>
+					A JSON file is expected in this format:
+					<programlisting>{
+	"columns": ["colname1", ... ],
+	"coltypes": ["type", ... ],
+	"rows": [
+		{ "colname1": value1, ...  },
+		...
+	]
+}</programlisting>
+				</para>
+				<para>
+					The JSON file is expected to list the column
+					names in a string array called <literal>columns</literal>.
+				</para>
+				<para>
+					The column types are optionally listed in the string
+					array called <literal>coltypes</literal>. If they are
+					listed, the <literal>coltypes</literal> array must have
+					the same number of strings as the <literal>columns</literal>
+					array. The type names are <literal>string</literal>,
+					<literal>number</literal> or <literal>datatime</literal>.
+					If the column type array is missing, then all data
+					values are assumed to be strings and data conversion
+					functions must be used, see for example
+					<xref linkend="valfunc"/>,
+					<xref linkend="stodtfunc"/> and
+					<xref linkend="intervalfunc"/>.
+				</para>
+				<para>
+					The data rows are listed in a <emphasis>JSON array</emphasis>
+					called <literal>rows</literal> and column data values for
+					each row are in a <emphasis>JSON collection</emphasis> with
+					data names from the <literal>columns</literal> and
+					data types from the <literal>coltypes</literal> arrays.
+				</para>
+				<para>
+					The sections <literal>columns</literal>,
+					<literal>coltypes</literal> and
+					<literal>rows</literal> may appear in any order.
+				</para>
+				<para>
+					When the <literal>coltypes</literal> part is missing
+					from the JSON input file, then using either report XML
+					description or programming code, an optional set of type
+					indicators may be added along with the JSON input file,
+					so the explicit conversion functions may be omitted from
+					expressions using the data.
+				</para>
+			</sect3>
+			<sect3 id="xmlds" xreflabel="XML file type">
+				<title>XML file type</title>
+				<para>
+					An XML file datasource is expected in this format:
+					<programlisting>&lt;?xml version="1.0"?&gt;
+&lt;data&gt;
+	&lt;rows&gt;
+		&lt;row&gt;
+			&lt;col&gt;value&lt;/col&gt;
+			...
+		&lt;/row&gt;
+		...
+	&lt;/rows&gt;
+	&lt;fields&gt;
+		&lt;field&gt;column1&lt;/field&gt;
+		...
+	&lt;/fields&gt;
+	&lt;coltypes&gt;
+		&lt;col&gt;type1&lt;/col&gt;
+		...
+	&lt;/coltypes&gt;
+&lt;/data&gt;</programlisting>
+					The XML section names <literal>&lt;data&gt;</literal>,
+					<literal>&lt;rows&gt;</literal> and
+					<literal>&lt;fields&gt;</literal>
+					are the same as they were in RLIB for its XML data
+					source. The order of <literal>&lt;rows&gt;</literal>
+					and <literal>&lt;fields&gt;</literal> is not important.
+					But the order of field names in <literal>&lt;fields&gt;</literal>
+					must match the column value order in each
+					<literal>&lt;row&gt;</literal>.
+				</para>
+				<para>
+					The optional section &lt;coltypes&gt; is new in
+					OpenCReports. If it's present, then it must list
+					the data types in the same order as section
+					<literal>&lt;fields&gt;</literal>.
+					The types may be <literal>string</literal>,
+					<literal>number</literal> or <literal>datatime</literal>.
+					If this section is not present, all values are assumed
+					to be strings and data conversion functions must be
+					used, see for example
+					<xref linkend="valfunc"/>,
+					<xref linkend="stodtfunc"/> and
+					<xref linkend="intervalfunc"/>.
+				</para>
+				<para>
+					When the <literal>coltypes</literal> part is missing
+					from the XML input file, then using either report XML
+					description or programming code, an optional set of type
+					indicators may be added along with the XML input file,
+					so the explicit conversion functions may be omitted from
+					expressions using the data.
+				</para>
+			</sect3>
+		</sect2>
+		<sect2 id="datadatasource" xreflabel="Application data based data source">
+			<title>Application data based datasource</title>
+			<para>
+				Applications may also have internal data that can be used
+				as input for OpenCReports.
+			</para>
+			<para>
+				OpenCReports supports using two-dimensional C arrays as directly
+				accessible application data. Such arrays must be declared as
+				<programlisting>char *array[ROWS][COLUMNS]</programlisting>
+				or converted to it if using OpenCReports from a different
+				language. Each element is a pointer to a zero-terminated
+				C string. The first row contains the names of columns.
+			</para>
+			<para>
+				Optionally, a set of type indicators may be supplied,
+				similarly to the <xref linkend="filedatasources"/>.
+			</para>
+		</sect2>
+		<sect2 id="appdefinedds" xreflabel="Application defined data sources">
+			<title>Application defined data sources</title>
+			<para>
+				OpenCReports allows application defined datasource
+				drivers that may even override built-in datasource
+				drivers.
+			</para>
+			<para>
+				An application defined data source may be any of the
+				previously listed types: SQL, file or data based.
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="queries" xreflabel="Queries">
+		<title>Queries</title>
+		<para>
+			Queries are the actual providers of tabular data.
+			They use specific data source drivers.
+		</para>
+		<para>
+			Queries have unique names associated with them.
+			This allows using multiple queries that have identical
+			field (or column) names. See <xref linkend="queryidents"/>
+		</para>
+		<sect2 id="sqlqueries" xreflabel="SQL queries">
+			<title>SQL queries</title>
+			<para>
+				An SQL query uses an SQL data source. An SQL query
+				provides tabular data in rows and columns. The columns
+				have names. One row of data is made up from individual
+				values in columns.
+			</para>
+			<para>
+				Examples:
+				<programlisting>SELECT * FROM table1;</programlisting>
+				<programlisting>SELECT column1, column2 FROM table1;</programlisting>
+			</para>
+			<para>
+				For more information, read the specific database server
+				documentation you intend to use.
+			</para>
+		</sect2>
+		<sect2 id="filequeries" xreflabel="File queries">
+			<title>File queries</title>
+			<para>
+				File queries specify the file name and path
+				on the computer. OpenCReports then loads the
+				file into memory and processes it to present
+				data on the report.
+			</para>
+		</sect2>
+		<sect2 id="dataqueries" xreflabel="Data queries">
+			<title>Data queries</title>
+			<para>
+				Data queries pass the internal data.
+				OpenCReports processes it to present data on the report.
+			</para>
+		</sect2>
+		<sect2 id="queryrelations" xreflabel="Relation between queries">
+			<title>Relation between queries</title>
+			<para>
+				Reports may use one or more queries.
+				If a report uses more queries, one of them
+				must be the report's <emphasis>primary query</emphasis>.
+			</para>
+			<para>
+				Supplementary queries are either
+				<emphasis>followers</emphasis> of the primary query,
+				or <emphasis>independent queries</emphasis>
+			</para>
+			<sect3 id="followerqueries" xreflabel="Follower queries">
+				<title>Follower queries</title>
+				<para>
+					Supplementary queries may be associated with the
+					primary query as so called <emphasis>follower</emphasis>
+					queries. Any query may be a follower to the primary query.
+				</para>
+				<para>
+					There are two kinds of follower queries:
+					<itemizedlist>
+						<listitem override="bullet">
+							<para>
+								regular, or basic follower queries, and
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								so called N:1 (N-to-one) followers
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+				<sect4 id="followerq">
+					<title>Regular follower queries</title>
+					<para>
+						A follower query is run along the primary query and
+						their rows are laid out side by side. The first row
+						of the follower query is assigned the first row of the
+						primary query. The second row of the follower query
+						is assigned to the second row of the primary query,
+						and so on. The number of rows of the complete data
+						set is determined by the primary query. If the
+						follower query runs out of rows before the primary,
+						the columns values will be presented as empty data,
+						i.e. SQL NULLs.
+					</para>
+					<para>
+						This is similar to using <literal>LEFT OUTER JOIN</literal>
+						and using <literal>ROWNUM</literal> in Oracle or
+						the <literal>row_number()</literal> SQL function
+						in PostgreSQL as the matching value between the
+						primary query and the follower query.
+					</para>
+				</sect4>
+				<sect4 id="n1followerq">
+					<title>N:1 follower queries</title>
+					<para>
+						An N:1 follower query, for all intents and
+						purposes, is the right side query in a
+						<literal>LEFT OUTER JOIN</literal> query, with
+						the primary query on the left side. Rows of the
+						main query and the follower query are matched
+						according to a specified boolean expression.
+					</para>
+				</sect4>
+				<sect4 id="followernotes">
+					<title>Note on follower queries</title>
+					<para>
+						One of the use cases of follower queries is
+						to use data from different datasources.
+						Nowadays, with foreign queries standardized in
+						SQL and more database servers implement it in
+						a performant manner, its use case is more limited.
+						Still, using data from different file based
+						datasources, or using from an SQL database server
+						and from a file based datasource at the same time
+						is possible with OpenCReports.
+					</para>
+				</sect4>
+			</sect3>
+			<sect3 id="independentqueries" xreflabel="Independent queries">
+				<title>Independent queries</title>
+				<para>
+					Multiple queries may be declared for a report.
+					If a query is neither set as a follower for a previously
+					declared query, nor set as the report's main query,
+					then it is an independent query.
+				</para>
+				<para>
+					Independent queries will stay on their first row
+					during the report run, so they can be considered
+					constant.
+				</para>
+				<para>
+					Therefore, column references of independent queries
+					may be used in expressions that would need a constant
+					value.
+				</para>
+			</sect3>
+		</sect2>
+	</sect1>
+</chapter>

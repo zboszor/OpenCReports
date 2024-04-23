@@ -1,6 +1,6 @@
-<chapter id="xmldescriptor" xreflabel="XML description">
-	<title>Report XML description</title>
-	<sect1 id="descstruct">
+<chapter id="xmldescriptor" xreflabel="Report XML description">
+	<title>Report XML description</title> <sect1
+	id="descstruct">
 		<title>XML description structure</title>
 		<para>
 			<ulink url="https://github.com/zboszor/OpenCReports">OpenCReports</ulink>
@@ -54,8 +54,8 @@
 &lt;/OpenCReport&gt;</programlisting>
 		</para>
 		<para>
-			The XML sections <xref linkend="datasources"/>
-			and <xref linkend="queries"/> are optional in the XML
+			The XML sections <xref linkend="datasourcesnode"/>
+			and <xref linkend="queriesnode"/> are optional in the XML
 			description. They can be substituted by program code
 			using the datasource and query related calls in the
 			<xref linkend="lowlevelapi"/>, similarly to RLIB.
@@ -71,10 +71,11 @@
 		<para>
 			Since XML files are hierarchical with a single toplevel
 			node with child nodes, multiple
-			<literal>&lt;Report&gt;</literal>s were only possible
-			if using <literal>&lt;Part&gt;</literal> as the
-			toplevel node with all the nodes having to be spelled
-			out between <literal>&lt;Part&gt;</literal> and
+			<literal>&lt;Report&gt;</literal> nodes in the same
+			report output were only possible in RLIB with using
+			<literal>&lt;Part&gt;</literal> as the toplevel node,
+			with all the nodes having to be spelled out between
+			<literal>&lt;Part&gt;</literal> and
 			<literal>&lt;Report&gt;</literal>. With
 			<literal>&lt;OpenCReport&gt;</literal> being the
 			toplevel node, multiple <literal>&lt;Report&gt;</literal>
@@ -235,13 +236,13 @@
 		<sect2 id="noqueryshownodata" xreflabel="No query show NoData attribute">
 			<title>No query show NoData</title>
 			<para>
-				The report uses data from <xref linkend="queries"/>
+				The report uses data from <xref linkend="queriesnode"/>
 				through the report's <xref linkend="queryattr"/>.
 				When a query provides no data rows, an alternative section
 				called <xref linkend="nodatanode"/> with static information
 				may be shown instead if it exists in the report.
 				The report uses the first query declared in
-				<xref linkend="queries"/> if it's not explicitly set
+				<xref linkend="queriesnode"/> if it's not explicitly set
 				via <xref linkend="queryattr"/>.
 			</para>
 			<para>
@@ -286,7 +287,7 @@
 		<sect2 id="xmlfollowermatchsingle" xreflabel="Follower match single attribute">
 			<title>Follower match single</title>
 			<para>
-				<xref linkend="queries"/> may be daisy-chained together
+				<xref linkend="queriesnode"/> may be daisy-chained together
 				as <xref linkend="followerqueries"/> in two ways, regular
 				and N:1 followers. See the links for details.
 			</para>
@@ -405,7 +406,7 @@
 &lt;/Paths&gt;</programlisting>
 		</para>
 	</sect1>
-	<sect1 id="datasources" xreflabel="Datasources">
+	<sect1 id="datasourcesnode" xreflabel="Datasources">
 		<title>Datasources</title>
 		<para>
 			Datasources in OpenCReports are either database
@@ -580,13 +581,11 @@ user=myuser
 				<ulink url="https://www.connectionstrings.com/">public examples</ulink>.
 			</para>
 		</sect2>
-		<sect2 id="csvds">
+		<sect2 id="xmlcsvds">
 			<title>CSV file datasource</title>
 			<para>
-				CSV ("Comma Separated Values") is a simple tabulated
-				file format. Every line must have the same number of
-				columns, for which the values are separated by commas.
-				The first line in the file contains the column names.
+				For a generic description of the CSV file format,
+				see <xref linkend="csvds"/>.
 			</para>
 			<para>
 				A CSV file datasource is declared very simply:
@@ -595,18 +594,13 @@ user=myuser
 				only that a "query" using a CSV file will be listed
 				later under <literal>&lt;Queries&gt;</literal>.
 			</para>
-			<para>
-				This datasource is less smart than others, in that
-				is cannot specify data type for columns. Every column
-				is assumed to be a string, regardless if the values
-				themselves are quoted or not in the file. Data
-				conversion functions must be used, like
-				<literal>val()</literal>, <literal>stodt()</literal>
-				or <literal>interval()</literal>.
-			</para>
 		</sect2>
-		<sect2 id="jsonds" xreflabel="JSON file datasource">
+		<sect2 id="xmljsonds">
 			<title>JSON file datasource</title>
+			<para>
+				For a generic description of the expected JSON file format,
+				see <xref linkend="jsonds"/>.
+			</para>
 			<para>
 				Similarly to CSV, the JSON file datasource is also declared
 				very simply:
@@ -615,41 +609,8 @@ user=myuser
 				only that a "query" using a JSON file will be listed
 				later under <literal>&lt;Queries&gt;</literal>.
 			</para>
-			<para>
-				A JSON file datasource is expected in this format:
-				<programlisting>{
-    "columns": ["colname1", ... ],
-    "coltypes": ["type", ... ],
-    "rows": [
-	    { "colname1": value1, ...  },
-        ...
-    ]
-}</programlisting>
-			</para>
-			<para>
-				The JSON file is expected to list the column
-				names in a string array called <literal>columns</literal>.
-			</para>
-			<para>
-				The column types are optionally listed in the string
-				array called <literal>coltypes</literal>. If they are
-				listed, the <literal>coltypes</literal> array must have
-				the same number of strings as the <literal>columns</literal>
-				array. The types may be <literal>string</literal>,
-				<literal>number</literal> or <literal>datatime</literal>.
-				If the column type array is missing, then all data
-				values are assumed to be strings and data conversion
-				functions must be used, like <literal>val()</literal>,
-				<literal>stodt()</literal> or <literal>interval()</literal>.
-			</para>
-			<para>
-				The rows are listed in an array called <literal>rows</literal>
-				and column data values for each row are in a collection
-				with data names from the <literal>columns</literal> and
-				data types from the <literal>coltypes</literal> arrays.
-			</para>
 		</sect2>
-		<sect2 id="xmlds" xreflabel="XML file datasource">
+		<sect2 id="xmlxmlds">
 			<title>XML file datasource</title>
 			<para>
 				Similarly to CSV and JSON, the XML file datasource is also declared
@@ -658,48 +619,6 @@ user=myuser
 				In this case, the actual XML file is not declared,
 				only that a "query" using an XML file will be listed
 				later under <literal>&lt;Queries&gt;</literal>.
-			</para>
-			<para>
-				An XML file datasource is expected in this format:
-				<programlisting>&lt;?xml version="1.0"?&gt;
-&lt;data&gt;
-    &lt;rows&gt;
-        &lt;row&gt;
-            &lt;col&gt;value&lt;/col&gt;
-            ...
-        &lt;/row&gt;
-        ...
-    &lt;/rows&gt;
-    &lt;fields&gt;
-        &lt;field&gt;column1&lt;/field&gt;
-        ...
-    &lt;/fields&gt;
-    &lt;coltypes&gt;
-        &lt;col&gt;type1&lt;/col&gt;
-        ...
-    &lt;/coltypes&gt;
-&lt;/data&gt;</programlisting>
-				The XML section names <literal>&lt;data&gt;</literal>,
-				<literal>&lt;rows&gt;</literal> and
-				<literal>&lt;fields&gt;</literal>
-				are the same as they were in RLIB for its XML data
-				source. The order of <literal>&lt;rows&gt;</literal>
-				and <literal>&lt;fields&gt;</literal> is not important.
-				But the order of field names in <literal>&lt;fields&gt;</literal>
-				must match the column value order in each
-				<literal>&lt;row&gt;</literal>.
-			</para>
-			<para>
-				The section &lt;coltypes&gt; is new in OpenCReports and
-				is optional. If it's present, then it must list
-				the data types in the same order as the section
-				<literal>&lt;fields&gt;</literal>.
-				The types may be <literal>string</literal>,
-				<literal>number</literal> or <literal>datatime</literal>.
-				If this section is not present, all values are assumed
-				to be strings and data conversion functions must be
-				used, like <literal>val()</literal>, <literal>stodt()</literal>
-				or <literal>interval()</literal>.
 			</para>
 		</sect2>
 		<sect2 id="arrayds">
@@ -773,7 +692,7 @@ const enum ocrpt_result_type coltypes[COLUMNS] = {
 			</sect3>
 		</sect2>
 	</sect1>
-	<sect1 id="queries" xreflabel="Queries">
+	<sect1 id="queriesnode" xreflabel="Queries">
 		<title>Queries</title>
 		<para>
 			Queries in OpenCReports are SQL queries for database
@@ -784,7 +703,7 @@ const enum ocrpt_result_type coltypes[COLUMNS] = {
     ...
 &lt;/Queries&gt;</programlisting>
 		</para>
-		<sect2 id="sqlqueries">
+		<sect2 id="xmlsqlqueries">
 			<title>SQL queries for SQL datasources</title>
 			<para>
 				SQL queries for MariaDB, PostgreSQL and ODBC
@@ -809,41 +728,8 @@ SELECT * FROM some_table
 				The SQL query can be any <literal>SELECT</literal>
 				statement.
 			</para>
-			<sect3 id="sqldsnotes">
-				<title>Special note for SQL datasources</title>
-				<para>
-					The database client libraries for MariaDB,
-					PostgreSQL and ODBC return all the query rows
-					from the database server at once by default.
-					As such, it is possible that a long query result
-					doesn't fit into the computer memory.
-				</para>
-				<para>
-					The report needs to traverse the query result twice
-					to pre-compute "delayed" values (see
-					<xref linkend="precalcexpr"/> and
-					<xref linkend="precalcvar"/>),
-					so it needs to be able to rewind the data set
-					once it was read to the end.
-				</para>
-				<para>
-					The alternative API in MariaDB to load the rows one by
-					one doesn't allow rewinding, so it's not usable
-					for the report's purposes.
-				</para>
-				<para>
-					It is only PostgreSQL that allows using an
-					<emphasis>SQL cursor</emphasis> as a standalone entity,
-					i.e. outside SQL procedures as defined by the SQL
-					standard. This PostgreSQL extension to the standard
-					allows saving memory in such a way that it allows
-					processing very long queries. Behind the scenes,
-					a <literal>WITH HOLD</literal> cursor is used and
-					1024 rows are loaded in one go from the server.
-				</para>
-			</sect3>
 		</sect2>
-		<sect2 id="filequeries" xreflabel="File based queries">
+		<sect2 id="xmlfilequeries" xreflabel="File based queries">
 			<title>Queries for file based datasources</title>
 			<para>
 				Queries for CSV, XML and JSON datasources may
@@ -893,13 +779,13 @@ SELECT * FROM some_table
 							with a memory array using the optional
 							<literal>coltypes="..."</literal> and
 							<literal>cols="..."</literal> attributes.
-							For details, see the <xref linkend="arrayqueries"/>.
+							For details, see the <xref linkend="xmlarrayqueries"/>.
 						</para>
 					</listitem>
 				</itemizedlist>
 			</para>
 		</sect2>
-		<sect2 id="arrayqueries" xreflabel="Array queries">
+		<sect2 id="xmlarrayqueries" xreflabel="Array queries">
 			<title>Queries for array based datasources</title>
 			<para>
 				Queries for array datasources may be declared two ways.
@@ -984,124 +870,58 @@ SELECT * FROM some_table
 				or wrong data to be used in the report.
 			</para>
 		</sect2>
-		<sect2 id="followerqueries" xreflabel="Follower queries">
+		<sect2 id="xmlfollowerqueries" xreflabel="Follower queries">
 			<title>Follower queries</title>
-			<para>
-				Multiple queries may be declared for a report.
-				But by default, only the first one is actually
-				used by a report.
-			</para>
-			<para>
-				Secondary queries may be associated with the
-				primary query as so called "follower" queries.
-				Any query may be a follower to the primary query.
-			</para>
-			<para>
-				There are two kinds of follower queries:
-				<itemizedlist>
-					<listitem override="bullet">
-						<para>
-							regular, or basic follower queries, and
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							so called N:1 (N-to-one) followers in RLIB
-							speak.
-						</para>
-					</listitem>
-				</itemizedlist>
-			</para>
-			<sect3 id="followerq">
+			<sect3 id="xmlfollowerq" xreflabel="Regular follower queries">
 				<title>Regular follower queries</title>
-				<para>
-					A follower query is run along the primary query and
-					their rows are laid out side by side. The first row
-					of the follower query is assigned the first row of the
-					primary query. The second row of the follower query
-					is assigned to the second row of the primary query,
-					and so on. The number of rows of the complete data
-					set is determined by the primary query. If the
-					follower query runs out of rows before the primary,
-					the columns values will be presented as SQL NULLs.
-				</para>
-				<para>
-					This is similar to using <literal>LEFT OUTER JOIN</literal>
-					and using <literal>ROWNUM</literal> in Oracle or
-					the <literal>row_number()</literal> SQL function
-					in PostgreSQL as the matching value between the
-					primary query and the follower query.
-				</para>
-				<para>
-					A regular follower query is declared by adding
-					the <literal>follower_for="..."</literal> attribute.
-					The value for <literal>follower_for="..."</literal>
-					is the <literal>name</literal> of a previously
-					declared query. Example:
-					<programlisting>&lt;Query
-    name="myquery1"
-    datasource="mysource1"
-    value="'SELECT * FROM table1'" /&gt;
+					<para>
+						A regular follower query is declared by adding
+						the <literal>follower_for="..."</literal> attribute.
+						The value for <literal>follower_for="..."</literal>
+						is the <literal>name</literal> of a previously
+						declared query. Example:
+						<programlisting>&lt;Query
+		name="myquery1"
+		datasource="mysource1"
+		value="'SELECT * FROM table1'" /&gt;
 
-&lt;Query
-    name="myquery2"
-    datasource="mysource2"
-    value="'SELECT * FROM table1'"
-    follower_for="myquery1" /&gt;</programlisting>
-				</para>
-				<para>
-					In this example, two queries of two different
-					datasources are used. This is one of the advantages
-					of using follower queries, i.e. data from different
-					databases may be used. Nowadays, with foreign
-					queries implemented in e.g. PostgreSQL, its use
-					case is more limited.
-				</para>
+	&lt;Query
+		name="myquery2"
+		datasource="mysource2"
+		value="'SELECT * FROM table1'"
+		follower_for="myquery1" /&gt;</programlisting>
+					</para>
+					<para>
+						In this example, two queries of two different
+						datasources are used. This is one of the advantages
+						of using follower queries, i.e. data from different
+						databases may be used. Nowadays, with foreign
+						queries implemented in e.g. PostgreSQL, its use
+						case is more limited.
+					</para>
 			</sect3>
-			<sect3 id="n1followerq">
+			<sect3 id="xmln1followerq">
 				<title>N:1 follower queries</title>
 				<para>
-					An N:1 follower query, for all intents and
-					purposes, is the right side query in a
-					<literal>LEFT OUTER JOIN</literal> query, with
-					the primary query on the left side. Rows of the
-					main query and the follower query are matched
-					according to the boolean expression specified
+					See <xref linkend="n1followerq"/> for explanation.
+				</para>
+				<para>
+					The follower matching expression is specified
 					with the <literal>follower_expr="..."</literal>
 					attribute. Example:
 					<programlisting>&lt;Query
-    name="myquery1"
-    datasource="mysource1"
-    value="'SELECT * FROM table1'" /&gt;
+	name="myquery1"
+	datasource="mysource1"
+	value="'SELECT * FROM table1'" /&gt;
 
 &lt;Query
-    name="myquery2"
-    datasource="mysource2"
-    value="'SELECT * FROM table1'"
-    follower_for="myquery1"
-    follower_expr="myquery1.id = myquery2.id" /&gt;</programlisting>
+	name="myquery2"
+	datasource="mysource2"
+	value="'SELECT * FROM table1'"
+	follower_for="myquery1"
+	follower_expr="myquery1.id = myquery2.id" /&gt;</programlisting>
 				</para>
 			</sect3>
-		</sect2>
-		<sect2 id="independentqueries" xreflabel="Independent queries">
-			<title>Independent queries</title>
-			<para>
-				Multiple queries may be declared in a report
-				XML description. If a query is neither set as a follower
-				for a previously declared query, nor set as a
-				<literal>&lt;Report&gt;</literal>'s main query via the
-				<literal>query="..."</literal> attribute, then it is an
-				independent query.
-			</para>
-			<para>
-				Independent queries will stay on their first row
-				during the run of <literal>&lt;Report&gt;</literal>s.
-			</para>
-			<para>
-				Column references of independent queries may be used
-				by node attributes that would need a constant expression
-				otherwise.
-			</para>
 		</sect2>
 	</sect1>
 	<sect1 id="parts" xreflabel="Report parts">
@@ -2029,12 +1849,12 @@ SELECT * FROM some_table
 				<title>Query</title>
 				<para>
 					Set the primary query name for <literal>&lt;Report&gt;</literal>
-					from the list of <xref linkend="queries"/>.
+					from the list of <xref linkend="queriesnode"/>.
 					<programlisting>&lt;Report query="query1"&gt;</programlisting>
 				</para>
 				<para>
 					Default value is unset, i.e. use the first
-					query from the list of <xref linkend="queries"/>.
+					query from the list of <xref linkend="queriesnode"/>.
 				</para>
 				<para>
 					Column references of the report's primary query
@@ -2362,7 +2182,7 @@ SELECT * FROM some_table
 				<para>
 					When the <xref linkend="reportqueryname"/>
 					does not exist in in the global list of
-					<xref linkend="queries"/> and the
+					<xref linkend="queriesnode"/> and the
 					<xref linkend="noqueryshownodata"/> is set, then
 					the <literal>&lt;NoData&gt;</literal> section
 					is not displayed.
@@ -2520,6 +2340,167 @@ SELECT * FROM some_table
 					when the base type needs to be something else
 					then a number. See below.
 				</para>
+				<sect4 id="xmlvarexamples" xreflabel="Complete variable examples">
+					<title>Complete variable examples</title>
+					<para>
+						Here's a complete example of an expression variable:
+						<programlisting>&lt;Report&gt;
+    &lt;Variables&gt;
+        &lt;Variable
+            name="var1"
+            value="query1.field1 + query2.field2"
+            type="expression" /&gt;
+    &lt;/Variables&gt;
+
+    &lt;Detail&gt;
+        &lt;FieldHeaders&gt;
+            &lt;literal value="'My variable'" /&gt;
+        &lt;/FieldHeaders&gt;
+
+        &lt;FieldDetails&gt;
+            &lt;field value="v.var1" /&gt;
+        &lt;/FieldDetails&gt;
+    &lt;/Detail&gt;
+&lt;/Report&gt;</programlisting>
+					</para>
+					<para>
+						Note, that in this simple example, there is
+						no difference if the variable is used in
+						the <literal>&lt;field&gt;</literal> or the
+						<literal>query1.field1 + query2.field2</literal>
+						expression. The efficiency of not computing
+						the variable again for the same data row can be
+						observed when the variable is used multiple times
+						and the report processes a huge data set.
+					</para>
+					<para>
+						Here's a complete example of using a variable:
+						<programlisting>&lt;Report&gt;
+    &lt;Variables&gt;
+        &lt;Variable
+            name="var1"
+            value="r.self + query1.field1 + query2.field2"
+            type="expression" /&gt;
+    &lt;/Variables&gt;
+
+    &lt;Detail&gt;
+        &lt;FieldHeaders&gt;
+            &lt;literal value="'My variable'" /&gt;
+        &lt;/FieldHeaders&gt;
+
+        &lt;FieldDetails&gt;
+            &lt;field value="v.var1" /&gt;
+        &lt;/FieldDetails&gt;
+    &lt;/Detail&gt;
+&lt;/Report&gt;</programlisting>
+					</para>
+					<para>
+						The trick is to use the <literal>r.self</literal>
+						internal variable.
+					</para>
+					<para>
+						Please note, that the above example will
+						not work as is, because for the first row,
+						<emphasis>there is no previous row</emphasis>.
+						But there is a trick to avoid such problems,
+						namely using the trinary operator (or its equivalent,
+						the <literal>iif()</literal> function) and the
+						<literal>rownum()</literal> to perform only safe
+						computations. (Note that the <literal>value=...</literal>
+						part below is a single line.)
+						<programlisting>&lt;Variable&gt;
+    ...
+    value="rownum() == 1 ?
+           query1.field1 + query2.field2 :
+           r.self + query1.field1 + query2.field2"
+    ...
+&lt;/Variable&gt;</programlisting>
+					</para>
+					<para>
+						This example shows the correct operation of
+						an iterative expression. For the first row,
+						set a known good value. For every subsequent rows,
+						the previous row value may be used for deriving
+						the new value from.
+					</para>
+					<para>
+						The above spelled out example can also be written
+						as a <literal>sum</literal>ming variable:
+						<programlisting>&lt;Report&gt;
+    &lt;Variables&gt;
+        &lt;Variable
+            name="var1"
+            value="query1.field1 + query2.field2"
+            type="sum" /&gt;
+    &lt;/Variables&gt;
+
+    &lt;Detail&gt;
+        &lt;FieldHeaders&gt;
+            &lt;literal value="'My variable'" /&gt;
+        &lt;/FieldHeaders&gt;
+
+        &lt;FieldDetails&gt;
+            &lt;field value="v.var1" /&gt;
+        &lt;/FieldDetails&gt;
+    &lt;/Detail&gt;
+&lt;/Report&gt;</programlisting>
+					</para>
+					<para>
+						Here are two examples of the 
+						<literal>count</literal> and
+						<literal>countall</literal> variable types:
+						<programlisting>&lt;Report&gt;
+    &lt;Variables&gt;
+        &lt;Variable
+            name="var1"
+            value="query1.field1"
+            type="count" /&gt;
+
+        &lt;Variable
+            name="var2"
+            value="query1.field1"
+            type="countall" /&gt;
+    &lt;/Variables&gt;
+&lt;/Report&gt;</programlisting>
+					</para>
+					<para>
+						Here are two examples of using the
+						<literal>average</literal> and
+						<literal>averageall</literal>
+						variable types:
+						<programlisting>&lt;Report&gt;
+    &lt;Variables&gt;
+        &lt;Variable
+            name="var1"
+            value="query1.field1"
+            type="average" /&gt;
+
+        &lt;Variable
+            name="var2"
+            value="query1.field1"
+            type="averageall" /&gt;
+    &lt;/Variables&gt;
+&lt;/Report&gt;</programlisting>
+					</para>
+					<para>
+						Here are two examples of using
+						<literal>highest</literal> and
+						<literal>lowest</literal> variable types:
+						<programlisting>&lt;Report&gt;
+    &lt;Variables&gt;
+        &lt;Variable
+            name="var1"
+            value="query1.field1"
+            type="highest" /&gt;
+
+        &lt;Variable
+            name="var2"
+            value="query1.field1"
+            type="lowest" /&gt;
+    &lt;/Variables&gt;
+&lt;/Report&gt;</programlisting>
+					</para>
+				</sect4>
 			</sect3>
 			<sect3 id="customvarattrs" xreflabel="Custom variable attributes">
 				<title>Custom variable attributes</title>
@@ -2559,6 +2540,29 @@ SELECT * FROM some_table
 					Note that the <literal>baseexpr</literal> attribute
 					is an alias for <literal>value</literal>.
 				</para>
+				<sect4 id="xmlcustomvarexample" xreflabel="Custom variable example">
+					<title>Custom variable example</title>
+					<para>
+						For example, the <literal>average</literal> variable
+						works this way behind the scenes as written below.
+						<programlisting>&lt;Report&gt;
+    &lt;Variables&gt;
+        &lt;Variable
+            name="averagevar1"
+            type="custom"
+            basetype="number"
+            baseexpr="query1.field1"
+            intermedexpr="(rownum() == 1 ? 0 : r.self) +
+                          (isnull(r.baseexpr) ?
+                              0 : r.baseexpr)"
+            intermed2expr="r.self +
+                           (isnull(r.baseexpr) ? 0 : 1)"
+            resultexpr="r.intermedexpr / r.intermed2expr"
+            /&gt;
+    &lt;/Variables&gt;
+&lt;/Report&gt;</programlisting>
+					</para>
+				</sect4>
 			</sect3>
 			<sect3 id="resetonbreak" xreflabel="Reset on break attribute">
 				<title>Reset on break</title>
@@ -2572,6 +2576,36 @@ SELECT * FROM some_table
 				</para>
 				<para>
 					Default is unset, i.e. no reset on a break.
+				</para>
+				<para>
+					Here's an example to use a variable that's value
+					is reset on a break boundary:
+					<programlisting>&lt;Report&gt;
+    &lt;Breaks&gt;
+        &lt;Break name="break1" ... &gt;
+            &lt;BreaksHeader&gt;
+                &lt;Output&gt;
+                    &lt;field value="v.var1" /&gt;
+                &lt;/Output&gt;
+            &lt;/BreaksHeader&gt;
+            &lt;BreaksFields&gt;
+                &lt;BreaksField value="query1.field2" /&gt;
+            &lt;/BreaksFields&gt;
+        &lt;/Break&gt;
+    &lt;/Breaks&gt;
+
+    &lt;Variables&gt;
+        &lt;Variable
+            name="var1"
+            value="query1.field1"
+            type="average"
+            precalculate="yes"
+            resetonbreak="'break1'" /&gt;
+    &lt;/Variables&gt;
+    ...
+&lt;/Report&gt;</programlisting>
+				</para>
+				<para>
 				</para>
 			</sect3>
 			<sect3 id="precalcvarattr" xreflabel="Precalculate attribute">
@@ -2596,7 +2630,7 @@ SELECT * FROM some_table
 					A precalculated variable may also use the
 					<xref linkend="resetonbreak"/>. In this case,
 					the precalculated value is computed for each
-					break period separately.
+					break range separately.
 				</para>
 				<para>
 					Precalculated variables may be used to show totals in
@@ -2607,6 +2641,46 @@ SELECT * FROM some_table
 					and in
 					<xref linkend="reportpageheader"/>,
 					among other places.
+				</para>
+				<para>
+					Here's an example of a precalculated variable:
+					<programlisting>&lt;Report&gt;
+    &lt;Variables&gt;
+        &lt;Variable
+            name="var1"
+            value="query1.field1"
+            type="average"
+            precalculate="yes" /&gt;
+    &lt;/Variables&gt;
+
+    &lt;ReportHeader&gt;
+        &lt;Output&gt;
+            &lt;field value="v.var1"&gt;
+        &lt;/Output&gt;
+    &lt;/ReportHeader&gt;
+&lt;/Report&gt;</programlisting>
+				</para>
+				<para>
+					To reveal the internals of a variable
+					that's value is reset on break boundaries,
+					here is the equivalent using a
+					<literal>custom</literal> variable.
+					The value returned by the <xref linkend="brrownumfunc"/>
+					automatically resets at every break boundary, so it
+					can be used as below.
+					<programlisting>&lt;Variables&gt;
+    &lt;Variable
+        name="var1"
+        type="custom"
+        baseexpr="query1.field1"
+        intermedexpr="(brrownum('break1') == 1 ? 0 : r.self) +
+                      (isnull(r.baseexpr) ?
+                          0 : r.baseexpr)"
+        intermed2expr="r.self +
+                       (isnull(r.baseexpr) ? 0 : 1)"
+        resultexpr="r.intermedexpr / r.intermed2expr"
+        /&gt;
+&lt;/Variables&gt;</programlisting>
 				</para>
 			</sect3>
 		</sect2>
@@ -2765,6 +2839,165 @@ SELECT * FROM some_table
 					</para>
 				</sect4>
 			</sect3>
+		</sect2>
+		<sect2 id="breaksexample" xreflabel="A complete break example">
+			<title>A complete break example</title>
+			<para>
+				This XML part below shows a complete example of
+				nested breaks based on the real life example
+				mentioned in <xref linkend="groupingdata"/>.
+				<programlisting>&lt;Report&gt;
+
+    &lt;Breaks&gt;
+
+        &lt;Break&gt;
+
+            &lt;BreakHeader&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;field value="query1.department" /&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/BreakHeader&gt;
+
+            &lt;BreakFooter&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;literal&gt;End of &lt;/literal&gt;
+                        &lt;field value="query1.department" /&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/BreakFooter&gt;
+
+            &lt;BreakFields&gt;
+                &lt;BreakField value="query1.department" /&gt;
+            &lt;/BreakFields&gt;
+
+        &lt;/Break&gt;
+
+        &lt;Break&gt;
+
+            &lt;BreakHeader&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;literal width="30" /&gt;
+                        &lt;field value="query1.paygrade" /&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/BreakHeader&gt;
+
+            &lt;BreakFooter&gt;
+                &lt;Output&gt;
+                    &lt;Line&gt;
+                        &lt;literal width="30" /&gt;
+                        &lt;literal&gt;End of &lt;/literal&gt;
+                        &lt;field value="query1.paygrade" /&gt;
+                    &lt;/Line&gt;
+                &lt;/Output&gt;
+            &lt;/BreakFooter&gt;
+
+            &lt;BreakFields&gt;
+                &lt;BreakField value="query1.paygrade" /&gt;
+            &lt;/BreakFields&gt;
+
+        &lt;/Break&gt;
+
+    &lt;/Breaks&gt;
+
+    &lt;Detail&gt;
+
+        &lt;FieldHeaders&gt;
+            &lt;Output&gt;
+                &lt;Line&gt;
+                    &lt;literal width="60" /&gt;
+                    &lt;literal&gt;Employee name&lt;/literal&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/FieldHeaders&gt;
+
+        &lt;FieldDetails&gt;
+            &lt;Output&gt;
+                &lt;Line&gt;
+                    &lt;literal width="60" /&gt;
+                    &lt;field value="query1.employee" /&gt;
+                &lt;/Line&gt;
+            &lt;/Output&gt;
+        &lt;/FieldDetails&gt;
+
+    &lt;Detail&gt;
+
+&lt;/Report&gt;</programlisting>
+			</para>
+			<para>
+				Assuming that <xref linkend="sizeunit"/> is set to
+				<literal>points</literal>, the indentation would be
+				30 and 60 points for certain elements (see the empty
+				<literal>&lt;literal&gt;</literal>s) and the result
+				would look like this:
+				<orderedlist>
+					<listitem>
+						<para>
+							Before the first row on every page, the contents
+							of <literal>&lt;FieldHeaders&gt;</literal> is
+							printed.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Before the first row, the contents of
+							<literal>&lt;BreakHeader&gt;</literal>
+							is printed for every break declared in
+							the <literal>&lt;Report&gt;</literal> in
+							the order of their declaration.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							The contents of
+							<literal>&lt;FieldDetails&gt;</literal>
+							is printed for the current row. Repeat until
+							a value change is observed between
+							adjacent rows for a break's expression.
+							In this case, the employees are printed
+							in one block that are in the current paygrade
+							category and working at the current department.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							When a value change happened between
+							adjacent rows for a break's expression,
+							then this break and every break declared after
+							it triggers. For every triggering breaks,
+							their <literal>&lt;BreakFooter&gt;</literal>
+							is printed in the reverse order of their
+							declaration. This is done using the
+							<emphasis>previous row</emphasis>, so if any data
+							used from the row or derived from it (e.g. a
+							variable) and is to be displayed in the footer,
+							it will be valid for the break range that just
+							ended.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Before the new row, the contents of
+							<literal>&lt;BreakHeader&gt;</literal>
+							is printed for every break that just triggered.
+							For example, the department's name is not
+							printed if only the paygrade category changed
+							in the same department from the one row to
+							the next.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Repeat from step 3 until there are no more
+							data rows.
+						</para>
+					</listitem>
+				</orderedlist>
+			</para>
 		</sect2>
 	</sect1>
 	<sect1 id="outputnode" xreflabel="Output node">
@@ -3077,12 +3310,12 @@ SELECT * FROM some_table
 					examples above.
 				</para>
 			</sect3>
-			<sect3 id="textelemdelayed">
+			<sect3 id="textelemdelayed" xreflabel="Precalculated value in XML">
 				<title>Delayed (precalculated) value</title>
 				<para>
 					This setting indicates whether the value is
-					"precalculated", i.e. the value for the last
-					row in the data set is used for every row.
+					"delayed" or "precalculated", i.e. the value for
+					the last row in the data set is used for every row.
 					It is equivalent to referencing an
 					<xref linkend="exprvar"/> with
 					<literal>precalculate="yes"</literal> and
@@ -3112,11 +3345,9 @@ SELECT * FROM some_table
 			<sect3 id="formatattr" xreflabel="Text element format attribute">
 				<title>Format string</title>
 				<para>
-					The format string is used to format the
-					<literal>value</literal> to be displayed
-					in the generated output. For example, to
-					print a number with two decimal places:
-					<programlisting>&lt;field value="3" format="'%.2d'" /&gt;</programlisting>
+					The format string is one way to format the
+					field <literal>value</literal> to be displayed
+					in the generated output.
 				</para>
 				<para>
 					The format string is expected to be a string
@@ -3125,6 +3356,111 @@ SELECT * FROM some_table
 				<para>
 					See <xref linkend="formatting"/> for details.
 				</para>
+				<sect4 id="formatattrexamples" xreflabel="Format attribute examples">
+					<title>Format attribute examples</title>
+					<para>
+						Format a value as a string, first as is, second
+						with adding a surrounding text:
+						<programlisting>&lt;field value="query1.field1" format="'%s'" &gt;
+
+&lt;field value="query1.field1"
+       format="'Look, there is a %s there!'" &gt;</programlisting>
+					</para>
+					<para>
+						Here's the same with the "new syle" formatting flag:
+						<programlisting>&lt;field value="query1.field1" format="'!&amp;%s'" /&gt;
+
+&lt;field value="query1.field1"
+       format="'Look, there is a !&amp;%s there!'" &gt;</programlisting>
+					</para>
+					<para>
+						Also, with the 2nd generation new style formatting
+						flag:
+						<programlisting>&lt;field value="query1.field1"
+       format="'!&amp;{%s}'" ... /&gt;</programlisting>
+					</para>
+					<para>
+						Here's an example to truncate a string
+						to 6 characters using format string flags
+						in legacy and both new style formatting flags:
+<programlisting>&lt;field value="query1.field1"
+       format="'%6.6s'" ... /&gt;
+
+&lt;field value="query1.field1"
+       format="'!&amp;%6.6s'" ... /&gt;
+
+&lt;field value="query1.field1"
+       format="'!&amp;{%6.6s}'" ... /&gt;</programlisting>
+					</para>
+					<para>
+						Format a numeric value with three decimal places,
+						first as is, second with adding a surrounding text:
+						<programlisting>&lt;field value="query1.field1"
+       format="'%.3d'" &gt;
+
+&lt;field value="query1.field1"
+       format="'You have %.3d apples.'" &gt;</programlisting>
+					</para>
+					<para>
+						Convert a number from a string and the value with two
+						decimal places:
+						<programlisting>&lt;field value="val(query1.field1)"
+       format="'%.2d'" /&gt;</programlisting>
+					</para>
+					<para>
+						Here are the same examples using the "new style"
+						formatting flags:
+						<programlisting>&lt;field value="query1.field1"
+       format="'!#%.3d'" &gt;
+
+&lt;field value="query1.field1"
+       format="'You have !#%.3d apples.'" &gt;
+
+&lt;field value="val(query1.field1)"
+       format="'!#%.2d'" /&gt;</programlisting>
+					</para>
+					<para>
+						Here are the same examples using the 2nd generation
+						new style formatting flags:
+						<programlisting>&lt;field value="query1.field1"
+       format="'!#{%.3d}'" &gt;
+
+&lt;field value="query1.field1"
+       format="'You have !#{%.3d} apples.'" &gt;
+
+&lt;field value="val(query1.field1)"
+       format="'!#%.2d'" /&gt;</programlisting>
+					</para>
+					<para>
+						Format a numeric value with monetary details
+						either using the first or the second generation
+						format strings:
+						<programlisting>&lt;field value="query1.field1"
+       format="'!$%=*#150n'" /&gt;
+
+&lt;field value="query1.field1"
+       format="'!${%=*#150n}'" /&gt;</programlisting>
+					</para>
+					<para>
+						Format a datetime value, first with the preferred
+						datetime format for the locale, then only the year,
+						month and day using the YYYY-MM-DD format:
+						<programlisting>&lt;field value="query1.field1"
+       format="'!@%c'" /&gt;
+
+&lt;field value="query1.field1"
+       format="'!@%Y-%m-%d'" ... /&gt;</programlisting>
+					</para>
+					<para>
+						Here's the same using the second generation
+						format strings:
+						<programlisting>&lt;field value="query1.field1"
+       format="'!@{%c}'" ... /&gt;
+
+&lt;field value="query1.field1"
+       format="'!@{%Y-%m-%d}'" ... /&gt;</programlisting>
+					</para>
+				</sect4>
 			</sect3>
 			<sect3 id="textelemwidth" xreflabel="Text element width">
 				<title>Width</title>

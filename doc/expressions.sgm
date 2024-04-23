@@ -26,13 +26,13 @@
 			to wrong data in the report output.
 		</para>
 		<para>
-			Another potential problem with the fixed point numeric
-			representation was that converting numbers from the
-			input data to this internal representation always and
-			unconditionally rounded down. The numeric error (i.e.
-			the difference between regular floating point values and
-			the fixed point representation) can be demonstrated even
-			with small data sets that add up percentages.
+			Another potential problem with fixed point numeric
+			representation is that converting numbers from the
+			input data to this internal representation always
+			rounds down. The numeric error (i.e. the difference
+			between floating point values and fixed point values)
+			can be demonstrated even with small data sets that
+			add up percentages.
 		</para>
 		<para>
 			OpenCReports uses GNU MPFR floating point values with
@@ -46,8 +46,8 @@
 			prices.
 		</para>
 		<para>
-			A <literal>string</literal> expression's result is a
-			string. Strings can be concatenated or otherwise processed
+			A <literal>string</literal> expression's result is arbitrary
+			text. Strings can be concatenated or otherwise processed
 			by string functions.
 		</para>
 		<para>
@@ -121,7 +121,8 @@ apple""pear</programlisting>
 				arbitrary precision, by default 256 bits. This allows for
 				very high precision, i.e. very long numbers. This is good
 				for directly using e.g. arbitrary precision
-				<literal>numeric</literal> type columns from PostgreSQL.
+				<literal>numeric</literal> or <literal>decimal</literal> type
+				columns from PostgreSQL or other SQL database sources.
 			</para>
 			<para>
 				Numeric constants can be integer or fractional numbers with or
@@ -148,6 +149,14 @@ apple""pear</programlisting>
 				<programlisting>0.123
 .123</programlisting>
 			</para>
+			<para>
+				Technically, there are no negative numeric constants.
+				Instead, the number and the unary minus operator
+				(see <xref linkend="unaryprefixops"/>) are initially
+				handled separately. Then the expression optimizer
+				merged them, creating the negative numeric constant
+				internally.
+			</para>
 		</sect2>
 		<sect2 id="boolconstants" xreflabel="Boolean constants">
 			<title>Boolean constants</title>
@@ -165,35 +174,49 @@ false</programlisting>
 			<title>Datetime constants</title>
 			<para>
 				There are no datetime constants per se, although expressions
-				like <literal>stodt('1980-06-30 16:00:00')</literal> (i.e.
-				function calls with constant arguments that result in a
-				<literal>datetime</literal> value) implicitly turn into
-				constants through expression optimization.
+				like <literal>stodt('1980-06-30 16:00:00')</literal> or
+				<literal>interval('2 months')</literal> (i.e. function calls
+				with constant arguments that result in a
+				<literal>datetime</literal> value) are implicitly turned into
+				constants by the expression optimizer.
 			</para>
 		</sect2>
 		<sect2 id="constexpr" xreflabel="Constant expressions">
 			<title>Constant expressions</title>
 			<para>
-				Constant expressions are ones that contain
-				constant values (of any type) and operators
-				or functions.
+				Constant expressions are ones that only contain
+				constant values (of any type) and operators or
+				functions.
 			</para>
 		</sect2>
 	</sect1>
 	<sect1 id="precalcexpr" xreflabel="precalculated">
-		<title>Precalculated expressions</title>
+		<title>Delayed (precalculated) expressions</title>
 		<para>
-			Due to the possibility of precalculated variables
-			expressions, reports are actually run (and layed out)
-			twice. The second run uses the precalculated values
-			from the first run. Because of this,
-			OpenCReports allows mixing precalculated
-			<xref linkend="variables"/> and non-precalculated
-			variables and subexpressions in the same expression.
-			The result is intuitively expected.
+			Reports internally go through the data set twice,
+			the second run generates the report output.
+			The data set does not (must not) change between the
+			two runs. This makes it possible to use so called
+			"delayed" or "precalculated" values. A precalculated
+			expression keeps the value computed for the last row
+			of the data set during the first run. The second run
+			uses this value.
 		</para>
 		<para>
-			The actual report output is generated in the second run.
+			Expressions need to be explicitly marked as precalculated.
+			Marking expressions as precalculated is possible via
+			the report XML description, or by the OpenCReports API.
+			See <xref linkend="textelemdelayed"/>,
+			<xref linkend="setexprdelayed"/>, and
+			<xref linkend="phpexprsetdelayed"/>.
+			See also <xref linkend="precalcvar"/>.
+		</para>
+		<para>
+			OpenCReports allows mixing precalculated and non-precalculated
+			values in the same expression.
+		</para>
+		<para>
+			By default, expressions are not precalculated.
 		</para>
 	</sect1>
 	<sect1 id="identifiers" xreflabel="Identifiers">
@@ -213,7 +236,8 @@ false</programlisting>
 			</para>
 			<para>
 				OpenCReports is using UTF-8 encoding even in identifier
-				names. Accented characters are accepted as identifiers.
+				names. National or accented characters are accepted
+				in identifiers.
 			</para>
 			<para>
 				Valid names for <literal>domain</literal> and
@@ -230,27 +254,50 @@ false</programlisting>
 				<programlisting>field_name
 field_name5
 myquery1.field_name
-oszlop_név
-lekérdezés.oszlop_név</programlisting>
-				By the way, in the above example,
-				<literal>oszlop_név</literal> means
+mező_név
+lekérdezés.mező_név</programlisting>
+				In the above example,
+				<literal>mező_név</literal> means
 				<literal>field_name</literal>, and
 				<literal>lekérdezés.oszlop_név</literal> means
 				<literal>query.field_name</literal> in Hungarian.
 				The accented characters are a courtesy of UTF-8.
 			</para>
 			<para>
-				Query field identifiers in expressions are matched
-				during expression resolution. If the domain name
-				is specified, a query with that name must be present
-				in the report, either as the main query or as a
-				follower query. If the domain name is not specified,
-				the field names of the main query and all the follower
-				queries are matched with the expression.
+				Query field identifiers in expressions are resolved
+				by matching them against query names (used as the
+				domain) and their field names.
+			</para>
+			<para>
+				If the domain name is specified, a query matching
+				the domain name name must be declared for the report,
+				either as the primary query, a follower query, or an
+				independent query. That query must have a column name
+				that matches the identifier name.
+			</para>
+			<para>
+				If the domain name is not specified, the field name
+				references are matched against all the queries of the
+				report in the order of their declaration. The first
+				query with a matching column name will be used for
+				that reference.
 			</para>
 			<para>
 				For exceptions (and exceptions from under the exceptions!),
 				see below.
+			</para>
+		</sect2>
+		<sect2 id="uservariables" xreflabel="User defined variables">
+			<title>User defined variables</title>
+			<para>
+				Domain <literal>v</literal> signifies user defined
+				report variables, which can be used in breaks or
+				to shortcut expressions. Example:
+				<programlisting>v.my_variable</programlisting>
+			</para>
+			<para>
+				For details, see <xref linkend="variables"/>
+				and <xref linkend="variablenode"/>.
 			</para>
 		</sect2>
 		<sect2 id="speciddomains" xreflabel="Special purpose identifier domains">
@@ -262,19 +309,24 @@ lekérdezés.oszlop_név</programlisting>
 				<title>Environment variables</title>
 				<para>
 					Domain <literal>m</literal> indicates the domain
-					of environment variables. The nature of environment
-					variables depend on the languange binding. In C,
-					it's the variables in the operating environment.
-					In PHP, they are simply global PHP variables. Example:
+					of environment variables.
+				</para>
+				<para>
+					The nature of environment variables depends on the
+					languange binding. For example in C, it's the
+					environment variables in the operating system.
+					In PHP, the identifier name is first matched against
+					global PHP variables, and if not found, against
+					the operating system environment variables.
+					Example:
 					<programlisting>m.current_date</programlisting>
 				</para>
 				<para>
 					Since such a setting is controlled outside the report,
 					and for the duration of running the report, its value
 					cannot (or <emphasis>shouldn't</emphasis>) change,
-					environment variable references are treated as constants
-					and are optimized as constant at the start of the report
-					execution.
+					environment variable references are optimized into
+					constants at the beginning of the report execution.
 				</para>
 				<para>
 					Environment variables can't change during report
@@ -284,7 +336,7 @@ lekérdezés.oszlop_név</programlisting>
 					in expressions instead of querying the environment
 					every time the same expression is evaluated,
 					potential data races (that may result in inconsistent
-					results) are eliminated or reduced.
+					results) are eliminated.
 				</para>
 			</sect3>
 			<sect3 id="internalvaridents">
@@ -298,11 +350,15 @@ lekérdezés.oszlop_név</programlisting>
 					<para>
 						<programlisting>r.pageno</programlisting>
 						The current page of the report is maintained by
-						the report layout and is intertwined with running
-						a report. For example, if an expression is evaluated
+						the report layout during the report run.
+						For example, if an expression is evaluated
 						on page 4 of the report, and happens to reference
 						the current page number variable, then this variable
 						will have the value 4 in the result.
+					</para>
+					<para>
+						PDF output supports pagination. Other output formats
+						do not. For them the value of this variable is 1.
 					</para>
 				</sect4>
 				<sect4 id="totpages" xreflabel="r.totpages">
@@ -311,63 +367,76 @@ lekérdezés.oszlop_név</programlisting>
 						<programlisting>r.totpages</programlisting>
 						This variable carries the total number of pages
 						in the report. Its value is maintained by the
-						report. This variable is inherently
-						<xref linkend="precalcexpr"/>.
+						report.
+					</para>
+					<para>
+						Only the PDF output format supports pagination.
+						For output formats not supporting pagination,
+						the value of this variable is 1 throughout the
+						report.
+					</para>
+					<para>
+						This variable is inherently <xref linkend="precalcexpr"/>.
+						Expressions like this will intuitively produce the
+						expected result:
+						<programlisting>printf("Page: %d / %d", r.pageno, r.totpages)</programlisting>
+						For example, on the 3rd page of a 5-page report,
+						the value would be:
+						<programlisting>Page: 3 / 5</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="lineno">
+				<sect4 id="lineno" xreflabel="Line number variable">
 					<title>Line number</title>
 					<para>
 						<programlisting>r.lineno</programlisting>
-						This variable is an alias to the
-						<literal>rownum()</literal> function, i.e.
-						it is the current row (line) number in the data set.
+						This variable gives the current row (line) number in the
+						data set.
 					</para>
 					<para>
-						Being an alias means that the variable is replaced by
-						the <literal>rownum()</literal> function call in the
-						grammar. Please, be aware, that functions may be
-						overridden by user defined functions. If
-						<literal>rownum()</literal> is overridden, then it will
-						be called with zero arguments by the grammar transformation,
-						which may or may not work for the user defined function
-						and the variable will not work as intended.
+						It can be thought as an alias to the
+						<xref linkend="rownumfunc"/> function which does
+						the same by default. But functions may be overridden
+						by user defined functions, while this variable will
+						always work as described.
 					</para>
 				</sect4>
 				<sect4 id="detailcount">
 					<title>Detail count</title>
 					<para>
 						<programlisting>r.detailcnt</programlisting>
-						This variable works similarly to the row number
-						counter, e.g. <literal>rownum()</literal> or
-						<literal>r.lineno</literal>, except it restarts
-						from 1 at every <literal>&lt;FieldHeaders&gt;</literal>.
+						This variable works similarly to the
+						<xref linkend="lineno"/> and
+						<xref linkend="rownumfunc"/>,
+						except it restarts from 1 when
+						a field header is emitted on the report.
+						See <xref linkend="detailnode"/>.
 					</para>
 					<para>
-						With the default behaviour of
-						<literal>&lt;Breaks&gt;</literal> vs
-						<literal>&lt;FieldHeaders&gt;</literal>,
-						i.e. when <literal>&lt;FieldHeaders&gt;</literal>
-						is printed on the top of every page,
+						With the default behaviour of the field header
+						regarding breaks (see
+						<xref linkend="reportfhpriority"/>),
+						i.e. when field header is printed on the top of every page,
 						<literal>r.detailcnt</literal> works as a per page
 						line count value.
 					</para>
 					<para>
-						When <literal>&lt;Report field_header_priority="low"&gt;</literal>
-						is used, the effect may be more emphasized because
-						the value of this variable is reset more often.
+						When the report field header priority is set to
+						<emphasis>low</emphasis>, the effect may be more
+						emphasized because the value of this variable is
+						reset more often.
 					</para>
 				</sect4>
 				<sect4 id="fieldval">
 					<title>Field value</title>
 					<para>
 						<programlisting>r.value</programlisting>
-						The report field description has an expression for its
-						value in the  form of
-						<literal>&lt;field value="..." /&gt;</literal>.
-						It also has supplementary expressions, like the
-						foreground and background colors, the format string,
-						and others.
+						Data on the report is represented by field
+						description. Along with the data expression,
+						supplementary expressions are used for metadata
+						that make up the displaying of the value.
+						Such supplementary expression exist for the
+						foreground and background colors, the formatting
+						of the value, and others.
 					</para>
 					<para>
 						The supplementary expressions may reference the field
@@ -382,10 +451,8 @@ lekérdezés.oszlop_név</programlisting>
 					</para>
 					<para>
 						Referencing <literal>r.value</literal> is only possible
-						for supplementary expressions for the same field
-						description, i.e. other XML attributes for a
-						<literal>&lt;field value="..." .../&gt;</literal>
-						line. This variable cannot cross-reference other
+						for supplementary expressions in the same field
+						description. This variable cannot cross-reference other
 						field descriptions, or anything not in the same scope.
 						For this purpose, there are user
 						<xref linkend="variables"/>.
@@ -407,7 +474,7 @@ lekérdezés.oszlop_név</programlisting>
 						This variable references the previous result of
 						the expression. It is used in iterative expressions,
 						like in user-defined <xref linkend="variables"/>.
-						It can be used in any user defined expression.
+						It can also be used in any user defined expression.
 					</para>
 				</sect4>
 				<sect4 id="uservarsubexpr">
@@ -419,16 +486,59 @@ r.intermed2expr</programlisting>
 						These variables are references for the three
 						subexpressions that potentially make up a
 						user-defined custom variable. The expressions in
-						order are: base expression, intermediary expressions
-						one and two. Their evaluation order is the same
-						as in the order they are mentioned here.
+						order are: base expression, and two intermediary
+						expressions.
 					</para>
 					<para>
 						Actually, there's a fourth subexpression that exists
 						in every user defined variable, namely the result
 						expression. It's reference is simply the user variable
-						reference, see <xref linkend="uservariables"/>.
-						See also <xref linkend="customvarattrs"/>.
+						reference, see <xref linkend="uservariables"/> and
+						<xref linkend="customvarattrs"/>.
+					</para>
+					<para>
+						They are evaluated in this order:
+						<itemizedlist>
+							<listitem override="bullet">
+								<para>
+									<literal>r.baseexpr</literal>
+								</para>
+								<para>
+									The base expression must not reference
+									any of the others of <literal>r.intermedexpr</literal>
+									and <literal>r.intermed2expr</literal>.
+								</para>
+							</listitem>
+							<listitem override="bullet">
+								<para>
+									<literal>r.intermedexpr</literal>
+								</para>
+								<para>
+									The first intermediary expression can
+									reference <literal>r.baseexpr</literal>
+									but it must not reference <literal>r.intermed2expr</literal>.
+								</para>
+							</listitem>
+							<listitem override="bullet">
+								<para>
+									<literal>r.intermed2expr</literal>
+								</para>
+								<para>
+									The second intermediary expression can
+									reference both <literal>r.baseexpr</literal>
+									and <literal>r.intermedexpr</literal>.
+								</para>
+							</listitem>
+							<listitem override="bullet">
+								<para>
+									The result expression, which has no internal
+									variable name. It can reference all of
+									<literal>r.baseexpr</literal>,
+									<literal>r.intermedexpr</literal> and
+									<literal>r.intermed2expr</literal>.
+								</para>
+							</listitem>
+						</itemizedlist>
 					</para>
 					<para>
 						For example, a running average over a data series
@@ -443,16 +553,6 @@ r.intermed2expr</programlisting>
 					</para>
 				</sect4>
 			</sect3>
-			<sect3 id="uservariables" xreflabel="User defined variables">
-				<title>User defined variables</title>
-				<para>
-					Domain <literal>v</literal> signifies user defined
-					report variables, which can be used in breaks or
-					to shortcut expressions. Example:
-					<programlisting>v.my_variable
-					</programlisting>
-				</para>
-			</sect3>
 			<sect3 id="quotedidents">
 				<title>Quoted and dot-prefixed identifiers</title>
 				<para>
@@ -464,8 +564,7 @@ r.intermed2expr</programlisting>
 query."field_name2"
 query."field with space in the name"
 "query2".field_name3
-"query2"."and"
-					</programlisting>
+"query2"."and"</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="dotprefixedidents">
@@ -475,27 +574,25 @@ query."field with space in the name"
 					is not specified, but the identifier name is prefixed
 					with a dot. Examples:
 					<programlisting>.field_name
-."field_name"
-					</programlisting>
+."field_name"</programlisting>
 				</para>
 				<para>
-					Semi-reserved words are the boolean constants. They can be used
-					as identifiers with dot-prefixed identifier names without
-					a domain name and without quoting:
+					The boolean constants are semi-reserved words.
+					They can be used as identifiers with dot-prefixed
+					identifier names without a domain name and without
+					quoting:
 					<programlisting>.yes
 .no
 .true
 .false
-yes.no
-					</programlisting>
+yes.no</programlisting>
 					The above unquoted identifiers are equivalent with
 					these quoted ones below:
 					<programlisting>."yes"
 ."no"
 ."true"
 ."false"
-"yes"."no"
-					</programlisting>
+"yes"."no"</programlisting>
 				</para>
 				<para>
 					Operator names are reserved words, e.g. <literal>and</literal>
@@ -506,8 +603,7 @@ yes.no
 					and column name:
 					<programlisting>."and"
 ."or"
-"and"."or"
-					</programlisting>
+"and"."or"</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="quotedinternaldomains">
@@ -520,8 +616,7 @@ yes.no
 					Examples:
 					<programlisting>"m".current_date
 "r".totpages
-"v".my_variable
-					</programlisting>
+"v".my_variable</programlisting>
 				</para>
 			</sect3>
 		</sect2>
@@ -535,12 +630,18 @@ yes.no
 			multiplication. The precedence classes are as below,
 			in increasing order of precedence.
 		</para>
-		<sect2 id="ternaryop">
+		<para>
+			Note that all of the operators are implemented internally
+			as a function call to the equivalent function. Since every
+			function may be overridden by user functions, the operators
+			may work differently than the documentation.
+		</para>
+		<sect2 id="ternaryop" xreflabel="Ternary operator">
 			<title>Ternary operator</title>
 			<para>
-				The ternary operator is as in the C language:
-				<programlisting>expression1 ? expression2 : expression3
-				</programlisting>
+				The ternary operator works as in the C, PHP and other
+				languages:
+				<programlisting>expression1 ? expression2 : expression3</programlisting>
 				It's evaluated as follows: if the value of numeric
 				<literal>expression1</literal> is <literal>true</literal>
 				(i.e. non-zero), then the result is the <literal>expression2</literal>,
@@ -550,17 +651,26 @@ yes.no
 				result type will be the type of the underlying expression
 				but it can result in runtime errors.
 			</para>
-		</sect2>
-		<sect2 id="logicalops">
-			<title>Logical operators with two operands</title>
 			<para>
-				Logical OR can be written as <literal>||</literal> or
+				Internally, it's implemented using the
+				<xref linkend="iiffunc"/>.
+			</para>
+		</sect2>
+		<sect2 id="logicops">
+			<title>Boolean logic operators with two operands</title>
+			<para>
+				Logic OR can be written as <literal>||</literal> or
 				<literal>or</literal>. Example: <literal>a || b</literal>
 			</para>
 			<para>
-				Logical AND can be written as <literal>&amp;&amp;</literal> or
-				<literal>and</literal>. Logical AND has precedence over OR.
+				Logic AND can be written as <literal>&amp;&amp;</literal> or
+				<literal>and</literal>. Logic AND has precedence over OR.
 				Example: <literal>a &amp;&amp; b</literal>
+			</para>
+			<para>
+				Internally, they are implemented using the
+				<xref linkend="landfunc"/> and
+				<xref linkend="lorfunc"/> functions.
 			</para>
 		</sect2>
 		<sect2 id="bitwiseops">
@@ -590,8 +700,8 @@ yes.no
 					These are not vectors in the mathematical sense,
 					but a comma separated list of scalars inside
 					brackets (<literal>[ ... ]</literal>), with
-					<literal>op</literal> being any of the above
-					operators:
+					<literal>op</literal> being any of the
+					equality or inequality comparison operators:
 					<programlisting>[ expa1, expa2, ... ] op [ expb1, expb2, ... ]</programlisting>
 				</para>
 				<para>
@@ -604,7 +714,7 @@ yes.no
 					from the vector form to the expanded logic operator form,
 					the following two lines have different meaning:
 					<programlisting>not ([ expa1, expa2, ... ] = [ expb1, expb2, ... ])
-					[ expa1, expa2, ... ] != [ expb1, expb2, ... ]</programlisting>
+[ expa1, expa2, ... ] != [ expb1, expb2, ... ]</programlisting>
 				</para>
 			</sect3>
 		</sect2>
@@ -659,7 +769,7 @@ yes.no
 				<literal>a!</literal>, the '!' sign used as postfix operator.
 			</para>
 		</sect2>
-		<sect2 id="unaryprefixops">
+		<sect2 id="unaryprefixops" xreflabel="Unary operators">
 			<title>Unary plus and minus, logical and bitwise NOT, prefix increment and decrement</title>
 			<para>
 				Unary plus (<literal>+a</literal>), unary minus (<literal>-a</literal>),
@@ -717,14 +827,48 @@ yes.no
 							<programlisting>x(a+b)</programlisting>
 						</para>
 						<para>
-							This is only treated as implicit
-							multiplication if the identifier name is not known as
-							a function name at the time of parsing and there is
-							a single expression inside the parentheses.
-							No expressions, a single expression with a known function
-							name as the identifier, or a series of comma delimited
-							series of expressions are treated as a function call and
-							the function call validity is checked against the number
+							This is only treated as implicit multiplication
+							if the following conditions are met:
+							<itemizedlist>
+								<listitem>
+									<para>
+										the <literal>x</literal> identifier
+										is not a function name at the time
+										of parsing
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										there is a single expression
+										inside the parentheses
+									</para>
+								</listitem>
+							</itemizedlist>
+						</para>
+						<para>
+							If any of the conditions below are true,
+							the expression is treated as a function call:
+							<itemizedlist>
+								<listitem>
+									<para>
+										<literal>x</literal> is a known
+										function name
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										there is no expression inside the parentheses
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										a series of comma delimited
+										expressions is inside the
+										parentheses
+									</para>
+								</listitem>
+							</itemizedlist>
+							The function call validity is checked against the number
 							of operands, with a potential parser error. If there's
 							an ambiguity between function names and identifiers
 							provided by data sources, it can be avoided by using
@@ -815,22 +959,21 @@ yes.no
 				Expression parsing handles precedence and whitespaces.
 				For example, these below do not mean the same thing:
 				<programlisting>a++ + ++b
-a+++++b
-				</programlisting>
+a+++++b</programlisting>
 				The former is obvious, but the latter may be a little
 				surprising: <literal>(a++)++ + b</literal>, but not when
 				considering precedence and the Flex lexer behaviour to
 				match the the longest known token first. In this case,
 				to make the expression unambiguous, whitespace or parenthesis
 				should be used. Another ambiguous example:
-				<programlisting>a++b
-				</programlisting>
+				<programlisting>a++b</programlisting>
 				The above may be interpreted as <literal>a + +b</literal>
-				but since no whitespace is used, Flex is free to interpret
-				it as <literal>a++ b</literal>, because <literal>++</literal>
-				is longer than <literal>+</literal>, so the former is matched
-				first as an operator token. This is a syntax error and
-				expression parsing throws an error for it.
+				but since no whitespace is used, the tokenizer is free to
+				interpret it as <literal>a++ b</literal>, because
+				<literal>++</literal> is longer than <literal>+</literal>,
+				so the former is matched first as an operator token.
+				This is a syntax error and expression parsing throws
+				an error for it.
 			</para>
 		</sect2>
 	</sect1>
@@ -1196,10 +1339,11 @@ a+++++b
 				this function.
 			</para>
 		</sect2>
-		<sect2 id="iiffunc">
+		<sect2 id="iiffunc" xreflabel="iif() function">
 			<title>iif()</title>
 			<para>
-				Trinary function. It takes three operands of which the first one
+				It's equivalent to the <xref linkend="ternaryop"/> in
+				function form. It takes three operands of which the first one
 				is numeric, the second and third operands can be of any type.
 				If the first operand is non-zero (i.e.: "true") then
 				the result will be the value of the second operand,
@@ -1236,7 +1380,7 @@ a+++++b
 				It takes one operand of any type.
 			</para>
 		</sect2>
-		<sect2 id="landfunc">
+		<sect2 id="landfunc" xreflabel="Boolean AND">
 			<title>land()</title>
 			<para>
 				Boolean logic AND. Operator <literal>&amp;&amp;</literal> is a
@@ -1296,7 +1440,7 @@ a+++++b
 				Base-2 logarithm. It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2 id="lorfunc">
+		<sect2 id="lorfunc" xreflabel="Boolean OR">
 			<title>lor()</title>
 			<para>
 				Boolean logic OR. Operator <literal>||</literal> is a shortcut for
@@ -1502,7 +1646,7 @@ a+++++b
 				It takes one numeric operand.
 			</para>
 		</sect2>
-		<sect2 id="rownumfunc">
+		<sect2 id="rownumfunc" xreflabel="Primary query row number function">
 			<title>rownum()</title>
 			<para>
 				It takes either zero operands or one string operand.

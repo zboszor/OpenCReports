@@ -3,16 +3,13 @@
 	<sect1 id="uservarintro">
 		<title>Introduction to report variables</title>
 		<para>
-			Variables are named aliases for
-			<xref linkend="expressions"/>.
-		</para>
-		<para>
 			In OpenCReports, there are a few
 			variable types:
 			<itemizedlist>
 				<listitem override="bullet">
 					<para>
-						freeform expression variables
+						expression variables, practically
+						named aliases for <xref linkend="expressions"/>
 					</para>
 				</listitem>
 				<listitem override="bullet">
@@ -26,8 +23,7 @@
 				<listitem override="bullet">
 					<para>
 						custom variables where the data type and
-						the operation on the data is completely
-						user-defined
+						the operation on the data are user-defined
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -40,45 +36,20 @@
 	<sect1 id="exprvar" xreflabel="Expression variable">
 		<title>Expression variables</title>
 		<para>
-			For basic expressions, the value of a variable is
-			calculated from the aliased expression using the current
-			row of data from the data source. This can be thought of
-			as a kind of shortcut. A variable calculates the
-			value of a long or often used expression, and the variable
-			result may in turn be used in other expressions.
-			This can save both typing (in the report XML) and report
-			execution time during the report generation.
+			The value of an expression variable is calculated from
+			the expression using current row of data from the query.
 		</para>
 		<para>
-			Here's a complete example of using a variable:
-			<programlisting>&lt;Report&gt;
-    &lt;Variables&gt;
-        &lt;Variable
-            name="var1"
-            value="query1.field1 + query2.field2"
-            type="expression" /&gt;
-    &lt;/Variables&gt;
-
-    &lt;Detail&gt;
-        &lt;FieldHeaders&gt;
-            &lt;literal value="'My variable'" /&gt;
-        &lt;/FieldHeaders&gt;
-
-        &lt;FieldDetails&gt;
-            &lt;field value="v.var1" /&gt;
-        &lt;/FieldDetails&gt;
-    &lt;/Detail&gt;
-&lt;/Report&gt;</programlisting>
-		</para>
-		<para>
-			Note, that in this simple example, there is
-			no difference if the variable is used in
-			the <literal>&lt;field&gt;</literal> or the
-			<literal>query1.field1 + query2.field2</literal>
-			expression. The efficiency of not computing
-			the variable again for the same data row can be
-			observed when the variable is used multiple times
-			and the report processes a huge data set.
+			This can be thought of as a kind of shortcut. A variable may use
+			a long expression. Other expressions may use the same long
+			expression as a subexpression, i.e. part of themselves.
+			Typing the same long expression over and over is error-prone.
+			The variable allows typing the expression once, then
+			the variable can be used in other expressions.
+			This not only saves on typing. The expression value of the
+			varable is calculated once, and referencing the variable
+			simply uses the already calculated value, thereby saving
+			report execution time.
 		</para>
 		<sect2 id="exprvariterative">
 			<title>Variables with iterative expressions</title>
@@ -87,55 +58,15 @@
 				is derived from the previous value of itself.
 				See <xref linkend="exprself"/>.
 			</para>
+		</sect2>
+		<sect2 id="exprvarexamples">
+			<title>Expression variable examples</title>
 			<para>
-				Here's a complete example of using a variable:
-				<programlisting>&lt;Report&gt;
-    &lt;Variables&gt;
-        &lt;Variable
-            name="var1"
-            value="r.self + query1.field1 + query2.field2"
-            type="expression" /&gt;
-    &lt;/Variables&gt;
-
-    &lt;Detail&gt;
-        &lt;FieldHeaders&gt;
-            &lt;literal value="'My variable'" /&gt;
-        &lt;/FieldHeaders&gt;
-
-        &lt;FieldDetails&gt;
-            &lt;field value="v.var1" /&gt;
-        &lt;/FieldDetails&gt;
-    &lt;/Detail&gt;
-&lt;/Report&gt;</programlisting>
-			</para>
-			<para>
-				The trick is to use the <literal>r.self</literal>
-				internal variable.
-			</para>
-			<para>
-				Please note, that the above example will likely
-				not work as is, because for the first row,
-				<emphasis>there is no previous row</emphasis>.
-				But there is a trick to avoid such problems,
-				namely using the trinary operator (or its equivalent,
-				the <literal>iif()</literal> function) and the
-				<literal>rownum()</literal> to perform only safe
-				computations. (Note that the <literal>value=...</literal>
-				part below is a single line.)
-				<programlisting>&lt;Variable&gt;
-    ...
-    value="rownum() == 1 ?
-           query1.field1 + query2.field2 :
-           r.self + query1.field1 + query2.field2"
-    ...
-&lt;/Variable&gt;</programlisting>
-			</para>
-			<para>
-				This example shows the correct operation of
-				an iterative expression. For the first row,
-				set a known good value. For every subsequent rows,
-				the previous row value may be used for deriving
-				the new value from.
+				Examples cannot be understood without
+				the context in which they are used.
+				<xref linkend="xmlvarexamples"/> are in the
+				<xref linkend="variablenode"/> section of the
+				<xref linkend="xmldescriptor"/> chapter.
 			</para>
 		</sect2>
 	</sect1>
@@ -145,140 +76,95 @@
 			There are pre-defined variable types for
 			performing simple statistic calculations.
 			All of them (except data series counting)
-			operate on numeric values.
+			operate on numeric values and use iterative
+			expressions internally.
 		</para>
-		<sect2 id="uservarsum">
-			<title>Summing a data series</title>
+		<para>
+			The pre-defined variables types are as below:
+			<itemizedlist>
+				<listitem>
+					<para>
+						Summing a data series. The variable type is
+						<literal>sum</literal>.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Counting a data series. The variable type is
+						<literal>count</literal> or
+						<literal>countall</literal>.
+						The difference between the two
+						is that plain <literal>count</literal>
+						does not count NULL data, while
+						<literal>countall</literal> does.
+						It's equivalent to the difference between
+						<literal>COUNT(query1.field1)</literal> and
+						<literal>COUNT(*)</literal> in
+						<literal>SQL</literal>.
+						The former doesn't count NULL (empty) values,
+						the latter does.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Averaging in a data series.
+						Averaging uses two running expressions
+						behind the scenes. One is the
+						<literal>sum</literal> of
+						data, the other is the <literal>count</literal>
+						of data. The sum is divided by the count.
+					</para>
+					<para>
+						Here, two different calculation is possible
+						again, depending on which counting method is used,
+						see above. NULL data contributes 0 to the sum,
+						but the count (the denominator in the division)
+						may differ. The result depends on this detail.
+					</para>
+					<para>
+						For this reason, <literal>average</literal> and
+						<literal>averageall</literal> variable types exist.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Highest and lowest values of a data series.
+						Finding the highest and lowest values in a
+						data series is done by the <literal>highest</literal>
+						and the <literal>lowest</literal> variable types.
+					</para>
+					<para>
+						NULL values don't contribute to the result
+						of either variable type, so in an all-NULL
+						series, each variable will give a NULL result,
+						i.e. empty when displayed.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+		<sect2 id="simplevarexamples">
+			<title>Statistics variable examples</title>
 			<para>
-				Summing is done via the <literal>sum</literal>
-				variable type. For example, the above spelled
-				out example can be written as:
-				<programlisting>&lt;Report&gt;
-    &lt;Variables&gt;
-        &lt;Variable
-            name="var1"
-            value="query1.field1 + query2.field2"
-            type="sum" /&gt;
-    &lt;/Variables&gt;
-
-    &lt;Detail&gt;
-        &lt;FieldHeaders&gt;
-            &lt;literal value="'My variable'" /&gt;
-        &lt;/FieldHeaders&gt;
-
-        &lt;FieldDetails&gt;
-            &lt;field value="v.var1" /&gt;
-        &lt;/FieldDetails&gt;
-    &lt;/Detail&gt;
-&lt;/Report&gt;</programlisting>
-			</para>
-			<para>
-				The iterative nature is implicit
-				for the variable's result.
-			</para>
-		</sect2>
-		<sect2 id="uservarcount">
-			<title>Counting data in a series</title>
-			<para>
-				Counting is done via the <literal>count</literal>
-				and <literal>countall</literal>
-				variable types. The difference between the two
-				is that plain <literal>count</literal>
-				does not count NULL data, while
-				<literal>countall</literal> does.
-				It's equivalent to the difference between
-				<literal>COUNT(query1.field1)</literal> and
-				<literal>COUNT(*)</literal>
-				<literal>SQL</literal>.
-				(The former doesn't count NULL values, the latter does.)
-				<programlisting>&lt;Report&gt;
-    &lt;Variables&gt;
-        &lt;Variable
-            name="var1"
-            value="query1.field1"
-            type="count" /&gt;
-
-        &lt;Variable
-            name="var2"
-            value="query1.field1"
-            type="countall" /&gt;
-    &lt;/Variables&gt;
-&lt;/Report&gt;</programlisting>
-			</para>
-		</sect2>
-		<sect2 id="uservaravg">
-			<title>Averaging data in a series</title>
-			<para>
-				Averaging uses two running expressions
-				behind the scenes. One is the
-				<literal>sum</literal> of
-				data, the other is the <literal>count</literal>
-				of data. The sum is divided by the count.
-			</para>
-			<para>
-				Here, two different calculation is possible
-				again, depending on which counting mething is used,
-				see above. NULL data contributes 0 to the sum,
-				but the count (the denominator in the division)
-				may differ. The result depends on this detail.
-			</para>
-			<para>
-				For this reason, <literal>average</literal> and
-				<literal>averageall</literal> both exist.
-				<programlisting>&lt;Report&gt;
-    &lt;Variables&gt;
-        &lt;Variable
-            name="var1"
-            value="query1.field1"
-            type="average" /&gt;
-
-        &lt;Variable
-            name="var2"
-            value="query1.field1"
-            type="averageall" /&gt;
-    &lt;/Variables&gt;
-&lt;/Report&gt;</programlisting>
-			</para>
-		</sect2>
-		<sect2 id="uservarhighestlowest">
-			<title>Highest and lowest values of a series</title>
-			<para>
-				Finding the highest and lowest values in a
-				data series is done by the <literal>highest</literal>
-				and the <literal>lowest</literal> variable types.
-				<programlisting>&lt;Report&gt;
-    &lt;Variables&gt;
-        &lt;Variable
-            name="var1"
-            value="query1.field1"
-            type="highest" /&gt;
-
-        &lt;Variable
-            name="var2"
-            value="query1.field1"
-            type="lowest" /&gt;
-    &lt;/Variables&gt;
-&lt;/Report&gt;</programlisting>
-			</para>
-			<para>
-				NULL values don't contribute to the results
-				of either variable types, so in an all-NULL
-				series, each variable will give a NULL result,
-				i.e. empty when displayed.
+				Examples cannot be understood without
+				the context in which they are used.
+				<xref linkend="xmlvarexamples"/> are in the
+				<xref linkend="variablenode"/> section of the
+				<xref linkend="xmldescriptor"/> chapter.
 			</para>
 		</sect2>
 	</sect1>
 	<sect1 id="customvar" xreflabel="Custom variables">
 		<title>Custom variables</title>
 		<para>
-			As seen in <xref linkend="exprvar"/>s above,
+			As seen in <xref linkend="exprvar"/>s
+			and also in the <xref linkend="xmlvarexamples"/>,
 			variables are not mysterious. They can be
 			iterative or non-iterative and their operation
 			can be spelled out. On the other hand, the
 			pre-defined variables for doing simple statistics
 			may be limiting. Maybe we need an iteratively
 			calculated value that uses a different type than
-			<literal>number</literal>. This is where
+			<literal>numeric</literal>. This is where
 			<literal>custom</literal> variables may be
 			useful.
 		</para>
@@ -317,23 +203,9 @@
 			</itemizedlist>
 		</para>
 		<para>
-			For example, the <literal>average</literal> variable
-			works this way behind the scenes as written below.
-			<programlisting>&lt;Report&gt;
-    &lt;Variables&gt;
-        &lt;Variable
-            name="averagevar1"
-            type="custom"
-            baseexpr="query1.field1"
-            intermedexpr="(rownum() == 1 ? 0 : r.self) +
-                          (isnull(r.baseexpr) ?
-                              0 : r.baseexpr)"
-            intermed2expr="r.self +
-                           (isnull(r.baseexpr) ? 0 : 1)"
-            resultexpr="r.intermedexpr / r.intermed2expr"
-            /&gt;
-    &lt;/Variables&gt;
-&lt;/Report&gt;</programlisting>
+			See the <xref linkend="xmlcustomvarexample"/> on how the
+			<literal>average</literal> type variable
+			can be spelled out as a custom variable.
 		</para>
 	</sect1>
 	<sect1 id="precalcvar" xreflabel="Precalculated variables">
@@ -346,7 +218,7 @@
 			rows.
 		</para>
 		<para>
-			But usually, we are not interested in the
+			Usually, we are not interested in the
 			<emphasis>running average</emphasis>, only
 			in the average of the whole data series.
 		</para>
@@ -359,90 +231,18 @@
 			<xref linkend="precalcvarattr"/>.
 		</para>
 		<para>
-			A report run goes through the data set twice.
+			As it was already mentioned for <xref linkend="precalcexpr"/>
+			expressions, the report goes through the data set twice.
 			At the end of the first run, the value of precalculated
 			variables computed for the last row are kept. In the
 			second run, the same value is supplied for every data row.
-			Such a variable (or, actually, its value) can be displayed
-			in e.g. <literal>&lt;ReportHeader&gt;</literal> which is
-			shown before any report details to inform the reader
-			without looking at the last page.
-			<programlisting>&lt;Report&gt;
-    &lt;Variables&gt;
-        &lt;Variable
-            name="var1"
-            value="query1.field1"
-            type="average"
-            precalculate="yes" /&gt;
-    &lt;/Variables&gt;
-
-    &lt;ReportHeader&gt;
-        &lt;Output&gt;
-            &lt;field value="v.var1"&gt;
-        &lt;/Output&gt;
-    &lt;/ReportHeader&gt;
-&lt;/Report&gt;</programlisting>
+			The value of such a precalculated variable can be displayed
+			in a report header, which is shown before any report details
+			to inform the reader in advance without having to look
+			at the last page.
 		</para>
 		<para>
-			See also <xref linkend="precalcvarattr"/>.
-		</para>
-	</sect1>
-	<sect1 id="uservarreset">
-		<title>Resetting a variable on break boundaries</title>
-		<para>
-			It may also be useful to use a regular or precalculated
-			variable that only considers data rows in break periods.
-			For example printing a running average for detail rows
-			in breaks, or printing the total average calculated for
-			a break period in the header for that period.
-		</para>
-		<para>
-			For this purpose, variables may be reset on break boundaries.
-			<programlisting>&lt;Report&gt;
-    &lt;Breaks&gt;
-        &lt;Break name="break1" ... &gt;
-            &lt;BreaksHeader&gt;
-                &lt;Output&gt;
-                    &lt;field value="v.var1" /&gt;
-                &lt;/Output&gt;
-            &lt;/BreaksHeader&gt;
-            &lt;BreaksFields&gt;
-                &lt;BreaksField value="query1.field2" /&gt;
-            &lt;/BreaksFields&gt;
-        &lt;/Break&gt;
-    &lt;/Breaks&gt;
-
-    &lt;Variables&gt;
-        &lt;Variable
-            name="var1"
-            value="query1.field1"
-            type="average"
-            precalculate="yes"
-            resetonbreak="'break1'" /&gt;
-    &lt;/Variables&gt;
-    ...
-&lt;/Report&gt;</programlisting>
-		</para>
-		<para>
-			To demistify such a variable, here is the
-			equivalent of the above using a
-			<literal>custom</literal> variable.
-			The value returned by the <xref linkend="brrownumfunc"/>
-			automatically resets at every break boundary, so it
-			can be used as below.
-			<programlisting>&lt;Variables&gt;
-    &lt;Variable
-        name="var1"
-        type="custom"
-        baseexpr="query1.field1"
-        intermedexpr="(brrownum('break1') == 1 ? 0 : r.self) +
-                      (isnull(r.baseexpr) ?
-                          0 : r.baseexpr)"
-        intermed2expr="r.self +
-                       (isnull(r.baseexpr) ? 0 : 1)"
-        resultexpr="r.intermedexpr / r.intermed2expr"
-        /&gt;
-&lt;/Variables&gt;</programlisting>
+			See <xref linkend="precalcvarattr"/> for an example.
 		</para>
 	</sect1>
 </chapter>

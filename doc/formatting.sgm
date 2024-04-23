@@ -35,10 +35,21 @@
 			</itemizedlist>
 		</para>
 		<para>
+			The legacy and the "new style" format strings can only be
+			used in the <xref linkend="formatfunc"/> and the
+			<xref linkend="formatattr"/>, due to them being RLIB
+			compatible. They can also be used in the
+			<xref linkend="printffunc"/> in limited cases,
+			i.e. when formatting a single data value.
+		</para>
+		<para>
 			OpenCReports also supports a 2nd generation
 			new style format strings with a prefix and a
 			pair of brackets (<literal>{}</literal>) that
-			embed the format strings.
+			embed the format strings. The 2nd generation
+			format strings can also be used with the
+			<xref linkend="printffunc"/> in a completely
+			unambiguous manner.
 		</para>
 	</sect1>
 	<sect1 id="legacyformatstrings">
@@ -51,26 +62,24 @@
 			<title>Format string for strings</title>
 			<para>
 				To print a string, the <literal>%s</literal>
-				format string can be used. Examples for
-				<xref linkend="formatattr"/>:
-				<programlisting>&lt;field value="query1.field1"
-       format="'%s'" &gt;
-
-field value="query1.field1"
-       format="'Look, there is a %s there!'" &gt;</programlisting>
+				format string can be used.
+				Examples for using it in the
+				<xref linkend="formatattr" /> can be found in the
+				<xref linkend="formatattrexamples"/>.
 			</para>
 			<para>
-				Example expressions for <xref linkend="formatfunc"/>:
+				Example expressions for the <xref linkend="formatfunc"/>:
 				<programlisting>format(query1.field1, '%s')
 format(query1.field1, 'Look, there is a %s there!')</programlisting>
 			</para>
 			<para>
 				Example expressions for <xref linkend="printffunc"/>:
 				<programlisting>printf('%s, 'query1.field1')
-format('Look, there is a %s there!', query1.field1)</programlisting>
+printf('Look, there is a %s there!', query1.field1)</programlisting>
 			</para>
 			<para>
-				Supplementary format strings flags are supported. See
+				Supplementary format string flags are supported. See
+				the string flags in
 				<ulink url="https://man7.org/linux/man-pages/man3/printf.3.html">printf(3)</ulink>
 			</para>
 		</sect2>
@@ -82,13 +91,9 @@ format('Look, there is a %s there!', query1.field1)</programlisting>
 				C <literal>printf</literal> format specifier
 				where <literal>%d</literal> is used for integers,
 				this is used for printing fractions, too.
-				Examples for
-				<xref linkend="formatattr"/>:
-				<programlisting>&lt;field value="query1.field1"
-       format="'%.3d'" &gt;
-
-field value="query1.field1"
-       format="'You have %.2d apples.'" &gt;</programlisting>
+				Examples for using it in the
+				<xref linkend="formatattr" /> can be found in the
+				<xref linkend="formatattrexamples"/>.
 			</para>
 			<para>
 				The same format string can be used for the
@@ -97,7 +102,8 @@ field value="query1.field1"
 				the previous examples for strings.
 			</para>
 			<para>
-				Supplementary format strings flags are supported. See
+				Supplementary format string flags are supported. See
+				the decimal and float/double format flags in
 				<ulink url="https://man7.org/linux/man-pages/man3/printf.3.html">printf(3)</ulink>
 			</para>
 		</sect2>
@@ -107,14 +113,16 @@ field value="query1.field1"
 				RLIB approximated <literal>strftime()</literal>
 				when printing a datetime value. OpenCReports
 				<emphasis>uses</emphasis> <literal>strftime()</literal>.
-				See <ulink url="https://man7.org/linux/man-pages/man3/strftime.3.html">strftime(3)</ulink>
-				for the complete set of format string flags.
+				See the
+				<ulink url="https://man7.org/linux/man-pages/man3/strftime.3.html">strftime()</ulink>
+				function description for the complete description of
+				format string flags.
 			</para>
 			<para>
 				When a datetime field didn't have an explicit format string,
 				RLIB used the US date format to print the datetime value.
-				In this case, OpenCReports uses the locale specific date format
-				if the report has a locale set.
+				On the other hand, OpenCReports uses the locale specific
+				date format if the report has a locale set.
 			</para>
 		</sect2>
 	</sect1>
@@ -133,27 +141,24 @@ field value="query1.field1"
 			<para>
 				This is an extension over RLIB, which didn't have
 				such a notion. In OpenCReports, the new style flag
-				is prefixed with <literal>!&amp;</literal>
-				<programlisting>&lt;field ... format="'!&amp;%s'" ... /&gt;</programlisting>
+				is prefixed with <literal>!&amp;</literal>.
 			</para>
 		</sect2>
 		<sect2 id="newformatstringsnum">
 			<title>New style format string for numeric data</title>
 			<para>
-				The new style flag is prefixed with <literal>!#</literal>
-				<programlisting>&lt;field ... format="'!#%5.3d'" ... /&gt;</programlisting>
+				The new style flag is the legacy flag prefixed with <literal>!#</literal>
 			</para>
 		</sect2>
 		<sect2 id="newformatstringsmoney">
 			<title>New style format string for monetary data</title>
 			<para>
-				The new style flag is prefixed with <literal>!$</literal>
-				<programlisting>&lt;field ... format="'!$%=*#150n'" ... /&gt;</programlisting>
-			</para>
-			<para>
-				Formatting monetary values uses <literal>strfmon()</literal>.
-				See
-				<ulink url="https://man7.org/linux/man-pages/man3/strfmon.3.html">strfmon(3)</ulink>
+				There was way to format numeric data using the legacy
+				formatting flags. The new style flag is prefixed with
+				<literal>!$</literal> and uses the flags of
+				<literal>strfmon()</literal>. See the
+				<ulink url="https://man7.org/linux/man-pages/man3/strfmon.3.html">strfmon()</ulink>
+				function for details.
 			</para>
 			<para>
 				To print the correct currency name, the locale must be
@@ -165,11 +170,17 @@ field value="query1.field1"
 		<sect2 id="newformatstringsdatetime">
 			<title>New style format string for datetime values</title>
 			<para>
-				The new style flag is prefixed with <literal>!@</literal>
-				Formatting a datetime value uses <literal>strftime()</literal>.
-				<programlisting>&lt;field ... format="'!@%c'" ... /&gt;
-
-&lt;field ... format="'!@%Y-%m-%d'" ... /&gt;</programlisting>
+				The new style flag is the legacy flags prefixed with
+				<literal>!@</literal>. Formatting a datetime value uses
+				<ulink url="https://man7.org/linux/man-pages/man3/strftime.3.html">strftime()</ulink>.
+			</para>
+		</sect2>
+		<sect2 id="newformatstringexamples">
+			<title>New style format string examples</title>
+			<para>
+				Examples for using these in the
+				<xref linkend="formatattr" /> can be found in the
+				<xref linkend="formatattrexamples"/>.
 			</para>
 		</sect2>
 	</sect1>
@@ -183,22 +194,24 @@ field value="query1.field1"
 		<sect2 id="newformatstringsgen2string">
 			<title>2nd gen new style format string for strings</title>
 			<para>
-				The format string format is <literal>!&amp;{...}</literal>
-				<programlisting>&lt;field ... format="'!&amp;{%s}'" ... /&gt;</programlisting>
+				The format string format is the legacy format string
+				embedded in <literal>!&amp;{...}</literal>.
 			</para>
 		</sect2>
 		<sect2 id="newformatstringsgen2num">
 			<title>2nd gen new style format string for numeric data</title>
 			<para>
-				The format string format is <literal>!#{...}</literal>
-				<programlisting>&lt;field ... format="'!#{%5.3d}'" ... /&gt;</programlisting>
+				The format string format is the legacy format string
+				embedded in <literal>!#{...}</literal>
 			</para>
 		</sect2>
 		<sect2 id="newformatstringsgen2money">
 			<title>2nd gen new style format string for monetary data</title>
 			<para>
-				The format string format is <literal>!${...}</literal>
-				<programlisting>&lt;field ... format="'!${%=*#150n}'" ... /&gt;</programlisting>
+				The format string format is the same as the first
+				generation. Instead of just having a prefix, the
+				<literal>strfmon()</literal> format string is embedded in
+				<literal>!${...}</literal>
 			</para>
 			<para>
 				Formatting monetary values uses <literal>strfmon()</literal>.
@@ -215,31 +228,38 @@ field value="query1.field1"
 		<sect2 id="newformatstringsgen2datetime">
 			<title>2nd gen new style format string for datetime values</title>
 			<para>
-				The format string format is <literal>!@{...}</literal>
-				Formatting a datetime value uses <literal>strftime()</literal>.
-				<programlisting>&lt;field ... format="'!@{%c}'" ... /&gt;
-
-&lt;field ... format="'!@{%Y-%m-%d}'" ... /&gt;</programlisting>
+				The format string format is embedded in
+				<literal>!@{...}</literal>. Formatting a datetime value uses
+				<literal>strftime()</literal>.
 			</para>
 		</sect2>
-		<sect2 id="swissarmyknife">
-			<title>The swiss army knife of formatting</title>
+		<sect2 id="newformatstringexamples2">
+			<title>2nd gen new style format string examples</title>
 			<para>
-				The <xref linkend="printffunc"/> is the most versatile
-				formatting function in OpenCReports. It does not exist
-				in RLIB. Using the second generation format strings
-				which makes them completely disambiguous, the
-				<literal>printf()</literal> function in OpenCReports
-				allows formatting every data type into a common result
-				string. Example:
-				<programlisting>printf('You had %d %s on !@{%Y-%m-%d} '
+				Examples for using these in the
+				<xref linkend="formatattr" /> can be found in the
+				<xref linkend="formatattrexamples"/>.
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="swissarmyknife">
+		<title>The swiss army knife of formatting</title>
+		<para>
+			The <xref linkend="printffunc"/> is the most versatile
+			formatting function in OpenCReports. It does not exist
+			in RLIB. Using the second generation format strings
+			makes it completely unambiguous.
+		</para>
+		<para>
+			The <literal>printf()</literal> function in OpenCReports
+			allows formatting every data type into a common result string.
+			Example:
+			<programlisting>printf('You had %d %s on !@{%Y-%m-%d} '
       'and %d %s on !@{%Y-%m-%d} in your pocket.',
       6, 'apples', stodt('2022-05-01'),
       2, 'oranges', stodt('2022-05-02'))</programlisting>
-				The result is:
-				<programlisting>You had 6 apples on 2022-05-01 and 2 oranges on 2022-05-02 in
-your pocket.</programlisting>
-			</para>
-		</sect2>
+			The result is:
+			<programlisting>You had 6 apples on 2022-05-01 and 2 oranges on 2022-05-02 in your pocket.</programlisting>
+		</para>
 	</sect1>
 </chapter>

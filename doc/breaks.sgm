@@ -54,172 +54,41 @@ ORDER BY department,paygrade,employee;</programlisting>
 		</para>
 		<para>
 			Prioritization (nesting) of breaks is done according their order
-			of declaration. See the <xref linkend="breaksnode"/> and
-			<xref linkend="breaknode"/> nodes.
+			of declaration. See <xref linkend="breaksnode"/> and
+			<xref linkend="breaknode"/>.
 		</para>
 		<para>
 			Visual separation is optionally helped with break headers
 			and footers. See <xref linkend="breakheadernode"/> and
 			<xref linkend="breakfooternode"/>.
 		</para>
-		<sect2 id="breakexample">
-			<title>Example</title>
-			<para>
-				This XML part below shows a complete example of
-				nested breaks based on the above mentioned real life
-				example.
-				<programlisting>&lt;Report&gt;
-
-    &lt;Breaks&gt;
-
-        &lt;Break&gt;
-
-            &lt;BreakHeader&gt;
-                &lt;Output&gt;
-                    &lt;Line&gt;
-                        &lt;field value="query1.department" /&gt;
-                    &lt;/Line&gt;
-                &lt;/Output&gt;
-            &lt;/BreakHeader&gt;
-
-            &lt;BreakFooter&gt;
-                &lt;Output&gt;
-                    &lt;Line&gt;
-                        &lt;literal&gt;End of &lt;/literal&gt;
-                        &lt;field value="query1.department" /&gt;
-                    &lt;/Line&gt;
-                &lt;/Output&gt;
-            &lt;/BreakFooter&gt;
-
-            &lt;BreakFields&gt;
-                &lt;BreakField value="query1.department" /&gt;
-            &lt;/BreakFields&gt;
-
-        &lt;/Break&gt;
-
-        &lt;Break&gt;
-
-            &lt;BreakHeader&gt;
-                &lt;Output&gt;
-                    &lt;Line&gt;
-                        &lt;literal width="30" /&gt;
-                        &lt;field value="query1.paygrade" /&gt;
-                    &lt;/Line&gt;
-                &lt;/Output&gt;
-            &lt;/BreakHeader&gt;
-
-            &lt;BreakFooter&gt;
-                &lt;Output&gt;
-                    &lt;Line&gt;
-                        &lt;literal width="30" /&gt;
-                        &lt;literal&gt;End of &lt;/literal&gt;
-                        &lt;field value="query1.paygrade" /&gt;
-                    &lt;/Line&gt;
-                &lt;/Output&gt;
-            &lt;/BreakFooter&gt;
-
-            &lt;BreakFields&gt;
-                &lt;BreakField value="query1.paygrade" /&gt;
-            &lt;/BreakFields&gt;
-
-        &lt;/Break&gt;
-
-    &lt;/Breaks&gt;
-
-    &lt;Detail&gt;
-
-        &lt;FieldHeaders&gt;
-            &lt;Output&gt;
-                &lt;Line&gt;
-                    &lt;literal width="60" /&gt;
-                    &lt;literal&gt;Employee name&lt;/literal&gt;
-                &lt;/Line&gt;
-            &lt;/Output&gt;
-        &lt;/FieldHeaders&gt;
-
-        &lt;FieldDetails&gt;
-            &lt;Output&gt;
-                &lt;Line&gt;
-                    &lt;literal width="60" /&gt;
-                    &lt;field value="query1.employee" /&gt;
-                &lt;/Line&gt;
-            &lt;/Output&gt;
-        &lt;/FieldDetails&gt;
-
-    &lt;Detail&gt;
-
-&lt;/Report&gt;</programlisting>
-			</para>
-			<para>
-				Assuming that <xref linkend="sizeunit"/> is set to
-				<literal>points</literal>, the indentation would be
-				30 and 60 points for certain elements (see the empty
-				<literal>&lt;literal&gt;</literal>s) and the result
-				would look like this:
-				<orderedlist>
-					<listitem>
-						<para>
-							Before the first row on every page, the contents
-							of <literal>&lt;FieldHeaders&gt;</literal> is
-							printed.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							Before the first row, the contents of
-							<literal>&lt;BreakHeader&gt;</literal>
-							is printed for every break declared in
-							the <literal>&lt;Report&gt;</literal> in
-							the order of their declaration.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							The contents of
-							<literal>&lt;FieldDetails&gt;</literal>
-							is printed for the current row. Repeat until
-							a value change is observed between
-                            adjacent rows for a break's expression.
-							In this case, the employees are printed
-							in one block that are in the current paygrade
-							category and working at the current department.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							When a value change happened between
-							adjacent rows for a break's expression,
-							then this break and every break declared after
-							it triggers. For every triggering breaks,
-							their <literal>&lt;BreakFooter&gt;</literal>
-							is printed in the reverse order of their
-							declaration. This is done using the
-							<emphasis>previous row</emphasis>, so if any data
-							used from the row or derived from it (e.g. a
-							variable) and is to be displayed in the footer,
-							it will be valid for the break period that just
-							ended.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							Before the new row, the contents of
-							<literal>&lt;BreakHeader&gt;</literal>
-							is printed for every break that just triggered.
-							For example, the department's name is not
-							printed if only the paygrade category changed
-							in the same department from the one row to
-							the next.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							Repeat from step 3 until there are no more
-							data rows.
-						</para>
-					</listitem>
-				</orderedlist>
-			</para>
-		</sect2>
+	</sect1>
+	<sect1 id="uservarreset">
+		<title>Resetting a variable on break boundaries</title>
+		<para>
+			It may also be useful to use a regular or precalculated
+			variable that only considers data rows in break ranges.
+			For example printing a running average for detail rows
+			in breaks, or printing the total average calculated for
+			a break range in the header for that period.
+		</para>
+		<para>
+			For this purpose, variables may be reset on break boundaries.
+			See examples of such variables in
+			<xref linkend="resetonbreak"/> and
+			<xref linkend="precalcvarattr"/> in the
+			<xref linkend="variablenode"/> section of the
+			<xref linkend="xmldescriptor"/> chapter.
+		</para>
+	</sect1>
+	<sect1 id="breakexample">
+		<title>Example</title>
+		<para>
+			Examples cannot be understood without
+			the context in which they are used.
+			<xref linkend="breaksexample"/> can be found
+			at the end of the <xref linkend="breaksnode"/> section
+			of the <xref linkend="xmldescriptor"/> chapter.
+		</para>
 	</sect1>
 </chapter>
