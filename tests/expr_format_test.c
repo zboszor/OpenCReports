@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
 		"format('apples and oranges', 'You have some % 10s pears')",
 		"format('apples', '% 10s')",
 		"format('árvíztűrő tükörfúrógép', '%9s')",
+		"format('árvíztűrő tükörfúrógép', '%9.9s')",
 		"format('árvíztűrő tükörfúrógép', '% 9s')",
 		"format('hülye', '% 9s')",
 
@@ -75,6 +76,7 @@ int main(int argc, char **argv) {
 		/* printf(), yay!!! */
 
 		"printf('You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.', 6, 'apples', stodt('2022-05-01'), 2, 'oranges', stodt('2022-05-02'))",
+		"printf('You had %d %s on !@{%Y-%m-%d} ' 'and %d %s on !@{%Y-%m-%d} in your pocket.', 6, 'apples', stodt('2022-05-01'), 2, 'oranges', stodt('2022-05-02'))",
 
 		/*
 		 * NULL data is treated as empty string,

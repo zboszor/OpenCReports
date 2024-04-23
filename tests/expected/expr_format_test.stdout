@@ -68,6 +68,13 @@ expr optimized: (string)árvíztűrő
 expr nodes: 1
 (string)árvíztűrő
 
+string: format('árvíztűrő tükörfúrógép', '%9.9s')
+expr reprinted: format((string)árvíztűrő tükörfúrógép,(string)%9.9s)
+expr nodes: 3
+expr optimized: (string)árvíztűrő
+expr nodes: 1
+(string)árvíztűrő
+
 string: format('árvíztűrő tükörfúrógép', '% 9s')
 expr reprinted: format((string)árvíztűrő tükörfúrógép,(string)% 9s)
 expr nodes: 3
@@ -244,6 +251,13 @@ expr nodes: 1
 (string)You have          6 oranges
 
 string: printf('You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.', 6, 'apples', stodt('2022-05-01'), 2, 'oranges', stodt('2022-05-02'))
+expr reprinted: printf((string)You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.,6.000000,(string)apples,stodt((string)2022-05-01),2.000000,(string)oranges,stodt((string)2022-05-02))
+expr nodes: 10
+expr optimized: (string)You had 6 apples on 2022-05-01 and 2 oranges on 2022-05-02 in your pocket.
+expr nodes: 1
+(string)You had 6 apples on 2022-05-01 and 2 oranges on 2022-05-02 in your pocket.
+
+string: printf('You had %d %s on !@{%Y-%m-%d} ' 'and %d %s on !@{%Y-%m-%d} in your pocket.', 6, 'apples', stodt('2022-05-01'), 2, 'oranges', stodt('2022-05-02'))
 expr reprinted: printf((string)You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.,6.000000,(string)apples,stodt((string)2022-05-01),2.000000,(string)oranges,stodt((string)2022-05-02))
 expr nodes: 10
 expr optimized: (string)You had 6 apples on 2022-05-01 and 2 oranges on 2022-05-02 in your pocket.
