@@ -2403,8 +2403,8 @@ SELECT * FROM some_table
 						not work as is, because for the first row,
 						<emphasis>there is no previous row</emphasis>.
 						But there is a trick to avoid such problems,
-						namely using the trinary operator (or its equivalent,
-						the <literal>iif()</literal> function) and the
+						namely using the <xref linkend="ternaryop"/>
+						(or its equivalent, the <xref linkend="iiffunc"/>) and the
 						<literal>rownum()</literal> to perform only safe
 						computations. (Note that the <literal>value=...</literal>
 						part below is a single line.)
