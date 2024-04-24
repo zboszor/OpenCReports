@@ -131,6 +131,8 @@ struct opencreport {
 	ocrpt_result *totpages;
 	/* The result of r.format */
 	ocrpt_result *rptformat;
+	/* Helper for ocrpt_inc and ocrpt_dec */
+	ocrpt_result *one;
 
 	/* Locale specific data */
 	char *textdomain;

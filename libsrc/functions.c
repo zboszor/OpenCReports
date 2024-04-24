@@ -220,10 +220,6 @@ OCRPT_STATIC_FUNCTION(ocrpt_add) {
 					mpfr_add(e->result[e->o->residx]->number, e->result[e->o->residx]->number, e->ops[i]->result[e->o->residx]->number, e->o->rndmode);
 					break;
 				case OCRPT_RESULT_DATETIME:
-					if (e->ops[i]->result[e->o->residx]->interval) {
-						ocrpt_expr_make_error_result(e, "invalid operand(s)");
-						return;
-					}
 					e->result[e->o->residx]->type = OCRPT_RESULT_DATETIME;
 					ocrpt_datetime_add_number(e->o, e, e->ops[i]->result[e->o->residx], e->result[e->o->residx]);
 					break;
@@ -236,10 +232,6 @@ OCRPT_STATIC_FUNCTION(ocrpt_add) {
 			case OCRPT_RESULT_DATETIME:
 				switch (e->ops[i]->result[e->o->residx]->type) {
 				case OCRPT_RESULT_NUMBER:
-					if (e->result[e->o->residx]->interval) {
-						ocrpt_expr_make_error_result(e, "invalid operand(s)");
-						return;
-					}
 					ocrpt_datetime_add_number(e->o, e, e->result[e->o->residx], e->ops[i]->result[e->o->residx]);
 					break;
 				case OCRPT_RESULT_DATETIME:
@@ -352,10 +344,6 @@ OCRPT_STATIC_FUNCTION(ocrpt_sub) {
 			case OCRPT_RESULT_DATETIME:
 				switch (e->ops[i]->result[e->o->residx]->type) {
 				case OCRPT_RESULT_NUMBER:
-					if (e->result[e->o->residx]->interval) {
-						ocrpt_expr_make_error_result(e, "invalid operand(s)");
-						return;
-					}
 					ocrpt_datetime_sub_number(e->o, e, e->result[e->o->residx], e->ops[i]->result[e->o->residx]);
 					break;
 				case OCRPT_RESULT_DATETIME:
@@ -1135,8 +1123,15 @@ OCRPT_STATIC_FUNCTION(ocrpt_inc) {
 	case OCRPT_RESULT_ERROR:
 		ocrpt_expr_make_error_result(e, e->ops[0]->result[e->o->residx]->string->str);
 		break;
-	case OCRPT_RESULT_STRING:
 	case OCRPT_RESULT_DATETIME:
+		/*
+		 * See the rules in ocrpt_add.
+		 */
+		ocrpt_expr_init_result(e, e->ops[0]->result[e->o->residx]->type);
+		ocrpt_result_copy(e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
+		ocrpt_datetime_add_number(e->o, e, e->ops[0]->result[e->o->residx], e->o->one);
+		break;
+	case OCRPT_RESULT_STRING:
 	default:
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		break;
@@ -1163,8 +1158,15 @@ OCRPT_STATIC_FUNCTION(ocrpt_dec) {
 	case OCRPT_RESULT_ERROR:
 		ocrpt_expr_make_error_result(e, e->ops[0]->result[e->o->residx]->string->str);
 		break;
-	case OCRPT_RESULT_STRING:
 	case OCRPT_RESULT_DATETIME:
+		/*
+		 * See the rules in ocrpt_sub.
+		 */
+		ocrpt_expr_init_result(e, e->ops[0]->result[e->o->residx]->type);
+		ocrpt_result_copy(e->result[e->o->residx], e->ops[0]->result[e->o->residx]);
+		ocrpt_datetime_sub_number(e->o, e, e->result[e->o->residx], e->o->one);
+		break;
+	case OCRPT_RESULT_STRING:
 	default:
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 		break;

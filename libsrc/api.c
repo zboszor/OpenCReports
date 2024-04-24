@@ -130,6 +130,12 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	o->totpages->number_initialized = true;
 	mpfr_set_ui(o->totpages->number, 1, o->rndmode);
 
+	o->one = ocrpt_result_new(o);
+	o->one->type = OCRPT_RESULT_NUMBER;
+	mpfr_init2(o->one->number, o->prec);
+	o->one->number_initialized = true;
+	mpfr_set_ui(o->one->number, 1, o->rndmode);
+
 	return o;
 }
 
@@ -231,6 +237,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	ocrpt_result_free(o->pageno);
 	ocrpt_result_free(o->totpages);
 	ocrpt_result_free(o->rptformat);
+	ocrpt_result_free(o->one);
 
 	ocrpt_mem_string_free(o->output_buffer, true);
 	if (o->content_type)

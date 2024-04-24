@@ -278,9 +278,23 @@ expr optimized: (datetime)1980-05-06
 expr nodes: 1
 (datetime)1980-05-06
 
+string: stodt('1980-05-05')++
+expr reprinted: inc(stodt((string)1980-05-05))
+expr nodes: 3
+expr optimized: (datetime)1980-05-06
+expr nodes: 1
+(datetime)1980-05-06
+
 string: stodt('1980-05-05') + 1 + 1
 expr reprinted: add(add(stodt((string)1980-05-05),1.000000),1.000000)
 expr nodes: 6
+expr optimized: (datetime)1980-05-07
+expr nodes: 1
+(datetime)1980-05-07
+
+string: stodt('1980-05-05')++++
+expr reprinted: inc(inc(stodt((string)1980-05-05)))
+expr nodes: 4
 expr optimized: (datetime)1980-05-07
 expr nodes: 1
 (datetime)1980-05-07
@@ -292,9 +306,23 @@ expr optimized: (datetime)1980-05-06
 expr nodes: 1
 (datetime)1980-05-06
 
+string: ++stodt('1980-05-05')
+expr reprinted: inc(stodt((string)1980-05-05))
+expr nodes: 3
+expr optimized: (datetime)1980-05-06
+expr nodes: 1
+(datetime)1980-05-06
+
 string: 1 + 1 + stodt('1980-05-05')
 expr reprinted: add(add(1.000000,1.000000),stodt((string)1980-05-05))
 expr nodes: 6
+expr optimized: (datetime)1980-05-07
+expr nodes: 1
+(datetime)1980-05-07
+
+string: ++++stodt('1980-05-05')
+expr reprinted: inc(inc(stodt((string)1980-05-05)))
+expr nodes: 4
 expr optimized: (datetime)1980-05-07
 expr nodes: 1
 (datetime)1980-05-07
@@ -306,9 +334,23 @@ expr optimized: (datetime)1980-05-07
 expr nodes: 1
 (datetime)1980-05-07
 
+string: ++stodt('1980-05-05')++
+expr reprinted: inc(inc(stodt((string)1980-05-05)))
+expr nodes: 4
+expr optimized: (datetime)1980-05-07
+expr nodes: 1
+(datetime)1980-05-07
+
 string: stodt('1980-05-05 06:00') + 1
 expr reprinted: add(stodt((string)1980-05-05 06:00),1.000000)
 expr nodes: 4
+expr optimized: (datetime)1980-05-05 06:00:01
+expr nodes: 1
+(datetime)1980-05-05 06:00:01
+
+string: stodt('1980-05-05 06:00')++
+expr reprinted: inc(stodt((string)1980-05-05 06:00))
+expr nodes: 3
 expr optimized: (datetime)1980-05-05 06:00:01
 expr nodes: 1
 (datetime)1980-05-05 06:00:01
@@ -320,9 +362,23 @@ expr optimized: (datetime)1980-05-05 06:00:02
 expr nodes: 1
 (datetime)1980-05-05 06:00:02
 
+string: stodt('1980-05-05 06:00')++++
+expr reprinted: inc(inc(stodt((string)1980-05-05 06:00)))
+expr nodes: 4
+expr optimized: (datetime)1980-05-05 06:00:02
+expr nodes: 1
+(datetime)1980-05-05 06:00:02
+
 string: 1 + stodt('1980-05-05 06:00')
 expr reprinted: add(1.000000,stodt((string)1980-05-05 06:00))
 expr nodes: 4
+expr optimized: (datetime)1980-05-05 06:00:01
+expr nodes: 1
+(datetime)1980-05-05 06:00:01
+
+string: ++stodt('1980-05-05 06:00')
+expr reprinted: inc(stodt((string)1980-05-05 06:00))
+expr nodes: 3
 expr optimized: (datetime)1980-05-05 06:00:01
 expr nodes: 1
 (datetime)1980-05-05 06:00:01
@@ -334,9 +390,23 @@ expr optimized: (datetime)1980-05-05 06:00:02
 expr nodes: 1
 (datetime)1980-05-05 06:00:02
 
+string: ++++stodt('1980-05-05 06:00')
+expr reprinted: inc(inc(stodt((string)1980-05-05 06:00)))
+expr nodes: 4
+expr optimized: (datetime)1980-05-05 06:00:02
+expr nodes: 1
+(datetime)1980-05-05 06:00:02
+
 string: 1 + stodt('1980-05-05 06:00') + 1
 expr reprinted: add(add(1.000000,stodt((string)1980-05-05 06:00)),1.000000)
 expr nodes: 6
+expr optimized: (datetime)1980-05-05 06:00:02
+expr nodes: 1
+(datetime)1980-05-05 06:00:02
+
+string: ++stodt('1980-05-05 06:00')++
+expr reprinted: inc(inc(stodt((string)1980-05-05 06:00)))
+expr nodes: 4
 expr optimized: (datetime)1980-05-05 06:00:02
 expr nodes: 1
 (datetime)1980-05-05 06:00:02
@@ -348,9 +418,23 @@ expr optimized: (datetime)06:00:01
 expr nodes: 1
 (datetime)06:00:01
 
+string: stodt('06:00')++
+expr reprinted: inc(stodt((string)06:00))
+expr nodes: 3
+expr optimized: (datetime)06:00:01
+expr nodes: 1
+(datetime)06:00:01
+
 string: stodt('06:00') + 1 + 1
 expr reprinted: add(add(stodt((string)06:00),1.000000),1.000000)
 expr nodes: 6
+expr optimized: (datetime)06:00:02
+expr nodes: 1
+(datetime)06:00:02
+
+string: stodt('06:00')++++
+expr reprinted: inc(inc(stodt((string)06:00)))
+expr nodes: 4
 expr optimized: (datetime)06:00:02
 expr nodes: 1
 (datetime)06:00:02
@@ -362,9 +446,23 @@ expr optimized: (datetime)06:00:01
 expr nodes: 1
 (datetime)06:00:01
 
+string: ++stodt('06:00')
+expr reprinted: inc(stodt((string)06:00))
+expr nodes: 3
+expr optimized: (datetime)06:00:01
+expr nodes: 1
+(datetime)06:00:01
+
 string: 1 + 1 + stodt('06:00')
 expr reprinted: add(add(1.000000,1.000000),stodt((string)06:00))
 expr nodes: 6
+expr optimized: (datetime)06:00:02
+expr nodes: 1
+(datetime)06:00:02
+
+string: ++++stodt('06:00')
+expr reprinted: inc(inc(stodt((string)06:00)))
+expr nodes: 4
 expr optimized: (datetime)06:00:02
 expr nodes: 1
 (datetime)06:00:02
@@ -376,9 +474,23 @@ expr optimized: (datetime)06:00:02
 expr nodes: 1
 (datetime)06:00:02
 
+string: ++stodt('06:00')++
+expr reprinted: inc(inc(stodt((string)06:00)))
+expr nodes: 4
+expr optimized: (datetime)06:00:02
+expr nodes: 1
+(datetime)06:00:02
+
 string: stodt('1980-05-05') - 1
 expr reprinted: sub(stodt((string)1980-05-05),1.000000)
 expr nodes: 4
+expr optimized: (datetime)1980-05-04
+expr nodes: 1
+(datetime)1980-05-04
+
+string: stodt('1980-05-05')--
+expr reprinted: dec(stodt((string)1980-05-05))
+expr nodes: 3
 expr optimized: (datetime)1980-05-04
 expr nodes: 1
 (datetime)1980-05-04
@@ -390,9 +502,23 @@ expr optimized: (datetime)1980-05-05 05:59:59
 expr nodes: 1
 (datetime)1980-05-05 05:59:59
 
+string: stodt('1980-05-05 06:00')--
+expr reprinted: dec(stodt((string)1980-05-05 06:00))
+expr nodes: 3
+expr optimized: (datetime)1980-05-05 05:59:59
+expr nodes: 1
+(datetime)1980-05-05 05:59:59
+
 string: stodt('06:00') - 1
 expr reprinted: sub(stodt((string)06:00),1.000000)
 expr nodes: 4
+expr optimized: (datetime)05:59:59
+expr nodes: 1
+(datetime)05:59:59
+
+string: stodt('06:00')--
+expr reprinted: dec(stodt((string)06:00))
+expr nodes: 3
 expr optimized: (datetime)05:59:59
 expr nodes: 1
 (datetime)05:59:59
@@ -404,9 +530,23 @@ expr optimized: (datetime)1980-05-06 00:00:00
 expr nodes: 1
 (datetime)1980-05-06 00:00:00
 
+string: stodt('1980-05-05 23:59:59')++
+expr reprinted: inc(stodt((string)1980-05-05 23:59:59))
+expr nodes: 3
+expr optimized: (datetime)1980-05-06 00:00:00
+expr nodes: 1
+(datetime)1980-05-06 00:00:00
+
 string: stodt('1980-05-06 00:00:00') - 1
 expr reprinted: sub(stodt((string)1980-05-06 00:00:00),1.000000)
 expr nodes: 4
+expr optimized: (datetime)1980-05-05 23:59:59
+expr nodes: 1
+(datetime)1980-05-05 23:59:59
+
+string: stodt('1980-05-06 00:00:00')--
+expr reprinted: dec(stodt((string)1980-05-06 00:00:00))
+expr nodes: 3
 expr optimized: (datetime)1980-05-05 23:59:59
 expr nodes: 1
 (datetime)1980-05-05 23:59:59
@@ -578,6 +718,62 @@ expr nodes: 10
 expr optimized: (datetime)1979-02-01
 expr nodes: 1
 (datetime)1979-02-01
+
+string: interval(1,0,0,0,0,0) + 1
+expr reprinted: add(interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000),1.000000)
+expr nodes: 9
+expr optimized: (datetime)1 years 1 seconds
+expr nodes: 1
+(datetime)1 years 1 seconds
+
+string: interval(1,0,0,0,0,0)++
+expr reprinted: inc(interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000))
+expr nodes: 8
+expr optimized: (datetime)1 years 1 seconds
+expr nodes: 1
+(datetime)1 years 1 seconds
+
+string: 1 + interval(1,0,0,0,0,0)
+expr reprinted: add(1.000000,interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000))
+expr nodes: 9
+expr optimized: (datetime)1 years 1 seconds
+expr nodes: 1
+(datetime)1 years 1 seconds
+
+string: ++interval(1,0,0,0,0,0)
+expr reprinted: inc(interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000))
+expr nodes: 8
+expr optimized: (datetime)1 years 1 seconds
+expr nodes: 1
+(datetime)1 years 1 seconds
+
+string: interval(1,0,0,0,0,0) - 1
+expr reprinted: sub(interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000),1.000000)
+expr nodes: 9
+expr optimized: (datetime)1 years -1 days 23 hours 59 mins 59 seconds
+expr nodes: 1
+(datetime)1 years -1 days 23 hours 59 mins 59 seconds
+
+string: interval(1,0,0,0,0,0)--
+expr reprinted: dec(interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000))
+expr nodes: 8
+expr optimized: (datetime)1 years -1 days 23 hours 59 mins 59 seconds
+expr nodes: 1
+(datetime)1 years -1 days 23 hours 59 mins 59 seconds
+
+string: 1 - interval(1,0,0,0,0,0)
+expr reprinted: sub(1.000000,interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000))
+expr nodes: 9
+expr optimized: (ERROR)invalid operand(s)
+expr nodes: 1
+(ERROR)invalid operand(s)
+
+string: --interval(1,0,0,0,0,0)
+expr reprinted: dec(interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000))
+expr nodes: 8
+expr optimized: (datetime)1 years -1 days 23 hours 59 mins 59 seconds
+expr nodes: 1
+(datetime)1 years -1 days 23 hours 59 mins 59 seconds
 
 string: interval(1,0,0,0,0,0) + interval(0,1,0,0,0,0)
 expr reprinted: add(interval(1.000000,0.000000,0.000000,0.000000,0.000000,0.000000),interval(0.000000,1.000000,0.000000,0.000000,0.000000,0.000000))
