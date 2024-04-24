@@ -53,6 +53,12 @@ int main(int argc, char **argv) {
 		"(-1 + -2) * -3",
 		"(-1 - -2) * -3",
 
+		/* Unary operators */
+		"+1",
+		"-1",
+		"1 + +1",
+		"1 + -1",
+
 		/* Increment/decrement */
 		"1++",
 		"++1",

@@ -222,6 +222,34 @@ expr optimized: -3.000000
 expr nodes: 1
 (number)-3.000000
 
+string: +1
+expr reprinted: uplus(1.000000)
+expr nodes: 2
+expr optimized: 1.000000
+expr nodes: 1
+(number)1.000000
+
+string: -1
+expr reprinted: uminus(1.000000)
+expr nodes: 2
+expr optimized: -1.000000
+expr nodes: 1
+(number)-1.000000
+
+string: 1 + +1
+expr reprinted: add(1.000000,uplus(1.000000))
+expr nodes: 4
+expr optimized: 2.000000
+expr nodes: 1
+(number)2.000000
+
+string: 1 + -1
+expr reprinted: add(1.000000,uminus(1.000000))
+expr nodes: 4
+expr optimized: 0.000000
+expr nodes: 1
+(number)0.000000
+
 string: 1++
 expr reprinted: inc(1.000000)
 expr nodes: 2

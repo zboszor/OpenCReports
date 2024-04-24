@@ -117,6 +117,21 @@ OCRPT_STATIC_FUNCTION(ocrpt_uminus) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_uplus) {
+	if (e->n_ops == 1 && e->ops[0]->result[e->o->residx] && e->ops[0]->result[e->o->residx]->type == OCRPT_RESULT_NUMBER) {
+		ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
+
+		if (e->ops[0]->result[e->o->residx]->isnull) {
+			e->result[e->o->residx]->isnull = true;
+			return;
+		}
+
+		e->result[e->o->residx]->type = OCRPT_RESULT_NUMBER;
+		mpfr_set(e->result[e->o->residx]->number, e->ops[0]->result[e->o->residx]->number, e->o->rndmode);
+	} else
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+}
+
 OCRPT_STATIC_FUNCTION(ocrpt_add) {
 	uint32_t nnum, nstr, ndt;
 
@@ -3902,6 +3917,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "trunc",		ocrpt_trunc,	NULL,	1,	false,	false,	false,	false },
 	{ "tstod",		ocrpt_stodt,	NULL,	1,	false,	false,	false,	false },
 	{ "uminus",		ocrpt_uminus,	NULL,	1,	false,	false,	false,	false },
+	{ "uplus",		ocrpt_uplus,	NULL,	1,	false,	false,	false,	false },
 	{ "upper",		ocrpt_upper,	NULL,	1,	false,	false,	false,	false },
 	{ "val",		ocrpt_val,	NULL,	1,	false,	false,	false,	false },
 	{ "wiy",		ocrpt_wiy,	NULL,	1,	false,	false,	false,	false },

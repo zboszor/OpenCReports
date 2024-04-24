@@ -510,144 +510,144 @@ string: "".""
 syntax error: quoted identifier cannot be empty at or near """."""
 
 string: +a
-expr reprinted: .'a'
-expr nodes: 1
+expr reprinted: uplus(.'a')
+expr nodes: 2
 
 string: -_
 expr reprinted: uminus(.'_')
 expr nodes: 2
 
 string: +_a
-expr reprinted: .'_a'
-expr nodes: 1
+expr reprinted: uplus(.'_a')
+expr nodes: 2
 
 string: -a_
 expr reprinted: uminus(.'a_')
 expr nodes: 2
 
 string: +aa
-expr reprinted: .'aa'
-expr nodes: 1
+expr reprinted: uplus(.'aa')
+expr nodes: 2
 
 string: -_aa
 expr reprinted: uminus(.'_aa')
 expr nodes: 2
 
 string: +aa_
-expr reprinted: .'aa_'
-expr nodes: 1
+expr reprinted: uplus(.'aa_')
+expr nodes: 2
 
 string: -a_a
 expr reprinted: uminus(.'a_a')
 expr nodes: 2
 
 string: +apple
-expr reprinted: .'apple'
-expr nodes: 1
+expr reprinted: uplus(.'apple')
+expr nodes: 2
 
 string: -apple1
 expr reprinted: uminus(.'apple1')
 expr nodes: 2
 
 string: +app1e
-expr reprinted: .'app1e'
-expr nodes: 1
+expr reprinted: uplus(.'app1e')
+expr nodes: 2
 
 string: +.a
-expr reprinted: .'a'
-expr nodes: 1
+expr reprinted: uplus(.'a')
+expr nodes: 2
 
 string: -._
 expr reprinted: uminus(.'_')
 expr nodes: 2
 
 string: +.a_
-expr reprinted: .'a_'
-expr nodes: 1
+expr reprinted: uplus(.'a_')
+expr nodes: 2
 
 string: -._a
 expr reprinted: uminus(.'_a')
 expr nodes: 2
 
 string: +.aa
-expr reprinted: .'aa'
-expr nodes: 1
+expr reprinted: uplus(.'aa')
+expr nodes: 2
 
 string: -._aa
 expr reprinted: uminus(.'_aa')
 expr nodes: 2
 
 string: +.aa_
-expr reprinted: .'aa_'
-expr nodes: 1
+expr reprinted: uplus(.'aa_')
+expr nodes: 2
 
 string: -.a_a
 expr reprinted: uminus(.'a_a')
 expr nodes: 2
 
 string: +.apple
-expr reprinted: .'apple'
-expr nodes: 1
+expr reprinted: uplus(.'apple')
+expr nodes: 2
 
 string: -.apple1
 expr reprinted: uminus(.'apple1')
 expr nodes: 2
 
 string: +.app1e
-expr reprinted: .'app1e'
-expr nodes: 1
+expr reprinted: uplus(.'app1e')
+expr nodes: 2
 
 string: +.'a'
-expr reprinted: .'a'
-expr nodes: 1
+expr reprinted: uplus(.'a')
+expr nodes: 2
 
 string: -.'_'
 expr reprinted: uminus(.'_')
 expr nodes: 2
 
 string: +.'a_'
-expr reprinted: .'a_'
-expr nodes: 1
+expr reprinted: uplus(.'a_')
+expr nodes: 2
 
 string: -.'_a'
 expr reprinted: uminus(.'_a')
 expr nodes: 2
 
 string: +.'aa'
-expr reprinted: .'aa'
-expr nodes: 1
+expr reprinted: uplus(.'aa')
+expr nodes: 2
 
 string: -.'_aa'
 expr reprinted: uminus(.'_aa')
 expr nodes: 2
 
 string: +.'aa_'
-expr reprinted: .'aa_'
-expr nodes: 1
+expr reprinted: uplus(.'aa_')
+expr nodes: 2
 
 string: -.'a_a'
 expr reprinted: uminus(.'a_a')
 expr nodes: 2
 
 string: +.'apple'
-expr reprinted: .'apple'
-expr nodes: 1
+expr reprinted: uplus(.'apple')
+expr nodes: 2
 
 string: -.'apple1'
 expr reprinted: uminus(.'apple1')
 expr nodes: 2
 
 string: +.'app1e'
-expr reprinted: .'app1e'
-expr nodes: 1
+expr reprinted: uplus(.'app1e')
+expr nodes: 2
 
 string: -.'app-e'
 expr reprinted: uminus(.'app-e')
 expr nodes: 2
 
 string: +.'app e'
-expr reprinted: .'app e'
-expr nodes: 1
+expr reprinted: uplus(.'app e')
+expr nodes: 2
 
 string: -.' '
 expr reprinted: uminus(.' ')
@@ -660,100 +660,100 @@ string: +.""
 syntax error: quoted identifier cannot be empty at or near "+."""
 
 string: +a.a
-expr reprinted: 'a'.'a'
-expr nodes: 1
+expr reprinted: uplus('a'.'a')
+expr nodes: 2
 
 string: -_._
 expr reprinted: uminus('_'.'_')
 expr nodes: 2
 
 string: +a_.a_
-expr reprinted: 'a_'.'a_'
-expr nodes: 1
+expr reprinted: uplus('a_'.'a_')
+expr nodes: 2
 
 string: --_a._a
 expr reprinted: dec('_a'.'_a')
 expr nodes: 2
 
 string: +aa.aa
-expr reprinted: 'aa'.'aa'
-expr nodes: 1
+expr reprinted: uplus('aa'.'aa')
+expr nodes: 2
 
 string: -_aa._aa
 expr reprinted: uminus('_aa'.'_aa')
 expr nodes: 2
 
 string: +aa_.aa_
-expr reprinted: 'aa_'.'aa_'
-expr nodes: 1
+expr reprinted: uplus('aa_'.'aa_')
+expr nodes: 2
 
 string: -a_a.a_a
 expr reprinted: uminus('a_a'.'a_a')
 expr nodes: 2
 
 string: +apple.apple
-expr reprinted: 'apple'.'apple'
-expr nodes: 1
+expr reprinted: uplus('apple'.'apple')
+expr nodes: 2
 
 string: -apple1.apple1
 expr reprinted: uminus('apple1'.'apple1')
 expr nodes: 2
 
 string: +app1e.app1e
-expr reprinted: 'app1e'.'app1e'
-expr nodes: 1
+expr reprinted: uplus('app1e'.'app1e')
+expr nodes: 2
 
 string: +'a'.'a'
-expr reprinted: 'a'.'a'
-expr nodes: 1
+expr reprinted: uplus('a'.'a')
+expr nodes: 2
 
 string: -'_'.'_'
 expr reprinted: uminus('_'.'_')
 expr nodes: 2
 
 string: +'a_'.'a_'
-expr reprinted: 'a_'.'a_'
-expr nodes: 1
+expr reprinted: uplus('a_'.'a_')
+expr nodes: 2
 
 string: -'_a'.'_a'
 expr reprinted: uminus('_a'.'_a')
 expr nodes: 2
 
 string: +'aa'.'aa'
-expr reprinted: 'aa'.'aa'
-expr nodes: 1
+expr reprinted: uplus('aa'.'aa')
+expr nodes: 2
 
 string: -'_aa'.'_aa'
 expr reprinted: uminus('_aa'.'_aa')
 expr nodes: 2
 
 string: +'aa_'.'aa_'
-expr reprinted: 'aa_'.'aa_'
-expr nodes: 1
+expr reprinted: uplus('aa_'.'aa_')
+expr nodes: 2
 
 string: -'a_a'.'a_a'
 expr reprinted: uminus('a_a'.'a_a')
 expr nodes: 2
 
 string: +'apple'.'apple'
-expr reprinted: 'apple'.'apple'
-expr nodes: 1
+expr reprinted: uplus('apple'.'apple')
+expr nodes: 2
 
 string: -'apple1'.'apple1'
 expr reprinted: uminus('apple1'.'apple1')
 expr nodes: 2
 
 string: +'app1e'.'app1e'
-expr reprinted: 'app1e'.'app1e'
-expr nodes: 1
+expr reprinted: uplus('app1e'.'app1e')
+expr nodes: 2
 
 string: -'app-e'.'app-e'
 expr reprinted: uminus('app-e'.'app-e')
 expr nodes: 2
 
 string: +'app e'.'app e'
-expr reprinted: 'app e'.'app e'
-expr nodes: 1
+expr reprinted: uplus('app e'.'app e')
+expr nodes: 2
 
 string: -' '.' '
 expr reprinted: uminus(' '.' ')
@@ -958,8 +958,8 @@ expr reprinted: add(1.000000,.'aa')
 expr nodes: 3
 
 string: 1+ +2
-expr reprinted: add(1.000000,2.000000)
-expr nodes: 3
+expr reprinted: add(1.000000,uplus(2.000000))
+expr nodes: 4
 
 string: 1+ ++2
 expr reprinted: add(1.000000,inc(2.000000))
@@ -982,52 +982,52 @@ expr reprinted: add(inc(inc(1.000000)),2.000000)
 expr nodes: 5
 
 string: 1+ +2
-expr reprinted: add(1.000000,2.000000)
-expr nodes: 3
+expr reprinted: add(1.000000,uplus(2.000000))
+expr nodes: 4
 
 string: 1 ++2
 syntax error at or near "2"
 
 string: 1 + +2
-expr reprinted: add(1.000000,2.000000)
-expr nodes: 3
+expr reprinted: add(1.000000,uplus(2.000000))
+expr nodes: 4
 
 string: 1 + + 2
-expr reprinted: add(1.000000,2.000000)
-expr nodes: 3
+expr reprinted: add(1.000000,uplus(2.000000))
+expr nodes: 4
 
 string: 1+ +a
-expr reprinted: add(1.000000,.'a')
-expr nodes: 3
+expr reprinted: add(1.000000,uplus(.'a'))
+expr nodes: 4
 
 string: 1 ++a
 syntax error at or near "a"
 
 string: 1 + +a
-expr reprinted: add(1.000000,.'a')
-expr nodes: 3
+expr reprinted: add(1.000000,uplus(.'a'))
+expr nodes: 4
 
 string: 1 + + a
-expr reprinted: add(1.000000,.'a')
-expr nodes: 3
+expr reprinted: add(1.000000,uplus(.'a'))
+expr nodes: 4
 
 string: 1++aa
 syntax error at or near "aa"
 
 string: 1+ +aa
-expr reprinted: add(1.000000,.'aa')
-expr nodes: 3
+expr reprinted: add(1.000000,uplus(.'aa'))
+expr nodes: 4
 
 string: 1 ++aa
 syntax error at or near "aa"
 
 string: 1 + +aa
-expr reprinted: add(1.000000,.'aa')
-expr nodes: 3
+expr reprinted: add(1.000000,uplus(.'aa'))
+expr nodes: 4
 
 string: 1 + + aa
-expr reprinted: add(1.000000,.'aa')
-expr nodes: 3
+expr reprinted: add(1.000000,uplus(.'aa'))
+expr nodes: 4
 
 string: 1+-2
 expr reprinted: add(1.000000,uminus(2.000000))
@@ -1186,8 +1186,8 @@ expr reprinted: iif(lnot('q'.'a'),uminus(1.500000),uminus(3.000000))
 expr nodes: 7
 
 string: q.a ? +1.5 : +3
-expr reprinted: iif('q'.'a',1.500000,3.000000)
-expr nodes: 4
+expr reprinted: iif('q'.'a',uplus(1.500000),uplus(3.000000))
+expr nodes: 6
 
 string: !q.a ? 1 + 2 * 3 : (1 + 2) * 3
 expr reprinted: iif(lnot('q'.'a'),add(1.000000,mul(2.000000,3.000000)),mul(add(1.000000,2.000000),3.000000))
@@ -1207,8 +1207,8 @@ expr reprinted: iif(lnot('q'.'a'),uminus(1.500000),uminus(3.000000))
 expr nodes: 7
 
 string: iif(q.a, +1.5, +3)
-expr reprinted: iif('q'.'a',1.500000,3.000000)
-expr nodes: 4
+expr reprinted: iif('q'.'a',uplus(1.500000),uplus(3.000000))
+expr nodes: 6
 
 string: iif(!q.a, 1 + 2 * 3, (1 + 2) * 3)
 expr reprinted: iif(lnot('q'.'a'),add(1.000000,mul(2.000000,3.000000)),mul(add(1.000000,2.000000),3.000000))

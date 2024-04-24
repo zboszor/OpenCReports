@@ -333,7 +333,7 @@ exp:
 							}
 	| '+' exp %prec UMINUS	{
 								yyset_lloc(&@1, yyscanner);
-								$$ = $2;
+								$$ = newexpr(yyscanner, ocrpt_mem_string_new_with_len("uplus", 6), ocrpt_makelist($2, NULL));
 							}
 	| INCDEC exp			{
 								yyset_lloc(&@1, yyscanner);
