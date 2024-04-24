@@ -3608,7 +3608,7 @@ ocrpt_list_free_deep(ocrpt_list *l,
 				</para>
 			</sect3>
 		</sect2>
-		<sect2 id="stringfuncs">
+		<sect2 id="cstringfuncs">
 			<title>String related functions</title>
 			<para>
 				For memory safety and higher performance, a wrapper

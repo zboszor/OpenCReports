@@ -4,6 +4,7 @@
 <!ENTITY introduction SYSTEM "introduction.sgm">
 <!ENTITY dsandqueries SYSTEM "dsandqueries.sgm">
 <!ENTITY expressions SYSTEM "expressions.sgm">
+<!ENTITY functions SYSTEM "functions.sgm">
 <!ENTITY variables SYSTEM "variables.sgm">
 <!ENTITY breaks SYSTEM "breaks.sgm">
 <!ENTITY formatting SYSTEM "formatting.sgm">
@@ -36,6 +37,7 @@
 	&introduction;
 	&dsandqueries;
 	&expressions;
+	&functions;
 	&variables;
 	&breaks;
 	&formatting;

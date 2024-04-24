@@ -5,6 +5,7 @@ SGMLFILES = \
 	introduction.sgm \
 	dsandqueries.sgm \
 	expressions.sgm \
+	functions.sgm \
 	variables.sgm \
 	breaks.sgm \
 	xmldescription.sgm \
