@@ -1,307 +1,11 @@
-<chapter id="c-api-reference" xreflabel="C API Reference">
-	<title>C language API reference</title>
-	<sect1 id="c_header">
-		<title>Header file</title>
-		<para>
-			For using OpenCReports, this single header must be used:
-			<programlisting>#include &lt;opencreport.h&gt;</programlisting>
-		</para>
-	</sect1>
-	<sect1 id="highlevelapi" xreflabel="High level C API">
-		<title>High level C API</title>
-		<para>
-			Example code using the high level C API where everything
-			concerning the report (including the data source)
-			is described in the report XML:
-			<programlisting>#include &lt;opencreport.h&gt;
-
-int main(void) {
-    opencreport *o = ocrpt_init();
-
-    if (!ocrpt_parse_xml(o, "report.xml")) {
-        printf("XML parse error\n");
-        ocrpt_free(o);
-        return 1;
-    }
-
-    ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);
-    ocrpt_execute(o);
-    ocrpt_spool(o);
-    ocrpt_free(o);
-    return 0;
-}</programlisting>
-		</para>
-		<para>
-			The above code will load <literal>report.xml</literal>,
-			set the output format to PDF, runs the report and prints
-			its output on <literal>stdout</literal>.
-		</para>
-		<sect2 id="rephndinit">
-			<title>Report handler initialization</title>
-			<para>
-				<programlisting>opencreport *
-ocrpt_init(void);</programlisting>
-			</para>
-		</sect2>
-		<sect2 id="loadrepxml">
-			<title>Load a report XML description</title>
-			<para>
-				This function loads the specified XML file
-				into the report handler. It returns
-				<literal>true</literal> for success,
-				<literal>false</literal> for failure.
-				<programlisting>bool
-ocrpt_parse_xml(opencreport *o,
-                const char *filename);</programlisting>
-			</para>
-		</sect2>
-		<sect2 id="parsexmlfrombuf">
-			<title>Parse report XML description from a buffer</title>
-			<para>
-				This function parses the buffer as if it contained
-				XML contents and loads the details into the report handler.
-				It returns <literal>true</literal> for success,
-				<literal>false</literal> for failure.
-				<programlisting>bool
-ocrpt_parse_xml_from_buffer(opencreport *o,
-                            const char *buffer,
-                            size_t size);</programlisting>
-			</para>
-		</sect2>
-		<sect2 id="setoutpfmt">
-			<title>Set report output format</title>
-			<para>
-				<programlisting>enum ocrpt_format_type {
-    OCRPT_OUTPUT_UNSET,
-    OCRPT_OUTPUT_PDF,
-    OCRPT_OUTPUT_HTML,
-    OCRPT_OUTPUT_TXT,
-    OCRPT_OUTPUT_CSV,
-    OCRPT_OUTPUT_XML
-};
-typedef enum ocrpt_format_type ocrpt_format_type;
-
-void
-ocrpt_set_output_format(opencreport *o,
-                        ocrpt_format_type format);</programlisting>
-			</para>
-		</sect2>
-		<sect2 id="setoutpparam">
-			<title>Set report output parameter</title>
-			<para>
-				Set output parameters for the report.
-				<programlisting>void
-ocrpt_set_output_parameter(opencreport *o,
-                           const char *param,
-                           const char *value);</programlisting>
-			</para>
-			<para>
-				Possible parameters for the HTML output driver:
-				<itemizedlist>
-					<listitem override="bullet">
-						<para>
-							<literal>document_root</literal> sets
-							the document root for trimming path prefix
-							from image paths.
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							<literal>meta</literal> extends
-							the default
-							<literal>&lt;meta charset="utf-8"&gt;</literal>.
-                            <literal>literal</literal> (see
-							The passed-in string value may contain
-							the whole <literal>&lt;meta ...&gt;</literal>,
-							in which case the inner parameters are
-							used only. The <literal>charset</literal>
-							specification is ignored. Only the rest is used.
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							<literal>suppress_head</literal> suppresses the default
-							<literal>&lt;head&gt; ... &lt;/head&gt;</literal> section.
-							Possible values to enable suppressing the
-							default <literal>&lt;head&gt; ... &lt;/head&gt;</literal>
-							are <literal>yes</literal>,
-							<literal>true</literal>,
-							<literal>on</literal> or any positive non-zero
-							number. Anything else disables it.
-							Be aware, that the default section contains
-							importand CSS stylesheet settings that are
-							needed for the correct layout.
-						</para>
-					</listitem>
-				</itemizedlist>
-			</para>
-			<para>
-				Possible parameters for the CSV output driver:
-				<itemizedlist>
-					<listitem override="bullet">
-						<para>
-							<literal>csv_filename</literal> sets the file
-							name for <literal>Content-Disposition</literal>
-							in the HTTP metadata returned by
-							<literal>ocrpt_get_content_type()</literal>.
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							<literal>csv_as_text</literal> sets the MIME type
-							for <literal>Content-Type</literal>
-							in the HTTP metadata returned by
-							<literal>ocrpt_get_content_type()</literal>
-							to <literal>text/plain</literal> when enabled.
-							By default it's <literal>text/csv</literal>.
-							Possible values to enable it are
-							<literal>yes</literal>,
-							<literal>true</literal>,
-							<literal>on</literal> or any positive non-zero
-							number. Anything else disables it.
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							<literal>csv_delimiter</literal> (also aliased as
-							<literal>csv_delimeter</literal> according to
-							the historical typo in RLIB) sets the CSV field
-							delimiter to the first character of the string.
-							By default it's a comma.
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							<literal>no_quotes</literal> will create a CSV
-							output with values unquoted.
-							Possible values to enable it are
-							<literal>yes</literal>,
-							<literal>true</literal>,
-							<literal>on</literal> or any positive non-zero
-							number. Anything else disables it.
-							It takes precedence over
-							<literal>only_quote_strings</literal>
-						</para>
-					</listitem>
-					<listitem override="bullet">
-						<para>
-							<literal>only_quote_strings</literal>
-							will create a CSV output with only string
-							values quoted.
-							Possible values to enable it are
-							<literal>yes</literal>,
-							<literal>true</literal>,
-							<literal>on</literal> or any positive non-zero
-							number. Anything else disables it.
-						</para>
-					</listitem>
-				</itemizedlist>
-			</para>
-			<para>
-				Note that some languages (e.g. German, Swedish
-				and Hungarian) use comma as the decimal separator
-				instead of decimal point. For these languages,
-				either set <literal>csv_delimiter</literal> or
-				set neither <literal>no_quotes</literal>, nor
-				<literal>only_quote_strings</literal>
-			</para>
-			<para>
-				Possible parameters for the XML output driver:
-				<itemizedlist>
-					<listitem override="bullet">
-						<para>
-							<literal>xml_rlib_compat</literal> sets the
-							flag to create an RLIB compatible XML output.
-							Possible values to enable it are
-							<literal>yes</literal>,
-							<literal>true</literal>,
-							<literal>on</literal> or any positive non-zero
-							number. Anything else disables it.
-						</para>
-						<para>
-							When enabled, the toplevel element
-							will be <literal>&lt;rlib&gt;</literal>
-							and <literal>&lt;Report&gt;</literal>s
-							inside <literal>&lt;pd&gt;</literal>
-							won't be embedded in a
-							<literal>report</literal> element.
-						</para>
-					</listitem>
-				</itemizedlist>
-			</para>
-		</sect2>
-		<sect2 id="runreport">
-			<title>Run the report</title>
-			<para>
-				This function executes the report, constructs
-				the result in memory. It returns <literal>true</literal>
-				for success, <literal>false</literal> for failure.
-				It is a failure if the output format is unset.
-				<programlisting>bool
-ocrpt_execute(opencreport *o);</programlisting>
-			</para>
-		</sect2>
-		<sect2 id="dumpreport">
-			<title>Dump report result</title>
-			<para>
-				Dump the report output on the program's
-				standard output channel.
-				<programlisting>void
-ocrpt_spool(opencreport *o);</programlisting>
-			</para>
-		</sect2>
-		<sect2 id="getresult">
-			<title>Get report result</title>
-			<para>
-				Get the report output. The application
-				then can save it as a file.
-				<programlisting>const char *
-ocrpt_get_output(opencreport *o, size_t *length);</programlisting>
-			</para>
-		</sect2>
-		<sect2 id="getcontenttype">
-			<title>Get report content type</title>
-			<para>
-				Get the report content type for web publishing.
-				The content type depends on the output type
-				the report was executed with.
-				It returns an array of
-				<literal>ocrpt_string *</literal> pointers
-				for potentially multiple HTTP header lines.
-				The last pointer in the array is
-				<literal>NULL</literal>.
-				<programlisting>const ocrpt_string **
-ocrpt_get_content_type(opencreport *o);</programlisting>
-			</para>
-		</sect2>
-		<sect2 id="rephnddestroy">
-			<title>Report handler destruction</title>
-			<para>
-				Calling this function frees up the report handler
-				structure and everything created for it, even
-				the details that were created by the low level API.
-				<programlisting>void
-ocrpt_free(opencreport *o);</programlisting>
-			</para>
-		</sect2>
-		<sect2 id="getlibver">
-			<title>Get library version</title>
-			<para>
-				This function reports the OpenCReports
-				library version.
-				<programlisting>const char *
-ocrpt_version(void);</programlisting>
-			</para>
-		</sect2>
-	</sect1>
+<chapter id="c-api-ref-low" xreflabel="Low level C API Reference">
+	<title>Low level C language API reference</title>
 	<sect1 id="lowlevelapi" xreflabel="Low level C API">
 		<title>Low level C API</title>
 		<para>
-			The <xref linkend="highlevelapi"/> is also part of the
-			low level API. The functions described below allow
-			creating a report using program code, or simply
-			fine tuning the report behavior by mostly using the
-			<xref linkend="highlevelapi"/>.
+			The low level API extends the <xref linkend="highlevelapi"/>
+			to either fine-tune the report behaviour, or to create
+			a report purely from program code.
 		</para>
 		<sect2 id="numerictuning" xreflabel="Numeric behavior related functions">
 			<title>Numeric behavior related functions</title>
@@ -317,12 +21,21 @@ ocrpt_set_numeric_precision_bits(opencreport *o,
                                  const char *expr_string);</programlisting>
 				</para>
 			</sect3>
+			<sect3 id="getnumprec">
+				<title><literal>Get numeric precision</literal></title>
+				<para>
+					The report XML description may set the numeric
+					precision. This function allows the application
+					to query it.
+					<programlisting>mpfr_prec_t
+ocrpt_get_numeric_precision_bits(opencreport *o);</programlisting>
+				</para>
+			</sect3>
 			<sect3 id="setroundingmode">
 				<title>Set rounding mode</title>
 				<para>
-					Set the rounding mode. The expression string must
-					evaluate to a string value with values
-					<literal>nearest</literal>,
+					The expression string must evaluate to a string value.
+					Possible values are: <literal>nearest</literal>,
 					<literal>to_minus_inf</literal>,
 					<literal>to_inf</literal>,
 					<literal>to_zero</literal>,
@@ -373,8 +86,8 @@ ocrpt_bindtextdomain_from_expr(opencreport *o,
 				<title>Set report locale</title>
 				<para>
 					Setting the locale for the report does not affect
-					the main program or other threads. Locale setting
-					includes the language, the country. The UTF-8 suffix
+					the main program or other threads. A locale setting
+					includes the language and the country. The UTF-8 suffix
 					is necessary. E.g.: <literal>en_GB.UTF-8</literal> or
 					<literal>de_DE.UTF-8</literal>
 					<programlisting>void
@@ -432,317 +145,166 @@ struct ocrpt_query;
 typedef struct ocrpt_query ocrpt_query;
 
 struct ocrpt_query_result;
-typedef struct ocrpt_query_result ocrpt_query_result;
-
-struct ocrpt_input {
-    void (*describe)(ocrpt_query *,
-                     ocrpt_query_result **,
-                     int32_t *);
-    void (*rewind)(ocrpt_query *);
-    bool (*next)(ocrpt_query *);
-    bool (*populate_result)(ocrpt_query *);
-    bool (*isdone)(ocrpt_query *);
-    void (*free)(ocrpt_query *);
-    bool (*set_encoding)(ocrpt_datasource *,
-                         const char *);
-    void (*close)(const ocrpt_datasource *);
-};
-typedef struct ocrpt_input ocrpt_input;</programlisting>
+typedef struct ocrpt_query_result ocrpt_query_result;</programlisting>
 			</para>
 			<para>
-				Data sources in this context are "mini drivers".
-				Data source handling is implemented via
-				<literal>ocrpt_input</literal> functions.
-			</para>
-			<para>
-				Queries are data providers over data sources. They are
-				the actual sources of data using a specific data source.
+				For more details, see <xref linkend="dsandqueries"/>.
 				Multiple queries may use the same data source.
 			</para>
-			<sect3 id="addarrayds">
-				<title>Add an array datasource</title>
+			<sect3 id="addds">
+				<title>Add a datasource</title>
 				<para>
-					Add an array datasource to the report handler.
+					Add a datasource of the specific
+					<emphasis>type</emphasis> to the report handler with the
+					associated <emphasis>source_name</emphasis>, using
+					optional <emphasis>connection parameters</emphasis>.
 					<programlisting>ocrpt_datasource *
-ocrpt_datasource_add_array(opencreport *o,
-                           const char *source_name);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="testdsforarray">
-				<title>Test whether a datasource is array based</title>
-				<para>
-					<programlisting>bool
-ocrpt_datasource_is_array(ocrpt_datasource *source);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="addarrayquery">
-				<title>Add an array query</title>
-				<para>
-					Add an "array query" to the report handler.
-					This adds the array pointer and parameters, so
-					the array datasource input driver can use it.
-					The provided <literal>array</literal> array pointer
-					contains <literal>(rows + 1) * cols</literal> number of
-					<literal>char *</literal> pointers, with the first row
-					being the column (field) names. The
-					<literal>types</literal> array contains
-					<literal>cols</literal> number of
-					<literal>enum ocrpt_result_type</literal> elements to
-					indicate the column data type.
-					<programlisting>ocrpt_query *
-ocrpt_query_add_array(ocrpt_datasource *source,
-                      const char *name,
-                      const char **array,
-                      int32_t rows, int32_t cols,
-                      const int32_t *types,
-                      int32_t types_cols);</programlisting>
+ocrpt_datasource_add(opencreport *o,
+                     const char *source_name,
+                     const char *type,
+                     const ocrpt_input_connect_parameter *conn_params);</programlisting>
 				</para>
 				<para>
-					If the <literal>types</literal> pointer is
-					<literal>NULL</literal>, the column values are treated
-					as strings. This is how RLIB operated.
+					The pointer to connection parameters can be
+					NULL for <literal>array</literal>,
+					<literal>csv</literal>, <literal>json</literal>,
+					and <literal>xml</literal> datasource types.
 				</para>
-			</sect3>
-			<sect3 id="addcsvds">
-				<title>Add a CSV datasource</title>
-				<para>
-					Add a CSV datasource to the report handler.
-					<programlisting>ocrpt_datasource *
-ocrpt_datasource_add_csv(opencreport *o,
-                         const char *source_name);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="testdsforcsv">
-				<title>Test whether a datasource is CSV based</title>
-				<para>
-					<programlisting>bool
-ocrpt_datasource_is_csv(ocrpt_datasource *source);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="addcsvquery">
-				<title>Add a CSV query</title>
-				<para>
-					Add a "CSV query" to the report handler.
-					This specifies the file name, so
-					the CSV datasource input driver can load it.
-					<programlisting>ocrpt_query *
-ocrpt_query_add_csv(ocrpt_datasource *source,
-                    const char *name,
-                    const char *filename,
-                    const int32_t *types,
-                    int32_t types_cols);</programlisting>
-				</para>
-				<para>
-					The <literal>types</literal> array pointer is optional.
-					If it is <literal>NULL</literal>, the column values are
-					treated as strings. This is how RLIB operated.
-				</para>
-			</sect3>
-			<sect3 id="addjsonds">
-				<title>Add a JSON datasource</title>
-				<para>
-					Add a JSON datasource to the report handler.
-					<programlisting>ocrpt_datasource *
-ocrpt_datasource_add_json(opencreport *o,
-                          const char *source_name);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="testdsforjson">
-				<title>Test whether a datasource is JSON based</title>
-				<para>
-					<programlisting>bool
-ocrpt_datasource_is_json(ocrpt_datasource *source);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="addjsonquery">
-				<title>Add a JSON query</title>
-				<para>
-					Add a "JSON query" to the report handler.
-					This specifies the file name, so
-					the JSON datasource input driver can load it.
-					<programlisting>ocrpt_query *
-ocrpt_query_add_json(ocrpt_datasource *source,
-                     const char *name,
-                     const char *filename,
-                     const int32_t *types,
-                     int32_t types_cols);</programlisting>
-				</para>
-				<para>
-					The JSON file format defined in <xref linkend="jsonds"/>
-					contains the way to describe the column data types,
-					which is optional in a JSON file.
-					The <literal>types</literal> array pointer may
-					optionally supplement (or override) the column types.
-					It is only meaningful if the JSON file itself doesn't
-					contain the type description for the columns. If it is
-					<literal>NULL</literal> (and the JSON file doesn't
-					contain type specifiers), the column values are
-					treated as strings. RLIB didn't have JSON input.
-				</para>
-			</sect3>
-			<sect3 id="addxmlds">
-				<title>Add an XML datasource</title>
-				<para>
-					Add an XML datasource to the report handler.
-					<programlisting>ocrpt_datasource *
-ocrpt_datasource_add_xml(opencreport *o,
-                         const char *source_name);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="testdsforxml">
-				<title>Test whether a datasource is XML based</title>
-				<para>
-					<programlisting>bool
-ocrpt_datasource_is_xml(ocrpt_datasource *source);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="addxmlquery">
-				<title>Add an XML query</title>
-				<para>
-					Add an "XML query" to the report handler.
-					This specifies the file name, so
-					the XML datasource input driver can load it.
-					<programlisting>ocrpt_query *
-ocrpt_query_add_xml(ocrpt_datasource *source,
-                    const char *name,
-                    const char *filename,
-                    const int32_t *types,
-                    int32_t types_cols);</programlisting>
-				</para>
-				<para>
-					The XML file format defined in <xref linkend="xmlds"/>
-					contains the way to describe the column data types,
-					which is optional in an XML file.
-					The <literal>types</literal> array pointer may
-					optionally supplement (or override) the column types.
-					It is only meaningful if the XML file itself doesn't
-					contain the type description for the columns. If it is
-					<literal>NULL</literal> (and the XML file doesn't
-					contain type specifiers), the column values are
-					treated as strings. This is how RLIB operated.
-					The OpenCReports XML input file format is RLIB
-					compatible without the type specification part.
-				</para>
-			</sect3>
-			<sect3 id="addpgds">
-				<title>Add a PostgreSQL datasource</title>
-				<para>
-					Add a PostgreSQL datasource to the report handler.
-					<programlisting>ocrpt_datasource *
-ocrpt_datasource_add_postgresql(opencreport *o,
-                                const char *source_name,
-                                const char *host,
-                                const char *port,
-                                const char *dbname,
-                                const char *user,
-                                const char *password);
-
-ocrpt_datasource *
-ocrpt_datasource_add_postgresql2(opencreport *o,
-                                 const char *source_name,
-                                 const char *conninfo);</programlisting>
-				</para>
-				<para>
-					For the parameters, see <xref linkend="postgresqlds"/>.
-				</para>
-			</sect3>
-			<sect3 id="testdsforpg">
-				<title>Test whether a datasource is PostgreSQL based</title>
-				<para>
-					<programlisting>bool
-ocrpt_datasource_is_postgresql(ocrpt_datasource *source);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="addpgquery">
-				<title>Add a PostgreSQL query</title>
-				<para>
-					Add a SQL query using the PostgreSQL datasource
-					to the report handler.
-					<programlisting>ocrpt_query *
-ocrpt_query_add_postgresql(ocrpt_datasource *source,
-                           const char *name,
-                           const char *querystr);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="addmariads">
-				<title>Add a MariaDB datasource</title>
-				<para>
-					Add a MariaDB datasource to the report handler.
-					<programlisting>ocrpt_datasource *
-ocrpt_datasource_add_mariadb(opencreport *o,
-                             const char *source_name,
-                             const char *host,
-                             const char *port,
-                             const char *dbname,
-                             const char *user,
-                             const char *password,
-                             const char *unix_socket);
-
-ocrpt_datasource *
-ocrpt_datasource_add_mariadb2(opencreport *o,
-                              const char *source_name,
-                              const char *optionfile,
-                              const char *group);</programlisting>
-				</para>
-				<para>
-					For the parameters, see <xref linkend="mariadbds"/>.
-				</para>
-			</sect3>
-			<sect3 id="testdsformaria">
-				<title>Test whether a datasource is MariaDB based</title>
-				<para>
-					<programlisting>bool
-ocrpt_datasource_is_mariadb(ocrpt_datasource *source);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="addmariaquery">
-				<title>Add a MariaDB query</title>
-				<para>
-					Add an SQL query using the MariaDB datasource
-					to the report handler.
-					<programlisting>ocrpt_query *
-ocrpt_query_add_mariadb(ocrpt_datasource *source,
-                        const char *name,
-                        const char *querystr);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="addodbcds">
-				<title>Add an ODBC datasource</title>
-				<para>
-					Add an ODBC datasource to the report handler.
-					<programlisting>ocrpt_datasource *
-ocrpt_datasource_add_odbc(opencreport *o,
-                          const char *source_name,
-                          const char *dbname,
-                          const char *user,
-                          const char *password);
-
-ocrpt_datasource *
-ocrpt_datasource_add_odbc2(opencreport *o,
-                           const char *source_name,
-                           const char *conninfo);</programlisting>
-				</para>
-				<para>
-					For the parameters, see <xref linkend="odbcds"/>.
-				</para>
-			</sect3>
-			<sect3 id="testdsforodbc">
-				<title>Test whether a datasource is ODBC based</title>
-				<para>
-					<programlisting>bool
-ocrpt_datasource_is_odbc(ocrpt_datasource *source);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="addodbcquery">
-				<title>Add an ODBC query</title>
-				<para>
-					Add an SQL query using the ODBC datasource
-					to the report handler.
-					<programlisting>ocrpt_query *
-ocrpt_query_add_odbc(ocrpt_datasource *source,
-                     const char *name,
-                     const char *querystr);</programlisting>
-				</para>
+				<sect4 id="mariadbconnparams">
+					<title>MariaDB connection parameters</title>
+					<para>
+						There are two methods to connect to a MariaDB
+						(or MySQL) database.
+					</para>
+					<para>
+						The first method uses a MariaDB (MySQL) specific
+						configuration <literal>ini</literal> file and
+						the <literal>group</literal> name in it.
+						The <literal>group</literal> parameter is mandatory
+						as the main database configuration may also have such
+						a group section, in which case the separate
+						<literal>optionfile</literal> is not needed.
+						<programlisting>ocrpt_input_connect_parameter conn_params[] = {
+    { .param_name = "group", .param_value = "..." },
+    { .param_name = "optionfile", .param_value = "..." },
+    { .param_name = NULL }
+};</programlisting>
+					</para>
+					<para>
+						The second method spells out individual connection
+						parameters. This allows <emphasis>local</emphasis>
+						and <emphasis>remote</emphasis> database
+						connections. The <literal>dbname</literal> parameter
+						is mandatory, others are optional.
+						<programlisting>ocrpt_input_connect_parameter conn_params[] = {
+    { .param_name = "dbname", .param_value = "..." },
+    { .param_name = "host", .param_value = "..." },
+    { .param_name = "port", .param_value = "..." },
+    { .param_name = "unix_socket", .param_value = "..." },
+    { .param_name = "user", .param_value = "..." },
+    { .param_name = "password", .param_value = "..." },
+    { .param_name = NULL }
+};</programlisting>
+					</para>
+					<para>
+						These connection parameters can be used as XML node
+						attributes, see <xref linkend="mariadbds"/>.
+					</para>
+				</sect4>
+				<sect4 id="pgconnparams">
+					<title>PostgreSQL connection parameters</title>
+					<para>
+						There are three methods to connect to a PostgreSQL
+						database.
+					</para>
+					<para>
+						The first method uses the PostgreSQL specific
+						<emphasis>connection string</emphasis>. It is the
+						only setting and as such, it's mandatory. Its content
+						is almost freeform, with optional elements.
+						See <ulink url="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING">PostgreSQL connection string</ulink>.
+						<programlisting>ocrpt_input_connect_parameter conn_params[] = {
+    { .param_name = "connstr", .param_value = "..." },
+    { .param_name = NULL }
+};</programlisting>
+					</para>
+					<para>
+						The second method spells out individual connection
+						parameters. This allows <emphasis>local</emphasis>
+						database connections on a <emphasis>named socket</emphasis>.
+						The <literal>unix_socket</literal> and
+						<literal>dbname</literal> parameters are mandatory,
+						others are optional.
+						<programlisting>ocrpt_input_connect_parameter conn_params[] = {
+    { .param_name = "unix_socket", .param_value = "..." },
+    { .param_name = "dbname", .param_value = "..." },
+    { .param_name = "user", .param_value = "..." },
+    { .param_name = "password", .param_value = "..." },
+    { .param_name = NULL }
+};</programlisting>
+					</para>
+					<para>
+						The third method also spells out individual connection
+						parameters. This allows <emphasis>remote</emphasis>
+						database connection using the <literal>host</literal>
+						and <literal>port</literal> parameters. Only the
+						<literal>dbname</literal> parameter is mandatory,
+						others are optional.
+						<programlisting>ocrpt_input_connect_parameter conn_params[] = {
+    { .param_name = "dbname", .param_value = "..." },
+    { .param_name = "host", .param_value = "..." },
+    { .param_name = "port", .param_value = "..." },
+    { .param_name = "user", .param_value = "..." },
+    { .param_name = "password", .param_value = "..." },
+    { .param_name = NULL }
+};</programlisting>
+					</para>
+					<para>
+						These connection parameters can be used as XML node
+						attributes, see <xref linkend="postgresqlds"/>.
+					</para>
+				</sect4>
+				<sect4 id="odbcconnparams">
+					<title>ODBC connection parameters</title>
+					<para>
+						There are two methods to connect to an ODBC database.
+					</para>
+					<para>
+						The first method uses the ODBC specific
+						<emphasis>connection string</emphasis>. It is the
+						only setting, and as such, it's mandatory.
+						Its content is defined by the ODBC knowledge base
+						with optional elements.
+						See
+						<ulink url="https://docs.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc">Microsoft Open Database Connectivity</ulink>
+						and
+						<ulink url="https://www.connectionstrings.com/">Connection string examples </ulink>.
+						<programlisting>ocrpt_input_connect_parameter conn_params[] = {
+    { .param_name = "connstr", .param_value = "..." },
+    { .param_name = NULL }
+};</programlisting>
+					</para>
+					<para>
+						The second method spells out <emphasis>some</emphasis>
+						individual connection parameters. It requires that
+						an ODBC data source (DSN) is already configured.
+						Whether the database connections is
+						<emphasis>local</emphasis> or
+						<emphasis>remote</emphasis> depends on the
+						pre-configured DSN. The <literal>dbname</literal>
+						parameters is mandatory, others are optional.
+						<programlisting>ocrpt_input_connect_parameter conn_params[] = {
+    { .param_name = "dbname", .param_value = "..." },
+    { .param_name = "user", .param_value = "..." },
+    { .param_name = "password", .param_value = "..." },
+    { .param_name = NULL }
+};</programlisting>
+					</para>
+					<para>
+						These connection parameters can be used as XML node
+						attributes, see <xref linkend="odbcds"/>.
+					</para>
+				</sect4>
 			</sect3>
 			<sect3 id="findds">
 				<title>Find a datasource</title>
@@ -753,16 +315,6 @@ ocrpt_query_add_odbc(ocrpt_datasource *source,
 					<programlisting>ocrpt_datasource *
 ocrpt_datasource_get(opencreport *o,
                      const char *source_name);</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="addcustomds">
-				<title><literal>Add a custom datasource</literal></title>
-				<para>
-					Add a custom data source to the report handler.
-					<programlisting>ocrpt_datasource *
-ocrpt_add_datasource(opencreport *o,
-                     const char *source_name,
-                     const ocrpt_input *input);</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="setdsencoding">
@@ -785,6 +337,152 @@ ocrpt_datasource_set_encoding(ocrpt_datasource *source,
 					<literal>ocrpt_free()</literal>
 					<programlisting>void
 ocrpt_datasource_free(ocrpt_datasource *source);</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="adddataquery">
+				<title>Add a direct data based query</title>
+				<para>
+					Add a direct (application internal) data based query
+					to the report handler.
+					<programlisting>ocrpt_query *
+ocrpt_query_add_data(ocrpt_datasource *source,
+                     const char *name,
+                     const void *data,
+                     int32_t rows, int32_t cols,
+                     const int32_t *types,
+                     int32_t types_cols);</programlisting>
+				</para>
+				<para>
+					The built-in <literal>array</literal> datasource
+					interprets <literal>void *data</literal> as a
+					two-dimensional array containing pointers to C strings,
+					a.k.a. <programlisting>char *array[rows + 1][cols]</programlisting>
+					The first row of the array are the column (field) names.
+					The <literal>types</literal> array contains
+					<literal>cols</literal> (or fewer) number of
+					<literal>enum ocrpt_result_type</literal> elements to
+					indicate the column data types.
+				</para>
+				<para>
+					If the <literal>types</literal> pointer is
+					<literal>NULL</literal>, the column values are treated
+					as <literal>string</literal> data. This is how RLIB
+					worked.
+				</para>
+				<para>
+					The call is only successful if the datasource
+					is direct data based. See <xref linkend="isdsdata"/> and
+					<xref linkend="inputdriver"/>.
+				</para>
+			</sect3>
+			<sect3 id="addsymdataquery">
+				<title>Add a symbolic data based query</title>
+				<para>
+					Add a "symbolic" (discoverable by name) data
+					based query.
+					<programlisting>ocrpt_query *
+ocrpt_query_add_symbolic_data(ocrpt_datasource *source,
+                              const char *name,
+                              const char *data_name,
+                              int32_t rows, int32_t cols,
+                              const char *types_name,
+                              int32_t types_cols);</programlisting>
+				</para>
+				<para>
+					Symbols of the application can be discovered via
+					<literal>dlsym()</literal> if the application was
+					built with the compiler option
+					<literal>-rdynamic</literal>.
+				</para>
+				<para>
+					The call is only successful if the datasource
+					is symbolic data based. See <xref linkend="isdssymdata"/>
+					and <xref linkend="inputdriver"/>.
+				</para>
+			</sect3>
+			<sect3 id="addfilequery">
+				<title>Add a file based query</title>
+				<para>
+					Add a file based query to the report handler.
+					<programlisting>ocrpt_query *
+ocrpt_query_add_file(ocrpt_datasource *source,
+                     const char *name,
+                     const char *filename,
+                     const int32_t *types,
+                     int32_t types_cols);</programlisting>
+				</para>
+				<para>
+					The call is only successful if the datasource
+					is file based. See <xref linkend="isdsfile"/> and
+					<xref linkend="inputdriver"/>.
+				</para>
+				<para>
+					The <literal>types</literal> array pointer may be NULL.
+					For file based datasource types that don't support
+					data type specifiers internally (or they are optional
+					and omitted), this means that the column values are of
+					the <literal>string</literal> data type. This is how
+					RLIB worked. In this case, conversion functions like
+					<xref linkend="valfunc"/>, <xref linkend="stodtfunc"/>
+					and <xref linkend="intervalfunc"/> are needed to process
+					the values using their actual data type.
+				</para>
+				<para>
+					When the <literal>types</literal> array pointer is
+					not NULL, it is used to set the data type specifiers
+					for built-in file based datasources, even if the file
+					contains type specifiers.
+				</para>
+				<para>
+					The JSON file format expected by OpenCReports is defined
+					in <xref linkend="jsonds"/>.
+				</para>
+				<para>
+					The XML file format expected by OpenCReports is defined
+					in <xref linkend="xmlds"/>.
+				</para>
+			</sect3>
+			<sect3 id="addsqlquery">
+				<title>Add an SQL statement based query</title>
+				<para>
+					Add an SQL statement based query to the report handler.
+					<programlisting>ocrpt_query *
+ocrpt_query_add_sql(ocrpt_datasource *source,
+                    const char *name,
+                    const char *querystr);</programlisting>
+				</para>
+				<para>
+					The call is only successful if the datasource
+					is SQL based. See <xref linkend="isdssql"/> and
+					<xref linkend="inputdriver"/>.
+				</para>
+			</sect3>
+			<sect3 id="isdsdata">
+				<title>Test whether a datasource is direct data based</title>
+				<para>
+					<programlisting>bool
+ocrpt_datasource_is_data(ocrpt_datasource *source);</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="isdssymdata">
+				<title>Test whether a datasource is direct data based</title>
+				<para>
+					<programlisting>bool
+ocrpt_datasource_is_symbolic_data(ocrpt_datasource *source);</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="isdsfile">
+				<title>Test whether a datasource is file based</title>
+				<para>
+					<programlisting>bool
+ocrpt_datasource_is_file(ocrpt_datasource *source);</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="isdssql">
+				<title>Test whether a datasource is SQL based</title>
+				<para>
+					<programlisting>bool
+ocrpt_datasource_is_sql(ocrpt_datasource *source);</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="findquery">
@@ -867,6 +565,17 @@ ocrpt_query_add_follower_n_to_1(ocrpt_query *leader,
                                 ocrpt_expr *match);</programlisting>
 				</para>
 			</sect3>
+			<sect3 id="queryrefresh">
+				<title>Refresh query contents</title>
+				<para>
+					Call the ocrpt_input::refresh() method for
+					datasources that support it.
+					It returns <literal>true</literal> if
+					all queries were successfully refreshed.
+					<programlisting>bool
+ocrpt_query_refresh(opencreport *o);</programlisting>
+				</para>
+			</sect3>
 			<sect3 id="freequery">
 				<title><literal>Free a query</literal></title>
 				<para>
@@ -925,18 +634,20 @@ ocrpt_query_navigate_use_next_row(ocrpt_query *q);</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="arraydiscoveryfunc" xreflabel="Array discovery function">
-				<title><literal>API specific array discovery function</literal></title>
+				<title><literal>API specific data discovery function</literal></title>
 				<para>
-					For array data sources and queries, OpenCReports
-					needs a way to to find the data array and the
-					supplementary type identifier array.
+					For direct (application internal) data based data sources
+					and queries, OpenCReports needs a way to to find the data
+					pointer and the supplementary type identifier array.
 					These are language specific. The below ones
-					are the C specific ones. The override function
+					are the C specific ones. An override function
 					is also provided to set a new discovery function.
 					The discovery function <emphasis>should</emphasis>
-					return the dimensions for both the 2D
-					<literal>array</literal> and the 1D
-					<literal>coltypes</literal> arrays.
+					return the dimensions for both the (usuall 2D array)
+					<literal>data</literal> and the 1D
+					<literal>types</literal> array.
+					It also returns whether <literal>types</literal>
+					must be freed by the caller.
 					<programlisting>typedef void
 (*ocrpt_query_discover_func)(const char *,
                              void **,
@@ -944,7 +655,8 @@ ocrpt_query_navigate_use_next_row(ocrpt_query *q);</programlisting>
                              int32_t *,
                              const char *,
                              void **,
-                             int32_t *);
+                             int32_t *,
+                             bool *);
 
 void
 ocrpt_query_set_discover_func(ocrpt_query_discover_func func);
@@ -958,7 +670,8 @@ ocrpt_query_discover_array_c(const char *arrayname,
                              int32_t *cols,
                              const char *typesname,
                              void **types,
-                             int32_t *types_cols);</programlisting>
+                             int32_t *types_cols,
+                             bool *free_types);</programlisting>
 				</para>
 				<para>
 					Note that the C specific generic discovery function

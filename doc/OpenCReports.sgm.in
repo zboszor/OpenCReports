@@ -9,7 +9,9 @@
 <!ENTITY breaks SYSTEM "breaks.sgm">
 <!ENTITY formatting SYSTEM "formatting.sgm">
 <!ENTITY xmldescription SYSTEM "xmldescription.sgm">
-<!ENTITY c-api-reference SYSTEM "c-api-reference.sgm">
+<!ENTITY c-api-ref-high SYSTEM "c-api-ref-high.sgm">
+<!ENTITY c-api-ref-low SYSTEM "c-api-ref-low.sgm">
+<!ENTITY c-api-ds-impl SYSTEM "c-api-ds-impl.sgm">
 <!ENTITY php-api-reference SYSTEM "php-api-reference.sgm">
 <!ENTITY examples SYSTEM "examples.sgm">
 <!ENTITY license SYSTEM "license.sgm">
@@ -42,7 +44,9 @@
 	&breaks;
 	&formatting;
 	&xmldescription;
-	&c-api-reference;
+	&c-api-ref-high;
+	&c-api-ref-low;
+	&c-api-ds-impl;
 	&php-api-reference;
 	&examples;
 	&license;

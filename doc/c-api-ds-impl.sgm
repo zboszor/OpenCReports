@@ -1,0 +1,243 @@
+<chapter id="c-api-ds-impl" xreflabel="Implement a datasource input driver">
+	<title>Implement a datasource input driver</title>
+	<sect1 id="dsregisterapi">
+		<title>Datasource input driver registration API</title>
+		<para>
+			A datasource driver can be implemented
+			and registered with OpenCReports easily.
+			In fact, all the built-in datasource input drivers
+			use the registration interface. A newly registered
+			datasource input driver can also replace the
+			built-in ones.
+		</para>
+		<sect2 id="inputreg">
+			<title>Register a datasource input driver</title>
+			<para>
+				<programlisting>bool
+ocrpt_input_register(const ocrpt_input * const input);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="inputget">
+			<title>Get a datasource input driver</title>
+			<para>
+				Get a datasource input driver using its name.
+				<programlisting>const ocrpt_input * const
+ocrpt_input_get(const char *name);</programlisting>
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="inputdriver" xreflabel="Datasource input driver details">
+		<title>Datasource input driver details</title>
+		<sect2 id="inputmethods">
+			<title>Datasource input driver interface</title>
+			<para>
+				Below is the driver interface that defines
+				the driver <literal>names</literal>, the
+				<literal>connect_parameters</literal> used by
+				adding a datasource (see <xref linkend="addds"/>)
+				and the driver methods.
+				<programlisting>struct ocrpt_input {
+    const char **names;
+    const ocrpt_input_connect_parameter **connect_parameters;
+    bool (*connect)(ocrpt_datasource *ds,
+                    const ocrpt_input_connect_parameter *params);
+    ocrpt_query *(*query_add_sql)(ocrpt_datasource *ds,
+                                  const char *name,
+                                  const char *sql);
+    ocrpt_query *(*query_add_file)(ocrpt_datasource *ds,
+                                   const char *name,
+                                   const char *filename,
+                                   const int32_t *types,
+                                   int32_t types_cols);
+    ocrpt_query *(*query_add_data)(ocrpt_datasource *ds,
+                                   const char *name,
+                                   const void *data,
+                                   int32_t rows,
+                                   int32_t cols,
+                                   const int32_t *types,
+                                   int32_t types_cols);
+    ocrpt_query *(*query_add_symbolic_data)(
+                                   ocrpt_datasource *ds,
+                                   const char *name,
+                                   const char *dataname,
+                                   int32_t rows,
+                                   int32_t cols,
+                                   const char *types,
+                                   int32_t types_cols);
+    void (*describe)(ocrpt_query *query,
+                     ocrpt_query_result **result,
+                     int32_t *result_cols);
+    bool (*refresh)(ocrpt_query *query);
+    void (*rewind)(ocrpt_query *query);
+    bool (*next)(ocrpt_query *query);
+    bool (*populate_result)(ocrpt_query *query);
+    bool (*isdone)(ocrpt_query *query);
+    void (*free)(ocrpt_query *query);
+    bool (*set_encoding)(ocrpt_datasource *ds,
+                         const char *encoding);
+    void (*close)(const ocrpt_datasource *);
+};
+typedef struct ocrpt_input ocrpt_input;</programlisting>
+			</para>
+			<para>
+				The driver <literal>names</literal> is a NULL-terminated
+				array of name strings. This allows the driver to be picked up
+				using either name. For example the built-in MariaDB
+				driver does so:
+				<programlisting>static const char *
+ocrpt_mariadb_input_names[] = {
+    "mariadb", "mysql", NULL
+};</programlisting>
+			</para>
+			<para>
+				The <literal>connect_parameters</literal> data pointer
+				and the <literal>connect</literal> method are either
+				both set as valid, or both are NULL.
+			</para>
+			<para>
+				The <literal>query_add*()</literal> methods are
+				optional. Some datasource drivers support direct or
+				symbolic data, some support file formats, some are
+				SQL based. A datasource input driver must support at
+				least one of the interfaces.
+			</para>
+			<para>
+				The <literal>describe()</literal> method is mandatory.
+				It returns an array of <literal>ocrpt_query_result</literal>
+				data together with the number of columns in the result
+				set. The result array must contain elements 3 times the
+				number of columns in total due to the internal
+				operation of OpenCReports.
+				<programlisting>#define OCRPT_EXPR_RESULTS (3)</programlisting>
+			</para>
+			<para>
+				The <literal>refresh()</literal> method is optional.
+				See the PHP module source code for its potential uses.
+			</para>
+			<para>
+				The <literal>rewind()</literal>,
+				<literal>next()</literal>,
+				<literal>populate_result()</literal> and
+				<literal>isdone()</literal> methods are all mandatory
+				as they are required to traverse the result set.
+			</para>
+			<para>
+				The <literal>free()</literal> method is optional.
+				It's needed if the query uses private data.
+			</para>
+			<para>
+				The <literal>set_encoding()</literal> method is
+				optional. It's needed if the datasource input driver
+				can use data in encodings other than
+				<literal>UTF-8</literal>.
+			</para>
+			<para>
+				The <literal>close()</literal> method is optional.
+				It's needed if the datasource connection uses
+				private data.
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="dsimplhelpers">
+		<title>Helper functions to implement a datasource input driver</title>
+		<sect2 id="dsgeto">
+			<title>Get the parent pointer of a datasource</title>
+			<para>
+				<programlisting>opencreport *
+ocrpt_datasource_get_opencreport(const ocrpt_datasource *ds);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="dsgetname">
+			<title>Get the name of a datasource</title>
+			<para>
+				<programlisting>const char *
+ocrpt_datasource_get_name(const ocrpt_datasource *ds);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="dsgetinput">
+			<title>Get the input driver pointer of a datasource</title>
+			<para>
+				<programlisting>const ocrpt_input *
+ocrpt_datasource_get_input(const ocrpt_datasource *ds);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="dssetpriv">
+			<title>Set the private pointer of a datasource</title>
+			<para>
+				<programlisting>void
+ocrpt_datasource_set_private(ocrpt_datasource *ds,
+                             void *priv);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="dsgetpriv">
+			<title>Get the private pointer of a datasource</title>
+			<para>
+				<programlisting>void *
+ocrpt_datasource_get_private(ocrpt_datasource *ds);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="queryalloc">
+			<title>Allocate a query structure</title>
+			<para>
+				Allocate a query structure and add the query name.
+				<programlisting>ocrpt_query *
+ocrpt_query_alloc(const ocrpt_datasource *source,
+                  const char *name);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="querygetname">
+			<title>Get the query name</title>
+			<para>
+				<programlisting>char *
+ocrpt_query_get_name(const ocrpt_query *query);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="querygetsource">
+			<title>Get the datasource pointer of a query</title>
+			<para>
+				<programlisting>ocrpt_datasource *
+ocrpt_query_get_source(const ocrpt_query *query);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="querysetprivate">
+			<title>Set the private pointer of a query</title>
+			<para>
+				<programlisting>void
+ocrpt_query_set_private(ocrpt_query *query,
+                        const void *priv);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="querygetprivate">
+			<title>Get the private pointer of a query</title>
+			<para>
+				<programlisting>void *
+ocrpt_query_get_private(const ocrpt_query *query);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="querysetrownul">
+			<title>Set current row of a query all NULL</title>
+			<para>
+				<programlisting>void
+ocrpt_query_result_set_values_null(ocrpt_query *q);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="querysetcolval">
+			<title>Set a column value of a query</title>
+			<para>
+				Set the <literal>i</literal>th column value
+				in the current row of a query. The value
+				can be set to NULL if the <literal>isnull</literal>
+				parameter is <literal>true</literal>, 
+				or to a valid value using the <literal>str</literal>
+				and the <emphasis>length</emphasis> parameters.
+				<programlisting>void
+ocrpt_query_result_set_value(ocrpt_query *q,
+                             int32_t i,
+                             bool isnull,
+                             iconv_t conv,
+                             const char *str,
+                             size_t len);</programlisting>
+			</para>
+		</sect2>
+	</sect1>
+</chapter>

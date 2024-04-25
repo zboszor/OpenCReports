@@ -10,7 +10,9 @@ SGMLFILES = \
 	breaks.sgm \
 	xmldescription.sgm \
 	formatting.sgm \
-	c-api-reference.sgm \
+	c-api-ref-high.sgm \
+	c-api-ref-low.sgm \
+	c-api-ds-impl.sgm \
 	php-api-reference.sgm \
 	examples.sgm \
 	license.sgm \

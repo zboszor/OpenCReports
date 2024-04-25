@@ -55,6 +55,7 @@
 
     public final set_numeric_precision_bits(
                      string $expr_string): void;
+    public final get_numeric_precision_bits(): long;
     public final set_rounding_mode(
                      string $expr_string): void;
 
@@ -63,49 +64,9 @@
                      string $dirname): void;
     public final set_locale(string $locale): void;
 
-    public final datasource_add_array(string $source_name):
-                     ?OpenCReport\Datasource;
-    public final datasource_add_csv(string $source_name):
-                     ?OpenCReport\Datasource;
-    public final datasource_add_json(string $source_name):
-                     ?OpenCReport\Datasource;
-    public final datasource_add_xml(string $source_name):
-                     ?OpenCReport\Datasource;
-    public final datasource_add_postgresql(
-                     string $source_name,
-                     string $host = null,
-                     string $port = null,
-                     string $dbname = null,
-                     string $user = null,
-                     string $password = null):
-                     ?OpenCReport\Datasource;
-    public final datasource_add_postgresql2(
-                     string $source_name,
-                     string $connection_info = null):
-                     ?OpenCReport\Datasource;
-    public final datasource_add_mariadb(
-                     string $source_name,
-                     string $host = null,
-                     string $port = null,
-                     string $dbname = null,
-                     string $user = null,
-                     string $password = null,
-                     string $unix_socket = null):
-                     ?OpenCReport\Datasource;
-    public final datasource_add_mariadb2(
-                     string $source_name,
-                     string $option_file = null,
-                     string $group = null):
-                     ?OpenCReport\Datasource;
-    public final datasource_add_odbc(
-                     string $source_name,
-                     string $dbname = null,
-                     ?string $user,
-                     ?string $password):
-                     ?OpenCReport\Datasource;
-    public final datasource_add_odbc2(
-                     string $source_name,
-                     string $connection_info = null):
+    public final datasource_add(string $source_name,
+                                string $source_type,
+                                ?array $conn_params = null):
                      ?OpenCReport\Datasource;
 
     public final datasource_get(string $source_name):
@@ -113,7 +74,7 @@
     public final query_get(string $query_name):
                      ?OpenCReport\Query;
 
-    public static final query_refresh(): void;
+    public final query_refresh(): void;
 
     public final expr_parse(string $expr_string):
                      ?OpenCReport\Expr;
@@ -482,6 +443,13 @@ OpenCReport::set_numeric_precision_bits(
                      string $expr_string): void;</programlisting>
 				</para>
 			</sect3>
+			<sect3 id="phpgetnumprec">
+				<title><literal>Get numeric precision</literal></title>
+				<para>
+				<programlisting>public final
+OpenCReport::get_numeric_precision_bits(): long;</programlisting>
+				</para>
+			</sect3>
 			<sect3 id="phpsetroundingmode">
 				<title>Set rounding mode</title>
 				<para>
@@ -529,113 +497,54 @@ OpenCReport::set_locale(string $locale): void;</programlisting>
 		</sect2>
 		<sect2 id="phpdsmethods">
 			<title>Data source and query related methods</title>
-			<sect3 id="phpaddarrayds">
-				<title>Add an array datasource</title>
+			<sect3 id="phpaddds">
+				<title>Add a datasource</title>
 				<para>
 					For the <literal>OpenCReport\Datasource</literal>
 					class methods, see <xref linkend="phpdsclass"/>
 					<programlisting>public final
-OpenCReport::datasource_add_array(string $source_name):
-                     ?OpenCReport\Datasource;</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="phpaddcsvds">
-				<title>Add a CSV datasource</title>
-				<para>
-					For the <literal>OpenCReport\Datasource</literal>
-					class methods, see <xref linkend="phpdsclass"/>
-					<programlisting>public final
-OpenCReport::datasource_add_csv(string $source_name):
-                     ?OpenCReport\Datasource;</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="phpaddjsonds">
-				<title>Add a JSON datasource</title>
-				<para>
-					For the <literal>OpenCReport\Datasource</literal>
-					class methods, see <xref linkend="phpdsclass"/>.
-					<programlisting>public final
-OpenCReport::datasource_add_json(string $source_name):
-                     ?OpenCReport\Datasource;</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="phpaddxmlds">
-				<title>Add an XML datasource</title>
-				<para>
-					For the <literal>OpenCReport\Datasource</literal>
-					class methods, see <xref linkend="phpdsclass"/>.
-					<programlisting>public final
-OpenCReport::datasource_add_xml(string $source_name):
-                     ?OpenCReport\Datasource;</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="phpaddpgds">
-				<title>Add an PostgreSQL datasource</title>
-				<para>
-					For the <literal>OpenCReport\Datasource</literal>
-					class methods, see <xref linkend="phpdsclass"/>.
-					<programlisting>public final
-OpenCReport::datasource_add_postgresql(
-                     string $source_name,
-                     string $host = null,
-                     string $port = null,
-                     string $dbname = null,
-                     string $user = null,
-                     string $password = null):
-                     ?OpenCReport\Datasource;
-
-public final
-OpenCReport::datasource_add_postgresql2(
-                     string $source_name,
-                     string $connection_info = null):
-                     ?OpenCReport\Datasource;</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="phpaddmariads">
-				<title>Add a MariaDB datasource</title>
-				<para>
-					For the <literal>OpenCReport\Datasource</literal>
-					class methods, see <xref linkend="phpdsclass"/>.
-					<programlisting>public final
-OpenCReport::datasource_add_mariadb(
-                     string $source_name,
-                     string $host = null,
-                     string $port = null,
-                     string $dbname = null,
-                     string $user = null,
-                     string $password = null,
-                     string $unix_socket = null):
-                     ?OpenCReport\Datasource;
-
-public final
-OpenCReport::datasource_add_mariadb2(
-                     string $source_name,
-                     string $option_file = null,
-                     string $group = null):
-                     ?OpenCReport\Datasource;</programlisting>
-				</para>
-			</sect3>
-			<sect3 id="phpaddodbcds">
-				<title>Add an ODBC datasource</title>
-				<para>
-					For the <literal>OpenCReport\Datasource</literal>
-					class methods, see <xref linkend="phpdsclass"/>.
-					<programlisting>public final
-OpenCReport::datasource_add_odbc(
-                     string $source_name,
-                     string $dbname = null,
-                     ?string $user,
-                     ?string $password):
-                     ?OpenCReport\Datasource;
-
-public final
-OpenCReport::datasource_add_odbc2(
-                     string $source_name,
-                     string $connection_info = null):
+OpenCReport::datasource_add(string $source_name,
+                            string $source_type,
+                            ?array $conn_params = null):
                      ?OpenCReport\Datasource;</programlisting>
 				</para>
 				<para>
-					For the parameters, see <xref linkend="odbcds"/>.
+					This method adds a datasource of the specified
+					type to the report, using the optional connection
+					parameters.
+				</para>
+				<para>
+					The possible datasource types are:
+					<literal>array</literal>, <literal>csv</literal>,
+					<literal>json</literal>, <literal>xml</literal>,
+					<literal>mariadb</literal> (also aliased as
+					<literal>mysql</literal>), <literal>postgresql</literal>
+					and <literal>odbc</literal>.
+				</para>
+				<para>
+					The connection parameter array is an associative
+					array which contains keys and value pairs.
+					The contents of this array is needed to connect
+					to SQL databases. For example:
+					<programlisting>$conn_params = [
+    "dbname" => "mydatabase",
+    "user" => "myuser"
+];</programlisting>
+				</para>
+				<para>
+					The <literal>array</literal>,
+					<literal>csv</literal>, <literal>json</literal>,
+					and <literal>xml</literal> datasource types do not
+					need connection parameters.
+				</para>
+				<para>
+					The list of connection parameters
+					to establish database connection for
+					<literal>mariadb</literal>,
+					<literal>postgresql</literal>, and
+					<literal>odbc</literal> are listed at
+					<xref linkend="addds"/>, in the
+					<xref linkend="c-api-ref-low"/>.
 				</para>
 			</sect3>
 			<sect3 id="phpgetds">
@@ -661,14 +570,17 @@ OpenCReport::query_get(string $query_name):
 			<sect3 id="phprefreshquery" xreflabel="OpenCReport::query_refresh()">
 				<title>Refresh the internal representation of array queries</title>
 				<para>
-					When adding an array query, the PHP array
-					is internally transformed into a C array
-					representation, decoupling it from the source data.
-					The PHP array may be modified during
-					executing the report, e.g. in an event callback.
-					This method makes the internal representation
-					reflect the new data.
-					<programlisting>public static final
+					A two dimensional array (actually, a one dimensional
+					array of one dimensional arrays) can be used in PHP
+					as an array query.
+				</para>
+				<para>
+					The PHP array may be modified during executing the
+					report, e.g. in an event callback called after one
+					iteration of a report part. This method refreshes the
+					the query's internals to be aware of the new contents
+					of the array.
+					<programlisting>public final
 query_refresh(): void;</programlisting>
 				</para>
 				<para>
@@ -677,14 +589,24 @@ query_refresh(): void;</programlisting>
 					<itemizedlist>
 						<listitem override="bullet">
 							<para>
-								Changes to the first row of data
-								(the column names) are ignored.
+								The array contents must not change
+								during a report iteration, i.e. in a
+								new row callback and some others.
+								This would invalidate the contents of
+								the PHP internal representation in a way
+								that OpenCReports may break in subtle ways.
 							</para>
 						</listitem>
 						<listitem override="bullet">
 							<para>
-								The number of rows and columns
-								in the data must not change.
+								Changes to the first row of the array
+								(i.e. the column names) are ignored.
+							</para>
+						</listitem>
+						<listitem override="bullet">
+							<para>
+								The number of columns in the array
+								must not change.
 							</para>
 						</listitem>
 					</itemizedlist>
@@ -3788,6 +3710,11 @@ OpenCReport\Barcode::set_bgcolor(
 				<programlisting>function
 rlib_init(): ?OpenCReport;</programlisting>
 			</para>
+			<para>
+				Note that initializing the report using this function
+				automatically enables some RLIB compatibility settings,
+				like the output parameter "xml_rlib_compat".
+			</para>
 		</sect2>
 		<sect2 id="rlibdestroy">
 			<title>Destroy a report</title>
@@ -4119,12 +4046,7 @@ rlib_set_output_parameter(
 				<xref linkend="phprefreshquery"/>.
 				The same limitations apply.
 				<programlisting>function
-rlib_query_refresh(?OpenCReport $r = null): void;</programlisting>
-			</para>
-			<para>
-				OpenCReports allows calling this function
-				with no parameters or a <literal>NULL</literal>
-				parameter.
+rlib_query_refresh(OpenCReport $r): void;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="rlibaddeventcb">

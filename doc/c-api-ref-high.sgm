@@ -1,0 +1,298 @@
+<chapter id="c-api-ref-high" xreflabel="High level C API Reference">
+	<title>High level C language API reference</title>
+	<sect1 id="c_header">
+		<title>Header file</title>
+		<para>
+			For using OpenCReports, this single header must be used:
+			<programlisting>#include &lt;opencreport.h&gt;</programlisting>
+		</para>
+		<para>
+			The header can be used from C and C++ source code.
+		</para>
+	</sect1>
+	<sect1 id="highlevelapi" xreflabel="High level C API">
+		<title>High level C API</title>
+		<para>
+			Example code using the high level C API where everything
+			concerning the report (including the data source)
+			is described in the report XML:
+			<programlisting>#include &lt;opencreport.h&gt;
+
+int main(void) {
+    opencreport *o = ocrpt_init();
+
+    if (!ocrpt_parse_xml(o, "report.xml")) {
+        printf("XML parse error\n");
+        ocrpt_free(o);
+        return 1;
+    }
+
+    ocrpt_set_output_format(o, OCRPT_OUTPUT_PDF);
+    ocrpt_execute(o);
+    ocrpt_spool(o);
+    ocrpt_free(o);
+    return 0;
+}</programlisting>
+		</para>
+		<para>
+			The above code will load <literal>report.xml</literal>,
+			set the output format to PDF, runs the report and prints
+			its output on <literal>stdout</literal>.
+		</para>
+		<sect2 id="rephndinit">
+			<title>Report handler initialization</title>
+			<para>
+				<programlisting>opencreport *
+ocrpt_init(void);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="loadrepxml">
+			<title>Load a report XML description</title>
+			<para>
+				This function loads the specified XML file
+				into the report handler. It returns
+				<literal>true</literal> for success,
+				<literal>false</literal> for failure.
+				<programlisting>bool
+ocrpt_parse_xml(opencreport *o,
+                const char *filename);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="parsexmlfrombuf">
+			<title>Parse report XML description from a buffer</title>
+			<para>
+				This function parses the buffer as if it contained
+				XML contents and loads the details into the report handler.
+				It returns <literal>true</literal> for success,
+				<literal>false</literal> for failure.
+				<programlisting>bool
+ocrpt_parse_xml_from_buffer(opencreport *o,
+                            const char *buffer,
+                            size_t size);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="setoutpfmt">
+			<title>Set report output format</title>
+			<para>
+				<programlisting>enum ocrpt_format_type {
+    OCRPT_OUTPUT_UNSET,
+    OCRPT_OUTPUT_PDF,
+    OCRPT_OUTPUT_HTML,
+    OCRPT_OUTPUT_TXT,
+    OCRPT_OUTPUT_CSV,
+    OCRPT_OUTPUT_XML
+};
+typedef enum ocrpt_format_type ocrpt_format_type;
+
+void
+ocrpt_set_output_format(opencreport *o,
+                        ocrpt_format_type format);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="setoutpparam">
+			<title>Set report output parameter</title>
+			<para>
+				Set output parameters for the report.
+				<programlisting>void
+ocrpt_set_output_parameter(opencreport *o,
+                           const char *param,
+                           const char *value);</programlisting>
+			</para>
+			<para>
+				Possible parameters for the HTML output driver:
+				<itemizedlist>
+					<listitem override="bullet">
+						<para>
+							<literal>document_root</literal> sets
+							the document root for trimming path prefix
+							from image paths.
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<literal>meta</literal> extends the default
+							<literal>&lt;meta charset="utf-8"&gt;</literal>.
+							The passed-in string value may contain
+							the whole <literal>&lt;meta ...&gt;</literal>,
+							in which case the inner parameters are
+							used only. The <literal>charset</literal>
+							specification is ignored. Only the rest is used.
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<literal>suppress_head</literal> suppresses the
+							default
+							<literal>&lt;head&gt; ... &lt;/head&gt;</literal>
+							section. Possible values are
+							<literal>yes</literal>, <literal>true</literal>,
+							<literal>on</literal> or any positive non-zero
+							number. Anything else disables it. Be aware,
+							that the default section contains importand CSS
+							stylesheet settings that are needed for the
+							correct layout.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				Possible parameters for the CSV output driver:
+				<itemizedlist>
+					<listitem override="bullet">
+						<para>
+							<literal>csv_filename</literal> sets the file
+							name for <literal>Content-Disposition</literal>
+							in the HTTP metadata returned by
+							<literal>ocrpt_get_content_type()</literal>.
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<literal>csv_as_text</literal> sets the MIME type
+							for <literal>Content-Type</literal>
+							in the HTTP metadata returned by
+							<literal>ocrpt_get_content_type()</literal>
+							to <literal>text/plain</literal> when enabled.
+							By default it's <literal>text/csv</literal>.
+							Possible values to enable it are
+							<literal>yes</literal>,
+							<literal>true</literal>,
+							<literal>on</literal> or any positive non-zero
+							number. Anything else disables it.
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<literal>csv_delimiter</literal> (also aliased as
+							<literal>csv_delimeter</literal> according to
+							the historical typo in RLIB) sets the CSV field
+							delimiter to the first character of the string.
+							By default it's a comma.
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<literal>no_quotes</literal> will create a CSV
+							output with values unquoted.
+							Possible values to enable it are
+							<literal>yes</literal>,
+							<literal>true</literal>,
+							<literal>on</literal> or any positive non-zero
+							number. Anything else disables it.
+							It takes precedence over
+							<literal>only_quote_strings</literal>
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							<literal>only_quote_strings</literal>
+							will create a CSV output with only string
+							values quoted.
+							Possible values to enable it are
+							<literal>yes</literal>,
+							<literal>true</literal>,
+							<literal>on</literal> or any positive non-zero
+							number. Anything else disables it.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				Note that some languages (e.g. German, Swedish
+				and Hungarian) use comma as the decimal separator
+				instead of the decimal dot. For these languages,
+				either set <literal>csv_delimiter</literal> to
+				something else, or don't enable either
+				<literal>no_quotes</literal> or
+				<literal>only_quote_strings</literal>.
+			</para>
+			<para>
+				Possible parameters for the XML output driver:
+				<itemizedlist>
+					<listitem override="bullet">
+						<para>
+							<literal>xml_rlib_compat</literal> sets the
+							flag to create an RLIB compatible XML output.
+							Possible values to enable it are
+							<literal>yes</literal>,
+							<literal>true</literal>,
+							<literal>on</literal> or any positive non-zero
+							number. Anything else disables it.
+						</para>
+						<para>
+							When enabled, the toplevel element
+							will be <literal>&lt;rlib&gt;</literal>
+							and <literal>&lt;Report&gt;</literal>s
+							inside <literal>&lt;pd&gt;</literal>
+							won't be embedded in a
+							<literal>report</literal> element.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+		</sect2>
+		<sect2 id="runreport">
+			<title>Run the report</title>
+			<para>
+				This function executes the report, constructs
+				the result in memory. It returns <literal>true</literal>
+				for success, <literal>false</literal> for failure.
+				It is a failure if the output format is unset.
+				<programlisting>bool
+ocrpt_execute(opencreport *o);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="dumpreport">
+			<title>Dump report result</title>
+			<para>
+				Dump the report output on the program's
+				standard output channel.
+				<programlisting>void
+ocrpt_spool(opencreport *o);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="getresult">
+			<title>Get report result</title>
+			<para>
+				Get the report output. The application
+				then can save it as a file.
+				<programlisting>const char *
+ocrpt_get_output(opencreport *o, size_t *length);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="getcontenttype">
+			<title>Get report content type</title>
+			<para>
+				Get the report content type for web publishing.
+				The content type depends on the output type
+				the report was executed with.
+				It returns an array of
+				<literal>ocrpt_string *</literal> pointers
+				for potentially multiple HTTP header lines.
+				The last pointer in the array is
+				<literal>NULL</literal>.
+				<programlisting>const ocrpt_string **
+ocrpt_get_content_type(opencreport *o);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="rephnddestroy">
+			<title>Report handler destruction</title>
+			<para>
+				Calling this function frees up the report handler
+				structure and everything created for it, even
+				the details that were created by the low level API.
+				<programlisting>void
+ocrpt_free(opencreport *o);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="getlibver">
+			<title>Get library version</title>
+			<para>
+				This function reports the OpenCReports
+				library version.
+				<programlisting>const char *
+ocrpt_version(void);</programlisting>
+			</para>
+		</sect2>
+	</sect1>
+</chapter>
