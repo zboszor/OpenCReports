@@ -253,17 +253,6 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 		{ "name", &name },
 		{ "type", &type },
 		{ "encoding", &encoding },
-#if 0
-		{ "host", &host },
-		{ "unix_socket", &unix_socket },
-		{ "port", &port },
-		{ "dbname", &dbname },
-		{ "user", &user },
-		{ "password", &password },
-		{ "connstr", &connstr },
-		{ "optionfile", &optionfile },
-		{ "group", &group },
-#endif
 		{ NULL, NULL },
 	};
 
