@@ -893,15 +893,15 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 
 				ocrpt_expr_resolve(r->height_expr);
 				ocrpt_expr_optimize(r->height_expr);
-				if (r->height_expr) {
+				if (r->height_expr && !r->rlib_compat) {
 					double height = ocrpt_expr_get_double(r->height_expr);
-					if (height > 0.0)
+					if (height > 0.0) {
 						r->height = height;
-					else {
-						/* This does not cause a leak */
-						r->height_expr = NULL;
-					}
-				}
+						r->height_valid = true;
+					} else
+						r->height_valid = false;
+				} else
+					r->height_valid = false;
 
 				ocrpt_expr_resolve_nowarn(r->font_name_expr);
 				ocrpt_expr_optimize(r->font_name_expr);
@@ -1044,6 +1044,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 				uint32_t pds_without_width = 0;
 				double pds_total_width = 0;
+				double pds_max_height = 0;
 
 				for (pdl = pr->pd_list; pdl; pdl = pdl->next) {
 					ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
@@ -1058,6 +1059,17 @@ static void ocrpt_execute_parts(opencreport *o) {
 						pds_total_width += pd->real_width;
 					} else
 						pds_without_width++;
+
+					if (pd->height_expr) {
+						if (pds_max_height < pd->height)
+							pds_max_height = pd->height;
+					}
+				}
+
+				/* All <pd> sections must be of equal height */
+				for (pdl = pr->pd_list; pdl; pdl = pdl->next) {
+					ocrpt_part_column *pd = (ocrpt_part_column *)pdl->data;
+					pd->height = pds_max_height;
 				}
 
 				if (pds_without_width > 0) {
@@ -1147,9 +1159,14 @@ static void ocrpt_execute_parts(opencreport *o) {
 								o->output_functions.start_report(o, p, pr, pd, r);
 
 							r->executing = true;
-
 							r->finished = false;
-							if (r->height_expr)
+
+							if (r->rlib_compat && o->output_functions.get_current_page)
+								r->start_page = o->output_functions.get_current_page(o);
+
+							r->start_page_position = page_position;
+
+							if (r->height_valid)
 								r->remaining_height = r->height * (o->size_in_points ? 1.0 : (r->font_size_expr ? r->font_size : p->font_size));
 
 							ocrpt_query_navigate_start(r->query);
@@ -1182,12 +1199,22 @@ static void ocrpt_execute_parts(opencreport *o) {
 							if (o->output_functions.end_report && !o->precalculate)
 								o->output_functions.end_report(o, p, pr, pd, r);
 
-							if (r->height_expr) {
+							if (r->height_valid) {
 								if (rl->next || o->report_height_after_last) {
 									page_position += r->remaining_height;
 
 									if (pd->max_page_position < page_position)
 										pd->max_page_position = page_position;
+								}
+							} else if (r->rlib_compat && r->height_expr && o->output_functions.get_current_page) {
+								if (r->start_page == o->output_functions.get_current_page(o)) {
+									/* RLIB had <Report height="x"> in terms of percentage of <pd height="y"> */
+									double report_min_size = pd->height * (r->height / 100.0);
+
+									if (r->start_page_position + report_min_size > p->page_footer_height)
+										report_min_size = p->page_footer_height - r->start_page_position;
+									if (page_position < report_min_size)
+										page_position = report_min_size;
 								}
 							}
 

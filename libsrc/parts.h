@@ -74,6 +74,8 @@ struct ocrpt_report {
 	ocrpt_list *newrow_callbacks;
 	ocrpt_list *precalc_done_callbacks;
 	ocrpt_list *iteration_callbacks;
+	/* Layout accounting */
+	ocrpt_list *start_page;
 
 	/* Parameter expressions */
 	ocrpt_expr *filename_expr;
@@ -108,6 +110,7 @@ struct ocrpt_report {
 	bool finished:1;
 	bool noquery_show_nodata:1;
 	bool rlib_compat:1;
+	bool height_valid:1;
 };
 
 struct ocrpt_part_column {
