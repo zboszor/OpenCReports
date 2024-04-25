@@ -1090,6 +1090,10 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 	if (!r)
 		r = ocrpt_part_column_new_report(pd);
 
+	r->p = p;
+	r->pr = pr;
+	r->pd = pd;
+	r->rlib_compat = !called_from_ocrpt_node;
 	r->noquery_show_nodata = called_from_ocrpt_node;
 
 	xmlChar *font_name, *font_size;
@@ -1361,6 +1365,7 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 		r->pr = pr;
 		r->pd = pd;
 		r->rlib_compat = !called_from_ocrpt_node;
+		r->noquery_show_nodata = called_from_ocrpt_node;
 
 		r->filename_expr = ocrpt_expr_parse(o, (char *)filename, NULL);
 		if (!r->filename_expr)
