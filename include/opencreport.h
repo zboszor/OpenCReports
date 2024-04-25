@@ -336,11 +336,11 @@ const ocrpt_input * const ocrpt_input_get(const char *name);
  ******************************************/
 
 /*
- * Add a custom datasource using its registered type name
+ * Add a datasource using its registered type name
  */
 ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const char *type, const ocrpt_input_connect_parameter *conn_params);
 /*
- * Find the datasource using its name
+ * Find the datasource using its registered type name
  */
 ocrpt_datasource *ocrpt_datasource_get(opencreport *o, const char *source_name);
 /*
