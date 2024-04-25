@@ -1,8 +1,11 @@
 # OpenCReports
 
 OpenCReports is a report generator engine based on ideas from RLIB
-(https://github.com/SICOM/rlib) but having a complete
-reimplementation and licensed under LGPLv3.
+with a complete reimplementation and licensed under LGPLv3.
+
+The most up-to-date original repository was at https://github.com/SICOM/rlib
+which was (together with many others under https://github.com/SICOM)
+recently deleted. Ancient versions of RLIB are at https://sourceforge.net/projects/rlib
 
 ## Currently missing features
 
