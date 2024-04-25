@@ -181,9 +181,11 @@
 					<listitem override="bullet">
 						<para>
 							height for <xref linkend="report"/>
-							is measured in number of characters
-							influenced by <xref linkend="partfontsize"/>
-							and <xref linkend="reportfontsize"/>
+							is measured in percentage of
+							<xref linkend="partcol"/> and considered
+							to be a minimum value, so padding is added
+							if the report contents end earlier
+							than the limit
 						</para>
 					</listitem>
 					<listitem override="bullet">
