@@ -101,7 +101,7 @@ struct ocrpt_input {
 	/* One of the four below must be set */
 	ocrpt_query *(*query_add_sql)(ocrpt_datasource *, const char *, const char *); /* optional */
 	ocrpt_query *(*query_add_file)(ocrpt_datasource *, const char *, const char *, const int32_t *, int32_t); /* optional */
-	ocrpt_query *(*query_add_data)(ocrpt_datasource *, const char *, const char **, int32_t, int32_t, const int32_t *, int32_t); /* optional */
+	ocrpt_query *(*query_add_data)(ocrpt_datasource *, const char *, const void *, int32_t, int32_t, const int32_t *, int32_t); /* optional */
 	ocrpt_query *(*query_add_symbolic_data)(ocrpt_datasource *, const char *, const char *, int32_t, int32_t, const char *, int32_t); /* optional */
 	void (*describe)(ocrpt_query *, ocrpt_query_result **, int32_t *); /* mandatory */
 	bool (*refresh)(ocrpt_query *); /* optional */
@@ -360,10 +360,11 @@ void ocrpt_datasource_set_encoding(ocrpt_datasource *source, const char *encodin
  */
 void ocrpt_datasource_free(ocrpt_datasource *source);
 /*
- * Add a C data query using the datasource pointer
+ * Add a C data query using the data pointer
  */
 ocrpt_query *ocrpt_query_add_data(ocrpt_datasource *source,
-									const char *name, const char **data,
+									const char *name,
+									const void *data,
 									int32_t rows, int32_t cols,
 									const int32_t *types,
 									int32_t types_cols);

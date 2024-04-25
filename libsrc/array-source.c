@@ -149,9 +149,9 @@ static ocrpt_query *array_query_add(const ocrpt_datasource *source, const char *
 
 static ocrpt_query *ocrpt_array_query_add(ocrpt_datasource *source,
 										const char *name,
-										const char **array, int32_t rows, int32_t cols,
+										const void *data, int32_t rows, int32_t cols,
 										const int32_t *types, int32_t types_cols) {
-	return array_query_add(source, name, array, rows, cols, types, types_cols);
+	return array_query_add(source, name, (const char **)data, rows, cols, types, types_cols);
 }
 
 static ocrpt_query *ocrpt_array_query_add_symbolic(ocrpt_datasource *source,
