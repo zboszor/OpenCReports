@@ -5960,6 +5960,7 @@ ZEND_FUNCTION(rlib_init) {
 
 	oo->o = ocrpt_init();
 	oo->free_me = true;
+	ocrpt_set_output_parameter(oo->o, "xml_rlib_compat", "yes");
 }
 
 ZEND_FUNCTION(rlib_free) {
