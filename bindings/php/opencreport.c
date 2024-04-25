@@ -577,6 +577,13 @@ PHP_METHOD(opencreport, set_numeric_precision_bits) {
 	ocrpt_set_numeric_precision_bits(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
+PHP_METHOD(opencreport, get_numeric_precision_bits) {
+	zval *object = ZEND_THIS;
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	RETURN_LONG(ocrpt_get_numeric_precision_bits(oo->o));
+}
+
 PHP_METHOD(opencreport, set_rounding_mode) {
 	zval *object = ZEND_THIS;
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
@@ -1330,6 +1337,9 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_numeric_precisio
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_get_numeric_precision_bits, 0, 0, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_rounding_mode, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
@@ -1460,6 +1470,7 @@ static const zend_function_entry opencreport_class_methods[] = {
 	 */
 	/* Numeric behavior related methods */
 	PHP_ME(opencreport, set_numeric_precision_bits, arginfo_opencreport_set_numeric_precision_bits, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport, get_numeric_precision_bits, arginfo_opencreport_get_numeric_precision_bits, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, set_rounding_mode, arginfo_opencreport_set_rounding_mode, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	/* Locale related methods */
 	PHP_ME(opencreport, bindtextdomain, arginfo_opencreport_bindtextdomain, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
