@@ -1317,7 +1317,7 @@ bool ocrpt_parse_report_node_for_load(ocrpt_report *r) {
 			/* ignore - xmllint validation is enough */
 		} else if (nodeType == XML_READER_TYPE_ELEMENT && depth == 0) {
 			if (!strcmp((char *)name, "Report"))
-				r1 = ocrpt_parse_report_node(r->o, r->p, r->pr, r->pd, r, reader, r->called_from_ocrpt_node);
+				r1 = ocrpt_parse_report_node(r->o, r->p, r->pr, r->pd, r, reader, !r->rlib_compat);
 		}
 
 		xmlFree(name);
@@ -1360,7 +1360,7 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 		r->p = p;
 		r->pr = pr;
 		r->pd = pd;
-		r->called_from_ocrpt_node = called_from_ocrpt_node;
+		r->rlib_compat = !called_from_ocrpt_node;
 
 		r->filename_expr = ocrpt_expr_parse(o, (char *)filename, NULL);
 		if (!r->filename_expr)

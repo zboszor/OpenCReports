@@ -107,7 +107,7 @@ struct ocrpt_report {
 	bool fieldheader_high_priority:1;
 	bool finished:1;
 	bool noquery_show_nodata:1;
-	bool called_from_ocrpt_node:1;
+	bool rlib_compat:1;
 };
 
 struct ocrpt_part_column {
