@@ -859,7 +859,7 @@ static int32_t ocrpt_parse_col_node(opencreport *o, xmlTextReaderPtr reader, ocr
 		if (value) {
 			field = ocrpt_mem_malloc(len + 1);
 			if (field) {
-				char *end = stpncpy(field, (char *)value, len);
+				char *end = stpncpy(field, (char *)value, len + 1);
 				*end = 0;
 			}
 		}
