@@ -942,9 +942,9 @@ static bool ocrpt_barcode_code128_verify(ocrpt_string *barcode) {
 
 static int ocrpt_barcode_code128a_or_b(const char *barcode, size_t len) {
 	for (size_t i = 0; i < len; i++) {
-		if (NEED_CODE_A(barcode[i]))
+		if (NEED_CODE_A((unsigned char)barcode[i]))
 			return 'A';
-		if (NEED_CODE_B(barcode[i]))
+		if (NEED_CODE_B((unsigned char)barcode[i]))
 			return 'B';
 	}
 
@@ -1015,7 +1015,7 @@ static ocrpt_string *ocrpt_barcode_code128_make_array(ocrpt_barcode *bc, ocrpt_s
 	for (i = 0, rlen = barcode->len; i < barcode->len; /* increments are in the loop */) {
 		switch(code) {
 		case 'C':
-			if (barcode->str[i] == 0xc1) { /* F1 is valid */
+			if ((unsigned char)barcode->str[i] == 0xc1) { /* F1 is valid */
 				ocrpt_mem_string_append_int(codes, FUNC_1);
 				i++;
 				rlen--;
@@ -1046,7 +1046,7 @@ static ocrpt_string *ocrpt_barcode_code128_make_array(ocrpt_barcode *bc, ocrpt_s
 				}
 				ocrpt_mem_string_append_int(codes, CODE_C);
 				code = 'C';
-			} else if (code == 'A' && NEED_CODE_B(barcode->str[i])) {
+			} else if (code == 'A' && NEED_CODE_B((unsigned char)barcode->str[i])) {
 				/* check whether we should use SHIFT or change code */
 				j = ocrpt_barcode_code128a_or_b(barcode->str + i + 1, rlen - 1);
 				if (j == 'B') {
@@ -1058,7 +1058,7 @@ static ocrpt_string *ocrpt_barcode_code128_make_array(ocrpt_barcode *bc, ocrpt_s
 					i++;
 					rlen--;
 				}
-			} else if (code == 'B' && NEED_CODE_A(barcode->str[i])) {
+			} else if (code == 'B' && NEED_CODE_A((unsigned char)barcode->str[i])) {
 				/* check whether we should use SHIFT or change code */
 				j = ocrpt_barcode_code128a_or_b(barcode->str + i + 1, rlen - 1);
 				if (j == 'A') {
