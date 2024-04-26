@@ -65,18 +65,36 @@ export LSAN_OPTIONS="suppressions=${top_srcdir}/fontconfig.supp"
 "./${TEST}" "${TYPE}" 2>"results/${TEST}.${SFX[$TYPE]}.stderr" >"results/${TEST}.${SFX[$TYPE]}"
 
 WARNINGS=
-if [[ -f ${abs_srcdir}/expected/${TEST}.${SFX[$TYPE]} ]]; then
-	case $TYPE in
-	1)
+case $TYPE in
+1)
+	if [[ -f ${abs_srcdir}/expected/${TEST}.${SFX[$TYPE]} ]]; then
 		compare_pdf
-		;;
-	*)
+	else
+		OUTDIFF="expected/${TEST}.${SFX[$TYPE]} does not exist"
+	fi
+	;;
+*)
+	if [[ -f ${abs_srcdir}/expected/${TEST}.${SFX[$TYPE]} ]]; then
 		OUTDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.${SFX[$TYPE]} ${abs_srcdir}/results/${TEST}.${SFX[$TYPE]} 2>/dev/null)
-		;;
-	esac
-else
-	OUTDIFF="expected/${TEST}.${SFX[$TYPE]} does not exist"
-fi
+	else
+		FOUND=
+		for i in ${abs_srcdir}/expected/${TEST}.${SFX[$TYPE]}* ; do
+			if [[ -f "$i" ]]; then
+				OUTDIFF=$(diff -durpN "$i" ${abs_srcdir}/results/${TEST}.${SFX[$TYPE]} 2>/dev/null)
+				if [[ -z "$OUTDIFF" ]]; then
+					FOUND=1
+					break;
+				fi
+			else
+				OUTDIFF="${abs_srcdir}/expected/${TEST}.${SFX[$TYPE]} or a variant does not exist."
+			fi
+		done
+		if [[ -z "$FOUND" ]]; then
+			OUTDIFF="No matching expected result found"
+		fi
+	fi
+	;;
+esac
 
 ERRDIFF=$(diff -durpN "${abs_srcdir}/expected/${TEST}.${SFX[$TYPE]}.stderr" "${abs_builddir}/results/${TEST}.${SFX[$TYPE]}.stderr" 2>/dev/null)
 ERRRET=$?
