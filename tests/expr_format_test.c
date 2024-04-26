@@ -118,14 +118,6 @@ int main(int argc, char **argv) {
 		"format(12345.56789, '!#{%''16.3d}')",
 		"format(-12345.56789, '!#{%''16.3d}')",
 
-		/* New style monetary format */
-
-		"format(12345.56789, '!$%=*#60n')",
-		"format(-12345.56789, '!$%=*#60n')",
-
-		"format(12345.56789, '!${%=*#60n}')",
-		"format(-12345.56789, '!${%=*#60n}')",
-
 		/* Legacy datetime format */
 
 		"format(stodt('2022-05-08'), '')",

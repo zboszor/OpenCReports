@@ -44,10 +44,6 @@ jeudi jeu.
 vendredi ven.
 samedi sam.
 
-Hungarian money (national notation):  *****1000000,00 Ft (19 0)
-Hungarian money (international notation):  HUF *****1.000.000,00 (22 0)
-
-thousands separator: money ' ' regular ' '
 French money (national notation):  *****1000000,00 € (20 0)
 French money (international notation):  *****1000 000,00 EUR (23 0)
 

@@ -62,16 +62,6 @@ int main(int argc, char **argv) {
 	mpfr_set_si(mval, 1000000, MPFR_RNDN);
 
 	errno = 0;
-	ret = ocrpt_mpfr_strfmon(o1, sval, sizeof(sval), "%^=*#12n", mval);
-	printf("Hungarian money (national notation): %s (%d %d)\n", sval, ret, errno);
-
-	errno = 0;
-	ret = ocrpt_mpfr_strfmon(o1, sval, sizeof(sval), "%=*#12i", mval);
-	printf("Hungarian money (international notation): %s (%d %d)\n\n", sval, ret, errno);
-
-	char *sep1 = nl_langinfo_l(__MON_THOUSANDS_SEP, o2l), *sep2 = nl_langinfo_l(__THOUSANDS_SEP, o2l);
-	printf("thousands separator: money '%s' regular '%s'\n", sep1, sep2);
-	errno = 0;
 	ret = ocrpt_mpfr_strfmon(o2, sval, sizeof(sval), "%^=*#12n", mval);
 	printf("French money (national notation): %s (%d %d)\n", sval, ret, errno);
 

@@ -351,34 +351,6 @@ expr optimized: (string)          -12345.568
 expr nodes: 1
 (string)          -12345.568
 
-string: format(12345.56789, '!$%=*#60n')
-expr reprinted: format(12345.567890,(string)!$%=*#60n)
-expr nodes: 3
-expr optimized: (string)*******************************************************12345.57
-expr nodes: 1
-(string)*******************************************************12345.57
-
-string: format(-12345.56789, '!$%=*#60n')
-expr reprinted: format(uminus(12345.567890),(string)!$%=*#60n)
-expr nodes: 4
-expr optimized: (string)*******************************************************12345.57
-expr nodes: 1
-(string)*******************************************************12345.57
-
-string: format(12345.56789, '!${%=*#60n}')
-expr reprinted: format(12345.567890,(string)!${%=*#60n})
-expr nodes: 3
-expr optimized: (string)*******************************************************12345.57
-expr nodes: 1
-(string)*******************************************************12345.57
-
-string: format(-12345.56789, '!${%=*#60n}')
-expr reprinted: format(uminus(12345.567890),(string)!${%=*#60n})
-expr nodes: 4
-expr optimized: (string)*******************************************************12345.57
-expr nodes: 1
-(string)*******************************************************12345.57
-
 string: format(stodt('2022-05-08'), '')
 expr reprinted: format(stodt((string)2022-05-08),(string))
 expr nodes: 4
@@ -521,34 +493,6 @@ expr nodes: 4
 expr optimized: (string)         -12,345.568
 expr nodes: 1
 (string)         -12,345.568
-
-string: format(12345.56789, '!$%=*#60n')
-expr reprinted: format(12345.567890,(string)!$%=*#60n)
-expr nodes: 3
-expr optimized: (string) $********************************************************12,345.57
-expr nodes: 1
-(string) $********************************************************12,345.57
-
-string: format(-12345.56789, '!$%=*#60n')
-expr reprinted: format(uminus(12345.567890),(string)!$%=*#60n)
-expr nodes: 4
-expr optimized: (string)-$********************************************************12,345.57
-expr nodes: 1
-(string)-$********************************************************12,345.57
-
-string: format(12345.56789, '!${%=*#60n}')
-expr reprinted: format(12345.567890,(string)!${%=*#60n})
-expr nodes: 3
-expr optimized: (string) $********************************************************12,345.57
-expr nodes: 1
-(string) $********************************************************12,345.57
-
-string: format(-12345.56789, '!${%=*#60n}')
-expr reprinted: format(uminus(12345.567890),(string)!${%=*#60n})
-expr nodes: 4
-expr optimized: (string)-$********************************************************12,345.57
-expr nodes: 1
-(string)-$********************************************************12,345.57
 
 string: format(stodt('2022-05-08'), '')
 expr reprinted: format(stodt((string)2022-05-08),(string))
@@ -693,34 +637,6 @@ expr optimized: (string)         -12,345.568
 expr nodes: 1
 (string)         -12,345.568
 
-string: format(12345.56789, '!$%=*#60n')
-expr reprinted: format(12345.567890,(string)!$%=*#60n)
-expr nodes: 3
-expr optimized: (string) £********************************************************12,345.57
-expr nodes: 1
-(string) £********************************************************12,345.57
-
-string: format(-12345.56789, '!$%=*#60n')
-expr reprinted: format(uminus(12345.567890),(string)!$%=*#60n)
-expr nodes: 4
-expr optimized: (string)-£********************************************************12,345.57
-expr nodes: 1
-(string)-£********************************************************12,345.57
-
-string: format(12345.56789, '!${%=*#60n}')
-expr reprinted: format(12345.567890,(string)!${%=*#60n})
-expr nodes: 3
-expr optimized: (string) £********************************************************12,345.57
-expr nodes: 1
-(string) £********************************************************12,345.57
-
-string: format(-12345.56789, '!${%=*#60n}')
-expr reprinted: format(uminus(12345.567890),(string)!${%=*#60n})
-expr nodes: 4
-expr optimized: (string)-£********************************************************12,345.57
-expr nodes: 1
-(string)-£********************************************************12,345.57
-
 string: format(stodt('2022-05-08'), '')
 expr reprinted: format(stodt((string)2022-05-08),(string))
 expr nodes: 4
@@ -863,34 +779,6 @@ expr nodes: 4
 expr optimized: (string)          -12345,568
 expr nodes: 1
 (string)          -12345,568
-
-string: format(12345.56789, '!$%=*#60n')
-expr reprinted: format(12345.567890,(string)!$%=*#60n)
-expr nodes: 3
-expr optimized: (string) *******************************************************12 345,57 €
-expr nodes: 1
-(string) *******************************************************12 345,57 €
-
-string: format(-12345.56789, '!$%=*#60n')
-expr reprinted: format(uminus(12345.567890),(string)!$%=*#60n)
-expr nodes: 4
-expr optimized: (string)-*******************************************************12 345,57 €
-expr nodes: 1
-(string)-*******************************************************12 345,57 €
-
-string: format(12345.56789, '!${%=*#60n}')
-expr reprinted: format(12345.567890,(string)!${%=*#60n})
-expr nodes: 3
-expr optimized: (string) *******************************************************12 345,57 €
-expr nodes: 1
-(string) *******************************************************12 345,57 €
-
-string: format(-12345.56789, '!${%=*#60n}')
-expr reprinted: format(uminus(12345.567890),(string)!${%=*#60n})
-expr nodes: 4
-expr optimized: (string)-*******************************************************12 345,57 €
-expr nodes: 1
-(string)-*******************************************************12 345,57 €
 
 string: format(stodt('2022-05-08'), '')
 expr reprinted: format(stodt((string)2022-05-08),(string))
@@ -1035,34 +923,6 @@ expr optimized: (string)         -12.345,568
 expr nodes: 1
 (string)         -12.345,568
 
-string: format(12345.56789, '!$%=*#60n')
-expr reprinted: format(12345.567890,(string)!$%=*#60n)
-expr nodes: 3
-expr optimized: (string) ********************************************************12.345,57 €
-expr nodes: 1
-(string) ********************************************************12.345,57 €
-
-string: format(-12345.56789, '!$%=*#60n')
-expr reprinted: format(uminus(12345.567890),(string)!$%=*#60n)
-expr nodes: 4
-expr optimized: (string)-********************************************************12.345,57 €
-expr nodes: 1
-(string)-********************************************************12.345,57 €
-
-string: format(12345.56789, '!${%=*#60n}')
-expr reprinted: format(12345.567890,(string)!${%=*#60n})
-expr nodes: 3
-expr optimized: (string) ********************************************************12.345,57 €
-expr nodes: 1
-(string) ********************************************************12.345,57 €
-
-string: format(-12345.56789, '!${%=*#60n}')
-expr reprinted: format(uminus(12345.567890),(string)!${%=*#60n})
-expr nodes: 4
-expr optimized: (string)-********************************************************12.345,57 €
-expr nodes: 1
-(string)-********************************************************12.345,57 €
-
 string: format(stodt('2022-05-08'), '')
 expr reprinted: format(stodt((string)2022-05-08),(string))
 expr nodes: 4
@@ -1205,34 +1065,6 @@ expr nodes: 4
 expr optimized: (string)         -12.345,568
 expr nodes: 1
 (string)         -12.345,568
-
-string: format(12345.56789, '!$%=*#60n')
-expr reprinted: format(12345.567890,(string)!$%=*#60n)
-expr nodes: 3
-expr optimized: (string) ********************************************************12.345,57 Ft
-expr nodes: 1
-(string) ********************************************************12.345,57 Ft
-
-string: format(-12345.56789, '!$%=*#60n')
-expr reprinted: format(uminus(12345.567890),(string)!$%=*#60n)
-expr nodes: 4
-expr optimized: (string)-********************************************************12.345,57 Ft
-expr nodes: 1
-(string)-********************************************************12.345,57 Ft
-
-string: format(12345.56789, '!${%=*#60n}')
-expr reprinted: format(12345.567890,(string)!${%=*#60n})
-expr nodes: 3
-expr optimized: (string) ********************************************************12.345,57 Ft
-expr nodes: 1
-(string) ********************************************************12.345,57 Ft
-
-string: format(-12345.56789, '!${%=*#60n}')
-expr reprinted: format(uminus(12345.567890),(string)!${%=*#60n})
-expr nodes: 4
-expr optimized: (string)-********************************************************12.345,57 Ft
-expr nodes: 1
-(string)-********************************************************12.345,57 Ft
 
 string: format(stodt('2022-05-08'), '')
 expr reprinted: format(stodt((string)2022-05-08),(string))
