@@ -199,6 +199,7 @@ LAYOUT_TESTS = \
 	layout_xml41_test \
 	layout_code41_test \
 	layout_xml42_test \
+	layout_xml43_test \
 	header_query_test \
 	header_query2_test \
 	page_header_footer_vars_test \

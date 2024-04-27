@@ -183,6 +183,7 @@
 <!ELEMENT HorizontalLine EMPTY>
 <!ATTLIST HorizontalLine
 	size CDATA #IMPLIED
+	align CDATA #IMPLIED
 	indent CDATA #IMPLIED
 	length CDATA #IMPLIED
 	fontSize CDATA #IMPLIED

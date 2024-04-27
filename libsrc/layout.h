@@ -121,6 +121,7 @@ struct ocrpt_hline {
 	double font_width;
 	ocrpt_output *output;
 	ocrpt_expr *size;
+	ocrpt_expr *align;
 	ocrpt_expr *indent;
 	ocrpt_expr *length;
 	ocrpt_expr *font_size;

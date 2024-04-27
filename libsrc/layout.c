@@ -2110,6 +2110,16 @@ DLL_EXPORT_SYM void ocrpt_hline_set_size(ocrpt_hline *hline, const char *expr_st
 	hline->size = expr_string ? ocrpt_layout_expr_parse(hline->output->o, hline->output->r, expr_string, true, false) : NULL;
 }
 
+DLL_EXPORT_SYM void ocrpt_hline_set_align(ocrpt_hline *hline, const char *expr_string) {
+	if (!hline)
+		return;
+
+	if (hline->align)
+		ocrpt_expr_free(hline->align);
+
+	hline->align = expr_string ? ocrpt_layout_expr_parse(hline->output->o, hline->output->r, expr_string, true, false) : NULL;
+}
+
 DLL_EXPORT_SYM void ocrpt_hline_set_indent(ocrpt_hline *hline, const char *expr_string) {
 	if (!hline)
 		return;

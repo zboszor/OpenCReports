@@ -4398,6 +4398,18 @@ PHP_METHOD(opencreport_hline, set_size) {
 	ocrpt_hline_set_size(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
+PHP_METHOD(opencreport_hline, set_align) {
+	zval *object = ZEND_THIS;
+	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+
+	ocrpt_hline_set_align(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+}
+
 PHP_METHOD(opencreport_hline, set_indent) {
 	zval *object = ZEND_THIS;
 	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
@@ -4462,6 +4474,10 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_size, 0, 1
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_align, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_indent, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
@@ -4484,6 +4500,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry opencreport_hline_class_methods[] = {
 	PHP_ME(opencreport_hline, set_size, arginfo_opencreport_hline_set_size, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_hline, set_align, arginfo_opencreport_hline_set_align, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_hline, set_indent, arginfo_opencreport_hline_set_indent, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_hline, set_length, arginfo_opencreport_hline_set_length, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_hline, set_font_size, arginfo_opencreport_hline_set_font_size, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)

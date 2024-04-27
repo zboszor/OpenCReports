@@ -655,12 +655,13 @@ static void ocrpt_parse_output_line_node(opencreport *o, ocrpt_report *r, ocrpt_
 
 static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
 	ocrpt_hline *hline = ocrpt_output_add_hline(output);
-	xmlChar *size, *indent, *length, *font_size, *suppress, *color;
+	xmlChar *size, *align, *indent, *length, *font_size, *suppress, *color;
 	struct {
 		char *attrs[5];
 		xmlChar **attrp;
 	} xmlattrs[] = {
 		{ { "size" }, &size },
+		{ { "align" }, &align },
 		{ { "indent" }, &indent },
 		{ { "length" }, &length },
 		{ { "font_size", "fontSize" }, &font_size },
@@ -679,6 +680,7 @@ static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt
 	}
 
 	ocrpt_hline_set_size(hline, (char *)size);
+	ocrpt_hline_set_align(hline, (char *)align);
 	ocrpt_hline_set_indent(hline, (char *)indent);
 	ocrpt_hline_set_length(hline, (char *)length);
 	ocrpt_hline_set_font_size(hline, (char *)font_size);

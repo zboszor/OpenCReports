@@ -96,11 +96,27 @@ static void ocrpt_html_add_new_page_epilogue(opencreport *o) {
 static void ocrpt_html_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_hline *hline, double page_width, double page_indent, double page_position, double size) {
 	html_private_data *priv = o->output_private;
 	double indent, length;
+	PangoAlignment align = PANGO_ALIGN_LEFT;
 
-	if (hline->indent && hline->indent->result[o->residx] && hline->indent->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->indent->result[o->residx]->number_initialized)
+	if (hline->align && hline->align->result[o->residx] && hline->align->result[o->residx]->type == OCRPT_RESULT_STRING && hline->align->result[o->residx]->string) {
+		const char *alignment = hline->align->result[o->residx]->string->str;
+
+		if (strcasecmp(alignment, "right") == 0)
+			align = PANGO_ALIGN_RIGHT;
+		else if (strcasecmp(alignment, "center") == 0)
+			align = PANGO_ALIGN_CENTER;
+	}
+
+	if (align == PANGO_ALIGN_LEFT && hline->indent && hline->indent->result[o->residx] && hline->indent->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->indent->result[o->residx]->number_initialized) {
 		indent = mpfr_get_d(hline->indent->result[o->residx]->number, o->rndmode);
-	else
+		if (indent < 0.0)
+			indent = 0.0;
+	} else
 		indent = 0.0;
+
+	double maxlength = page_width - indent;
+	if (maxlength < 0.0)
+		maxlength = page_width;
 
 	if (hline->length && hline->length->result[o->residx] && hline->length->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->length->result[o->residx]->number_initialized) {
 		double size_multiplier;
@@ -111,10 +127,17 @@ static void ocrpt_html_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 			size_multiplier = hline->font_width;
 
 		length = mpfr_get_d(hline->length->result[o->residx]->number, o->rndmode) * size_multiplier;
-		if (length > page_width - indent)
-			length = page_width - indent;
+		if (length > maxlength)
+			length = maxlength;
 	} else
-		length = page_width - indent;
+		length = maxlength;
+
+	if (length < maxlength) {
+		if (align == PANGO_ALIGN_RIGHT)
+			indent = page_width - length;
+		else if (align == PANGO_ALIGN_CENTER)
+			indent = page_indent + (page_width - length) / 2.0;
+	}
 
 	ocrpt_color color;
 	char *color_name = NULL;

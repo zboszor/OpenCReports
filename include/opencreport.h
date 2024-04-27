@@ -971,6 +971,7 @@ void ocrpt_text_set_memo_max_lines(ocrpt_text *text, const char *expr_string);
 ocrpt_hline *ocrpt_output_add_hline(ocrpt_output *output);
 
 void ocrpt_hline_set_size(ocrpt_hline *hline, const char *expr_string);
+void ocrpt_hline_set_align(ocrpt_hline *hline, const char *expr_string);
 void ocrpt_hline_set_indent(ocrpt_hline *hline, const char *expr_string);
 void ocrpt_hline_set_length(ocrpt_hline *hline, const char *expr_string);
 void ocrpt_hline_set_font_size(ocrpt_hline *hline, const char *expr_string);

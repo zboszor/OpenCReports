@@ -2353,11 +2353,29 @@ ocrpt_hline_set_size(ocrpt_hline *hline,
                      const char *expr_string);</programlisting>
 					</para>
 				</sect4>
+				<sect4 id="hlinesetalign">
+					<title>Set horizontal line alignment</title>
+					<para>
+						Set the horizontal line's alignment from
+						an expression string. Possibly values are
+						<literal>left</literal>,
+						<literal>right</literal> and
+						<literal>center</literal>. Default is
+						<literal>left</literal> alignment.
+						The alignment is only applied if the line
+						length is shorter than the designated page
+						or column width without the margins.
+						<programlisting>void
+ocrpt_hline_set_align(ocrpt_hline *hline,
+                      const char *expr_string);</programlisting>
+					</para>
+				</sect4>
 				<sect4 id="hlinesetindentation">
 					<title>Set horizontal line indentation</title>
 					<para>
 						Set the horizontal line's indentation value from
-						an expression string.
+						an expression string. The indentation is used if
+						<literal>left</literal> alignment is set.
 						<programlisting>void
 ocrpt_hline_set_indent(ocrpt_hline *hline,
                        const char *expr_string);</programlisting>

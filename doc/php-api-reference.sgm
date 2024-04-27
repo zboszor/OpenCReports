@@ -3085,6 +3085,9 @@ OpenCReport\Line::add_image():
     public final set_size(
                      ?string $expr_string = null): void;
 
+    public final set_align(
+                     ?string $expr_string = null): void;
+
     public final set_indent(
                      ?string $expr_string = null): void;
 
@@ -3108,6 +3111,16 @@ OpenCReport\Line::add_image():
 				Also see <xref linkend="hlinewidth"/>
 				<programlisting>public final
 OpenCReport\HorizontalLine::set_size(
+                     ?string $expr_string = null): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phphlinesetalign">
+			<title>Set the line alignment</title>
+			<para>
+				Set the line alignment.
+				Also see <xref linkend="hlinealign"/>
+				<programlisting>public final
+OpenCReport\HorizontalLine::set_align(
                      ?string $expr_string = null): void;</programlisting>
 			</para>
 		</sect2>

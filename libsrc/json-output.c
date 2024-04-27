@@ -350,6 +350,20 @@ static void ocrpt_json_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 	yajl_gen_string(priv->yajl_gen, (ystr)"horizontal_line", 15);
 
 	double indent, length;
+	char *align = NULL;
+	int align_len = 0;
+
+	if (hline->align && hline->align->result[o->residx] && hline->align->result[o->residx]->type == OCRPT_RESULT_STRING && hline->align->result[o->residx]->string) {
+		const char *alignment = hline->align->result[o->residx]->string->str;
+
+		if (strcasecmp(alignment, "right") == 0) {
+			align = "right";
+			align_len = 5;
+		} else if (strcasecmp(alignment, "center") == 0) {
+			align = "center";
+			align_len = 6;
+		}
+	}
 
 	if (hline->indent && hline->indent->result[o->residx] && hline->indent->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->indent->result[o->residx]->number_initialized)
 		indent = mpfr_get_d(hline->indent->result[o->residx]->number, o->rndmode);
@@ -383,6 +397,11 @@ static void ocrpt_json_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 
 	yajl_gen_string(priv->yajl_gen, (ystr)"color", 5);
 	yajl_gen_string(priv->yajl_gen, (ystr)priv->base.data->str, priv->base.data->len);
+
+	if (align) {
+		yajl_gen_string(priv->yajl_gen, (ystr)"align", 5);
+		yajl_gen_string(priv->yajl_gen, (ystr)align, align_len);
+	}
 
 	yajl_gen_string(priv->yajl_gen, (ystr)"indent", 6);
 	yajl_gen_double(priv->yajl_gen, indent + priv->image_indent);

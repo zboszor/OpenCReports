@@ -3808,6 +3808,24 @@ SELECT * FROM some_table
 					Default is <literal>1.0</literal>
 				</para>
 			</sect3>
+			<sect3 id="hlinealign">
+				<title>Line alignment</title>
+				<para>
+					The possible alignment values are
+					<literal>left</literal>,
+					<literal>right</literal> and
+					<literal>center</literal>. Default is
+					<literal>left</literal> alignment.
+					The alignment is only applied if the line
+					length is shorter than the designated page
+					or column width without the margins.
+					<programlisting>&lt;HorizontalLine align="'center'"
+                length="200" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>1.0</literal>
+				</para>
+			</sect3>
 			<sect3 id="hlineindent">
 				<title>Indentation</title>
 				<para>

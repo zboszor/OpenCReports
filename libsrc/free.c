@@ -226,6 +226,7 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 				ocrpt_hline *hline = (ocrpt_hline *)oe;
 
 				ocrpt_expr_free(hline->size);
+				ocrpt_expr_free(hline->align);
 				ocrpt_expr_free(hline->indent);
 				ocrpt_expr_free(hline->length);
 				ocrpt_expr_free(hline->font_size);
