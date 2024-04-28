@@ -236,9 +236,6 @@ DLL_EXPORT_SYM void ocrpt_report_resolve_breaks(ocrpt_report *r) {
 	if (!r)
 		return;
 
-	opencreport *o = r->o;
-	int residx = o->residx;
-
 	for (ocrpt_list *ptr = r->breaks; ptr; ptr = ptr->next) {
 		ocrpt_break *br = (ocrpt_break *)ptr->data;
 		ocrpt_break_resolve_fields(br);
@@ -254,15 +251,15 @@ DLL_EXPORT_SYM void ocrpt_report_resolve_breaks(ocrpt_report *r) {
 		ocrpt_expr_resolve(e);
 		ocrpt_expr_optimize(e);
 		ocrpt_expr_eval(e);
-		if (e && e->result[residx] && e->result[residx]->type == OCRPT_RESULT_NUMBER && e->result[residx]->number_initialized)
-			br->headernewpage = !!mpfr_get_ui(e->result[residx]->number, r->o->rndmode);
+		if (EXPR_VALID_NUMERIC(e))
+			br->headernewpage = !!mpfr_get_ui(EXPR_NUMERIC(e), EXPR_RNDMODE(e));
 
 		e = br->suppressblank_expr;
 		ocrpt_expr_resolve(e);
 		ocrpt_expr_optimize(e);
 		ocrpt_expr_eval(e);
-		if (e && e->result[residx] && e->result[residx]->type == OCRPT_RESULT_NUMBER && e->result[residx]->number_initialized)
-			br->suppressblank = !!mpfr_get_ui(e->result[residx]->number, r->o->rndmode);
+		if (EXPR_VALID_NUMERIC(e))
+			br->suppressblank = !!mpfr_get_ui(EXPR_NUMERIC(e), EXPR_RNDMODE(e));
 	}
 }
 

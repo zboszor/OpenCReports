@@ -711,8 +711,8 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, ocrpt_string *string0, o
 	assert(string);
 
 	if (e && !e->result[o->residx]->string) {
-		e->result[o->residx]->string = string;
-		e->result[o->residx]->string_owned = true;
+		EXPR_STRING(e) = string;
+		EXPR_STRING_OWNED(e) = true;
 	}
 	string->len = 0;
 
@@ -860,9 +860,9 @@ void ocrpt_format_string_literal(opencreport *o, ocrpt_expr *e, ocrpt_string *st
 	ocrpt_string *string = ocrpt_mem_string_resize(string0, 16);
 	assert(string);
 
-	if (e && !e->result[o->residx]->string) {
-		e->result[o->residx]->string = string;
-		e->result[o->residx]->string_owned = true;
+	if (e && !EXPR_STRING(e)) {
+		EXPR_STRING(e) = string;
+		EXPR_STRING_OWNED(e) = true;
 	}
 	string->len = 0;
 

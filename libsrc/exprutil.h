@@ -175,6 +175,34 @@ static inline int ocrpt_expr_prev_residx(int residx) {
 	return val;
 }
 
+#define EXPR_VALID(e) ((e) && (e)->result[(e)->o->residx])
+#define EXPR_RESULT(e) ((e)->result[(e)->o->residx])
+#define EXPR_NEXT_RESULT(e) ((e)->result[ocrpt_expr_next_residx((e)->o->residx)])
+#define EXPR_PREV_RESULT(e) ((e)->result[ocrpt_expr_prev_residx((e)->o->residx)])
+#define EXPR_TYPE(e) (EXPR_RESULT(e)->type)
+#define EXPR_ISNULL(e) (EXPR_RESULT(e)->isnull)
+#define EXPR_VALID_NOT_NULL(e) ((e) && EXPR_RESULT(e) && !EXPR_ISNULL(e))
+#define EXPR_VALID_NUMERIC(e) ((e) && EXPR_RESULT(e) && EXPR_TYPE(e) == OCRPT_RESULT_NUMBER && EXPR_RESULT(e)->number_initialized)
+#define EXPR_VALID_NUMERIC_MAYBE_UNINITIALIZED(e) ((e) && EXPR_RESULT(e) && EXPR_TYPE(e) == OCRPT_RESULT_NUMBER)
+#define EXPR_NUMERIC(e) (EXPR_RESULT(e)->number)
+#define EXPR_RNDMODE(e) ((e)->o->rndmode)
+#define EXPR_VALID_STRING(e) ((e) && EXPR_RESULT(e) && EXPR_TYPE(e) == OCRPT_RESULT_STRING && EXPR_RESULT(e)->string)
+#define EXPR_VALID_STRING_MAYBE_UNINITIALIZED(e) ((e) && EXPR_RESULT(e) && EXPR_TYPE(e) == OCRPT_RESULT_STRING)
+#define EXPR_STRING(e) (EXPR_RESULT(e)->string)
+#define EXPR_STRING_OWNED(e) (EXPR_RESULT(e)->string_owned)
+#define EXPR_STRING_VAL(e) (EXPR_STRING(e)->str)
+#define EXPR_STRING_LEN(e) (EXPR_STRING(e)->len)
+#define EXPR_STRING_ALEN(e) (EXPR_STRING(e)->allocated_len)
+#define EXPR_VALID_DATETIME(e) ((e) && EXPR_RESULT(e) && EXPR_TYPE(e) == OCRPT_RESULT_DATETIME && (EXPR_RESULT(e)->date_valid || EXPR_RESULT(e)->time_valid))
+#define EXPR_VALID_DATETIME_MAYBE_UNINITIALIZED(e) ((e) && EXPR_RESULT(e) && EXPR_TYPE(e) == OCRPT_RESULT_DATETIME)
+#define EXPR_DATETIME(e) (EXPR_RESULT(e)->datetime)
+#define EXPR_DATE_VALID(e) (EXPR_RESULT(e)->date_valid)
+#define EXPR_TIME_VALID(e) (EXPR_RESULT(e)->time_valid)
+#define EXPR_INTERVAL(e) (EXPR_RESULT(e)->interval)
+#define EXPR_DAY_CARRY(e) (EXPR_RESULT(e)->day_carry)
+#define EXPR_VALID_ERROR(e) ((e) && EXPR_RESULT(e) && EXPR_TYPE(e) == OCRPT_RESULT_ERROR && EXPR_STRING(e))
+#define EXPR_VALID_ERROR_MAYBE_UNINITIALIZED(e) ((e) && EXPR_RESULT(e) && EXPR_TYPE(e) == OCRPT_RESULT_ERROR)
+
 void ocrpt_result_free_data(ocrpt_result *r);
 
 #endif

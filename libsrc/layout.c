@@ -39,19 +39,14 @@ void ocrpt_layout_compute_text(opencreport *o, ocrpt_text *le) {
 	bool has_format = false;
 	bool has_value = false;
 
-	if (o->textdomain && le->translate && le->translate->result[o->residx] && le->translate->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->translate->result[o->residx]->number_initialized) {
-		has_translate = !!mpfr_get_si(le->translate->result[o->residx]->number, o->rndmode);
+	if (o->textdomain && EXPR_VALID_NUMERIC(le->translate)) {
+		has_translate = !!mpfr_get_si(EXPR_NUMERIC(le->translate), EXPR_RNDMODE(le->translate));
 	}
 
-	if (le->format && le->format->result[o->residx] && le->format->result[o->residx]->type == OCRPT_RESULT_STRING && le->format->result[o->residx]->string)
+	if (EXPR_VALID_STRING(le->format))
 		has_format = true;
 
-	if (le->value && le->value->result[o->residx] && !le->value->result[o->residx]->isnull &&
-		(
-			(le->value->result[o->residx]->type == OCRPT_RESULT_STRING && le->value->result[o->residx]->string) ||
-			(le->value->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->value->result[o->residx]->number_initialized) ||
-			(le->value->result[o->residx]->type == OCRPT_RESULT_DATETIME && (le->value->result[o->residx]->date_valid || le->value->result[o->residx]->time_valid))
-		))
+	if (EXPR_VALID_NOT_NULL(le->value) && (EXPR_VALID_STRING(le->value) || EXPR_VALID_NUMERIC(le->value) || EXPR_VALID_DATETIME(le->value)))
 		has_value = true;
 
 	ocrpt_string *fstring = ocrpt_mem_string_resize(le->format_str, 16);
@@ -75,22 +70,22 @@ void ocrpt_layout_compute_text(opencreport *o, ocrpt_text *le) {
 	if (has_format) {
 		if (has_translate) {
 			locale_t locale = uselocale(o->locale);
-			ocrpt_mem_string_append_printf(fstring, "%s", dgettext(o->textdomain, le->format->result[o->residx]->string->str));
+			ocrpt_mem_string_append_printf(fstring, "%s", dgettext(o->textdomain, EXPR_STRING_VAL(le->format)));
 			uselocale(locale);
 		} else
-			ocrpt_mem_string_append_printf(fstring, "%s", le->format->result[o->residx]->string->str);
+			ocrpt_mem_string_append_printf(fstring, "%s", EXPR_STRING_VAL(le->format));
 		ocrpt_format_string(o, NULL, rstring, fstring, &le->value, 1);
 	} else if (has_value) {
-		switch (le->value->result[o->residx]->type) {
+		switch (EXPR_TYPE(le->value)) {
 		case OCRPT_RESULT_STRING:
 		case OCRPT_RESULT_ERROR:
 			ocrpt_mem_string_append_printf(fstring, "%s", "%s");
 			if (has_translate) {
 				locale_t locale = uselocale(o->locale);
-				ocrpt_mem_string_append_printf(string, "%s", dgettext(o->textdomain, le->value->result[o->residx]->string->str));
+				ocrpt_mem_string_append_printf(string, "%s", dgettext(o->textdomain, EXPR_STRING_VAL(le->value)));
 				uselocale(locale);
 			} else
-				ocrpt_mem_string_append_printf(string, "%s", le->value->result[o->residx]->string->str);
+				ocrpt_mem_string_append_printf(string, "%s", EXPR_STRING_VAL(le->value));
 			ocrpt_format_string_literal(o, NULL, rstring, fstring, string);
 			break;
 		case OCRPT_RESULT_NUMBER:
@@ -148,10 +143,10 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 
 			ocrpt_layout_image_setup(o, p, pr, pd, r, output, line, img, page_width, img->start, page_position);
 
-			if (img->text_width && img->text_width->result[o->residx] && img->text_width->result[o->residx]->type == OCRPT_RESULT_NUMBER && img->text_width->result[o->residx]->number_initialized)
-				img->image_text_width = mpfr_get_d(img->text_width->result[o->residx]->number, o->rndmode);
-			else if (img->width && img->width->result[o->residx] && img->width->result[o->residx]->type == OCRPT_RESULT_NUMBER && img->width->result[o->residx]->number_initialized)
-				img->image_text_width = mpfr_get_d(img->width->result[o->residx]->number, o->rndmode);
+			if (EXPR_VALID_NUMERIC(img->text_width))
+				img->image_text_width = mpfr_get_d(EXPR_NUMERIC(img->text_width), EXPR_RNDMODE(img->text_width));
+			else if (EXPR_VALID_NUMERIC(img->width))
+				img->image_text_width = mpfr_get_d(EXPR_NUMERIC(img->width), EXPR_RNDMODE(img->width));
 			else
 				img->image_text_width = 0.0;
 
@@ -164,15 +159,15 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 		case OCRPT_OUTPUT_LE_BARCODE:
 			bc->start = next_start;
 
-			if (bc->height && bc->height->result[o->residx] && bc->height->result[o->residx]->type == OCRPT_RESULT_NUMBER && bc->height->result[o->residx]->number_initialized)
-				bc->barcode_height = mpfr_get_d(bc->height->result[o->residx]->number, o->rndmode);
+			if (EXPR_VALID_NUMERIC(bc->height))
+				bc->barcode_height = mpfr_get_d(EXPR_NUMERIC(bc->height), EXPR_RNDMODE(bc->height));
 			else
 				bc->barcode_height = 0.0; /* it will be set in the loop below when the line height is known */
 
 			bool encoding_ok = ocrpt_barcode_encode(o, bc);
 
-			if (bc->width && bc->width->result[o->residx] && bc->width->result[o->residx]->type == OCRPT_RESULT_NUMBER && bc->width->result[o->residx]->number_initialized) {
-				bc->barcode_width = mpfr_get_d(bc->width->result[o->residx]->number, o->rndmode);
+			if (EXPR_VALID_NUMERIC(bc->width)) {
+				bc->barcode_width = mpfr_get_d(EXPR_NUMERIC(bc->width), EXPR_RNDMODE(bc->width));
 				if (!o->size_in_points)
 					bc->barcode_width *= line->font_width;
 			} else
@@ -254,8 +249,8 @@ static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_pa
 }
 
 static void ocrpt_layout_hline(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_hline *hline, double page_width, double page_indent, double *page_position) {
-	if (hline->suppress && hline->suppress->result[o->residx] && hline->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->suppress->result[o->residx]->number_initialized) {
-		long suppress = mpfr_get_si(hline->suppress->result[o->residx]->number, o->rndmode);
+	if (EXPR_VALID_NUMERIC(hline->suppress)) {
+		long suppress = mpfr_get_si(EXPR_NUMERIC(hline->suppress), EXPR_RNDMODE(hline->suppress));
 
 		if (suppress)
 			return;
@@ -263,8 +258,8 @@ static void ocrpt_layout_hline(bool draw, opencreport *o, ocrpt_part *p, ocrpt_p
 
 	double size;
 
-	if (hline->size && hline->size->result[o->residx] && hline->size->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->size->result[o->residx]->number_initialized)
-		size = mpfr_get_d(hline->size->result[o->residx]->number, o->rndmode);
+	if (EXPR_VALID_NUMERIC(hline->size))
+		size = mpfr_get_d(EXPR_NUMERIC(hline->size), EXPR_RNDMODE(hline->size));
 	else
 		size = 1.0;
 
@@ -370,37 +365,37 @@ static void ocrpt_layout_image_setup(opencreport *o, ocrpt_part *p, ocrpt_part_r
 	image->suppress_image = false;
 
 	/* Don't render the image if the filename, the width or the height are not set. */
-	if (!image->value || !image->value->result[o->residx] || image->value->result[o->residx]->type != OCRPT_RESULT_STRING || !image->value->result[o->residx]->string) {
+	if (!EXPR_VALID_STRING(image->value)) {
 		image->suppress_image = true;
 		return;
 	}
 
-	if (!image->width || !image->width->result[o->residx] || image->width->result[o->residx]->type != OCRPT_RESULT_NUMBER || !image->width->result[o->residx]->number_initialized) {
+	if (!EXPR_VALID_NUMERIC(image->width)) {
 		if (!image->in_line) {
 			image->suppress_image = true;
 			return;
 		}
 		image->image_width = 0.0;
 	} else
-		image->image_width = mpfr_get_d(image->width->result[o->residx]->number, o->rndmode);
+		image->image_width = mpfr_get_d(EXPR_NUMERIC(image->width), EXPR_RNDMODE(image->width));
 
-	if (!image->height || !image->height->result[o->residx] || image->height->result[o->residx]->type != OCRPT_RESULT_NUMBER || !image->height->result[o->residx]->number_initialized) {
+	if (!EXPR_VALID_NUMERIC(image->height)) {
 		if (!image->in_line) {
 			image->suppress_image = true;
 			return;
 		}
 		image->image_height = 0.0;
 	} else
-		image->image_height = mpfr_get_d(image->height->result[o->residx]->number, o->rndmode);
+		image->image_height = mpfr_get_d(EXPR_NUMERIC(image->height), EXPR_RNDMODE(image->height));
 
-	if (image->bgcolor && image->bgcolor->result[o->residx] && image->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && image->bgcolor->result[o->residx]->string)
-		ocrpt_get_color(image->bgcolor->result[o->residx]->string->str, &image->bg, true);
-	else if (line && line->bgcolor && line->bgcolor->result[o->residx] && line->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && line->bgcolor->result[o->residx]->string)
-		ocrpt_get_color(line->bgcolor->result[o->residx]->string->str, &image->bg, true);
+	if (EXPR_VALID_STRING(image->bgcolor))
+		ocrpt_get_color(EXPR_STRING_VAL(image->bgcolor), &image->bg, true);
+	else if (line && EXPR_VALID_STRING(line->bgcolor))
+		ocrpt_get_color(EXPR_STRING_VAL(line->bgcolor), &image->bg, true);
 	else
 		ocrpt_get_color(NULL, &image->bg, true);
 
-	char *img_filename = ocrpt_find_file(o, image->value->result[o->residx]->string->str);
+	char *img_filename = ocrpt_find_file(o, EXPR_STRING_VAL(image->value));
 
 	if (!img_filename) {
 		image->suppress_image = true;
@@ -427,10 +422,10 @@ static void ocrpt_layout_image_setup(opencreport *o, ocrpt_part *p, ocrpt_part_r
 		bool svg = false;
 		bool valid = false;
 
-		if (image->imgtype && image->imgtype->result[o->residx] && image->imgtype->result[o->residx]->type == OCRPT_RESULT_STRING && image->imgtype->result[o->residx]->string) {
-			svg = strcasecmp(image->imgtype->result[o->residx]->string->str, "svg") == 0;
+		if (EXPR_VALID_STRING(image->imgtype)) {
+			svg = strcasecmp(EXPR_STRING_VAL(image->imgtype), "svg") == 0;
 		} else {
-			ocrpt_string *s = image->value->result[o->residx]->string;
+			ocrpt_string *s = EXPR_STRING(image->value);
 			if (s->len > 4)
 				svg = strcasecmp(s->str + s->len - 4, ".svg") == 0;
 		}
@@ -460,28 +455,28 @@ static void ocrpt_layout_barcode_setup(opencreport *o, ocrpt_part *p, ocrpt_part
 	bc->suppress_bc = false;
 
 	/* Don't render the barcode if the value, the width or the height are not set. */
-	if (!bc->value || !bc->value->result[o->residx] || bc->value->result[o->residx]->type != OCRPT_RESULT_STRING || !bc->value->result[o->residx]->string) {
+	if (!EXPR_VALID_STRING(bc->value)) {
 		bc->suppress_bc = true;
 		return;
 	}
 
-	if (!bc->width || !bc->width->result[o->residx] || bc->width->result[o->residx]->type != OCRPT_RESULT_NUMBER || !bc->width->result[o->residx]->number_initialized) {
+	if (!EXPR_VALID_NUMERIC(bc->width)) {
 		if (!bc->in_line) {
 			bc->suppress_bc = true;
 			return;
 		}
 		bc->barcode_width = 0.0;
 	} else
-		bc->barcode_width = mpfr_get_d(bc->width->result[o->residx]->number, o->rndmode);
+		bc->barcode_width = mpfr_get_d(EXPR_NUMERIC(bc->width), EXPR_RNDMODE(bc->width));
 
-	if (!bc->height || !bc->height->result[o->residx] || bc->height->result[o->residx]->type != OCRPT_RESULT_NUMBER || !bc->height->result[o->residx]->number_initialized) {
+	if (!EXPR_VALID_NUMERIC(bc->height)) {
 		if (!bc->in_line) {
 			bc->suppress_bc = true;
 			return;
 		}
 		bc->barcode_height = 0.0;
 	} else
-		bc->barcode_height = mpfr_get_d(bc->height->result[o->residx]->number, o->rndmode);
+		bc->barcode_height = mpfr_get_d(EXPR_NUMERIC(bc->height), EXPR_RNDMODE(bc->height));
 }
 
 static void ocrpt_layout_barcode(bool draw, opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_barcode *bc, bool last, double page_width, double page_indent, double *page_position) {
@@ -832,8 +827,8 @@ void ocrpt_layout_output_evaluate(ocrpt_output *output) {
 void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, double page_width, double page_indent, double *page_position) {
 	output->suppress_output = false;
 
-	if (output->suppress && output->suppress->result[o->residx] && output->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && output->suppress->result[o->residx]->number_initialized) {
-		long suppress = mpfr_get_si(output->suppress->result[o->residx]->number, o->rndmode);
+	if (EXPR_VALID_NUMERIC(output->suppress)) {
+		long suppress = mpfr_get_si(EXPR_NUMERIC(output->suppress), EXPR_RNDMODE(output->suppress));
 
 		if (suppress) {
 			output->suppress_output = true;
@@ -856,8 +851,8 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 		switch (oe->type) {
 		case OCRPT_OUTPUT_LINE:
 			l->suppress_line = false;
-			if (l->suppress && l->suppress->result[o->residx] && l->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->suppress->result[o->residx]->number_initialized) {
-				long suppress = mpfr_get_si(l->suppress->result[o->residx]->number, o->rndmode);
+			if (EXPR_VALID_NUMERIC(l->suppress)) {
+				long suppress = mpfr_get_si(EXPR_NUMERIC(l->suppress), EXPR_RNDMODE(l->suppress));
 
 				if (suppress) {
 					l->suppress_line = true;
@@ -866,13 +861,13 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 			}
 
 			if (o->output_functions.support_any_font) {
-				if (l->font_name && l->font_name->result[o->residx] && l->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && l->font_name->result[o->residx]->string)
-					font_name = l->font_name->result[o->residx]->string->str;
+				if (EXPR_VALID_STRING(l->font_name))
+					font_name = EXPR_STRING_VAL(l->font_name);
 				else
 					font_name = (r && r->font_name) ? r->font_name : p->font_name;
 
-				if (l->font_size && l->font_size->result[o->residx] && l->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->font_size->result[o->residx]->number_initialized)
-					font_size = mpfr_get_d(l->font_size->result[o->residx]->number, o->rndmode);
+				if (EXPR_VALID_NUMERIC(l->font_size))
+					font_size = mpfr_get_d(EXPR_NUMERIC(l->font_size), EXPR_RNDMODE(l->font_size));
 				else
 					font_size = r ? r->font_size : p->font_size;
 			} else {
@@ -891,8 +886,8 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 			break;
 		case OCRPT_OUTPUT_HLINE:
 			hl->suppress_hline = false;
-			if (hl->suppress && hl->suppress->result[o->residx] && hl->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && hl->suppress->result[o->residx]->number_initialized) {
-				long suppress = mpfr_get_si(hl->suppress->result[o->residx]->number, o->rndmode);
+			if (EXPR_VALID_NUMERIC(hl->suppress)) {
+				long suppress = mpfr_get_si(EXPR_NUMERIC(hl->suppress), EXPR_RNDMODE(hl->suppress));
 
 				if (suppress) {
 					hl->suppress_hline = true;
@@ -903,8 +898,8 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 			if (o->output_functions.support_any_font) {
 				font_name = (r && r->font_name) ? r->font_name : p->font_name;
 
-				if (hl->font_size && hl->font_size->result[o->residx] && hl->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && hl->font_size->result[o->residx]->number_initialized)
-					font_size = mpfr_get_d(hl->font_size->result[o->residx]->number, o->rndmode);
+				if (EXPR_VALID_NUMERIC(hl->font_size))
+					font_size = mpfr_get_d(EXPR_NUMERIC(hl->font_size), EXPR_RNDMODE(hl->font_size));
 				else
 					font_size = (r ? r->font_size : p->font_size);
 			} else {
@@ -919,8 +914,8 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 			output->current_image = NULL;
 			output->current_barcode = NULL;
 			img->suppress_image = false;
-			if (img->suppress && img->suppress->result[o->residx] && img->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && img->suppress->result[o->residx]->number_initialized) {
-				long suppress = mpfr_get_si(img->suppress->result[o->residx]->number, o->rndmode);
+			if (EXPR_VALID_NUMERIC(img->suppress)) {
+				long suppress = mpfr_get_si(EXPR_NUMERIC(img->suppress), EXPR_RNDMODE(img->suppress));
 
 				if (suppress) {
 					img->suppress_image = true;
@@ -936,8 +931,8 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 			output->current_image = NULL;
 			output->current_barcode = NULL;
 			bc->suppress_bc = false;
-			if (bc->suppress && bc->suppress->result[o->residx] && bc->suppress->result[o->residx]->type == OCRPT_RESULT_NUMBER && bc->suppress->result[o->residx]->number_initialized) {
-				long suppress = mpfr_get_si(bc->suppress->result[o->residx]->number, o->rndmode);
+			if (EXPR_VALID_NUMERIC(bc->suppress)) {
+				long suppress = mpfr_get_si(EXPR_NUMERIC(bc->suppress), EXPR_RNDMODE(bc->suppress));
 
 				if (suppress) {
 					bc->suppress_bc = true;

@@ -360,7 +360,7 @@ void ocrpt_variables_add_precalculated_results(ocrpt_report *r, ocrpt_list *brl_
 
 			if (var_br_triggered) {
 				ocrpt_result *dst = ocrpt_result_new(r->o);
-				ocrpt_result_copy(dst, var->resultexpr->result[r->o->residx]);
+				ocrpt_result_copy(dst, EXPR_RESULT(var->resultexpr));
 				var->precalc_results = ocrpt_list_append(var->precalc_results, dst);
 			}
 		}

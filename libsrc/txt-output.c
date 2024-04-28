@@ -103,8 +103,8 @@ static void ocrpt_txt_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	uint32_t nspc, i;
 
 	if (line) {
-		if (line && line->font_size && line->font_size->result[o->residx] && line->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && line->font_size->result[o->residx]->number_initialized)
-			size = mpfr_get_d(line->font_size->result[o->residx]->number, o->rndmode);
+		if (line && EXPR_VALID_NUMERIC(line->font_size))
+			size = mpfr_get_d(EXPR_NUMERIC(line->font_size), EXPR_RNDMODE(line->font_size));
 		else if (r && r->font_size_expr)
 			size = r->font_size;
 		else if (p && p->font_size_expr)

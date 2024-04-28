@@ -98,8 +98,8 @@ static void ocrpt_html_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 	double indent, length;
 	PangoAlignment align = PANGO_ALIGN_LEFT;
 
-	if (hline->align && hline->align->result[o->residx] && hline->align->result[o->residx]->type == OCRPT_RESULT_STRING && hline->align->result[o->residx]->string) {
-		const char *alignment = hline->align->result[o->residx]->string->str;
+	if (EXPR_VALID_STRING(hline->align)) {
+		const char *alignment = EXPR_STRING_VAL(hline->align);
 
 		if (strcasecmp(alignment, "right") == 0)
 			align = PANGO_ALIGN_RIGHT;
@@ -107,8 +107,8 @@ static void ocrpt_html_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 			align = PANGO_ALIGN_CENTER;
 	}
 
-	if (align == PANGO_ALIGN_LEFT && hline->indent && hline->indent->result[o->residx] && hline->indent->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->indent->result[o->residx]->number_initialized) {
-		indent = mpfr_get_d(hline->indent->result[o->residx]->number, o->rndmode);
+	if (align == PANGO_ALIGN_LEFT && EXPR_VALID_NUMERIC(hline->indent)) {
+		indent = mpfr_get_d(EXPR_NUMERIC(hline->indent), EXPR_RNDMODE(hline->indent));
 		if (indent < 0.0)
 			indent = 0.0;
 	} else
@@ -118,7 +118,7 @@ static void ocrpt_html_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 	if (maxlength < 0.0)
 		maxlength = page_width;
 
-	if (hline->length && hline->length->result[o->residx] && hline->length->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->length->result[o->residx]->number_initialized) {
+	if (EXPR_VALID_NUMERIC(hline->length)) {
 		double size_multiplier;
 
 		if (o->size_in_points)
@@ -126,7 +126,7 @@ static void ocrpt_html_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 		else
 			size_multiplier = hline->font_width;
 
-		length = mpfr_get_d(hline->length->result[o->residx]->number, o->rndmode) * size_multiplier;
+		length = mpfr_get_d(EXPR_NUMERIC(hline->length), EXPR_RNDMODE(hline->length)) * size_multiplier;
 		if (length > maxlength)
 			length = maxlength;
 	} else
@@ -142,8 +142,8 @@ static void ocrpt_html_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 	ocrpt_color color;
 	char *color_name = NULL;
 
-	if (hline->color && hline->color->result[o->residx] && hline->color->result[o->residx]->type == OCRPT_RESULT_STRING && hline->color->result[o->residx]->string)
-		color_name = hline->color->result[o->residx]->string->str;
+	if (EXPR_VALID_STRING(hline->color))
+		color_name = EXPR_STRING_VAL(hline->color);
 
 	ocrpt_get_color(color_name, &color, false);
 
@@ -247,18 +247,18 @@ static void ocrpt_html_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	ocrpt_mem_string_append_printf(o->output_buffer, "font-family: '%s'; font-size: %.2lfpt; ", le->font, le->fontsz);
 
 	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
-	if (le->bgcolor && le->bgcolor->result[o->residx] && le->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && le->bgcolor->result[o->residx]->string)
-		ocrpt_get_color(le->bgcolor->result[o->residx]->string->str, &bgcolor, true);
-	else if (l->bgcolor && l->bgcolor->result[o->residx] && l->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && l->bgcolor->result[o->residx]->string)
-		ocrpt_get_color(l->bgcolor->result[o->residx]->string->str, &bgcolor, true);
+	if (EXPR_VALID_STRING(le->bgcolor))
+		ocrpt_get_color(EXPR_STRING_VAL(le->bgcolor), &bgcolor, true);
+	else if (EXPR_VALID_STRING(l->bgcolor))
+		ocrpt_get_color(EXPR_STRING_VAL(l->bgcolor), &bgcolor, true);
 
 	ocrpt_mem_string_append_printf(o->output_buffer, "background-color: #%02x%02x%02x; ", ocrpt_common_color_value(bgcolor.r), ocrpt_common_color_value(bgcolor.g), ocrpt_common_color_value(bgcolor.b));
 
 	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
-	if (le->color && le->color->result[o->residx] && le->color->result[o->residx]->type == OCRPT_RESULT_STRING && le->color->result[o->residx]->string)
-		ocrpt_get_color(le->color->result[o->residx]->string->str, &color, true);
-	else if (l->color && l->color->result[o->residx] && l->color->result[o->residx]->type == OCRPT_RESULT_STRING && l->color->result[o->residx]->string)
-		ocrpt_get_color(l->color->result[o->residx]->string->str, &color, true);
+	if (EXPR_VALID_STRING(le->color))
+		ocrpt_get_color(EXPR_STRING_VAL(le->color), &color, true);
+	else if (EXPR_VALID_STRING(l->color))
+		ocrpt_get_color(EXPR_STRING_VAL(l->color), &color, true);
 
 	ocrpt_mem_string_append_printf(o->output_buffer, "color: #%02x%02x%02x; ", ocrpt_common_color_value(color.r), ocrpt_common_color_value(color.g), ocrpt_common_color_value(color.b));
 
@@ -271,8 +271,8 @@ static void ocrpt_html_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 
 	ocrpt_html_escape_data(o, le);
 
-	if (le->link && le->link->result[o->residx] && le->link->result[o->residx]->type == OCRPT_RESULT_STRING && le->link->result[o->residx]->string) {
-		char *link = le->link->result[o->residx]->string->str;
+	if (EXPR_VALID_STRING(le->link)) {
+		char *link = EXPR_STRING_VAL(le->link);
 
 		ocrpt_mem_string_append_printf(o->output_buffer, "<a href=\"%s\">%s</a>", link, priv->base.data->str);
 	} else
@@ -302,8 +302,8 @@ static void ocrpt_html_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 
 	if (line) {
 		const char *al = "start";
-		if (img->align && img->align->result[o->residx] && img->align->result[o->residx]->type == OCRPT_RESULT_STRING && img->align->result[o->residx]->string) {
-			const char *alignment = img->align->result[o->residx]->string->str;
+		if (EXPR_VALID_STRING(img->align)) {
+			const char *alignment = EXPR_STRING_VAL(img->align);
 			if (strcasecmp(alignment, "right") == 0)
 				al = "end";
 			else if (strcasecmp(alignment, "center") == 0)
@@ -431,15 +431,15 @@ static void ocrpt_html_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 	ocrpt_color bg = { 1.0, 1.0, 1.0 };
 	ocrpt_color fg = { 0.0, 0.0, 0.0 };
 
-	if (bc->color && bc->color->result[o->residx] && bc->color->result[o->residx]->type == OCRPT_RESULT_STRING && bc->color->result[o->residx]->string)
-		ocrpt_get_color(bc->color->result[o->residx]->string->str, &fg, false);
-	else if (line && line->color && line->color->result[o->residx] && line->color->result[o->residx]->type == OCRPT_RESULT_STRING && line->color->result[o->residx]->string)
-		ocrpt_get_color(line->color->result[o->residx]->string->str, &fg, false);
+	if (EXPR_VALID_STRING(bc->color))
+		ocrpt_get_color(EXPR_STRING_VAL(bc->color), &fg, false);
+	else if (line && EXPR_VALID_STRING(line->color))
+		ocrpt_get_color(EXPR_STRING_VAL(line->color), &fg, false);
 
-	if (bc->bgcolor && bc->bgcolor->result[o->residx] && bc->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && bc->bgcolor->result[o->residx]->string)
-		ocrpt_get_color(bc->bgcolor->result[o->residx]->string->str, &bg, true);
-	else if (line && line->bgcolor && line->bgcolor->result[o->residx] && line->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && line->bgcolor->result[o->residx]->string)
-		ocrpt_get_color(line->bgcolor->result[o->residx]->string->str, &bg, false);
+	if (EXPR_VALID_STRING(bc->bgcolor))
+		ocrpt_get_color(EXPR_STRING_VAL(bc->bgcolor), &bg, true);
+	else if (line && EXPR_VALID_STRING(line->bgcolor))
+		ocrpt_get_color(EXPR_STRING_VAL(line->bgcolor), &bg, false);
 
 	cairo_save(cr);
 

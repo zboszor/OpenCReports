@@ -84,7 +84,7 @@ static bool ocrpt_navigate_next_with_followers(ocrpt_query *q) {
 
 	ocrpt_expr_init_result(q->rownum, OCRPT_RESULT_NUMBER);
 	if (has_row) {
-		mpfr_set_si(q->rownum->result[q->source->o->residx]->number, q->current_row + 1, q->source->o->rndmode);
+		mpfr_set_si(EXPR_NUMERIC(q->rownum), q->current_row + 1, EXPR_RNDMODE(q->rownum));
 
 		for (ocrpt_list *l = q->followers; l; l = l->next) {
 			ocrpt_query *q1 = (ocrpt_query *)l->data;
@@ -92,7 +92,7 @@ static bool ocrpt_navigate_next_with_followers(ocrpt_query *q) {
 			ocrpt_navigate_next_with_followers(q1);
 		}
 	} else {
-		q->rownum->result[q->source->o->residx]->isnull = true;
+		EXPR_ISNULL(q->rownum) = true;
 
 		for (ocrpt_list *l = q->followers; l; l = l->next) {
 			ocrpt_query *q1 = (ocrpt_query *)l->data;
@@ -158,7 +158,7 @@ static void ocrpt_navigate_start_private(ocrpt_query *topq, ocrpt_query *q) {
 
 	q->current_row = -1;
 	ocrpt_expr_init_result(q->rownum, OCRPT_RESULT_NUMBER);
-	q->rownum->result[q->source->o->residx]->isnull = true;
+	EXPR_ISNULL(q->rownum) = true;
 
 	q->n_to_1_empty = false;
 	q->n_to_1_started = false;

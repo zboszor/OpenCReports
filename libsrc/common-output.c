@@ -130,10 +130,10 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 
 	if (l->current_line == 0 || (l->current_line > 0 && le->lines > 0 && l->current_line < le->lines)) {
 		if (o->output_functions.support_any_font) {
-			if (o->output_functions.line_element_font && le->font_name && le->font_name->result[o->residx] && le->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && le->font_name->result[o->residx]->string)
-				font = le->font_name->result[o->residx]->string->str;
-			else if (l->font_name && l->font_name->result[o->residx] && l->font_name->result[o->residx]->type == OCRPT_RESULT_STRING && l->font_name->result[o->residx]->string)
-				font = l->font_name->result[o->residx]->string->str;
+			if (o->output_functions.line_element_font && EXPR_VALID_STRING(le->font_name))
+				font = EXPR_STRING_VAL(le->font_name);
+			else if (EXPR_VALID_STRING(l->font_name))
+				font = EXPR_STRING_VAL(l->font_name);
 			else if (r && r->font_name)
 				font = r->font_name;
 			else if (p->font_name)
@@ -144,10 +144,10 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 			font = "Courier";
 
 		if (o->output_functions.support_any_font) {
-			if (o->output_functions.line_element_font && le && le->font_size && le->font_size->result[o->residx] && le->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->font_size->result[o->residx]->number_initialized)
-				size = mpfr_get_d(le->font_size->result[o->residx]->number, o->rndmode);
-			else if (l && l->font_size && l->font_size->result[o->residx] && l->font_size->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->font_size->result[o->residx]->number_initialized)
-				size = mpfr_get_d(l->font_size->result[o->residx]->number, o->rndmode);
+			if (o->output_functions.line_element_font && le && EXPR_VALID_NUMERIC(le->font_size))
+				size = mpfr_get_d(EXPR_NUMERIC(le->font_size), EXPR_RNDMODE(le->font_size));
+			else if (l && EXPR_VALID_NUMERIC(l->font_size))
+				size = mpfr_get_d(EXPR_NUMERIC(l->font_size), EXPR_RNDMODE(l->font_size));
 			else if (r && r->font_size_expr)
 				size = r->font_size;
 			else if (p && p->font_size_expr)
@@ -157,18 +157,18 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 		} else
 			size = OCRPT_DEFAULT_FONT_SIZE;
 
-		if (le->bold && le->bold->result[o->residx] && le->bold->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->bold->result[o->residx]->number_initialized)
-			bold = !!mpfr_get_ui(le->bold->result[o->residx]->number, o->rndmode);
-		else if (l->bold && l->bold->result[o->residx] && l->bold->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->bold->result[o->residx]->number_initialized)
-			bold = !!mpfr_get_ui(l->bold->result[o->residx]->number, o->rndmode);
+		if (EXPR_VALID_NUMERIC(le->bold))
+			bold = !!mpfr_get_ui(EXPR_NUMERIC(le->bold), EXPR_RNDMODE(le->bold));
+		else if (EXPR_VALID_NUMERIC(l->bold))
+			bold = !!mpfr_get_ui(EXPR_NUMERIC(l->bold), EXPR_RNDMODE(l->bold));
 
-		if (le->italic && le->italic->result[o->residx] && le->italic->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->italic->result[o->residx]->number_initialized)
-			italic = !!mpfr_get_ui(le->italic->result[o->residx]->number, o->rndmode);
-		else if (l->italic && l->italic->result[o->residx] && l->italic->result[o->residx]->type == OCRPT_RESULT_NUMBER && l->italic->result[o->residx]->number_initialized)
-			italic = !!mpfr_get_ui(l->italic->result[o->residx]->number, o->rndmode);
+		if (EXPR_VALID_NUMERIC(le->italic))
+			italic = !!mpfr_get_ui(EXPR_NUMERIC(le->italic), EXPR_RNDMODE(le->italic));
+		else if (EXPR_VALID_NUMERIC(l->italic))
+			italic = !!mpfr_get_ui(EXPR_NUMERIC(l->italic), EXPR_RNDMODE(l->italic));
 
-		if (le->align && le->align->result[o->residx] && le->align->result[o->residx]->type == OCRPT_RESULT_STRING && le->align->result[o->residx]->string) {
-			const char *alignment = le->align->result[o->residx]->string->str;
+		if (EXPR_VALID_STRING(le->align)) {
+			const char *alignment = EXPR_STRING_VAL(le->align);
 			if (strcasecmp(alignment, "right") == 0)
 				align = PANGO_ALIGN_RIGHT;
 			else if (strcasecmp(alignment, "center") == 0)
@@ -262,8 +262,8 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 
 		pango_layout_set_text(le->layout, le->result_str->str, le->result_str->len);
 
-		if (le->width && le->width->result[o->residx] && le->width->result[o->residx]->type == OCRPT_RESULT_NUMBER && le->width->result[o->residx]->number_initialized) {
-			w = mpfr_get_d(le->width->result[o->residx]->number, o->rndmode);
+		if (EXPR_VALID_NUMERIC(le->width)) {
+			w = mpfr_get_d(EXPR_NUMERIC(le->width), EXPR_RNDMODE(le->width));
 			if (!o->size_in_points)
 				w *= l->font_width;
 		} else if (ocrpt_list_length(l->elements) == 1) {

@@ -201,8 +201,8 @@ static void ocrpt_json_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	yajl_gen_bool(priv->yajl_gen, le->italic_val);
 
 	const char *align = "left";
-	if (le->align && le->align->result[o->residx] && le->align->result[o->residx]->type == OCRPT_RESULT_STRING && le->align->result[o->residx]->string) {
-		const char *alignment = le->align->result[o->residx]->string->str;
+	if (EXPR_VALID_STRING(le->align)) {
+		const char *alignment = EXPR_STRING_VAL(le->align);
 		if (strcasecmp(alignment, "right") == 0)
 			align = "right";
 		else if (strcasecmp(alignment, "center") == 0)
@@ -214,10 +214,10 @@ static void ocrpt_json_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	yajl_gen_string(priv->yajl_gen, (ystr)align, strlen(align));
 
 	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
-	if (le->bgcolor && le->bgcolor->result[o->residx] && le->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && le->bgcolor->result[o->residx]->string)
-		ocrpt_get_color(le->bgcolor->result[o->residx]->string->str, &bgcolor, true);
-	else if (l->bgcolor && l->bgcolor->result[o->residx] && l->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && l->bgcolor->result[o->residx]->string)
-		ocrpt_get_color(l->bgcolor->result[o->residx]->string->str, &bgcolor, true);
+	if (EXPR_VALID_STRING(le->bgcolor))
+		ocrpt_get_color(EXPR_STRING_VAL(le->bgcolor), &bgcolor, true);
+	else if (EXPR_VALID_STRING(l->bgcolor))
+		ocrpt_get_color(EXPR_STRING_VAL(l->bgcolor), &bgcolor, true);
 
 	priv->base.data->len = 0;
 	ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(bgcolor.r), ocrpt_common_color_value(bgcolor.g), ocrpt_common_color_value(bgcolor.b));
@@ -225,10 +225,10 @@ static void ocrpt_json_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	yajl_gen_string(priv->yajl_gen, (ystr)priv->base.data->str, priv->base.data->len);
 
 	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
-	if (le->color && le->color->result[o->residx] && le->color->result[o->residx]->type == OCRPT_RESULT_STRING && le->color->result[o->residx]->string)
-		ocrpt_get_color(le->color->result[o->residx]->string->str, &color, true);
-	else if (l->color && l->color->result[o->residx] && l->color->result[o->residx]->type == OCRPT_RESULT_STRING && l->color->result[o->residx]->string)
-		ocrpt_get_color(l->color->result[o->residx]->string->str, &color, true);
+	if (EXPR_VALID_STRING(le->color))
+		ocrpt_get_color(EXPR_STRING_VAL(le->color), &color, true);
+	else if (EXPR_VALID_STRING(l->color))
+		ocrpt_get_color(EXPR_STRING_VAL(l->color), &color, true);
 	priv->base.data->len = 0;
 	ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(color.r), ocrpt_common_color_value(color.g), ocrpt_common_color_value(color.b));
 	yajl_gen_string(priv->yajl_gen, (ystr)"color", 5);
@@ -300,8 +300,8 @@ static void ocrpt_json_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 	yajl_gen_double(priv->yajl_gen, bc->barcode_height);
 
 	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
-	if (bc->bgcolor && bc->bgcolor->result[o->residx] && bc->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && bc->bgcolor->result[o->residx]->string)
-		ocrpt_get_color(bc->bgcolor->result[o->residx]->string->str, &bgcolor, true);
+	if (EXPR_VALID_STRING(bc->bgcolor))
+		ocrpt_get_color(EXPR_STRING_VAL(bc->bgcolor), &bgcolor, true);
 
 	priv->base.data->len = 0;
 	ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(bgcolor.r), ocrpt_common_color_value(bgcolor.g), ocrpt_common_color_value(bgcolor.b));
@@ -309,16 +309,16 @@ static void ocrpt_json_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 	yajl_gen_string(priv->yajl_gen, (ystr)priv->base.data->str, priv->base.data->len);
 
 	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
-	if (bc->color && bc->color->result[o->residx] && bc->color->result[o->residx]->type == OCRPT_RESULT_STRING && bc->color->result[o->residx]->string)
-		ocrpt_get_color(bc->color->result[o->residx]->string->str, &color, true);
+	if (EXPR_VALID_STRING(bc->color))
+		ocrpt_get_color(EXPR_STRING_VAL(bc->color), &color, true);
 	priv->base.data->len = 0;
 	ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(color.r), ocrpt_common_color_value(color.g), ocrpt_common_color_value(color.b));
 	yajl_gen_string(priv->yajl_gen, (ystr)"color", 5);
 	yajl_gen_string(priv->yajl_gen, (ystr)priv->base.data->str, priv->base.data->len);
 
 	yajl_gen_string(priv->yajl_gen, (ystr)"value", 5);
-	if (bc->value && bc->value->result[o->residx] && bc->value->result[o->residx]->type == OCRPT_RESULT_STRING)
-		yajl_gen_string(priv->yajl_gen, (ystr)bc->value->result[o->residx]->string->str, bc->value->result[o->residx]->string->len);
+	if (EXPR_VALID_STRING(bc->value))
+		yajl_gen_string(priv->yajl_gen, (ystr)EXPR_STRING_VAL(bc->value), EXPR_STRING_LEN(bc->value));
 	else
 		yajl_gen_string(priv->yajl_gen, (ystr)"", 0);
 
@@ -353,8 +353,8 @@ static void ocrpt_json_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 	char *align = NULL;
 	int align_len = 0;
 
-	if (hline->align && hline->align->result[o->residx] && hline->align->result[o->residx]->type == OCRPT_RESULT_STRING && hline->align->result[o->residx]->string) {
-		const char *alignment = hline->align->result[o->residx]->string->str;
+	if (EXPR_VALID_STRING(hline->align)) {
+		const char *alignment = EXPR_STRING_VAL(hline->align);
 
 		if (strcasecmp(alignment, "right") == 0) {
 			align = "right";
@@ -365,12 +365,12 @@ static void ocrpt_json_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 		}
 	}
 
-	if (hline->indent && hline->indent->result[o->residx] && hline->indent->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->indent->result[o->residx]->number_initialized)
-		indent = mpfr_get_d(hline->indent->result[o->residx]->number, o->rndmode);
+	if (EXPR_VALID_NUMERIC(hline->indent))
+		indent = mpfr_get_d(EXPR_NUMERIC(hline->indent), EXPR_RNDMODE(hline->indent));
 	else
 		indent = 0.0;
 
-	if (hline->length && hline->length->result[o->residx] && hline->length->result[o->residx]->type == OCRPT_RESULT_NUMBER && hline->length->result[o->residx]->number_initialized) {
+	if (EXPR_VALID_NUMERIC(hline->length)) {
 		double size_multiplier;
 
 		if (o->size_in_points)
@@ -378,7 +378,7 @@ static void ocrpt_json_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 		else
 			size_multiplier = hline->font_width;
 
-		length = mpfr_get_d(hline->length->result[o->residx]->number, o->rndmode) * size_multiplier;
+		length = mpfr_get_d(EXPR_NUMERIC(hline->length), EXPR_RNDMODE(hline->length)) * size_multiplier;
 		if (length > page_width - indent)
 			length = page_width - indent;
 	} else
@@ -387,8 +387,8 @@ static void ocrpt_json_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 	ocrpt_color color;
 	char *color_name = NULL;
 
-	if (hline->color && hline->color->result[o->residx] && hline->color->result[o->residx]->type == OCRPT_RESULT_STRING && hline->color->result[o->residx]->string)
-		color_name = hline->color->result[o->residx]->string->str;
+	if (EXPR_VALID_STRING(hline->color))
+		color_name = EXPR_STRING_VAL(hline->color);
 
 	ocrpt_get_color(color_name, &color, false);
 

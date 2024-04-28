@@ -614,16 +614,15 @@ static ocrpt_expr *newblankexpr1(yyscan_t yyscanner, enum ocrpt_expr_type type, 
 static ocrpt_expr *newstring(yyscan_t yyscanner, ocrpt_string *s) {
 	ocrpt_expr *e = newblankexpr1(yyscanner, OCRPT_EXPR_STRING, 0);
 	base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
-	opencreport *o = extra->o;
 
 	extra->tokens = ocrpt_list_remove(extra->tokens, s);
 	ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
-	if (e->result[o->residx]->string_owned)
-		ocrpt_mem_string_free(e->result[o->residx]->string, true);
-	e->result[o->residx]->string = s;
-	e->result[o->residx]->string_owned = true;
-	e->result[ocrpt_expr_next_residx(o->residx)] = e->result[o->residx];
-	e->result[ocrpt_expr_next_residx(ocrpt_expr_next_residx(o->residx))] = e->result[o->residx];
+	if (EXPR_STRING_OWNED(e))
+		ocrpt_mem_string_free(EXPR_STRING(e), true);
+	EXPR_STRING(e) = s;
+	EXPR_STRING_OWNED(e) = true;
+	EXPR_NEXT_RESULT(e) = EXPR_RESULT(e);
+	EXPR_PREV_RESULT(e) = EXPR_RESULT(e);
 
 	return e;
 }
@@ -631,13 +630,12 @@ static ocrpt_expr *newstring(yyscan_t yyscanner, ocrpt_string *s) {
 static ocrpt_expr *newnumber(yyscan_t yyscanner, ocrpt_string *n) {
 	ocrpt_expr *e = newblankexpr1(yyscanner, OCRPT_EXPR_NUMBER, 0);
 	base_yy_extra_type *extra = parser_yyget_extra(yyscanner);
-	opencreport *o = extra->o;
 
 	extra->tokens = ocrpt_list_remove(extra->tokens, n);
 	ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
-	mpfr_set_str(e->result[o->residx]->number, n->str, 10, o->rndmode);
-	e->result[ocrpt_expr_next_residx(o->residx)] = e->result[o->residx];
-	e->result[ocrpt_expr_next_residx(ocrpt_expr_next_residx(o->residx))] = e->result[o->residx];
+	mpfr_set_str(EXPR_NUMERIC(e), n->str, 10, EXPR_RNDMODE(e));
+	EXPR_NEXT_RESULT(e) = EXPR_RESULT(e);
+	EXPR_PREV_RESULT(e) = EXPR_RESULT(e);
 	ocrpt_mem_string_free(n, true);
 
 	return e;
@@ -779,7 +777,7 @@ static ocrpt_expr *parseembeddedexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt
 		return NULL;
 
 	char *err = NULL;
-	ocrpt_expr *e = ocrpt_expr_parse_internal(extra->o, extra->r, arg1->result[extra->o->residx]->string->str, &err);
+	ocrpt_expr *e = ocrpt_expr_parse_internal(extra->o, extra->r, EXPR_STRING_VAL(arg1), &err);
 
 	extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, func);
 	ocrpt_expr_free(func);

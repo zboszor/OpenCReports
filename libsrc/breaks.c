@@ -201,7 +201,7 @@ DLL_EXPORT_SYM bool ocrpt_break_check_fields(ocrpt_break *br) {
 	bool retval = !match || (q && q->current_row == 0);
 
 	if (retval) {
-		mpfr_set_ui(br->rownum->result[o->residx]->number, 1, o->rndmode);
+		mpfr_set_ui(EXPR_NUMERIC(br->rownum), 1, EXPR_RNDMODE(br->rownum));
 		ocrpt_expr_set_iterative_start_value(br->rownum, true);
 	}
 	ocrpt_expr_eval(br->rownum);
@@ -227,11 +227,11 @@ DLL_EXPORT_SYM bool ocrpt_break_check_blank(ocrpt_break *br, bool evaluate) {
 		if (evaluate)
 			ocrpt_expr_eval(e);
 
-		if (!e->result[o->residx])
+		if (!EXPR_RESULT(e))
 			return true;
-		if (e->result[e->o->residx]->isnull)
+		if (EXPR_ISNULL(e))
 			return true;
-		if (e->result[o->residx]->type == OCRPT_RESULT_STRING && e->result[o->residx]->string && e->result[o->residx]->string->len == 0)
+		if (EXPR_VALID_STRING(e) && EXPR_STRING_LEN(e) == 0)
 			return true;
 	}
 

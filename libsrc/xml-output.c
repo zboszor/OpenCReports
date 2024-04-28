@@ -247,8 +247,8 @@ static void ocrpt_xml_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		xmlSetProp(data, BAD_CAST "italics", BAD_CAST priv->base.data->str);
 
 		const char *align = "left";
-		if (le->align && le->align->result[o->residx] && le->align->result[o->residx]->type == OCRPT_RESULT_STRING && le->align->result[o->residx]->string) {
-			const char *alignment = le->align->result[o->residx]->string->str;
+		if (EXPR_VALID_STRING(le->align)) {
+			const char *alignment = EXPR_STRING_VAL(le->align);
 			if (strcasecmp(alignment, "right") == 0)
 				align = "right";
 			else if (strcasecmp(alignment, "center") == 0)
@@ -259,19 +259,19 @@ static void ocrpt_xml_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		xmlSetProp(data, BAD_CAST "align", BAD_CAST align);
 
 		ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
-		if (le->bgcolor && le->bgcolor->result[o->residx] && le->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && le->bgcolor->result[o->residx]->string)
-			ocrpt_get_color(le->bgcolor->result[o->residx]->string->str, &bgcolor, true);
-		else if (l->bgcolor && l->bgcolor->result[o->residx] && l->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && l->bgcolor->result[o->residx]->string)
-			ocrpt_get_color(l->bgcolor->result[o->residx]->string->str, &bgcolor, true);
+		if (EXPR_VALID_STRING(le->bgcolor))
+			ocrpt_get_color(EXPR_STRING_VAL(le->bgcolor), &bgcolor, true);
+		else if (EXPR_VALID_STRING(l->bgcolor))
+			ocrpt_get_color(EXPR_STRING_VAL(l->bgcolor), &bgcolor, true);
 		priv->base.data->len = 0;
 		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(bgcolor.r), ocrpt_common_color_value(bgcolor.g), ocrpt_common_color_value(bgcolor.b));
 		xmlSetProp(data, BAD_CAST "bgcolor", BAD_CAST priv->base.data->str);
 
 		ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
-		if (le->color && le->color->result[o->residx] && le->color->result[o->residx]->type == OCRPT_RESULT_STRING && le->color->result[o->residx]->string)
-			ocrpt_get_color(le->color->result[o->residx]->string->str, &color, true);
-		else if (l->color && l->color->result[o->residx] && l->color->result[o->residx]->type == OCRPT_RESULT_STRING && l->color->result[o->residx]->string)
-			ocrpt_get_color(l->color->result[o->residx]->string->str, &color, true);
+		if (EXPR_VALID_STRING(le->color))
+			ocrpt_get_color(EXPR_STRING_VAL(le->color), &color, true);
+		else if (EXPR_VALID_STRING(l->color))
+			ocrpt_get_color(EXPR_STRING_VAL(l->color), &color, true);
 		priv->base.data->len = 0;
 		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(color.r), ocrpt_common_color_value(color.g), ocrpt_common_color_value(color.b));
 		xmlSetProp(data, BAD_CAST "color", BAD_CAST priv->base.data->str);
@@ -301,8 +301,8 @@ static void ocrpt_xml_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row
 	if (outn) {
 		xmlNodePtr barc;
 
-		if (bc->value && bc->value->result[o->residx] && bc->value->result[o->residx]->type == OCRPT_RESULT_STRING)
-			barc = xmlNewDocNode(priv->doc, NULL, BAD_CAST "barcode", BAD_CAST bc->value->result[o->residx]->string->str);
+		if (EXPR_VALID_STRING(bc->value))
+			barc = xmlNewDocNode(priv->doc, NULL, BAD_CAST "barcode", BAD_CAST EXPR_STRING_VAL(bc->value));
 		else
 			barc = xmlNewDocNode(priv->doc, NULL, BAD_CAST "barcode", NULL);
 
@@ -320,22 +320,22 @@ static void ocrpt_xml_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row
 		xmlSetProp(barc, BAD_CAST "height", BAD_CAST priv->base.data->str);
 
 		ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
-		if (bc->bgcolor && bc->bgcolor->result[o->residx] && bc->bgcolor->result[o->residx]->type == OCRPT_RESULT_STRING && bc->bgcolor->result[o->residx]->string)
-			ocrpt_get_color(bc->bgcolor->result[o->residx]->string->str, &bgcolor, true);
+		if (EXPR_VALID_STRING(bc->bgcolor))
+			ocrpt_get_color(EXPR_STRING_VAL(bc->bgcolor), &bgcolor, true);
 		priv->base.data->len = 0;
 		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(bgcolor.r), ocrpt_common_color_value(bgcolor.g), ocrpt_common_color_value(bgcolor.b));
 		xmlSetProp(barc, BAD_CAST "bgcolor", BAD_CAST priv->base.data->str);
 
 		ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
-		if (bc->color && bc->color->result[o->residx] && bc->color->result[o->residx]->type == OCRPT_RESULT_STRING && bc->color->result[o->residx]->string)
-			ocrpt_get_color(bc->color->result[o->residx]->string->str, &color, true);
+		if (EXPR_VALID_STRING(bc->color))
+			ocrpt_get_color(EXPR_STRING_VAL(bc->color), &color, true);
 		priv->base.data->len = 0;
 		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(color.r), ocrpt_common_color_value(color.g), ocrpt_common_color_value(color.b));
 		xmlSetProp(barc, BAD_CAST "color", BAD_CAST priv->base.data->str);
 
 		priv->base.data->len = 0;
-		if (bc->bctype && bc->bctype->result[o->residx] && bc->bctype->result[o->residx]->type == OCRPT_RESULT_STRING)
-			ocrpt_mem_string_append_printf(priv->base.data, "%s", bc->bctype->result[o->residx]->string->str);
+		if (EXPR_VALID_STRING(bc->bctype))
+			ocrpt_mem_string_append_printf(priv->base.data, "%s", EXPR_STRING_VAL(bc->bctype));
 		else
 			ocrpt_mem_string_append_printf(priv->base.data, "%s", "auto");
 		xmlSetProp(barc, BAD_CAST "type", BAD_CAST priv->base.data->str);

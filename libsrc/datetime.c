@@ -451,12 +451,12 @@ bool ocrpt_datetime_result_add_number(opencreport *o, ocrpt_result *dst, ocrpt_r
 }
 
 void ocrpt_datetime_add_number(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_number) {
-	if (!ocrpt_datetime_result_add_number(o, dst->result[o->residx], src_datetime, mpfr_get_si(src_number->number, o->rndmode)))
+	if (!ocrpt_datetime_result_add_number(o, EXPR_RESULT(dst), src_datetime, mpfr_get_si(src_number->number, o->rndmode)))
 		ocrpt_expr_make_error_result(dst, "invalid operand(s)");
 }
 
 void ocrpt_datetime_sub_number(opencreport *o, ocrpt_expr *dst, ocrpt_result *src_datetime, ocrpt_result *src_number) {
-	if (!ocrpt_datetime_result_add_number(o, dst->result[o->residx], src_datetime, -mpfr_get_si(src_number->number, o->rndmode)))
+	if (!ocrpt_datetime_result_add_number(o, EXPR_RESULT(dst), src_datetime, -mpfr_get_si(src_number->number, o->rndmode)))
 		ocrpt_expr_make_error_result(dst, "invalid operand(s)");
 }
 
@@ -464,31 +464,31 @@ void ocrpt_datetime_add_interval(opencreport *o, ocrpt_expr *dst, ocrpt_result *
 	bool src_date_valid = src_datetime->date_valid || (src_interval->interval && (src_interval->datetime.tm_year || src_interval->datetime.tm_mon || src_interval->datetime.tm_mday));
 	bool src_time_valid = src_datetime->time_valid || (src_interval->interval && (src_interval->datetime.tm_hour || src_interval->datetime.tm_min || src_interval->datetime.tm_sec));
 
-	dst->result[o->residx]->datetime = src_datetime->datetime;
-	dst->result[o->residx]->interval = src_datetime->interval;
-	dst->result[o->residx]->date_valid = src_datetime->interval ? false : (src_datetime->date_valid || src_date_valid);
-	dst->result[o->residx]->time_valid = src_datetime->interval ? false : (src_datetime->time_valid || src_time_valid);
+	EXPR_DATETIME(dst) = src_datetime->datetime;
+	EXPR_INTERVAL(dst) = src_datetime->interval;
+	EXPR_DATE_VALID(dst) = src_datetime->interval ? false : (src_datetime->date_valid || src_date_valid);
+	EXPR_TIME_VALID(dst) = src_datetime->interval ? false : (src_datetime->time_valid || src_time_valid);
 
-	if (dst->result[o->residx]->interval || dst->result[o->residx]->time_valid) {
-		dst->result[o->residx]->datetime.tm_sec += src_interval->datetime.tm_sec;
-		dst->result[o->residx]->datetime.tm_min += src_interval->datetime.tm_min;
-		dst->result[o->residx]->datetime.tm_hour += src_interval->datetime.tm_hour;
-		fix_time_wrap(&dst->result[o->residx]->datetime);
+	if (EXPR_INTERVAL(dst) || EXPR_TIME_VALID(dst)) {
+		EXPR_DATETIME(dst).tm_sec += src_interval->datetime.tm_sec;
+		EXPR_DATETIME(dst).tm_min += src_interval->datetime.tm_min;
+		EXPR_DATETIME(dst).tm_hour += src_interval->datetime.tm_hour;
+		fix_time_wrap(&EXPR_DATETIME(dst));
 	}
 
-	dst->result[o->residx]->datetime.tm_year += src_interval->datetime.tm_year;
-	dst->result[o->residx]->datetime.tm_mon += src_interval->datetime.tm_mon;
-	dst->result[o->residx]->datetime.tm_mday += src_datetime->day_carry;
+	EXPR_DATETIME(dst).tm_year += src_interval->datetime.tm_year;
+	EXPR_DATETIME(dst).tm_mon += src_interval->datetime.tm_mon;
+	EXPR_DATETIME(dst).tm_mday += src_datetime->day_carry;
 
 	int day_carry = 0;
-	fix_day_wrap(&dst->result[o->residx]->datetime, dst->result[o->residx]->interval, &day_carry);
-	dst->result[o->residx]->day_carry = day_carry;
+	fix_day_wrap(&EXPR_DATETIME(dst), EXPR_INTERVAL(dst), &day_carry);
+	EXPR_DAY_CARRY(dst) = day_carry;
 
 	if (src_interval->datetime.tm_mday) {
-		dst->result[o->residx]->day_carry = 0;
-		dst->result[o->residx]->datetime.tm_mday += src_interval->datetime.tm_mday;
-		fix_day_wrap(&dst->result[o->residx]->datetime, dst->result[o->residx]->interval, NULL);
-		dst->result[o->residx]->day_carry = 0;
+		EXPR_DAY_CARRY(dst) = 0;
+		EXPR_DATETIME(dst).tm_mday += src_interval->datetime.tm_mday;
+		fix_day_wrap(&EXPR_DATETIME(dst), EXPR_INTERVAL(dst), NULL);
+		EXPR_DAY_CARRY(dst) = 0;
 	}
 }
 
@@ -506,19 +506,19 @@ void ocrpt_datetime_sub_datetime(opencreport *o, ocrpt_expr *dst, ocrpt_result *
 
 		ocrpt_datetime_add_interval(o, dst, src_datetime1, &interval);
 	} else {
-		dst->result[o->residx]->datetime.tm_year = src_datetime1->datetime.tm_year - src_datetime2->datetime.tm_year;
-		dst->result[o->residx]->datetime.tm_mon = src_datetime1->datetime.tm_mon - src_datetime2->datetime.tm_mon;
-		dst->result[o->residx]->datetime.tm_mday = src_datetime1->datetime.tm_mday - src_datetime2->datetime.tm_mday;
-		dst->result[o->residx]->datetime.tm_hour = src_datetime1->datetime.tm_hour - src_datetime2->datetime.tm_hour;
-		dst->result[o->residx]->datetime.tm_min = src_datetime1->datetime.tm_min - src_datetime2->datetime.tm_min;
-		dst->result[o->residx]->datetime.tm_sec = src_datetime1->datetime.tm_sec - src_datetime2->datetime.tm_sec;
+		EXPR_DATETIME(dst).tm_year = src_datetime1->datetime.tm_year - src_datetime2->datetime.tm_year;
+		EXPR_DATETIME(dst).tm_mon = src_datetime1->datetime.tm_mon - src_datetime2->datetime.tm_mon;
+		EXPR_DATETIME(dst).tm_mday = src_datetime1->datetime.tm_mday - src_datetime2->datetime.tm_mday;
+		EXPR_DATETIME(dst).tm_hour = src_datetime1->datetime.tm_hour - src_datetime2->datetime.tm_hour;
+		EXPR_DATETIME(dst).tm_min = src_datetime1->datetime.tm_min - src_datetime2->datetime.tm_min;
+		EXPR_DATETIME(dst).tm_sec = src_datetime1->datetime.tm_sec - src_datetime2->datetime.tm_sec;
 
-		dst->result[o->residx]->interval = true;
-		dst->result[o->residx]->date_valid = false;
-		dst->result[o->residx]->time_valid = false;
-		dst->result[o->residx]->day_carry = 0;
+		EXPR_INTERVAL(dst) = true;
+		EXPR_DATE_VALID(dst) = false;
+		EXPR_TIME_VALID(dst) = false;
+		EXPR_DAY_CARRY(dst) = 0;
 
-		fix_time_wrap(&dst->result[o->residx]->datetime);
-		fix_day_wrap(&dst->result[o->residx]->datetime, true, NULL);
+		fix_time_wrap(&EXPR_DATETIME(dst));
+		fix_day_wrap(&EXPR_DATETIME(dst), true, NULL);
 	}
 }

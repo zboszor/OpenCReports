@@ -1191,14 +1191,14 @@ bool ocrpt_barcode_encode(opencreport *o, ocrpt_barcode *barcode) {
 
 	ocrpt_string *b = NULL, *t = NULL;
 
-	if (barcode->value && barcode->value->result[o->residx] && barcode->value->result[o->residx]->type == OCRPT_RESULT_STRING)
-		b = barcode->value->result[o->residx]->string;
+	if (EXPR_VALID_STRING_MAYBE_UNINITIALIZED(barcode->value))
+		b = EXPR_STRING(barcode->value);
 
 	if (!b || !b->len)
 		return false;
 
-	if (barcode->bctype && barcode->bctype->result[o->residx] && barcode->bctype->result[o->residx]->type == OCRPT_RESULT_STRING)
-		t = barcode->bctype->result[o->residx]->string;
+	if (EXPR_VALID_STRING_MAYBE_UNINITIALIZED(barcode->bctype))
+		t = EXPR_STRING(barcode->bctype);
 
 	if (!ocrpt_barcode_verify(b, (t && t->len > 0) ? t : NULL , &type_idx))
 		return false;
