@@ -1753,57 +1753,99 @@ SELECT * FROM some_table
 					<programlisting>&lt;Report height="120"&gt;</programlisting>
 				</para>
 				<para>
-					When <xref linkend="sizeunit"/> is set to
-					<literal>rlib</literal> (the default),
-					the report height is measured in characters,
-					which is controlled by <xref linkend="reportfontsize"/>.
-					Note, that the font width and height may differ,
-					depending on the font face controlled by
-					<xref linkend="reportfontname"/>. Report height is
-					computed from the font height.
+					This setting is interpreted differently depending on
+					whether the report XML description uses
+					<literal>&lt;OpenCReport&gt;</literal>
+					as the toplevel node, or it uses
+					either <literal>&lt;Part&gt;</literal> or
+					<literal>&lt;Report&gt;</literal>.
 				</para>
-				<para>
-					When <xref linkend="sizeunit"/> is set to
-					<literal>points</literal>, height is measured
-					in points.
-				</para>
-				<para>
-					Report details are layed out up to the
-					specified height. If the report would run longer
-					than the specified height, it gets truncated.
-					When the report fits in the specified height,
-					the next report starts with the remaining height
-					added as padding before it.
-				</para>
-				<para>
-					If the <literal>&lt;Report&gt;</literal> is the last
-					one in the <literal>&lt;pd&gt;</literal> node, then
-					the report may or may not be padded with the remaining
-					height, depending on the
-					<xref linkend="reportheightafterlast"/>.
-				</para>
-				<para>
-					If height is unset for the parent
-					<literal>&lt;pd&gt;</literal> node, it is expanded
-					with this vertical padding.
-				</para>
-				<para>
-					In case height is set for both the parent
-					<literal>&lt;pd&gt;</literal> node and the
-					<literal>&lt;Report&gt;</literal> nodes in it,
-					the height value for <literal>&lt;pd&gt;</literal>
-					is applied first. It would limit the displayed
-					rows in whichever <literal>&lt;Report&gt;</literal> node
-					is terminated by it. Subsequent
-					<literal>&lt;Report&gt;</literal> nodes would
-					no be displayed in that <literal>&lt;pd&gt;</literal>
-					node.
-				</para>
-				<para>
-					Note, that OpenCReports allows fixed-height
-					reports to break over page boundaries.
-					This is a deviation from RLIB.
-				</para>
+				<sect4 id="reportheightocrpt">
+					<title>Report height in OpenCReports mode</title>
+					<para>
+						When <xref linkend="sizeunit"/> is set to
+						<literal>rlib</literal> (the default),
+						the report height is measured in characters,
+						which is controlled by <xref linkend="reportfontsize"/>.
+						Note, that the font width and height may differ,
+						depending on the font face controlled by
+						<xref linkend="reportfontname"/>. Report height is
+						computed from the font height.
+					</para>
+					<para>
+						When <xref linkend="sizeunit"/> is set to
+						<literal>points</literal>, height is measured
+						in points.
+					</para>
+					<para>
+						Report details are layed out up to the
+						specified height. If the report would run longer
+						than the specified height, it gets truncated.
+						When the report fits in the specified height,
+						the next report starts with the remaining height
+						added as padding before it.
+					</para>
+					<para>
+						If the <literal>&lt;Report&gt;</literal> is the last
+						one in the <literal>&lt;pd&gt;</literal> node, then
+						the report may or may not be padded with the remaining
+						height, depending on the
+						<xref linkend="reportheightafterlast"/>.
+					</para>
+					<para>
+						If height is unset for the parent
+						<literal>&lt;pd&gt;</literal> node, it is expanded
+						with this vertical padding.
+					</para>
+					<para>
+						In case height is set for both the parent
+						<literal>&lt;pd&gt;</literal> node and the
+						<literal>&lt;Report&gt;</literal> nodes in it,
+						the height value for <literal>&lt;pd&gt;</literal>
+						is applied first. It would limit the displayed
+						rows in whichever <literal>&lt;Report&gt;</literal> node
+						is terminated by it. Subsequent
+						<literal>&lt;Report&gt;</literal> nodes would
+						no be displayed in that <literal>&lt;pd&gt;</literal>
+						node.
+					</para>
+					<para>
+						Note, that OpenCReports allows fixed-height
+						reports to break over page boundaries.
+						This is a deviation from RLIB.
+					</para>
+				</sect4>
+				<sect4 id="reportheightrlib">
+					<title>Report height in RLIB compatibility mode</title>
+					<para>
+						When parsing XML descriptions from RLIB, i.e. when
+						either <literal>&lt;Part&gt;</literal> or
+						<literal>&lt;Report&gt;</literal> is used as
+						the toplevel node, compatibility mode is turned on
+						for interpreting this setting.
+					</para>
+					<para>
+						In this mode, the report height is interpreted
+						as a percentage of the height set in
+						<xref linkend="partcolheight"/>. In this case,
+						the report height setting is a hint, to use it
+						as <emphasis>minimum height</emphasis>.
+						If the <literal>&lt;Report&gt;</literal> is rendered
+						on the same page from start to end, and is shorter
+						than the height of the parent
+						<literal>&lt;pd&gt;</literal> node, then a gap is
+						added to the <literal>&lt;Report&gt;</literal>.
+						If there are multiple <literal>&lt;Report&gt;</literal>
+						nodes in the same <literal>&lt;pd&gt;</literal>
+						node, this will separate them visually.
+					</para>
+					<para>
+						Note, that this behaviour is not available when
+						using the programming API to create a report.
+						It's only for RLIB compatibility which relied
+						only on the report XML description file.
+					</para>
+				</sect4>
 			</sect3>
 			<sect3 id="reportiter" xreflabel="Report iterations attribute">
 				<title>Iterations</title>
