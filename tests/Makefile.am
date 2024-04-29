@@ -44,6 +44,7 @@ TESTS = \
 	odbc5_test odbc6_test odbc7_test \
 	odbc_xml_test odbc_xml2_test odbc_xml3_test \
 	odbc_xml4_test \
+	xls_test \
 	follower_circular_test \
 	follower_invalidref_test \
 	follower_test1_test follower_test2_test \

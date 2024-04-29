@@ -18,6 +18,7 @@
 <!ATTLIST Datasource
 	name CDATA #REQUIRED
 	type CDATA #REQUIRED
+	encoding CDATA #IMPLIED
 	host CDATA #IMPLIED
 	unix_socket CDATA #IMPLIED
 	port CDATA #IMPLIED
@@ -27,7 +28,7 @@
 	connstr CDATA #IMPLIED
 	optionfile CDATA #IMPLIED
 	group CDATA #IMPLIED
-	encoding CDATA #IMPLIED >
+	filename CDATA #IMPLIED >
 <!ELEMENT Queries (Query)+>
 <!ELEMENT Query (#PCDATA)>
 <!ATTLIST Query

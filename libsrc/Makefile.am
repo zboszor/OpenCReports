@@ -34,22 +34,23 @@ libopencreport_la_CFLAGS = \
 	$(CFLAG_VISIBILITY) \
 	$(MPFR_CFLAGS) $(PAPER_CFLAGS) $(UTF8PROC_CFLAGS) \
 	$(LIBXML_CFLAGS) $(YAJL_CFLAGS) $(POSTGRESQL_CFLAGS) \
-	$(MYSQL_CLIENT_CFLAGS) $(ODBC_CFLAGS) $(PDFGEN_CFLAGS)
+	$(MYSQL_CLIENT_CFLAGS) $(ODBC_CFLAGS) $(PYTHON_CFLAGS) \
+	$(PDFGEN_CFLAGS)
 
 libopencreport_la_SOURCES = \
 	memutil.c listutil.c exprutil.c functions.c \
 	api.c free.c parsexml.c datasource.c environment.c \
-	array-source.c db-source.c navigation.c breaks.c \
-	parts.c variables.c strfmon.c datetime.c formatting.c \
-	layout.c color.c common-output.c pdf-output.c \
-	html-output.c txt-output.c xml-output.c csv-output.c \
-	json-output.c barcode.c
+	array-source.c db-source.c pandas-source.c \
+	navigation.c breaks.c parts.c variables.c strfmon.c \
+	datetime.c formatting.c layout.c color.c barcode.c \
+	common-output.c pdf-output.c html-output.c txt-output.c \
+	xml-output.c csv-output.c json-output.c
 
 libopencreport_la_LIBADD = \
 	libopencreport_grammar.la \
 	$(MPFR_LIBS) $(PAPER_LIBS) $(UTF8PROC_LIBS) $(LIBXML_LIBS) \
 	$(CSV_LIBS) $(YAJL_LIBS) $(POSTGRESQL_LIBS) $(MYSQL_CLIENT_LIBS) \
-	$(ODBC_LIBS) $(PDFGEN_LIBS)
+	$(ODBC_LIBS) $(PYTHON_LIBS) $(PDFGEN_LIBS)
 
 libopencreport_la_LDFLAGS = \
 	-version-info $(OCRPT_LT_CURRENT):$(OCRPT_LT_REVISION):$(OCRPT_LT_AGE) \

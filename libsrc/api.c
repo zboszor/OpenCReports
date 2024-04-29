@@ -52,6 +52,12 @@
 #include "xml-output.h"
 #include "json-output.h"
 
+/* This must be after #include <datasource.h> */
+#if HAVE_LIBPYTHON
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+#endif
+
 #ifndef HAVE_GETRANDOM
 static ssize_t getrandom(void *buf, size_t buflen, unsigned int flags) {
 	/* Dummy implementation */
@@ -2091,6 +2097,10 @@ static void initialize_ocrpt(void) {
 #if HAVE_ODBC
 	ocrpt_input_register(&ocrpt_odbc_input);
 #endif
+#if HAVE_LIBPYTHON
+	if (ocrpt_pandas_initialize())
+		ocrpt_input_register(&ocrpt_pandas_input);
+#endif
 
 	LIBXML_TEST_VERSION;
 	xmlInitParser();
@@ -2105,4 +2115,7 @@ static void uninitialize_ocrpt(void) {
 	free(papersizes);
 
 	xmlCleanupParser();
+#if HAVE_LIBPYTHON
+	ocrpt_pandas_deinitialize();
+#endif
 }
