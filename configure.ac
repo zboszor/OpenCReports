@@ -239,6 +239,11 @@ AS_IF([test -n "$ODBC_LIBS"],[AC_MSG_NOTICE([ODBC manager is $odbcmanager])])
 AC_SUBST(ODBC_CFLAGS)
 AC_SUBST(ODBC_LIBS)
 
+PKG_CHECK_MODULES(PYTHON, python3-embed,
+	[AC_DEFINE(HAVE_LIBPYTHON,[1],[Have embedded python])])
+AC_SUBST(PYTHON_CFLAGS)
+AC_SUBST(PYTHON_LIBS)
+
 AC_MSG_CHECKING([whether tests are enabled])
 AC_ARG_ENABLE([tests],
 	[AS_HELP_STRING([--enable-tests],[enable unit tests])],
