@@ -235,7 +235,7 @@
 					listed, the <literal>coltypes</literal> array must have
 					the same number of strings as the <literal>columns</literal>
 					array. The type names are <literal>string</literal>,
-					<literal>number</literal> or <literal>datatime</literal>.
+					<literal>number</literal> or <literal>datetime</literal>.
 					If the column type array is missing, then all data
 					values are assumed to be strings and data conversion
 					functions must be used, see for example
@@ -302,7 +302,7 @@
 					the data types in the same order as section
 					<literal>&lt;fields&gt;</literal>.
 					The types may be <literal>string</literal>,
-					<literal>number</literal> or <literal>datatime</literal>.
+					<literal>number</literal> or <literal>datetime</literal>.
 					If this section is not present, all values are assumed
 					to be strings and data conversion functions must be
 					used, see for example
@@ -470,7 +470,7 @@
 						One of the use cases of follower queries is
 						to use data from different datasources.
 						Nowadays, with foreign queries standardized in
-						SQL and more database servers implement it in
+						SQL and more database servers implementing it in
 						a performant manner, its use case is more limited.
 						Still, using data from different file based
 						datasources, or using from an SQL database server
