@@ -510,13 +510,13 @@ static bool ocrpt_mariadb_connect(ocrpt_datasource *source, const ocrpt_input_co
 
 	MYSQL *mysql = NULL;
 
-	mysql_optionsv(mysql0, MYSQL_READ_DEFAULT_FILE, "/etc/my.cnf");
+	mysql_options(mysql0, MYSQL_READ_DEFAULT_FILE, "/etc/my.cnf");
 
 	if (group) {
 		if (optionfile)
-			mysql_optionsv(mysql0, MYSQL_READ_DEFAULT_FILE, optionfile);
-		mysql_optionsv(mysql0, MYSQL_READ_DEFAULT_GROUP, group);
-		mysql_optionsv(mysql0, MYSQL_SET_CHARSET_NAME, "utf8");
+			mysql_options(mysql0, MYSQL_READ_DEFAULT_FILE, optionfile);
+		mysql_options(mysql0, MYSQL_READ_DEFAULT_GROUP, group);
+		mysql_options(mysql0, MYSQL_SET_CHARSET_NAME, "utf8");
 
 		mysql = mysql_real_connect(mysql0, NULL, NULL, NULL, NULL, -1, NULL, 0);
 		if (!mysql) {
