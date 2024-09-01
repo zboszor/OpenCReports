@@ -243,8 +243,25 @@
 	side CDATA #IMPLIED
 	disabled CDATA #IMPLIED
 	color CDATA #IMPLIED >
-<!ELEMENT Chart EMPTY>
+<!ELEMENT Chart (HeaderRow?,Row?)>
 <!ATTLIST Chart
+	name CDATA #IMPLIED
+	title CDATA #IMPLIED
+	cols CDATA #IMPLIED
+	rows CDATA #IMPLIED
+	cell_width CDATA #IMPLIED
+	cell_height CDATA #IMPLIED
+	cell_width_padding CDATA #IMPLIED
+	cell_height_padding CDATA #IMPLIED
+	label_width CDATA #IMPLIED
+	header_row CDATA #IMPLIED >
+<!ELEMENT HeaderRow EMPTY>
+<!ATTLIST HeaderRow
+	query CDATA #IMPLIED
+	field CDATA #IMPLIED
+	colspan CDATA #IMPLIED >
+<!ELEMENT Row EMPTY>
+<!ATTLIST Row
 	row CDATA #IMPLIED
 	bar_start CDATA #IMPLIED
 	bar_end CDATA #IMPLIED
