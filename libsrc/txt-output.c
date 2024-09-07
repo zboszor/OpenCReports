@@ -21,8 +21,13 @@ static void ocrpt_txt_end_data_row(opencreport *o, ocrpt_part *p, ocrpt_part_row
 
 static void ocrpt_txt_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *l, ocrpt_text *le, bool last, double page_width, double page_indent, double y) {
 	txt_private_data *priv = o->output_private;
+#if PANGO_VERSION_CHECK(1,50,0)
 	int startpos = le->pline ? pango_layout_line_get_start_index(le->pline) : 0;
 	int length = le->pline ? pango_layout_line_get_length(le->pline) : 0;
+#else
+	int startpos = le->pline ? le->pline->start_index : 0;
+	int length = le->pline ? le->pline->length : 0;
+#endif
 	int32_t l2, bl2;
 	int32_t field_width;
 

@@ -231,6 +231,7 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 			PangoLanguage *language = pango_context_get_language(context);
 			PangoFontMetrics *metrics = pango_context_get_metrics(context, le->font_description, language);
 
+#if PANGO_VERSION_CHECK(1,44,0)
 			PangoAttrList *alist = pango_layout_get_attributes(le->layout);
 			bool free_alist = false;
 			if (!alist) {
@@ -244,11 +245,14 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 
 			if (free_alist)
 				pango_attr_list_unref(alist);
+#endif
 
 			pango_layout_set_alignment(le->layout, le->p_align);
 			if (le->justified) {
 				pango_layout_set_justify(le->layout, true);
+#if PANGO_VERSION_CHECK(1,50,0)
 				pango_layout_set_justify_last_line(le->layout, false);
+#endif
 			}
 
 			int char_width = pango_font_metrics_get_approximate_char_width(metrics);

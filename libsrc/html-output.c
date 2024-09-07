@@ -164,8 +164,13 @@ static inline void ocrpt_html_escape_data(opencreport *o, ocrpt_text *le) {
 	utf8proc_ssize_t bytes_read, bytes_total, bytes_written;
 	char cc[8];
 
+#if PANGO_VERSION_CHECK(1,50,0)
 	int startpos = le->pline ? pango_layout_line_get_start_index(le->pline) : 0;
 	int length = le->pline ? pango_layout_line_get_length(le->pline) : 0;
+#else
+	int startpos = le->pline ? le->pline->start_index : 0;
+	int length = le->pline ? le->pline->length : 0;
+#endif
 	priv->base.data->len = 0;
 	bytes_total = 0;
 

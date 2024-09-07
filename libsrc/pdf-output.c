@@ -413,14 +413,15 @@ static void ocrpt_pdf_finalize(opencreport *o) {
 	pdf_private_data *priv = o->output_private;
 	ocrpt_list *page;
 	cairo_surface_t *pdf = cairo_pdf_surface_create_for_stream(ocrpt_write_pdf, o, o->paper->width, o->paper->height);
-	char *testrun;
 
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1,16,0)
 	cairo_pdf_surface_set_metadata(pdf, CAIRO_PDF_METADATA_TITLE, "OpenCReports report");
 	cairo_pdf_surface_set_metadata(pdf, CAIRO_PDF_METADATA_AUTHOR, "OpenCReports");
 	cairo_pdf_surface_set_metadata(pdf, CAIRO_PDF_METADATA_CREATOR, "OpenCReports");
-	testrun = getenv("OCRPT_TEST");
+	char *testrun = getenv("OCRPT_TEST");
 	if (testrun && *testrun && (strcasecmp(testrun, "yes") == 0 || strcasecmp(testrun, "true") == 0 || atoi(testrun) > 0))
 		cairo_pdf_surface_set_metadata(pdf, CAIRO_PDF_METADATA_CREATE_DATE, "2022-06-01T12:00:00Z");
+#endif
 
 	for (page = priv->pages; page; page = page->next) {
 		cairo_surface_t *surface = (cairo_surface_t *)page->data;

@@ -235,12 +235,14 @@ void draw_text_with_bounding_box(cairo_t *cr, const char *font, const char *text
 	if (wrap) {
 		pango_layout_set_wrap(layout, PANGO_WRAP_WORD);
 	} else {
+#if PANGO_VERSION_CHECK(1,44,0)
 		PangoAttrList *alist = pango_layout_get_attributes(layout);
 		if (!alist)
 			alist = pango_attr_list_new();
 		PangoAttribute *nohyph = pango_attr_insert_hyphens_new(FALSE);
 		pango_attr_list_insert(alist, nohyph);
 		pango_layout_set_attributes(layout, alist);
+#endif
 		pango_layout_set_wrap(layout, PANGO_WRAP_CHAR);
 	}
 
