@@ -274,7 +274,14 @@ static bool ocrpt_load_svg(ocrpt_image_file *img) {
 	if (!img->rsvg)
 		return false;
 
+#if LIBRSVG_CHECK_VERSION(2,52,0)
 	rsvg_handle_get_intrinsic_size_in_pixels(img->rsvg, &img->width, &img->height);
+#else
+	RsvgDimensionData ddata;
+	rsvg_handle_get_dimensions(img->rsvg, &ddata);
+	img->width = ddata.width;
+	img->height = ddata.height;
+#endif
 
 	img->surface = cairo_svg_surface_create(NULL, img->width, img->height);
 

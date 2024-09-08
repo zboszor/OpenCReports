@@ -122,8 +122,12 @@ static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 		cairo_set_source_surface(priv->cr, img_file->surface, 0.0, 0.0);
 
 		if (img->img_file->rsvg) {
+#if LIBRSVG_CHECK_VERSION(2,52,0)
 			RsvgRectangle rect = { .x = 0.0, .y = 0.0, .width = img_file->width, .height = img_file->height };
 			rsvg_handle_render_document(img_file->rsvg, priv->cr, &rect, NULL);
+#else
+			rsvg_handle_render_cairo(img_file->rsvg, priv->cr);
+#endif
 		}
 
 		cairo_paint(priv->cr);

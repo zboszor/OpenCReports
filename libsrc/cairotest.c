@@ -26,17 +26,23 @@ cairo_status_t ocrpt_write_pdf(void *closure, const unsigned char *data, unsigne
 }
 
 void put_svg_on_page(cairo_t *cr, const char *filename, double x, double y, double w, double h) {
-	struct {
-		double width, height;
-	} dimensions;
-
 	RsvgHandle *rsvg = rsvg_handle_new_from_file(filename, NULL);
 	if (!rsvg)
 		return;
 
 	cairo_save(cr);
 
+#if LIBRSVG_CHECK_VERSION(2,52,0)
+	struct {
+		double width, height;
+	} dimensions;
+
 	rsvg_handle_get_intrinsic_size_in_pixels(rsvg, &dimensions.width, &dimensions.height);
+#else
+	RsvgDimensionData dimensions;
+
+	rsvg_handle_get_dimensions(rsvg, &dimensions);
+#endif
 
 	cairo_surface_t *svg = cairo_svg_surface_create(NULL, dimensions.width, dimensions.height);
 	cairo_set_source_surface(cr, svg, 0.0, 0.0);
@@ -44,8 +50,12 @@ void put_svg_on_page(cairo_t *cr, const char *filename, double x, double y, doub
 	cairo_translate(cr, x, y);
 	cairo_scale(cr, w / dimensions.width, h / dimensions.height);
 
+#if LIBRSVG_CHECK_VERSION(2,52,0)
 	RsvgRectangle rect = { .x = 0.0, .y = 0.0, .width = dimensions.width, .height = dimensions.height };
 	rsvg_handle_render_document(rsvg, cr, &rect, NULL);
+#else
+	rsvg_handle_render_cairo(rsvg, cr);
+#endif
 
 	cairo_paint(cr);
 
