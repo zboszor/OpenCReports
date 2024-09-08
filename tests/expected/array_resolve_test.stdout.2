@@ -1,0 +1,66 @@
+Discovered array pointer: identical
+Discovered coltypes pointer: identical
+.'id'
+.'name'
+mul(.'age',2.000000)
+Query columns:
+0: 'id'
+1: 'name'
+2: 'property'
+3: 'age'
+4: 'adult'
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 1.000000)
+	Col #1: 'name': string value: Fred Flintstone
+	Col #2: 'property': string value: strong
+	Col #3: 'age': string value: NULL (converted to number: 31.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: .'id'
+Evaluated: (number)1.000000
+Expression: .'name'
+Evaluated: (string)Fred Flintstone
+Expression: mul(.'age',2.000000)
+Evaluated: (number)62.000000
+Expression: 'a'.'adult'
+Evaluated: (number)1.000000
+Expression is different from previous row
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 2.000000)
+	Col #1: 'name': string value: Wilma Flintstone
+	Col #2: 'property': string value: charming
+	Col #3: 'age': string value: NULL (converted to number: 28.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: .'id'
+Evaluated: (number)2.000000
+Expression: .'name'
+Evaluated: (string)Wilma Flintstone
+Expression: mul(.'age',2.000000)
+Evaluated: (number)56.000000
+Expression: 'a'.'adult'
+Evaluated: (number)1.000000
+Expression is identical to previous row
+
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 3.000000)
+	Col #1: 'name': string value: Pebbles Flintstone
+	Col #2: 'property': string value: young
+	Col #3: 'age': string value: NULL (converted to number: 0.500000)
+	Col #4: 'adult': string value: NULL (converted to number: 0.000000)
+
+Expression: .'id'
+Evaluated: (number)3.000000
+Expression: .'name'
+Evaluated: (string)Pebbles Flintstone
+Expression: mul(.'age',2.000000)
+Evaluated: (number)1.000000
+Expression: 'a'.'adult'
+Evaluated: (number)0
+Expression is different from previous row
+
+--- END ---
