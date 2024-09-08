@@ -1,0 +1,1306 @@
+string: format('apples and oranges', '')
+expr reprinted: format((string)apples and oranges,(string))
+expr nodes: 3
+expr optimized: (string)apples and oranges
+expr nodes: 1
+(string)apples and oranges
+
+string: format('apples and oranges', nulls())
+expr reprinted: format((string)apples and oranges,nulls())
+expr nodes: 3
+expr optimized: (string)apples and oranges
+expr nodes: 1
+(string)apples and oranges
+
+string: format('apples and oranges', '%s')
+expr reprinted: format((string)apples and oranges,(string)%s)
+expr nodes: 3
+expr optimized: (string)apples and oranges
+expr nodes: 1
+(string)apples and oranges
+
+string: format('apples and oranges', 'You have some %s')
+expr reprinted: format((string)apples and oranges,(string)You have some %s)
+expr nodes: 3
+expr optimized: (string)You have some apples and oranges
+expr nodes: 1
+(string)You have some apples and oranges
+
+string: format('apples and oranges', 'You have some %s and pears')
+expr reprinted: format((string)apples and oranges,(string)You have some %s and pears)
+expr nodes: 3
+expr optimized: (string)You have some apples and oranges and pears
+expr nodes: 1
+(string)You have some apples and oranges and pears
+
+string: format('apples and oranges', 'You have some: %s')
+expr reprinted: format((string)apples and oranges,(string)You have some: %s)
+expr nodes: 3
+expr optimized: (string)You have some: apples and oranges
+expr nodes: 1
+(string)You have some: apples and oranges
+
+string: format('apples and oranges', '% 10s')
+expr reprinted: format((string)apples and oranges,(string)% 10s)
+expr nodes: 3
+expr optimized: (string)apples and
+expr nodes: 1
+(string)apples and
+
+string: format('apples and oranges', 'You have some % 10s pears')
+expr reprinted: format((string)apples and oranges,(string)You have some % 10s pears)
+expr nodes: 3
+expr optimized: (string)You have some apples and pears
+expr nodes: 1
+(string)You have some apples and pears
+
+string: format('apples', '% 10s')
+expr reprinted: format((string)apples,(string)% 10s)
+expr nodes: 3
+expr optimized: (string)    apples
+expr nodes: 1
+(string)    apples
+
+string: format('árvíztűrő tükörfúrógép', '%9s')
+expr reprinted: format((string)árvíztűrő tükörfúrógép,(string)%9s)
+expr nodes: 3
+expr optimized: (string)árvíztűrő
+expr nodes: 1
+(string)árvíztűrő
+
+string: format('árvíztűrő tükörfúrógép', '% 9s')
+expr reprinted: format((string)árvíztűrő tükörfúrógép,(string)% 9s)
+expr nodes: 3
+expr optimized: (string)árvíztűrő
+expr nodes: 1
+(string)árvíztűrő
+
+string: format('hülye', '% 9s')
+expr reprinted: format((string)hülye,(string)% 9s)
+expr nodes: 3
+expr optimized: (string)    hülye
+expr nodes: 1
+(string)    hülye
+
+string: format(12345.56789, '%d')
+expr reprinted: format(12345.567890,(string)%d)
+expr nodes: 3
+expr optimized: (string)12346
+expr nodes: 1
+(string)12346
+
+string: format(-12345.56789, '%d')
+expr reprinted: format(uminus(12345.567890),(string)%d)
+expr nodes: 4
+expr optimized: (string)-12346
+expr nodes: 1
+(string)-12346
+
+string: format(12345.56789, '%6.3d')
+expr reprinted: format(12345.567890,(string)%6.3d)
+expr nodes: 3
+expr optimized: (string) 12345.568
+expr nodes: 1
+(string) 12345.568
+
+string: format(-12345.56789, '%6.3d')
+expr reprinted: format(uminus(12345.567890),(string)%6.3d)
+expr nodes: 4
+expr optimized: (string)-12345.568
+expr nodes: 1
+(string)-12345.568
+
+string: format(12345.56789, '%16.3d')
+expr reprinted: format(12345.567890,(string)%16.3d)
+expr nodes: 3
+expr optimized: (string)           12345.568
+expr nodes: 1
+(string)           12345.568
+
+string: format(-12345.56789, '%16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%16.3d)
+expr nodes: 4
+expr optimized: (string)          -12345.568
+expr nodes: 1
+(string)          -12345.568
+
+string: format(12345.56789, '% 16.3d')
+expr reprinted: format(12345.567890,(string)% 16.3d)
+expr nodes: 3
+expr optimized: (string)           12345.568
+expr nodes: 1
+(string)           12345.568
+
+string: format(-12345.56789, '% 16.3d')
+expr reprinted: format(uminus(12345.567890),(string)% 16.3d)
+expr nodes: 4
+expr optimized: (string)          -12345.568
+expr nodes: 1
+(string)          -12345.568
+
+string: format(12345.56789, '%-16.3d')
+expr reprinted: format(12345.567890,(string)%-16.3d)
+expr nodes: 3
+expr optimized: (string)12345.568           
+expr nodes: 1
+(string)12345.568           
+
+string: format(-12345.56789, '%-16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%-16.3d)
+expr nodes: 4
+expr optimized: (string)-12345.568          
+expr nodes: 1
+(string)-12345.568          
+
+string: format(6, 'You have % 10d oranges')
+expr reprinted: format(6.000000,(string)You have % 10d oranges)
+expr nodes: 3
+expr optimized: (string)You have          6 oranges
+expr nodes: 1
+(string)You have          6 oranges
+
+string: format(stodt('2022-05-08'), '')
+expr reprinted: format(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)05/08/22
+expr nodes: 1
+(string)05/08/22
+
+string: format(stodt('2022-05-08'), '%Y-%m-%d')
+expr reprinted: format(stodt((string)2022-05-08),(string)%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)05/08/22
+expr nodes: 1
+(string)05/08/22
+
+string: dtosf(stodt('2022-05-08'), '%Y-%m-%d')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format('apples and oranges', 'You have some !&% 10s pears')
+expr reprinted: format((string)apples and oranges,(string)You have some !&% 10s pears)
+expr nodes: 3
+expr optimized: (string)You have some apples and pears
+expr nodes: 1
+(string)You have some apples and pears
+
+string: format('apples and oranges', 'You have some !&{% 10s} pears')
+expr reprinted: format((string)apples and oranges,(string)You have some !&{% 10s} pears)
+expr nodes: 3
+expr optimized: (string)You have some apples and pears
+expr nodes: 1
+(string)You have some apples and pears
+
+string: format(12345.56789, '!#%16.3d')
+expr reprinted: format(12345.567890,(string)!#%16.3d)
+expr nodes: 3
+expr optimized: (string)           12345.568
+expr nodes: 1
+(string)           12345.568
+
+string: format(-12345.56789, '!#%16.3d')
+expr reprinted: format(uminus(12345.567890),(string)!#%16.3d)
+expr nodes: 4
+expr optimized: (string)          -12345.568
+expr nodes: 1
+(string)          -12345.568
+
+string: format(12345.56789, '!#{%16.3d}')
+expr reprinted: format(12345.567890,(string)!#{%16.3d})
+expr nodes: 3
+expr optimized: (string)           12345.568
+expr nodes: 1
+(string)           12345.568
+
+string: format(-12345.56789, '!#{%16.3d}')
+expr reprinted: format(uminus(12345.567890),(string)!#{%16.3d})
+expr nodes: 4
+expr optimized: (string)          -12345.568
+expr nodes: 1
+(string)          -12345.568
+
+string: format(6, 'You have !#% 10d oranges')
+expr reprinted: format(6.000000,(string)You have !#% 10d oranges)
+expr nodes: 3
+expr optimized: (string)You have          6 oranges
+expr nodes: 1
+(string)You have          6 oranges
+
+string: format(6, 'You have !#{% 10d} oranges')
+expr reprinted: format(6.000000,(string)You have !#{% 10d} oranges)
+expr nodes: 3
+expr optimized: (string)You have          6 oranges
+expr nodes: 1
+(string)You have          6 oranges
+
+string: printf('You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.', 6, 'apples', stodt('2022-05-01'), 2, 'oranges', stodt('2022-05-02'))
+expr reprinted: printf((string)You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.,6.000000,(string)apples,stodt((string)2022-05-01),2.000000,(string)oranges,stodt((string)2022-05-02))
+expr nodes: 10
+expr optimized: (string)You had 6 apples on 2022-05-01 and 2 oranges on 2022-05-02 in your pocket.
+expr nodes: 1
+(string)You had 6 apples on 2022-05-01 and 2 oranges on 2022-05-02 in your pocket.
+
+string: printf('You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.', nulln(), nulls(), nulldt(), nulln(), nulls(), nulldt())
+expr reprinted: printf((string)You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.,nulln(),nulls(),nulldt(),nulln(),nulls(),nulldt())
+expr nodes: 8
+expr optimized: (string)You had   on  and   on  in your pocket.
+expr nodes: 1
+(string)You had   on  and   on  in your pocket.
+
+string: printf('You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.', nulln(), nulls(), nulldt(), nulln(), nulls(), nulls())
+expr reprinted: printf((string)You had %d %s on !@{%Y-%m-%d} and %d %s on !@{%Y-%m-%d} in your pocket.,nulln(),nulls(),nulldt(),nulln(),nulls(),nulls())
+expr nodes: 8
+expr optimized: (ERROR)format error
+expr nodes: 1
+(ERROR)format error
+
+string: format('apples and oranges', '%6.3d')
+expr reprinted: format((string)apples and oranges,(string)%6.3d)
+expr nodes: 3
+expr optimized: (ERROR)format error
+expr nodes: 1
+(ERROR)format error
+
+string: format(-12345.56789, '% 10s')
+expr reprinted: format(uminus(12345.567890),(string)% 10s)
+expr nodes: 4
+expr optimized: (ERROR)format error
+expr nodes: 1
+(ERROR)format error
+
+
+Print formats in C
+
+string: format(12345.56789, '%$16.3d')
+expr reprinted: format(12345.567890,(string)%$16.3d)
+expr nodes: 3
+expr optimized: (string)           12345.568
+expr nodes: 1
+(string)           12345.568
+
+string: format(-12345.56789, '%$16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%$16.3d)
+expr nodes: 4
+expr optimized: (string)          -12345.568
+expr nodes: 1
+(string)          -12345.568
+
+string: format(12345.56789, '%''16.3d')
+expr reprinted: format(12345.567890,(string)%'16.3d)
+expr nodes: 3
+expr optimized: (string)           12345.568
+expr nodes: 1
+(string)           12345.568
+
+string: format(-12345.56789, '%''16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%'16.3d)
+expr nodes: 4
+expr optimized: (string)          -12345.568
+expr nodes: 1
+(string)          -12345.568
+
+string: format(12345.56789, '!#%''16.3d')
+expr reprinted: format(12345.567890,(string)!#%'16.3d)
+expr nodes: 3
+expr optimized: (string)           12345.568
+expr nodes: 1
+(string)           12345.568
+
+string: format(-12345.56789, '!#%''16.3d')
+expr reprinted: format(uminus(12345.567890),(string)!#%'16.3d)
+expr nodes: 4
+expr optimized: (string)          -12345.568
+expr nodes: 1
+(string)          -12345.568
+
+string: format(12345.56789, '!#{%''16.3d}')
+expr reprinted: format(12345.567890,(string)!#{%'16.3d})
+expr nodes: 3
+expr optimized: (string)           12345.568
+expr nodes: 1
+(string)           12345.568
+
+string: format(-12345.56789, '!#{%''16.3d}')
+expr reprinted: format(uminus(12345.567890),(string)!#{%'16.3d})
+expr nodes: 4
+expr optimized: (string)          -12345.568
+expr nodes: 1
+(string)          -12345.568
+
+string: format(12345.56789, '!$%=*#60n')
+expr reprinted: format(12345.567890,(string)!$%=*#60n)
+expr nodes: 3
+expr optimized: (string)*******************************************************12345.57
+expr nodes: 1
+(string)*******************************************************12345.57
+
+string: format(-12345.56789, '!$%=*#60n')
+expr reprinted: format(uminus(12345.567890),(string)!$%=*#60n)
+expr nodes: 4
+expr optimized: (string)*******************************************************12345.57
+expr nodes: 1
+(string)*******************************************************12345.57
+
+string: format(12345.56789, '!${%=*#60n}')
+expr reprinted: format(12345.567890,(string)!${%=*#60n})
+expr nodes: 3
+expr optimized: (string)*******************************************************12345.57
+expr nodes: 1
+(string)*******************************************************12345.57
+
+string: format(-12345.56789, '!${%=*#60n}')
+expr reprinted: format(uminus(12345.567890),(string)!${%=*#60n})
+expr nodes: 4
+expr optimized: (string)*******************************************************12345.57
+expr nodes: 1
+(string)*******************************************************12345.57
+
+string: format(stodt('2022-05-08'), '')
+expr reprinted: format(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)05/08/22
+expr nodes: 1
+(string)05/08/22
+
+string: format(stodt('2022-05-08'), '%A')
+expr reprinted: format(stodt((string)2022-05-08),(string)%A)
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: dtosf(stodt('2022-05-08'), '')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)05/08/22
+expr nodes: 1
+(string)05/08/22
+
+string: dtosf(stodt('2022-05-08'), '%A')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)%A)
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: format(stodt('2022-05-08'), '!@%Y-%m-%d')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format(stodt('2022-05-08'), '!@%A')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@%A)
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: format(stodt('2022-05-08'), '!@{%Y-%m-%d}')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format(stodt('2022-05-08'), '!@{%A}')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@{%A})
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: dtosf(stodt('2022-05-08'), '!@%Y-%m-%d')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '!@%A')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%A)
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: dtosf(stodt('2022-05-08'), '!@{%Y-%m-%d}')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '!@{%A}')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%A})
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+
+Print formats in en_US.UTF-8
+
+string: format(12345.56789, '%$16.3d')
+expr reprinted: format(12345.567890,(string)%$16.3d)
+expr nodes: 3
+expr optimized: (string)          12,345.568
+expr nodes: 1
+(string)          12,345.568
+
+string: format(-12345.56789, '%$16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%$16.3d)
+expr nodes: 4
+expr optimized: (string)         -12,345.568
+expr nodes: 1
+(string)         -12,345.568
+
+string: format(12345.56789, '%''16.3d')
+expr reprinted: format(12345.567890,(string)%'16.3d)
+expr nodes: 3
+expr optimized: (string)          12,345.568
+expr nodes: 1
+(string)          12,345.568
+
+string: format(-12345.56789, '%''16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%'16.3d)
+expr nodes: 4
+expr optimized: (string)         -12,345.568
+expr nodes: 1
+(string)         -12,345.568
+
+string: format(12345.56789, '!#%''16.3d')
+expr reprinted: format(12345.567890,(string)!#%'16.3d)
+expr nodes: 3
+expr optimized: (string)          12,345.568
+expr nodes: 1
+(string)          12,345.568
+
+string: format(-12345.56789, '!#%''16.3d')
+expr reprinted: format(uminus(12345.567890),(string)!#%'16.3d)
+expr nodes: 4
+expr optimized: (string)         -12,345.568
+expr nodes: 1
+(string)         -12,345.568
+
+string: format(12345.56789, '!#{%''16.3d}')
+expr reprinted: format(12345.567890,(string)!#{%'16.3d})
+expr nodes: 3
+expr optimized: (string)          12,345.568
+expr nodes: 1
+(string)          12,345.568
+
+string: format(-12345.56789, '!#{%''16.3d}')
+expr reprinted: format(uminus(12345.567890),(string)!#{%'16.3d})
+expr nodes: 4
+expr optimized: (string)         -12,345.568
+expr nodes: 1
+(string)         -12,345.568
+
+string: format(12345.56789, '!$%=*#60n')
+expr reprinted: format(12345.567890,(string)!$%=*#60n)
+expr nodes: 3
+expr optimized: (string) $*******************************************************12,345.57
+expr nodes: 1
+(string) $*******************************************************12,345.57
+
+string: format(-12345.56789, '!$%=*#60n')
+expr reprinted: format(uminus(12345.567890),(string)!$%=*#60n)
+expr nodes: 4
+expr optimized: (string)-$*******************************************************12,345.57
+expr nodes: 1
+(string)-$*******************************************************12,345.57
+
+string: format(12345.56789, '!${%=*#60n}')
+expr reprinted: format(12345.567890,(string)!${%=*#60n})
+expr nodes: 3
+expr optimized: (string) $*******************************************************12,345.57
+expr nodes: 1
+(string) $*******************************************************12,345.57
+
+string: format(-12345.56789, '!${%=*#60n}')
+expr reprinted: format(uminus(12345.567890),(string)!${%=*#60n})
+expr nodes: 4
+expr optimized: (string)-$*******************************************************12,345.57
+expr nodes: 1
+(string)-$*******************************************************12,345.57
+
+string: format(stodt('2022-05-08'), '')
+expr reprinted: format(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)05/08/2022
+expr nodes: 1
+(string)05/08/2022
+
+string: format(stodt('2022-05-08'), '%A')
+expr reprinted: format(stodt((string)2022-05-08),(string)%A)
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: dtosf(stodt('2022-05-08'), '')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)05/08/2022
+expr nodes: 1
+(string)05/08/2022
+
+string: dtosf(stodt('2022-05-08'), '%A')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)%A)
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: format(stodt('2022-05-08'), '!@%Y-%m-%d')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format(stodt('2022-05-08'), '!@%A')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@%A)
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: format(stodt('2022-05-08'), '!@{%Y-%m-%d}')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format(stodt('2022-05-08'), '!@{%A}')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@{%A})
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: dtosf(stodt('2022-05-08'), '!@%Y-%m-%d')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '!@%A')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%A)
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: dtosf(stodt('2022-05-08'), '!@{%Y-%m-%d}')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '!@{%A}')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%A})
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+
+Print formats in en_GB.UTF-8
+
+string: format(12345.56789, '%$16.3d')
+expr reprinted: format(12345.567890,(string)%$16.3d)
+expr nodes: 3
+expr optimized: (string)          12,345.568
+expr nodes: 1
+(string)          12,345.568
+
+string: format(-12345.56789, '%$16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%$16.3d)
+expr nodes: 4
+expr optimized: (string)         -12,345.568
+expr nodes: 1
+(string)         -12,345.568
+
+string: format(12345.56789, '%''16.3d')
+expr reprinted: format(12345.567890,(string)%'16.3d)
+expr nodes: 3
+expr optimized: (string)          12,345.568
+expr nodes: 1
+(string)          12,345.568
+
+string: format(-12345.56789, '%''16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%'16.3d)
+expr nodes: 4
+expr optimized: (string)         -12,345.568
+expr nodes: 1
+(string)         -12,345.568
+
+string: format(12345.56789, '!#%''16.3d')
+expr reprinted: format(12345.567890,(string)!#%'16.3d)
+expr nodes: 3
+expr optimized: (string)          12,345.568
+expr nodes: 1
+(string)          12,345.568
+
+string: format(-12345.56789, '!#%''16.3d')
+expr reprinted: format(uminus(12345.567890),(string)!#%'16.3d)
+expr nodes: 4
+expr optimized: (string)         -12,345.568
+expr nodes: 1
+(string)         -12,345.568
+
+string: format(12345.56789, '!#{%''16.3d}')
+expr reprinted: format(12345.567890,(string)!#{%'16.3d})
+expr nodes: 3
+expr optimized: (string)          12,345.568
+expr nodes: 1
+(string)          12,345.568
+
+string: format(-12345.56789, '!#{%''16.3d}')
+expr reprinted: format(uminus(12345.567890),(string)!#{%'16.3d})
+expr nodes: 4
+expr optimized: (string)         -12,345.568
+expr nodes: 1
+(string)         -12,345.568
+
+string: format(12345.56789, '!$%=*#60n')
+expr reprinted: format(12345.567890,(string)!$%=*#60n)
+expr nodes: 3
+expr optimized: (string) £*******************************************************12,345.57
+expr nodes: 1
+(string) £*******************************************************12,345.57
+
+string: format(-12345.56789, '!$%=*#60n')
+expr reprinted: format(uminus(12345.567890),(string)!$%=*#60n)
+expr nodes: 4
+expr optimized: (string)-£*******************************************************12,345.57
+expr nodes: 1
+(string)-£*******************************************************12,345.57
+
+string: format(12345.56789, '!${%=*#60n}')
+expr reprinted: format(12345.567890,(string)!${%=*#60n})
+expr nodes: 3
+expr optimized: (string) £*******************************************************12,345.57
+expr nodes: 1
+(string) £*******************************************************12,345.57
+
+string: format(-12345.56789, '!${%=*#60n}')
+expr reprinted: format(uminus(12345.567890),(string)!${%=*#60n})
+expr nodes: 4
+expr optimized: (string)-£*******************************************************12,345.57
+expr nodes: 1
+(string)-£*******************************************************12,345.57
+
+string: format(stodt('2022-05-08'), '')
+expr reprinted: format(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)08/05/22
+expr nodes: 1
+(string)08/05/22
+
+string: format(stodt('2022-05-08'), '%A')
+expr reprinted: format(stodt((string)2022-05-08),(string)%A)
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: dtosf(stodt('2022-05-08'), '')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)08/05/22
+expr nodes: 1
+(string)08/05/22
+
+string: dtosf(stodt('2022-05-08'), '%A')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)%A)
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: format(stodt('2022-05-08'), '!@%Y-%m-%d')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format(stodt('2022-05-08'), '!@%A')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@%A)
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: format(stodt('2022-05-08'), '!@{%Y-%m-%d}')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format(stodt('2022-05-08'), '!@{%A}')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@{%A})
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: dtosf(stodt('2022-05-08'), '!@%Y-%m-%d')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '!@%A')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%A)
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+string: dtosf(stodt('2022-05-08'), '!@{%Y-%m-%d}')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '!@{%A}')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%A})
+expr nodes: 4
+expr optimized: (string)Sunday
+expr nodes: 1
+(string)Sunday
+
+
+Print formats in fr_FR.UTF-8
+
+string: format(12345.56789, '%$16.3d')
+expr reprinted: format(12345.567890,(string)%$16.3d)
+expr nodes: 3
+expr optimized: (string)           12345,568
+expr nodes: 1
+(string)           12345,568
+
+string: format(-12345.56789, '%$16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%$16.3d)
+expr nodes: 4
+expr optimized: (string)          -12345,568
+expr nodes: 1
+(string)          -12345,568
+
+string: format(12345.56789, '%''16.3d')
+expr reprinted: format(12345.567890,(string)%'16.3d)
+expr nodes: 3
+expr optimized: (string)           12345,568
+expr nodes: 1
+(string)           12345,568
+
+string: format(-12345.56789, '%''16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%'16.3d)
+expr nodes: 4
+expr optimized: (string)          -12345,568
+expr nodes: 1
+(string)          -12345,568
+
+string: format(12345.56789, '!#%''16.3d')
+expr reprinted: format(12345.567890,(string)!#%'16.3d)
+expr nodes: 3
+expr optimized: (string)           12345,568
+expr nodes: 1
+(string)           12345,568
+
+string: format(-12345.56789, '!#%''16.3d')
+expr reprinted: format(uminus(12345.567890),(string)!#%'16.3d)
+expr nodes: 4
+expr optimized: (string)          -12345,568
+expr nodes: 1
+(string)          -12345,568
+
+string: format(12345.56789, '!#{%''16.3d}')
+expr reprinted: format(12345.567890,(string)!#{%'16.3d})
+expr nodes: 3
+expr optimized: (string)           12345,568
+expr nodes: 1
+(string)           12345,568
+
+string: format(-12345.56789, '!#{%''16.3d}')
+expr reprinted: format(uminus(12345.567890),(string)!#{%'16.3d})
+expr nodes: 4
+expr optimized: (string)          -12345,568
+expr nodes: 1
+(string)          -12345,568
+
+string: format(12345.56789, '!$%=*#60n')
+expr reprinted: format(12345.567890,(string)!$%=*#60n)
+expr nodes: 3
+expr optimized: (string) *******************************************************12 345,57 €
+expr nodes: 1
+(string) *******************************************************12 345,57 €
+
+string: format(-12345.56789, '!$%=*#60n')
+expr reprinted: format(uminus(12345.567890),(string)!$%=*#60n)
+expr nodes: 4
+expr optimized: (string)-*******************************************************12 345,57 €
+expr nodes: 1
+(string)-*******************************************************12 345,57 €
+
+string: format(12345.56789, '!${%=*#60n}')
+expr reprinted: format(12345.567890,(string)!${%=*#60n})
+expr nodes: 3
+expr optimized: (string) *******************************************************12 345,57 €
+expr nodes: 1
+(string) *******************************************************12 345,57 €
+
+string: format(-12345.56789, '!${%=*#60n}')
+expr reprinted: format(uminus(12345.567890),(string)!${%=*#60n})
+expr nodes: 4
+expr optimized: (string)-*******************************************************12 345,57 €
+expr nodes: 1
+(string)-*******************************************************12 345,57 €
+
+string: format(stodt('2022-05-08'), '')
+expr reprinted: format(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)08/05/2022
+expr nodes: 1
+(string)08/05/2022
+
+string: format(stodt('2022-05-08'), '%A')
+expr reprinted: format(stodt((string)2022-05-08),(string)%A)
+expr nodes: 4
+expr optimized: (string)dimanche
+expr nodes: 1
+(string)dimanche
+
+string: dtosf(stodt('2022-05-08'), '')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)08/05/2022
+expr nodes: 1
+(string)08/05/2022
+
+string: dtosf(stodt('2022-05-08'), '%A')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)%A)
+expr nodes: 4
+expr optimized: (string)dimanche
+expr nodes: 1
+(string)dimanche
+
+string: format(stodt('2022-05-08'), '!@%Y-%m-%d')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format(stodt('2022-05-08'), '!@%A')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@%A)
+expr nodes: 4
+expr optimized: (string)dimanche
+expr nodes: 1
+(string)dimanche
+
+string: format(stodt('2022-05-08'), '!@{%Y-%m-%d}')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format(stodt('2022-05-08'), '!@{%A}')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@{%A})
+expr nodes: 4
+expr optimized: (string)dimanche
+expr nodes: 1
+(string)dimanche
+
+string: dtosf(stodt('2022-05-08'), '!@%Y-%m-%d')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '!@%A')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%A)
+expr nodes: 4
+expr optimized: (string)dimanche
+expr nodes: 1
+(string)dimanche
+
+string: dtosf(stodt('2022-05-08'), '!@{%Y-%m-%d}')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '!@{%A}')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%A})
+expr nodes: 4
+expr optimized: (string)dimanche
+expr nodes: 1
+(string)dimanche
+
+
+Print formats in de_DE.UTF-8
+
+string: format(12345.56789, '%$16.3d')
+expr reprinted: format(12345.567890,(string)%$16.3d)
+expr nodes: 3
+expr optimized: (string)          12.345,568
+expr nodes: 1
+(string)          12.345,568
+
+string: format(-12345.56789, '%$16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%$16.3d)
+expr nodes: 4
+expr optimized: (string)         -12.345,568
+expr nodes: 1
+(string)         -12.345,568
+
+string: format(12345.56789, '%''16.3d')
+expr reprinted: format(12345.567890,(string)%'16.3d)
+expr nodes: 3
+expr optimized: (string)          12.345,568
+expr nodes: 1
+(string)          12.345,568
+
+string: format(-12345.56789, '%''16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%'16.3d)
+expr nodes: 4
+expr optimized: (string)         -12.345,568
+expr nodes: 1
+(string)         -12.345,568
+
+string: format(12345.56789, '!#%''16.3d')
+expr reprinted: format(12345.567890,(string)!#%'16.3d)
+expr nodes: 3
+expr optimized: (string)          12.345,568
+expr nodes: 1
+(string)          12.345,568
+
+string: format(-12345.56789, '!#%''16.3d')
+expr reprinted: format(uminus(12345.567890),(string)!#%'16.3d)
+expr nodes: 4
+expr optimized: (string)         -12.345,568
+expr nodes: 1
+(string)         -12.345,568
+
+string: format(12345.56789, '!#{%''16.3d}')
+expr reprinted: format(12345.567890,(string)!#{%'16.3d})
+expr nodes: 3
+expr optimized: (string)          12.345,568
+expr nodes: 1
+(string)          12.345,568
+
+string: format(-12345.56789, '!#{%''16.3d}')
+expr reprinted: format(uminus(12345.567890),(string)!#{%'16.3d})
+expr nodes: 4
+expr optimized: (string)         -12.345,568
+expr nodes: 1
+(string)         -12.345,568
+
+string: format(12345.56789, '!$%=*#60n')
+expr reprinted: format(12345.567890,(string)!$%=*#60n)
+expr nodes: 3
+expr optimized: (string) *******************************************************12.345,57 €
+expr nodes: 1
+(string) *******************************************************12.345,57 €
+
+string: format(-12345.56789, '!$%=*#60n')
+expr reprinted: format(uminus(12345.567890),(string)!$%=*#60n)
+expr nodes: 4
+expr optimized: (string)-*******************************************************12.345,57 €
+expr nodes: 1
+(string)-*******************************************************12.345,57 €
+
+string: format(12345.56789, '!${%=*#60n}')
+expr reprinted: format(12345.567890,(string)!${%=*#60n})
+expr nodes: 3
+expr optimized: (string) *******************************************************12.345,57 €
+expr nodes: 1
+(string) *******************************************************12.345,57 €
+
+string: format(-12345.56789, '!${%=*#60n}')
+expr reprinted: format(uminus(12345.567890),(string)!${%=*#60n})
+expr nodes: 4
+expr optimized: (string)-*******************************************************12.345,57 €
+expr nodes: 1
+(string)-*******************************************************12.345,57 €
+
+string: format(stodt('2022-05-08'), '')
+expr reprinted: format(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)08.05.2022
+expr nodes: 1
+(string)08.05.2022
+
+string: format(stodt('2022-05-08'), '%A')
+expr reprinted: format(stodt((string)2022-05-08),(string)%A)
+expr nodes: 4
+expr optimized: (string)Sonntag
+expr nodes: 1
+(string)Sonntag
+
+string: dtosf(stodt('2022-05-08'), '')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)08.05.2022
+expr nodes: 1
+(string)08.05.2022
+
+string: dtosf(stodt('2022-05-08'), '%A')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)%A)
+expr nodes: 4
+expr optimized: (string)Sonntag
+expr nodes: 1
+(string)Sonntag
+
+string: format(stodt('2022-05-08'), '!@%Y-%m-%d')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format(stodt('2022-05-08'), '!@%A')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@%A)
+expr nodes: 4
+expr optimized: (string)Sonntag
+expr nodes: 1
+(string)Sonntag
+
+string: format(stodt('2022-05-08'), '!@{%Y-%m-%d}')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format(stodt('2022-05-08'), '!@{%A}')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@{%A})
+expr nodes: 4
+expr optimized: (string)Sonntag
+expr nodes: 1
+(string)Sonntag
+
+string: dtosf(stodt('2022-05-08'), '!@%Y-%m-%d')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '!@%A')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%A)
+expr nodes: 4
+expr optimized: (string)Sonntag
+expr nodes: 1
+(string)Sonntag
+
+string: dtosf(stodt('2022-05-08'), '!@{%Y-%m-%d}')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '!@{%A}')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%A})
+expr nodes: 4
+expr optimized: (string)Sonntag
+expr nodes: 1
+(string)Sonntag
+
+
+Print formats in hu_HU.UTF-8
+
+string: format(12345.56789, '%$16.3d')
+expr reprinted: format(12345.567890,(string)%$16.3d)
+expr nodes: 3
+expr optimized: (string)          12.345,568
+expr nodes: 1
+(string)          12.345,568
+
+string: format(-12345.56789, '%$16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%$16.3d)
+expr nodes: 4
+expr optimized: (string)         -12.345,568
+expr nodes: 1
+(string)         -12.345,568
+
+string: format(12345.56789, '%''16.3d')
+expr reprinted: format(12345.567890,(string)%'16.3d)
+expr nodes: 3
+expr optimized: (string)          12.345,568
+expr nodes: 1
+(string)          12.345,568
+
+string: format(-12345.56789, '%''16.3d')
+expr reprinted: format(uminus(12345.567890),(string)%'16.3d)
+expr nodes: 4
+expr optimized: (string)         -12.345,568
+expr nodes: 1
+(string)         -12.345,568
+
+string: format(12345.56789, '!#%''16.3d')
+expr reprinted: format(12345.567890,(string)!#%'16.3d)
+expr nodes: 3
+expr optimized: (string)          12.345,568
+expr nodes: 1
+(string)          12.345,568
+
+string: format(-12345.56789, '!#%''16.3d')
+expr reprinted: format(uminus(12345.567890),(string)!#%'16.3d)
+expr nodes: 4
+expr optimized: (string)         -12.345,568
+expr nodes: 1
+(string)         -12.345,568
+
+string: format(12345.56789, '!#{%''16.3d}')
+expr reprinted: format(12345.567890,(string)!#{%'16.3d})
+expr nodes: 3
+expr optimized: (string)          12.345,568
+expr nodes: 1
+(string)          12.345,568
+
+string: format(-12345.56789, '!#{%''16.3d}')
+expr reprinted: format(uminus(12345.567890),(string)!#{%'16.3d})
+expr nodes: 4
+expr optimized: (string)         -12.345,568
+expr nodes: 1
+(string)         -12.345,568
+
+string: format(12345.56789, '!$%=*#60n')
+expr reprinted: format(12345.567890,(string)!$%=*#60n)
+expr nodes: 3
+expr optimized: (string) *******************************************************12.345,57 Ft
+expr nodes: 1
+(string) *******************************************************12.345,57 Ft
+
+string: format(-12345.56789, '!$%=*#60n')
+expr reprinted: format(uminus(12345.567890),(string)!$%=*#60n)
+expr nodes: 4
+expr optimized: (string)-*******************************************************12.345,57 Ft
+expr nodes: 1
+(string)-*******************************************************12.345,57 Ft
+
+string: format(12345.56789, '!${%=*#60n}')
+expr reprinted: format(12345.567890,(string)!${%=*#60n})
+expr nodes: 3
+expr optimized: (string) *******************************************************12.345,57 Ft
+expr nodes: 1
+(string) *******************************************************12.345,57 Ft
+
+string: format(-12345.56789, '!${%=*#60n}')
+expr reprinted: format(uminus(12345.567890),(string)!${%=*#60n})
+expr nodes: 4
+expr optimized: (string)-*******************************************************12.345,57 Ft
+expr nodes: 1
+(string)-*******************************************************12.345,57 Ft
+
+string: format(stodt('2022-05-08'), '')
+expr reprinted: format(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format(stodt('2022-05-08'), '%A')
+expr reprinted: format(stodt((string)2022-05-08),(string)%A)
+expr nodes: 4
+expr optimized: (string)vasárnap
+expr nodes: 1
+(string)vasárnap
+
+string: dtosf(stodt('2022-05-08'), '')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string))
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '%A')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)%A)
+expr nodes: 4
+expr optimized: (string)vasárnap
+expr nodes: 1
+(string)vasárnap
+
+string: format(stodt('2022-05-08'), '!@%Y-%m-%d')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format(stodt('2022-05-08'), '!@%A')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@%A)
+expr nodes: 4
+expr optimized: (string)vasárnap
+expr nodes: 1
+(string)vasárnap
+
+string: format(stodt('2022-05-08'), '!@{%Y-%m-%d}')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: format(stodt('2022-05-08'), '!@{%A}')
+expr reprinted: format(stodt((string)2022-05-08),(string)!@{%A})
+expr nodes: 4
+expr optimized: (string)vasárnap
+expr nodes: 1
+(string)vasárnap
+
+string: dtosf(stodt('2022-05-08'), '!@%Y-%m-%d')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%Y-%m-%d)
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '!@%A')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@%A)
+expr nodes: 4
+expr optimized: (string)vasárnap
+expr nodes: 1
+(string)vasárnap
+
+string: dtosf(stodt('2022-05-08'), '!@{%Y-%m-%d}')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%Y-%m-%d})
+expr nodes: 4
+expr optimized: (string)2022-05-08
+expr nodes: 1
+(string)2022-05-08
+
+string: dtosf(stodt('2022-05-08'), '!@{%A}')
+expr reprinted: dtosf(stodt((string)2022-05-08),(string)!@{%A})
+expr nodes: 4
+expr optimized: (string)vasárnap
+expr nodes: 1
+(string)vasárnap
+
