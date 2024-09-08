@@ -50,39 +50,71 @@ old_CFLAGS="$CFLAGS"
 CFLAGS="-Werror -D_BSD_SOURCE $CFLAGS"
 AC_COMPILE_IFELSE(
 	[AC_LANG_PROGRAM([[#include <string.h>]],[[return strcasecmp("a", "a");]])],
-	[_bsd_source_works=yes],
-	[_bsd_source_works=no])
+	[_bsd_source_strcasecmp=yes],
+	[_bsd_source_strcasecmp=no])
 CFLAGS="$old_CFLAGS"
-AC_MSG_RESULT([$_bsd_source_works])
+AC_MSG_RESULT([$_bsd_source_strcasecmp])
 
 AC_MSG_CHECKING([whether -D_DEFAULT_SOURCE provides strcasecmp])
 old_CFLAGS="$CFLAGS"
 CFLAGS="-Werror -D_DEFAULT_SOURCE $CFLAGS"
 AC_COMPILE_IFELSE(
 	[AC_LANG_PROGRAM([[#include <string.h>]],[[return strcasecmp("a", "a");]])],
-	[_default_source_works=yes],
-	[_default_source_works=no])
+	[_default_source_strcasecmp=yes],
+	[_default_source_strcasecmp=no])
 CFLAGS="$old_CFLAGS"
-AC_MSG_RESULT([$_default_source_works])
+AC_MSG_RESULT([$_default_source_strcasecmp])
 
 AC_MSG_CHECKING([whether -D_GNU_SOURCE provides strcasecmp])
 old_CFLAGS="$CFLAGS"
 CFLAGS="-Werror -D_GNU_SOURCE $CFLAGS"
 AC_COMPILE_IFELSE(
 	[AC_LANG_PROGRAM([[#include <string.h>]],[[return strcasecmp("a", "a");]])],
-	[_gnu_source_works=yes],
-	[_gnu_source_works=no])
+	[_gnu_source_strcasecmp=yes],
+	[_gnu_source_strcasecmp=no])
 CFLAGS="$old_CFLAGS"
-AC_MSG_RESULT([$_gnu_source_works])
+AC_MSG_RESULT([$_gnu_source_strcasecmp])
 
 AS_IF(
-	[test x$_bsd_source_works = xyes],
+	[test x$_bsd_source_strcasecmp = xyes],
 	[COMPILE_SYMBOL=-D_BSD_SOURCE],
-	[test x$_default_source_works = xyes],
+	[test x$_default_source_strcasecmp = xyes],
 	[COMPILE_SYMBOL=-D_DEFAULT_SOURCE],
-	[test x$_gnu_source_works = xyes],
+	[test x$_gnu_source_strcasecmp = xyes],
 	[COMPILE_SYMBOL=-D_GNU_SOURCE],
 	[AC_MSG_WARN([Using strcasecmp may fail to compile!])])
+
+AC_MSG_CHECKING([whether -D_DEFAULT_SOURCE provides reallocarray])
+old_CFLAGS="$CFLAGS"
+CFLAGS="-Werror -D_DEFAULT_SOURCE $CFLAGS"
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM(
+		[[#include <stdlib.h>]],
+		[[void *x = reallocarray(NULL, 2, 16); return x != NULL;]])],
+	[_default_source_reallocarray=yes],
+	[_default_source_reallocarray=no])
+CFLAGS="$old_CFLAGS"
+AC_MSG_RESULT([$_default_source_reallocarray])
+
+AC_MSG_CHECKING([whether -D_GNU_SOURCE provides reallocarray])
+old_CFLAGS="$CFLAGS"
+CFLAGS="-Werror -D_GNU_SOURCE $CFLAGS"
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM(
+		[[#include <stdlib.h>]],
+		[[void *x = reallocarray(NULL, 2, 16); return x != NULL;]])],
+	[_gnu_source_reallocarray=yes],
+	[_gnu_source_reallocarray=no])
+CFLAGS="$old_CFLAGS"
+AC_MSG_RESULT([$_gnu_source_reallocarray])
+
+AS_IF(
+	[test x$_default_source_reallocarray = xyes],
+	[COMPILE_SYMBOL="$COMPILE_SYMBOL -D_DEFAULT_SOURCE"],
+	[test x$_gnu_source_reallocarray = xyes],
+	[COMPILE_SYMBOL="$COMPILE_SYMBOL -D_GNU_SOURCE"],
+	[AC_MSG_WARN([Using reallocarray may fail to compile!])])
+
 AC_SUBST(COMPILE_SYMBOL)
 
 gl_VISIBILITY
