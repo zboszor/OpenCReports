@@ -1,8 +1,12 @@
+acinclude.m4
 Makefile.fragments
+Makefile.global
 Makefile.objects
 build/
 config.nice
 configure.ac
+configure.in
+mkinstalldirs
 modules/
 opencreport.dep
 run-tests.php
