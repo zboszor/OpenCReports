@@ -34,6 +34,9 @@
 %{
 
 /* Suppress the defined-but-unused function warning  */
+#ifndef yynoreturn
+#define yynoreturn __attribute__((__noreturn__))
+#endif
 static void yynoreturn yy_fatal_error ( const char* msg , yyscan_t yyscanner ) __attribute__((unused));
 
 #define SET_YYLLOC()  (*(yylloc) = yytext - yyextra->scanbuf)
