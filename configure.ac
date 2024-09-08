@@ -98,7 +98,12 @@ PKG_CHECK_MODULES(LIBXML, libxml-2.0 >= 2.5.0)
 AC_SUBST(LIBXML_LIBS)
 AC_SUBST(LIBXML_CFLAGS)
 
-PKG_CHECK_MODULES(UTF8PROC, libutf8proc)
+PKG_CHECK_MODULES(UTF8PROC, libutf8proc,,
+	[AC_CHECK_HEADER(utf8proc.h,
+		[AC_CHECK_LIB(utf8proc, utf8proc_iterate,
+			[UTF8PROC_LIBS="-lutf8proc"],
+			[AC_MSG_ERROR([utf8proc is not installed])])],
+		[AC_MSG_ERROR([utf8proc is not installed])])])
 AC_SUBST(UTF8PROC_LIBS)
 AC_SUBST(UTF8PROC_CFLAGS)
 
@@ -129,7 +134,12 @@ PKG_CHECK_MODULES(PDFGEN, cairo cairo-pdf pangocairo >= 1.10 librsvg-2.0 gdk-pix
 AC_SUBST(PDFGEN_CFLAGS)
 AC_SUBST(PDFGEN_LIBS)
 
-PKG_CHECK_MODULES(POSTGRESQL, libpq)
+PKG_CHECK_MODULES(POSTGRESQL, libpq,,
+	[AC_CHECK_HEADERS(libpq-fe.h,
+		[AC_CHECK_LIB(pq, PQdescribePortal,
+			[POSTGRESQL_LIBS="-lpq"],
+			[AC_MSG_ERROR([PostgreSQL is not installed])])],
+		[AC_MSG_ERROR([PostgreSQL is not installed])])])
 AC_SUBST(POSTGRESQL_CFLAGS)
 AC_SUBST(POSTGRESQL_LIBS)
 
@@ -141,7 +151,13 @@ AC_ARG_WITH([odbcmanager],
 	[odbcmanager=$with_odbcmanager],
 	[odbcmanager=unixodbc])
 AS_IF(
-	[test x$odbcmanager = xunixodbc],[PKG_CHECK_MODULES(ODBC, odbc)],
+	[test x$odbcmanager = xunixodbc],
+		[PKG_CHECK_MODULES(ODBC, odbc,,
+			[AC_CHECK_HEADERS(sql.h sqlext.h sqltypes.h,
+				[AC_CHECK_LIB(odbc, SQLSetConnectAttr,
+					[ODBC_LIBS="-lodbc"],
+					[AC_MSG_ERROR([ODBC library is not installed])])],
+				[AC_MSG_ERROR([ODBC headers are not installed])])])],
 	[test x$odbcmanager = xiodbc],[PKG_CHECK_MODULES(ODBC, libiodbc)],
 	[AC_MSG_ERROR([Invalid ODBC manager type])])
 AC_MSG_NOTICE([ODBC manager is $odbcmanager])
