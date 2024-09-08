@@ -4,6 +4,7 @@
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
