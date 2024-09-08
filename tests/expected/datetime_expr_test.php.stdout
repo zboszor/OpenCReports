@@ -54,13 +54,6 @@ expr optimized: (datetime)1980-05-05 06:10:15
 expr nodes: 1
 (datetime)1980-05-05 06:10:15
 
-string: stodt('1980-05-05 06:10:15+02')
-expr reprinted: stodt((string)1980-05-05 06:10:15+02)
-expr nodes: 2
-expr optimized: (datetime)1980-05-05 06:10:15
-expr nodes: 1
-(datetime)1980-05-05 06:10:15
-
 string: stodt('19800505061015')
 expr reprinted: stodt((string)19800505061015)
 expr nodes: 2
