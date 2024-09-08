@@ -1978,7 +1978,9 @@ static void initialize_ocrpt(void) {
 	tzset();
 
 	/* Use the OpenCReport allocator functions in GMP/MPFR */
+#if MPFR_VERSION_MAJOR >= 4
 	mpfr_mp_memory_cleanup();
+#endif
 	mp_set_memory_functions(ocrpt_mem_malloc0, ocrpt_mem_reallocarray0, (ocrpt_mem_free_size_t)ocrpt_mem_free0);
 
 	/*

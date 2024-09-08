@@ -69,7 +69,9 @@ DLL_EXPORT_SYM void ocrpt_mem_set_alloc_funcs(
 	 */
 
 	/* Use the same allocator in GMP/MPFR */
+#if MPFR_VERSION_MAJOR >= 4
 	mpfr_mp_memory_cleanup();
+#endif
 	mp_set_memory_functions(ocrpt_mem_malloc0, ocrpt_mem_reallocarray0, ocrpt_mem_free_size0);
 }
 
