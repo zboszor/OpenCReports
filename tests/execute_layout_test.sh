@@ -83,7 +83,7 @@ case $TYPE in
 				OUTDIFF=$(diff -durpN "$i" ${abs_srcdir}/results/${TEST}.${SFX[$TYPE]} 2>/dev/null)
 				if [[ -z "$OUTDIFF" ]]; then
 					FOUND=1
-					break;
+					break
 				fi
 			else
 				OUTDIFF="${abs_srcdir}/expected/${TEST}.${SFX[$TYPE]} or a variant does not exist."

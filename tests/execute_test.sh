@@ -23,10 +23,29 @@ export UBSAN_OPTIONS=print_stacktrace=true
 export LSAN_OPTIONS="suppressions=${top_srcdir}/fontconfig.supp"
 ./${TEST} 2>results/${TEST}.stderr >results/${TEST}.stdout
 
-OUTDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.stdout ${abs_srcdir}/results/${TEST}.stdout 2>/dev/null)
-OUTRET=$?
-ERRDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.stderr ${abs_srcdir}/results/${TEST}.stderr 2>/dev/null)
-ERRRET=$?
+if [[ -f ${abs_srcdir}/expected/${TEST}.stdout ]]; then
+	OUTDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.stdout ${abs_srcdir}/results/${TEST}.stdout 2>/dev/null)
+	OUTRET=$?
+	ERRDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.stderr ${abs_srcdir}/results/${TEST}.stderr 2>/dev/null)
+	ERRRET=$?
+else
+	FOUND=
+	for i in ${abs_srcdir}/expected/${TEST}.stdout* ; do
+		if [[ -f "$i" ]]; then
+			SFX=${i#${abs_srcdir}/expected/${TEST}.stdout}
+			OUTDIFF=$(diff -durpN "$i" ${abs_srcdir}/results/${TEST}.stdout 2>/dev/null)
+			OUTRET=$?
+			ERRDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.stderr${SFX} ${abs_srcdir}/results/${TEST}.stderr 2>/dev/null)
+			ERRRET=$?
+			if [[ -z "$OUTDIFF" ]]; then
+				FOUND=1
+				break
+			fi
+		else
+			OUTDIFF="${abs_srcdir}/expected/${TEST}.stdout or a variant does not exist."
+		fi
+	done
+fi
 
 if [[ $OUTRET -ne 0 ]]; then
 	ERROR=1

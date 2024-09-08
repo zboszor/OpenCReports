@@ -20,10 +20,29 @@ mkdir -p ${abs_builddir}/results
 rm -f results/${TEST}.php.stdout.*.png results/${TEST}.asanout.*
 php ${TEST}.php 2>results/${TEST}.php.stderr >results/${TEST}.php.stdout
 
-OUTDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.php.stdout ${abs_srcdir}/results/${TEST}.php.stdout 2>/dev/null)
-OUTRET=$?
-ERRDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.php.stderr ${abs_srcdir}/results/${TEST}.php.stderr 2>/dev/null)
-ERRRET=$?
+if [[ -f ${abs_srcdir}/expected/${TEST}.php.stdout ]]; then
+	OUTDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.php.stdout ${abs_srcdir}/results/${TEST}.php.stdout 2>/dev/null)
+	OUTRET=$?
+	ERRDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.php.stderr ${abs_srcdir}/results/${TEST}.php.stderr 2>/dev/null)
+	ERRRET=$?
+else
+	FOUND=
+	for i in ${abs_srcdir}/expected/${TEST}.php.stdout* ; do
+		if [[ -f "$i" ]]; then
+			SFX=${i#${abs_srcdir}/expected/${TEST}.php.stdout}
+			OUTDIFF=$(diff -durpN "$i" ${abs_srcdir}/results/${TEST}.php.stdout 2>/dev/null)
+			OUTRET=$?
+			ERRDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}.php.stderr${SFX} ${abs_srcdir}/results/${TEST}.php.stderr 2>/dev/null)
+			ERRRET=$?
+			if [[ -z "$OUTDIFF" ]]; then
+				FOUND=1
+				break
+			fi
+		else
+			OUTDIFF="${abs_srcdir}/expected/${TEST}.php.stdout or a variant does not exist."
+		fi
+	done
+fi
 
 if [[ $OUTRET -ne 0 ]]; then
 	ERROR=1
