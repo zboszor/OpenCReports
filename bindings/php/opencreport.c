@@ -21,6 +21,12 @@
  * PHP compatibility wrappers
  */
 
+/* Introduced in PHP 7.4 */
+
+#ifndef ZEND_THIS
+#define ZEND_THIS (&EX(This))
+#endif
+
 /* Introduced in PHP 8.0 */
 #ifndef zend_result
 typedef int zend_result;
