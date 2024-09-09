@@ -42,7 +42,7 @@ function test_newrow_cb(OpenCReport $o, OpenCReport\Report $r) {
 	$rs->print();
 }
 
-function test_break_trigger_cb(OpenCReport $o, OpenCReport\Report $r, OpenCReport\Break $br) {
+function test_break_trigger_cb(OpenCReport $o, OpenCReport\Report $r, OpenCReport\ReportBreak $br) {
 	echo "break '" . $br->name() . "' triggered" . PHP_EOL;
 }
 

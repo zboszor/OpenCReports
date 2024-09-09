@@ -2127,14 +2127,14 @@ OpenCReport\Column::set_column_padding(
 
     public final break_new(
                      ?string $name):
-                     OpenCReport\Break;
+                     OpenCReport\ReportBreak;
 
     public final break_get(
                      string $break_name):
-                     OpenCReport\Break;
+                     OpenCReport\ReportBreak;
 
     public final break_get_first():
-                     ?OpenCReport\Break;
+                     ?OpenCReport\ReportBreak;
 
     public final resolve_breaks(): void;
 
@@ -2323,12 +2323,12 @@ OpenCReport\Report::evaluate_variables(): void;</programlisting>
 				is the basis for grouping data.
 				See <xref linkend="breaks"/>.
 				For the class methods of
-				<literal>OpenCReport\Break</literal>,
+				<literal>OpenCReport\ReportBreak</literal>,
 				see <xref linkend="phpbreakclass"/>.
 				<programlisting>public final
 OpenCReport\Report::break_new(
                      ?string $name):
-                     OpenCReport\Break;</programlisting>
+                     OpenCReport\ReportBreak;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpreportbreakget">
@@ -2338,12 +2338,12 @@ OpenCReport\Report::break_new(
 				using its name. The object that's created
 				this way is <emphasis>not</emphasis> marked
 				as an iterator, so
-				<literal>OpenCReport\Break::get_next()</literal>
+				<literal>OpenCReport\ReportBreak::get_next()</literal>
 				may not be used on it.
 				<programlisting>public final
 OpenCReport\Report::break_get(
                      string $break_name):
-                     OpenCReport\Break;</programlisting>
+                     OpenCReport\ReportBreak;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpreportbreakgetfirst">
@@ -2353,11 +2353,11 @@ OpenCReport\Report::break_get(
 				chain of breaks of the report.
 				The object is marked internally
 				as an iterator, so
-				<literal>OpenCReport\Break::get_next()</literal>
+				<literal>OpenCReport\ReportBreak::get_next()</literal>
 				may be used on it.
 				<programlisting>public final
 OpenCReport\Report::break_get_first():
-                     ?OpenCReport\Break;</programlisting>
+                     ?OpenCReport\ReportBreak;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpreportresolvebreaks">
@@ -2710,11 +2710,11 @@ OpenCReport\Variable::eval(): void;</programlisting>
 		</sect2>
 	</sect1>
 	<sect1 id="phpbreakclass">
-		<title>The OpenCReport\Break class</title>
+		<title>The OpenCReport\ReportBreak class</title>
 		<para>
-			<programlisting>class OpenCReport\Break {
+			<programlisting>class OpenCReport\ReportBreak {
     public final get_next():
-                     ?OpenCReport\Break;
+                     ?OpenCReport\ReportBreak;
 
     public final breakfield_add(
                      OpenCReport\Expr $breakfield_expr):
@@ -2744,8 +2744,8 @@ OpenCReport\Variable::eval(): void;</programlisting>
 				i.e. one that was created by
 				<literal>OpenCReport\Report::break_get_first()</literal>.
 				<programlisting>public final
-OpenCReport\Break::get_next():
-                     ?OpenCReport\Break;</programlisting>
+OpenCReport\ReportBreak::get_next():
+                     ?OpenCReport\ReportBreak;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpbreakbfadd">
@@ -2756,7 +2756,7 @@ OpenCReport\Break::get_next():
 				A break triggers if any of the breakfields
 				change from one data line to another.
 				<programlisting>public final
-OpenCReport\Break::breakfield_add(
+OpenCReport\ReportBreak::breakfield_add(
                      OpenCReport\Expr $breakfield_expr):
                      void;</programlisting>
 			</para>
@@ -2774,7 +2774,7 @@ OpenCReport\Break::breakfield_add(
 				and also used by unit tests. It may be useful
 				to implement a custom report executor.
 				<programlisting>public final
-OpenCReport\Break::check_fields(): bool;</programlisting>
+OpenCReport\ReportBreak::check_fields(): bool;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpbreakresetvars">
@@ -2788,7 +2788,7 @@ OpenCReport\Break::check_fields(): bool;</programlisting>
 				and also used by unit tests. It may be useful
 				to implement a custom report executor.
 				<programlisting>public final
-OpenCReport\Break::reset_vars(): void;</programlisting>
+OpenCReport\ReportBreak::reset_vars(): void;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpbreakaddtriggercb">
@@ -2796,7 +2796,7 @@ OpenCReport\Break::reset_vars(): void;</programlisting>
 			<para>
 				Add a "trigger" callback to the break.
 				<programlisting>public final
-OpenCReport\Break::add_trigger_cb(
+OpenCReport\ReportBreak::add_trigger_cb(
                      ?string $callback):
                      void;</programlisting>
 			</para>
@@ -2809,7 +2809,7 @@ OpenCReport\Break::add_trigger_cb(
 				XML descriptor but variables are added
 				afterwards from code.
 				<programlisting>public final
-OpenCReport\Break::name(): string;</programlisting>
+OpenCReport\ReportBreak::name(): string;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpbreakoutputs">
@@ -2821,10 +2821,10 @@ OpenCReport\Break::name(): string;</programlisting>
 				For class methods of <literal>OpenCReport\Output</literal>,
 				see <xref linkend="phpoutputclass"/>
 				<programlisting>public final
-OpenCReport\Break::header(): OpenCReport\Output;
+OpenCReport\ReportBreak::header(): OpenCReport\Output;
 
 public final
-OpenCReport\Break::footer(): OpenCReport\Output;</programlisting>
+OpenCReport\ReportBreak::footer(): OpenCReport\Output;</programlisting>
 			</para>
 		</sect2>
 	</sect1>

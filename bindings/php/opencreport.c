@@ -17,6 +17,25 @@
 
 #include <opencreport.h>
 
+/*
+ * PHP compatibility wrappers
+ */
+
+/* Introduced in PHP 8.0 */
+#ifndef zend_result
+typedef int zend_result;
+#endif
+#ifndef RETURN_THROWS
+#define RETURN_THROWS() do { ZEND_ASSERT(EG(exception)); (void) return_value; return; } while (0)
+#endif
+#ifndef Z_PARAM_ARRAY_HT_OR_NULL
+#define Z_PARAM_ARRAY_HT_OR_NULL(dest) Z_PARAM_ARRAY_HT_EX(dest, 1, 0)
+#endif
+
+/*
+ * End of PHP compatibility wrappers
+ */
+
 /* {{{ REGISTER_OPENCREPORT_CLASS_CONST_LONG */
 
 /*
@@ -801,9 +820,9 @@ PHP_METHOD(opencreport, expr_error) {
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
-	if (oo->expr_error)
+	if (oo->expr_error) {
 		RETURN_STRING(oo->expr_error);
-	else
+	} else
 		RETURN_NULL();
 }
 
@@ -3298,9 +3317,9 @@ PHP_METHOD(opencreport_report, expr_error) {
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
-	if (pro->expr_error)
+	if (pro->expr_error) {
 		RETURN_STRING(pro->expr_error);
-	else
+	} else
 		RETURN_NULL();
 }
 
@@ -3675,11 +3694,11 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_report_evaluate_variables, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_break_new, 0, 1, OpenCReport\\Break, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_break_new, 0, 1, OpenCReport\\ReportBreak, 1)
 ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_break_get_first, 0, 0, OpenCReport\\Break, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_break_get_first, 0, 0, OpenCReport\\ReportBreak, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_report_resolve_breaks, 0, 0, IS_VOID, 0)
@@ -3688,7 +3707,7 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_report_get_query_rownum, 0, 0, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_break_get, 0, 1, OpenCReport\\Break, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_break_get, 0, 1, OpenCReport\\ReportBreak, 1)
 ZEND_ARG_TYPE_INFO(0, break_name, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
@@ -3910,7 +3929,7 @@ PHP_METHOD(opencreport_break, get_next) {
 	php_opencreport_break_object *bro = Z_OPENCREPORT_BREAK_P(object);
 
 	if (!bro->is_iterator) {
-		zend_throw_error(NULL, "OpenCReport\\Break object is not an iterator");
+		zend_throw_error(NULL, "OpenCReport\\ReportBreak object is not an iterator");
 		RETURN_THROWS();
 	}
 
@@ -4052,7 +4071,7 @@ PHP_METHOD(opencreport_break, footer) {
 	out->output = ocrpt_break_get_footer(bro->br);
 }
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_break_get_next, 0, 0, OpenCReport\\Break, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_break_get_next, 0, 0, OpenCReport\\ReportBreak, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_break_breakfield_add, 0, 1, _IS_BOOL, 0)
@@ -5646,7 +5665,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	opencreport_object_handlers.offset = XtOffsetOf(php_opencreport_object, zo);
 	opencreport_object_handlers.clone_obj = NULL;
 	opencreport_object_handlers.free_obj = opencreport_object_free;
+#if PHP_VERSION_ID >= 80000
 	opencreport_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_ce = zend_register_internal_class(&ce);
 #if PHP_VERSION_ID >= 80100
 	opencreport_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
@@ -5660,7 +5681,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_ds_object_new;
 	opencreport_ds_object_handlers.offset = XtOffsetOf(php_opencreport_ds_object, zo);
 	opencreport_ds_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_ds_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_ds_ce = zend_register_internal_class(&ce);
 	opencreport_ds_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5675,7 +5698,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_query_object_new;
 	opencreport_query_object_handlers.offset = XtOffsetOf(php_opencreport_query_object, zo);
 	opencreport_query_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_query_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_query_ce = zend_register_internal_class(&ce);
 	opencreport_query_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5690,7 +5715,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_query_result_object_new;
 	opencreport_query_result_object_handlers.offset = XtOffsetOf(php_opencreport_query_result_object, zo);
 	opencreport_query_result_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_query_result_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_query_result_ce = zend_register_internal_class(&ce);
 	opencreport_query_result_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5705,7 +5732,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_expr_object_new;
 	opencreport_expr_object_handlers.offset = XtOffsetOf(php_opencreport_expr_object, zo);
 	opencreport_expr_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_expr_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_expr_ce = zend_register_internal_class(&ce);
 	opencreport_expr_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5721,7 +5750,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	opencreport_result_object_handlers.offset = XtOffsetOf(php_opencreport_result_object, zo);
 	opencreport_result_object_handlers.clone_obj = NULL;
 	opencreport_result_object_handlers.free_obj = opencreport_result_object_free;
+#if PHP_VERSION_ID >= 80000
 	opencreport_result_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_result_ce = zend_register_internal_class(&ce);
 	opencreport_result_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5736,7 +5767,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_part_object_new;
 	opencreport_part_object_handlers.offset = XtOffsetOf(php_opencreport_part_object, zo);
 	opencreport_part_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_part_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_part_ce = zend_register_internal_class(&ce);
 	opencreport_part_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5751,7 +5784,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_row_object_new;
 	opencreport_row_object_handlers.offset = XtOffsetOf(php_opencreport_row_object, zo);
 	opencreport_row_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_row_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_row_ce = zend_register_internal_class(&ce);
 	opencreport_row_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5766,7 +5801,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_col_object_new;
 	opencreport_col_object_handlers.offset = XtOffsetOf(php_opencreport_col_object, zo);
 	opencreport_col_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_col_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_col_ce = zend_register_internal_class(&ce);
 	opencreport_col_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5782,7 +5819,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	opencreport_report_object_handlers.offset = XtOffsetOf(php_opencreport_report_object, zo);
 	opencreport_report_object_handlers.clone_obj = NULL;
 	opencreport_report_object_handlers.free_obj = opencreport_report_object_free;
+#if PHP_VERSION_ID >= 80000
 	opencreport_report_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_report_ce = zend_register_internal_class(&ce);
 	opencreport_report_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5797,7 +5836,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_variable_object_new;
 	opencreport_variable_object_handlers.offset = XtOffsetOf(php_opencreport_variable_object, zo);
 	opencreport_variable_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_variable_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_variable_ce = zend_register_internal_class(&ce);
 	opencreport_variable_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5808,11 +5849,13 @@ static PHP_MINIT_FUNCTION(opencreport)
 #endif
 
 	memcpy(&opencreport_break_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
-	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Break", opencreport_break_class_methods);
+	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "ReportBreak", opencreport_break_class_methods);
 	ce.create_object = opencreport_break_object_new;
 	opencreport_break_object_handlers.offset = XtOffsetOf(php_opencreport_break_object, zo);
 	opencreport_break_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_break_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_break_ce = zend_register_internal_class(&ce);
 	opencreport_break_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5827,7 +5870,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_output_object_new;
 	opencreport_output_object_handlers.offset = XtOffsetOf(php_opencreport_output_object, zo);
 	opencreport_output_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_output_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_output_ce = zend_register_internal_class(&ce);
 	opencreport_output_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5842,7 +5887,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_line_object_new;
 	opencreport_line_object_handlers.offset = XtOffsetOf(php_opencreport_line_object, zo);
 	opencreport_line_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_line_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_line_ce = zend_register_internal_class(&ce);
 	opencreport_line_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5857,7 +5904,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_hline_object_new;
 	opencreport_hline_object_handlers.offset = XtOffsetOf(php_opencreport_hline_object, zo);
 	opencreport_hline_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_hline_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_hline_ce = zend_register_internal_class(&ce);
 	opencreport_hline_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5872,7 +5921,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_image_object_new;
 	opencreport_image_object_handlers.offset = XtOffsetOf(php_opencreport_image_object, zo);
 	opencreport_image_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_image_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_image_ce = zend_register_internal_class(&ce);
 	opencreport_image_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5887,7 +5938,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_text_object_new;
 	opencreport_text_object_handlers.offset = XtOffsetOf(php_opencreport_text_object, zo);
 	opencreport_text_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_text_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_text_ce = zend_register_internal_class(&ce);
 	opencreport_text_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
@@ -5902,7 +5955,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	ce.create_object = opencreport_barcode_object_new;
 	opencreport_barcode_object_handlers.offset = XtOffsetOf(php_opencreport_barcode_object, zo);
 	opencreport_barcode_object_handlers.clone_obj = NULL;
+#if PHP_VERSION_ID >= 80000
 	opencreport_barcode_object_handlers.compare = zend_objects_not_comparable;
+#endif
 	opencreport_barcode_ce = zend_register_internal_class(&ce);
 	opencreport_barcode_ce->ce_flags |= ZEND_ACC_FINAL;
 #if PHP_VERSION_ID >= 80100
