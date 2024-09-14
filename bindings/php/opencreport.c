@@ -23,18 +23,14 @@
 
 /* Introduced in PHP 7.4 */
 
-#ifndef ZEND_THIS
+#if PHP_VERSION_ID < 70400
 #define ZEND_THIS (&EX(This))
 #endif
 
 /* Introduced in PHP 8.0 */
-#ifndef zend_result
+#if PHP_VERSION_ID < 80100
 typedef int zend_result;
-#endif
-#ifndef RETURN_THROWS
 #define RETURN_THROWS() do { ZEND_ASSERT(EG(exception)); (void) return_value; return; } while (0)
-#endif
-#ifndef Z_PARAM_ARRAY_HT_OR_NULL
 #define Z_PARAM_ARRAY_HT_OR_NULL(dest) Z_PARAM_ARRAY_HT_EX(dest, 1, 0)
 #endif
 
