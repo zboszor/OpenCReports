@@ -32,6 +32,22 @@
  * PHP compatibility wrappers
  */
 
+/* Introduced in PHP 7.3 */
+
+#if PHP_VERSION_ID < 70300
+static zend_always_inline void *zend_object_alloc(size_t obj_size, zend_class_entry *ce) {
+	void *obj = emalloc(obj_size + zend_object_properties_size(ce));
+	/* Subtraction of sizeof(zval) is necessary, because zend_object_properties_size() may be
+	 * -sizeof(zval), if the object has no properties. */
+	memset(obj, 0, obj_size - sizeof(zval));
+	return obj;
+}
+
+#define ZEND_PARSE_PARAMETERS_NONE()  \
+	ZEND_PARSE_PARAMETERS_START(0, 0) \
+	ZEND_PARSE_PARAMETERS_END()
+#endif
+
 /* Introduced in PHP 7.4 */
 
 #if PHP_VERSION_ID < 70400
@@ -5360,7 +5376,7 @@ static char **php_opencreport_array_set_backing_array(HashTable *ahash, int32_t 
 			if (cell && Z_TYPE_P(cell) != IS_NULL) {
 				zval copy;
 
-				ZVAL_STR(&copy, zval_get_string_func(cell));
+				ZVAL_STR(&copy, _zval_get_string_func(cell));
 				str = Z_STRVAL(copy);
 				len = Z_STRLEN(copy);
 			}
@@ -5501,7 +5517,7 @@ static void php_opencreport_array_describe(ocrpt_query *query, ocrpt_query_resul
 			char *data_result;
 			zval copy;
 
-			ZVAL_STR(&copy, zval_get_string_func(cell));
+			ZVAL_STR(&copy, _zval_get_string_func(cell));
 			data_result = Z_STRVAL(copy);
 
 			for (int32_t j = 0; j < OCRPT_EXPR_RESULTS; j++) {
@@ -5661,7 +5677,7 @@ static bool php_opencreport_array_populate_result(ocrpt_query *query) {
 		if (cell && Z_TYPE_P(cell) != IS_NULL) {
 			zval copy;
 
-			ZVAL_STR(&copy, zval_get_string_func(cell));
+			ZVAL_STR(&copy, _zval_get_string_func(cell));
 			str = Z_STRVAL(copy);
 			len = Z_STRLEN(copy);
 		}
