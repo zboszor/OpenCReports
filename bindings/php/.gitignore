@@ -6,6 +6,7 @@ build/
 config.nice
 configure.ac
 configure.in
+include/
 mkinstalldirs
 modules/
 opencreport.dep

@@ -1,6 +1,15 @@
 PHP_ARG_ENABLE([opencreports],[whether to enable opencreport module],
 [  --enable-opencreports     Enable opencreports module],[shared],[yes])
 
+PHP_ARG_WITH([opencreports-static-array],[whether to use static arrays],
+[  --with-opencreports-static-array
+                             Use PHP arrays with statically discovered data],[no],[no])
+if test "$PHP_OPENCREPORTS_STATIC_ARRAY" != "no"; then
+	PHP_DEFINE(opencreports_use_static_array,[1])
+else
+	PHP_DEFINE(opencreports_use_static_array,[0])
+fi
+
 if test "$PHP_OPENCREPORTS" != "no"; then
 	AC_MSG_CHECKING(for pkg-config)
 	if test ! -f "$PKG_CONFIG"; then
