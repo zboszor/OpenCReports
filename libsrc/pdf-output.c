@@ -7,6 +7,7 @@
 #include <config.h>
 
 #include <ctype.h>
+#include <string.h>
 #include <cairo.h>
 #include <cairo-pdf.h>
 #include <cairo-svg.h>
