@@ -33,6 +33,12 @@
  * PHP compatibility wrappers
  */
 
+/* Introduced in PHP 7.1 */
+
+#if PHP_VERSION_ID < 70100
+#define IS_VOID 18
+#endif
+
 /* Introduced in PHP 7.2 */
 
 #if PHP_VERSION_ID < 70200
@@ -105,6 +111,13 @@ typedef int zend_result;
 # define MY_FINAL_CONST (0)
 #endif
 
+#if PHP_VERSION_ID < 70100
+
+#define REGISTER_OPENCREPORT_CLASS_CONST_LONG(const_name, value) \
+	zend_declare_class_constant_long(opencreport_ce, const_name, sizeof(const_name)-1, value);
+
+#else
+
 #define REGISTER_OPENCREPORT_CLASS_CONST_LONG(const_name, value) { \
 		zval constant; \
 		ZVAL_LONG(&constant, (zend_long)value); \
@@ -117,6 +130,8 @@ typedef int zend_result;
 		zend_declare_class_constant_ex(opencreport_ce, key, &constant, ZEND_ACC_PUBLIC | MY_FINAL_CONST, NULL); \
 		zend_string_release(key); \
 	}
+#endif
+
 /* }}} */
 
 /* Handlers */
