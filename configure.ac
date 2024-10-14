@@ -110,9 +110,11 @@ AC_MSG_RESULT([$_gnu_source_reallocarray])
 
 AS_IF(
 	[test x$_default_source_reallocarray = xyes],
-	[COMPILE_SYMBOL="$COMPILE_SYMBOL -D_DEFAULT_SOURCE"],
+	[COMPILE_SYMBOL="$COMPILE_SYMBOL -D_DEFAULT_SOURCE"
+	 AC_DEFINE(HAVE_REALLOCARRAY,[1],[Have reallocarray function])],
 	[test x$_gnu_source_reallocarray = xyes],
-	[COMPILE_SYMBOL="$COMPILE_SYMBOL -D_GNU_SOURCE"],
+	[COMPILE_SYMBOL="$COMPILE_SYMBOL -D_GNU_SOURCE"
+	 AC_DEFINE(HAVE_REALLOCARRAY,[1],[Have reallocarray function])],
 	[AC_MSG_WARN([Using reallocarray may fail to compile!])])
 
 AC_SUBST(COMPILE_SYMBOL)

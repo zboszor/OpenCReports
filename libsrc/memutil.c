@@ -8,6 +8,7 @@
 #include <config.h>
 
 #include <inttypes.h>
+#include <malloc.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +17,27 @@
 #include <yajl/yajl_common.h>
 
 #include "opencreport.h"
+
+#ifndef HAVE_REALLOCARRAY
+/* GNU specific naive reallocarray() implementation. */
+static void *reallocarray(void *ptr, size_t nmemb, size_t size) {
+	size_t oldsz = malloc_usable_size(ptr);
+	int padding = size % sizeof(void *);
+	size_t reqsz = nmemb * (size + padding);
+
+	if (oldsz >= reqsz)
+		return ptr;
+
+	void *newptr = malloc(reqsz);
+	if (!newptr)
+		return NULL;
+
+	memcpy(newptr, ptr, oldsz);
+	free(ptr);
+
+	return newptr;
+}
+#endif
 
 DLL_EXPORT_SYM ocrpt_mem_malloc_t ocrpt_mem_malloc0 = malloc;
 DLL_EXPORT_SYM ocrpt_mem_realloc_t ocrpt_mem_realloc0 = realloc;
