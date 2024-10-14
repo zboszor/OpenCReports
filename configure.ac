@@ -42,7 +42,7 @@ AX_PROG_FLEX
 AX_PROG_BISON
 LT_INIT([disable-static win32-dll])
 
-AC_CHECK_FUNCS([localtime_r strfmon])
+AC_CHECK_FUNCS([localtime_r strfmon getrandom])
 
 dnl Detect whether -D_BSD_SOURCE works
 AC_MSG_CHECKING([whether -D_BSD_SOURCE provides strcasecmp])

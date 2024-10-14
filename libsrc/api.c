@@ -19,7 +19,11 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#ifdef HAVE_GETRANDOM
 #include <sys/random.h>
+#else
+#define GRND_NONBLOCK 0x0001
+#endif
 #include <sys/stat.h>
 
 #include <cairo.h>
@@ -47,6 +51,13 @@
 #include "csv-output.h"
 #include "xml-output.h"
 #include "json-output.h"
+
+#ifndef HAVE_GETRANDOM
+static ssize_t getrandom(void *buf, size_t buflen, unsigned int flags) {
+	/* Dummy implementation */
+	return (ssize_t)-1;
+}
+#endif
 
 static int ocrpt_stderr_printf(const char *fmt, ...) {
 	va_list ap;
