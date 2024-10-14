@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include <opencreport.h>
+#include "fallthrough.h"
 #include "ocrpt-private.h"
 #include "exprutil.h"
 #include "layout.h"
@@ -88,7 +89,7 @@ static bool ocrpt_barcode_ean13_verify(ocrpt_string *barcode) {
 		if (barcode->str[12] != (ocrpt_barcode_ean_csum(barcode->str, 12, false) + '0'))
 			return false;
 		/* fall through */
-		__attribute__((fallthrough));
+		FALLTHROUGH;
 	case 12:
 		return true;
 	default:
@@ -112,7 +113,7 @@ static bool ocrpt_barcode_ean8_verify(ocrpt_string *barcode) {
 		if (barcode->str[7] != (ocrpt_barcode_ean_csum(barcode->str, 7, false) + '0'))
 			return false;
 		/* fall through */
-		__attribute__((fallthrough));
+		FALLTHROUGH;
 	case 7:
 		return true;
 	default:
@@ -190,7 +191,7 @@ static char *ocrpt_barcode_upc_e_to_a(const char *barcode, size_t len) {
 			ocrpt_mem_free(result);
 		}
 		/* fall through */
-		__attribute__((fallthrough));
+		FALLTHROUGH;
 	default:
 		/* Invalid representation for UPC-E. */
 		return NULL;
@@ -213,7 +214,7 @@ static bool ocrpt_barcode_upca_verify(ocrpt_string *barcode) {
 		if (barcode->str[11] != (ocrpt_barcode_ean_csum(barcode->str, 11, 0) + '0'))
 			return false;
 		/* fall through */
-		__attribute__((fallthrough));
+		FALLTHROUGH;
 	case 11:
 		return true;;
 	default:
