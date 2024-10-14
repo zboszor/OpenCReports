@@ -386,10 +386,18 @@ int main(void) {
 
 	cairo_surface_t *pdf = cairo_pdf_surface_create_for_stream(ocrpt_write_pdf, NULL, 595.276, 841.89);
 	cairo_pdf_surface_restrict_to_version(pdf, CAIRO_PDF_VERSION_1_5);
+#ifdef CAIRO_PDF_METADATA_TITLE
 	cairo_pdf_surface_set_metadata(pdf, CAIRO_PDF_METADATA_TITLE, "OpenCReports report");
+#endif
+#ifdef CAIRO_PDF_METADATA_AUTHOR
 	cairo_pdf_surface_set_metadata(pdf, CAIRO_PDF_METADATA_AUTHOR, "OpenCReports");
+#endif
+#ifdef CAIRO_PDF_METADATA_CREATOR
 	cairo_pdf_surface_set_metadata(pdf, CAIRO_PDF_METADATA_CREATOR, "OpenCReports");
+#endif
+#ifdef CAIRO_PDF_METADATA_CREATE_DATE
 	cairo_pdf_surface_set_metadata(pdf, CAIRO_PDF_METADATA_CREATE_DATE, "2020-01-01T00:00");
+#endif
 
 	for (int i = 0; i < 3; i++) {
 		cr = cairo_create(pdf);
