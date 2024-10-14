@@ -277,11 +277,13 @@ static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		if (EXPR_VALID_STRING(le->link))
 			link = EXPR_STRING_VAL(le->link);
 
+#ifdef CAIRO_TAG_LINK
 		if (link) {
 			ocrpt_string *uri = ocrpt_mem_string_new_printf("uri='%s'", link);
 			cairo_tag_begin(priv->cr, CAIRO_TAG_LINK, uri->str);
 			ocrpt_mem_string_free(uri, true);
 		}
+#endif
 
 		double x1;
 
@@ -301,8 +303,10 @@ static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		cairo_move_to(priv->cr, page_indent + x1, y + l->ascent);
 		pango_cairo_show_layout_line(priv->cr, le->pline);
 
+#ifdef CAIRO_TAG_LINK
 		if (link)
 			cairo_tag_end(priv->cr, CAIRO_TAG_LINK);
+#endif
 	}
 
 	if (last && le->start + le->width_computed < page_width) {
