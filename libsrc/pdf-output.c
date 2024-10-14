@@ -260,8 +260,6 @@ static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 	cairo_set_source_rgb(priv->cr, color.r, color.g, color.b);
 
 	if (le->pline) {
-		char *link = NULL;
-
 		if (le->use_bb) {
 			/*
 			 * Apply the bounding box over the text piece
@@ -274,10 +272,12 @@ static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 			cairo_clip(priv->cr);
 		}
 
+#ifdef CAIRO_TAG_LINK
+		char *link = NULL;
+
 		if (EXPR_VALID_STRING(le->link))
 			link = EXPR_STRING_VAL(le->link);
 
-#ifdef CAIRO_TAG_LINK
 		if (link) {
 			ocrpt_string *uri = ocrpt_mem_string_new_printf("uri='%s'", link);
 			cairo_tag_begin(priv->cr, CAIRO_TAG_LINK, uri->str);
