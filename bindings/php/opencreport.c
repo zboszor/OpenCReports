@@ -33,6 +33,16 @@
  * PHP compatibility wrappers
  */
 
+/* Introduced in PHP 5.5 */
+
+#if PHP_VERSION_ID < 50500
+#if ZEND_DEBUG
+#define ZEND_ASSERT(c) assert(c)
+#else
+#define ZEND_ASSERT(c)
+#endif
+#endif
+
 /* Introduced in PHP 7.0 */
 
 #if PHP_VERSION_ID < 70000
@@ -1127,17 +1137,29 @@ PHP_METHOD(opencreport, datasource_add) {
 			memset(conn_params, 0, (n_elements + 1) * sizeof(ocrpt_input_connect_parameter));
 
 			for (zend_hash_internal_pointer_reset_ex(source_params, &source_param_pos); pos < n_elements; pos++, zend_hash_move_forward_ex(source_params, &source_param_pos)) {
-				zval key, *value;
+#if PHP_VERSION_ID >= 70000
+				zval key;
 
 				zend_hash_get_current_key_zval_ex(source_params, &key, &source_param_pos);
 				if (Z_TYPE(key) != IS_STRING)
 					continue;
+#else
+				char *key;
+				uint key_len;
+				ulong num_index;
 
-				value = ocrpt_hash_get_current_data_ex(source_params, &source_param_pos);
+				zend_hash_get_current_key_ex(source_params, &key, &key_len, &num_index, 0, &source_param_pos);
+#endif
+
+				zval *value = ocrpt_hash_get_current_data_ex(source_params, &source_param_pos);
 				if (Z_TYPE_P(value) != IS_STRING)
 					continue;
 
+#if PHP_VERSION_ID >= 70000
 				conn_params[n_params].param_name = Z_STRVAL(key);
+#else
+				conn_params[n_params].param_name = key;
+#endif
 				conn_params[n_params].param_value = Z_STRVAL_P(value);
 				n_params++;
 			}
