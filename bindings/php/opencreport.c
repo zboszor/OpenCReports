@@ -10,13 +10,13 @@
 
 #include "php.h"
 #include "php_version.h"
+#if PHP_VERSION_ID < 70000
+#include "zend_exceptions.h"
+#endif
 #include "ext/standard/info.h"
 #include "zend_interfaces.h"
-#include "php_opencreport.h"
 #include <errno.h>
 #include <stdio.h>
-
-#include <opencreport.h>
 
 /*
  * With PHP 7.2 or older, static array backing is needed.
@@ -33,15 +33,69 @@
  * PHP compatibility wrappers
  */
 
+/* Introduced in PHP 7.0 */
+
+#if PHP_VERSION_ID < 70000
+#define zend_throw_error(unused, format, ...) zend_throw_exception_ex(zend_exception_get_default(TSRMLS_C), 0 TSRMLS_CC, format, ## __VA_ARGS__)
+
+#define ZSTR_VAL(s) (s)
+#define ZSTR_LEN(s) (s ## _len)
+
+#define OCRPT_ZVAL_STRINGL(zv, str, len) ZVAL_STRINGL(zv, str, len, 1)
+#define OCRPT_RETVAL_STRINGL(str, len) RETVAL_STRINGL(str, len, 1)
+#define OCRPT_RETVAL_STRING(str) RETVAL_STRING(str, 1)
+#define OCRPT_RETURN_STRINGL(str, len) RETURN_STRINGL(str, len, 1)
+#define OCRPT_RETURN_STRING(str) RETURN_STRING(str, 1)
+
+#else
+
+#define OCRPT_ZVAL_STRINGL(zv, str, len) ZVAL_STRINGL(zv, str, len)
+#define OCRPT_RETVAL_STRINGL(str, len) RETVAL_STRINGL(str, len)
+#define OCRPT_RETVAL_STRING(str) RETVAL_STRING(str)
+#define OCRPT_RETURN_STRINGL(str, len) RETURN_STRINGL(str, len)
+#define OCRPT_RETURN_STRING(str) RETURN_STRING(str)
+
+#endif
+
 /* Introduced in PHP 7.1 */
 
 #if PHP_VERSION_ID < 70100
-#define IS_VOID 18
+#define IS_VOID (0)
 #endif
 
-/* Introduced in PHP 7.2 */
+/* Add common wrappers to hide the differences between php5, and different incarnations of phpng. */
 
-#if PHP_VERSION_ID < 70200
+#if PHP_VERSION_ID >= 70000
+
+#define ocrpt_hash_get_current_data_ex(hash, hashposptr) zend_hash_get_current_data_ex(hash, hashposptr)
+#define ocrpt_hash_str_find(hash, key, len) zend_hash_str_find(hash, key, len)
+
+#else
+
+static inline zval *ocrpt_hash_get_current_data_ex(HashTable *hash, HashPosition *pos) {
+	void *data;
+
+	zend_hash_get_current_data_ex(hash, &data, pos);
+	return data ? *(zval **)data : NULL;
+}
+
+static inline zval *ocrpt_hash_str_find(const HashTable *hash, const char *key, size_t len) {
+	void *data;
+
+	if (zend_hash_find(hash, key, len + 1, (void**)&data) == SUCCESS)
+		return *(zval **)data;
+
+	return NULL;
+}
+
+#endif
+
+#if PHP_VERSION_ID < 70000
+
+/* For PHP 5.6 and older, arginfo is not needed. */
+
+#elif PHP_VERSION_ID < 70200
+
 #define OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(name, return_reference, required_num_args, type, allow_null) \
 		ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(name, return_reference, required_num_args, type, NULL, allow_null)
 
@@ -67,7 +121,15 @@ static zend_always_inline zend_string *zend_string_init_interned(const char *str
 
 /* Introduced in PHP 7.3 */
 
-#if PHP_VERSION_ID < 70300
+#if PHP_VERSION_ID < 70000
+static zend_always_inline void *zend_object_alloc(size_t obj_size, zend_class_entry *ce) {
+	void *obj = emalloc(obj_size);
+
+	memset(obj + sizeof(zend_object), 0, obj_size - sizeof(zend_object));
+
+	return obj;
+}
+#elif PHP_VERSION_ID < 70300
 static zend_always_inline void *zend_object_alloc(size_t obj_size, zend_class_entry *ce) {
 	void *obj = emalloc(obj_size + zend_object_properties_size(ce));
 	/* Subtraction of sizeof(zval) is necessary, because zend_object_properties_size() may be
@@ -75,16 +137,17 @@ static zend_always_inline void *zend_object_alloc(size_t obj_size, zend_class_en
 	memset(obj, 0, obj_size - sizeof(zval));
 	return obj;
 }
+#endif
+
+#if PHP_VERSION_ID < 70000
+
+#define ZEND_PARSE_PARAMETERS_NONE() { if (zend_parse_parameters_none() == FAILURE) return; }
+
+#elif PHP_VERSION_ID < 70300
 
 #define ZEND_PARSE_PARAMETERS_NONE()  \
 	ZEND_PARSE_PARAMETERS_START(0, 0) \
 	ZEND_PARSE_PARAMETERS_END()
-#endif
-
-/* Introduced in PHP 7.4 */
-
-#if PHP_VERSION_ID < 70400
-#define ZEND_THIS (&EX(This))
 #endif
 
 /* Introduced in PHP 8.0 */
@@ -94,9 +157,19 @@ typedef int zend_result;
 #define Z_PARAM_ARRAY_HT_OR_NULL(dest) Z_PARAM_ARRAY_HT_EX(dest, 1, 0)
 #endif
 
+/* Removed in PHP 8.0 */
+#if PHP_VERSION_ID >= 80000
+#define TSRMLS_DC
+#define TSRMLS_CC
+#define TSRMLS_FETCH()
+#endif
+
 /*
  * End of PHP compatibility wrappers
  */
+
+#include <opencreport.h>
+#include "php_opencreport.h"
 
 /* {{{ REGISTER_OPENCREPORT_CLASS_CONST_LONG */
 
@@ -174,20 +247,38 @@ zend_class_entry *opencreport_image_ce;
 zend_class_entry *opencreport_text_ce;
 zend_class_entry *opencreport_barcode_ce;
 
-static zend_object *opencreport_object_new(zend_class_entry *class_type) /* {{{ */
+static void opencreport_object_free(zend_object *object TSRMLS_DC);
+
+#if PHP_VERSION_ID >= 70000
+static zend_object *opencreport_object_new(zend_class_entry *class_type TSRMLS_DC) /* {{{ */
+#else
+static zend_object_value opencreport_object_new(zend_class_entry *class_type TSRMLS_DC) /* {{{ */
+#endif
 {
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
 	php_opencreport_object *intern = zend_object_alloc(sizeof(php_opencreport_object), class_type);
 
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, NULL, (zend_objects_free_object_storage_t) opencreport_object_free, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_object_handlers;
+#else
 	intern->zo.handlers = &opencreport_object_handlers;
+#endif
 
 	intern->o = NULL;
 	intern->expr_error = NULL;
 	intern->free_me = false;
 
+#if PHP_VERSION_ID < 70000
+	return retval;
+#else
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
@@ -199,7 +290,7 @@ static void opencreport_object_deinit(php_opencreport_object *oo) {
 	oo->o = NULL;
 }
 
-static void opencreport_object_free(zend_object *object) /* {{{ */
+static void opencreport_object_free(zend_object *object TSRMLS_DC) /* {{{ */
 {
 	php_opencreport_object *oo = php_opencreport_from_obj(object);
 
@@ -208,85 +299,144 @@ static void opencreport_object_free(zend_object *object) /* {{{ */
 
 	opencreport_object_deinit(oo);
 
-	zend_object_std_dtor(&oo->zo);
+	zend_object_std_dtor(&oo->zo TSRMLS_CC);
+#if PHP_VERSION_ID < 70000
+	efree(oo);
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_ds_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_ds_object_new(zend_class_entry *class_type TSRMLS_DC) /* {{{ */
+#endif
 {
-	php_opencreport_ds_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_ds_object *intern = zend_object_alloc(sizeof(php_opencreport_ds_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_ds_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_ds_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_ds_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_query_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_query_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_query_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_query_object *intern = zend_object_alloc(sizeof(php_opencreport_query_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_query_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_query_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_query_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_query_result_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_query_result_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_query_result_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_query_result_object *intern = zend_object_alloc(sizeof(php_opencreport_query_result_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_query_result_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_query_result_object_handlers;
+#else
 	intern->zo.handlers = &opencreport_query_result_object_handlers;
+#endif
 
 	intern->qr = NULL;
 	intern->cols = 0;
 
+#if PHP_VERSION_ID < 70000
+	return retval;
+#else
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_expr_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_expr_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_expr_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_expr_object *intern = zend_object_alloc(sizeof(php_opencreport_expr_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_expr_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_expr_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_expr_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+static void opencreport_result_object_free(zend_object *object);
+
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_result_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_result_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_result_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_result_object *intern = zend_object_alloc(sizeof(php_opencreport_result_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_result_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, NULL, (zend_objects_free_object_storage_t) opencreport_result_object_free, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_result_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_result_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
@@ -300,66 +450,111 @@ static void opencreport_result_object_free(zend_object *object) /* {{{ */
 	ro->r = NULL;
 
 	zend_object_std_dtor(object);
+#if PHP_VERSION_ID < 70000
+	efree(ro);
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_part_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_part_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_part_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_part_object *intern = zend_object_alloc(sizeof(php_opencreport_part_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_part_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_part_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_part_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_row_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_row_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_row_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_row_object *intern = zend_object_alloc(sizeof(php_opencreport_row_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_row_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_row_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_row_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_col_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_col_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_col_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_col_object *intern = zend_object_alloc(sizeof(php_opencreport_col_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_col_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_col_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_col_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+static void opencreport_report_object_free(zend_object *object);
+
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_report_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_report_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_report_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_report_object *intern = zend_object_alloc(sizeof(php_opencreport_report_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_report_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, NULL, (zend_objects_free_object_storage_t) opencreport_report_object_free, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_report_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_report_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
@@ -370,131 +565,214 @@ static void opencreport_report_object_free(zend_object *object) /* {{{ */
 	ocrpt_strfree(pro->expr_error);
 
 	zend_object_std_dtor(&pro->zo);
+#if PHP_VERSION_ID < 70000
+	efree(pro);
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_variable_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_variable_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_variable_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_variable_object *intern = zend_object_alloc(sizeof(php_opencreport_variable_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_variable_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_variable_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_variable_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_break_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_break_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_break_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_break_object *intern = zend_object_alloc(sizeof(php_opencreport_break_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_break_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_break_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_break_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_output_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_output_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_output_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_output_object *intern = zend_object_alloc(sizeof(php_opencreport_output_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_output_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_output_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_output_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_line_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_line_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_line_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_line_object *intern = zend_object_alloc(sizeof(php_opencreport_line_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_line_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_line_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_line_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_hline_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_hline_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_hline_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_hline_object *intern = zend_object_alloc(sizeof(php_opencreport_hline_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_hline_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_hline_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_hline_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_image_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_image_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_image_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_image_object *intern = zend_object_alloc(sizeof(php_opencreport_image_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_image_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_image_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_image_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_text_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_text_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_text_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_text_object *intern = zend_object_alloc(sizeof(php_opencreport_text_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_text_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_text_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_text_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
+#if PHP_VERSION_ID >= 70000
 static zend_object *opencreport_barcode_object_new(zend_class_entry *class_type) /* {{{ */
+#else
+static zend_object_value opencreport_barcode_object_new(zend_class_entry *class_type) /* {{{ */
+#endif
 {
-	php_opencreport_barcode_object *intern;
+#if PHP_VERSION_ID < 70000
+	zend_object_value retval;
+#endif
+	php_opencreport_barcode_object *intern = zend_object_alloc(sizeof(php_opencreport_barcode_object), class_type);
 
-	intern = zend_object_alloc(sizeof(php_opencreport_barcode_object), class_type);
-
-	zend_object_std_init(&intern->zo, class_type);
+	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
 	object_properties_init(&intern->zo, class_type);
 
+#if PHP_VERSION_ID < 70000
+	retval.handle = zend_objects_store_put(intern, (zend_objects_store_dtor_t) zend_objects_destroy_object, (zend_objects_free_object_storage_t) zend_objects_free_object_storage, NULL TSRMLS_CC);
+	retval.handlers = &opencreport_barcode_object_handlers;
+	return retval;
+#else
 	intern->zo.handlers = &opencreport_barcode_object_handlers;
-
 	return &intern->zo;
+#endif
 }
 /* }}} */
 
 PHP_METHOD(opencreport, __construct) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	oo->o = ocrpt_init();
@@ -502,77 +780,112 @@ PHP_METHOD(opencreport, __construct) {
 }
 
 PHP_METHOD(opencreport, parse_xml) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *filename;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_string *filename;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(filename);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *filename;
+	int filename_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &filename, &filename_len) == FAILURE)
+		return;
+#endif
 
 	RETURN_BOOL(ocrpt_parse_xml(oo->o, ZSTR_VAL(filename)));
 }
 
 PHP_METHOD(opencreport, parse_xml_from_buffer) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *buffer;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_string *buffer;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(buffer);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *buffer;
+	int buffer_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &buffer, &buffer_len) == FAILURE)
+		return;
+#endif
 
 	RETURN_BOOL(ocrpt_parse_xml_from_buffer(oo->o, ZSTR_VAL(buffer), ZSTR_LEN(buffer)));
 }
 
 PHP_METHOD(opencreport, set_output_format) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_long format;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_long format;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_LONG(format);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	long format;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &format) == FAILURE)
+		return;
+#endif
 
 	ocrpt_set_output_format(oo->o, format);
 }
 
 PHP_METHOD(opencreport, set_output_parameter) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *param;
-	zend_string *value;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_string *param;
+	zend_string *value;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_STR(param);
 		Z_PARAM_STR(value);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *param, *value;
+	int param_len, value_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &param, &param_len, &value, &value_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_set_output_parameter(oo->o, ZSTR_VAL(param), ZSTR_VAL(value));
 }
 
 PHP_METHOD(opencreport, execute) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
@@ -586,7 +899,7 @@ PHP_METHOD(opencreport, execute) {
 }
 
 PHP_METHOD(opencreport, spool) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
@@ -600,7 +913,7 @@ PHP_METHOD(opencreport, spool) {
 }
 
 PHP_METHOD(opencreport, get_output) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
@@ -616,11 +929,11 @@ PHP_METHOD(opencreport, get_output) {
 	if (!res)
 		RETURN_FALSE;
 
-	RETURN_STRINGL(res, sz);
+	OCRPT_RETURN_STRINGL(res, sz);
 }
 
 PHP_METHOD(opencreport, get_content_type) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
@@ -638,100 +951,143 @@ PHP_METHOD(opencreport, get_content_type) {
 	array_init(return_value);
 
 	for (int32_t i = 0; content_type[i]; i++) {
+#if PHP_VERSION_ID >= 70000
 		zval tmp;
 		ZVAL_STRINGL(&tmp, content_type[i]->str, content_type[i]->len);
 		zend_hash_next_index_insert_new(Z_ARRVAL_P(return_value), &tmp);
+#else
+		zval *tmp;
+		MAKE_STD_ZVAL(tmp);
+		ZVAL_STRINGL(tmp, content_type[i]->str, content_type[i]->len, 1);
+		zend_hash_next_index_insert(Z_ARRVAL_P(return_value), tmp, sizeof(zval *), NULL);
+#endif
 	}
 }
 
 PHP_METHOD(opencreport, version) {
 	ZEND_PARSE_PARAMETERS_NONE();
 
-	RETURN_STRING(ocrpt_version());
+	OCRPT_RETURN_STRING(ocrpt_version());
 }
 
 PHP_METHOD(opencreport, set_numeric_precision_bits) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *expr_string = NULL;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_string *expr_string = NULL;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_set_numeric_precision_bits(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport, get_numeric_precision_bits) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
 
 	RETURN_LONG(ocrpt_get_numeric_precision_bits(oo->o));
 }
 
 PHP_METHOD(opencreport, set_rounding_mode) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *expr_string = NULL;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_string *expr_string = NULL;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_set_rounding_mode(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport, bindtextdomain) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *domainname;
-	zend_string *dirname;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
 		RETURN_THROWS();
 	}
+
+#if PHP_VERSION_ID >= 70000
+	zend_string *domainname;
+	zend_string *dirname;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_STR(domainname);
 		Z_PARAM_STR(dirname);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *domainname, *dirname;
+	int domainname_len, dirname_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &domainname, &domainname_len, &dirname, &dirname_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_bindtextdomain(oo->o, ZSTR_VAL(domainname), ZSTR_VAL(dirname));
 }
 
 PHP_METHOD(opencreport, set_locale) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *locale;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_string *locale;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(locale);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *locale;
+	int locale_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &locale, &locale_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_set_locale(oo->o, ZSTR_VAL(locale));
 }
 
 PHP_METHOD(opencreport, datasource_add) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *source_name;
-	zend_string *source_type;
 	HashTable *source_params = NULL;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
@@ -742,12 +1098,23 @@ PHP_METHOD(opencreport, datasource_add) {
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_string *source_name;
+	zend_string *source_type;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 3)
 		Z_PARAM_STR(source_name);
 		Z_PARAM_STR(source_type);
 		Z_PARAM_OPTIONAL;
 		Z_PARAM_ARRAY_HT_OR_NULL(source_params);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *source_name, *source_type;
+	int source_name_len, source_type_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss|h!", &source_name, &source_name_len, &source_type, &source_type_len, &source_params) == FAILURE)
+		return;
+#endif
 
 	if (source_params) {
 		uint32_t n_elements = zend_hash_num_elements(source_params);
@@ -766,7 +1133,7 @@ PHP_METHOD(opencreport, datasource_add) {
 				if (Z_TYPE(key) != IS_STRING)
 					continue;
 
-				value = zend_hash_get_current_data_ex(source_params, &source_param_pos);
+				value = ocrpt_hash_get_current_data_ex(source_params, &source_param_pos);
 				if (Z_TYPE_P(value) != IS_STRING)
 					continue;
 
@@ -790,9 +1157,8 @@ PHP_METHOD(opencreport, datasource_add) {
 }
 
 PHP_METHOD(opencreport, datasource_get) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *source_name;
 	ocrpt_datasource *ds;
 	php_opencreport_ds_object *dso;
 
@@ -801,9 +1167,19 @@ PHP_METHOD(opencreport, datasource_get) {
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_string *source_name;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(source_name);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *source_name;
+	int source_name_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &source_name, &source_name_len) == FAILURE)
+		return;
+#endif
 
 	ds = ocrpt_datasource_get(oo->o, ZSTR_VAL(source_name));
 	if (!ds)
@@ -815,9 +1191,8 @@ PHP_METHOD(opencreport, datasource_get) {
 }
 
 PHP_METHOD(opencreport, query_get) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *query_name;
 	ocrpt_query *q;
 	php_opencreport_query_object *qo;
 
@@ -826,9 +1201,19 @@ PHP_METHOD(opencreport, query_get) {
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_string *query_name;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(query_name);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *query_name;
+	int query_name_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &query_name, &query_name_len) == FAILURE)
+		return;
+#endif
 
 	q = ocrpt_query_get(oo->o, ZSTR_VAL(query_name));
 	if (!q)
@@ -840,32 +1225,43 @@ PHP_METHOD(opencreport, query_get) {
 }
 
 PHP_METHOD(opencreport, query_refresh) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
 		RETURN_THROWS();
 	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
 
 	ocrpt_query_refresh(oo->o);
 }
 
 PHP_METHOD(opencreport, expr_parse) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *expr_string;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
 		RETURN_THROWS();
 	}
 
+	char *err = NULL;
+#if PHP_VERSION_ID >= 70000
+	zend_string *expr_string;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(expr_string);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string;
+	int expr_string_len;
 
-	char *err = NULL;
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
+
 	ocrpt_expr *e = ocrpt_expr_parse(oo->o, ZSTR_VAL(expr_string), &err);
 
 	ocrpt_strfree(oo->expr_error);
@@ -881,7 +1277,7 @@ PHP_METHOD(opencreport, expr_parse) {
 }
 
 PHP_METHOD(opencreport, expr_error) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
@@ -892,43 +1288,72 @@ PHP_METHOD(opencreport, expr_error) {
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	if (oo->expr_error) {
-		RETURN_STRING(oo->expr_error);
+		OCRPT_RETURN_STRING(oo->expr_error);
 	} else
 		RETURN_NULL();
 }
 
 OCRPT_STATIC_FUNCTION(opencreport_default_function) {
-	zend_string *fname = user_data;
-	zval zfname;
+	ocrpt_string *fname = user_data;
 
 	ocrpt_expr_make_error_result(e, "not implemented");
 
-	ZVAL_STRINGL(&zfname, ZSTR_VAL(fname), ZSTR_LEN(fname));
-
+#if PHP_VERSION_ID >= 70000
+	zval zfname;
 	zval retval;
 	zval params[1];
 
+	ZVAL_STRINGL(&zfname, fname->str, fname->len);
+
 	object_init_ex(&params[0], opencreport_expr_ce);
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(&params[0]);
+#else
+	zval *zfname;
+	zval *retval;
+	zval *params0[1];
+	zval ***params = emalloc(sizeof(zval **));
+
+	MAKE_STD_ZVAL(zfname);
+	ZVAL_STRINGL(zfname, fname->str, fname->len, 1);
+
+	ALLOC_INIT_ZVAL(params0[0]);
+	object_init_ex(params0[0], opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(params0[0]);
+
+	params[0] = &params0[0];
+#endif
+
 	eo->e = e;
 
-#if PHP_MAJOR_VERSION >= 8
-	if (call_user_function(CG(function_table), NULL, &zfname, &retval, 1, params) == FAILURE)
+#if PHP_VERSION_ID >= 80000
+	bool failed = (call_user_function(CG(function_table), NULL, &zfname, &retval, 1, params) == FAILURE);
+#elif PHP_VERSION_ID >= 70000
+	bool failed = (call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 1, params, 0, NULL TSRMLS_CC) == FAILURE);
 #else
-	if (call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 1, params, 0, NULL TSRMLS_CC) == FAILURE)
+	bool failed = (call_user_function_ex(CG(function_table), NULL, zfname, &retval, 1, params, 0, NULL TSRMLS_CC) == FAILURE);
 #endif
-		return;
 
+#if PHP_VERSION_ID >= 70000
 	zend_object_std_dtor(&eo->zo);
 	OBJ_RELEASE(&eo->zo);
 
 	zend_string_release(Z_STR(zfname));
+#else
+	zval_dtor(zfname);
+	efree(zfname);
+	efree(params);
+	zval_dtor(params0[0]);
+	efree(params0[0]);
+#endif
 
 	/*
 	 * The function must be a real OpenCReports user function
 	 * and called $e->set_{long|double|string}_value(...)
 	 */
-	if (Z_TYPE(retval) == IS_UNDEF || Z_TYPE(retval) == IS_NULL)
+#if PHP_VERSION_ID >= 70000
+	if (failed)
+		ocrpt_expr_make_error_result(e, "invalid function call");
+	else if (Z_TYPE(retval) == IS_UNDEF || Z_TYPE(retval) == IS_NULL)
 		return;
 	else if (Z_TYPE(retval) == IS_FALSE)
 		ocrpt_expr_set_long(e, 0);
@@ -942,10 +1367,31 @@ OCRPT_STATIC_FUNCTION(opencreport_default_function) {
 		ocrpt_expr_set_string(e, Z_STRVAL(retval));
 	else
 		ocrpt_expr_make_error_result(e, "invalid return value");
+#else
+	if (failed)
+		ocrpt_expr_make_error_result(e, "invalid function call");
+	else if (Z_TYPE_P(retval) == IS_NULL)
+		/* Do nothing */;
+	else if (Z_TYPE_P(retval) == IS_BOOL)
+		ocrpt_expr_set_long(e, Z_BVAL_P(retval));
+	else if (Z_TYPE_P(retval) == IS_LONG)
+		ocrpt_expr_set_long(e, Z_LVAL_P(retval));
+	else if (Z_TYPE_P(retval) == IS_DOUBLE)
+		ocrpt_expr_set_double(e, Z_DVAL_P(retval));
+	else if (Z_TYPE_P(retval) == IS_STRING)
+		ocrpt_expr_set_string(e, Z_STRVAL_P(retval));
+	else
+		ocrpt_expr_make_error_result(e, "invalid return value");
+
+	if (retval) {
+		zval_dtor(retval);
+		efree(retval);
+	}
+#endif
 }
 
 PHP_METHOD(opencreport, part_new) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
@@ -968,7 +1414,7 @@ PHP_METHOD(opencreport, part_new) {
 }
 
 PHP_METHOD(opencreport, part_get_first) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	if (!oo->o) {
@@ -993,17 +1439,19 @@ PHP_METHOD(opencreport, part_get_first) {
 }
 
 PHP_METHOD(opencreport, function_add) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *expr_func_name;
-	zend_string *zend_func_name;
-	zend_long n_ops;
 	zend_bool commutative, associative, left_associative, dont_optimize;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
 		RETURN_THROWS();
 	}
+
+#if PHP_VERSION_ID >= 70000
+	zend_string *expr_func_name;
+	zend_string *zend_func_name;
+	zend_long n_ops;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 7, 7)
 		Z_PARAM_STR(expr_func_name);
@@ -1014,12 +1462,26 @@ PHP_METHOD(opencreport, function_add) {
 		Z_PARAM_BOOL(left_associative);
 		Z_PARAM_BOOL(dont_optimize);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_func_name, *zend_func_name;
+	int expr_func_name_len, zend_func_name_len;
+	long n_ops;
 
-	zend_string *zfunc = zend_string_init(ZSTR_VAL(zend_func_name), ZSTR_LEN(zend_func_name), false);
-	bool ret = ocrpt_function_add(oo->o, ZSTR_VAL(expr_func_name), opencreport_default_function, zfunc, n_ops, commutative, associative, left_associative, dont_optimize);
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sslbbbb", &expr_func_name, &expr_func_name_len, &zend_func_name, &zend_func_name_len, &n_ops, &commutative, &associative, &left_associative, &dont_optimize) == FAILURE)
+		return;
+#endif
+
+	ocrpt_string *ofunc = ocrpt_mem_string_new_with_len(ZSTR_VAL(zend_func_name), ZSTR_LEN(zend_func_name));
+	bool ret = ocrpt_function_add(oo->o, ZSTR_VAL(expr_func_name), opencreport_default_function, ofunc, n_ops, commutative, associative, left_associative, dont_optimize);
 
 	RETURN_BOOL(ret);
 }
+
+#if PHP_VERSION_ID >= 70000
+static zval *php_opencreport_get_zval_direct(zval *zv);
+#else
+#define php_opencreport_get_zval_direct(zv) (zv)
+#endif
 
 static ocrpt_result *php_opencreport_env_query(opencreport *o, const char *env) {
 	if (!env)
@@ -1030,15 +1492,8 @@ static ocrpt_result *php_opencreport_env_query(opencreport *o, const char *env) 
 		return NULL;
 
 	bool found = false;
-	zval *var = zend_hash_str_find(&EG(symbol_table), env, strlen(env));
+	zval *var = php_opencreport_get_zval_direct(ocrpt_hash_str_find(&EG(symbol_table), env, strlen(env)));
 	if (var) {
-		for (int unref_count = 0; unref_count < 3 && (Z_TYPE_P(var) == IS_INDIRECT || Z_TYPE_P(var) == IS_REFERENCE); unref_count++) {
-			if (EXPECTED(Z_TYPE_P(var) == IS_INDIRECT))
-				var = Z_INDIRECT_P(var);
-			if (EXPECTED(Z_TYPE_P(var) == IS_REFERENCE))
-				var = Z_REFVAL_P(var);
-		}
-
 		found = true;
 		if (Z_TYPE_P(var) == IS_STRING)
 			ocrpt_result_set_string(result, Z_STRVAL_P(var));
@@ -1061,10 +1516,11 @@ static ocrpt_result *php_opencreport_env_query(opencreport *o, const char *env) 
 }
 
 static void opencreport_cb(opencreport *o, void *data) {
-	zend_string *callback = data;
-	zval zfname;
+	char *callback = data;
 
-	ZVAL_STRINGL(&zfname, ZSTR_VAL(callback), ZSTR_LEN(callback));
+#if PHP_VERSION_ID >= 70000
+	zval zfname;
+	ZVAL_STRING(&zfname, callback);
 
 	zval retval;
 	zval params[1];
@@ -1072,25 +1528,58 @@ static void opencreport_cb(opencreport *o, void *data) {
 	object_init_ex(&params[0], opencreport_ce);
 	php_opencreport_object *oo = Z_OPENCREPORT_P(&params[0]);
 	oo->o = o;
-
-#if PHP_MAJOR_VERSION >= 8
-	if (call_user_function(CG(function_table), NULL, &zfname, &retval, 1, params) == FAILURE)
 #else
-	if (call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 1, params, 0, NULL TSRMLS_CC) == FAILURE)
-#endif
-		return;
+	zval *zfname;
+	MAKE_STD_ZVAL(zfname);
+	ZVAL_STRING(zfname, callback, 1);
 
+	zval *retval = NULL;
+	zval *params0[1];
+	zval ***params = emalloc(sizeof(zval **));
+
+	ALLOC_INIT_ZVAL(params0[0]);
+	object_init_ex(params0[0], opencreport_ce);
+	php_opencreport_object *oo = Z_OPENCREPORT_P(params0[0]);
+	oo->o = o;
+
+	params[0] = &params0[0];
+#endif
+
+#if PHP_VERSION_ID >= 80000
+	call_user_function(CG(function_table), NULL, &zfname, &retval, 1, params);
+#elif PHP_VERSION_ID >= 70000
+	call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 1, params, 0, NULL TSRMLS_CC);
+#else
+	call_user_function_ex(CG(function_table), NULL, zfname, &retval, 1, params, 0, NULL TSRMLS_CC);
+#endif
+
+#if PHP_VERSION_ID >= 70000
 	zend_object_std_dtor(&oo->zo);
 	OBJ_RELEASE(&oo->zo);
 
 	zend_string_release(Z_STR(zfname));
+#else
+	zval_dtor(zfname);
+	efree(zfname);
+	efree(params);
+	zend_object_std_dtor(&oo->zo);
+	if (Z_REFCOUNT_P(params0[0]) == 1) {
+		zval_dtor(params0[0]);
+		efree(params0[0]);
+	}
+	if (retval) {
+		zval_dtor(retval);
+		efree(retval);
+	}
+#endif
 }
 
 static void opencreport_part_cb(opencreport *o, ocrpt_part *p, void *data) {
-	zend_string *callback = data;
-	zval zfname;
+	char *callback = data;
 
-	ZVAL_STRINGL(&zfname, ZSTR_VAL(callback), ZSTR_LEN(callback));
+#if PHP_VERSION_ID >= 70000
+	zval zfname;
+	ZVAL_STRING(&zfname, callback);
 
 	zval retval;
 	zval params[2];
@@ -1102,55 +1591,113 @@ static void opencreport_part_cb(opencreport *o, ocrpt_part *p, void *data) {
 	object_init_ex(&params[1], opencreport_part_ce);
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(&params[1]);
 	po->p = p;
-
-#if PHP_MAJOR_VERSION >= 8
-	if (call_user_function(CG(function_table), NULL, &zfname, &retval, 2, params) == FAILURE)
 #else
-	if (call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 2, params, 0, NULL TSRMLS_CC) == FAILURE)
-#endif
-		return;
+	zval *zfname;
+	MAKE_STD_ZVAL(zfname);
+	ZVAL_STRING(zfname, callback, 1);
 
+	zval *retval = NULL;
+	zval *params0[2];
+	zval ***params = emalloc(sizeof(zval **) * 2);
+
+	ALLOC_INIT_ZVAL(params0[0]);
+	object_init_ex(params0[0], opencreport_ce);
+	php_opencreport_object *oo = Z_OPENCREPORT_P(params0[0]);
+	oo->o = o;
+
+	ALLOC_INIT_ZVAL(params0[1]);
+	object_init_ex(params0[1], opencreport_part_ce);
+	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(params0[1]);
+	po->p = p;
+
+	for (int32_t i = 0; i < 2; i++)
+		params[i] = &params0[i];
+#endif
+
+#if PHP_VERSION_ID >= 80000
+	call_user_function(CG(function_table), NULL, &zfname, &retval, 2, params);
+#elif PHP_VERSION_ID >= 70000
+	call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 2, params, 0, NULL TSRMLS_CC);
+#else
+	call_user_function_ex(CG(function_table), NULL, zfname, &retval, 2, params, 0, NULL TSRMLS_CC);
+#endif
+
+#if PHP_VERSION_ID >= 70000
 	zend_object_std_dtor(&oo->zo);
 	OBJ_RELEASE(&oo->zo);
 	zend_object_std_dtor(&po->zo);
 	OBJ_RELEASE(&po->zo);
 
 	zend_string_release(Z_STR(zfname));
+#else
+	zval_dtor(zfname);
+	efree(zfname);
+	efree(params);
+	zend_object_std_dtor(&oo->zo);
+	zend_object_std_dtor(&po->zo);
+	for (int32_t i = 0; i < 2; i++) {
+		if (Z_REFCOUNT_P(params0[i]) == 1) {
+			zval_dtor(params0[i]);
+			efree(params0[i]);
+		}
+	}
+	if (retval) {
+		zval_dtor(retval);
+		efree(retval);
+	}
+#endif
 }
 
 PHP_METHOD(opencreport, add_precalculation_done_cb) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *callback;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *callback;
+	int callback_len;
 
-	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &callback, &callback_len) == FAILURE)
+		return;
+#endif
+
+	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
 
 	ocrpt_add_precalculation_done_cb(oo->o, opencreport_cb, cb_name);
 }
 
 PHP_METHOD(opencreport, add_part_added_cb) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *callback;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *callback;
+	int callback_len;
 
-	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &callback, &callback_len) == FAILURE)
+		return;
+#endif
+
+	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
 
 	ocrpt_add_part_added_cb(oo->o, opencreport_part_cb, cb_name);
 }
 
 static void opencreport_report_cb(opencreport *o, ocrpt_report *r, void *data) {
-	zend_string *callback = data;
-	zval zfname;
+	char *callback = data;
 
-	ZVAL_STRINGL(&zfname, ZSTR_VAL(callback), ZSTR_LEN(callback));
+#if PHP_VERSION_ID >= 70000
+	zval zfname;
+	ZVAL_STRING(&zfname, callback);
 
 	zval retval;
 	zval params[2];
@@ -1162,44 +1709,101 @@ static void opencreport_report_cb(opencreport *o, ocrpt_report *r, void *data) {
 	object_init_ex(&params[1], opencreport_report_ce);
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(&params[1]);
 	pro->r = r;
-
-#if PHP_MAJOR_VERSION >= 8
-	if (call_user_function(CG(function_table), NULL, &zfname, &retval, 2, params) == FAILURE)
 #else
-	if (call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 2, params, 0, NULL TSRMLS_CC) == FAILURE)
-#endif
-		return;
+	zval *zfname;
+	MAKE_STD_ZVAL(zfname);
+	ZVAL_STRING(zfname, callback, 1);
 
+	zval *retval = NULL;
+	zval *params0[2];
+	zval ***params = emalloc(sizeof(zval **) * 2);
+
+	ALLOC_INIT_ZVAL(params0[0]);
+	object_init_ex(params0[0], opencreport_ce);
+	php_opencreport_object *oo = Z_OPENCREPORT_P(params0[0]);
+	oo->o = o;
+
+	ALLOC_INIT_ZVAL(params0[1]);
+	object_init_ex(params0[1], opencreport_report_ce);
+	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(params0[1]);
+	pro->r = r;
+
+	for (int32_t i = 0; i < 2; i++)
+		params[i] = &params0[i];
+#endif
+
+#if PHP_VERSION_ID >= 80000
+	call_user_function(CG(function_table), NULL, &zfname, &retval, 2, params);
+#elif PHP_VERSION_ID >= 70000
+	call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 2, params, 0, NULL TSRMLS_CC);
+#else
+	call_user_function_ex(CG(function_table), NULL, zfname, &retval, 2, params, 0, NULL TSRMLS_CC);
+#endif
+
+#if PHP_VERSION_ID >= 70000
 	zend_object_std_dtor(&oo->zo);
 	OBJ_RELEASE(&oo->zo);
 	zend_object_std_dtor(&pro->zo);
 	OBJ_RELEASE(&pro->zo);
 
 	zend_string_release(Z_STR(zfname));
+#else
+	zval_dtor(zfname);
+	efree(zfname);
+	efree(params);
+	zend_object_std_dtor(&oo->zo);
+	zend_object_std_dtor(&pro->zo);
+	for (int32_t i = 0; i < 2; i++) {
+		if (Z_REFCOUNT_P(params0[i]) == 1) {
+			zval_dtor(params0[i]);
+			efree(params0[i]);
+		}
+	}
+	if (retval) {
+		zval_dtor(retval);
+		efree(retval);
+	}
+#endif
 }
 
 PHP_METHOD(opencreport, add_report_added_cb) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *callback;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *callback;
+	int callback_len;
 
-	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &callback, &callback_len) == FAILURE)
+		return;
+#endif
+
+	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
 
 	ocrpt_add_report_added_cb(oo->o, opencreport_report_cb, cb_name);
 }
 
 PHP_METHOD(opencreport, env_get) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *var_name;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(var_name);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *var_name;
+	int var_name_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &var_name, &var_name_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_result *r = ocrpt_env_get(oo->o, ZSTR_VAL(var_name));
 	if (!r)
@@ -1213,7 +1817,7 @@ PHP_METHOD(opencreport, env_get) {
 }
 
 PHP_METHOD(opencreport, result_new) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -1230,8 +1834,15 @@ PHP_METHOD(opencreport, result_new) {
 }
 
 PHP_METHOD(opencreport, set_mvariable) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+#if PHP_VERSION_ID >= 70000
 	zend_string *name;
 	zend_string *value = NULL;
 
@@ -1240,70 +1851,114 @@ PHP_METHOD(opencreport, set_mvariable) {
 		Z_PARAM_OPTIONAL;
 		Z_PARAM_STR_EX(value, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *name, *value = NULL;
+	int name_len, value_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s!", &name, &name_len, &value, &value_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_set_mvariable(oo->o, ZSTR_VAL(name), value ? ZSTR_VAL(value) : NULL);
 }
 
 PHP_METHOD(opencreport, add_search_path) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
-	zend_string *path;
 
 	if (!oo->o) {
 		zend_throw_error(NULL, "OpenCReport object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_string *path;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(path);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *path;
+	int path_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &path, &path_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_add_search_path(oo->o, ZSTR_VAL(path));
 }
 
 PHP_METHOD(opencreport, canonicalize_path) {
+#if PHP_VERSION_ID >= 70000
 	zend_string *path;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(path);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *path;
+	int path_len;
 
-	RETURN_STRING(ocrpt_canonicalize_path(ZSTR_VAL(path)));
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &path, &path_len) == FAILURE)
+		return;
+#endif
+
+	char *cpath = ocrpt_canonicalize_path(ZSTR_VAL(path));
+	OCRPT_RETVAL_STRING(cpath);
+	ocrpt_mem_free(cpath);
 }
 
 PHP_METHOD(opencreport, find_file) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+#if PHP_VERSION_ID >= 70000
 	zend_string *path;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(path);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *path;
+	int path_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &path, &path_len) == FAILURE)
+		return;
+#endif
 
 	char *file = ocrpt_find_file(oo->o, ZSTR_VAL(path));
 
 	if (!file)
 		RETURN_NULL();
 
-	RETVAL_STRING(file);
+	OCRPT_RETVAL_STRING(file);
 	ocrpt_mem_free(file);
 }
 
 PHP_METHOD(opencreport, get_color) {
-	zend_string *color_name = NULL;
 	zend_bool bgcolor = false;
 	ocrpt_color c;
+#if PHP_VERSION_ID >= 70000
+	zend_string *color_name = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 2)
 		Z_PARAM_STR_EX(color_name, 1, 0);
 		Z_PARAM_OPTIONAL;
 		Z_PARAM_BOOL(bgcolor);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *color_name = NULL;
+	int color_name_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!|b", &color_name, &color_name_len, &bgcolor) == FAILURE)
+		return;
+#endif
 
 	ocrpt_get_color(color_name ? ZSTR_VAL(color_name) : NULL, &c, bgcolor);
 
 	array_init(return_value);
 
+#if PHP_VERSION_ID >= 70000
 	zval tmp;
 
 	ZVAL_DOUBLE(&tmp, c.r);
@@ -1314,79 +1969,141 @@ PHP_METHOD(opencreport, get_color) {
 
 	ZVAL_DOUBLE(&tmp, c.b);
 	zend_hash_str_add_new(Z_ARRVAL_P(return_value), "b", 1, &tmp);
+#else
+	zval *tmp;
+
+	ALLOC_INIT_ZVAL(tmp);
+	ZVAL_DOUBLE(tmp, c.r);
+	zend_hash_add(Z_ARRVAL_P(return_value), "r", sizeof("r"), &tmp, sizeof(zval*), NULL);
+
+	ALLOC_INIT_ZVAL(tmp);
+	ZVAL_DOUBLE(tmp, c.g);
+	zend_hash_add(Z_ARRVAL_P(return_value), "g", sizeof("g"), &tmp, sizeof(zval*), NULL);
+
+	ALLOC_INIT_ZVAL(tmp);
+	ZVAL_DOUBLE(tmp, c.b);
+	zend_hash_add(Z_ARRVAL_P(return_value), "b", sizeof("b"), &tmp, sizeof(zval*), NULL);
+#endif
 }
 
 PHP_METHOD(opencreport, set_paper) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *paper;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(paper);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *paper;
+	int paper_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &paper, &paper_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_set_paper_by_name(oo->o, ZSTR_VAL(paper));
 }
 
 PHP_METHOD(opencreport, set_size_unit) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_set_size_unit(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport, set_noquery_show_nodata) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_set_noquery_show_nodata(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport, set_report_height_after_last) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_set_report_height_after_last(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport, set_follower_match_single) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_set_follower_match_single(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport, set_follower_match_single_direct) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 	zend_bool value = false;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_BOOL(value);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "b", &value) == FAILURE)
+		return;
+#endif
 
 	ocrpt_set_follower_match_single_direct(oo->o, value);
 }
+
+#if PHP_VERSION_ID >= 70000
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_opencreport___construct, 0, 0, 0)
 ZEND_END_ARG_INFO()
@@ -1541,6 +2258,49 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_follower_match_
 ZEND_ARG_TYPE_INFO(0, value, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport___construct NULL
+#define arginfo_opencreport_parse_xml NULL
+#define arginfo_opencreport_parse_xml_from_buffer NULL
+#define arginfo_opencreport_set_output_format NULL
+#define arginfo_opencreport_set_output_parameter NULL
+#define arginfo_opencreport_execute NULL
+#define arginfo_opencreport_spool NULL
+#define arginfo_opencreport_get_output NULL
+#define arginfo_opencreport_get_content_type NULL
+#define arginfo_opencreport_version NULL
+#define arginfo_opencreport_set_numeric_precision_bits NULL
+#define arginfo_opencreport_get_numeric_precision_bits NULL
+#define arginfo_opencreport_set_rounding_mode NULL
+#define arginfo_opencreport_bindtextdomain NULL
+#define arginfo_opencreport_set_locale NULL
+#define arginfo_opencreport_datasource_add NULL
+#define arginfo_opencreport_datasource_get NULL
+#define arginfo_opencreport_query_get NULL
+#define arginfo_array_query_refresh NULL
+#define arginfo_opencreport_expr_parse NULL
+#define arginfo_opencreport_expr_error NULL
+#define arginfo_opencreport_part_new NULL
+#define arginfo_opencreport_part_get_first NULL
+#define arginfo_opencreport_function_add NULL
+#define arginfo_opencreport_add_any_cb NULL
+#define arginfo_opencreport_env_get NULL
+#define arginfo_opencreport_result_new NULL
+#define arginfo_opencreport_set_mvariable NULL
+#define arginfo_opencreport_add_search_path NULL
+#define arginfo_opencreport_canonicalize_path NULL
+#define arginfo_opencreport_find_file NULL
+#define arginfo_opencreport_get_color NULL
+#define arginfo_opencreport_set_paper NULL
+#define arginfo_opencreport_set_size_unit NULL
+#define arginfo_opencreport_set_noquery_show_nodata NULL
+#define arginfo_opencreport_set_report_height_after_last NULL
+#define arginfo_opencreport_set_follower_match_single NULL
+#define arginfo_opencreport_set_follower_match_single_direct NULL
+
+#endif
+
 static const zend_function_entry opencreport_class_methods[] = {
 	/*
 	 * High level API
@@ -1605,7 +2365,7 @@ static const zend_function_entry opencreport_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_ds, free) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -1615,11 +2375,13 @@ PHP_METHOD(opencreport_ds, free) {
 }
 
 PHP_METHOD(opencreport_ds, query_add) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(object);
-	zend_string *name, *array_or_file_or_sql, *coltypes = NULL;
 	ocrpt_query *q;
 	php_opencreport_query_object *qo;
+
+#if PHP_VERSION_ID >= 70000
+	zend_string *name, *array_or_file_or_sql, *coltypes = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 3)
 		Z_PARAM_STR(name);
@@ -1627,6 +2389,13 @@ PHP_METHOD(opencreport_ds, query_add) {
 		Z_PARAM_OPTIONAL;
 		Z_PARAM_STR_EX(coltypes, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *name, *array_or_file_or_sql, *coltypes = NULL;
+	int name_len, array_or_file_or_sql_len, coltypes_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss|s!", &name, &name_len, &array_or_file_or_sql, &array_or_file_or_sql_len, &coltypes, &coltypes_len) == FAILURE)
+		return;
+#endif
 
 	if (ocrpt_datasource_is_sql(dso->ds)) {
 		q = ocrpt_query_add_sql(dso->ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
@@ -1656,16 +2425,26 @@ PHP_METHOD(opencreport_ds, query_add) {
 }
 
 PHP_METHOD(opencreport_ds, set_encoding) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *encoding;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(encoding);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *encoding;
+	int encoding_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &encoding, &encoding_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_datasource_set_encoding(dso->ds, ZSTR_VAL(encoding));
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_ds_free, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
@@ -1680,6 +2459,14 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_ds_set_encoding, 0,
 ZEND_ARG_TYPE_INFO(0, encoding, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_ds_free NULL
+#define arginfo_opencreport_ds_query_add NULL
+#define arginfo_opencreport_ds_set_encoding NULL
+
+#endif
+
 static const zend_function_entry opencreport_ds_class_methods[] = {
 	PHP_ME(opencreport_ds, free, arginfo_opencreport_ds_free, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_ds, query_add, arginfo_opencreport_ds_query_add, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -1688,7 +2475,7 @@ static const zend_function_entry opencreport_ds_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_query, get_result) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -1706,7 +2493,7 @@ PHP_METHOD(opencreport_query, get_result) {
 }
 
 PHP_METHOD(opencreport_query, navigate_start) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -1715,7 +2502,7 @@ PHP_METHOD(opencreport_query, navigate_start) {
 }
 
 PHP_METHOD(opencreport_query, navigate_next) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -1724,7 +2511,7 @@ PHP_METHOD(opencreport_query, navigate_next) {
 }
 
 PHP_METHOD(opencreport_query, navigate_use_prev_row) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -1733,7 +2520,7 @@ PHP_METHOD(opencreport_query, navigate_use_prev_row) {
 }
 
 PHP_METHOD(opencreport_query, navigate_use_next_row) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -1742,13 +2529,18 @@ PHP_METHOD(opencreport_query, navigate_use_next_row) {
 }
 
 PHP_METHOD(opencreport_query, add_follower) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(object);
 	zval *fobj;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_OBJECT_OF_CLASS(fobj, opencreport_query_ce);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &fobj, opencreport_query_ce) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_query_object *fo = Z_OPENCREPORT_QUERY_P(fobj);
 
@@ -1756,15 +2548,20 @@ PHP_METHOD(opencreport_query, add_follower) {
 }
 
 PHP_METHOD(opencreport_query, add_follower_n_to_1) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(object);
 	zval *fobj;
 	zval *mobj;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_OBJECT_OF_CLASS(fobj, opencreport_query_ce);
 		Z_PARAM_OBJECT_OF_CLASS(mobj, opencreport_expr_ce);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "OO", &fobj, opencreport_query_ce, &mobj, opencreport_expr_ce) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_query_object *fo = Z_OPENCREPORT_QUERY_P(fobj);
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(mobj);
@@ -1778,7 +2575,7 @@ PHP_METHOD(opencreport_query, add_follower_n_to_1) {
 }
 
 PHP_METHOD(opencreport_query, free) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(object);
 
 	if (!qo->q) {
@@ -1791,6 +2588,8 @@ PHP_METHOD(opencreport_query, free) {
 	ocrpt_query_free(qo->q);
 	qo->q = NULL;
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_query_get_result, 0, 0, OpenCReport\\QueryResult, 1)
 ZEND_END_ARG_INFO()
@@ -1819,6 +2618,19 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_free, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_query_get_result NULL
+#define arginfo_opencreport_query_navigate_start NULL
+#define arginfo_opencreport_query_navigate_next NULL
+#define arginfo_opencreport_query_navigate_use_prev_row NULL
+#define arginfo_opencreport_query_navigate_use_next_row NULL
+#define arginfo_opencreport_query_add_follower NULL
+#define arginfo_opencreport_query_add_follower_n_to_1 NULL
+#define arginfo_opencreport_query_free NULL
+
+#endif
+
 static const zend_function_entry opencreport_query_class_methods[] = {
 	PHP_ME(opencreport_query, get_result, arginfo_opencreport_query_get_result, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_query, navigate_start, arginfo_opencreport_query_navigate_start, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -1832,7 +2644,7 @@ static const zend_function_entry opencreport_query_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_query_result, columns) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_query_result_object *qr = Z_OPENCREPORT_QUERY_RESULT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -1841,28 +2653,42 @@ PHP_METHOD(opencreport_query_result, columns) {
 }
 
 PHP_METHOD(opencreport_query_result, column_name) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_query_result_object *qr = Z_OPENCREPORT_QUERY_RESULT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_long index;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_LONG(index);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	long index;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &index) == FAILURE)
+		return;
+#endif
 
 	if (index < 0 || index >= qr->cols)
 		RETURN_NULL();
 
-	RETURN_STRING(ocrpt_query_result_column_name(qr->qr, index));
+	OCRPT_RETURN_STRING(ocrpt_query_result_column_name(qr->qr, index));
 }
 
 PHP_METHOD(opencreport_query_result, column_result) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_query_result_object *qr = Z_OPENCREPORT_QUERY_RESULT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_long index;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_LONG(index);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	long index;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &index) == FAILURE)
+		return;
+#endif
 
 	if (index < 0 || index >= qr->cols)
 		RETURN_NULL();
@@ -1878,6 +2704,8 @@ PHP_METHOD(opencreport_query_result, column_result) {
 	ro->freed_by_lib = true;
 }
 
+#if PHP_VERSION_ID >= 70000
+
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_query_result_columns, 0, 0, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
@@ -1889,6 +2717,14 @@ OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_query_result_column_
 ZEND_ARG_TYPE_INFO(0, index, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_query_result_columns NULL
+#define arginfo_opencreport_query_result_column_name NULL
+#define arginfo_opencreport_query_result_column_result NULL
+
+#endif
+
 static const zend_function_entry opencreport_query_result_class_methods[] = {
 	PHP_ME(opencreport_query_result, columns, arginfo_opencreport_query_result_columns, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_query_result, column_name, arginfo_opencreport_query_result_column_name, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -1897,7 +2733,7 @@ static const zend_function_entry opencreport_query_result_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_expr, free) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -1907,7 +2743,7 @@ PHP_METHOD(opencreport_expr, free) {
 }
 
 PHP_METHOD(opencreport_expr, print) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
 	if (!eo->e) {
@@ -1921,7 +2757,7 @@ PHP_METHOD(opencreport_expr, print) {
 }
 
 PHP_METHOD(opencreport_expr, nodes) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
 	if (!eo->e) {
@@ -1935,7 +2771,7 @@ PHP_METHOD(opencreport_expr, nodes) {
 }
 
 PHP_METHOD(opencreport_expr, optimize) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
 	if (!eo->e) {
@@ -1949,7 +2785,7 @@ PHP_METHOD(opencreport_expr, optimize) {
 }
 
 PHP_METHOD(opencreport_expr, resolve) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
 	if (!eo->e) {
@@ -1963,7 +2799,7 @@ PHP_METHOD(opencreport_expr, resolve) {
 }
 
 PHP_METHOD(opencreport_expr, eval) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	php_opencreport_result_object *ro;
 
@@ -1985,7 +2821,7 @@ PHP_METHOD(opencreport_expr, eval) {
 }
 
 PHP_METHOD(opencreport_expr, get_result) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
 	if (!eo->e) {
@@ -2007,41 +2843,58 @@ PHP_METHOD(opencreport_expr, get_result) {
 }
 
 PHP_METHOD(opencreport_expr, set_string) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
-	zend_string *value;
 
 	if (!eo->e) {
 		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_string *value;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(value);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *value;
+	int value_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &value, &value_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_expr_set_string(eo->e, ZSTR_VAL(value));
 }
 
 PHP_METHOD(opencreport_expr, set_long) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
-	zend_long value;
 
 	if (!eo->e) {
 		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_long value;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_LONG(value);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	long value;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &value) == FAILURE)
+		return;
+#endif
 
 	ocrpt_expr_set_long(eo->e, value);
 }
 
 PHP_METHOD(opencreport_expr, set_double) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	double value;
 
@@ -2050,32 +2903,46 @@ PHP_METHOD(opencreport_expr, set_double) {
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_DOUBLE(value);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "d", &value) == FAILURE)
+		return;
+#endif
 
 	ocrpt_expr_set_double(eo->e, value);
 }
 
 PHP_METHOD(opencreport_expr, set_number) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
-	zend_string *value;
 
 	if (!eo->e) {
 		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_string *value;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(value);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *value;
+	int value_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &value, &value_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_expr_set_number_from_string(eo->e, ZSTR_VAL(value));
 }
 
 PHP_METHOD(opencreport_expr, get_num_operands) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
 	if (!eo->e) {
@@ -2089,18 +2956,26 @@ PHP_METHOD(opencreport_expr, get_num_operands) {
 }
 
 PHP_METHOD(opencreport_expr, operand_get_result) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
-	zend_long opidx;
 
 	if (!eo->e) {
 		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_long opidx;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_LONG(opidx);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	long opidx;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &opidx) == FAILURE)
+		return;
+#endif
 
 	ocrpt_result *r = ocrpt_expr_operand_get_result(eo->e, opidx);
 	if (!r)
@@ -2113,7 +2988,7 @@ PHP_METHOD(opencreport_expr, operand_get_result) {
 }
 
 PHP_METHOD(opencreport_expr, cmp_results) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
 	if (!eo->e) {
@@ -2127,24 +3002,32 @@ PHP_METHOD(opencreport_expr, cmp_results) {
 }
 
 PHP_METHOD(opencreport_expr, init_results) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
-	zend_long result_type;
 
 	if (!eo->e) {
 		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_long result_type;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_LONG(result_type);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	long result_type;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &result_type) == FAILURE)
+		return;
+#endif
 
 	ocrpt_expr_init_results(eo->e, result_type);
 }
 
 PHP_METHOD(opencreport_expr, get_string) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
 	if (!eo->e) {
@@ -2159,11 +3042,11 @@ PHP_METHOD(opencreport_expr, get_string) {
 	if (!s)
 		RETURN_NULL();
 
-	RETURN_STRINGL(s->str, s->len);
+	OCRPT_RETURN_STRINGL(s->str, s->len);
 }
 
 PHP_METHOD(opencreport_expr, get_long) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
 	if (!eo->e) {
@@ -2177,7 +3060,7 @@ PHP_METHOD(opencreport_expr, get_long) {
 }
 
 PHP_METHOD(opencreport_expr, get_double) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 
 	if (!eo->e) {
@@ -2191,19 +3074,28 @@ PHP_METHOD(opencreport_expr, get_double) {
 }
 
 PHP_METHOD(opencreport_expr, get_number) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
-	zend_string *format = NULL;
 
 	if (!eo->e) {
 		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
+	zend_string *format = NULL;
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
 		Z_PARAM_OPTIONAL;
 		Z_PARAM_STR(format);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *format = NULL;
+	int format_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|s", &format, &format_len) == FAILURE)
+		return;
+#endif
 
 	char *fmt = format ? ZSTR_VAL(format) : "%RF";
 	mpfr_ptr number = ocrpt_expr_get_number(eo->e);
@@ -2214,68 +3106,95 @@ PHP_METHOD(opencreport_expr, get_number) {
 	char *retval = emalloc(len + 1);
 	mpfr_snprintf(retval, len + 1, fmt, number);
 
-	RETURN_STRINGL(retval, len);
+	OCRPT_RETURN_STRINGL(retval, len);
 }
 
 PHP_METHOD(opencreport_expr, set_nth_result_string) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
-	zend_long which;
-	zend_string *value;
 
 	if (!eo->e) {
 		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
 		RETURN_THROWS();
 	}
+
+#if PHP_VERSION_ID >= 70000
+	zend_long which;
+	zend_string *value;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_LONG(which);
 		Z_PARAM_STR(value);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	long which;
+	char *value;
+	int value_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ls", &which, &value, &value_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_expr_set_nth_result_string(eo->e, which, ZSTR_VAL(value));
 }
 
 PHP_METHOD(opencreport_expr, set_nth_result_long) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
-	zend_long which;
-	zend_long value;
 
 	if (!eo->e) {
 		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
 		RETURN_THROWS();
 	}
+
+#if PHP_VERSION_ID >= 70000
+	zend_long which;
+	zend_long value;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_LONG(which);
 		Z_PARAM_LONG(value);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	long which;
+	long value;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ll", &which, &value) == FAILURE)
+		return;
+#endif
 
 	ocrpt_expr_set_nth_result_long(eo->e, which, value);
 }
 
 PHP_METHOD(opencreport_expr, set_nth_result_double) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
-	zend_long which;
-	double value;
 
 	if (!eo->e) {
 		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
 		RETURN_THROWS();
 	}
+
+	double value;
+#if PHP_VERSION_ID >= 70000
+	zend_long which;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_LONG(which);
 		Z_PARAM_DOUBLE(value);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	long which;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ld", &which, &value) == FAILURE)
+		return;
+#endif
 
 	ocrpt_expr_set_nth_result_double(eo->e, which, value);
 }
 
 PHP_METHOD(opencreport_expr, set_iterative_start_value) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	zend_bool value;
 
@@ -2284,15 +3203,20 @@ PHP_METHOD(opencreport_expr, set_iterative_start_value) {
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_BOOL(value);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "b", &value) == FAILURE)
+		return;
+#endif
 
 	ocrpt_expr_set_iterative_start_value(eo->e, value);
 }
 
 PHP_METHOD(opencreport_expr, set_delayed) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
 	zend_bool value;
 
@@ -2301,12 +3225,19 @@ PHP_METHOD(opencreport_expr, set_delayed) {
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_BOOL(value);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "b", &value) == FAILURE)
+		return;
+#endif
 
 	ocrpt_expr_set_delayed(eo->e, value);
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_free, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
@@ -2395,6 +3326,35 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_set_delayed, 0
 ZEND_ARG_TYPE_INFO(0, value, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_expr_free NULL
+#define arginfo_opencreport_expr_print NULL
+#define arginfo_opencreport_expr_nodes NULL
+#define arginfo_opencreport_expr_optimize NULL
+#define arginfo_opencreport_expr_resolve NULL
+#define arginfo_opencreport_expr_eval NULL
+#define arginfo_opencreport_expr_get_result NULL
+#define arginfo_opencreport_expr_set_string NULL
+#define arginfo_opencreport_expr_set_long NULL
+#define arginfo_opencreport_expr_set_double NULL
+#define arginfo_opencreport_expr_set_number NULL
+#define arginfo_opencreport_expr_get_num_operands NULL
+#define arginfo_opencreport_expr_operand_get_result NULL
+#define arginfo_opencreport_expr_cmp_results NULL
+#define arginfo_opencreport_expr_init_results NULL
+#define arginfo_opencreport_expr_get_string NULL
+#define arginfo_opencreport_expr_get_long NULL
+#define arginfo_opencreport_expr_get_double NULL
+#define arginfo_opencreport_expr_get_number NULL
+#define arginfo_opencreport_expr_set_nth_result_string NULL
+#define arginfo_opencreport_expr_set_nth_result_long NULL
+#define arginfo_opencreport_expr_set_nth_result_double NULL
+#define arginfo_opencreport_expr_set_iterative_start_value NULL
+#define arginfo_opencreport_expr_set_delayed NULL
+
+#endif
+
 static const zend_function_entry opencreport_expr_class_methods[] = {
 	PHP_ME(opencreport_expr, free, arginfo_opencreport_expr_free, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, print, arginfo_opencreport_expr_print, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -2424,7 +3384,7 @@ static const zend_function_entry opencreport_expr_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_result, free) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -2436,7 +3396,7 @@ PHP_METHOD(opencreport_result, free) {
 }
 
 PHP_METHOD(opencreport_result, copy) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(object);
 	zval *src_result;
 
@@ -2445,9 +3405,14 @@ PHP_METHOD(opencreport_result, copy) {
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_OBJECT_OF_CLASS(src_result, opencreport_result_ce);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &src_result, opencreport_result_ce) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_result_object *src_ro = Z_OPENCREPORT_RESULT_P(src_result);
 	if (!src_ro->r) {
@@ -2459,7 +3424,7 @@ PHP_METHOD(opencreport_result, copy) {
 }
 
 PHP_METHOD(opencreport_result, print) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -2468,7 +3433,7 @@ PHP_METHOD(opencreport_result, print) {
 }
 
 PHP_METHOD(opencreport_result, get_type) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -2477,7 +3442,7 @@ PHP_METHOD(opencreport_result, get_type) {
 }
 
 PHP_METHOD(opencreport_result, is_null) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -2486,7 +3451,7 @@ PHP_METHOD(opencreport_result, is_null) {
 }
 
 PHP_METHOD(opencreport_result, is_string) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -2495,7 +3460,7 @@ PHP_METHOD(opencreport_result, is_string) {
 }
 
 PHP_METHOD(opencreport_result, is_number) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -2504,7 +3469,7 @@ PHP_METHOD(opencreport_result, is_number) {
 }
 
 PHP_METHOD(opencreport_result, get_string) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -2513,18 +3478,26 @@ PHP_METHOD(opencreport_result, get_string) {
 	if (!s)
 		RETURN_NULL();
 
-	RETURN_STRINGL(s->str, s->len);
+	OCRPT_RETURN_STRINGL(s->str, s->len);
 }
 
 PHP_METHOD(opencreport_result, get_number) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *format = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
 		Z_PARAM_OPTIONAL;
 		Z_PARAM_STR_EX(format, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *format = NULL;
+	int format_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|s!", &format, &format_len) == FAILURE)
+		return;
+#endif
 
 	char *fmt = format ? ZSTR_VAL(format) : "%RF";
 	mpfr_ptr number = ocrpt_result_get_number(ro->r);
@@ -2535,8 +3508,10 @@ PHP_METHOD(opencreport_result, get_number) {
 	char *retval = emalloc(len + 1);
 	mpfr_snprintf(retval, len + 1, fmt, number);
 
-	RETURN_STRINGL(retval, len);
+	OCRPT_RETURN_STRINGL(retval, len);
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_result_free, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
@@ -2567,6 +3542,20 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_result_get_number, 
 ZEND_ARG_VARIADIC_TYPE_INFO(0, format, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_result_free NULL
+#define arginfo_opencreport_result_copy NULL
+#define arginfo_opencreport_result_print NULL
+#define arginfo_opencreport_result_get_type NULL
+#define arginfo_opencreport_result_is_null NULL
+#define arginfo_opencreport_result_is_string NULL
+#define arginfo_opencreport_result_is_number NULL
+#define arginfo_opencreport_result_get_string NULL
+#define arginfo_opencreport_result_get_number NULL
+
+#endif
+
 static const zend_function_entry opencreport_result_class_methods[] = {
 	PHP_ME(opencreport_result, free, arginfo_opencreport_result_free, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_result, copy, arginfo_opencreport_result_copy, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -2581,7 +3570,7 @@ static const zend_function_entry opencreport_result_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_part, get_next) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
 
 	if (!po->is_iterator) {
@@ -2607,7 +3596,7 @@ PHP_METHOD(opencreport_part, get_next) {
 }
 
 PHP_METHOD(opencreport_part, row_new) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -2618,7 +3607,7 @@ PHP_METHOD(opencreport_part, row_new) {
 }
 
 PHP_METHOD(opencreport_part, row_get_first) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -2639,27 +3628,40 @@ PHP_METHOD(opencreport_part, row_get_first) {
 }
 
 PHP_METHOD(opencreport_part, add_iteration_cb) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *callback;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *callback;
+	int callback_len;
 
-	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &callback, &callback_len) == FAILURE)
+		return;
+#endif
+
+	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
 
 	ocrpt_part_add_iteration_cb(po->p, opencreport_part_cb, cb_name);
 }
 
 PHP_METHOD(opencreport_part, equals) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
 	zval *part;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_OBJECT_OF_CLASS(part, opencreport_part_ce);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &part, opencreport_part_ce) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_part_object *po1 = Z_OPENCREPORT_PART_P(part);
 
@@ -2667,139 +3669,227 @@ PHP_METHOD(opencreport_part, equals) {
 }
 
 PHP_METHOD(opencreport_part, set_iterations) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_set_iterations(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part, set_font_name) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_set_font_name(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part, set_font_size) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_set_font_size(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part, set_paper) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_set_paper_by_name(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part, set_orientation) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_set_orientation(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part, set_top_margin) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_set_top_margin(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part, set_bottom_margin) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_set_bottom_margin(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part, set_left_margin) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_set_left_margin(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part, set_right_margin) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_set_right_margin(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part, set_suppress) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_set_suppress(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part, set_suppress_pageheader_firstpage) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_set_suppress_pageheader_firstpage(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part, page_header) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -2811,19 +3901,24 @@ PHP_METHOD(opencreport_part, page_header) {
 }
 
 PHP_METHOD(opencreport_part, page_header_set_report) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
 	zval *report = NULL;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_OBJECT_OF_CLASS_EX(report, opencreport_report_ce, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O!", &report, opencreport_report_ce) == FAILURE)
+		return;
+#endif
 
 	ocrpt_layout_part_page_header_set_report(po->p, report ? Z_OPENCREPORT_REPORT_P(report)->r : NULL);
 }
 
 PHP_METHOD(opencreport_part, page_footer) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -2835,16 +3930,23 @@ PHP_METHOD(opencreport_part, page_footer) {
 }
 
 PHP_METHOD(opencreport_part, page_footer_set_report) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_part_object *po = Z_OPENCREPORT_PART_P(object);
 	zval *report = NULL;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_OBJECT_OF_CLASS_EX(report, opencreport_report_ce, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O!", &report, opencreport_report_ce) == FAILURE)
+		return;
+#endif
 
 	ocrpt_layout_part_page_footer_set_report(po->p, report ? Z_OPENCREPORT_REPORT_P(report)->r : NULL);
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_get_next, 0, 0, OpenCReport\\Part, 1)
 ZEND_END_ARG_INFO()
@@ -2917,6 +4019,30 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_page_footer_se
 ZEND_ARG_OBJ_INFO(0, report, OpenCReport\\Report, 0)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_part_get_next NULL
+#define arginfo_opencreport_part_row_new NULL
+#define arginfo_opencreport_part_row_get_first NULL
+#define arginfo_opencreport_part_equals NULL
+#define arginfo_opencreport_part_set_iterations NULL
+#define arginfo_opencreport_part_set_font_name NULL
+#define arginfo_opencreport_part_set_font_size NULL
+#define arginfo_opencreport_part_set_paper NULL
+#define arginfo_opencreport_part_set_orientation NULL
+#define arginfo_opencreport_part_set_top_margin NULL
+#define arginfo_opencreport_part_set_bottom_margin NULL
+#define arginfo_opencreport_part_set_left_margin NULL
+#define arginfo_opencreport_part_set_right_margin NULL
+#define arginfo_opencreport_part_set_suppress NULL
+#define arginfo_opencreport_part_set_suppress_pageheader_firstpage NULL
+#define arginfo_opencreport_part_page_header NULL
+#define arginfo_opencreport_part_page_header_set_report NULL
+#define arginfo_opencreport_part_page_footer NULL
+#define arginfo_opencreport_part_page_footer_set_report NULL
+
+#endif
+
 static const zend_function_entry opencreport_part_class_methods[] = {
 	PHP_ME(opencreport_part, get_next, arginfo_opencreport_part_get_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_part, row_new, arginfo_opencreport_part_row_new, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -2942,7 +4068,7 @@ static const zend_function_entry opencreport_part_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_row, get_next) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_row_object *pro = Z_OPENCREPORT_ROW_P(object);
 
 	if (!pro->is_iterator) {
@@ -2968,7 +4094,7 @@ PHP_METHOD(opencreport_row, get_next) {
 }
 
 PHP_METHOD(opencreport_row, column_new) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_row_object *pro = Z_OPENCREPORT_ROW_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -2982,7 +4108,7 @@ PHP_METHOD(opencreport_row, column_new) {
 }
 
 PHP_METHOD(opencreport_row, column_get_first) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_row_object *pro = Z_OPENCREPORT_ROW_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3002,40 +4128,66 @@ PHP_METHOD(opencreport_row, column_get_first) {
 }
 
 PHP_METHOD(opencreport_row, set_suppress) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_row_object *pro = Z_OPENCREPORT_ROW_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_row_set_suppress(pro->pr, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_row, set_newpage) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_row_object *pro = Z_OPENCREPORT_ROW_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_row_set_newpage(pro->pr, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_row, set_layout) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_row_object *pro = Z_OPENCREPORT_ROW_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_row_set_layout(pro->pr, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_row_get_next, 0, 0, OpenCReport\\Row, 1)
 ZEND_END_ARG_INFO()
@@ -3058,6 +4210,17 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_row_set_layout, 0, 
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_row_get_next NULL
+#define arginfo_opencreport_row_column_new NULL
+#define arginfo_opencreport_row_column_get_first NULL
+#define arginfo_opencreport_row_set_suppress NULL
+#define arginfo_opencreport_row_set_newpage NULL
+#define arginfo_opencreport_row_set_layout NULL
+
+#endif
+
 static const zend_function_entry opencreport_row_class_methods[] = {
 	PHP_ME(opencreport_row, get_next, arginfo_opencreport_row_get_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_row, column_new, arginfo_opencreport_row_column_new, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -3069,7 +4232,7 @@ static const zend_function_entry opencreport_row_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_part_col, get_next) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_col_object *pco = Z_OPENCREPORT_COL_P(object);
 
 	if (!pco->is_iterator) {
@@ -3095,7 +4258,7 @@ PHP_METHOD(opencreport_part_col, get_next) {
 }
 
 PHP_METHOD(opencreport_part_col, report_new) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_col_object *pco = Z_OPENCREPORT_COL_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3114,7 +4277,7 @@ PHP_METHOD(opencreport_part_col, report_new) {
 }
 
 PHP_METHOD(opencreport_part_col, report_get_first) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_col_object *pco = Z_OPENCREPORT_COL_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3135,88 +4298,146 @@ PHP_METHOD(opencreport_part_col, report_get_first) {
 }
 
 PHP_METHOD(opencreport_part_col, set_suppress) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_col_object *pco = Z_OPENCREPORT_COL_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_column_set_suppress(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part_col, set_width) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_col_object *pco = Z_OPENCREPORT_COL_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_column_set_width(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part_col, set_height) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_col_object *pco = Z_OPENCREPORT_COL_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_column_set_height(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part_col, set_border_width) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_col_object *pco = Z_OPENCREPORT_COL_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_column_set_border_width(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part_col, set_border_color) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_col_object *pco = Z_OPENCREPORT_COL_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_column_set_border_color(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part_col, set_detail_columns) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_col_object *pco = Z_OPENCREPORT_COL_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_column_set_detail_columns(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_part_col, set_column_padding) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_col_object *pco = Z_OPENCREPORT_COL_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_part_column_set_column_padding(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_col_get_next, 0, 0, OpenCReport\\Column, 1)
 ZEND_END_ARG_INFO()
@@ -3255,6 +4476,21 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_col_set_column
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_part_col_get_next NULL
+#define arginfo_opencreport_part_col_report_new NULL
+#define arginfo_opencreport_part_col_report_get_first NULL
+#define arginfo_opencreport_part_col_set_suppress NULL
+#define arginfo_opencreport_part_col_set_width NULL
+#define arginfo_opencreport_part_col_set_height NULL
+#define arginfo_opencreport_part_col_set_border_width NULL
+#define arginfo_opencreport_part_col_set_border_color NULL
+#define arginfo_opencreport_part_col_set_detail_columns NULL
+#define arginfo_opencreport_part_col_set_column_padding NULL
+
+#endif
+
 static const zend_function_entry opencreport_part_col_class_methods[] = {
 	PHP_ME(opencreport_part_col, get_next, arginfo_opencreport_part_col_get_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_part_col, report_new, arginfo_opencreport_part_col_report_new, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -3270,7 +4506,7 @@ static const zend_function_entry opencreport_part_col_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_report, get_next) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
 
 	if (!pro->is_iterator) {
@@ -3296,8 +4532,9 @@ PHP_METHOD(opencreport_report, get_next) {
 }
 
 PHP_METHOD(opencreport_report, variable_new) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_long variable_type;
 	zend_string *name;
 	zend_string *expr;
@@ -3310,9 +4547,18 @@ PHP_METHOD(opencreport_report, variable_new) {
 		Z_PARAM_OPTIONAL;
 		Z_PARAM_STR_EX(reset_on_break_name, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	long variable_type;
+	char *name;
+	char *expr;
+	char *reset_on_break_name = NULL;
+	int name_len, expr_len, reset_on_break_name_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lss|s!", &variable_type, &name, &name_len, &expr, &expr_len, &reset_on_break_name, &reset_on_break_name_len)== FAILURE)
+		return;
+#endif
 
 	ocrpt_var *v = ocrpt_variable_new(pro->r, variable_type, ZSTR_VAL(name), ZSTR_VAL(expr), reset_on_break_name ? ZSTR_VAL(reset_on_break_name) : NULL);
-
 	if (!v)
 		RETURN_NULL();
 
@@ -3322,8 +4568,9 @@ PHP_METHOD(opencreport_report, variable_new) {
 }
 
 PHP_METHOD(opencreport_report, variable_new_full) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_long result_type;
 	zend_string *name;
 	zend_string *baseexpr = NULL;
@@ -3342,6 +4589,20 @@ PHP_METHOD(opencreport_report, variable_new_full) {
 		Z_PARAM_STR_EX(resultexpr, 1, 0);
 		Z_PARAM_STR_EX(reset_on_break_name, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	long result_type;
+	char *name;
+	char *baseexpr = NULL;
+	char *intermedexpr = NULL;
+	char *intermed2expr = NULL;
+	char *resultexpr = NULL;
+	char *reset_on_break_name = NULL;
+	int name_len, baseexpr_len, intermedexpr_len, intermed2expr_len;
+	int resultexpr_len, reset_on_break_name_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ls|s!s!s!s!s!", &result_type, &name, &name_len, &baseexpr, &baseexpr_len, &intermedexpr, &intermedexpr_len, &intermed2expr, &intermed2expr_len, &resultexpr, &resultexpr_len, &reset_on_break_name, &reset_on_break_name_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_var *v = ocrpt_variable_new_full(pro->r, result_type, ZSTR_VAL(name),
 												baseexpr ? ZSTR_VAL(baseexpr) : NULL,
@@ -3359,13 +4620,21 @@ PHP_METHOD(opencreport_report, variable_new_full) {
 }
 
 PHP_METHOD(opencreport_report, expr_parse) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(expr_string);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	char *err = NULL;
 	ocrpt_expr *e = ocrpt_report_expr_parse(pro->r, ZSTR_VAL(expr_string), &err);
@@ -3383,19 +4652,19 @@ PHP_METHOD(opencreport_report, expr_parse) {
 }
 
 PHP_METHOD(opencreport_report, expr_error) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	if (pro->expr_error) {
-		RETURN_STRING(pro->expr_error);
+		OCRPT_RETURN_STRING(pro->expr_error);
 	} else
 		RETURN_NULL();
 }
 
 PHP_METHOD(opencreport_report, resolve_variables) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3404,7 +4673,7 @@ PHP_METHOD(opencreport_report, resolve_variables) {
 }
 
 PHP_METHOD(opencreport_report, evaluate_variables) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3413,13 +4682,21 @@ PHP_METHOD(opencreport_report, evaluate_variables) {
 }
 
 PHP_METHOD(opencreport_report, break_new) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *name;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(name);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *name;
+	int name_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_break *br = ocrpt_break_new(pro->r, ZSTR_VAL(name));
 	if (!br)
@@ -3431,7 +4708,7 @@ PHP_METHOD(opencreport_report, break_new) {
 }
 
 PHP_METHOD(opencreport_report, break_get_first) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3450,7 +4727,7 @@ PHP_METHOD(opencreport_report, break_get_first) {
 }
 
 PHP_METHOD(opencreport_report, resolve_breaks) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3459,7 +4736,7 @@ PHP_METHOD(opencreport_report, resolve_breaks) {
 }
 
 PHP_METHOD(opencreport_report, get_query_rownum) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3468,83 +4745,131 @@ PHP_METHOD(opencreport_report, get_query_rownum) {
 }
 
 PHP_METHOD(opencreport_report, add_start_cb) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *callback;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *callback;
+	int callback_len;
 
-	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &callback, &callback_len) == FAILURE)
+		return;
+#endif
+
+	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
 
 	ocrpt_report_add_start_cb(pro->r, opencreport_report_cb, cb_name);
 }
 
 PHP_METHOD(opencreport_report, add_done_cb) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *callback;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *callback;
+	int callback_len;
 
-	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &callback, &callback_len) == FAILURE)
+		return;
+#endif
+
+	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
 
 	ocrpt_report_add_done_cb(pro->r, opencreport_report_cb, cb_name);
 }
 
 PHP_METHOD(opencreport_report, add_new_row_cb) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *callback;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *callback;
+	int callback_len;
 
-	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &callback, &callback_len) == FAILURE)
+		return;
+#endif
+
+	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
 
 	ocrpt_report_add_new_row_cb(pro->r, opencreport_report_cb, cb_name);
 }
 
 PHP_METHOD(opencreport_report, add_iteration_cb) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *callback;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *callback;
+	int callback_len;
 
-	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &callback, &callback_len) == FAILURE)
+		return;
+#endif
+
+	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
 
 	ocrpt_report_add_iteration_cb(pro->r, opencreport_report_cb, cb_name);
 }
 
 PHP_METHOD(opencreport_report, add_precalculation_done_cb) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *callback;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *callback;
+	int callback_len;
 
-	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &callback, &callback_len) == FAILURE)
+		return;
+#endif
+
+	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
 
 	ocrpt_report_add_precalculation_done_cb(pro->r, opencreport_report_cb, cb_name);
 }
 
 PHP_METHOD(opencreport_report, break_get) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *break_name;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(break_name);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *break_name;
+	int break_name_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &break_name, &break_name_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_break *br = ocrpt_break_get(pro->r, ZSTR_VAL(break_name));
 
@@ -3561,13 +4886,18 @@ PHP_METHOD(opencreport_report, break_get) {
 }
 
 PHP_METHOD(opencreport_report, equals) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
 	zval *report;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_OBJECT_OF_CLASS(report, opencreport_report_ce);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &report, opencreport_report_ce) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_report_object *pro1 = Z_OPENCREPORT_REPORT_P(report);
 
@@ -3575,13 +4905,18 @@ PHP_METHOD(opencreport_report, equals) {
 }
 
 PHP_METHOD(opencreport_report, set_main_query) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
 	zval *query;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_OBJECT_OF_CLASS(query, opencreport_query_ce);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &query, opencreport_query_ce) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(query);
 
@@ -3589,91 +4924,147 @@ PHP_METHOD(opencreport_report, set_main_query) {
 }
 
 PHP_METHOD(opencreport_report, set_main_query_by_name) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *query_name;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(query_name);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *query_name;
+	int query_name_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &query_name, &query_name_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_report_set_main_query_from_expr(pro->r, ZSTR_VAL(query_name));
 }
 
 PHP_METHOD(opencreport_report, set_suppress) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_report_set_suppress(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_report, set_iterations) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_report_set_iterations(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_report, set_font_name) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_report_set_font_name(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_report, set_font_size) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_report_set_font_size(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_report, set_height) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_report_set_height(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_report, set_fieldheader_priority) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_report_set_fieldheader_priority(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_report, nodata) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *ro = Z_OPENCREPORT_REPORT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3685,7 +5076,7 @@ PHP_METHOD(opencreport_report, nodata) {
 }
 
 PHP_METHOD(opencreport_report, header) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *ro = Z_OPENCREPORT_REPORT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3697,7 +5088,7 @@ PHP_METHOD(opencreport_report, header) {
 }
 
 PHP_METHOD(opencreport_report, footer) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *ro = Z_OPENCREPORT_REPORT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3709,7 +5100,7 @@ PHP_METHOD(opencreport_report, footer) {
 }
 
 PHP_METHOD(opencreport_report, field_header) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *ro = Z_OPENCREPORT_REPORT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3721,7 +5112,7 @@ PHP_METHOD(opencreport_report, field_header) {
 }
 
 PHP_METHOD(opencreport_report, field_details) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_report_object *ro = Z_OPENCREPORT_REPORT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3731,6 +5122,8 @@ PHP_METHOD(opencreport_report, field_details) {
 
 	out->output = ocrpt_layout_report_field_details(ro->r);
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_get_next, 0, 0, OpenCReport\\Report, 1)
 ZEND_END_ARG_INFO()
@@ -3833,6 +5226,37 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_field_details, 0, 0, OpenCReport\\Output, 1)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_report_get_next NULL
+#define arginfo_opencreport_variable_new NULL
+#define arginfo_opencreport_variable_new_full NULL
+#define arginfo_opencreport_report_expr_parse NULL
+#define arginfo_opencreport_report_expr_error NULL
+#define arginfo_opencreport_report_resolve_variables NULL
+#define arginfo_opencreport_report_evaluate_variables NULL
+#define arginfo_opencreport_break_new NULL
+#define arginfo_opencreport_break_get_first NULL
+#define arginfo_opencreport_report_resolve_breaks NULL
+#define arginfo_opencreport_report_get_query_rownum NULL
+#define arginfo_opencreport_break_get NULL
+#define arginfo_opencreport_report_equals NULL
+#define arginfo_opencreport_report_set_main_query NULL
+#define arginfo_opencreport_report_set_main_query_by_name NULL
+#define arginfo_opencreport_report_set_suppress NULL
+#define arginfo_opencreport_report_set_iterations NULL
+#define arginfo_opencreport_report_set_font_name NULL
+#define arginfo_opencreport_report_set_font_size NULL
+#define arginfo_opencreport_report_set_height NULL
+#define arginfo_opencreport_report_set_fieldheader_priority NULL
+#define arginfo_opencreport_report_nodata NULL
+#define arginfo_opencreport_report_header NULL
+#define arginfo_opencreport_report_footer NULL
+#define arginfo_opencreport_report_field_header NULL
+#define arginfo_opencreport_report_field_details NULL
+
+#endif
+
 static const zend_function_entry opencreport_report_class_methods[] = {
 	PHP_ME(opencreport_report, get_next, arginfo_opencreport_report_get_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_report, set_main_query, arginfo_opencreport_report_set_main_query, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -3869,7 +5293,7 @@ static const zend_function_entry opencreport_report_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_variable, baseexpr) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3885,7 +5309,7 @@ PHP_METHOD(opencreport_variable, baseexpr) {
 }
 
 PHP_METHOD(opencreport_variable, intermedexpr) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3901,7 +5325,7 @@ PHP_METHOD(opencreport_variable, intermedexpr) {
 }
 
 PHP_METHOD(opencreport_variable, intermed2expr) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3917,7 +5341,7 @@ PHP_METHOD(opencreport_variable, intermed2expr) {
 }
 
 PHP_METHOD(opencreport_variable, resultexpr) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3933,19 +5357,27 @@ PHP_METHOD(opencreport_variable, resultexpr) {
 }
 
 PHP_METHOD(opencreport_variable, set_precalculate) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_variable_set_precalculate(vo->v, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_variable, resolve) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -3954,13 +5386,15 @@ PHP_METHOD(opencreport_variable, resolve) {
 }
 
 PHP_METHOD(opencreport_variable, eval) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	ocrpt_variable_evaluate(vo->v);
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_variable_baseexpr, 0, 0, OpenCReport\\Expr, 1)
 ZEND_END_ARG_INFO()
@@ -3984,6 +5418,18 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_variable_eval, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_variable_baseexpr NULL
+#define arginfo_opencreport_variable_intermedexpr NULL
+#define arginfo_opencreport_variable_intermed2expr NULL
+#define arginfo_opencreport_variable_resultexpr NULL
+#define arginfo_opencreport_variable_set_precalculate NULL
+#define arginfo_opencreport_variable_resolve NULL
+#define arginfo_opencreport_variable_eval NULL
+
+#endif
+
 static const zend_function_entry opencreport_variable_class_methods[] = {
 	PHP_ME(opencreport_variable, baseexpr, arginfo_opencreport_variable_baseexpr, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_variable, intermedexpr, arginfo_opencreport_variable_intermedexpr, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -3996,7 +5442,7 @@ static const zend_function_entry opencreport_variable_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_break, get_next) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_break_object *bro = Z_OPENCREPORT_BREAK_P(object);
 
 	if (!bro->is_iterator) {
@@ -4020,13 +5466,18 @@ PHP_METHOD(opencreport_break, get_next) {
 }
 
 PHP_METHOD(opencreport_break, breakfield_add) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_break_object *bro = Z_OPENCREPORT_BREAK_P(object);
 	zval *breakfield_expr;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_OBJECT_OF_CLASS(breakfield_expr, opencreport_expr_ce);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &breakfield_expr, opencreport_expr_ce) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(breakfield_expr);
 
@@ -4039,7 +5490,7 @@ PHP_METHOD(opencreport_break, breakfield_add) {
 }
 
 PHP_METHOD(opencreport_break, check_fields) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_break_object *bro = Z_OPENCREPORT_BREAK_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -4048,7 +5499,7 @@ PHP_METHOD(opencreport_break, check_fields) {
 }
 
 PHP_METHOD(opencreport_break, reset_vars) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_break_object *bro = Z_OPENCREPORT_BREAK_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -4057,10 +5508,11 @@ PHP_METHOD(opencreport_break, reset_vars) {
 }
 
 static void opencreport_break_cb(opencreport *o, ocrpt_report *r, ocrpt_break *br, void *data) {
-	zend_string *callback = data;
-	zval zfname;
+	char *callback = data;
 
-	ZVAL_STRINGL(&zfname, ZSTR_VAL(callback), ZSTR_LEN(callback));
+#if PHP_VERSION_ID >= 70000
+	zval zfname;
+	ZVAL_STRING(&zfname, callback);
 
 	zval retval;
 	zval params[3];
@@ -4077,14 +5529,44 @@ static void opencreport_break_cb(opencreport *o, ocrpt_report *r, ocrpt_break *b
 	php_opencreport_break_object *bro = Z_OPENCREPORT_BREAK_P(&params[2]);
 	bro->r = r;
 	bro->br = br;
-
-#if PHP_MAJOR_VERSION >= 8
-	if (call_user_function(CG(function_table), NULL, &zfname, &retval, 3, params) == FAILURE)
 #else
-	if (call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 3, params, 0, NULL TSRMLS_CC) == FAILURE)
-#endif
-		return;
+	zval *zfname;
+	MAKE_STD_ZVAL(zfname);
+	ZVAL_STRING(zfname, callback, 1);
 
+	zval *retval = NULL;
+	zval *params0[3];
+	zval ***params = emalloc(sizeof(zval **) * 3);
+
+	ALLOC_INIT_ZVAL(params0[0]);
+	object_init_ex(params0[0], opencreport_ce);
+	php_opencreport_object *oo = Z_OPENCREPORT_P(params0[0]);
+	oo->o = o;
+
+	ALLOC_INIT_ZVAL(params0[1]);
+	object_init_ex(params0[1], opencreport_report_ce);
+	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(params0[1]);
+	pro->r = r;
+
+	ALLOC_INIT_ZVAL(params0[2]);
+	object_init_ex(params0[2], opencreport_break_ce);
+	php_opencreport_break_object *bro = Z_OPENCREPORT_BREAK_P(params0[2]);
+	bro->r = r;
+	bro->br = br;
+
+	for (int32_t i = 0; i < 3; i++)
+		params[i] = &params0[i];
+#endif
+
+#if PHP_VERSION_ID >= 80000
+	call_user_function(CG(function_table), NULL, &zfname, &retval, 3, params);
+#elif PHP_VERSION_ID >= 70000
+	call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 3, params, 0, NULL TSRMLS_CC);
+#else
+	call_user_function_ex(CG(function_table), NULL, zfname, &retval, 3, params, 0, NULL TSRMLS_CC);
+#endif
+
+#if PHP_VERSION_ID >= 70000
 	zend_object_std_dtor(&oo->zo);
 	OBJ_RELEASE(&oo->zo);
 	zend_object_std_dtor(&pro->zo);
@@ -4093,33 +5575,59 @@ static void opencreport_break_cb(opencreport *o, ocrpt_report *r, ocrpt_break *b
 	OBJ_RELEASE(&bro->zo);
 
 	zend_string_release(Z_STR(zfname));
+#else
+	zval_dtor(zfname);
+	efree(zfname);
+	efree(params);
+	zend_object_std_dtor(&oo->zo);
+	zend_object_std_dtor(&pro->zo);
+	zend_object_std_dtor(&bro->zo);
+	for (int32_t i = 0; i < 3; i++) {
+		if (Z_REFCOUNT_P(params0[i]) == 1) {
+			zval_dtor(params0[i]);
+			efree(params0[i]);
+		}
+	}
+	if (retval) {
+		zval_dtor(retval);
+		efree(retval);
+	}
+#endif
 }
 
 PHP_METHOD(opencreport_break, add_trigger_cb) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_break_object *bro = Z_OPENCREPORT_BREAK_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *callback;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(callback);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *callback;
+	int callback_len;
 
-	zend_string *cb_name = zend_string_init(ZSTR_VAL(callback), ZSTR_LEN(callback), false);
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &callback, &callback_len) == FAILURE)
+		return;
+#endif
+
+	char *cb_name = ocrpt_mem_strdup(ZSTR_VAL(callback));
 
 	ocrpt_break_add_trigger_cb(bro->br, opencreport_break_cb, cb_name);
 }
 
 PHP_METHOD(opencreport_break, name) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_break_object *bro = Z_OPENCREPORT_BREAK_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
-	RETURN_STRING(ocrpt_break_get_name(bro->br));
+	OCRPT_RETURN_STRING(ocrpt_break_get_name(bro->br));
 }
 
 PHP_METHOD(opencreport_break, header) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_break_object *bro = Z_OPENCREPORT_BREAK_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -4131,7 +5639,7 @@ PHP_METHOD(opencreport_break, header) {
 }
 
 PHP_METHOD(opencreport_break, footer) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_break_object *bro = Z_OPENCREPORT_BREAK_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -4141,6 +5649,8 @@ PHP_METHOD(opencreport_break, footer) {
 
 	out->output = ocrpt_break_get_footer(bro->br);
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_break_get_next, 0, 0, OpenCReport\\ReportBreak, 1)
 ZEND_END_ARG_INFO()
@@ -4164,6 +5674,18 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_break_footer, 0, 0, OpenCReport\\Output, 1)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_break_get_next NULL
+#define arginfo_opencreport_break_breakfield_add NULL
+#define arginfo_opencreport_break_check_fields NULL
+#define arginfo_opencreport_break_reset_vars NULL
+#define arginfo_opencreport_break_name NULL
+#define arginfo_opencreport_break_header NULL
+#define arginfo_opencreport_break_footer NULL
+
+#endif
+
 static const zend_function_entry opencreport_break_class_methods[] = {
 	PHP_ME(opencreport_break, get_next, arginfo_opencreport_break_get_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_break, breakfield_add, arginfo_opencreport_break_breakfield_add, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -4177,19 +5699,27 @@ static const zend_function_entry opencreport_break_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_output, set_suppress) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_output_set_suppress(oo->output, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_output, add_line) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
 	ocrpt_line *l;
 	php_opencreport_line_object *lo;
@@ -4206,7 +5736,7 @@ PHP_METHOD(opencreport_output, add_line) {
 }
 
 PHP_METHOD(opencreport_output, add_hline) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
 	ocrpt_hline *hl;
 	php_opencreport_hline_object *hlo;
@@ -4223,7 +5753,7 @@ PHP_METHOD(opencreport_output, add_hline) {
 }
 
 PHP_METHOD(opencreport_output, add_image) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
 	ocrpt_image *im;
 	php_opencreport_image_object *imo;
@@ -4240,7 +5770,7 @@ PHP_METHOD(opencreport_output, add_image) {
 }
 
 PHP_METHOD(opencreport_output, add_image_end) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
 
 	ZEND_PARSE_PARAMETERS_NONE();
@@ -4249,7 +5779,7 @@ PHP_METHOD(opencreport_output, add_image_end) {
 }
 
 PHP_METHOD(opencreport_output, add_barcode) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
 	ocrpt_barcode *bc;
 	php_opencreport_barcode_object *bco;
@@ -4264,6 +5794,8 @@ PHP_METHOD(opencreport_output, add_barcode) {
 	bco = Z_OPENCREPORT_BARCODE_P(return_value);
 	bco->bc = bc;
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_output_set_suppress, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
@@ -4281,101 +5813,172 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_output_add_image_end, 0, 0, IS_VOID, 1)
 ZEND_END_ARG_INFO()
 
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_output_add_barcode, 0, 0, OpenCReport\\Image, 1)
+ZEND_END_ARG_INFO()
+
+#else
+
+#define arginfo_opencreport_output_set_suppress NULL
+#define arginfo_opencreport_output_add_line NULL
+#define arginfo_opencreport_output_add_hline NULL
+#define arginfo_opencreport_output_add_image NULL
+#define arginfo_opencreport_output_add_image_end NULL
+#define arginfo_opencreport_output_add_barcode NULL
+
+#endif
+
 static const zend_function_entry opencreport_output_class_methods[] = {
 	PHP_ME(opencreport_output, set_suppress, arginfo_opencreport_output_set_suppress, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output, add_line, arginfo_opencreport_output_add_line, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output, add_hline, arginfo_opencreport_output_add_hline, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output, add_image, arginfo_opencreport_output_add_image, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output, add_image_end, arginfo_opencreport_output_add_image_end, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_output, add_barcode, arginfo_opencreport_output_add_barcode, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 
 PHP_METHOD(opencreport_line, set_font_name) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_line_set_font_name(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_line, set_font_size) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_line_set_font_size(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_line, set_bold) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_line_set_bold(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_line, set_italic) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_line_set_italic(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_line, set_suppress) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_line_set_suppress(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_line, set_color) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_line_set_color(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_line, set_bgcolor) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_line_set_bgcolor(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_line, add_text) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
 	ocrpt_text *t;
 	php_opencreport_text_object *to;
@@ -4392,7 +5995,7 @@ PHP_METHOD(opencreport_line, add_text) {
 }
 
 PHP_METHOD(opencreport_line, add_image) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
 	ocrpt_image *im;
 	php_opencreport_image_object *imo;
@@ -4409,7 +6012,7 @@ PHP_METHOD(opencreport_line, add_image) {
 }
 
 PHP_METHOD(opencreport_line, add_barcode) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(object);
 	ocrpt_barcode *bc;
 	php_opencreport_barcode_object *bco;
@@ -4424,6 +6027,8 @@ PHP_METHOD(opencreport_line, add_barcode) {
 	bco = Z_OPENCREPORT_BARCODE_P(return_value);
 	bco->bc = bc;
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_font_name, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
@@ -4462,6 +6067,21 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_line_add_barcode, 0, 0, OpenCReport\\Barcode, 1)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_line_set_font_name NULL
+#define arginfo_opencreport_line_set_font_size NULL
+#define arginfo_opencreport_line_set_bold NULL
+#define arginfo_opencreport_line_set_italic NULL
+#define arginfo_opencreport_line_set_suppress NULL
+#define arginfo_opencreport_line_set_color NULL
+#define arginfo_opencreport_line_set_bgcolor NULL
+#define arginfo_opencreport_line_add_text NULL
+#define arginfo_opencreport_line_add_image NULL
+#define arginfo_opencreport_line_add_barcode NULL
+
+#endif
+
 static const zend_function_entry opencreport_line_class_methods[] = {
 	PHP_ME(opencreport_line, set_font_name, arginfo_opencreport_line_set_font_name, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_line, set_font_size, arginfo_opencreport_line_set_font_size, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -4477,88 +6097,146 @@ static const zend_function_entry opencreport_line_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_hline, set_size) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_hline_set_size(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_hline, set_align) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_hline_set_align(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_hline, set_indent) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_hline_set_indent(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_hline, set_length) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_hline_set_length(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_hline, set_font_size) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_hline_set_font_size(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_hline, set_suppress) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_hline_set_suppress(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_hline, set_color) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_hline_object *hlo = Z_OPENCREPORT_HLINE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_hline_set_color(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_size, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
@@ -4588,6 +6266,18 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_color, 0,
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_hline_set_size NULL
+#define arginfo_opencreport_hline_set_align NULL
+#define arginfo_opencreport_hline_set_indent NULL
+#define arginfo_opencreport_hline_set_length NULL
+#define arginfo_opencreport_hline_set_font_size NULL
+#define arginfo_opencreport_hline_set_suppress NULL
+#define arginfo_opencreport_hline_set_color NULL
+
+#endif
+
 static const zend_function_entry opencreport_hline_class_methods[] = {
 	PHP_ME(opencreport_hline, set_size, arginfo_opencreport_hline_set_size, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_hline, set_align, arginfo_opencreport_hline_set_align, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -4600,100 +6290,166 @@ static const zend_function_entry opencreport_hline_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_image, set_value) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_image_set_value(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_image, set_suppress) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_image_set_suppress(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_image, set_type) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_image_set_type(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_image, set_width) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_image_set_width(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_image, set_height) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_image_set_height(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_image, set_alignment) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_image_set_alignment(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_image, set_bgcolor) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_image_set_bgcolor(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_image, set_text_width) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_image_set_text_width(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_value, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
@@ -4727,6 +6483,19 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_text_widt
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_image_set_value NULL
+#define arginfo_opencreport_image_set_suppress NULL
+#define arginfo_opencreport_image_set_type NULL
+#define arginfo_opencreport_image_set_width NULL
+#define arginfo_opencreport_image_set_height NULL
+#define arginfo_opencreport_image_set_alignment NULL
+#define arginfo_opencreport_image_set_bgcolor NULL
+#define arginfo_opencreport_image_set_text_width NULL
+
+#endif
+
 static const zend_function_entry opencreport_image_class_methods[] = {
 	PHP_ME(opencreport_image, set_value, arginfo_opencreport_image_set_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_image, set_suppress, arginfo_opencreport_image_set_suppress, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -4740,208 +6509,346 @@ static const zend_function_entry opencreport_image_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_text, set_value_string) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_value_string(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_value_expr) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_value_expr(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_value_delayed) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_value_delayed(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_format) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_format(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_translate) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_translate(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_width) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_width(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_alignment) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_alignment(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_color) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_color(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_bgcolor) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_bgcolor(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_font_name) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_font_name(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_font_size) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_font_size(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_bold) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_bold(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_italic) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_italic(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_link) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_link(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_memo) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_memo(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_memo_wrap_chars) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_memo_wrap_chars(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_text, set_memo_max_lines) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_text_set_memo_max_lines(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_value_string, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
@@ -5011,6 +6918,28 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_memo_max_l
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_text_set_value_string NULL
+#define arginfo_opencreport_text_set_value_expr NULL
+#define arginfo_opencreport_text_set_value_delayed NULL
+#define arginfo_opencreport_text_set_format NULL
+#define arginfo_opencreport_text_set_translate NULL
+#define arginfo_opencreport_text_set_width NULL
+#define arginfo_opencreport_text_set_alignment NULL
+#define arginfo_opencreport_text_set_color NULL
+#define arginfo_opencreport_text_set_bgcolor NULL
+#define arginfo_opencreport_text_set_font_name NULL
+#define arginfo_opencreport_text_set_font_size NULL
+#define arginfo_opencreport_text_set_bold NULL
+#define arginfo_opencreport_text_set_italic NULL
+#define arginfo_opencreport_text_set_link NULL
+#define arginfo_opencreport_text_set_memo NULL
+#define arginfo_opencreport_text_set_memo_wrap_chars NULL
+#define arginfo_opencreport_text_set_memo_max_lines NULL
+
+#endif
+
 static const zend_function_entry opencreport_text_class_methods[] = {
 	PHP_ME(opencreport_text, set_value_string, arginfo_opencreport_text_set_value_string, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_text, set_value_expr, arginfo_opencreport_text_set_value_expr, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -5033,100 +6962,166 @@ static const zend_function_entry opencreport_text_class_methods[] = {
 };
 
 PHP_METHOD(opencreport_barcode, set_value) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_barcode_set_value(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_barcode, set_value_delayed) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_barcode_set_value_delayed(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_barcode, set_suppress) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_barcode_set_suppress(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_barcode, set_type) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_barcode_set_type(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_barcode, set_width) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_barcode_set_width(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_barcode, set_height) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_barcode_set_height(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_barcode, set_color) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_barcode_set_color(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
 PHP_METHOD(opencreport_barcode, set_bgcolor) {
-	zval *object = ZEND_THIS;
+	zval *object = getThis();
 	php_opencreport_barcode_object *bco = Z_OPENCREPORT_BARCODE_P(object);
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string = NULL;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR_EX(expr_string, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	ocrpt_barcode_set_bgcolor(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
+
+#if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_value, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
@@ -5160,6 +7155,19 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_bgcolor
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+#else
+
+#define arginfo_opencreport_barcode_set_value NULL
+#define arginfo_opencreport_barcode_set_value_delayed NULL
+#define arginfo_opencreport_barcode_set_suppress NULL
+#define arginfo_opencreport_barcode_set_type NULL
+#define arginfo_opencreport_barcode_set_width NULL
+#define arginfo_opencreport_barcode_set_height NULL
+#define arginfo_opencreport_barcode_set_color NULL
+#define arginfo_opencreport_barcode_set_bgcolor NULL
+
+#endif
+
 static const zend_function_entry opencreport_barcode_class_methods[] = {
 	PHP_ME(opencreport_barcode, set_value, arginfo_opencreport_barcode_set_value, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_barcode, set_value_delayed, arginfo_opencreport_barcode_set_value_delayed, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
@@ -5172,6 +7180,7 @@ static const zend_function_entry opencreport_barcode_class_methods[] = {
 	PHP_FE_END
 };
 
+#if PHP_VERSION_ID >= 70000
 static zval *php_opencreport_get_zval_direct(zval *zv) {
 	if (zv == NULL)
 		return NULL;
@@ -5198,18 +7207,19 @@ static zval *php_opencreport_get_zval_direct(zval *zv) {
 
 	return zv;
 }
+#endif
 
 static zval *php_opencreport_get_zval_of_type_raw(zval *zv, int expected_type) {
-	zv = php_opencreport_get_zval_direct(zv);
+	zval *zv1 = php_opencreport_get_zval_direct(zv);
 
-	return (zv && (Z_TYPE_P(zv) == expected_type)) ? zv : NULL;
+	return (zv1 && (Z_TYPE_P(zv1) == expected_type)) ? zv1 : NULL;
 }
 
 static zval *php_opencreport_get_zval_of_type(const char *name, int expected_type) {
 	if (!name || !*name)
 		return NULL;
 
-	zval *zv = zend_hash_str_find(&EG(symbol_table), name, strlen(name));
+	zval *zv = ocrpt_hash_str_find(&EG(symbol_table), name, strlen(name));
 
 	return php_opencreport_get_zval_of_type_raw(zv, expected_type);
 }
@@ -5246,11 +7256,15 @@ static void php_opencreport_query_discover_array(const char *arrayname, void **a
 
 	int32_t col;
 	for (col = 0, zend_hash_internal_pointer_reset_ex(htab1, &htab1p); col < t_cols; col++, zend_hash_move_forward_ex(htab1, &htab1p)) {
-		zval *cell = zend_hash_get_current_data_ex(htab1, &htab1p);
+		zval *cell = ocrpt_hash_get_current_data_ex(htab1, &htab1p);
 		int32_t data_result;
 
 		if (Z_TYPE_P(cell) == IS_LONG) {
+#if PHP_VERSION_ID >= 70000
 			zend_long l = Z_LVAL_P(cell);
+#else
+			long l = Z_LVAL_P(cell);
+#endif
 			if (l >= OCRPT_RESULT_ERROR && l <= OCRPT_RESULT_DATETIME)
 				data_result = l;
 			else
@@ -5394,7 +7408,7 @@ static char **php_opencreport_array_set_backing_array(HashTable *ahash, int32_t 
 	HashPosition ahashpos;
 
 	for (a_rows = 0, zend_hash_internal_pointer_reset_ex(ahash, &ahashpos); a_rows < array_rows; a_rows++, zend_hash_move_forward_ex(ahash, &ahashpos)) {
-		zval *row = zend_hash_get_current_data_ex(ahash, &ahashpos);
+		zval *row = ocrpt_hash_get_current_data_ex(ahash, &ahashpos);
 		row = php_opencreport_get_zval_of_type_raw(row, IS_ARRAY);
 
 		/* If row is not an array, use an all-NULL row instead. */
@@ -5406,19 +7420,24 @@ static char **php_opencreport_array_set_backing_array(HashTable *ahash, int32_t 
 		int32_t i;
 
 		for (i = 0, zend_hash_internal_pointer_reset_ex(rowhash, &rowhashpos); i < a_cols; i++, zend_hash_move_forward_ex(rowhash, &rowhashpos)) {
-			zval *row = zend_hash_get_current_data_ex(ahash, &ahashpos);
+			zval *row = ocrpt_hash_get_current_data_ex(ahash, &ahashpos);
 			row = php_opencreport_get_zval_of_type_raw(row, IS_ARRAY);
 
-			zval *cell = zend_hash_get_current_data_ex(rowhash, &rowhashpos);
+			zval *cell = ocrpt_hash_get_current_data_ex(rowhash, &rowhashpos);
 			cell = php_opencreport_get_zval_direct(cell);
 
 			char *str = NULL, *newstr = NULL;
 			int32_t len = 0;
+			zval copy;
 
 			if (cell && Z_TYPE_P(cell) != IS_NULL) {
-				zval copy;
-
+#if PHP_VERSION_ID >= 70000
 				ZVAL_STR(&copy, _zval_get_string_func(cell));
+#else
+				ZVAL_COPY_VALUE(&copy, cell);
+				zval_copy_ctor(&copy);
+				convert_to_string(&copy);
+#endif
 				str = Z_STRVAL(copy);
 				len = Z_STRLEN(copy);
 			}
@@ -5429,6 +7448,12 @@ static char **php_opencreport_array_set_backing_array(HashTable *ahash, int32_t 
 				memcpy(newstr, str, len);
 				newstr[len] = 0;
 			}
+
+#if PHP_VERSION_ID < 70000
+			if (cell && Z_TYPE_P(cell) != IS_NULL) {
+				zval_dtor(&copy);
+			}
+#endif
 
 			data[a_rows * a_cols + i] = newstr;
 		}
@@ -5457,7 +7482,7 @@ static ocrpt_query *php_opencreport_array_query_add_symbolic(ocrpt_datasource *s
 	HashPosition ahashpos;
 
 	zend_hash_internal_pointer_reset_ex(ahash, &ahashpos);
-	zval *row = zend_hash_get_current_data_ex(ahash, &ahashpos);
+	zval *row = ocrpt_hash_get_current_data_ex(ahash, &ahashpos);
 	row = php_opencreport_get_zval_of_type_raw(row, IS_ARRAY);
 
 	if (!row)
@@ -5470,7 +7495,7 @@ static ocrpt_query *php_opencreport_array_query_add_symbolic(ocrpt_datasource *s
 
 	zend_hash_internal_pointer_reset_ex(rowhash, &rowhashpos);
 	for (a_cols = 0; a_cols < array_cols; a_cols++, zend_hash_move_forward_ex(rowhash, &rowhashpos)) {
-		cell = zend_hash_get_current_data_ex(rowhash, &rowhashpos);
+		cell = ocrpt_hash_get_current_data_ex(rowhash, &rowhashpos);
 		cell = php_opencreport_get_zval_of_type_raw(cell, IS_STRING);
 
 		if (cell == NULL)
@@ -5539,7 +7564,7 @@ static void php_opencreport_array_describe(ocrpt_query *query, ocrpt_query_resul
 		HashPosition ahashpos;
 
 		zend_hash_internal_pointer_reset_ex(ahash, &ahashpos);
-		zval *row = zend_hash_get_current_data_ex(ahash, &ahashpos);
+		zval *row = ocrpt_hash_get_current_data_ex(ahash, &ahashpos);
 		row = php_opencreport_get_zval_of_type_raw(row, IS_ARRAY);
 
 		if (!row)
@@ -5553,13 +7578,19 @@ static void php_opencreport_array_describe(ocrpt_query *query, ocrpt_query_resul
 			goto out_error;
 
 		for (i = 0, zend_hash_internal_pointer_reset_ex(rowhash, &rowhashpos); i < result->cols; i++, zend_hash_move_forward_ex(rowhash, &rowhashpos)) {
-			zval *cell = zend_hash_get_current_data_ex(rowhash, &rowhashpos);
+			zval *cell = ocrpt_hash_get_current_data_ex(rowhash, &rowhashpos);
 			cell = php_opencreport_get_zval_direct(cell);
 
 			char *data_result;
 			zval copy;
 
+#if PHP_VERSION_ID >= 70000
 			ZVAL_STR(&copy, _zval_get_string_func(cell));
+#else
+			ZVAL_COPY_VALUE(&copy, cell);
+			zval_copy_ctor(&copy);
+			convert_to_string(&copy);
+#endif
 			data_result = Z_STRVAL(copy);
 
 			for (int32_t j = 0; j < OCRPT_EXPR_RESULTS; j++) {
@@ -5567,6 +7598,10 @@ static void php_opencreport_array_describe(ocrpt_query *query, ocrpt_query_resul
 				qr[j * result->cols + i].name = (j == 0) ? ocrpt_mem_strdup(data_result) : qr[i].name;
 				qr[j * result->cols + i].name_allocated = (j == 0);
 			}
+
+#if PHP_VERSION_ID < 70000
+			zval_dtor(&copy);
+#endif
 		}
 
 		i = 0;
@@ -5578,12 +7613,16 @@ static void php_opencreport_array_describe(ocrpt_query *query, ocrpt_query_resul
 			int types_cols = zend_hash_num_elements(typeshash);
 
 			for (zend_hash_internal_pointer_reset_ex(typeshash, &typeshashpos); i < types_cols && i < result->cols; i++, zend_hash_move_forward_ex(typeshash, &typeshashpos)) {
-				zval *cell = zend_hash_get_current_data_ex(typeshash, &typeshashpos);
+				zval *cell = ocrpt_hash_get_current_data_ex(typeshash, &typeshashpos);
 				cell = php_opencreport_get_zval_of_type_raw(cell, IS_LONG);
 
 				enum ocrpt_result_type type = OCRPT_RESULT_ERROR;
 				if (cell) {
+#if PHP_VERSION_ID >= 70000
 					zend_long l = Z_LVAL_P(cell);
+#else
+					long l = Z_LVAL_P(cell);
+#endif
 
 					if (l >= OCRPT_RESULT_ERROR && l <= OCRPT_RESULT_DATETIME)
 						type = l;
@@ -5702,7 +7741,7 @@ static bool php_opencreport_array_populate_result(ocrpt_query *query) {
 		ocrpt_query_result_set_value(query, i, (str == NULL), ocrpt_datasource_get_private(source), str, len);
 	}
 #else
-	zval *row = zend_hash_get_current_data_ex(result->ahash, &result->ahashpos);
+	zval *row = ocrpt_hash_get_current_data_ex(result->ahash, &result->ahashpos);
 	row = php_opencreport_get_zval_of_type_raw(row, IS_ARRAY);
 
 	HashTable *rowhash = Z_ARRVAL_P(row);
@@ -5710,7 +7749,7 @@ static bool php_opencreport_array_populate_result(ocrpt_query *query) {
 	int32_t i;
 
 	for (i = 0, zend_hash_internal_pointer_reset_ex(rowhash, &rowhashpos); i < result->cols; i++, zend_hash_move_forward_ex(rowhash, &rowhashpos)) {
-		zval *cell = zend_hash_get_current_data_ex(rowhash, &rowhashpos);
+		zval *cell = ocrpt_hash_get_current_data_ex(rowhash, &rowhashpos);
 		cell = php_opencreport_get_zval_direct(cell);
 
 		char *str = NULL;
@@ -5862,9 +7901,11 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_CLASS_ENTRY(ce, "OpenCReport", opencreport_class_methods);
 	ce.create_object = opencreport_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_object_handlers.offset = XtOffsetOf(php_opencreport_object, zo);
-	opencreport_object_handlers.clone_obj = NULL;
 	opencreport_object_handlers.free_obj = opencreport_object_free;
+#endif
+	opencreport_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_object_handlers.compare = zend_objects_not_comparable;
 #endif
@@ -5879,7 +7920,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_ds_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Datasource", opencreport_ds_class_methods);
 	ce.create_object = opencreport_ds_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_ds_object_handlers.offset = XtOffsetOf(php_opencreport_ds_object, zo);
+#endif
 	opencreport_ds_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_ds_object_handlers.compare = zend_objects_not_comparable;
@@ -5896,7 +7939,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_query_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Query", opencreport_query_class_methods);
 	ce.create_object = opencreport_query_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_query_object_handlers.offset = XtOffsetOf(php_opencreport_query_object, zo);
+#endif
 	opencreport_query_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_query_object_handlers.compare = zend_objects_not_comparable;
@@ -5913,7 +7958,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_query_result_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "QueryResult", opencreport_query_result_class_methods);
 	ce.create_object = opencreport_query_result_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_query_result_object_handlers.offset = XtOffsetOf(php_opencreport_query_result_object, zo);
+#endif
 	opencreport_query_result_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_query_result_object_handlers.compare = zend_objects_not_comparable;
@@ -5930,7 +7977,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_expr_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Expr", opencreport_expr_class_methods);
 	ce.create_object = opencreport_expr_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_expr_object_handlers.offset = XtOffsetOf(php_opencreport_expr_object, zo);
+#endif
 	opencreport_expr_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_expr_object_handlers.compare = zend_objects_not_comparable;
@@ -5947,9 +7996,11 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_result_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Result", opencreport_result_class_methods);
 	ce.create_object = opencreport_result_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_result_object_handlers.offset = XtOffsetOf(php_opencreport_result_object, zo);
-	opencreport_result_object_handlers.clone_obj = NULL;
 	opencreport_result_object_handlers.free_obj = opencreport_result_object_free;
+#endif
+	opencreport_result_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_result_object_handlers.compare = zend_objects_not_comparable;
 #endif
@@ -5965,7 +8016,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_part_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Part", opencreport_part_class_methods);
 	ce.create_object = opencreport_part_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_part_object_handlers.offset = XtOffsetOf(php_opencreport_part_object, zo);
+#endif
 	opencreport_part_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_part_object_handlers.compare = zend_objects_not_comparable;
@@ -5982,7 +8035,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_row_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Row", opencreport_row_class_methods);
 	ce.create_object = opencreport_row_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_row_object_handlers.offset = XtOffsetOf(php_opencreport_row_object, zo);
+#endif
 	opencreport_row_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_row_object_handlers.compare = zend_objects_not_comparable;
@@ -5999,7 +8054,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_col_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Column", opencreport_part_col_class_methods);
 	ce.create_object = opencreport_col_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_col_object_handlers.offset = XtOffsetOf(php_opencreport_col_object, zo);
+#endif
 	opencreport_col_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_col_object_handlers.compare = zend_objects_not_comparable;
@@ -6016,9 +8073,11 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_report_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Report", opencreport_report_class_methods);
 	ce.create_object = opencreport_report_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_report_object_handlers.offset = XtOffsetOf(php_opencreport_report_object, zo);
-	opencreport_report_object_handlers.clone_obj = NULL;
 	opencreport_report_object_handlers.free_obj = opencreport_report_object_free;
+#endif
+	opencreport_report_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_report_object_handlers.compare = zend_objects_not_comparable;
 #endif
@@ -6034,7 +8093,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_variable_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Variable", opencreport_variable_class_methods);
 	ce.create_object = opencreport_variable_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_variable_object_handlers.offset = XtOffsetOf(php_opencreport_variable_object, zo);
+#endif
 	opencreport_variable_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_variable_object_handlers.compare = zend_objects_not_comparable;
@@ -6051,7 +8112,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_break_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "ReportBreak", opencreport_break_class_methods);
 	ce.create_object = opencreport_break_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_break_object_handlers.offset = XtOffsetOf(php_opencreport_break_object, zo);
+#endif
 	opencreport_break_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_break_object_handlers.compare = zend_objects_not_comparable;
@@ -6068,7 +8131,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_output_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Output", opencreport_output_class_methods);
 	ce.create_object = opencreport_output_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_output_object_handlers.offset = XtOffsetOf(php_opencreport_output_object, zo);
+#endif
 	opencreport_output_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_output_object_handlers.compare = zend_objects_not_comparable;
@@ -6085,7 +8150,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_line_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Line", opencreport_line_class_methods);
 	ce.create_object = opencreport_line_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_line_object_handlers.offset = XtOffsetOf(php_opencreport_line_object, zo);
+#endif
 	opencreport_line_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_line_object_handlers.compare = zend_objects_not_comparable;
@@ -6102,7 +8169,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_hline_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "HorizontalLine", opencreport_hline_class_methods);
 	ce.create_object = opencreport_hline_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_hline_object_handlers.offset = XtOffsetOf(php_opencreport_hline_object, zo);
+#endif
 	opencreport_hline_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_hline_object_handlers.compare = zend_objects_not_comparable;
@@ -6119,7 +8188,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_image_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Image", opencreport_image_class_methods);
 	ce.create_object = opencreport_image_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_image_object_handlers.offset = XtOffsetOf(php_opencreport_image_object, zo);
+#endif
 	opencreport_image_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_image_object_handlers.compare = zend_objects_not_comparable;
@@ -6136,7 +8207,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_text_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Text", opencreport_text_class_methods);
 	ce.create_object = opencreport_text_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_text_object_handlers.offset = XtOffsetOf(php_opencreport_text_object, zo);
+#endif
 	opencreport_text_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_text_object_handlers.compare = zend_objects_not_comparable;
@@ -6153,7 +8226,9 @@ static PHP_MINIT_FUNCTION(opencreport)
 	memcpy(&opencreport_barcode_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	INIT_NS_CLASS_ENTRY(ce, "OpenCReport", "Barcode", opencreport_barcode_class_methods);
 	ce.create_object = opencreport_barcode_object_new;
+#if PHP_VERSION_ID >= 70000
 	opencreport_barcode_object_handlers.offset = XtOffsetOf(php_opencreport_barcode_object, zo);
+#endif
 	opencreport_barcode_object_handlers.clone_obj = NULL;
 #if PHP_VERSION_ID >= 80000
 	opencreport_barcode_object_handlers.compare = zend_objects_not_comparable;
@@ -6232,7 +8307,7 @@ static PHP_MINFO_FUNCTION(opencreport)
 ZEND_FUNCTION(rlib_version) {
 	ZEND_PARSE_PARAMETERS_NONE();
 
-	RETURN_STRING(ocrpt_version());
+	OCRPT_RETURN_STRING(ocrpt_version());
 }
 
 ZEND_FUNCTION(rlib_init) {
@@ -6249,9 +8324,14 @@ ZEND_FUNCTION(rlib_init) {
 ZEND_FUNCTION(rlib_free) {
 	zval *obj;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_OBJECT_OF_CLASS(obj, opencreport_ce);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &obj, opencreport_ce) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(obj);
 
@@ -6265,11 +8345,10 @@ ZEND_FUNCTION(rlib_free) {
 
 ZEND_FUNCTION(rlib_add_datasource_mysql) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *source_name;
 	zend_string *host, *dbname;
 	zend_string *user, *password;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 6, 6)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
@@ -6279,6 +8358,17 @@ ZEND_FUNCTION(rlib_add_datasource_mysql) {
 		Z_PARAM_STR_EX(password, 1, 0);
 		Z_PARAM_STR_EX(dbname, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *source_name;
+	char *host = NULL, *dbname = NULL;
+	char *user = NULL, *password = NULL;
+	int source_name_len;
+	int host_len, dbname_len;
+	int user_len, password_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Oss!s!s!s!", &object, opencreport_ce, &source_name, &source_name_len, &host, &host_len, &user, &user_len, &password, &password_len, &dbname, &dbname_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6295,21 +8385,20 @@ ZEND_FUNCTION(rlib_add_datasource_mysql) {
 		{ NULL }
 	};
 
-	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "mariadb", conn_params);
+	ocrpt_datasource *ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "mariadb", conn_params);
 	if (!ds)
 		RETURN_NULL();
 
 	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
+	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(return_value);
 	dso->ds = ds;
 }
 
 ZEND_FUNCTION(rlib_add_datasource_mysql_from_group) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *source_name;
 	zend_string *option_file, *group;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 4)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
@@ -6318,6 +8407,15 @@ ZEND_FUNCTION(rlib_add_datasource_mysql_from_group) {
 		Z_PARAM_OPTIONAL;
 		Z_PARAM_STR_EX(option_file, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *source_name;
+	char *option_file = NULL, *group = NULL;
+	int source_name_len;
+	int option_file_len, group_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Oss!|s!", &object, opencreport_ce, &source_name, &source_name_len, &option_file, &option_file_len, &group, &group_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6332,27 +8430,33 @@ ZEND_FUNCTION(rlib_add_datasource_mysql_from_group) {
 		{ NULL }
 	};
 
-	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "mariadb", conn_params);
+	ocrpt_datasource *ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "mariadb", conn_params);
 	if (!ds)
 		RETURN_NULL();
 
 	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
+	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(return_value);
 	dso->ds = ds;
 }
 
 ZEND_FUNCTION(rlib_add_datasource_postgres) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *source_name;
 	zend_string *connection_info;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(source_name);
 		Z_PARAM_STR_EX(connection_info, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *source_name, *connection_info;
+	int source_name_len, connection_info_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Oss!", &object, opencreport_ce, &source_name, &source_name_len, &connection_info, &connection_info_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6366,21 +8470,20 @@ ZEND_FUNCTION(rlib_add_datasource_postgres) {
 		{ NULL }
 	};
 
-	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "postgresql", conn_params);
+	ocrpt_datasource *ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "postgresql", conn_params);
 	if (!ds)
 		RETURN_NULL();
 
 	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
+	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(return_value);
 	dso->ds = ds;
 }
 
 ZEND_FUNCTION(rlib_add_datasource_odbc) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *source_name;
 	zend_string *dbname, *user, *password;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 5)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
@@ -6390,6 +8493,15 @@ ZEND_FUNCTION(rlib_add_datasource_odbc) {
 		Z_PARAM_STR_EX(user, 1, 0);
 		Z_PARAM_STR_EX(password, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *source_name;
+	char *dbname, *user, *password;
+	int source_name_len;
+	int dbname_len, user_len, password_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Oss!|s!s!", &object, opencreport_ce, &source_name, &source_name_len, &dbname, &dbname_len, &user, &user_len, &password, &password_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6405,25 +8517,31 @@ ZEND_FUNCTION(rlib_add_datasource_odbc) {
 		{ NULL }
 	};
 
-	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "odbc", conn_params);
+	ocrpt_datasource *ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "odbc", conn_params);
 	if (!ds)
 		RETURN_NULL();
 
 	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
+	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(return_value);
 	dso->ds = ds;
 }
 
 ZEND_FUNCTION(rlib_add_datasource_array) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *source_name;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(source_name);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *source_name;
+	int source_name_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Os", &object, opencreport_ce, &source_name, &source_name_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6432,25 +8550,31 @@ ZEND_FUNCTION(rlib_add_datasource_array) {
 		RETURN_THROWS();
 	}
 
-	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "array", NULL);
+	ocrpt_datasource *ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "array", NULL);
 	if (!ds)
 		RETURN_NULL();
 
 	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
+	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(return_value);
 	dso->ds = ds;
 }
 
 ZEND_FUNCTION(rlib_add_datasource_xml) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *source_name;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(source_name);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *source_name;
+	int source_name_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Os", &object, opencreport_ce, &source_name, &source_name_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6459,25 +8583,31 @@ ZEND_FUNCTION(rlib_add_datasource_xml) {
 		RETURN_THROWS();
 	}
 
-	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "xml", NULL);
+	ocrpt_datasource *ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "xml", NULL);
 	if (!ds)
 		RETURN_NULL();
 
 	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
+	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(return_value);
 	dso->ds = ds;
 }
 
 ZEND_FUNCTION(rlib_add_datasource_csv) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *source_name;
-	ocrpt_datasource *ds;
-	php_opencreport_ds_object *dso;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(source_name);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *source_name;
+	int source_name_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Os", &object, opencreport_ce, &source_name, &source_name_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6486,20 +8616,19 @@ ZEND_FUNCTION(rlib_add_datasource_csv) {
 		RETURN_THROWS();
 	}
 
-	ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "csv", NULL);
+	ocrpt_datasource *ds = ocrpt_datasource_add(oo->o, ZSTR_VAL(source_name), "csv", NULL);
 	if (!ds)
 		RETURN_NULL();
 
 	object_init_ex(return_value, opencreport_ds_ce);
-	dso = Z_OPENCREPORT_DS_P(return_value);
+	php_opencreport_ds_object *dso = Z_OPENCREPORT_DS_P(return_value);
 	dso->ds = ds;
 }
 
 ZEND_FUNCTION(rlib_add_query_as) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *source_name, *array_or_file_or_sql, *name;
-	ocrpt_query *q;
-	php_opencreport_query_object *qo;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 4, 4)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
@@ -6507,6 +8636,13 @@ ZEND_FUNCTION(rlib_add_query_as) {
 		Z_PARAM_STR(array_or_file_or_sql);
 		Z_PARAM_STR(name);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *source_name, *array_or_file_or_sql, *name;
+	int source_name_len, array_or_file_or_sql_len, name_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Osss", &object, opencreport_ce, &source_name, &source_name_len, &array_or_file_or_sql, &array_or_file_or_sql_len, &name, &name_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6516,6 +8652,7 @@ ZEND_FUNCTION(rlib_add_query_as) {
 	}
 
 	ocrpt_datasource *ds = ocrpt_datasource_get(oo->o, ZSTR_VAL(source_name));
+	ocrpt_query *q;
 
 	if (ocrpt_datasource_is_sql(ds))
 		q = ocrpt_query_add_sql(ds, ZSTR_VAL(name), ZSTR_VAL(array_or_file_or_sql));
@@ -6530,12 +8667,13 @@ ZEND_FUNCTION(rlib_add_query_as) {
 		RETURN_NULL();
 
 	object_init_ex(return_value, opencreport_query_ce);
-	qo = Z_OPENCREPORT_QUERY_P(return_value);
+	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(return_value);
 	qo->q = q;
 }
 
 ZEND_FUNCTION(rlib_add_resultset_follower) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *leader, *follower;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
@@ -6543,6 +8681,13 @@ ZEND_FUNCTION(rlib_add_resultset_follower) {
 		Z_PARAM_STR(leader);
 		Z_PARAM_STR(follower);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *leader, *follower;
+	int leader_len, follower_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Oss", &object, opencreport_ce, &leader, &leader_len, &follower, &follower_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6562,6 +8707,7 @@ ZEND_FUNCTION(rlib_add_resultset_follower) {
 
 ZEND_FUNCTION(rlib_add_resultset_follower_n_to_1) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *leader, *leader_field, *follower, *follower_field;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 5, 5)
@@ -6571,6 +8717,13 @@ ZEND_FUNCTION(rlib_add_resultset_follower_n_to_1) {
 		Z_PARAM_STR(follower);
 		Z_PARAM_STR(follower_field);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *leader, *leader_field, *follower, *follower_field;
+	int leader_len, leader_field_len, follower_len, follower_field_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Oss", &object, opencreport_ce, &leader, &leader_len, &leader_field, &leader_field_len, &follower, &follower_len, &follower_field, &follower_field_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6605,6 +8758,7 @@ ZEND_FUNCTION(rlib_add_resultset_follower_n_to_1) {
 
 ZEND_FUNCTION(rlib_set_datasource_encoding) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *name, *encoding;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
@@ -6612,6 +8766,13 @@ ZEND_FUNCTION(rlib_set_datasource_encoding) {
 		Z_PARAM_STR(name);
 		Z_PARAM_STR(encoding);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *name, *encoding;
+	int name_len, encoding_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Oss", &object, opencreport_ce, &name, &name_len, &encoding, &encoding_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6630,12 +8791,20 @@ ZEND_FUNCTION(rlib_set_datasource_encoding) {
 
 ZEND_FUNCTION(rlib_add_report) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *filename;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(filename);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *filename;
+	int filename_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Os", &object, opencreport_ce, &filename, &filename_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6644,17 +8813,29 @@ ZEND_FUNCTION(rlib_add_report) {
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
 	RETURN_BOOL(ocrpt_parse_xml(oo->o, ZSTR_VAL(filename)));
+#else
+	RETURN_BOOL(ocrpt_parse_xml(oo->o, filename));
+#endif
 }
 
 ZEND_FUNCTION(rlib_add_report_from_buffer) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *buffer;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(buffer);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *buffer;
+	int buffer_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Os", &object, opencreport_ce, &buffer, &buffer_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6663,17 +8844,29 @@ ZEND_FUNCTION(rlib_add_report_from_buffer) {
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
 	RETURN_BOOL(ocrpt_parse_xml_from_buffer(oo->o, ZSTR_VAL(buffer), ZSTR_LEN(buffer)));
+#else
+	RETURN_BOOL(ocrpt_parse_xml_from_buffer(oo->o, buffer, buffer_len));
+#endif
 }
 
 ZEND_FUNCTION(rlib_add_search_path) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *path;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(path);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *path;
+	int path_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &object, opencreport_ce, &path, &path_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6682,17 +8875,29 @@ ZEND_FUNCTION(rlib_add_search_path) {
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
 	ocrpt_add_search_path(oo->o, ZSTR_VAL(path));
+#else
+	ocrpt_add_search_path(oo->o, path);
+#endif
 }
 
 ZEND_FUNCTION(rlib_set_locale) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *locale;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(locale);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *locale;
+	int locale_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Os", &object, opencreport_ce, &locale, &locale_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6701,11 +8906,16 @@ ZEND_FUNCTION(rlib_set_locale) {
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
 	ocrpt_set_locale(oo->o, ZSTR_VAL(locale));
+#else
+	ocrpt_set_locale(oo->o, locale);
+#endif
 }
 
 ZEND_FUNCTION(rlib_bindtextdomain) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *domainname;
 	zend_string *dirname;
 
@@ -6714,6 +8924,13 @@ ZEND_FUNCTION(rlib_bindtextdomain) {
 		Z_PARAM_STR(domainname);
 		Z_PARAM_STR(dirname);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *domainname, *dirname;
+	int domainname_len, dirname_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Oss", &object, opencreport_ce, &domainname, &domainname_len, &dirname, &dirname_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6722,17 +8939,29 @@ ZEND_FUNCTION(rlib_bindtextdomain) {
 		RETURN_THROWS();
 	}
 
+#if PHP_VERSION_ID >= 70000
 	ocrpt_bindtextdomain(oo->o, ZSTR_VAL(domainname), ZSTR_VAL(dirname));
+#else
+	ocrpt_bindtextdomain(oo->o, domainname, dirname);
+#endif
 }
 
 ZEND_FUNCTION(rlib_set_output_format_from_text) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *format;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(format);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *format;
+	int format_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Os", &object, opencreport_ce, &format, &format_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6761,15 +8990,21 @@ ZEND_FUNCTION(rlib_set_output_format_from_text) {
 }
 
 OCRPT_STATIC_FUNCTION(rlib_default_function) {
+	ocrpt_string *fname = user_data;
+	ocrpt_string *sval;
+	mpfr_ptr mval;
+	bool failed = false;
+
 	ocrpt_expr_make_error_result(e, "not implemented");
 
 	int32_t n_ops = ocrpt_expr_get_num_operands(e);
 
+#if PHP_VERSION_ID >= 70000
+	zval zfname;
 	zval retval;
 	zval params[n_ops];
 
-	mpfr_ptr mval;
-	ocrpt_string *sval;
+	ZVAL_STRINGL(&zfname, fname->str, fname->len);
 
 	for (int32_t i = 0; i < n_ops; i++) {
 		ocrpt_result *rs = ocrpt_expr_operand_get_result(e, i);
@@ -6777,7 +9012,7 @@ OCRPT_STATIC_FUNCTION(rlib_default_function) {
 		case OCRPT_RESULT_ERROR:
 			sval = ocrpt_result_get_string(rs);
 			ocrpt_expr_make_error_result(e, sval->str);
-			return;
+			goto out;
 		case OCRPT_RESULT_STRING:
 			sval = ocrpt_result_get_string(rs);
 			ZVAL_STRINGL(&params[i], sval->str, sval->len);
@@ -6796,22 +9031,64 @@ OCRPT_STATIC_FUNCTION(rlib_default_function) {
 			break;
 		}
 	}
-
-	char *fname = user_data;
-	zval zfname;
-
-	ZVAL_STRING(&zfname, fname);
-
-#if PHP_MAJOR_VERSION >= 8
-	if (call_user_function(CG(function_table), NULL, &zfname, &retval, n_ops, params) == FAILURE)
 #else
-	if (call_user_function_ex(CG(function_table), NULL, &zfname, &retval, n_ops, params, 0, NULL TSRMLS_CC) == FAILURE)
-#endif
-		return;
+	zval *zfname;
+	zval *retval;
+	zval *params0[n_ops];
+	zval ***params = emalloc(sizeof(zval **) * n_ops);
 
-	zend_string_release(Z_STR(zfname));
+	MAKE_STD_ZVAL(zfname);
+	ZVAL_STRINGL(zfname, fname->str, fname->len, 1);
 
 	for (int32_t i = 0; i < n_ops; i++) {
+		MAKE_STD_ZVAL(params0[i]);
+		params[i] = &params0[i];
+
+		ocrpt_result *rs = ocrpt_expr_operand_get_result(e, i);
+		switch (ocrpt_result_get_type(rs)) {
+		case OCRPT_RESULT_ERROR:
+			sval = ocrpt_result_get_string(rs);
+			ocrpt_expr_make_error_result(e, sval->str);
+			goto out;
+		case OCRPT_RESULT_STRING:
+			sval = ocrpt_result_get_string(rs);
+			ZVAL_STRINGL(params0[i], sval->str, sval->len, 1);
+			break;
+		case OCRPT_RESULT_NUMBER:
+			/*
+			 * Naive representation.
+			 * MPFR number may exceed double precision.
+			 */
+			mval = ocrpt_result_get_number(rs);
+			ZVAL_DOUBLE(params0[i], mpfr_get_d(mval, MPFR_RNDN));
+			break;
+		case OCRPT_RESULT_DATETIME:
+			/* Not implemented yet */
+			ZVAL_NULL(params0[i]);
+			break;
+		}
+	}
+#endif
+
+#if PHP_VERSION_ID >= 80000
+	failed = (call_user_function(CG(function_table), NULL, &zfname, &retval, n_ops, params) == FAILURE);
+#elif PHP_VERSION_ID >= 70000
+	failed = (call_user_function_ex(CG(function_table), NULL, &zfname, &retval, n_ops, params, 0, NULL TSRMLS_CC) == FAILURE);
+#else
+	failed = (call_user_function_ex(CG(function_table), NULL, zfname, &retval, n_ops, params, 0, NULL TSRMLS_CC) == FAILURE);
+#endif
+
+out:
+#if PHP_VERSION_ID >= 70000
+	zend_string_release(Z_STR(zfname));
+#else
+	zval_dtor(zfname);
+	efree(zfname);
+	efree(params);
+#endif
+
+	for (int32_t i = 0; i < n_ops; i++) {
+#if PHP_VERSION_ID >= 70000
 		ocrpt_result *rs = ocrpt_expr_operand_get_result(e, i);
 		switch (ocrpt_result_get_type(rs)) {
 		case OCRPT_RESULT_ERROR:
@@ -6824,13 +9101,20 @@ OCRPT_STATIC_FUNCTION(rlib_default_function) {
 		case OCRPT_RESULT_DATETIME:
 			break;
 		}
+#else
+		zval_dtor(params0[i]);
+		efree(params0[i]);
+#endif
 	}
 
 	/*
 	 * The function must be a real OpenCReports user function
 	 * and called $e->set_{long|double|string}_value(...)
 	 */
-	if (Z_TYPE(retval) == IS_UNDEF || Z_TYPE(retval) == IS_NULL)
+#if PHP_VERSION_ID >= 70000
+	if (failed)
+		ocrpt_expr_make_error_result(e, "invalid function call");
+	else if (Z_TYPE(retval) == IS_UNDEF || Z_TYPE(retval) == IS_NULL)
 		return;
 	else if (Z_TYPE(retval) == IS_FALSE)
 		ocrpt_expr_set_long(e, 0);
@@ -6844,10 +9128,30 @@ OCRPT_STATIC_FUNCTION(rlib_default_function) {
 		ocrpt_expr_set_string(e, Z_STRVAL(retval));
 	else
 		ocrpt_expr_make_error_result(e, "invalid return value");
+#else
+	if (!retval || failed)
+		ocrpt_expr_make_error_result(e, "invalid function call");
+	else if (Z_TYPE_P(retval) == IS_NULL)
+		/* Do nothing. */;
+	else if (Z_TYPE_P(retval) == IS_BOOL)
+		ocrpt_expr_set_long(e, Z_BVAL_P(retval));
+	else if (Z_TYPE_P(retval) == IS_LONG)
+		ocrpt_expr_set_long(e, Z_LVAL_P(retval));
+	else if (Z_TYPE_P(retval) == IS_DOUBLE)
+		ocrpt_expr_set_double(e, Z_DVAL_P(retval));
+	else if (Z_TYPE_P(retval) == IS_STRING)
+		ocrpt_expr_set_string(e, Z_STRVAL_P(retval));
+	else
+		ocrpt_expr_make_error_result(e, "invalid return value");
+
+	zval_dtor(retval);
+	efree(retval);
+#endif
 }
 
 ZEND_FUNCTION(rlib_add_function) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *name, *function;
 	zend_long params;
 
@@ -6857,6 +9161,14 @@ ZEND_FUNCTION(rlib_add_function) {
 		Z_PARAM_STR(function);
 		Z_PARAM_LONG(params);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *name, *function;
+	int name_len, function_len;
+	long params;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Ossl", &object, opencreport_ce, &name, &name_len, &function, &function_len, &params) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6865,18 +9177,27 @@ ZEND_FUNCTION(rlib_add_function) {
 		RETURN_THROWS();
 	}
 
-	char *zfunc = ocrpt_mem_strdup(ZSTR_VAL(function));
-	ocrpt_function_add(oo->o, ZSTR_VAL(name), rlib_default_function, zfunc, params, false, false, false, true);
+	ocrpt_string *ofunc = ocrpt_mem_string_new_with_len(ZSTR_VAL(function), ZSTR_LEN(function));
+
+	ocrpt_function_add(oo->o, ZSTR_VAL(name), rlib_default_function, ofunc, params, false, false, false, true);
 }
 
 ZEND_FUNCTION(rlib_set_output_encoding) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *encoding;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(encoding);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *encoding;
+	int encoding_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Ossl", &object, opencreport_ce, &encoding, &encoding_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6890,6 +9211,7 @@ ZEND_FUNCTION(rlib_set_output_encoding) {
 
 ZEND_FUNCTION(rlib_add_parameter) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *param;
 	zend_string *value = NULL;
 
@@ -6899,6 +9221,13 @@ ZEND_FUNCTION(rlib_add_parameter) {
 		Z_PARAM_OPTIONAL;
 		Z_PARAM_STR_EX(value, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *param, *value = NULL;
+	int param_len, value_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Os|s!", &object, opencreport_ce, &param, &param_len, &value, &value_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6912,6 +9241,7 @@ ZEND_FUNCTION(rlib_add_parameter) {
 
 ZEND_FUNCTION(rlib_set_output_parameter) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *param, *value;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
@@ -6919,6 +9249,13 @@ ZEND_FUNCTION(rlib_set_output_parameter) {
 		Z_PARAM_STR(param);
 		Z_PARAM_STR(value);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *param, *value;
+	int param_len, value_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Oss", &object, opencreport_ce, &param, &param_len, &value, &value_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6933,9 +9270,14 @@ ZEND_FUNCTION(rlib_set_output_parameter) {
 ZEND_FUNCTION(rlib_query_refresh) {
 	zval *object;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &object, opencreport_ce) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -6948,43 +9290,80 @@ ZEND_FUNCTION(rlib_query_refresh) {
 }
 
 static void rlib_report_cb(opencreport *o, ocrpt_report *r, void *data) {
-	zend_string *callback = data;
+	char *callback = data;
+
+#if PHP_VERSION_ID >= 70000
 	zval zfname;
-
-	ZVAL_STRINGL(&zfname, ZSTR_VAL(callback), ZSTR_LEN(callback));
-
 	zval retval;
 
-#if PHP_MAJOR_VERSION >= 8
-	if (call_user_function(CG(function_table), NULL, &zfname, &retval, 0, NULL) == FAILURE)
+	ZVAL_STRING(&zfname, callback);
 #else
-	if (call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 0, NULL, 0, NULL TSRMLS_CC) == FAILURE)
-#endif
-		return;
+	zval *zfname;
+	zval *retval = NULL;
 
+	MAKE_STD_ZVAL(zfname);
+	ZVAL_STRING(zfname, callback, 1);
+#endif
+
+#if PHP_VERSION_ID >= 80000
+	call_user_function(CG(function_table), NULL, &zfname, &retval, 0, NULL);
+#elif PHP_VERSION_ID >= 70000
+	call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 0, NULL, 0, NULL TSRMLS_CC);
+#else
+	call_user_function_ex(CG(function_table), NULL, zfname, &retval, 0, NULL, 0, NULL TSRMLS_CC);
+#endif
+
+#if PHP_VERSION_ID >= 70000
 	zend_string_release(Z_STR(zfname));
+#else
+	zval_dtor(zfname);
+	efree(zfname);
+	if (retval) {
+		zval_dtor(retval);
+		efree(retval);
+	}
+#endif
 }
 
 static void rlib_part_cb(opencreport *o, ocrpt_part *p, void *data) {
-	zend_string *callback = data;
+	char *callback = data;
+
+#if PHP_VERSION_ID >= 70000
 	zval zfname;
-
-	ZVAL_STRINGL(&zfname, ZSTR_VAL(callback), ZSTR_LEN(callback));
-
 	zval retval;
 
-#if PHP_MAJOR_VERSION >= 8
-	if (call_user_function(CG(function_table), NULL, &zfname, &retval, 0, NULL) == FAILURE)
+	ZVAL_STRING(&zfname, callback);
 #else
-	if (call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 0, NULL, 0, NULL TSRMLS_CC) == FAILURE)
-#endif
-		return;
+	zval *zfname;
+	zval *retval = NULL;
 
+	MAKE_STD_ZVAL(zfname);
+	ZVAL_STRING(zfname, callback, 1);
+#endif
+
+#if PHP_VERSION_ID >= 80000
+	call_user_function(CG(function_table), NULL, &zfname, &retval, 0, NULL);
+#elif PHP_VERSION_ID >= 70000
+	call_user_function_ex(CG(function_table), NULL, &zfname, &retval, 0, NULL, 0, NULL TSRMLS_CC);
+#else
+	call_user_function_ex(CG(function_table), NULL, zfname, &retval, 0, NULL, 0, NULL TSRMLS_CC);
+#endif
+
+#if PHP_VERSION_ID >= 70000
 	zend_string_release(Z_STR(zfname));
+#else
+	zval_dtor(zfname);
+	efree(zfname);
+	if (retval) {
+		zval_dtor(retval);
+		efree(retval);
+	}
+#endif
 }
 
 ZEND_FUNCTION(rlib_signal_connect) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *signal, *function;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
@@ -6992,6 +9371,13 @@ ZEND_FUNCTION(rlib_signal_connect) {
 		Z_PARAM_STR(signal);
 		Z_PARAM_STR(function);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *signal, *function;
+	int signal_len, function_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Oss", &object, opencreport_ce, &signal, &signal_len, &function, &function_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -7000,29 +9386,34 @@ ZEND_FUNCTION(rlib_signal_connect) {
 		RETURN_THROWS();
 	}
 
-	zend_string *func = zend_string_init(ZSTR_VAL(function), ZSTR_LEN(function), false);
+	ocrpt_string *cb_name = ocrpt_mem_strdup(ZSTR_VAL(function));
 
 	char *signal_name = ZSTR_VAL(signal);
 	if (!strcasecmp(signal_name, "row_change"))
-		ocrpt_report_add_new_row_cb2(oo->o, rlib_report_cb, func);
+		ocrpt_report_add_new_row_cb2(oo->o, rlib_report_cb, cb_name);
 	else if (!strcasecmp(signal_name, "report_done"))
-		ocrpt_report_add_done_cb2(oo->o, rlib_report_cb, func);
+		ocrpt_report_add_done_cb2(oo->o, rlib_report_cb, cb_name);
 	else if (!strcasecmp(signal_name, "report_start"))
-		ocrpt_report_add_start_cb2(oo->o, rlib_report_cb, func);
+		ocrpt_report_add_start_cb2(oo->o, rlib_report_cb, cb_name);
 	else if (!strcasecmp(signal_name, "report_iteration"))
-		ocrpt_report_add_iteration_cb2(oo->o, rlib_report_cb, func);
+		ocrpt_report_add_iteration_cb2(oo->o, rlib_report_cb, cb_name);
 	else if (!strcasecmp(signal_name, "part_iteration"))
-		ocrpt_part_add_iteration_cb2(oo->o, rlib_part_cb, func);
+		ocrpt_part_add_iteration_cb2(oo->o, rlib_part_cb, cb_name);
 	else if (!strcasecmp(signal_name, "precalculation_done"))
-		ocrpt_report_add_precalculation_done_cb2(oo->o, rlib_report_cb, func);
+		ocrpt_report_add_precalculation_done_cb2(oo->o, rlib_report_cb, cb_name);
 }
 
 ZEND_FUNCTION(rlib_execute) {
 	zval *object;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &object, opencreport_ce) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -7037,9 +9428,14 @@ ZEND_FUNCTION(rlib_execute) {
 ZEND_FUNCTION(rlib_spool) {
 	zval *object;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &object, opencreport_ce) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -7054,9 +9450,14 @@ ZEND_FUNCTION(rlib_spool) {
 ZEND_FUNCTION(rlib_get_content_type) {
 	zval *object;
 
+#if PHP_VERSION_ID >= 70000
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &object, opencreport_ce) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -7075,19 +9476,27 @@ ZEND_FUNCTION(rlib_get_content_type) {
 	for (int32_t i = 0; content_type[i]; i++)
 		ocrpt_mem_string_append_printf(retval, "%s\n", content_type[i]->str);
 
-	RETVAL_STRINGL(retval->str, retval->len);
+	OCRPT_RETVAL_STRINGL(retval->str, retval->len);
 
 	ocrpt_mem_string_free(retval, true);
 }
 
 ZEND_FUNCTION(rlib_set_radix_character) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *radix;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(radix);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *radix;
+	int radix_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Os", &object, opencreport_ce, &radix, &radix_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -7100,11 +9509,19 @@ ZEND_FUNCTION(rlib_set_radix_character) {
 }
 
 ZEND_FUNCTION(rlib_compile_infix) {
+#if PHP_VERSION_ID >= 70000
 	zend_string *expr_string;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(expr_string);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
 
 	opencreport *o = ocrpt_init();
 
@@ -7112,7 +9529,7 @@ ZEND_FUNCTION(rlib_compile_infix) {
 	ocrpt_expr *e = ocrpt_expr_parse(o, ZSTR_VAL(expr_string), &err);
 
 	if (!e) {
-		RETVAL_STRING(err);
+		OCRPT_RETVAL_STRING(err);
 		ocrpt_strfree(err);
 		ocrpt_free(o);
 		return;
@@ -7128,7 +9545,7 @@ ZEND_FUNCTION(rlib_compile_infix) {
 	case OCRPT_RESULT_ERROR:
 	case OCRPT_RESULT_STRING:
 		sval = ocrpt_result_get_string(rs);
-		RETVAL_STRINGL(sval->str, sval->len);
+		OCRPT_RETVAL_STRINGL(sval->str, sval->len);
 		break;
 	case OCRPT_RESULT_NUMBER:
 		/*
@@ -7149,8 +9566,9 @@ ZEND_FUNCTION(rlib_compile_infix) {
 
 ZEND_FUNCTION(rlib_graph_add_bg_region) {
 	zval *object;
-	zend_string *graph, *region, *color;
 	double start, end;
+#if PHP_VERSION_ID >= 70000
+	zend_string *graph, *region, *color;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 6, 6)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
@@ -7160,6 +9578,13 @@ ZEND_FUNCTION(rlib_graph_add_bg_region) {
 		Z_PARAM_DOUBLE(start);
 		Z_PARAM_DOUBLE(end);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *graph, *region, *color;
+	int graph_len, region_len, color_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Osssdd", &object, opencreport_ce, &graph, &graph_len, &region, &region_len, &color, &color_len, &start, &end) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -7173,12 +9598,20 @@ ZEND_FUNCTION(rlib_graph_add_bg_region) {
 
 ZEND_FUNCTION(rlib_graph_clear_bg_region) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *graph;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(graph);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *graph;
+	int graph_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Os", &object, opencreport_ce, &graph, &graph_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -7192,13 +9625,21 @@ ZEND_FUNCTION(rlib_graph_clear_bg_region) {
 
 ZEND_FUNCTION(rlib_graph_set_x_minor_tick) {
 	zval *object;
+#if PHP_VERSION_ID >= 70000
 	zend_string *graph, *x;
 
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(graph);
 		Z_PARAM_STR(x);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *graph, *x;
+	int graph_len, x_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Oss", &object, opencreport_ce, &graph, &graph_len, &x, &x_len) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -7212,14 +9653,22 @@ ZEND_FUNCTION(rlib_graph_set_x_minor_tick) {
 
 ZEND_FUNCTION(rlib_graph_set_x_minor_tick_by_location) {
 	zval *object;
-	zend_string *graph;
 	double location;
+#if PHP_VERSION_ID >= 70000
+	zend_string *graph;
 
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 3)
 		Z_PARAM_OBJECT_OF_CLASS(object, opencreport_ce);
 		Z_PARAM_STR(graph);
 		Z_PARAM_DOUBLE(location);
 	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *graph;
+	int graph_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Osd", &object, opencreport_ce, &graph, &graph_len, &location) == FAILURE)
+		return;
+#endif
 
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
 
@@ -7230,6 +9679,11 @@ ZEND_FUNCTION(rlib_graph_set_x_minor_tick_by_location) {
 
 	/* Silently do nothing. Not implemented yet. */
 }
+
+#if PHP_VERSION_ID >= 70000
+
+OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_version, 0, 0, IS_STRING, 0)
+ZEND_END_ARG_INFO()
 
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_rlib_init, 0, 0, OpenCReport, 1)
 ZEND_END_ARG_INFO()
@@ -7323,9 +9777,6 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_add_search_path, 0, 2, IS_VOID, 0)
 ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
 ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_version, 0, 0, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rlib_set_locale, 0, 2, IS_VOID, 0)
@@ -7425,6 +9876,46 @@ ZEND_ARG_OBJ_INFO(0, r, OpenCReport, 0)
 ZEND_ARG_TYPE_INFO(0, graph, IS_STRING, 0)
 ZEND_ARG_TYPE_INFO(0, location, IS_DOUBLE, 0)
 ZEND_END_ARG_INFO()
+
+#else
+
+#define arginfo_rlib_version NULL
+#define arginfo_rlib_init NULL
+#define arginfo_rlib_free NULL
+#define arginfo_rlib_add_datasource_mysql NULL
+#define arginfo_rlib_add_datasource_mysql_from_group NULL
+#define arginfo_rlib_add_datasource_postgres NULL
+#define arginfo_rlib_add_datasource_odbc NULL
+#define arginfo_rlib_add_datasource_array NULL
+#define arginfo_rlib_add_datasource_xml NULL
+#define arginfo_rlib_add_datasource_csv NULL
+#define arginfo_rlib_add_query_as NULL
+#define arginfo_rlib_add_resultset_follower NULL
+#define arginfo_rlib_add_resultset_follower_n_to_1 NULL
+#define arginfo_rlib_set_datasource_encoding NULL
+#define arginfo_rlib_add_report NULL
+#define arginfo_rlib_add_report_from_buffer NULL
+#define arginfo_rlib_add_search_path NULL
+#define arginfo_rlib_set_locale NULL
+#define arginfo_rlib_bindtextdomain NULL
+#define arginfo_rlib_set_output_format_from_text NULL
+#define arginfo_rlib_add_function NULL
+#define arginfo_rlib_set_output_encoding NULL
+#define arginfo_rlib_add_parameter NULL
+#define arginfo_rlib_set_output_parameter NULL
+#define arginfo_rlib_query_refresh NULL
+#define arginfo_rlib_signal_connect NULL
+#define arginfo_rlib_execute NULL
+#define arginfo_rlib_spool NULL
+#define arginfo_rlib_get_content_type NULL
+#define arginfo_rlib_set_radix_character NULL
+#define arginfo_rlib_compile_infix NULL
+#define arginfo_rlib_graph_add_bg_region NULL
+#define arginfo_rlib_graph_clear_bg_region NULL
+#define arginfo_rlib_graph_set_x_minor_tick NULL
+#define arginfo_rlib_graph_set_x_minor_tick_by_location NULL
+
+#endif
 
 /* {{{ zend_function_entry */
 static const zend_function_entry opencreport_functions[] = {

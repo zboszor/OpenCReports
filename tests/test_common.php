@@ -12,7 +12,7 @@ function print_query_columns(&$q, $name = NULL) {
 		echo $i . ": '" . $qr->column_name($i) . "'" . PHP_EOL;
 }
 
-function print_result_row(string $name, OpenCReport\QueryResult &$qr) {
+function print_result_row($name, OpenCReport\QueryResult &$qr) {
 	echo "Query: '" . $name . "':" . PHP_EOL;
 	for ($i = 0; $i < $qr->columns(); $i++) {
 		$r = $qr->column_result($i);
@@ -29,7 +29,7 @@ function print_result_row(string $name, OpenCReport\QueryResult &$qr) {
 	}
 }
 
-function print_part_reports(string $name, OpenCReport\Part &$p) {
+function print_part_reports($name, OpenCReport\Part &$p) {
 	echo "part " . $name . ":" . PHP_EOL;
 	for ($row = $p->row_get_first(), $i = 0; isset($row); $row = $row->get_next(), $i++) {
 		echo "row ". $i . " reports:"; flush();
@@ -42,7 +42,7 @@ function print_part_reports(string $name, OpenCReport\Part &$p) {
 	}
 }
 
-function get_first_report(OpenCReport &$o): OpenCReport\Report {
+function get_first_report(OpenCReport &$o) {
 	return $o->part_get_first()->row_get_first()->column_get_first()->report_get_first();
 }
 
@@ -52,7 +52,7 @@ function create_expr(OpenCReport &$o, &$e, $str, $print = true) {
 		$e->print();
 }
 
-function create_exprs(OpenCReport &$o, bool $resolve = true) {
+function create_exprs(OpenCReport &$o, $resolve = true) {
 	global $id;
 	global $name;
 	global $age;
@@ -90,7 +90,7 @@ function resolve_exprs() {
 	$adult->resolve();
 }
 
-function create_exprs_with_val(OpenCReport &$o, bool $resolve = true) {
+function create_exprs_with_val(OpenCReport &$o, $resolve = true) {
 	global $id;
 	global $name;
 	global $age;
