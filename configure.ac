@@ -119,6 +119,20 @@ AS_IF(
 
 AC_SUBST(COMPILE_SYMBOL)
 
+AX_TRY_LINK_FLAG_CXX([-Wl,--export-dynamic],[ac_cv_Wl_dash_dash_export_dynamic])
+AS_IF([test x$ac_cv_Wl_dash_dash_export_dynamic = xyes],
+	[TEST_LINK_FLAG="-Wl,--export-dynamic"],
+	[AX_TRY_LINK_FLAG_CXX([-Wl,-export-dynamic],[ac_cv_Wl_dash_export_dynamic])
+	 AS_IF([test x$ac_cv_Wl_dash_export_dynamic = xyes],
+	 	[TEST_LINK_FLAG="-Wl,-export-dynamic"],
+	 	[AX_TRY_LINK_FLAG_CXX([-rdynamic],[ac_cv_WL_rdynamic])
+	 	 AS_IF([test x$ac_cv_WL_rdynamic = xyes],
+	 	 	[TEST_LINK_FLAG="-rdynamic"],
+	 	 	[AC_MSG_ERROR([Working dynamic linker option not found])])
+	 	 ])
+	])
+AC_SUBST(TEST_LINK_FLAG)
+
 gl_VISIBILITY
 AS_IF([test x$gl_cv_cc_visibility = xyes],
 	[AC_DEFINE(DLL_EXPORT_SYM,[__attribute__((visibility("default")))],[Explicitly export global symbols])],

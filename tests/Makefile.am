@@ -3,7 +3,7 @@ AM_CPPFLAGS = \
 	-D_XOPEN_SOURCE=700 \
 	-I$(top_srcdir)/include
 
-AM_LDFLAGS = -Wl,--export-dynamic
+AM_LDFLAGS = @TEST_LINK_FLAG@
 
 LIBS = $(top_builddir)/libsrc/libopencreport.la
 
