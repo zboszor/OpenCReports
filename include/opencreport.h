@@ -19,6 +19,7 @@ extern "C" {
 #include <stdio.h>
 #include <time.h>
 #include <iconv.h>
+#include <unistd.h>
 
 struct opencreport;
 typedef struct opencreport opencreport;

@@ -20,7 +20,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#ifdef HAVE_POSTGRESQL
 #include <libpq-fe.h>
+#endif
 #include <mysql.h>
 #include <sql.h>
 #include <sqlext.h>
@@ -50,6 +52,7 @@
 #include "listutil.h"
 #include "datasource.h"
 
+#if HAVE_POSTGRESQL
 /* Fetch (cache) this many rows at once from the cursor */
 #define PGFETCHSIZE (1024)
 
@@ -67,28 +70,30 @@ struct ocrpt_postgresql_results {
 typedef struct ocrpt_postgresql_results ocrpt_postgresql_results;
 
 static const ocrpt_input_connect_parameter ocrpt_postgresql_connect_method1[] = {
-	{ .param_name = "connstr", .optional = false },
+	{ .param_name = "connstr", { .optional = false } },
 	{ .param_name = NULL }
 };
 
 static const ocrpt_input_connect_parameter ocrpt_postgresql_connect_method2[] = {
-	{ .param_name = "unix_socket", .optional = false },
-	{ .param_name = "dbname", .optional = false },
-	{ .param_name = "user", .optional = true },
-	{ .param_name = "password", .optional = true },
+	{ .param_name = "unix_socket", { .optional = false } },
+	{ .param_name = "dbname", { .optional = false } },
+	{ .param_name = "user", { .optional = true } },
+	{ .param_name = "password", { .optional = true } },
 	{ .param_name = NULL }
 };
 
 static const ocrpt_input_connect_parameter ocrpt_postgresql_connect_method3[] = {
-	{ .param_name = "dbname", .optional = false },
-	{ .param_name = "host", .optional = true },
-	{ .param_name = "port", .optional = true },
-	{ .param_name = "user", .optional = true },
-	{ .param_name = "password", .optional = true },
+	{ .param_name = "dbname", { .optional = false } },
+	{ .param_name = "host", { .optional = true } },
+	{ .param_name = "port", { .optional = true } },
+	{ .param_name = "user", { .optional = true } },
+	{ .param_name = "password", { .optional = true } },
 	{ .param_name = NULL }
 };
+#endif
 
 static bool ocrpt_postgresql_connect(ocrpt_datasource *source, const ocrpt_input_connect_parameter *params) {
+#if HAVE_POSTGRESQL
 	if (!source || !params)
 		return false;
 
@@ -139,8 +144,12 @@ static bool ocrpt_postgresql_connect(ocrpt_datasource *source, const ocrpt_input
 	ocrpt_datasource_set_private(source, conn);
 
 	return true;
+#else
+	return false;
+#endif
 }
 
+#ifdef HAVE_POSTGRESQL
 static ocrpt_query *ocrpt_postgresql_query_add(ocrpt_datasource *source, const char *name, const char *querystr) {
 	if (!source || !name || !*name || !querystr || !*querystr)
 		return NULL;
@@ -427,13 +436,17 @@ static const ocrpt_input_connect_parameter *ocrpt_postgresql_connect_methods[] =
 	ocrpt_postgresql_connect_method3,
 	NULL
 };
+#endif
 
 static const char *ocrpt_postgresql_input_names[] = { "postgresql", NULL };
 
 const ocrpt_input ocrpt_postgresql_input = {
 	.names = ocrpt_postgresql_input_names,
+#ifdef HAVE_POSTGRESQL
 	.connect_parameters = ocrpt_postgresql_connect_methods,
+#endif
 	.connect = ocrpt_postgresql_connect,
+#ifdef HAVE_POSTGRESQL
 	.query_add_sql = ocrpt_postgresql_query_add,
 	.describe = ocrpt_postgresql_describe,
 	.rewind = ocrpt_postgresql_rewind,
@@ -442,6 +455,7 @@ const ocrpt_input ocrpt_postgresql_input = {
 	.isdone = ocrpt_postgresql_isdone,
 	.free = ocrpt_postgresql_free,
 	.close = ocrpt_postgresql_close
+#endif
 };
 
 struct ocrpt_mariadb_results {
@@ -455,18 +469,18 @@ struct ocrpt_mariadb_results {
 typedef struct ocrpt_mariadb_results ocrpt_mariadb_results;
 
 static const ocrpt_input_connect_parameter ocrpt_mariadb_connect_method1[] = {
-	{ .param_name = "group", .optional = false },
-	{ .param_name = "optionfile", .optional = true },
+	{ .param_name = "group", { .optional = false } },
+	{ .param_name = "optionfile", { .optional = true } },
 	{ .param_name = NULL }
 };
 
 static const ocrpt_input_connect_parameter ocrpt_mariadb_connect_method2[] = {
-	{ .param_name = "dbname", .optional = false },
-	{ .param_name = "host", .optional = true },
-	{ .param_name = "port", .optional = true },
-	{ .param_name = "unix_socket", .optional = true },
-	{ .param_name = "user", .optional = true },
-	{ .param_name = "password", .optional = true },
+	{ .param_name = "dbname", { .optional = false } },
+	{ .param_name = "host", { .optional = true } },
+	{ .param_name = "port", { .optional = true } },
+	{ .param_name = "unix_socket", { .optional = true } },
+	{ .param_name = "user", { .optional = true } },
+	{ .param_name = "password", { .optional = true } },
 	{ .param_name = NULL }
 };
 
@@ -783,14 +797,14 @@ static void ocrpt_odbc_print_diag(ocrpt_query *query, const char *stmt, SQLRETUR
 }
 
 static const ocrpt_input_connect_parameter ocrpt_odbc_connect_method1[] = {
-	{ .param_name = "connstr", .optional = false },
+	{ .param_name = "connstr", { .optional = false } },
 	{ .param_name = NULL }
 };
 
 static const ocrpt_input_connect_parameter ocrpt_odbc_connect_method2[] = {
-	{ .param_name = "dbname", .optional = false },
-	{ .param_name = "user", .optional = true },
-	{ .param_name = "password", .optional = true },
+	{ .param_name = "dbname", { .optional = false } },
+	{ .param_name = "user", { .optional = true } },
+	{ .param_name = "password", { .optional = true } },
 	{ .param_name = NULL }
 };
 

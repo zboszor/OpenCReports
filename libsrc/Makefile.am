@@ -29,7 +29,7 @@ libopencreport_grammar_la_SOURCES = \
 libopencreport_la_DEPENDENCIES = libopencreport_grammar.la
 
 libopencreport_la_CFLAGS = \
-	-Wall -Werror -O2 -g -I$(top_srcdir)/include \
+	-Wall @WERRORFLAG@ -O2 -g -I$(top_srcdir)/include \
 	-D_XOPEN_SOURCE=700 @COMPILE_SYMBOL@ \
 	$(CFLAG_VISIBILITY) \
 	$(MPFR_CFLAGS) $(PAPER_CFLAGS) $(UTF8PROC_CFLAGS) \

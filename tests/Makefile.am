@@ -1,5 +1,5 @@
 AM_CPPFLAGS = \
-	-Wall -Werror -O2 -g \
+	-Wall @WERRORFLAG@ -O2 -g \
 	-D_XOPEN_SOURCE=700 \
 	-I$(top_srcdir)/include
 
@@ -11,6 +11,16 @@ $(top_builddir)/libsrc/libopencreport.la:
 	$(MAKE) -C $(top_builddir)/libsrc libopencreport.la
 
 compiler_cc_test_SOURCES = compiler_cc_test.cc
+
+if ENABLE_PGSQL_TESTS
+
+PGSQL_TESTS = \
+	pgsql_test pgsql2_test \
+	pgsql_xml_test pgsql_xml2_test pgsql_xml3_test pgsql_xml4_test \
+	pgsql_xml5_test pgsql_xml6_test pgsql_xml7_test pgsql_xml8_test \
+	pgsql_xml9_test pgsql_xml10_test pgsql_xml11_test
+
+endif
 
 TESTS = \
 	compiler_test \
@@ -26,10 +36,7 @@ TESTS = \
 	json_xml_test json_xml2_test \
 	xml_test xml2_test xml3_test xml4_test xml5_test \
 	xml_xml_test xml_xml2_test \
-	pgsql_test pgsql2_test \
-	pgsql_xml_test pgsql_xml2_test pgsql_xml3_test pgsql_xml4_test \
-	pgsql_xml5_test pgsql_xml6_test pgsql_xml7_test pgsql_xml8_test \
-	pgsql_xml9_test pgsql_xml10_test pgsql_xml11_test \
+	$(PGSQL_TESTS) \
 	mariadb_test mariadb2_test \
 	mariadb_xml_test mariadb_xml2_test mariadb_xml3_test \
 	mariadb_xml4_test \
@@ -94,10 +101,7 @@ PHP_TESTS = \
 	json_xml_test json_xml2_test \
 	xml_test xml2_test xml3_test xml4_test xml5_test \
 	xml_xml_test xml_xml2_test \
-	pgsql_test pgsql2_test \
-	pgsql_xml_test pgsql_xml2_test pgsql_xml3_test pgsql_xml4_test \
-	pgsql_xml5_test pgsql_xml6_test pgsql_xml7_test pgsql_xml8_test \
-	pgsql_xml9_test pgsql_xml10_test pgsql_xml11_test \
+	$(PGSQL_TESTS) \
 	mariadb_test mariadb2_test \
 	mariadb_xml_test mariadb_xml2_test mariadb_xml3_test \
 	mariadb_xml4_test \
@@ -132,6 +136,8 @@ PHP_TESTS = \
 	color_test \
 	rlib_function_test
 
+if ENABLE_PGSQL_TESTS
+
 SLOW_TESTS = \
 	pgsql_numeric_precision_test \
 	pgsql_numeric_precision2_test
@@ -139,6 +145,8 @@ SLOW_TESTS = \
 SLOW_PHP_TESTS = \
 	pgsql_numeric_precision_test \
 	pgsql_numeric_precision2_test
+
+endif
 
 # All PDF output tests are inherently unstable because Cairo:
 # * sets the /Producer PDF property with its own name and version
@@ -346,15 +354,21 @@ test: basic-test pdf-test html-test txt-test csv-test xml-test json-test
 
 php-test: php-basic-test php-pdf-test
 
+if ENABLE_PGSQL_TESTS
+
+PGSQL_SLOW_TEST = slow-test
+
 slow-test: $(SLOW_TESTS) execute_test.sh
 	$(foreach TEST,$(SLOW_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_test.sh $(TEST) &&) true
 
 php-slow-test: execute_php_test.sh
 	$(foreach TEST,$(SLOW_PHP_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_php_test.sh $(TEST) &&) true
 
+endif
+
 unstable-test: $(UNSTABLE_TESTS) execute_test.sh
 	$(foreach TEST,$(UNSTABLE_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_test.sh $(TEST) &&) true
 
-all-test: test slow-test unstable-test
+all-test: test $(PGSQL_SLOW_TEST) unstable-test
 
 CLEANFILES = results/* locale/*/*/*.mo

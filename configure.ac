@@ -182,14 +182,18 @@ PKG_CHECK_MODULES(PDFGEN, cairo cairo-pdf pangocairo >= 1.10 librsvg-2.0 gdk-pix
 AC_SUBST(PDFGEN_CFLAGS)
 AC_SUBST(PDFGEN_LIBS)
 
+enable_pgsql_tests=no
 PKG_CHECK_MODULES(POSTGRESQL, libpq,,
 	[AC_CHECK_HEADERS(libpq-fe.h,
 		[AC_CHECK_LIB(pq, PQdescribePortal,
-			[POSTGRESQL_LIBS="-lpq"],
-			[AC_MSG_ERROR([PostgreSQL is not installed])])],
-		[AC_MSG_ERROR([PostgreSQL is not installed])])])
+			[POSTGRESQL_LIBS="-lpq"
+			 enable_pgsql_tests=yes
+			 AC_DEFINE(HAVE_POSTGRESQL,[1],[Have recent enough PostgreSQL])],
+			[AC_MSG_NOTICE([PostgreSQL is not installed or older than 8.2.0])])],
+		[AC_MSG_NOTICE([PostgreSQL is not installed or older than 8.2.0])])])
 AC_SUBST(POSTGRESQL_CFLAGS)
 AC_SUBST(POSTGRESQL_LIBS)
+AM_CONDITIONAL(ENABLE_PGSQL_TESTS, [test x$enable_pgsql_tests = xyes])
 
 MYSQL_CLIENT([5.0.3],[thread-safe])
 
@@ -226,23 +230,34 @@ AC_CHECK_PROG(GHOSTSCRIPT,[ghostscript],[ghostscript],[false])
 AC_CHECK_PROG(IMCOMPARE,[compare],[compare],[false])
 AM_CONDITIONAL(ENABLE_PDF_TESTS, [test x$ac_cv_prog_GHOSTSCRIPT = xghostscript -a x$ac_cv_prog_IMCOMPARE = xcompare])
 
+AC_MSG_CHECKING([whether building documentation is enabled])
+AC_ARG_ENABLE([documentation],
+    [AS_HELP_STRING([--enable-documentation],[enable building documentation])],
+    [],[enable_documentation=yes])
+AC_MSG_RESULT([$enable_documentation])
+
 AC_CHECK_PROG(XMLLINT,[xmllint],[xmllint],[false])
 AC_CHECK_PROG(XSLTPROC,[xsltproc],[xsltproc],[false])
 AC_CHECK_PROG(FOP,[fop],[fop],[false])
 
-AC_MSG_CHECKING([whether building HTML documentation is enabled])
+AC_MSG_CHECKING([whether building HTML documentation is possible])
 AS_IF([test x$ac_cv_prog_XMLLINT = xxmllint -a x$ac_cv_prog_XSLTPROC = xxsltproc],
 	[enable_docs=yes],
 	[enable_docs=no])
 AC_MSG_RESULT([$enable_docs])
+AS_IF([test x$enable_documentation = xno],[enable_docs=no])
 AM_CONDITIONAL(ENABLE_DOCS, [test x$enable_docs = xyes])
 
-AC_MSG_CHECKING([whether building PDF documentation is enabled])
+AC_MSG_CHECKING([whether building PDF documentation is possible])
 AS_IF([test x$enable_docs = xyes -a x$ac_cv_prog_FOP = xfop],
 	[enable_pdf_docs=yes],
 	[enable_pdf_docs=no])
 AC_MSG_RESULT([$enable_pdf_docs])
+AS_IF([test x$enable_documentation = xno],[enable_pdf_docs=no])
 AM_CONDITIONAL(ENABLE_PDF_DOCS, [test x$enable_pdf_docs = xyes])
+
+AS_IF([test x$enable_maintainer_mode = xyes],[WERRORFLAG=],[WERRORFLAG="-Werror"])
+AC_SUBST(WERRORFLAG)
 
 AC_CONFIG_FILES([
 	Makefile

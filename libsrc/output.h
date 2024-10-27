@@ -15,9 +15,6 @@
 #include <opencreport.h>
 #include "listutil.h"
 
-struct ocrpt_color;
-typedef struct ocrpt_color ocrpt_color;
-
 struct ocrpt_output_functions {
 	void (*reset_state)(opencreport *o);
 	void *(*get_new_page)(opencreport *o, ocrpt_part *p);
