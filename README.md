@@ -65,8 +65,10 @@ sudo make install
 
 ### Build OpenCReports PHP module
 
-OpenCReports contains a PHP module that supports PHP 7.0 or newer versions.
-It can be built after the OpenCReports engine is built and installed.
+OpenCReports contains a PHP module that supports PHP 5.4 or newer versions.
+It is possible that it suppports older PHP versions than 5.4 but it
+was not tested.
+The PHP module can be built after the OpenCReports engine is built and installed.
 
 ```
 cd bindings/php
