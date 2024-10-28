@@ -245,9 +245,16 @@ rlib_spool($r);</programlisting>
 
 int main(int argc, char **argv) {
     opencreport *o = ocrpt_init();
-    ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
 
-    ocrpt_query_add_postgresql(ds, "q", "select * from flintstones;");
+    struct ocrpt_input_connect_parameter conn_params[] = {
+        { .param_name = "dbname", .param_value = "ocrpttest" },
+        { .param_name = "user", .param_value = "ocrpt" },
+        { NULL }
+    };
+
+    ocrpt_datasource *ds = ocrpt_datasource_add(o, "pgsql", "postgresql", conn_params);
+
+    ocrpt_query_add_sql(ds, "q", "select * from flintstones;");
 
     if (!ocrpt_parse_xml(o, "example2.xml")) {
         printf("XML parse error\n");
@@ -270,7 +277,13 @@ int main(int argc, char **argv) {
 				Here's the equivalent program code in PHP.
 				<programlisting>&lt;?php
 $o = new OpenCReport();
-$ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+
+$conn_params = [
+    "dbname" =&gt; "ocrpttest",
+    "user" =&gt; "ocrpt"
+];
+
+$ds = $o-&gt;datasource_add("pgsql", "postgresql", $conn_params);
 
 $ds-&gt;query_add("q", "select * from flintstones;");
 
@@ -433,9 +446,16 @@ values
 
 int main(int argc, char **argv) {
     opencreport *o = ocrpt_init();
-    ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
 
-    ocrpt_query_add_postgresql(ds, "q", "select * from flintstones2;");
+    struct ocrpt_input_connect_parameter conn_params[] = {
+        { .param_name = "dbname", .param_value = "ocrpttest" },
+        { .param_name = "user", .param_value = "ocrpt" },
+        { NULL }
+    };
+
+    ocrpt_datasource *ds = ocrpt_datasource_add(o, "pgsql", "postgresql", conn_params);
+
+    ocrpt_query_add_sql(ds, "q", "select * from flintstones2;");
 
     if (!ocrpt_parse_xml(o, "example3.xml")) {
         printf("XML parse error\n");
@@ -458,7 +478,13 @@ int main(int argc, char **argv) {
 				Here's the equivalent program code in PHP.
 				<programlisting>&lt;?php
 $o = new OpenCReport();
-$ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+
+$conn_params = [
+    "dbname" =&gt; "ocrpttest",
+    "user" =&gt; "ocrpt"
+];
+
+$ds = $o-&gt;datasource_add("pgsql", "postgresql", $conn_params);
 
 $ds-&gt;query_add("q", "select * from flintstones2;");
 
@@ -629,9 +655,15 @@ values
 
 int main(int argc, char **argv) {
     opencreport *o = ocrpt_init();
-    ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
 
-    ocrpt_query_add_postgresql(ds, "q", "select * from flintstones3;");
+    struct ocrpt_input_connect_parameter conn_params[] = {
+        { .param_name = "connstr", .param_value = "dbname=ocrpttest user=ocrpt" },
+        { NULL }
+    };
+
+    ocrpt_datasource *ds = ocrpt_datasource_add(o, "pgsql", "postgresql", conn_params);
+
+    ocrpt_query_add_sql(ds, "q", "select * from flintstones3;");
 
     if (!ocrpt_parse_xml(o, "example4.xml")) {
         printf("XML parse error\n");
@@ -654,7 +686,10 @@ int main(int argc, char **argv) {
 				Here's the equivalent program code in PHP.
 				<programlisting>&lt;?php
 $o = new OpenCReport();
-$ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+
+$conn_params = [ "connstr" =&gt; "dbname=ocrpttest user=ocrpt" ];
+
+$ds = $o-&gt;datasource_add("pgsql", "postgresql", $conn_params);
 
 $ds-&gt;query_add("q", "select * from flintstones3;");
 
@@ -851,9 +886,16 @@ ocrpttest=&gt; select * from flintstones5;
 
 int main(int argc, char **argv) {
     opencreport *o = ocrpt_init();
-    ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
-    ocrpt_query *q1 = ocrpt_query_add_postgresql(ds, "q1", "select * from flintstones4;");
-    ocrpt_query *q2 = ocrpt_query_add_postgresql(ds, "q2", "select * from flintstones5;");
+
+    struct ocrpt_input_connect_parameter conn_params[] = {
+        { .param_name = "dbname", .param_value = "ocrpttest" },
+        { .param_name = "user", .param_value = "ocrpt" },
+        { NULL }
+    };
+
+    ocrpt_datasource *ds = ocrpt_datasource_add(o, "pgsql", "postgresql", conn_params);
+    ocrpt_query *q1 = ocrpt_query_add_sql(ds, "q1", "select * from flintstones4;");
+    ocrpt_query *q2 = ocrpt_query_add_sql(ds, "q2", "select * from flintstones5;");
 
     ocrpt_query_add_follower(q1, q2);
 
@@ -878,7 +920,13 @@ int main(int argc, char **argv) {
 				Here's the equivalent program code in PHP.
 				<programlisting>&lt;?php
 $o = new OpenCReport();
-$ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+
+$conn_params = [
+    "dbname" =&gt; "ocrpttest",
+    "user" =&gt; "ocrpt"
+];
+
+$ds = $o-&gt;datasource_add("pgsql", "postgresql", $conn_params);
 $q1 = $ds-&gt;query_add("q1", "select * from flintstones4;");
 $q2 = $ds-&gt;query_add("q2", "select * from flintstones5;");
 
@@ -1079,10 +1127,15 @@ ocrpttest-> order by data.id, more_data.id;
 
 int main(int argc, char **argv) {
     opencreport *o = ocrpt_init();
-    ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
-    ocrpt_query *q1 = ocrpt_query_add_postgresql(ds, "q1", "select * from data order by id;");
-    ocrpt_query *q2 = ocrpt_query_add_postgresql(ds, "q2", "select * from more_data order by id;");
-    ocrpt_query *q3 = ocrpt_query_add_postgresql(ds, "q3", "select * from moar_data order by sk_id;");
+    struct ocrpt_input_connect_parameter conn_params[] = {
+        { .param_name = "dbname", .param_value = "ocrpttest" },
+        { .param_name = "user", .param_value = "ocrpt" },
+        { NULL }
+    };
+    ocrpt_datasource *ds = ocrpt_datasource_add(o, "pgsql", "postgresql", conn_params);
+    ocrpt_query *q1 = ocrpt_query_add_sql(ds, "q1", "select * from data order by id;");
+    ocrpt_query *q2 = ocrpt_query_add_sql(ds, "q2", "select * from more_data order by id;");
+    ocrpt_query *q3 = ocrpt_query_add_sql(ds, "q3", "select * from moar_data order by sk_id;");
 
     ocrpt_expr *match = ocrpt_expr_parse(o, "q1.id = q2.boss_id", NULL);
     ocrpt_query_add_follower_n_to_1(q1, q2, match);
@@ -1111,7 +1164,13 @@ int main(int argc, char **argv) {
 				Here's the equivalent program code in PHP.
 				<programlisting>&lt;?php
 $o = new OpenCReport();
-$ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+
+$conn_params = [
+        "dbname" =&gt; "ocrpttest",
+        "user" =&gt; "ocrpt"
+];
+
+$ds = $o-&gt;datasource_add("pgsql", "postgresql", $conn_params);
 $q1 = $ds-&gt;query_add("q1", "select * from data order by id;");
 $q2 = $ds-&gt;query_add("q2", "select * from more_data order by id;");
 $q3 = $ds-&gt;query_add("q3", "select * from moar_data order by sk_id;");
@@ -1273,10 +1332,15 @@ ocrpttest->      order by moar_data.sk_id limit 1) y on (true);
 
 int main(int argc, char **argv) {
     opencreport *o = ocrpt_init();
-    ocrpt_datasource *ds = ocrpt_datasource_add_postgresql(o, "pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
-    ocrpt_query *q1 = ocrpt_query_add_postgresql(ds, "q1", "select * from data order by id;");
-    ocrpt_query *q2 = ocrpt_query_add_postgresql(ds, "q2", "select * from more_data order by id;");
-    ocrpt_query *q3 = ocrpt_query_add_postgresql(ds, "q3", "select * from moar_data order by sk_id;");
+    struct ocrpt_input_connect_parameter conn_params[] = {
+        { .param_name = "dbname", .param_value = "ocrpttest" },
+        { .param_name = "user", .param_value = "ocrpt" },
+        { NULL }
+    };
+    ocrpt_datasource *ds = ocrpt_datasource_add(o, "pgsql", "postgresql", conn_params);
+    ocrpt_query *q1 = ocrpt_query_add_sql(ds, "q1", "select * from data order by id;");
+    ocrpt_query *q2 = ocrpt_query_add_sql(ds, "q2", "select * from more_data order by id;");
+    ocrpt_query *q3 = ocrpt_query_add_sql(ds, "q3", "select * from moar_data order by sk_id;");
 
     ocrpt_expr *match = ocrpt_expr_parse(o, "q1.id = q2.boss_id", NULL);
     ocrpt_query_add_follower_n_to_1(q1, q2, match);
@@ -1305,7 +1369,11 @@ int main(int argc, char **argv) {
 				Here's the equivalent program code in PHP.
 				<programlisting>&lt;?php
 $o = new OpenCReport();
-$ds = $o-&gt;datasource_add_postgresql("pgsql", NULL, NULL, "ocrpttest", "ocrpt", NULL);
+$conn_params = [
+        "dbname" =&gt; "ocrpttest",
+        "user" =&gt; "ocrpt"
+];
+$ds = $o-&gt;datasource_add("pgsql", "postgresql", $conn_params);
 $q1 = $ds-&gt;query_add("q1", "select * from data order by id;");
 $q2 = $ds-&gt;query_add("q2", "select * from more_data order by id;");
 $q3 = $ds-&gt;query_add("q3", "select * from moar_data order by sk_id;");
