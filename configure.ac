@@ -183,7 +183,9 @@ AC_SUBST(PDFGEN_CFLAGS)
 AC_SUBST(PDFGEN_LIBS)
 
 enable_pgsql_tests=no
-PKG_CHECK_MODULES(POSTGRESQL, libpq,,
+PKG_CHECK_MODULES(POSTGRESQL, libpq,
+	[enable_pgsql_tests=yes
+	 AC_DEFINE(HAVE_POSTGRESQL,[1],[Have recent enough PostgreSQL])],
 	[AC_CHECK_HEADERS(libpq-fe.h,
 		[AC_CHECK_LIB(pq, PQdescribePortal,
 			[POSTGRESQL_LIBS="-lpq"
