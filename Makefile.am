@@ -10,9 +10,6 @@ endif
 
 if ENABLE_TESTS
 TESTS = tests
-else
-clean-local:
-	$(MAKE) -C tests clean
 endif
 
 SUBDIRS = $(DOCS) include libsrc $(TESTS)
