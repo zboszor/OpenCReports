@@ -1,6 +1,6 @@
 /*
  * Variable utilities
- * Copyright (C) 2019-2024 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2025 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 #ifndef _VARIABLES_H_
