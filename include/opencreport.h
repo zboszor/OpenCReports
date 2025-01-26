@@ -38,10 +38,10 @@ struct ocrpt_string {
 typedef struct ocrpt_string ocrpt_string;
 
 enum ocrpt_result_type {
-	OCRPT_RESULT_ERROR,
 	OCRPT_RESULT_STRING,
 	OCRPT_RESULT_NUMBER,
-	OCRPT_RESULT_DATETIME
+	OCRPT_RESULT_DATETIME,
+	OCRPT_RESULT_ERROR
 };
 
 struct ocrpt_result {

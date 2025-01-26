@@ -18,16 +18,16 @@
  */
 enum ocrpt_expr_type {
 	/*
-	 * Error in parsing or evaluation
-	 */
-	OCRPT_EXPR_ERROR,
-
-	/*
 	 * Constants
 	 */
 	OCRPT_EXPR_STRING,
 	OCRPT_EXPR_NUMBER,
 	OCRPT_EXPR_DATETIME,
+
+	/*
+	 * Error in parsing or evaluation
+	 */
+	OCRPT_EXPR_ERROR,
 
 	/*
 	 * Pre-set variable that can be evaluated early
