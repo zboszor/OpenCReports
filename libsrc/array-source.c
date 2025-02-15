@@ -124,6 +124,9 @@ static ocrpt_query *array_query_add(const ocrpt_datasource *source, const char *
 		}
 
 		memcpy(types_copy, types, types_cols_copy * sizeof(int32_t));
+
+		for (int32_t i = types_cols_copy; i < cols; i++)
+			types_copy[i] = OCRPT_RESULT_STRING;
 	}
 
 	struct ocrpt_array_results *priv = ocrpt_mem_malloc(sizeof(struct ocrpt_array_results));
