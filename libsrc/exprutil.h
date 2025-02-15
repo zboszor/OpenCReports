@@ -117,6 +117,19 @@ static inline void ocrpt_expr_resolve_nowarn(ocrpt_expr *e) {
 	ocrpt_expr_resolve_worker(e, e, NULL, 0, false);
 }
 
+#define get_string(o, expr) { \
+					expr##_e = ocrpt_expr_parse(o, (char *)expr, NULL); \
+					ocrpt_expr_resolve_nowarn(expr##_e); \
+					const ocrpt_string *expr##_ss = ocrpt_expr_get_string(expr##_e); \
+					expr##_s = expr##_ss ? expr##_ss->str : (char *)expr; \
+				}
+
+#define get_int(o, expr) { \
+					expr##_e = ocrpt_expr_parse(o, (char *)expr, NULL); \
+					ocrpt_expr_resolve_nowarn(expr##_e); \
+					expr##_i = ocrpt_expr_get_long(expr##_e); \
+				}
+
 void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exclude_mask);
 bool ocrpt_expr_references(ocrpt_expr *e, int32_t varref_include_mask, uint32_t *varref_vartype_mask);
 void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var);

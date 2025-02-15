@@ -59,19 +59,6 @@ static void processNode(xmlTextReaderPtr reader) {
 	}
 }
 
-#define get_string(o, expr) { \
-					expr##_e = ocrpt_expr_parse(o, (char *)expr, NULL); \
-					ocrpt_expr_resolve_nowarn(expr##_e); \
-					const ocrpt_string *expr##_ss = ocrpt_expr_get_string(expr##_e); \
-					expr##_s = expr##_ss ? expr##_ss->str : (char *)expr; \
-				}
-
-#define get_int(o, expr) { \
-					expr##_e = ocrpt_expr_parse(o, (char *)expr, NULL); \
-					ocrpt_expr_resolve_nowarn(expr##_e); \
-					expr##_i = ocrpt_expr_get_long(expr##_e); \
-				}
-
 static void ocrpt_ignore_child_nodes(opencreport *o, xmlTextReaderPtr reader, int depth, const char *leaf_name) {
 	int nodetype;
 
