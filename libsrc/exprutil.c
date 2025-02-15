@@ -596,7 +596,7 @@ static void ocrpt_expr_convert_to_string_const(ocrpt_expr *e, char *domain, char
 		ocrpt_err_printf("invalid field reference: '%s', converted to string literal\n", EXPR_STRING_VAL(e));
 }
 
-void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask, bool warn) {
+void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask, bool warn, bool *unresolved) {
 	int32_t i;
 
 	if (!e)
@@ -653,7 +653,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 				if (var && (orig_e == var->intermedexpr || orig_e == var->intermed2expr || orig_e == var->resultexpr)) {
 					e->var = var;
 					if (var->baseexpr) {
-						ocrpt_expr_resolve_worker(e->var->baseexpr, e->var->baseexpr, var, varref_exclude_mask, warn);
+						ocrpt_expr_resolve_worker(e->var->baseexpr, query, e->var->baseexpr, var, varref_exclude_mask, warn, unresolved);
 						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 							if (!e->result[i]) {
 								//assert(var->baseexpr->result[i]);
@@ -668,7 +668,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 				if (var && (orig_e == var->intermed2expr || orig_e == var->resultexpr)) {
 					e->var = var;
 					if (var->intermedexpr) {
-						ocrpt_expr_resolve_worker(e->var->intermedexpr, e->var->intermedexpr, var, varref_exclude_mask, warn);
+						ocrpt_expr_resolve_worker(e->var->intermedexpr, query, e->var->intermedexpr, var, varref_exclude_mask, warn, unresolved);
 						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 							if (!e->result[i]) {
 								//assert(var->intermedexpr->result[i]);
@@ -683,7 +683,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 				if (var && orig_e == var->resultexpr) {
 					e->var = var;
 					if (var->intermed2expr) {
-						ocrpt_expr_resolve_worker(e->var->intermed2expr, e->var->intermed2expr, var, varref_exclude_mask, warn);
+						ocrpt_expr_resolve_worker(e->var->intermed2expr, query, e->var->intermed2expr, var, varref_exclude_mask, warn, unresolved);
 						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 							if (!e->result[i]) {
 								//assert(var->intermed2expr->result[i]);
@@ -755,6 +755,8 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 					}
 				}
 			} else {
+				if (unresolved)
+					*unresolved = true;
 				/* No such identifier, turn it into a string. */
 				ocrpt_expr_convert_to_string_const(e, "r", ".", e->name->str, warn);
 			}
@@ -774,6 +776,8 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 					}
 				}
 				if (!ptr) {
+					if (unresolved)
+						*unresolved = true;
 					/* No such identifier, turn it into a string. */
 					ocrpt_expr_convert_to_string_const(e, "v", ".", e->name->str, warn);
 				}
@@ -787,7 +791,9 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 			/* Resolve the identifier ocrpt_query_result from the queries */
 			if (EXPR_RESULT(e) && EXPR_TYPE(e) != OCRPT_RESULT_ERROR)
 				break;
-			if (e->r && e->r->query)
+			if (query)
+				found = ocrpt_resolve_ident(e, query);
+			else if (e->r && e->r->query)
 				found = ocrpt_resolve_ident(e, e->r->query);
 			else if (e->o->queries) {
 				for (ocrpt_list *ql = e->o->queries; !found && ql; ql = ql->next) {
@@ -798,6 +804,8 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 			}
 
 			if (!found) {
+				if (unresolved)
+					*unresolved = true;
 				/* No such identifier, turn it into a string. */
 				ocrpt_expr_convert_to_string_const(e, e->query ? e->query->str : "", (e->query || e->dotprefixed) ? "." : "", e->name->str, warn);
 			}
@@ -805,7 +813,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var
 		break;
 	case OCRPT_EXPR:
 		for (i = 0; i < e->n_ops; i++)
-			ocrpt_expr_resolve_worker(e->ops[i], orig_e, var, varref_exclude_mask, warn);
+			ocrpt_expr_resolve_worker(e->ops[i], query, orig_e, var, varref_exclude_mask, warn, unresolved);
 		break;
 	default:
 		break;
@@ -816,14 +824,14 @@ DLL_EXPORT_SYM void ocrpt_expr_resolve(ocrpt_expr *e) {
 	if (!e)
 		return;
 
-	ocrpt_expr_resolve_worker(e, e, NULL, 0, true);
+	ocrpt_expr_resolve_worker(e, NULL, e, NULL, 0, true, NULL);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exclude_mask) {
 	if (!e)
 		return;
 
-	ocrpt_expr_resolve_worker(e, e, NULL, varref_exclude_mask, true);
+	ocrpt_expr_resolve_worker(e, NULL, e, NULL, varref_exclude_mask, true, NULL);
 }
 
 static bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask) {

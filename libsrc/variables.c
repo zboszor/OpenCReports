@@ -282,19 +282,19 @@ DLL_EXPORT_SYM void ocrpt_variable_resolve(ocrpt_var *v) {
 		return;
 
 	if (v->baseexpr) {
-		ocrpt_expr_resolve_worker(v->baseexpr, v->baseexpr, v, 0, true);
+		ocrpt_expr_resolve_worker(v->baseexpr, NULL, v->baseexpr, v, 0, true, NULL);
 		ocrpt_expr_optimize(v->baseexpr);
 	}
 	if (v->intermedexpr) {
-		ocrpt_expr_resolve_worker(v->intermedexpr, v->intermedexpr, v, 0, true);
+		ocrpt_expr_resolve_worker(v->intermedexpr, NULL, v->intermedexpr, v, 0, true, NULL);
 		ocrpt_expr_optimize(v->intermedexpr);
 	}
 	if (v->intermed2expr) {
-		ocrpt_expr_resolve_worker(v->intermed2expr, v->intermed2expr, v, 0, true);
+		ocrpt_expr_resolve_worker(v->intermed2expr, NULL, v->intermed2expr, v, 0, true, NULL);
 		ocrpt_expr_optimize(v->intermed2expr);
 	}
 
-	ocrpt_expr_resolve_worker(v->resultexpr, v->resultexpr, v, 0, true);
+	ocrpt_expr_resolve_worker(v->resultexpr, NULL, v->resultexpr, v, 0, true, NULL);
 	ocrpt_expr_optimize(v->resultexpr);
 
 	if (v->br_name && !v->br) {

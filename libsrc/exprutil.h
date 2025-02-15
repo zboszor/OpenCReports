@@ -110,11 +110,11 @@ void ocrpt_expr_free_internal(ocrpt_expr *e, bool free_from_list);
 
 void ocrpt_expr_print_internal(ocrpt_expr *e, ocrpt_printf_func func);
 void ocrpt_expr_result_deep_print_worker(ocrpt_expr *e, ocrpt_printf_func func);
-void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask, bool warn);
+void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *orig_e, ocrpt_var *var, int32_t varref_exclude_mask, bool warn, bool *unresolved);
 static inline void ocrpt_expr_resolve_nowarn(ocrpt_expr *e) {
 	if (!e)
 		return;
-	ocrpt_expr_resolve_worker(e, e, NULL, 0, false);
+	ocrpt_expr_resolve_worker(e, NULL, e, NULL, 0, false, NULL);
 }
 
 #define get_string(o, expr) { \
