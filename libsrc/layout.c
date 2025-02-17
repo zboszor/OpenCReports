@@ -1625,59 +1625,37 @@ DLL_EXPORT_SYM void ocrpt_output_add_image_end(ocrpt_output *output) {
 	output->output_list = ocrpt_list_append(output->output_list, elem);
 }
 
-DLL_EXPORT_SYM void ocrpt_image_set_value(ocrpt_image *image, const char *expr_string) {
-	if (!image)
-		return;
+#define SET_IMAGE_EXPR(exprname, report, create_string) { \
+		if (!image) \
+			return NULL; \
+		ocrpt_expr_free(image->exprname); \
+		image->exprname = expr_string ? ocrpt_layout_expr_parse(image->output->o, image->output->r, expr_string, report, create_string) : NULL; \
+		return image->exprname; \
+	}
 
-	if (image->value)
-		ocrpt_expr_free(image->value);
-
-	image->value = expr_string ? ocrpt_layout_expr_parse(image->output->o, image->output->r, expr_string, true, false) : NULL;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_value(ocrpt_image *image, const char *expr_string) {
+	SET_IMAGE_EXPR(value, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_image_set_suppress(ocrpt_image *image, const char *expr_string) {
-	if (!image)
-		return;
-
-	if (image->suppress)
-		ocrpt_expr_free(image->suppress);
-
-	image->suppress = expr_string ? ocrpt_layout_expr_parse(image->output->o, image->output->r, expr_string, true, false) : NULL;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_suppress(ocrpt_image *image, const char *expr_string) {
+	SET_IMAGE_EXPR(suppress, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_image_set_type(ocrpt_image *image, const char *expr_string) {
-	if (!image)
-		return;
-
-	if (image->imgtype)
-		ocrpt_expr_free(image->imgtype);
-
-	image->imgtype = expr_string ? ocrpt_layout_expr_parse(image->output->o, image->output->r, expr_string, true, false) : NULL;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_type(ocrpt_image *image, const char *expr_string) {
+	SET_IMAGE_EXPR(imgtype, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_image_set_width(ocrpt_image *image, const char *expr_string) {
-	if (!image)
-		return;
-
-	if (image->width)
-		ocrpt_expr_free(image->width);
-
-	image->width = expr_string ? ocrpt_layout_expr_parse(image->output->o, image->output->r, expr_string, true, false) : NULL;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_width(ocrpt_image *image, const char *expr_string) {
+	SET_IMAGE_EXPR(width, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_image_set_height(ocrpt_image *image, const char *expr_string) {
-	if (!image)
-		return;
-
-	if (image->height)
-		ocrpt_expr_free(image->height);
-
-	image->height = expr_string ? ocrpt_layout_expr_parse(image->output->o, image->output->r, expr_string, true, false) : NULL;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_height(ocrpt_image *image, const char *expr_string) {
+	SET_IMAGE_EXPR(height, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_image_set_alignment(ocrpt_image *image, const char *expr_string) {
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_alignment(ocrpt_image *image, const char *expr_string) {
 	if (!image)
-		return;
+		return NULL;
 
 	if (image->align)
 		ocrpt_expr_free(image->align);
@@ -1689,26 +1667,16 @@ DLL_EXPORT_SYM void ocrpt_image_set_alignment(ocrpt_image *image, const char *ex
 			image->align = ocrpt_layout_expr_parse(image->output->o, image->output->r, expr_string, true, false);
 	} else
 		image->align = NULL;
+
+	return image->align;
 }
 
-DLL_EXPORT_SYM void ocrpt_image_set_bgcolor(ocrpt_image *image, const char *expr_string) {
-	if (!image)
-		return;
-
-	if (image->bgcolor)
-		ocrpt_expr_free(image->bgcolor);
-
-	image->bgcolor = expr_string ? ocrpt_layout_expr_parse(image->output->o, image->output->r, expr_string, true, false) : NULL;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_bgcolor(ocrpt_image *image, const char *expr_string) {
+	SET_IMAGE_EXPR(bgcolor, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_image_set_text_width(ocrpt_image *image, const char *expr_string) {
-	if (!image)
-		return;
-
-	if (image->text_width)
-		ocrpt_expr_free(image->text_width);
-
-	image->text_width = expr_string ? ocrpt_layout_expr_parse(image->output->o, image->output->r, expr_string, true, false) : NULL;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_text_width(ocrpt_image *image, const char *expr_string) {
+	SET_IMAGE_EXPR(text_width, true, false);
 }
 
 DLL_EXPORT_SYM ocrpt_barcode *ocrpt_output_add_barcode(ocrpt_output *output) {
@@ -1749,501 +1717,254 @@ static void ocrpt_text_set_rvalue_internal(ocrpt_text *text) {
 		text->translate->rvalue = text->value;
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_value_string(ocrpt_text *text, const char *string) {
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_value_string(ocrpt_text *text, const char *string) {
 	if (!text)
-		return;
+		return NULL;
 
-	if (text->value)
-		ocrpt_expr_free(text->value);
-
+	ocrpt_expr_free(text->value);
 	text->value = string ? ocrpt_newstring_add_to_list(text->output->o, text->output->r, string) : NULL;
-
 	ocrpt_text_set_rvalue_internal(text);
+	return text->value;
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
+#define SET_TEXT_EXPR(exprname, report, create_string) { \
+		if (!text) \
+			return NULL; \
+		ocrpt_expr_free(text->exprname); \
+		text->exprname = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, report, create_string) : NULL; \
+		ocrpt_text_set_rvalue_internal(text); \
+		return text->exprname; \
+	}
 
-	if (text->value)
-		ocrpt_expr_free(text->value);
-
-	text->value = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
-
-	ocrpt_text_set_rvalue_internal(text);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(value, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_value_delayed(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->delayed)
-		ocrpt_expr_free(text->delayed);
-
-	text->delayed = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_value_delayed(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(delayed, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_format(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->format)
-		ocrpt_expr_free(text->format);
-
-	text->format = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
-	if (text->format)
-		text->format->rvalue = text->value;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_format(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(format, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_translate(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->translate)
-		ocrpt_expr_free(text->translate);
-
-	text->translate = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
-	if (text->translate)
-		text->translate->rvalue = text->value;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_translate(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(translate, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_width(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->width)
-		ocrpt_expr_free(text->width);
-
-	text->width = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
-	if (text->width)
-		text->width->rvalue = text->value;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_width(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(width, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_alignment(ocrpt_text *text, const char *expr_string) {
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_alignment(ocrpt_text *text, const char *expr_string) {
 	if (!text)
-		return;
+		return NULL;
 
-	if (text->align)
-		ocrpt_expr_free(text->align);
+	ocrpt_expr_free(text->align);
 
 	if (expr_string) {
 		if (strcasecmp(expr_string, "left") == 0 || strcasecmp(expr_string, "right") == 0 || strcasecmp(expr_string, "center") == 0 || strcasecmp(expr_string, "justified") == 0)
-			text->align = ocrpt_newstring_add_to_list(text->output->o, text->output->r, expr_string);
+			text->align = expr_string ? ocrpt_newstring_add_to_list(text->output->o, text->output->r, expr_string) : NULL;
 		else
-			text->align = ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false);
+			text->align = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
 	} else
 		text->align = NULL;
 
-	if (text->align)
-		text->align->rvalue = text->value;
+	ocrpt_text_set_rvalue_internal(text);
+	return text->align;
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_color(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->color)
-		ocrpt_expr_free(text->color);
-
-	text->color = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
-	if (text->color)
-		text->color->rvalue = text->value;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_color(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(color, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_bgcolor(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->bgcolor)
-		ocrpt_expr_free(text->bgcolor);
-
-	text->bgcolor = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
-	if (text->bgcolor)
-		text->bgcolor->rvalue = text->value;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_bgcolor(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(bgcolor, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_font_name(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->font_name)
-		ocrpt_expr_free(text->font_name);
-
-	text->font_name = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, false, true) : NULL;
-	if (text->font_name)
-		text->font_name->rvalue = text->value;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_font_name(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(font_name, false, true);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_font_size(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->font_size)
-		ocrpt_expr_free(text->font_size);
-
-	text->font_size = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
-	if (text->font_size)
-		text->font_size->rvalue = text->value;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_font_size(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(font_size, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_bold(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->bold)
-		ocrpt_expr_free(text->bold);
-
-	text->bold = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
-	if (text->bold)
-		text->bold->rvalue = text->value;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_bold(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(bold, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_italic(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->italic)
-		ocrpt_expr_free(text->italic);
-
-	text->italic = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
-	if (text->italic)
-		text->italic->rvalue = text->value;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_italic(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(italic, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_link(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->link)
-		ocrpt_expr_free(text->link);
-
-	text->link = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
-	if (text->link)
-		text->link->rvalue = text->value;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_link(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(link, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_memo(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->memo_expr)
-		ocrpt_expr_free(text->memo_expr);
-
-	text->memo_expr = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_memo(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(memo_expr, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_memo_wrap_chars(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->wrap_chars)
-		ocrpt_expr_free(text->wrap_chars);
-
-	text->wrap_chars = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_memo_wrap_chars(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(wrap_chars, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_text_set_memo_max_lines(ocrpt_text *text, const char *expr_string) {
-	if (!text)
-		return;
-
-	if (text->max_lines)
-		ocrpt_expr_free(text->max_lines);
-
-	text->max_lines = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, true, false) : NULL;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_memo_max_lines(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(max_lines, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_barcode_set_value(ocrpt_barcode *bc, const char *expr_string) {
-	if (!bc)
-		return;
-
-	if (bc->value)
-		ocrpt_expr_free(bc->value);
-
-	bc->value = expr_string ? ocrpt_layout_expr_parse(bc->output->o, bc->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_barcode_set_value_delayed(ocrpt_barcode *bc, const char *expr_string) {
-	if (!bc)
-		return;
-
-	if (bc->delayed)
-		ocrpt_expr_free(bc->delayed);
-
-	bc->delayed = expr_string ? ocrpt_layout_expr_parse(bc->output->o, bc->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_barcode_set_suppress(ocrpt_barcode *bc, const char *expr_string) {
-	if (!bc)
-		return;
-
-	if (bc->suppress)
-		ocrpt_expr_free(bc->suppress);
-
-	bc->suppress = expr_string ? ocrpt_layout_expr_parse(bc->output->o, bc->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_barcode_set_type(ocrpt_barcode *bc, const char *expr_string) {
-	if (!bc)
-		return;
-
-	if (bc->bctype)
-		ocrpt_expr_free(bc->bctype);
-
-	bc->bctype = expr_string ? ocrpt_layout_expr_parse(bc->output->o, bc->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_barcode_set_width(ocrpt_barcode *bc, const char *expr_string) {
-	if (!bc)
-		return;
-
-	if (bc->width)
-		ocrpt_expr_free(bc->width);
-
-	bc->width = expr_string ? ocrpt_layout_expr_parse(bc->output->o, bc->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_barcode_set_height(ocrpt_barcode *bc, const char *expr_string) {
-	if (!bc)
-		return;
-
-	if (bc->height)
-		ocrpt_expr_free(bc->height);
-
-	bc->height = expr_string ? ocrpt_layout_expr_parse(bc->output->o, bc->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_barcode_set_color(ocrpt_barcode *bc, const char *expr_string) {
-	if (!bc)
-		return;
-
-	if (bc->color)
-		ocrpt_expr_free(bc->color);
-
-	bc->color = expr_string ? ocrpt_layout_expr_parse(bc->output->o, bc->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_barcode_set_bgcolor(ocrpt_barcode *bc, const char *expr_string) {
-	if (!bc)
-		return;
-
-	if (bc->bgcolor)
-		ocrpt_expr_free(bc->bgcolor);
-
-	bc->bgcolor = expr_string ? ocrpt_layout_expr_parse(bc->output->o, bc->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_line_set_font_name(ocrpt_line *line, const char *expr_string) {
-	if (!line)
-		return;
-
-	if (line->font_name)
-		ocrpt_expr_free(line->font_name);
-
-	line->font_name = expr_string ? ocrpt_layout_expr_parse(line->output->o, line->output->r, expr_string, false, true) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_line_set_font_size(ocrpt_line *line, const char *expr_string) {
-	if (!line)
-		return;
-
-	if (line->font_size)
-		ocrpt_expr_free(line->font_size);
-
-	line->font_size = expr_string ? ocrpt_layout_expr_parse(line->output->o, line->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_line_set_bold(ocrpt_line *line, const char *expr_string) {
-	if (!line)
-		return;
-
-	if (line->bold)
-		ocrpt_expr_free(line->bold);
-
-	line->bold = expr_string ? ocrpt_layout_expr_parse(line->output->o, line->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_line_set_italic(ocrpt_line *line, const char *expr_string) {
-	if (!line)
-		return;
-
-	if (line->italic)
-		ocrpt_expr_free(line->italic);
-
-	line->italic = expr_string ? ocrpt_layout_expr_parse(line->output->o, line->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_line_set_suppress(ocrpt_line *line, const char *expr_string) {
-	if (!line)
-		return;
-
-	if (line->suppress)
-		ocrpt_expr_free(line->suppress);
-
-	line->suppress = expr_string ? ocrpt_layout_expr_parse(line->output->o, line->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_line_set_color(ocrpt_line *line, const char *expr_string) {
-	if (!line)
-		return;
-
-	if (line->color)
-		ocrpt_expr_free(line->color);
-
-	line->color = expr_string ? ocrpt_layout_expr_parse(line->output->o, line->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_line_set_bgcolor(ocrpt_line *line, const char *expr_string) {
-	if (!line)
-		return;
-
-	if (line->bgcolor)
-		ocrpt_expr_free(line->bgcolor);
-
-	line->bgcolor = expr_string ? ocrpt_layout_expr_parse(line->output->o, line->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_hline_set_size(ocrpt_hline *hline, const char *expr_string) {
-	if (!hline)
-		return;
-
-	if (hline->size)
-		ocrpt_expr_free(hline->size);
-
-	hline->size = expr_string ? ocrpt_layout_expr_parse(hline->output->o, hline->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_hline_set_align(ocrpt_hline *hline, const char *expr_string) {
-	if (!hline)
-		return;
-
-	if (hline->align)
-		ocrpt_expr_free(hline->align);
-
-	hline->align = expr_string ? ocrpt_layout_expr_parse(hline->output->o, hline->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_hline_set_indent(ocrpt_hline *hline, const char *expr_string) {
-	if (!hline)
-		return;
-
-	if (hline->indent)
-		ocrpt_expr_free(hline->indent);
-
-	hline->indent = expr_string ? ocrpt_layout_expr_parse(hline->output->o, hline->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_hline_set_length(ocrpt_hline *hline, const char *expr_string) {
-	if (!hline)
-		return;
-
-	if (hline->length)
-		ocrpt_expr_free(hline->length);
-
-	hline->length = expr_string ? ocrpt_layout_expr_parse(hline->output->o, hline->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_hline_set_font_size(ocrpt_hline *hline, const char *expr_string) {
-	if (!hline)
-		return;
-
-	if (hline->font_size)
-		ocrpt_expr_free(hline->font_size);
-
-	hline->font_size = expr_string ? ocrpt_layout_expr_parse(hline->output->o, hline->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_hline_set_suppress(ocrpt_hline *hline, const char *expr_string) {
-	if (!hline)
-		return;
-
-	if (hline->suppress)
-		ocrpt_expr_free(hline->suppress);
-
-	hline->suppress = expr_string ? ocrpt_layout_expr_parse(hline->output->o, hline->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_hline_set_color(ocrpt_hline *hline, const char *expr_string) {
-	if (!hline)
-		return;
-
-	if (hline->color)
-		ocrpt_expr_free(hline->color);
-
-	hline->color = expr_string ? ocrpt_layout_expr_parse(hline->output->o, hline->output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_output_set_suppress(ocrpt_output *output, const char *expr_string) {
-	if (!output)
-		return;
-
-	if (output->suppress)
-		ocrpt_expr_free(output->suppress);
-
-	output->suppress = expr_string ? ocrpt_layout_expr_parse(output->o, output->r, expr_string, true, false) : NULL;
-}
-
-DLL_EXPORT_SYM void ocrpt_set_noquery_show_nodata(opencreport *o, const char *expr_string) {
-	if (!o)
-		return;
-
-	ocrpt_expr_free(o->noquery_show_nodata_expr);
-	o->noquery_show_nodata_expr = NULL;
-	if (expr_string) {
-		char *err = NULL;
-		o->noquery_show_nodata_expr = ocrpt_expr_parse(o, expr_string, &err);
-		if (err) {
-			ocrpt_err_printf("ocrpt_set_noquery_show_nodata: %s\n", err);
-			ocrpt_strfree(err);
-		}
+#define SET_BARCODE_EXPR(exprname, report, create_string) { \
+		if (!bc) \
+			return NULL; \
+		ocrpt_expr_free(bc->exprname); \
+		bc->exprname = expr_string ? ocrpt_layout_expr_parse(bc->output->o, bc->output->r, expr_string, report, create_string) : NULL; \
+		return bc->exprname; \
 	}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_value(ocrpt_barcode *bc, const char *expr_string) {
+	SET_BARCODE_EXPR(value, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_set_report_height_after_last(opencreport *o, const char *expr_string) {
-	if (!o)
-		return;
-
-	ocrpt_expr_free(o->report_height_after_last_expr);
-	o->report_height_after_last_expr = NULL;
-	if (expr_string) {
-		char *err = NULL;
-		o->report_height_after_last_expr = ocrpt_expr_parse(o, expr_string, &err);
-		if (err) {
-			ocrpt_err_printf("ocrpt_set_report_height_after_last: %s\n", err);
-			ocrpt_strfree(err);
-		}
-	}
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_value_delayed(ocrpt_barcode *bc, const char *expr_string) {
+	SET_BARCODE_EXPR(delayed, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_set_size_unit(opencreport *o, const char *expr_string) {
-	if (!o)
-		return;
-
-	ocrpt_expr_free(o->size_unit_expr);
-	o->size_unit_expr = NULL;
-	if (expr_string) {
-		char *err = NULL;
-		o->size_unit_expr = ocrpt_expr_parse(o, expr_string, &err);
-		if (err) {
-			ocrpt_err_printf("ocrpt_set_size_unit: %s\n", err);
-			ocrpt_strfree(err);
-		}
-	}
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_suppress(ocrpt_barcode *bc, const char *expr_string) {
+	SET_BARCODE_EXPR(suppress, true, false);
 }
 
-DLL_EXPORT_SYM void ocrpt_set_follower_match_single(opencreport *o, const char *expr_string) {
-	if (!o)
-		return;
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_type(ocrpt_barcode *bc, const char *expr_string) {
+	SET_BARCODE_EXPR(bctype, true, false);
+}
 
-	ocrpt_expr_free(o->follower_match_single_expr);
-	o->follower_match_single_expr = NULL;
-	if (expr_string) {
-		char *err = NULL;
-		o->follower_match_single_expr = ocrpt_expr_parse(o, expr_string, &err);
-		if (err) {
-			ocrpt_err_printf("ocrpt_set_follower_match_single: %s\n", err);
-			ocrpt_strfree(err);
-		}
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_width(ocrpt_barcode *bc, const char *expr_string) {
+	SET_BARCODE_EXPR(width, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_height(ocrpt_barcode *bc, const char *expr_string) {
+	SET_BARCODE_EXPR(height, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_color(ocrpt_barcode *bc, const char *expr_string) {
+	SET_BARCODE_EXPR(color, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_bgcolor(ocrpt_barcode *bc, const char *expr_string) {
+	SET_BARCODE_EXPR(bgcolor, true, false);
+}
+
+#define SET_LINE_EXPR(exprname, report, create_string) { \
+		if (!line) \
+			return NULL; \
+		ocrpt_expr_free(line->exprname); \
+		line->exprname = expr_string ? ocrpt_layout_expr_parse(line->output->o, line->output->r, expr_string, report, create_string) : NULL; \
+		return line->exprname; \
 	}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_font_name(ocrpt_line *line, const char *expr_string) {
+	SET_LINE_EXPR(font_name, false, true);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_font_size(ocrpt_line *line, const char *expr_string) {
+	SET_LINE_EXPR(font_size, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_bold(ocrpt_line *line, const char *expr_string) {
+	SET_LINE_EXPR(bold, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_italic(ocrpt_line *line, const char *expr_string) {
+	SET_LINE_EXPR(italic, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_suppress(ocrpt_line *line, const char *expr_string) {
+	SET_LINE_EXPR(suppress, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_color(ocrpt_line *line, const char *expr_string) {
+	SET_LINE_EXPR(color, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_bgcolor(ocrpt_line *line, const char *expr_string) {
+	SET_LINE_EXPR(bgcolor, true, false);
+}
+
+#define SET_HLINE_EXPR(exprname, report, create_string) { \
+		if (!hline) \
+			return NULL; \
+		ocrpt_expr_free(hline->exprname); \
+		hline->exprname = expr_string ? ocrpt_layout_expr_parse(hline->output->o, hline->output->r, expr_string, report, create_string) : NULL; \
+		return hline->exprname; \
+	}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_size(ocrpt_hline *hline, const char *expr_string) {
+	SET_HLINE_EXPR(size, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_align(ocrpt_hline *hline, const char *expr_string) {
+	SET_HLINE_EXPR(align, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_indent(ocrpt_hline *hline, const char *expr_string) {
+	SET_HLINE_EXPR(indent, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_length(ocrpt_hline *hline, const char *expr_string) {
+	SET_HLINE_EXPR(length, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_font_size(ocrpt_hline *hline, const char *expr_string) {
+	SET_HLINE_EXPR(font_size, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_suppress(ocrpt_hline *hline, const char *expr_string) {
+	SET_HLINE_EXPR(suppress, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_color(ocrpt_hline *hline, const char *expr_string) {
+	SET_HLINE_EXPR(color, true, false);
+}
+
+#define SET_OUTPUT_EXPR(exprname, report, create_string) { \
+		if (!output) \
+			return NULL; \
+		ocrpt_expr_free(output->exprname); \
+		output->exprname = expr_string ? ocrpt_layout_expr_parse(output->o, output->r, expr_string, report, create_string) : NULL; \
+		return output->exprname; \
+	}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_output_set_suppress(ocrpt_output *output, const char *expr_string) {
+	SET_OUTPUT_EXPR(suppress, true, false);
+}
+
+#define SET_O_EXPR_REPORT(exprname) { \
+		if (!o) \
+			return NULL; \
+		ocrpt_expr_free(o->exprname); \
+		char *err = NULL; \
+		o->exprname = expr_string ? ocrpt_expr_parse(o, expr_string, &err) : NULL; \
+		if (err) { \
+			ocrpt_err_printf("%s: %s\n", __func__, err); \
+			ocrpt_strfree(err); \
+		} \
+		return o->exprname; \
+	}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_set_noquery_show_nodata(opencreport *o, const char *expr_string) {
+	SET_O_EXPR_REPORT(noquery_show_nodata_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_set_report_height_after_last(opencreport *o, const char *expr_string) {
+	SET_O_EXPR_REPORT(report_height_after_last_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_set_size_unit(opencreport *o, const char *expr_string) {
+	SET_O_EXPR_REPORT(size_unit_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_set_follower_match_single(opencreport *o, const char *expr_string) {
+	SET_O_EXPR_REPORT(follower_match_single_expr);
 }
 
 DLL_EXPORT_SYM void ocrpt_set_follower_match_single_direct(opencreport *o, bool value) {
@@ -2253,361 +1974,175 @@ DLL_EXPORT_SYM void ocrpt_set_follower_match_single_direct(opencreport *o, bool 
 	o->follower_match_single = value;
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_iterations(ocrpt_part *p, const char *expr_string) {
-	if (!p)
-		return;
-
-	ocrpt_expr_free(p->iterations_expr);
-	p->iterations_expr = NULL;
-	if (expr_string) {
-		char *err = NULL;
-		p->iterations_expr = ocrpt_expr_parse(p->o, expr_string, &err);
-		if (err) {
-			ocrpt_err_printf("ocrpt_part_set_iterations: %s\n", err);
-			ocrpt_strfree(err);
-		}
+#define SET_PART_EXPR(exprname) { \
+		if (!p) \
+			return NULL; \
+		ocrpt_expr_free(p->exprname); \
+		p->exprname = expr_string ? ocrpt_expr_parse(p->o, expr_string, NULL) : NULL; \
+		return p->exprname; \
 	}
+
+#define SET_PART_EXPR_OR_STR(exprname) { \
+		if (!p) \
+			return NULL; \
+		ocrpt_expr_free(p->exprname); \
+		p->exprname = expr_string ? ocrpt_expr_parse(p->o, expr_string, NULL) : NULL; \
+		if (!p->exprname) \
+			p->exprname = expr_string ? ocrpt_newstring(p->o, NULL, expr_string) : NULL; \
+		return p->exprname; \
+	}
+
+#define SET_PART_EXPR_REPORT(exprname) { \
+		if (!p) \
+			return NULL; \
+		ocrpt_expr_free(p->exprname); \
+		char *err = NULL; \
+		p->exprname = expr_string ? ocrpt_expr_parse(p->o, expr_string, &err) : NULL; \
+		if (err) { \
+			ocrpt_err_printf("%s: %s\n", __func__, err); \
+			ocrpt_strfree(err); \
+		} \
+		return p->exprname; \
+	}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_iterations(ocrpt_part *p, const char *expr_string) {
+	SET_PART_EXPR_REPORT(iterations_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_font_name(ocrpt_part *p, const char *expr_string) {
-	if (!p)
-		return;
-
-	ocrpt_expr_free(p->font_name_expr);
-	p->font_name_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	p->font_name_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
-	if (!p->font_name_expr)
-		p->font_name_expr = ocrpt_newstring(p->o, NULL, expr_string);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_font_name(ocrpt_part *p, const char *expr_string) {
+	SET_PART_EXPR_OR_STR(font_name_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_font_size(ocrpt_part *p, const char *expr_string) {
-	if (!p)
-		return;
-
-	ocrpt_expr_free(p->font_size_expr);
-	p->font_size_expr = NULL;
-	if (!expr_string)
-		return;
-
-	p->font_size_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_font_size(ocrpt_part *p, const char *expr_string) {
+	SET_PART_EXPR(font_size_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_paper_by_name(ocrpt_part *p, const char *expr_string) {
-	if (!p)
-		return;
-
-	ocrpt_expr_free(p->paper_type_expr);
-	p->paper_type_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	p->paper_type_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
-	if (!p->paper_type_expr)
-		p->paper_type_expr = ocrpt_newstring(p->o, NULL, expr_string);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_paper_by_name(ocrpt_part *p, const char *expr_string) {
+	SET_PART_EXPR_OR_STR(paper_type_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_orientation(ocrpt_part *p, const char *expr_string) {
-	if (!p)
-		return;
-
-	ocrpt_expr_free(p->orientation_expr);
-	p->orientation_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	p->orientation_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_orientation(ocrpt_part *p, const char *expr_string) {
+	SET_PART_EXPR(orientation_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_top_margin(ocrpt_part *p, const char *expr_string) {
-	if (!p)
-		return;
-
-	ocrpt_expr_free(p->top_margin_expr);
-	p->top_margin_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	p->top_margin_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_top_margin(ocrpt_part *p, const char *expr_string) {
+	SET_PART_EXPR(top_margin_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_bottom_margin(ocrpt_part *p, const char *expr_string) {
-	if (!p)
-		return;
-
-	ocrpt_expr_free(p->bottom_margin_expr);
-	p->bottom_margin_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	p->bottom_margin_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_bottom_margin(ocrpt_part *p, const char *expr_string) {
+	SET_PART_EXPR(bottom_margin_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_left_margin(ocrpt_part *p, const char *expr_string) {
-	if (!p)
-		return;
-
-	ocrpt_expr_free(p->left_margin_expr);
-	p->left_margin_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	p->left_margin_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_left_margin(ocrpt_part *p, const char *expr_string) {
+	SET_PART_EXPR(left_margin_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_right_margin(ocrpt_part *p, const char *expr_string) {
-	if (!p)
-		return;
-
-	ocrpt_expr_free(p->right_margin_expr);
-	p->right_margin_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	p->right_margin_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_right_margin(ocrpt_part *p, const char *expr_string) {
+	SET_PART_EXPR(right_margin_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_suppress(ocrpt_part *p, const char *expr_string) {
-	if (!p)
-		return;
-
-	ocrpt_expr_free(p->suppress_expr);
-	p->suppress_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	p->suppress_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_suppress(ocrpt_part *p, const char *expr_string) {
+	SET_PART_EXPR(suppress_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p, const char *expr_string) {
-	if (!p)
-		return;
-
-	ocrpt_expr_free(p->suppress_pageheader_firstpage_expr);
-	p->suppress_pageheader_firstpage_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	p->suppress_pageheader_firstpage_expr = ocrpt_expr_parse(p->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p, const char *expr_string) {
+	SET_PART_EXPR(suppress_pageheader_firstpage_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_row_set_suppress(ocrpt_part_row *pr, const char *expr_string) {
-	if (!pr)
-		return;
+#define SET_PART_ROW_EXPR(exprname) { \
+		if (!pr) \
+			return NULL; \
+		ocrpt_expr_free(pr->exprname); \
+		pr->exprname = expr_string ? ocrpt_expr_parse(pr->o, expr_string, NULL) : NULL; \
+		return pr->exprname; \
+	}
 
-	ocrpt_expr_free(pr->suppress_expr);
-	pr->suppress_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	pr->suppress_expr = ocrpt_expr_parse(pr->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_row_set_suppress(ocrpt_part_row *pr, const char *expr_string) {
+	SET_PART_ROW_EXPR(suppress_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_row_set_newpage(ocrpt_part_row *pr, const char *expr_string) {
-	if (!pr)
-		return;
-
-	ocrpt_expr_free(pr->newpage_expr);
-	pr->newpage_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	pr->newpage_expr = ocrpt_expr_parse(pr->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_row_set_newpage(ocrpt_part_row *pr, const char *expr_string) {
+	SET_PART_ROW_EXPR(newpage_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_row_set_layout(ocrpt_part_row *pr, const char *expr_string) {
-	if (!pr)
-		return;
-
-	ocrpt_expr_free(pr->layout_expr);
-	pr->layout_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	pr->layout_expr = ocrpt_expr_parse(pr->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_row_set_layout(ocrpt_part_row *pr, const char *expr_string) {
+	SET_PART_ROW_EXPR(layout_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_suppress(ocrpt_part_column *pd, const char *expr_string) {
-	if (!pd)
-		return;
+#define SET_PART_COLUMN_EXPR(exprname) { \
+		if (!pd) \
+			return NULL; \
+		ocrpt_expr_free(pd->exprname); \
+		pd->exprname = expr_string ? ocrpt_expr_parse(pd->o, expr_string, NULL) : NULL; \
+		return pd->exprname; \
+	}
 
-	ocrpt_expr_free(pd->suppress_expr);
-	pd->suppress_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	pd->suppress_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_suppress(ocrpt_part_column *pd, const char *expr_string) {
+	SET_PART_COLUMN_EXPR(suppress_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_width(ocrpt_part_column *pd, const char *expr_string) {
-	if (!pd)
-		return;
-
-	ocrpt_expr_free(pd->width_expr);
-	pd->width_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	pd->width_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_width(ocrpt_part_column *pd, const char *expr_string) {
+	SET_PART_COLUMN_EXPR(width_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_height(ocrpt_part_column *pd, const char *expr_string) {
-	if (!pd)
-		return;
-
-	ocrpt_expr_free(pd->height_expr);
-	pd->height_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	pd->height_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_height(ocrpt_part_column *pd, const char *expr_string) {
+	SET_PART_COLUMN_EXPR(height_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_border_width(ocrpt_part_column *pd, const char *expr_string) {
-	if (!pd)
-		return;
-
-	ocrpt_expr_free(pd->border_width_expr);
-	pd->border_width_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	pd->border_width_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_border_width(ocrpt_part_column *pd, const char *expr_string) {
+	SET_PART_COLUMN_EXPR(border_width_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_border_color(ocrpt_part_column *pd, const char *expr_string) {
-	if (!pd)
-		return;
-
-	ocrpt_expr_free(pd->border_color_expr);
-	pd->border_color_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	pd->border_color_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_border_color(ocrpt_part_column *pd, const char *expr_string) {
+	SET_PART_COLUMN_EXPR(border_color_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd, const char *expr_string) {
-	if (!pd)
-		return;
-
-	ocrpt_expr_free(pd->detail_columns_expr);
-	pd->detail_columns_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	pd->detail_columns_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd, const char *expr_string) {
+	SET_PART_COLUMN_EXPR(detail_columns_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_part_column_set_column_padding(ocrpt_part_column *pd, const char *expr_string) {
-	if (!pd)
-		return;
-
-	ocrpt_expr_free(pd->column_pad_expr);
-	pd->column_pad_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	pd->column_pad_expr = ocrpt_expr_parse(pd->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_column_padding(ocrpt_part_column *pd, const char *expr_string) {
+	SET_PART_COLUMN_EXPR(column_pad_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_suppress(ocrpt_report *r, const char *expr_string) {
-	if (!r)
-		return;
+#define SET_REPORT_EXPR(exprname) { \
+		if (!r) \
+			return NULL; \
+		ocrpt_expr_free(r->exprname); \
+		r->exprname = expr_string ? ocrpt_expr_parse(r->o, expr_string, NULL) : NULL; \
+		return r->exprname; \
+	}
 
-	ocrpt_expr_free(r->suppress_expr);
-	r->suppress_expr = NULL;
+#define SET_REPORT_EXPR_OR_STR(exprname) { \
+		if (!r) \
+			return NULL; \
+		ocrpt_expr_free(r->exprname); \
+		r->exprname = expr_string ? ocrpt_expr_parse(r->o, expr_string, NULL) : NULL; \
+		if (!r->exprname) \
+			r->exprname = expr_string ? ocrpt_newstring(r->o, r, expr_string) : NULL; \
+		return r->exprname; \
+	}
 
-	if (!expr_string)
-		return;
-
-	r->suppress_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_suppress(ocrpt_report *r, const char *expr_string) {
+	SET_REPORT_EXPR(suppress_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_iterations(ocrpt_report *r, const char *expr_string) {
-	if (!r)
-		return;
-
-	ocrpt_expr_free(r->iterations_expr);
-	r->iterations_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	r->iterations_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_iterations(ocrpt_report *r, const char *expr_string) {
+	SET_REPORT_EXPR(iterations_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_font_name(ocrpt_report *r, const char *expr_string) {
-	if (!r)
-		return;
-
-	ocrpt_expr_free(r->font_name_expr);
-	r->font_name_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	r->font_name_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
-	if (!r->font_name_expr)
-		r->font_name_expr = ocrpt_newstring(r->o, r, expr_string);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_font_name(ocrpt_report *r, const char *expr_string) {
+	SET_REPORT_EXPR_OR_STR(font_name_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_font_size(ocrpt_report *r, const char *expr_string) {
-	if (!r)
-		return;
-
-	ocrpt_expr_free(r->font_size_expr);
-	r->font_size_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	r->font_size_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_font_size(ocrpt_report *r, const char *expr_string) {
+	SET_REPORT_EXPR(font_size_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_height(ocrpt_report *r, const char *expr_string) {
-	if (!r)
-		return;
-
-	ocrpt_expr_free(r->height_expr);
-	r->height_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	r->height_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_height(ocrpt_report *r, const char *expr_string) {
+	SET_REPORT_EXPR(height_expr);
 }
 
-DLL_EXPORT_SYM void ocrpt_report_set_fieldheader_priority(ocrpt_report *r, const char *expr_string) {
-	if (!r)
-		return;
-
-	ocrpt_expr_free(r->fieldheader_priority_expr);
-	r->fieldheader_priority_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	r->fieldheader_priority_expr = ocrpt_expr_parse(r->o, expr_string, NULL);
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_fieldheader_priority(ocrpt_report *r, const char *expr_string) {
+	SET_REPORT_EXPR(fieldheader_priority_expr);
 }

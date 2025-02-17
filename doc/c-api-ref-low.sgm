@@ -1593,7 +1593,7 @@ ocrpt_report_evaluate_expressions(ocrpt_report *r);</programlisting>
 						Any other value will make the layout rendering
 						use the convoluted RLIB compatible size units,
 						mostly based on font sizes.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_set_size_unit(opencreport *o,
                     const char *expr_string);</programlisting>
 					</para>
@@ -1604,7 +1604,7 @@ ocrpt_set_size_unit(opencreport *o,
 						See <xref linkend="noqueryshownodata"/>.
 						The expression string should evaluate to
 						a boolean value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_set_noquery_show_nodata(opencreport *o,
                               const char *expr_string);</programlisting>
 					</para>
@@ -1615,7 +1615,7 @@ ocrpt_set_noquery_show_nodata(opencreport *o,
 						See <xref linkend="reportheightafterlast"/>.
 						The expression string should evaluate to
 						a boolean value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_set_report_height_after_last(opencreport *o,
                                    const char *expr_string);</programlisting>
 					</para>
@@ -1626,7 +1626,7 @@ ocrpt_set_report_height_after_last(opencreport *o,
 						See <xref linkend="xmlfollowermatchsingle"/>.
 						The expression string should evaluate to
 						a boolean value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_set_follower_match_single(opencreport *o,
                                 const char *expr_string);</programlisting>
 					</para>
@@ -1651,7 +1651,7 @@ ocrpt_set_follower_match_single_direct(opencreport *o,
 						See <xref linkend="partiter"/>.
 						The expression string must evaluate to
 						a numeric value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_set_iterations(ocrpt_part *p,
                           const char *expr_string);</programlisting>
 					</para>
@@ -1660,7 +1660,7 @@ ocrpt_part_set_iterations(ocrpt_part *p,
 					<title>Set part font name</title>
 					<para>
 						See <xref linkend="partfontname"/>.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_set_font_name(ocrpt_part *p,
                          const char *expr_string);</programlisting>
 					</para>
@@ -1669,7 +1669,7 @@ ocrpt_part_set_font_name(ocrpt_part *p,
 					<title>Set part font size</title>
 					<para>
 						See <xref linkend="partfontsize"/>.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_set_font_size(ocrpt_part *p,
                          const char *expr_string);</programlisting>
 					</para>
@@ -1678,7 +1678,7 @@ ocrpt_part_set_font_size(ocrpt_part *p,
 					<title>Set part paper type</title>
 					<para>
 						See <xref linkend="papertype"/>.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_set_paper_by_name(ocrpt_part *p,
                              const char *expr_string);</programlisting>
 					</para>
@@ -1693,7 +1693,7 @@ ocrpt_part_set_paper_by_name(ocrpt_part *p,
 						<literal>landscape</literal>. By default,
 						the part uses <literal>portrait</literal>
 						orientation.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_set_orientation(ocrpt_part *p,
                            const char *expr_string);</programlisting>
 					</para>
@@ -1704,19 +1704,19 @@ ocrpt_part_set_orientation(ocrpt_part *p,
 						See <xref linkend="marginsettings"/>.
 						The margin values must be passed in via strings
 						as they can be expressions.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_set_top_margin(ocrpt_part *p,
                           const char *expr_string);
 
-void
+ocrpt_expr *
 ocrpt_part_set_bottom_margin(ocrpt_part *p,
                              const char *expr_string);
 
-void
+ocrpt_expr *
 ocrpt_part_set_left_margin(ocrpt_part *p,
                            const char *expr_string);
 
-void
+ocrpt_expr *
 ocrpt_part_set_right_margin(ocrpt_part *p,
                             const char *expr_string);</programlisting>
 					</para>
@@ -1727,7 +1727,7 @@ ocrpt_part_set_right_margin(ocrpt_part *p,
 						See <xref linkend="partsuppress"/>.
 						The expression string must evaluate to
 						a numeric (boolean) value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_set_suppress(ocrpt_part *p,
                         const char *expr_string);</programlisting>
 					</para>
@@ -1738,7 +1738,7 @@ ocrpt_part_set_suppress(ocrpt_part *p,
 						See <xref linkend="suppresspageheaderfirstpage"/>.
 						The expression string must evaluate to
 						a numeric (boolean) value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p,
                                              const char *expr_string);</programlisting>
 					</para>
@@ -1752,7 +1752,7 @@ ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p,
 						See <xref linkend="partrowsuppress"/>.
 						The expression string must evaluate to
 						a numeric (boolean) value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_row_set_suppress(ocrpt_part_row *pr,
                             const char *expr_string);</programlisting>
 					</para>
@@ -1763,7 +1763,7 @@ ocrpt_part_row_set_suppress(ocrpt_part_row *pr,
 						See <xref linkend="partrownewpage"/>.
 						The expression string must evaluate to
 						a numeric (boolean) value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_row_set_newpage(ocrpt_part_row *pr,
                            const char *expr_string);</programlisting>
 					</para>
@@ -1778,7 +1778,7 @@ ocrpt_part_row_set_newpage(ocrpt_part_row *pr,
 						<literal>fixed</literal>. This setting
 						is ignored, it's only accepted for RLIB
 						compatibility.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_row_set_layout(ocrpt_part_row *pr,
                           const char *expr_string);</programlisting>
 					</para>
@@ -1792,7 +1792,7 @@ ocrpt_part_row_set_layout(ocrpt_part_row *pr,
 						See <xref linkend="partcolsuppress"/>.
 						The expression must evaluate to a numeric
 						(boolean) value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_suppress(ocrpt_part_column *pd,
                                const char *expr_string);</programlisting>
 					</para>
@@ -1803,7 +1803,7 @@ ocrpt_part_column_set_suppress(ocrpt_part_column *pd,
 						See <xref linkend="partcolwidth"/>.
 						The expression must evaluate to a numeric
 						value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_width(ocrpt_part_column *pd,
                             const char *expr_string);</programlisting>
 					</para>
@@ -1814,7 +1814,7 @@ ocrpt_part_column_set_width(ocrpt_part_column *pd,
 						See <xref linkend="partcolheight"/>.
 						The expression must evaluate to a numeric
 						value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_height(ocrpt_part_column *pd,
                              const char *expr_string);</programlisting>
 					</para>
@@ -1825,7 +1825,7 @@ ocrpt_part_column_set_height(ocrpt_part_column *pd,
 						See <xref linkend="pdborderwidth"/>.
 						The expression must evaluate to a numeric
 						value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_border_width(ocrpt_part_column *pd,
                                    const char *expr_string);</programlisting>
 					</para>
@@ -1836,7 +1836,7 @@ ocrpt_part_column_set_border_width(ocrpt_part_column *pd,
 						See <xref linkend="pdbordercolor"/>.
 						The expression must evaluate to a string
 						value with a valid color name or specification.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_border_color(ocrpt_part_column *pd,
                                    const char *expr_string);</programlisting>
 					</para>
@@ -1847,7 +1847,7 @@ ocrpt_part_column_set_border_color(ocrpt_part_column *pd,
 						See <xref linkend="detailcolumns"/>.
 						The expression must evaluate to a numeric
 						value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd,
                                      const char *expr_string);</programlisting>
 					</para>
@@ -1858,7 +1858,7 @@ ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd,
 						See <xref linkend="columnpadding"/>.
 						The expression must evaluate to a numeric
 						value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_column_padding(ocrpt_part_column *pd,
                                      const char *expr_string);</programlisting>
 					</para>
@@ -1872,7 +1872,7 @@ ocrpt_part_column_set_column_padding(ocrpt_part_column *pd,
 						See <xref linkend="reportsuppress"/>.
 						The expression must evaluate to a numeric
 						(boolean) value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_report_set_suppress(ocrpt_report *r,
                           const char *expr_string);</programlisting>
 					</para>
@@ -1883,7 +1883,7 @@ ocrpt_report_set_suppress(ocrpt_report *r,
 						See <xref linkend="reportiter"/>.
 						The expression must evaluate to a numeric
 						value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_report_set_iterations(ocrpt_report *r,
                             const char *expr_string);</programlisting>
 					</para>
@@ -1896,7 +1896,7 @@ ocrpt_report_set_iterations(ocrpt_report *r,
 						value, with fallback to plain string:
 						in case of a parsing error, the value
 						string is taken as is.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_report_set_font_name(ocrpt_report *r,
                            const char *expr_string);</programlisting>
 					</para>
@@ -1907,7 +1907,7 @@ ocrpt_report_set_font_name(ocrpt_report *r,
 						See <xref linkend="reportfontsize"/>.
 						The expression must evaluate to a numeric
 						value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_report_set_font_size(ocrpt_report *r,
                            const char *expr_string);</programlisting>
 					</para>
@@ -1918,7 +1918,7 @@ ocrpt_report_set_font_size(ocrpt_report *r,
 						See <xref linkend="reportheight"/>.
 						The expression must evaluate to a numeric
 						value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_report_set_height(ocrpt_report *r,
                         const char *expr_string);</programlisting>
 					</para>
@@ -1931,7 +1931,7 @@ ocrpt_report_set_height(ocrpt_report *r,
 						value with the options of <literal>high</literal>
 						and <literal>low</literal>. Default is
 						<literal>low</literal>.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_report_set_fieldheader_priority(ocrpt_report *r,
                                       const char *expr_string);</programlisting>
 					</para>
@@ -2020,7 +2020,7 @@ ocrpt_break_get_footer(ocrpt_break *br);</programlisting>
 					<title>Set output section suppression</title>
 					<para>
 						Set suppression from an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_output_set_suppress(ocrpt_output *output,
                           const char *expr_string);</programlisting>
 					</para>
@@ -2047,7 +2047,7 @@ ocrpt_output_add_line(ocrpt_output *output);</programlisting>
 					<para>
 						Set the text line's font name from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_line_set_font_name(ocrpt_line *line,
                          const char *expr_string);</programlisting>
 					</para>
@@ -2057,7 +2057,7 @@ ocrpt_line_set_font_name(ocrpt_line *line,
 					<para>
 						Set the text line's font size from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_line_set_font_size(ocrpt_line *line,
                          const char *expr_string);</programlisting>
 					</para>
@@ -2067,7 +2067,7 @@ ocrpt_line_set_font_size(ocrpt_line *line,
 					<para>
 						Set the text line's bold value from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_line_set_bold(ocrpt_line *line,
                     const char *expr_string);</programlisting>
 					</para>
@@ -2077,7 +2077,7 @@ ocrpt_line_set_bold(ocrpt_line *line,
 					<para>
 						Set the text line's italic value from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_line_set_italic(ocrpt_line *line,
                       const char *expr_string);</programlisting>
 					</para>
@@ -2087,7 +2087,7 @@ ocrpt_line_set_italic(ocrpt_line *line,
 					<para>
 						Set the text line's suppression value from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_line_set_suppress(ocrpt_line *line,
                         const char *expr_string);</programlisting>
 					</para>
@@ -2097,7 +2097,7 @@ ocrpt_line_set_suppress(ocrpt_line *line,
 					<para>
 						Set the text line's text color from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_line_set_color(ocrpt_line *line,
                      const char *expr_string);</programlisting>
 					</para>
@@ -2107,7 +2107,7 @@ ocrpt_line_set_color(ocrpt_line *line,
 					<para>
 						Set the text line's background color from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_line_set_bgcolor(ocrpt_line *line,
                        const char *expr_string);</programlisting>
 					</para>
@@ -2134,7 +2134,7 @@ ocrpt_line_add_text(ocrpt_line *line);</programlisting>
 					<para>
 						Set the text element's literal value from
 						a string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_value_string(ocrpt_text *text,
                             const char *string);</programlisting>
 					</para>
@@ -2144,7 +2144,7 @@ ocrpt_text_set_value_string(ocrpt_text *text,
 					<para>
 						Set the text element's value from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_value_expr(ocrpt_text *text,
                           const char *expr_string);</programlisting>
 					</para>
@@ -2154,7 +2154,7 @@ ocrpt_text_set_value_expr(ocrpt_text *text,
 					<para>
 						Set the text element value's delayed
 						property from an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_value_delayed(ocrpt_text *text,
                              const char *expr_string);</programlisting>
 					</para>
@@ -2164,7 +2164,7 @@ ocrpt_text_set_value_delayed(ocrpt_text *text,
 					<para>
 						Set the text element's format string from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_format(ocrpt_text *text,
                       const char *expr_string);</programlisting>
 					</para>
@@ -2174,7 +2174,7 @@ ocrpt_text_set_format(ocrpt_text *text,
 					<para>
 						Set the text element's translation from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_translate(ocrpt_text *text,
                          const char *expr_string);</programlisting>
 					</para>
@@ -2189,7 +2189,7 @@ ocrpt_text_set_translate(ocrpt_text *text,
 					<para>
 						Set the text element's field width from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_width(ocrpt_text *text,
                      const char *expr_string);</programlisting>
 					</para>
@@ -2199,7 +2199,7 @@ ocrpt_text_set_width(ocrpt_text *text,
 					<para>
 						Set the text element's alignment from
 						a string or an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_alignment(ocrpt_text *text,
                          const char *expr_string);</programlisting>
 					</para>
@@ -2216,7 +2216,7 @@ ocrpt_text_set_alignment(ocrpt_text *text,
 					<para>
 						Set the text element's text color from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_color(ocrpt_text *text,
                      const char *expr_string);</programlisting>
 					</para>
@@ -2226,7 +2226,7 @@ ocrpt_text_set_color(ocrpt_text *text,
 					<para>
 						Set the text element's background color from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_bgcolor(ocrpt_text *text,
                        const char *expr_string);</programlisting>
 					</para>
@@ -2236,7 +2236,7 @@ ocrpt_text_set_bgcolor(ocrpt_text *text,
 					<para>
 						Set the text element's font name from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_font_name(ocrpt_text *text,
                          const char *expr_string);</programlisting>
 					</para>
@@ -2246,7 +2246,7 @@ ocrpt_text_set_font_name(ocrpt_text *text,
 					<para>
 						Set the text element's font size from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_font_size(ocrpt_text *text,
                          const char *expr_string);</programlisting>
 					</para>
@@ -2256,7 +2256,7 @@ ocrpt_text_set_font_size(ocrpt_text *text,
 					<para>
 						Set the text element's bold value from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_bold(ocrpt_text *text,
                     const char *expr_string);</programlisting>
 					</para>
@@ -2266,7 +2266,7 @@ ocrpt_text_set_bold(ocrpt_text *text,
 					<para>
 						Set the text element's italic value from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_italic(ocrpt_text *text,
                       const char *expr_string);</programlisting>
 					</para>
@@ -2276,7 +2276,7 @@ ocrpt_text_set_italic(ocrpt_text *text,
 					<para>
 						Set the text element's link URL from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_link(ocrpt_text *text,
                     const char *expr_string);</programlisting>
 					</para>
@@ -2287,7 +2287,7 @@ ocrpt_text_set_link(ocrpt_text *text,
 						Set the text element's multiline property
 						from an expression string. The expression
 						must evaluate to a numeric (boolean) value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_memo(ocrpt_text *text,
                     const char *expr_string);</programlisting>
 					</para>
@@ -2302,7 +2302,7 @@ ocrpt_text_set_memo(ocrpt_text *text,
 						for multiline fields. When unset or set to
 						<literal>false</literal>, multiline text
 						fields wrap at word boundaries.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_memo_wrap_chars(ocrpt_text *text,
                                const char *expr_string);</programlisting>
 					</para>
@@ -2321,7 +2321,7 @@ ocrpt_text_set_memo_wrap_chars(ocrpt_text *text,
 						field value. The used font size, the field's width
 						and word/character wrapping influence the
 						number of lines the field value is rendered into.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_text_set_memo_max_lines(ocrpt_text *text,
                               const char *expr_string);</programlisting>
 					</para>
@@ -2348,7 +2348,7 @@ ocrpt_output_add_hline(ocrpt_output *output);</programlisting>
 					<para>
 						Set the horizontal line's size (width) from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_hline_set_size(ocrpt_hline *hline,
                      const char *expr_string);</programlisting>
 					</para>
@@ -2365,7 +2365,7 @@ ocrpt_hline_set_size(ocrpt_hline *hline,
 						The alignment is only applied if the line
 						length is shorter than the designated page
 						or column width without the margins.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_hline_set_align(ocrpt_hline *hline,
                       const char *expr_string);</programlisting>
 					</para>
@@ -2376,7 +2376,7 @@ ocrpt_hline_set_align(ocrpt_hline *hline,
 						Set the horizontal line's indentation value from
 						an expression string. The indentation is used if
 						<literal>left</literal> alignment is set.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_hline_set_indent(ocrpt_hline *hline,
                        const char *expr_string);</programlisting>
 					</para>
@@ -2386,7 +2386,7 @@ ocrpt_hline_set_indent(ocrpt_hline *hline,
 					<para>
 						Set the horizontal line's length from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_hline_set_length(ocrpt_hline *hline,
                        const char *expr_string);</programlisting>
 					</para>
@@ -2398,7 +2398,7 @@ ocrpt_hline_set_length(ocrpt_hline *hline,
 						an expression string. It's used in indentation
 						and length calculations if <xref linkend="sizeunit"/>
 						is set to <literal>rlib</literal>.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_hline_set_font_size(ocrpt_hline *hline,
                           const char *expr_string);</programlisting>
 					</para>
@@ -2408,7 +2408,7 @@ ocrpt_hline_set_font_size(ocrpt_hline *hline,
 					<para>
 						Set the horizontal line's suppression from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_hline_set_suppress(ocrpt_hline *hline,
                          const char *expr_string);</programlisting>
 					</para>
@@ -2418,7 +2418,7 @@ ocrpt_hline_set_suppress(ocrpt_hline *hline,
 					<para>
 						Set the horizontal line's color from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_hline_set_color(ocrpt_hline *hline,
                       const char *expr_string);</programlisting>
 					</para>
@@ -2448,7 +2448,7 @@ ocrpt_line_add_barcode(ocrpt_line *line);</programlisting>
 						must evaluate to a string, whose
 						value is the string to be encoded
 						as a barcode.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_value(ocrpt_barcode *bc,
                         const char *expr_string);</programlisting>
 					</para>
@@ -2459,7 +2459,7 @@ ocrpt_barcode_set_value(ocrpt_barcode *bc,
 						Set the barcode's value delayed from
 						an expression string. The expression
 						must evaluate to a boolean value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_value_delayed(ocrpt_barcode *bc,
                                 const char *expr_string);</programlisting>
 					</para>
@@ -2470,7 +2470,7 @@ ocrpt_barcode_set_value_delayed(ocrpt_barcode *bc,
 						Set the barcode's suppression value from
 						an expression string. The expression
 						must evaluate to a boolean value.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_suppress(ocrpt_barcode *bc,
                            const char *expr_string);</programlisting>
 					</para>
@@ -2484,7 +2484,7 @@ ocrpt_barcode_set_suppress(ocrpt_barcode *bc,
 					<para>
 						Set the barcode's type from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_type(ocrpt_barcode *bc,
                        const char *expr_string);</programlisting>
 					</para>
@@ -2522,7 +2522,7 @@ ocrpt_barcode_set_type(ocrpt_barcode *bc,
 					<para>
 						Set the barcode's width from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_width(ocrpt_barcode *bc,
                         const char *expr_string);</programlisting>
 					</para>
@@ -2539,7 +2539,7 @@ ocrpt_barcode_set_width(ocrpt_barcode *bc,
 					<para>
 						Set the barcode's height from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_height(ocrpt_barcode *bc,
                          const char *expr_string);</programlisting>
 					</para>
@@ -2560,7 +2560,7 @@ ocrpt_barcode_set_height(ocrpt_barcode *bc,
 					<para>
 						Set the barcode's line color from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_color(ocrpt_barcode *bc,
                          const char *expr_string);</programlisting>
 					</para>
@@ -2570,7 +2570,7 @@ ocrpt_barcode_set_color(ocrpt_barcode *bc,
 					<para>
 						Set the barcode's background color from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_bgcolor(ocrpt_barcode *bc,
                          const char *expr_string);</programlisting>
 					</para>
@@ -2604,7 +2604,7 @@ ocrpt_line_add_image(ocrpt_line *line);</programlisting>
 					<para>
 						Set the image's value (filename) from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_image_set_value(ocrpt_image *image,
                       const char *expr_string);</programlisting>
 					</para>
@@ -2614,7 +2614,7 @@ ocrpt_image_set_value(ocrpt_image *image,
 					<para>
 						Set the image's suppression from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_image_set_suppress(ocrpt_image *image,
                          const char *expr_string);</programlisting>
 					</para>
@@ -2624,7 +2624,7 @@ ocrpt_image_set_suppress(ocrpt_image *image,
 					<para>
 						Set the image's type from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_image_set_type(ocrpt_image *image,
                      const char *expr_string);</programlisting>
 					</para>
@@ -2636,7 +2636,7 @@ ocrpt_image_set_type(ocrpt_image *image,
 						an expression string. Used when
 						the image is directly added to
 						an output section.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_image_set_width(ocrpt_image *image,
                       const char *expr_string);</programlisting>
 					</para>
@@ -2648,7 +2648,7 @@ ocrpt_image_set_width(ocrpt_image *image,
 						an expression string. Used when
 						the image is directly added to
 						an output section.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_image_set_height(ocrpt_image *image,
                        const char *expr_string);</programlisting>
 					</para>
@@ -2659,7 +2659,7 @@ ocrpt_image_set_height(ocrpt_image *image,
 						Set the image's alignment from
 						an expression string. Used when
 						the image is added to text line.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_image_set_align(ocrpt_image *image,
                       const char *expr_string);</programlisting>
 					</para>
@@ -2669,7 +2669,7 @@ ocrpt_image_set_align(ocrpt_image *image,
 					<para>
 						Set the image's background color from
 						an expression string.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_image_set_bgcolor(ocrpt_image *image,
                         const char *expr_string);</programlisting>
 					</para>
@@ -2680,7 +2680,7 @@ ocrpt_image_set_bgcolor(ocrpt_image *image,
 						Set the image's field width from
 						an expression string. Used when
 						the image is added to text line.
-						<programlisting>void
+						<programlisting>ocrpt_expr *
 ocrpt_image_set_text_width(ocrpt_image *image,
                            const char *expr_string);</programlisting>
 					</para>

@@ -200,14 +200,9 @@ DLL_EXPORT_SYM void ocrpt_report_set_main_query_from_expr(ocrpt_report *r, const
 		return;
 
 	ocrpt_expr_free(r->query_expr);
-	r->query_expr = NULL;
-
-	if (!expr_string)
-		return;
-
-	r->query_expr = ocrpt_report_expr_parse(r, expr_string, NULL);
+	r->query_expr = expr_string ? ocrpt_report_expr_parse(r, expr_string, NULL) : NULL;
 	if (!r->query_expr)
-		r->query_expr = ocrpt_newstring(r->o, r, expr_string);
+		r->query_expr = expr_string ? ocrpt_newstring(r->o, r, expr_string) : NULL;
 }
 
 DLL_EXPORT_SYM void ocrpt_report_resolve_variables(ocrpt_report *r) {

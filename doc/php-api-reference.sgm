@@ -122,13 +122,16 @@
     public final set_paper(string $paper): void;
 
     public final set_size_unit(string $expr_string):
-                     void;
+                     ?OpenCReport\Expr;
     public final set_noquery_show_nodata(
-                     string $expr_string): void;
+                     string $expr_string):
+                     ?OpenCReport\Expr;
     public final set_report_height_after_last(
-                     string $expr_string): void;
+                     string $expr_string):
+                     ?OpenCReport\Expr;
     public final set_follower_match_single(
-                     string $expr_string): void;
+                     string $expr_string):
+                     ?OpenCReport\Expr;
     public final set_follower_match_single_direct(
                      bool $value): void;
 }</programlisting>
@@ -740,7 +743,8 @@ OpenCReport::set_paper(string $paper): void;</programlisting>
 					Default is <literal>rlib</literal>
 					for RLIB compatibility.
 					<programlisting>public final
-OpenCReport::set_size_unit(string $expr_string): void;</programlisting>
+OpenCReport::set_size_unit(string $expr_string):
+                     ?OpenCReport\Expr;</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="phppartsetnqsnd">
@@ -748,7 +752,8 @@ OpenCReport::set_size_unit(string $expr_string): void;</programlisting>
 				<para>
 					<programlisting>public final
 OpenCReport::set_noquery_show_nodata(
-                     string $expr_string): void;</programlisting>
+                     string $expr_string):
+                     ?OpenCReport\Expr;</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="phppartsetrhal">
@@ -756,7 +761,8 @@ OpenCReport::set_noquery_show_nodata(
 				<para>
 					<programlisting>public final
 OpenCReport::set_report_height_after_last(
-                     string $expr_string): void;</programlisting>
+                     string $expr_string):
+                     ?OpenCReport\Expr;</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="phppartsetfms">
@@ -765,7 +771,9 @@ OpenCReport::set_report_height_after_last(
 					See <xref linkend="xmlfollowermatchsingle"/>.
 					<programlisting>public final
 OpenCReport::set_follower_match_single(
-                     string $expr_string): void;
+                     string $expr_string):
+                     ?OpenCReport\Expr;
+
 public final
 OpenCReport::set_follower_match_single_direct(
                      bool $value): void;</programlisting>
@@ -1584,37 +1592,48 @@ OpenCReport\Result::get_number(?string $format): ?string;</programlisting>
                      OpenCReport\Part $part): bool;
 
     public final set_iterations(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_font_name(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_font_size(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_paper(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_orientation(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_top_margin(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_bottom_margin(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_left_margin(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_right_margin(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_suppress(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_suppress_pageheader_firstpage(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final page_header():
                      ?OpenCReport\Output;
@@ -1697,7 +1716,8 @@ OpenCReport\Part::equals(
 				this many times. Default is 1.
 				<programlisting>public final
 OpenCReport\Part::set_iterations(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phppartsetfontname">
@@ -1705,7 +1725,8 @@ OpenCReport\Part::set_iterations(
 			<para>
 				<programlisting>public final
 OpenCReport\Part::set_font_name(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phppartsetfontsize">
@@ -1713,15 +1734,17 @@ OpenCReport\Part::set_font_name(
 			<para>
 				<programlisting>public final
 OpenCReport\Part::set_font_size(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phppartsetpaper">
-			<title>Set part font size</title>
+			<title>Set paper type</title>
 			<para>
 				<programlisting>public final
 OpenCReport\Part::set_paper(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phppartsetorientation">
@@ -1734,7 +1757,8 @@ OpenCReport\Part::set_paper(
 				Default is <literal>portrait</literal>.
 				<programlisting>public final
 OpenCReport\Part::set_orientation(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phppartsettopmargin">
@@ -1742,7 +1766,8 @@ OpenCReport\Part::set_orientation(
 			<para>
 				<programlisting>public final
 OpenCReport\Part::set_top_margin(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phppartsetbottommargin">
@@ -1750,7 +1775,8 @@ OpenCReport\Part::set_top_margin(
 			<para>
 				<programlisting>public final
 OpenCReport\Part::set_bottom_margin(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phppartsetleftmargin">
@@ -1758,7 +1784,8 @@ OpenCReport\Part::set_bottom_margin(
 			<para>
 				<programlisting>public final
 OpenCReport\Part::set_left_margin(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phppartsetrightmargin">
@@ -1766,7 +1793,8 @@ OpenCReport\Part::set_left_margin(
 			<para>
 				<programlisting>public final
 OpenCReport\Part::set_right_margin(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phppartsetsuppress">
@@ -1777,7 +1805,8 @@ OpenCReport\Part::set_right_margin(
 				and rendering. Default is <literal>false</literal>.
 				<programlisting>public final
 OpenCReport\Part::set_suppress(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phppartsetsphf">
@@ -1790,7 +1819,8 @@ OpenCReport\Part::set_suppress(
 				Default is <literal>false</literal>.
 				<programlisting>public final
 OpenCReport\Part::set_suppress_pageheader_firstpage(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phppartpageheader">
@@ -1862,13 +1892,16 @@ OpenCReport\Part::page_footer_set_report(
                      ?OpenCReport\Column;
 
     public final set_suppress(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_newpage(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_layout(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 }</programlisting>
 		</para>
 		<sect2 id="phprowgetnext">
@@ -1911,7 +1944,8 @@ OpenCReport\Row::column_get_first():
 			<para>
 				<programlisting>public final
 OpenCReport\Row:set_suppress(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phprowsetnewpage">
@@ -1921,7 +1955,8 @@ OpenCReport\Row:set_suppress(
 				the part row will start on a new page.
 				<programlisting>public final
 OpenCReport\Row:set_newpage(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phprowsetlayout">
@@ -1929,7 +1964,8 @@ OpenCReport\Row:set_newpage(
 			<para>
 				<programlisting>public final
 OpenCReport\Row::set_layout(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 	</sect1>
@@ -1947,25 +1983,32 @@ OpenCReport\Row::set_layout(
                      ?OpenCReport\Report;
 
     public final set_suppress(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ??OpenCReport\Expr;
 
     public final set_width(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_width(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_border_width(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_border_color(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_detail_columns(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_column_padding(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 }</programlisting>
 		</para>
 		<sect2 id="phpcolgetnext">
@@ -2008,7 +2051,8 @@ OpenCReport\Column::report_get_first():
 			<para>
 				<programlisting>public final
 OpenCReport\Column::set_suppress(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpcolsetwidth">
@@ -2019,7 +2063,8 @@ OpenCReport\Column::set_suppress(
 				width, it's rendering is truncated.
 				<programlisting>public final
 OpenCReport\Column::set_width(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpcolsetheight">
@@ -2039,7 +2084,8 @@ OpenCReport\Column::set_width(
 				fully rendered.
 				<programlisting>public final
 OpenCReport\Column::set_height(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpcolsetborderwidth">
@@ -2051,7 +2097,8 @@ OpenCReport\Column::set_height(
 				around the part column.
 				<programlisting>public final
 OpenCReport\Column::set_border_width(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpcolsetbordercolor">
@@ -2061,7 +2108,8 @@ OpenCReport\Column::set_border_width(
 				Only used if the border width is set.
 				<programlisting>public final
 OpenCReport\Column::set_border_color(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpcolsetdetailcols">
@@ -2076,7 +2124,8 @@ OpenCReport\Column::set_border_color(
 				column would result in a page break.
 				<programlisting>public final
 OpenCReport\Column::set_detail_columns(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpcolsetpadding">
@@ -2087,7 +2136,8 @@ OpenCReport\Column::set_detail_columns(
 				columns is greater than 1.
 				<programlisting>public final
 OpenCReport\Column::set_column_padding(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 	</sect1>
@@ -2166,22 +2216,28 @@ OpenCReport\Column::set_column_padding(
                      string $query_name): void;
 
     public final set_suppress(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_iterations(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_font_name(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_font_size(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_height(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_fieldheader_priority(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final nodata(): OpenCReport\Output;
     public final header(): OpenCReport\Output;
@@ -2509,7 +2565,8 @@ OpenCReport\Report::set_main_query_by_name(
 				not rendered in the output.
 				<programlisting>public final
 OpenCReport\Report::public final set_suppress(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpreportsetiterations">
@@ -2520,7 +2577,8 @@ OpenCReport\Report::public final set_suppress(
 				this many times. Default is 1.
 				<programlisting>public final
 OpenCReport\Report::set_iterations(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpreportsetfontname">
@@ -2532,7 +2590,8 @@ OpenCReport\Report::set_iterations(
 				the font name themselves.
 				<programlisting>public final
 OpenCReport\Report::set_font_name(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpreportsetfontsize">
@@ -2544,7 +2603,8 @@ OpenCReport\Report::set_font_name(
 				the font size themselves.
 				<programlisting>public final
 OpenCReport\Report::set_font_size(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpreportsetheight">
@@ -2562,7 +2622,8 @@ OpenCReport\Report::set_font_size(
 				the report height,
 				<programlisting>public final
 OpenCReport\Report::set_height(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpreportsetfhprio">
@@ -2572,7 +2633,8 @@ OpenCReport\Report::set_height(
 				See <xref linkend="reportfhpriority"/> for explanation.
 				<programlisting>public final
 OpenCReport\Report::set_fieldheader_priority(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpreportgetoutput">
@@ -2833,7 +2895,8 @@ OpenCReport\ReportBreak::footer(): OpenCReport\Output;</programlisting>
 		<para>
 			<programlisting>class OpenCReport\Output {
     public final set_suppress(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final add_line():
                      ?OpenCReport\Line;
@@ -2857,7 +2920,8 @@ OpenCReport\ReportBreak::footer(): OpenCReport\Output;</programlisting>
 				i.e. the section is not suppressed.
 				<programlisting>public final
 OpenCReport\Output::set_suppress(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpoutputaddline">
@@ -2935,25 +2999,32 @@ OpenCReport\Output::add_image_end(): void;</programlisting>
 		<para>
 			<programlisting>class OpenCReport\Line {
     public final set_font_name(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_font_size(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_bold(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_italic(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_suppress(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_color(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_bgcolor(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final add_text():
                      ?OpenCReport\Text;
@@ -2973,7 +3044,8 @@ OpenCReport\Output::add_image_end(): void;</programlisting>
 				that don't set the font name themselves.
 				<programlisting>public final
 OpenCReport\Line::set_font_name(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phplinesetfontsize">
@@ -2984,7 +3056,8 @@ OpenCReport\Line::set_font_name(
 				that don't set the font size themselves.
 				<programlisting>public final
 OpenCReport\Line::set_font_size(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phplinesetbold">
@@ -2998,7 +3071,8 @@ OpenCReport\Line::set_font_size(
 				that don't set it themselves.
 				<programlisting>public final
 OpenCReport\Line::set_bold(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phplinesetitalic">
@@ -3012,7 +3086,8 @@ OpenCReport\Line::set_bold(
 				that don't set it themselves.
 				<programlisting>public final
 OpenCReport\Line::set_italic(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phplinesetsuppress">
@@ -3028,7 +3103,8 @@ OpenCReport\Line::set_italic(
 				be suppressed, i.e. not rendered.
 				<programlisting>public final
 OpenCReport\Line::set_suppress(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phplinesetcolor">
@@ -3040,7 +3116,8 @@ OpenCReport\Line::set_suppress(
 				that don't set the text color themselves.
 				<programlisting>public final
 OpenCReport\Line::set_color(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phplinesetbgcolor">
@@ -3052,7 +3129,8 @@ OpenCReport\Line::set_color(
 				that don't set the background color themselves.
 				<programlisting>public final
 OpenCReport\Line::set_bgcolor(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phplineaddtext">
@@ -3083,25 +3161,32 @@ OpenCReport\Line::add_image():
 		<para>
 			<programlisting>class OpenCReport\HorizontalLine {
     public final set_size(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_align(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_indent(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_length(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_font_size(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_suppress(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_color(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 }</programlisting>
 		</para>
 		<sect2 id="phphlinesetsize">
@@ -3111,7 +3196,8 @@ OpenCReport\Line::add_image():
 				Also see <xref linkend="hlinewidth"/>
 				<programlisting>public final
 OpenCReport\HorizontalLine::set_size(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phphlinesetalign">
@@ -3121,7 +3207,8 @@ OpenCReport\HorizontalLine::set_size(
 				Also see <xref linkend="hlinealign"/>
 				<programlisting>public final
 OpenCReport\HorizontalLine::set_align(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phphlinesetindent">
@@ -3132,7 +3219,8 @@ OpenCReport\HorizontalLine::set_align(
 				Also see <xref linkend="hlineindent"/>
 				<programlisting>public final
 OpenCReport\HorizontalLine::set_indent(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phphlinesetlength">
@@ -3143,7 +3231,8 @@ OpenCReport\HorizontalLine::set_indent(
 				<xref linkend="sizeunit"/>.
 				<programlisting>public final
 OpenCReport\HorizontalLine::set_length(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phphlinesetfontsize">
@@ -3154,7 +3243,8 @@ OpenCReport\HorizontalLine::set_length(
 				See <xref linkend="hlinefontsize"/>
 				<programlisting>public final
 OpenCReport\HorizontalLine::set_font_size(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phphlinesetsuppress">
@@ -3167,7 +3257,8 @@ OpenCReport\HorizontalLine::set_font_size(
 				is not rendered. Default is <literal>false</literal>.
 				<programlisting>public final
 OpenCReport\HorizontalLine::set_suppress(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phphlinesetcolor">
@@ -3177,7 +3268,8 @@ OpenCReport\HorizontalLine::set_suppress(
 				See <xref linkend="colorspec"/>.
 				<programlisting>public final
 OpenCReport\HorizontalLine::set_color(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 	</sect1>
@@ -3186,28 +3278,36 @@ OpenCReport\HorizontalLine::set_color(
 		<para>
 			<programlisting>class OpenCReport\Image {
     public final set_value(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_suppress(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_type(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_width(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_height(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_alignment(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_bgcolor(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_text_width(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 }</programlisting>
 		</para>
 		<sect2 id="phpimagesetvalue">
@@ -3221,7 +3321,8 @@ OpenCReport\HorizontalLine::set_color(
 				(See <xref linkend="phpaddsearchpath"/>.)
 				<programlisting>public final
 OpenCReport\Image::set_value(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpimagesetsuppress">
@@ -3233,7 +3334,8 @@ OpenCReport\Image::set_value(
 				Default is <literal>false</literal>.
 				<programlisting>public final
 OpenCReport\Image::set_suppress(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpimagesettype">
@@ -3243,7 +3345,8 @@ OpenCReport\Image::set_suppress(
 				Usually it's auto-detected and not needed.
 				<programlisting>public final
 OpenCReport\Image::set_type(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpimagesetwidth">
@@ -3255,7 +3358,8 @@ OpenCReport\Image::set_type(
 				See <xref linkend="imagewidth"/>.
 				<programlisting>public final
 OpenCReport\Image::set_width(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpimagesetheight">
@@ -3267,7 +3371,8 @@ OpenCReport\Image::set_width(
 				See <xref linkend="imagewidth"/>.
 				<programlisting>public final
 OpenCReport\Image::set_height(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpimagesetalignment">
@@ -3279,7 +3384,8 @@ OpenCReport\Image::set_height(
 				See <xref linkend="imagealign"/>.
 				<programlisting>public final
 OpenCReport\Image::set_alignment(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpimagesetbgcolor">
@@ -3291,7 +3397,8 @@ OpenCReport\Image::set_alignment(
 				See <xref linkend="imagebgcolor"/>.
 				<programlisting>public final
 OpenCReport\Image::set_bgcolor(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpimagesettextwidth">
@@ -3303,7 +3410,8 @@ OpenCReport\Image::set_bgcolor(
 				See <xref linkend="imagetextwidth"/>.
 				<programlisting>public final
 OpenCReport\Image::set_text_width(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 	</sect1>
@@ -3312,55 +3420,72 @@ OpenCReport\Image::set_text_width(
 		<para>
 			<programlisting>class OpenCReport\Text {
     public final set_value_string(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_value_expr(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_value_delayed(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_format(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_translate(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_width(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_alignment(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_color(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_bgcolor(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_font_name(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_font_size(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_bold(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_italic(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_link(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_memo(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_memo_wrap_chars(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_memo_max_lines(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 }</programlisting>
 		</para>
 		<sect2 id="phptextsetvaluestring">
@@ -3369,7 +3494,8 @@ OpenCReport\Image::set_text_width(
 				Set the literal value for the text element.
 				<programlisting>public final
 OpenCReport\Text::set_value_string(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetvalueexpr">
@@ -3380,7 +3506,8 @@ OpenCReport\Text::set_value_string(
 				See <xref linkend="expressions"/>.
 				<programlisting>public final
 OpenCReport\Text::set_value_expr(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetvaluedelayed">
@@ -3394,7 +3521,8 @@ OpenCReport\Text::set_value_expr(
 				rendering the report.
 				<programlisting>public final
 OpenCReport\Text::set_value_delayed(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetformat">
@@ -3406,7 +3534,8 @@ OpenCReport\Text::set_value_delayed(
 				See <xref linkend="formatting"/>
 				<programlisting>public final
 OpenCReport\Text::set_format(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetxlate">
@@ -3419,7 +3548,8 @@ OpenCReport\Text::set_format(
 				See <xref linkend="phplocalemethods"/>
 				<programlisting>public final
 OpenCReport\Text::set_translate(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetwidth">
@@ -3429,7 +3559,8 @@ OpenCReport\Text::set_translate(
 				See <xref linkend="textelemwidth"/>
 				<programlisting>public final
 OpenCReport\Text::set_width(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetalign">
@@ -3439,7 +3570,8 @@ OpenCReport\Text::set_width(
 				See <xref linkend="textelemalign"/>
 				<programlisting>public final
 OpenCReport\Text::set_alignment(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetcolor">
@@ -3449,7 +3581,8 @@ OpenCReport\Text::set_alignment(
 				See <xref linkend="textcolor"/>
 				<programlisting>public final
 OpenCReport\Text::set_color(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetbgcolor">
@@ -3459,7 +3592,8 @@ OpenCReport\Text::set_color(
 				See <xref linkend="textbgcolor"/>
 				<programlisting>public final
 OpenCReport\Text::set_bgcolor(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetfontname">
@@ -3469,7 +3603,8 @@ OpenCReport\Text::set_bgcolor(
 				See <xref linkend="textelemfontname"/>
 				<programlisting>public final
 OpenCReport\Text::set_font_name(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetfontsize">
@@ -3479,7 +3614,8 @@ OpenCReport\Text::set_font_name(
 				See <xref linkend="textelemfontsize"/>
 				<programlisting>public final
 OpenCReport\Text::set_font_size(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetbold">
@@ -3489,7 +3625,8 @@ OpenCReport\Text::set_font_size(
 				See <xref linkend="textbold"/>
 				<programlisting>public final
 OpenCReport\Text::set_bold(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetitalic">
@@ -3499,7 +3636,8 @@ OpenCReport\Text::set_bold(
 				See <xref linkend="textitalic"/>
 				<programlisting>public final
 OpenCReport\Text::set_italic(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetlink">
@@ -3511,7 +3649,8 @@ OpenCReport\Text::set_italic(
 				See <xref linkend="weblink"/>
 				<programlisting>public final
 OpenCReport\Text::set_link(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetmemo">
@@ -3523,7 +3662,8 @@ OpenCReport\Text::set_link(
 				See <xref linkend="memo"/>
 				<programlisting>public final
 OpenCReport\Text::set_memo(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetmemowrap">
@@ -3539,7 +3679,8 @@ OpenCReport\Text::set_memo(
 				See <xref linkend="memowrap"/>
 				<programlisting>public final
 OpenCReport\Text::set_memo_wrap_chars(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetmemomaxlines">
@@ -3553,7 +3694,8 @@ OpenCReport\Text::set_memo_wrap_chars(
 				See <xref linkend="memorowlimit"/>
 				<programlisting>public final
 OpenCReport\Text::set_memo_max_lines(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 	</sect1>
@@ -3562,28 +3704,36 @@ OpenCReport\Text::set_memo_max_lines(
 		<para>
 			<programlisting>class OpenCReport\Barcode {
     public final set_value(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_value_delayed(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_suppress(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_type(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_width(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_height(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_color(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 
     public final set_bgcolor(
-                     ?string $expr_string = null): void;
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
 }</programlisting>
 		</para>
 		<sect2 id="phpbarcodesetvalue">
@@ -3596,7 +3746,8 @@ OpenCReport\Text::set_memo_max_lines(
 				as a barcode.
 				<programlisting>public final
 OpenCReport\Barcode::set_value(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpbarcodesetvaluedelayed">
@@ -3607,7 +3758,8 @@ OpenCReport\Barcode::set_value(
 				must evaluate to a boolean value.
 				<programlisting>public final
 OpenCReport\Barcode::set_value_delayed(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpbarcodesetsuppress">
@@ -3618,7 +3770,8 @@ OpenCReport\Barcode::set_value_delayed(
 				must evaluate to a boolean value.
 				<programlisting>public final
 OpenCReport\Barcode::set_suppress(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 			<para>
 				Default value is <literal>false</literal>,
@@ -3631,7 +3784,8 @@ OpenCReport\Barcode::set_suppress(
 				Set the barcode type.
 				<programlisting>public final
 OpenCReport\Barcode::set_type(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 			<para>
 				The type may be optional, in which
@@ -3668,7 +3822,8 @@ OpenCReport\Barcode::set_type(
 				Set the barcode image width.
 				<programlisting>public final
 OpenCReport\Barcode::set_width(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 			<para>
 				The width is set according to
@@ -3684,7 +3839,8 @@ OpenCReport\Barcode::set_width(
 				Set the barcode image height.
 				<programlisting>public final
 OpenCReport\Barcode::set_height(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpbarcodesetcolor">
@@ -3693,7 +3849,8 @@ OpenCReport\Barcode::set_height(
 				Set the barcode image line color.
 				<programlisting>public final
 OpenCReport\Barcode::set_color(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpbarcodesetbgcolor">
@@ -3702,7 +3859,8 @@ OpenCReport\Barcode::set_color(
 				Set the barcode image background color.
 				<programlisting>public final
 OpenCReport\Barcode::set_bgcolor(
-                     ?string $expr_string = null): void;</programlisting>
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 	</sect1>

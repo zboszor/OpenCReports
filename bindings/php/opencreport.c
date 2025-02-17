@@ -2045,7 +2045,12 @@ PHP_METHOD(opencreport, set_size_unit) {
 		return;
 #endif
 
-	ocrpt_set_size_unit(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_set_size_unit(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport, set_noquery_show_nodata) {
@@ -2065,7 +2070,12 @@ PHP_METHOD(opencreport, set_noquery_show_nodata) {
 		return;
 #endif
 
-	ocrpt_set_noquery_show_nodata(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_set_noquery_show_nodata(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport, set_report_height_after_last) {
@@ -2085,7 +2095,12 @@ PHP_METHOD(opencreport, set_report_height_after_last) {
 		return;
 #endif
 
-	ocrpt_set_report_height_after_last(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_set_report_height_after_last(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport, set_follower_match_single) {
@@ -2105,7 +2120,12 @@ PHP_METHOD(opencreport, set_follower_match_single) {
 		return;
 #endif
 
-	ocrpt_set_follower_match_single(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_set_follower_match_single(oo->o, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport, set_follower_match_single_direct) {
@@ -2260,19 +2280,19 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_paper, 0, 1, IS
 ZEND_ARG_TYPE_INFO(0, paper, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_size_unit, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_set_size_unit, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_noquery_show_nodata, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_set_noquery_show_nodata, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_report_height_after_last, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_set_report_height_after_last, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_follower_match_single, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_set_follower_match_single, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
@@ -3707,7 +3727,12 @@ PHP_METHOD(opencreport_part, set_iterations) {
 		return;
 #endif
 
-	ocrpt_part_set_iterations(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_set_iterations(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part, set_font_name) {
@@ -3727,7 +3752,12 @@ PHP_METHOD(opencreport_part, set_font_name) {
 		return;
 #endif
 
-	ocrpt_part_set_font_name(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_set_font_name(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part, set_font_size) {
@@ -3747,7 +3777,12 @@ PHP_METHOD(opencreport_part, set_font_size) {
 		return;
 #endif
 
-	ocrpt_part_set_font_size(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_set_font_size(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part, set_paper) {
@@ -3767,7 +3802,12 @@ PHP_METHOD(opencreport_part, set_paper) {
 		return;
 #endif
 
-	ocrpt_part_set_paper_by_name(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_set_paper_by_name(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part, set_orientation) {
@@ -3787,7 +3827,12 @@ PHP_METHOD(opencreport_part, set_orientation) {
 		return;
 #endif
 
-	ocrpt_part_set_orientation(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_set_orientation(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part, set_top_margin) {
@@ -3807,7 +3852,12 @@ PHP_METHOD(opencreport_part, set_top_margin) {
 		return;
 #endif
 
-	ocrpt_part_set_top_margin(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_set_top_margin(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part, set_bottom_margin) {
@@ -3827,7 +3877,12 @@ PHP_METHOD(opencreport_part, set_bottom_margin) {
 		return;
 #endif
 
-	ocrpt_part_set_bottom_margin(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_set_bottom_margin(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part, set_left_margin) {
@@ -3847,7 +3902,12 @@ PHP_METHOD(opencreport_part, set_left_margin) {
 		return;
 #endif
 
-	ocrpt_part_set_left_margin(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_set_left_margin(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part, set_right_margin) {
@@ -3867,7 +3927,12 @@ PHP_METHOD(opencreport_part, set_right_margin) {
 		return;
 #endif
 
-	ocrpt_part_set_right_margin(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_set_right_margin(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part, set_suppress) {
@@ -3887,7 +3952,12 @@ PHP_METHOD(opencreport_part, set_suppress) {
 		return;
 #endif
 
-	ocrpt_part_set_suppress(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_set_suppress(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part, set_suppress_pageheader_firstpage) {
@@ -3907,7 +3977,12 @@ PHP_METHOD(opencreport_part, set_suppress_pageheader_firstpage) {
 		return;
 #endif
 
-	ocrpt_part_set_suppress_pageheader_firstpage(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_set_suppress_pageheader_firstpage(po->p, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part, page_header) {
@@ -3983,47 +4058,47 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_equals, 0, 1, 
 ZEND_ARG_OBJ_INFO(0, part, OpenCReport\\Part, 0)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_set_iterations, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_set_iterations, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_set_font_name, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_set_font_name, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_set_font_size, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_set_font_size, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_set_paper, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_set_paper, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_set_orientation, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_set_orientation, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_set_top_margin, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_set_top_margin, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_set_bottom_margin, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_set_bottom_margin, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_set_left_margin, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_set_left_margin, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_set_right_margin, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_set_right_margin, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_set_suppress, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_set_suppress, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_set_suppress_pageheader_firstpage, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_set_suppress_pageheader_firstpage, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
@@ -4166,7 +4241,12 @@ PHP_METHOD(opencreport_row, set_suppress) {
 		return;
 #endif
 
-	ocrpt_part_row_set_suppress(pro->pr, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_row_set_suppress(pro->pr, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_row, set_newpage) {
@@ -4186,7 +4266,12 @@ PHP_METHOD(opencreport_row, set_newpage) {
 		return;
 #endif
 
-	ocrpt_part_row_set_newpage(pro->pr, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_row_set_newpage(pro->pr, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_row, set_layout) {
@@ -4206,7 +4291,12 @@ PHP_METHOD(opencreport_row, set_layout) {
 		return;
 #endif
 
-	ocrpt_part_row_set_layout(pro->pr, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_row_set_layout(pro->pr, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 #if PHP_VERSION_ID >= 70000
@@ -4220,15 +4310,15 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_row_column_get_first, 0, 0, OpenCReport\\Column, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_row_set_suppress, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_row_set_suppress, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_row_set_newpage, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_row_set_newpage, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_row_set_layout, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_row_set_layout, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
@@ -4336,7 +4426,12 @@ PHP_METHOD(opencreport_part_col, set_suppress) {
 		return;
 #endif
 
-	ocrpt_part_column_set_suppress(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_column_set_suppress(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part_col, set_width) {
@@ -4356,7 +4451,12 @@ PHP_METHOD(opencreport_part_col, set_width) {
 		return;
 #endif
 
-	ocrpt_part_column_set_width(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_column_set_width(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part_col, set_height) {
@@ -4376,7 +4476,12 @@ PHP_METHOD(opencreport_part_col, set_height) {
 		return;
 #endif
 
-	ocrpt_part_column_set_height(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_column_set_height(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part_col, set_border_width) {
@@ -4396,7 +4501,12 @@ PHP_METHOD(opencreport_part_col, set_border_width) {
 		return;
 #endif
 
-	ocrpt_part_column_set_border_width(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_column_set_border_width(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part_col, set_border_color) {
@@ -4416,7 +4526,12 @@ PHP_METHOD(opencreport_part_col, set_border_color) {
 		return;
 #endif
 
-	ocrpt_part_column_set_border_color(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_column_set_border_color(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part_col, set_detail_columns) {
@@ -4436,7 +4551,12 @@ PHP_METHOD(opencreport_part_col, set_detail_columns) {
 		return;
 #endif
 
-	ocrpt_part_column_set_detail_columns(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_column_set_detail_columns(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_part_col, set_column_padding) {
@@ -4456,7 +4576,12 @@ PHP_METHOD(opencreport_part_col, set_column_padding) {
 		return;
 #endif
 
-	ocrpt_part_column_set_column_padding(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_part_column_set_column_padding(pco->pc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 #if PHP_VERSION_ID >= 70000
@@ -4470,31 +4595,31 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_col_report_get_first, 0, 0, OpenCReport\\Report, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_col_set_suppress, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_col_set_suppress, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_col_set_width, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_col_set_width, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_col_set_height, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_col_set_height, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_col_set_border_width, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_col_set_border_width, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_col_set_border_color, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_col_set_border_color, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_col_set_detail_columns, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_col_set_detail_columns, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_part_col_set_column_padding, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_part_col_set_column_padding, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
@@ -4982,7 +5107,12 @@ PHP_METHOD(opencreport_report, set_suppress) {
 		return;
 #endif
 
-	ocrpt_report_set_suppress(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_report_set_suppress(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_report, set_iterations) {
@@ -5002,7 +5132,12 @@ PHP_METHOD(opencreport_report, set_iterations) {
 		return;
 #endif
 
-	ocrpt_report_set_iterations(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_report_set_iterations(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_report, set_font_name) {
@@ -5022,7 +5157,12 @@ PHP_METHOD(opencreport_report, set_font_name) {
 		return;
 #endif
 
-	ocrpt_report_set_font_name(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_report_set_font_name(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_report, set_font_size) {
@@ -5042,7 +5182,12 @@ PHP_METHOD(opencreport_report, set_font_size) {
 		return;
 #endif
 
-	ocrpt_report_set_font_size(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_report_set_font_size(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_report, set_height) {
@@ -5062,7 +5207,12 @@ PHP_METHOD(opencreport_report, set_height) {
 		return;
 #endif
 
-	ocrpt_report_set_height(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_report_set_height(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_report, set_fieldheader_priority) {
@@ -5082,7 +5232,12 @@ PHP_METHOD(opencreport_report, set_fieldheader_priority) {
 		return;
 #endif
 
-	ocrpt_report_set_fieldheader_priority(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_report_set_fieldheader_priority(pro->r, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_report, nodata) {
@@ -5209,27 +5364,27 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_report_set_main_que
 ZEND_ARG_TYPE_INFO(0, query_name, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_report_set_suppress, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_set_suppress, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_report_set_iterations, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_set_iterations, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_report_set_font_name, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_set_font_name, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_report_set_font_size, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_set_font_size, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_report_set_height, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_set_height, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_report_set_fieldheader_priority, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_set_fieldheader_priority, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
@@ -5737,7 +5892,12 @@ PHP_METHOD(opencreport_output, set_suppress) {
 		return;
 #endif
 
-	ocrpt_output_set_suppress(oo->output, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_output_set_suppress(oo->output, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_output, add_line) {
@@ -5819,7 +5979,7 @@ PHP_METHOD(opencreport_output, add_barcode) {
 
 #if PHP_VERSION_ID >= 70000
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_output_set_suppress, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_output_set_suppress, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
@@ -5876,7 +6036,12 @@ PHP_METHOD(opencreport_line, set_font_name) {
 		return;
 #endif
 
-	ocrpt_line_set_font_name(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_line_set_font_name(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_line, set_font_size) {
@@ -5896,7 +6061,12 @@ PHP_METHOD(opencreport_line, set_font_size) {
 		return;
 #endif
 
-	ocrpt_line_set_font_size(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_line_set_font_size(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_line, set_bold) {
@@ -5916,7 +6086,12 @@ PHP_METHOD(opencreport_line, set_bold) {
 		return;
 #endif
 
-	ocrpt_line_set_bold(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_line_set_bold(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_line, set_italic) {
@@ -5936,7 +6111,12 @@ PHP_METHOD(opencreport_line, set_italic) {
 		return;
 #endif
 
-	ocrpt_line_set_italic(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_line_set_italic(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_line, set_suppress) {
@@ -5956,7 +6136,12 @@ PHP_METHOD(opencreport_line, set_suppress) {
 		return;
 #endif
 
-	ocrpt_line_set_suppress(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_line_set_suppress(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_line, set_color) {
@@ -5976,7 +6161,12 @@ PHP_METHOD(opencreport_line, set_color) {
 		return;
 #endif
 
-	ocrpt_line_set_color(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_line_set_color(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_line, set_bgcolor) {
@@ -5996,7 +6186,12 @@ PHP_METHOD(opencreport_line, set_bgcolor) {
 		return;
 #endif
 
-	ocrpt_line_set_bgcolor(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_line_set_bgcolor(lo->line, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_line, add_text) {
@@ -6052,31 +6247,31 @@ PHP_METHOD(opencreport_line, add_barcode) {
 
 #if PHP_VERSION_ID >= 70000
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_font_name, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_line_set_font_name, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_font_size, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_line_set_font_size, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_bold, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_line_set_bold, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_italic, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_line_set_italic, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_suppress, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_line_set_suppress, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_color, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_line_set_color, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_line_set_bgcolor, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_line_set_bgcolor, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
@@ -6135,7 +6330,12 @@ PHP_METHOD(opencreport_hline, set_size) {
 		return;
 #endif
 
-	ocrpt_hline_set_size(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_hline_set_size(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_hline, set_align) {
@@ -6155,7 +6355,12 @@ PHP_METHOD(opencreport_hline, set_align) {
 		return;
 #endif
 
-	ocrpt_hline_set_align(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_hline_set_align(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_hline, set_indent) {
@@ -6175,7 +6380,12 @@ PHP_METHOD(opencreport_hline, set_indent) {
 		return;
 #endif
 
-	ocrpt_hline_set_indent(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_hline_set_indent(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_hline, set_length) {
@@ -6195,7 +6405,12 @@ PHP_METHOD(opencreport_hline, set_length) {
 		return;
 #endif
 
-	ocrpt_hline_set_length(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_hline_set_length(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_hline, set_font_size) {
@@ -6215,7 +6430,12 @@ PHP_METHOD(opencreport_hline, set_font_size) {
 		return;
 #endif
 
-	ocrpt_hline_set_font_size(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_hline_set_font_size(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_hline, set_suppress) {
@@ -6235,7 +6455,12 @@ PHP_METHOD(opencreport_hline, set_suppress) {
 		return;
 #endif
 
-	ocrpt_hline_set_suppress(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_hline_set_suppress(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_hline, set_color) {
@@ -6255,36 +6480,41 @@ PHP_METHOD(opencreport_hline, set_color) {
 		return;
 #endif
 
-	ocrpt_hline_set_color(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_hline_set_color(hlo->hline, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 #if PHP_VERSION_ID >= 70000
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_size, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_hline_set_size, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_align, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_hline_set_align, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_indent, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_hline_set_indent, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_length, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_hline_set_length, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_font_size, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_hline_set_font_size, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_suppress, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_hline_set_suppress, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_hline_set_color, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_hline_set_color, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
@@ -6328,7 +6558,12 @@ PHP_METHOD(opencreport_image, set_value) {
 		return;
 #endif
 
-	ocrpt_image_set_value(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_image_set_value(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_image, set_suppress) {
@@ -6348,7 +6583,12 @@ PHP_METHOD(opencreport_image, set_suppress) {
 		return;
 #endif
 
-	ocrpt_image_set_suppress(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_image_set_suppress(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_image, set_type) {
@@ -6368,7 +6608,12 @@ PHP_METHOD(opencreport_image, set_type) {
 		return;
 #endif
 
-	ocrpt_image_set_type(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_image_set_type(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_image, set_width) {
@@ -6388,7 +6633,12 @@ PHP_METHOD(opencreport_image, set_width) {
 		return;
 #endif
 
-	ocrpt_image_set_width(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_image_set_width(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_image, set_height) {
@@ -6408,7 +6658,12 @@ PHP_METHOD(opencreport_image, set_height) {
 		return;
 #endif
 
-	ocrpt_image_set_height(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_image_set_height(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_image, set_alignment) {
@@ -6428,7 +6683,12 @@ PHP_METHOD(opencreport_image, set_alignment) {
 		return;
 #endif
 
-	ocrpt_image_set_alignment(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_image_set_alignment(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_image, set_bgcolor) {
@@ -6448,7 +6708,12 @@ PHP_METHOD(opencreport_image, set_bgcolor) {
 		return;
 #endif
 
-	ocrpt_image_set_bgcolor(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_image_set_bgcolor(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_image, set_text_width) {
@@ -6468,40 +6733,45 @@ PHP_METHOD(opencreport_image, set_text_width) {
 		return;
 #endif
 
-	ocrpt_image_set_text_width(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_image_set_text_width(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 #if PHP_VERSION_ID >= 70000
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_value, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_image_set_value, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_suppress, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_image_set_suppress, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_type, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_image_set_type, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_width, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_image_set_width, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_height, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_image_set_height, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_alignment, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_image_set_alignment, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_bgcolor, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_image_set_bgcolor, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_image_set_text_width, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_image_set_text_width, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
@@ -6547,7 +6817,12 @@ PHP_METHOD(opencreport_text, set_value_string) {
 		return;
 #endif
 
-	ocrpt_text_set_value_string(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_value_string(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_value_expr) {
@@ -6567,7 +6842,12 @@ PHP_METHOD(opencreport_text, set_value_expr) {
 		return;
 #endif
 
-	ocrpt_text_set_value_expr(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_value_expr(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_value_delayed) {
@@ -6587,7 +6867,12 @@ PHP_METHOD(opencreport_text, set_value_delayed) {
 		return;
 #endif
 
-	ocrpt_text_set_value_delayed(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_value_delayed(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_format) {
@@ -6607,7 +6892,12 @@ PHP_METHOD(opencreport_text, set_format) {
 		return;
 #endif
 
-	ocrpt_text_set_format(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_format(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_translate) {
@@ -6627,7 +6917,12 @@ PHP_METHOD(opencreport_text, set_translate) {
 		return;
 #endif
 
-	ocrpt_text_set_translate(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_translate(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_width) {
@@ -6647,7 +6942,12 @@ PHP_METHOD(opencreport_text, set_width) {
 		return;
 #endif
 
-	ocrpt_text_set_width(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_width(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_alignment) {
@@ -6667,7 +6967,12 @@ PHP_METHOD(opencreport_text, set_alignment) {
 		return;
 #endif
 
-	ocrpt_text_set_alignment(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_alignment(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_color) {
@@ -6687,7 +6992,12 @@ PHP_METHOD(opencreport_text, set_color) {
 		return;
 #endif
 
-	ocrpt_text_set_color(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_color(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_bgcolor) {
@@ -6707,7 +7017,12 @@ PHP_METHOD(opencreport_text, set_bgcolor) {
 		return;
 #endif
 
-	ocrpt_text_set_bgcolor(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_bgcolor(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_font_name) {
@@ -6727,7 +7042,12 @@ PHP_METHOD(opencreport_text, set_font_name) {
 		return;
 #endif
 
-	ocrpt_text_set_font_name(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_font_name(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_font_size) {
@@ -6747,7 +7067,12 @@ PHP_METHOD(opencreport_text, set_font_size) {
 		return;
 #endif
 
-	ocrpt_text_set_font_size(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_font_size(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_bold) {
@@ -6767,7 +7092,12 @@ PHP_METHOD(opencreport_text, set_bold) {
 		return;
 #endif
 
-	ocrpt_text_set_bold(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_bold(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_italic) {
@@ -6787,7 +7117,12 @@ PHP_METHOD(opencreport_text, set_italic) {
 		return;
 #endif
 
-	ocrpt_text_set_italic(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_italic(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_link) {
@@ -6807,7 +7142,12 @@ PHP_METHOD(opencreport_text, set_link) {
 		return;
 #endif
 
-	ocrpt_text_set_link(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_link(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_memo) {
@@ -6827,7 +7167,12 @@ PHP_METHOD(opencreport_text, set_memo) {
 		return;
 #endif
 
-	ocrpt_text_set_memo(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_memo(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_memo_wrap_chars) {
@@ -6847,7 +7192,12 @@ PHP_METHOD(opencreport_text, set_memo_wrap_chars) {
 		return;
 #endif
 
-	ocrpt_text_set_memo_wrap_chars(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_memo_wrap_chars(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_text, set_memo_max_lines) {
@@ -6867,76 +7217,81 @@ PHP_METHOD(opencreport_text, set_memo_max_lines) {
 		return;
 #endif
 
-	ocrpt_text_set_memo_max_lines(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_text_set_memo_max_lines(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 #if PHP_VERSION_ID >= 70000
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_value_string, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_value_string, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_value_expr, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_value_expr, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_value_delayed, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_value_delayed, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_format, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_format, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_translate, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_translate, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_width, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_width, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_alignment, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_alignment, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_color, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_color, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_bgcolor, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_bgcolor, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_font_name, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_font_name, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_font_size, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_font_size, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_bold, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_bold, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_italic, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_italic, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_link, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_link, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_memo, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_memo, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_memo_wrap_chars, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_memo_wrap_chars, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_text_set_memo_max_lines, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_memo_max_lines, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
@@ -7000,7 +7355,12 @@ PHP_METHOD(opencreport_barcode, set_value) {
 		return;
 #endif
 
-	ocrpt_barcode_set_value(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_barcode_set_value(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_barcode, set_value_delayed) {
@@ -7020,7 +7380,12 @@ PHP_METHOD(opencreport_barcode, set_value_delayed) {
 		return;
 #endif
 
-	ocrpt_barcode_set_value_delayed(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_barcode_set_value_delayed(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_barcode, set_suppress) {
@@ -7040,7 +7405,12 @@ PHP_METHOD(opencreport_barcode, set_suppress) {
 		return;
 #endif
 
-	ocrpt_barcode_set_suppress(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_barcode_set_suppress(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_barcode, set_type) {
@@ -7060,7 +7430,12 @@ PHP_METHOD(opencreport_barcode, set_type) {
 		return;
 #endif
 
-	ocrpt_barcode_set_type(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_barcode_set_type(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_barcode, set_width) {
@@ -7080,7 +7455,12 @@ PHP_METHOD(opencreport_barcode, set_width) {
 		return;
 #endif
 
-	ocrpt_barcode_set_width(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_barcode_set_width(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_barcode, set_height) {
@@ -7100,7 +7480,12 @@ PHP_METHOD(opencreport_barcode, set_height) {
 		return;
 #endif
 
-	ocrpt_barcode_set_height(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_barcode_set_height(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_barcode, set_color) {
@@ -7120,7 +7505,12 @@ PHP_METHOD(opencreport_barcode, set_color) {
 		return;
 #endif
 
-	ocrpt_barcode_set_color(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_barcode_set_color(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 PHP_METHOD(opencreport_barcode, set_bgcolor) {
@@ -7140,40 +7530,45 @@ PHP_METHOD(opencreport_barcode, set_bgcolor) {
 		return;
 #endif
 
-	ocrpt_barcode_set_bgcolor(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	ocrpt_expr *e = ocrpt_barcode_set_bgcolor(bco->bc, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
 }
 
 #if PHP_VERSION_ID >= 70000
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_value, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_barcode_set_value, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_value_delayed, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_barcode_set_value_delayed, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_suppress, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_barcode_set_suppress, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_type, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_barcode_set_type, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_width, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_barcode_set_width, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_height, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_barcode_set_height, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_color, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_barcode_set_color, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_barcode_set_bgcolor, 0, 1, IS_VOID, 0)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_barcode_set_bgcolor, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 

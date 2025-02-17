@@ -885,42 +885,42 @@ bool ocrpt_break_add_trigger_cb(ocrpt_break *br, ocrpt_break_trigger_cb func, vo
  * Output/layout related functions *
  ***********************************/
 
-void ocrpt_set_size_unit(opencreport *o, const char *expr_string);
-void ocrpt_set_noquery_show_nodata(opencreport *o, const char *expr_string);
-void ocrpt_set_report_height_after_last(opencreport *o, const char *expr_string);
-void ocrpt_set_follower_match_single(opencreport *o, const char *expr_string);
+ocrpt_expr *ocrpt_set_size_unit(opencreport *o, const char *expr_string);
+ocrpt_expr *ocrpt_set_noquery_show_nodata(opencreport *o, const char *expr_string);
+ocrpt_expr *ocrpt_set_report_height_after_last(opencreport *o, const char *expr_string);
+ocrpt_expr *ocrpt_set_follower_match_single(opencreport *o, const char *expr_string);
 void ocrpt_set_follower_match_single_direct(opencreport *o, bool value);
 
-void ocrpt_part_set_iterations(ocrpt_part *p, const char *expr_string);
-void ocrpt_part_set_font_name(ocrpt_part *p, const char *expr_string);
-void ocrpt_part_set_font_size(ocrpt_part *p, const char *expr_string);
-void ocrpt_part_set_paper_by_name(ocrpt_part *p, const char *expr_string);
-void ocrpt_part_set_orientation(ocrpt_part *p, const char *expr_string);
-void ocrpt_part_set_top_margin(ocrpt_part *p, const char *expr_string);
-void ocrpt_part_set_bottom_margin(ocrpt_part *p, const char *expr_string);
-void ocrpt_part_set_left_margin(ocrpt_part *p, const char *expr_string);
-void ocrpt_part_set_right_margin(ocrpt_part *p, const char *expr_string);
-void ocrpt_part_set_suppress(ocrpt_part *p, const char *expr_string);
-void ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p, const char *expr_string);
+ocrpt_expr *ocrpt_part_set_iterations(ocrpt_part *p, const char *expr_string);
+ocrpt_expr *ocrpt_part_set_font_name(ocrpt_part *p, const char *expr_string);
+ocrpt_expr *ocrpt_part_set_font_size(ocrpt_part *p, const char *expr_string);
+ocrpt_expr *ocrpt_part_set_paper_by_name(ocrpt_part *p, const char *expr_string);
+ocrpt_expr *ocrpt_part_set_orientation(ocrpt_part *p, const char *expr_string);
+ocrpt_expr *ocrpt_part_set_top_margin(ocrpt_part *p, const char *expr_string);
+ocrpt_expr *ocrpt_part_set_bottom_margin(ocrpt_part *p, const char *expr_string);
+ocrpt_expr *ocrpt_part_set_left_margin(ocrpt_part *p, const char *expr_string);
+ocrpt_expr *ocrpt_part_set_right_margin(ocrpt_part *p, const char *expr_string);
+ocrpt_expr *ocrpt_part_set_suppress(ocrpt_part *p, const char *expr_string);
+ocrpt_expr *ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p, const char *expr_string);
 
-void ocrpt_part_row_set_suppress(ocrpt_part_row *pr, const char *expr_string);
-void ocrpt_part_row_set_newpage(ocrpt_part_row *pr, const char *expr_string);
-void ocrpt_part_row_set_layout(ocrpt_part_row *pr, const char *expr_string);
+ocrpt_expr *ocrpt_part_row_set_suppress(ocrpt_part_row *pr, const char *expr_string);
+ocrpt_expr *ocrpt_part_row_set_newpage(ocrpt_part_row *pr, const char *expr_string);
+ocrpt_expr *ocrpt_part_row_set_layout(ocrpt_part_row *pr, const char *expr_string);
 
-void ocrpt_part_column_set_suppress(ocrpt_part_column *pd, const char *expr_string);
-void ocrpt_part_column_set_width(ocrpt_part_column *pd, const char *expr_string);
-void ocrpt_part_column_set_height(ocrpt_part_column *pd, const char *expr_string);
-void ocrpt_part_column_set_border_width(ocrpt_part_column *pd, const char *expr_string);
-void ocrpt_part_column_set_border_color(ocrpt_part_column *pd, const char *expr_string);
-void ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd, const char *expr_string);
-void ocrpt_part_column_set_column_padding(ocrpt_part_column *pd, const char *expr_string);
+ocrpt_expr *ocrpt_part_column_set_suppress(ocrpt_part_column *pd, const char *expr_string);
+ocrpt_expr *ocrpt_part_column_set_width(ocrpt_part_column *pd, const char *expr_string);
+ocrpt_expr *ocrpt_part_column_set_height(ocrpt_part_column *pd, const char *expr_string);
+ocrpt_expr *ocrpt_part_column_set_border_width(ocrpt_part_column *pd, const char *expr_string);
+ocrpt_expr *ocrpt_part_column_set_border_color(ocrpt_part_column *pd, const char *expr_string);
+ocrpt_expr *ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd, const char *expr_string);
+ocrpt_expr *ocrpt_part_column_set_column_padding(ocrpt_part_column *pd, const char *expr_string);
 
-void ocrpt_report_set_suppress(ocrpt_report *r, const char *expr_string);
-void ocrpt_report_set_iterations(ocrpt_report *r, const char *expr_string);
-void ocrpt_report_set_font_name(ocrpt_report *r, const char *expr_string);
-void ocrpt_report_set_font_size(ocrpt_report *r, const char *expr_string);
-void ocrpt_report_set_height(ocrpt_report *r, const char *expr_string);
-void ocrpt_report_set_fieldheader_priority(ocrpt_report *r, const char *expr_string);
+ocrpt_expr *ocrpt_report_set_suppress(ocrpt_report *r, const char *expr_string);
+ocrpt_expr *ocrpt_report_set_iterations(ocrpt_report *r, const char *expr_string);
+ocrpt_expr *ocrpt_report_set_font_name(ocrpt_report *r, const char *expr_string);
+ocrpt_expr *ocrpt_report_set_font_size(ocrpt_report *r, const char *expr_string);
+ocrpt_expr *ocrpt_report_set_height(ocrpt_report *r, const char *expr_string);
+ocrpt_expr *ocrpt_report_set_fieldheader_priority(ocrpt_report *r, const char *expr_string);
 
 void ocrpt_layout_part_page_header_set_report(ocrpt_part *p, ocrpt_report *r);
 ocrpt_output *ocrpt_layout_part_page_header(ocrpt_part *p);
@@ -937,71 +937,71 @@ ocrpt_output *ocrpt_layout_report_field_details(ocrpt_report *r);
 ocrpt_output *ocrpt_break_get_header(ocrpt_break *br);
 ocrpt_output *ocrpt_break_get_footer(ocrpt_break *br);
 
-void ocrpt_output_set_suppress(ocrpt_output *output, const char *expr_string);
+ocrpt_expr *ocrpt_output_set_suppress(ocrpt_output *output, const char *expr_string);
 
 ocrpt_line *ocrpt_output_add_line(ocrpt_output *output);
 
-void ocrpt_line_set_font_name(ocrpt_line *line, const char *expr_string);
-void ocrpt_line_set_font_size(ocrpt_line *line, const char *expr_string);
-void ocrpt_line_set_bold(ocrpt_line *line, const char *expr_string);
-void ocrpt_line_set_italic(ocrpt_line *line, const char *expr_string);
-void ocrpt_line_set_suppress(ocrpt_line *line, const char *expr_string);
-void ocrpt_line_set_color(ocrpt_line *line, const char *expr_string);
-void ocrpt_line_set_bgcolor(ocrpt_line *line, const char *expr_string);
+ocrpt_expr *ocrpt_line_set_font_name(ocrpt_line *line, const char *expr_string);
+ocrpt_expr *ocrpt_line_set_font_size(ocrpt_line *line, const char *expr_string);
+ocrpt_expr *ocrpt_line_set_bold(ocrpt_line *line, const char *expr_string);
+ocrpt_expr *ocrpt_line_set_italic(ocrpt_line *line, const char *expr_string);
+ocrpt_expr *ocrpt_line_set_suppress(ocrpt_line *line, const char *expr_string);
+ocrpt_expr *ocrpt_line_set_color(ocrpt_line *line, const char *expr_string);
+ocrpt_expr *ocrpt_line_set_bgcolor(ocrpt_line *line, const char *expr_string);
 
 ocrpt_text *ocrpt_line_add_text(ocrpt_line *line);
 
-void ocrpt_text_set_value_string(ocrpt_text *text, const char *string);
-void ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_value_delayed(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_format(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_translate(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_width(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_alignment(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_color(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_bgcolor(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_font_name(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_font_size(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_bold(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_italic(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_link(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_memo(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_memo_wrap_chars(ocrpt_text *text, const char *expr_string);
-void ocrpt_text_set_memo_max_lines(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_value_string(ocrpt_text *text, const char *string);
+ocrpt_expr *ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_value_delayed(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_format(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_translate(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_width(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_alignment(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_color(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_bgcolor(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_font_name(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_font_size(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_bold(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_italic(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_link(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_memo(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_memo_wrap_chars(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_set_memo_max_lines(ocrpt_text *text, const char *expr_string);
 
 ocrpt_hline *ocrpt_output_add_hline(ocrpt_output *output);
 
-void ocrpt_hline_set_size(ocrpt_hline *hline, const char *expr_string);
-void ocrpt_hline_set_align(ocrpt_hline *hline, const char *expr_string);
-void ocrpt_hline_set_indent(ocrpt_hline *hline, const char *expr_string);
-void ocrpt_hline_set_length(ocrpt_hline *hline, const char *expr_string);
-void ocrpt_hline_set_font_size(ocrpt_hline *hline, const char *expr_string);
-void ocrpt_hline_set_suppress(ocrpt_hline *hline, const char *expr_string);
-void ocrpt_hline_set_color(ocrpt_hline *hline, const char *expr_string);
+ocrpt_expr *ocrpt_hline_set_size(ocrpt_hline *hline, const char *expr_string);
+ocrpt_expr *ocrpt_hline_set_align(ocrpt_hline *hline, const char *expr_string);
+ocrpt_expr *ocrpt_hline_set_indent(ocrpt_hline *hline, const char *expr_string);
+ocrpt_expr *ocrpt_hline_set_length(ocrpt_hline *hline, const char *expr_string);
+ocrpt_expr *ocrpt_hline_set_font_size(ocrpt_hline *hline, const char *expr_string);
+ocrpt_expr *ocrpt_hline_set_suppress(ocrpt_hline *hline, const char *expr_string);
+ocrpt_expr *ocrpt_hline_set_color(ocrpt_hline *hline, const char *expr_string);
 
 ocrpt_image *ocrpt_output_add_image(ocrpt_output *output);
 ocrpt_image *ocrpt_line_add_image(ocrpt_line *line);
 
-void ocrpt_image_set_value(ocrpt_image *image, const char *expr_string);
-void ocrpt_image_set_suppress(ocrpt_image *image, const char *expr_string);
-void ocrpt_image_set_type(ocrpt_image *image, const char *expr_string);
-void ocrpt_image_set_width(ocrpt_image *image, const char *expr_string);
-void ocrpt_image_set_height(ocrpt_image *image, const char *expr_string);
-void ocrpt_image_set_alignment(ocrpt_image *image, const char *expr_string);
-void ocrpt_image_set_bgcolor(ocrpt_image *image, const char *expr_string);
-void ocrpt_image_set_text_width(ocrpt_image *image, const char *expr_string);
+ocrpt_expr *ocrpt_image_set_value(ocrpt_image *image, const char *expr_string);
+ocrpt_expr *ocrpt_image_set_suppress(ocrpt_image *image, const char *expr_string);
+ocrpt_expr *ocrpt_image_set_type(ocrpt_image *image, const char *expr_string);
+ocrpt_expr *ocrpt_image_set_width(ocrpt_image *image, const char *expr_string);
+ocrpt_expr *ocrpt_image_set_height(ocrpt_image *image, const char *expr_string);
+ocrpt_expr *ocrpt_image_set_alignment(ocrpt_image *image, const char *expr_string);
+ocrpt_expr *ocrpt_image_set_bgcolor(ocrpt_image *image, const char *expr_string);
+ocrpt_expr *ocrpt_image_set_text_width(ocrpt_image *image, const char *expr_string);
 
 ocrpt_barcode *ocrpt_output_add_barcode(ocrpt_output *output);
 ocrpt_barcode *ocrpt_line_add_barcode(ocrpt_line *line);
 
-void ocrpt_barcode_set_value(ocrpt_barcode *bc, const char *expr_string);
-void ocrpt_barcode_set_value_delayed(ocrpt_barcode *bc, const char *expr_string);
-void ocrpt_barcode_set_suppress(ocrpt_barcode *bc, const char *expr_string);
-void ocrpt_barcode_set_type(ocrpt_barcode *bc, const char *expr_string);
-void ocrpt_barcode_set_width(ocrpt_barcode *bc, const char *expr_string);
-void ocrpt_barcode_set_height(ocrpt_barcode *bc, const char *expr_string);
-void ocrpt_barcode_set_color(ocrpt_barcode *bc, const char *expr_string);
-void ocrpt_barcode_set_bgcolor(ocrpt_barcode *bc, const char *expr_string);
+ocrpt_expr *ocrpt_barcode_set_value(ocrpt_barcode *bc, const char *expr_string);
+ocrpt_expr *ocrpt_barcode_set_value_delayed(ocrpt_barcode *bc, const char *expr_string);
+ocrpt_expr *ocrpt_barcode_set_suppress(ocrpt_barcode *bc, const char *expr_string);
+ocrpt_expr *ocrpt_barcode_set_type(ocrpt_barcode *bc, const char *expr_string);
+ocrpt_expr *ocrpt_barcode_set_width(ocrpt_barcode *bc, const char *expr_string);
+ocrpt_expr *ocrpt_barcode_set_height(ocrpt_barcode *bc, const char *expr_string);
+ocrpt_expr *ocrpt_barcode_set_color(ocrpt_barcode *bc, const char *expr_string);
+ocrpt_expr *ocrpt_barcode_set_bgcolor(ocrpt_barcode *bc, const char *expr_string);
 
 void ocrpt_output_add_image_end(ocrpt_output *output);
 
