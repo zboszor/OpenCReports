@@ -1537,7 +1537,7 @@ DLL_EXPORT_SYM ocrpt_output *ocrpt_layout_report_field_details(ocrpt_report *r) 
 }
 
 DLL_EXPORT_SYM ocrpt_line *ocrpt_output_add_line(ocrpt_output *output) {
-	if (!output)
+	if (!output || (output->o && output->o->executing))
 		return NULL;
 
 	ocrpt_line *line = ocrpt_mem_malloc(sizeof(ocrpt_line));
@@ -1550,7 +1550,7 @@ DLL_EXPORT_SYM ocrpt_line *ocrpt_output_add_line(ocrpt_output *output) {
 }
 
 DLL_EXPORT_SYM ocrpt_text *ocrpt_line_add_text(ocrpt_line *line) {
-	if (!line)
+	if (!line || (line->output->o && line->output->o->executing))
 		return NULL;
 
 	ocrpt_text *elem = ocrpt_mem_malloc(sizeof(ocrpt_text));
@@ -1563,7 +1563,7 @@ DLL_EXPORT_SYM ocrpt_text *ocrpt_line_add_text(ocrpt_line *line) {
 }
 
 DLL_EXPORT_SYM ocrpt_image *ocrpt_line_add_image(ocrpt_line *line) {
-	if (!line)
+	if (!line || (line->output->o && line->output->o->executing))
 		return NULL;
 
 	ocrpt_image *image = ocrpt_mem_malloc(sizeof(ocrpt_image));
@@ -1577,7 +1577,7 @@ DLL_EXPORT_SYM ocrpt_image *ocrpt_line_add_image(ocrpt_line *line) {
 }
 
 DLL_EXPORT_SYM ocrpt_barcode *ocrpt_line_add_barcode(ocrpt_line *line) {
-	if (!line)
+	if (!line || (line->output->o && line->output->o->executing))
 		return NULL;
 
 	ocrpt_barcode *bc = ocrpt_mem_malloc(sizeof(ocrpt_barcode));
@@ -1591,7 +1591,7 @@ DLL_EXPORT_SYM ocrpt_barcode *ocrpt_line_add_barcode(ocrpt_line *line) {
 }
 
 DLL_EXPORT_SYM ocrpt_hline *ocrpt_output_add_hline(ocrpt_output *output) {
-	if (!output)
+	if (!output || (output->o && output->o->executing))
 		return NULL;
 
 	ocrpt_hline *hline = ocrpt_mem_malloc(sizeof(ocrpt_hline));
@@ -1604,7 +1604,7 @@ DLL_EXPORT_SYM ocrpt_hline *ocrpt_output_add_hline(ocrpt_output *output) {
 }
 
 DLL_EXPORT_SYM ocrpt_image *ocrpt_output_add_image(ocrpt_output *output) {
-	if (!output)
+	if (!output || (output->o && output->o->executing))
 		return NULL;
 
 	ocrpt_image *image = ocrpt_mem_malloc(sizeof(ocrpt_image));
@@ -1617,7 +1617,7 @@ DLL_EXPORT_SYM ocrpt_image *ocrpt_output_add_image(ocrpt_output *output) {
 }
 
 DLL_EXPORT_SYM void ocrpt_output_add_image_end(ocrpt_output *output) {
-	if (!output)
+	if (!output || (output->o && output->o->executing))
 		return;
 
 	ocrpt_output_element *elem = ocrpt_mem_malloc(sizeof(ocrpt_output_element));
@@ -1626,7 +1626,7 @@ DLL_EXPORT_SYM void ocrpt_output_add_image_end(ocrpt_output *output) {
 }
 
 #define SET_IMAGE_EXPR(exprname, report, create_string) { \
-		if (!image) \
+		if (!image || (image->output->o && image->output->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(image->exprname); \
 		image->exprname = expr_string ? ocrpt_layout_expr_parse(image->output->o, image->output->r, expr_string, report, create_string) : NULL; \
@@ -1654,7 +1654,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_height(ocrpt_image *image, const char
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_alignment(ocrpt_image *image, const char *expr_string) {
-	if (!image)
+	if (!image || (image->output->o && image->output->o->executing))
 		return NULL;
 
 	if (image->align)
@@ -1680,7 +1680,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_text_width(ocrpt_image *image, const 
 }
 
 DLL_EXPORT_SYM ocrpt_barcode *ocrpt_output_add_barcode(ocrpt_output *output) {
-	if (!output)
+	if (!output || (output->o && output->o->executing))
 		return NULL;
 
 	ocrpt_barcode *barcode = ocrpt_mem_malloc(sizeof(ocrpt_barcode));
@@ -1718,7 +1718,7 @@ static void ocrpt_text_set_rvalue_internal(ocrpt_text *text) {
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_value_string(ocrpt_text *text, const char *string) {
-	if (!text)
+	if (!text || (text->output->o && text->output->o->executing))
 		return NULL;
 
 	ocrpt_expr_free(text->value);
@@ -1728,7 +1728,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_value_string(ocrpt_text *text, const c
 }
 
 #define SET_TEXT_EXPR(exprname, report, create_string) { \
-		if (!text) \
+		if (!text|| (text->output->o && text->output->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(text->exprname); \
 		text->exprname = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, report, create_string) : NULL; \
@@ -1757,7 +1757,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_width(ocrpt_text *text, const char *ex
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_alignment(ocrpt_text *text, const char *expr_string) {
-	if (!text)
+	if (!text || (text->output->o && text->output->o->executing))
 		return NULL;
 
 	ocrpt_expr_free(text->align);
@@ -1815,7 +1815,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_memo_max_lines(ocrpt_text *text, const
 }
 
 #define SET_BARCODE_EXPR(exprname, report, create_string) { \
-		if (!bc) \
+		if (!bc || (bc->output->o && bc->output->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(bc->exprname); \
 		bc->exprname = expr_string ? ocrpt_layout_expr_parse(bc->output->o, bc->output->r, expr_string, report, create_string) : NULL; \
@@ -1855,7 +1855,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_bgcolor(ocrpt_barcode *bc, const ch
 }
 
 #define SET_LINE_EXPR(exprname, report, create_string) { \
-		if (!line) \
+		if (!line || (line->output->o && line->output->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(line->exprname); \
 		line->exprname = expr_string ? ocrpt_layout_expr_parse(line->output->o, line->output->r, expr_string, report, create_string) : NULL; \
@@ -1891,7 +1891,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_bgcolor(ocrpt_line *line, const char *
 }
 
 #define SET_HLINE_EXPR(exprname, report, create_string) { \
-		if (!hline) \
+		if (!hline || (hline->output->o && hline->output->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(hline->exprname); \
 		hline->exprname = expr_string ? ocrpt_layout_expr_parse(hline->output->o, hline->output->r, expr_string, report, create_string) : NULL; \
@@ -1927,7 +1927,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_color(ocrpt_hline *hline, const char 
 }
 
 #define SET_OUTPUT_EXPR(exprname, report, create_string) { \
-		if (!output) \
+		if (!output || (output->o && output->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(output->exprname); \
 		output->exprname = expr_string ? ocrpt_layout_expr_parse(output->o, output->r, expr_string, report, create_string) : NULL; \
@@ -1939,7 +1939,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_output_set_suppress(ocrpt_output *output, const
 }
 
 #define SET_O_EXPR_REPORT(exprname) { \
-		if (!o) \
+		if (!o || o->executing) \
 			return NULL; \
 		ocrpt_expr_free(o->exprname); \
 		char *err = NULL; \
@@ -1968,14 +1968,14 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_set_follower_match_single(opencreport *o, const
 }
 
 DLL_EXPORT_SYM void ocrpt_set_follower_match_single_direct(opencreport *o, bool value) {
-	if (!o)
+	if (!o || o->executing)
 		return;
 
 	o->follower_match_single = value;
 }
 
 #define SET_PART_EXPR(exprname) { \
-		if (!p) \
+		if (!p || (p->o && p->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(p->exprname); \
 		p->exprname = expr_string ? ocrpt_expr_parse(p->o, expr_string, NULL) : NULL; \
@@ -1983,7 +1983,7 @@ DLL_EXPORT_SYM void ocrpt_set_follower_match_single_direct(opencreport *o, bool 
 	}
 
 #define SET_PART_EXPR_OR_STR(exprname) { \
-		if (!p) \
+		if (!p || (p->o && p->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(p->exprname); \
 		p->exprname = expr_string ? ocrpt_expr_parse(p->o, expr_string, NULL) : NULL; \
@@ -1993,7 +1993,7 @@ DLL_EXPORT_SYM void ocrpt_set_follower_match_single_direct(opencreport *o, bool 
 	}
 
 #define SET_PART_EXPR_REPORT(exprname) { \
-		if (!p) \
+		if (!p || (p->o && p->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(p->exprname); \
 		char *err = NULL; \
@@ -2050,7 +2050,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_pa
 }
 
 #define SET_PART_ROW_EXPR(exprname) { \
-		if (!pr) \
+		if (!pr || (pr->o && pr->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(pr->exprname); \
 		pr->exprname = expr_string ? ocrpt_expr_parse(pr->o, expr_string, NULL) : NULL; \
@@ -2070,7 +2070,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_row_set_layout(ocrpt_part_row *pr, const c
 }
 
 #define SET_PART_COLUMN_EXPR(exprname) { \
-		if (!pd) \
+		if (!pd || (pd->o && pd->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(pd->exprname); \
 		pd->exprname = expr_string ? ocrpt_expr_parse(pd->o, expr_string, NULL) : NULL; \
@@ -2106,7 +2106,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_column_padding(ocrpt_part_colum
 }
 
 #define SET_REPORT_EXPR(exprname) { \
-		if (!r) \
+		if (!r || (r->o && r->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(r->exprname); \
 		r->exprname = expr_string ? ocrpt_expr_parse(r->o, expr_string, NULL) : NULL; \
@@ -2114,7 +2114,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_column_padding(ocrpt_part_colum
 	}
 
 #define SET_REPORT_EXPR_OR_STR(exprname) { \
-		if (!r) \
+		if (!r || (r->o && r->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(r->exprname); \
 		r->exprname = expr_string ? ocrpt_expr_parse(r->o, expr_string, NULL) : NULL; \

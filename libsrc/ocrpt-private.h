@@ -163,6 +163,7 @@ struct opencreport {
 	bool no_quotes:1;
 	bool only_quote_strings:1;
 	bool xml_rlib_compat:1;
+	bool executing:1;
 };
 
 /* Default print debugger functions */

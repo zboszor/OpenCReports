@@ -1024,6 +1024,14 @@ static void ocrpt_execute_parts(opencreport *o) {
 		 */
 		ocrpt_execute_parts_resolve_all_reports(o, p);
 
+		/*
+		 * Report is executing, prevent modifying expressions.
+		 * Set this flag only here to allow loading report parts in
+		 * ocrpt_parse_report_node_for_load() which happens late, called
+		 * from ocrpt_execute_parts_evaluate_global_params() above.
+		 */
+		o->executing = true;
+
 		p->left_margin_value = ocrpt_layout_left_margin(o, p);
 		p->right_margin_value = ocrpt_layout_right_margin(o, p);
 
@@ -1442,6 +1450,8 @@ static void ocrpt_execute_parts(opencreport *o) {
 			if (o->output_functions.end_part && !o->precalculate)
 				o->output_functions.end_part(o, p);
 		}
+
+		o->executing = false;
 	}
 }
 
