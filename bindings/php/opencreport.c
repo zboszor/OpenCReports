@@ -7682,7 +7682,7 @@ static void php_opencreport_query_discover_array(const char *arrayname, void **a
 #else
 			long l = Z_LVAL_P(cell);
 #endif
-			if (l >= OCRPT_RESULT_ERROR && l <= OCRPT_RESULT_DATETIME)
+			if (l >= OCRPT_RESULT_STRING && l <= OCRPT_RESULT_ERROR)
 				data_result = l;
 			else
 				data_result = OCRPT_RESULT_STRING;
@@ -7693,6 +7693,8 @@ static void php_opencreport_query_discover_array(const char *arrayname, void **a
 				data_result = OCRPT_RESULT_NUMBER;
 			else if (strcasecmp(s, "datetime") == 0)
 				data_result = OCRPT_RESULT_DATETIME;
+			else if (strcasecmp(s, "error") == 0)
+				data_result = OCRPT_RESULT_ERROR;
 			else /* if (strcasecmp(s, "string") == 0) */
 				data_result = OCRPT_RESULT_STRING;
 		} else {
@@ -8041,7 +8043,7 @@ static void php_opencreport_array_describe(ocrpt_query *query, ocrpt_query_resul
 					long l = Z_LVAL_P(cell);
 #endif
 
-					if (l >= OCRPT_RESULT_ERROR && l <= OCRPT_RESULT_DATETIME)
+					if (l >= OCRPT_RESULT_STRING && l <= OCRPT_RESULT_ERROR)
 						type = l;
 					else
 						type = OCRPT_RESULT_STRING;
