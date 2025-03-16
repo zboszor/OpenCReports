@@ -1,0 +1,282 @@
+{
+    "part": {
+        "pr": {
+            "pd": {
+                "report": {
+                    "nodata": [
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 566.47559055118108517
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 100.802734375
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 100.802734375
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 100.802734375
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 566.47559055118108517
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 100.802734375
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 100.802734375
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 100.802734375
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 566.47559055118108517
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 100.802734375
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 100.802734375
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 100.802734375
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 566.47559055118108517
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 100.802734375
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 100.802734375
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 100.802734375
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 100.802734375
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 566.47559055118108517
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 566.47559055118108517
+                        },
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 43.201171875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": true,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#0000ff",
+                                    "color": "#ff0000",
+                                    "data": "xxx"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 21.6005859375,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#000000",
+                                    "color": "#ffffff",
+                                    "data": "xxx"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 21.6005859375,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": true,
+                                    "align": "center",
+                                    "bgcolor": "#008080",
+                                    "color": "#00ff00",
+                                    "data": "xxx"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 36.0009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#c0c0c0",
+                                    "color": "#00ffff",
+                                    "data": "xxx"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 36.0009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#008000",
+                                    "color": "#ff00ff",
+                                    "data": "xxx"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "horizontal_line",
+                            "color": "#008000",
+                            "indent": 0.0,
+                            "size": 1.0,
+                            "length": 566.47559055118108517
+                        },
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 43.201171875,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": true,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#0000ff",
+                                    "color": "#ff0000",
+                                    "data": "xxx"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 21.6005859375,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#000000",
+                                    "color": "#ffffff",
+                                    "data": "xxx"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 21.6005859375,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": true,
+                                    "align": "center",
+                                    "bgcolor": "#008080",
+                                    "color": "#00ff00",
+                                    "data": "xxx"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 36.0009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#c0c0c0",
+                                    "color": "#00ffff",
+                                    "data": "xxx"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 36.0009765625,
+                                    "font_point": 12.0,
+                                    "font_face": "Courier",
+                                    "bold": false,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#008000",
+                                    "color": "#ff00ff",
+                                    "data": "xxx"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

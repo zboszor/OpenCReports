@@ -119,8 +119,14 @@ typedef struct ocrpt_input ocrpt_input;
 struct ocrpt_output;
 typedef struct ocrpt_output ocrpt_output;
 
+struct ocrpt_output_element;
+typedef struct ocrpt_output_element ocrpt_output_element;
+
 struct ocrpt_line;
 typedef struct ocrpt_line ocrpt_line;
+
+struct ocrpt_line_element;
+typedef struct ocrpt_line_element ocrpt_line_element;
 
 struct ocrpt_text;
 typedef struct ocrpt_text ocrpt_text;
@@ -1004,6 +1010,45 @@ ocrpt_expr *ocrpt_barcode_set_color(ocrpt_barcode *bc, const char *expr_string);
 ocrpt_expr *ocrpt_barcode_set_bgcolor(ocrpt_barcode *bc, const char *expr_string);
 
 void ocrpt_output_add_image_end(ocrpt_output *output);
+
+/*
+ * Iterate over an output section's element
+ *
+ * The pointer that void **iter points to must initially be NULL.
+ * The iterator function can be called until it returns NULL.
+ *
+ * ocrpt_output_element * is an abstract pointer type that can be
+ * casted to ocrpt_line *, ocrpt_hline *, ocrpt_image * or ocrpt_barcode *,
+ * depending on the result of the checks below.
+ *
+ * Note that there is no check for the "image end" output element.
+ * This output element type has no properties and there is no associated
+ * user visible (opaque) type associated with it.
+ * When every check below returns false, ignore the element returned
+ * by the iterator.
+ */
+ocrpt_output_element *ocrpt_output_iterate_elements(ocrpt_output *output, void **iter);
+
+bool ocrpt_output_element_is_line(ocrpt_output_element *elem);
+bool ocrpt_output_element_is_hline(ocrpt_output_element *elem);
+bool ocrpt_output_element_is_image(ocrpt_output_element *elem);
+bool ocrpt_output_element_is_barcode(ocrpt_output_element *elem);
+
+/*
+ * Iterate over an ocrpt_line's line elements
+ *
+ * The pointer that void **iter points must initially be NULL.
+ * The iterator function can be called until it returns NULL.
+ *
+ * ocrpt_line_element * is an abstract pointer type that can be
+ * casted to ocrpt_text *, ocrpt_image * or ocrpt_barcode *,
+ * depending on the result of the checks below.
+ */
+ocrpt_line_element *ocrpt_line_iterate_elements(ocrpt_line *line, void **iter);
+
+bool ocrpt_line_element_is_text(ocrpt_line_element *elem);
+bool ocrpt_line_element_is_image(ocrpt_line_element *elem);
+bool ocrpt_line_element_is_barcode(ocrpt_line_element *elem);
 
 /*********************************
  * Environment related functions *

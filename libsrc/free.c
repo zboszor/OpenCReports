@@ -160,7 +160,7 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 			for (ocrpt_list *l = ((ocrpt_line *)oe)->elements; l; l = l->next) {
 				ocrpt_text *le = (ocrpt_text *)l->data;
 
-				switch (le->le_type) {
+				switch (le->base.le_type) {
 				case OCRPT_OUTPUT_LE_TEXT:
 					/*
 					 * Only if "r" is NULL we need to free the individual expressions

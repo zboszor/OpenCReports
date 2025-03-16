@@ -117,7 +117,10 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_image *img = (ocrpt_image *)elem;
 		ocrpt_barcode *bc = (ocrpt_barcode *)elem;
 
-		switch (elem->le_type) {
+		switch (elem->base.le_type) {
+		case OCRPT_OUTPUT_LE_UNSET:
+			assert(0);
+			break;
 		case OCRPT_OUTPUT_LE_TEXT:
 			ocrpt_layout_compute_text(o, elem);
 
@@ -184,7 +187,7 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 	for (ocrpt_list *l = line->elements; l; l = l->next) {
 		ocrpt_barcode *bc = (ocrpt_barcode *)l->data;
 
-		if (bc->le_type == OCRPT_OUTPUT_LE_BARCODE) {
+		if (bc->base.le_type == OCRPT_OUTPUT_LE_BARCODE) {
 			if (bc->barcode_height == 0.0)
 				bc->barcode_height = line->line_height;
 
@@ -196,7 +199,7 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 	for (ocrpt_list *l = line->elements; l; l = l->next) {
 		ocrpt_barcode *bc = (ocrpt_barcode *)l->data;
 
-		if (bc->le_type == OCRPT_OUTPUT_LE_BARCODE) {
+		if (bc->base.le_type == OCRPT_OUTPUT_LE_BARCODE) {
 			if (bc->barcode_height < max_barcode_height)
 				bc->vertical_gap = (max_barcode_height - bc->barcode_height) / 2.0;
 		}
@@ -222,7 +225,10 @@ static void ocrpt_layout_line(bool draw, opencreport *o, ocrpt_part *p, ocrpt_pa
 			ocrpt_image *img = (ocrpt_image *)elem;
 			ocrpt_barcode *bc = (ocrpt_barcode *)elem;
 
-			switch (elem->le_type) {
+			switch (elem->base.le_type) {
+			case OCRPT_OUTPUT_LE_UNSET:
+				assert(0);
+				break;
 			case OCRPT_OUTPUT_LE_TEXT:
 				if ((!o->output_functions.support_any_font || (elem->start < page_width)) && o->output_functions.draw_text)
 					o->output_functions.draw_text(o, p, pr, pd, r, br, output, line, elem, (l->next == NULL), page_width, page_indent, *page_position);
@@ -507,6 +513,9 @@ void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output) {
 		ocrpt_barcode *lbc = (ocrpt_barcode *)ol->data;
 
 		switch (oe->type) {
+		case OCRPT_OUTPUT_UNSET:
+			assert(0);
+			break;
 		case OCRPT_OUTPUT_LINE: {
 			ocrpt_line *line = (ocrpt_line *)oe;
 
@@ -514,7 +523,10 @@ void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output) {
 				ocrpt_text *elem = (ocrpt_text *)l->data;
 				ocrpt_barcode *bc = (ocrpt_barcode *)l->data;
 
-				switch (elem->le_type) {
+				switch (elem->base.le_type) {
+				case OCRPT_OUTPUT_LE_UNSET:
+					assert(0);
+					break;
 				case OCRPT_OUTPUT_LE_TEXT:
 					ocrpt_expr_resolve(elem->delayed);
 					ocrpt_expr_optimize(elem->delayed);
@@ -708,19 +720,27 @@ void ocrpt_layout_output_resolve(ocrpt_output *output) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
 
 		switch (oe->type) {
+		case OCRPT_OUTPUT_UNSET:
+			assert(0);
+			break;
 		case OCRPT_OUTPUT_LINE:
 			ocrpt_layout_output_resolve_line((ocrpt_line *)oe);
 
 			for (ocrpt_list *l = ((ocrpt_line *)oe)->elements; l; l = l->next) {
-				switch (((ocrpt_line_element *)l->data)->le_type) {
+				ocrpt_output_element *le = (ocrpt_output_element *)l->data;
+
+				switch (le->le_type) {
+				case OCRPT_OUTPUT_LE_UNSET:
+					assert(0);
+					break;
 				case OCRPT_OUTPUT_LE_TEXT:
-					ocrpt_layout_output_resolve_text((ocrpt_text *)l->data);
+					ocrpt_layout_output_resolve_text((ocrpt_text *)le);
 					break;
 				case OCRPT_OUTPUT_LE_IMAGE:
-					ocrpt_layout_output_resolve_image((ocrpt_image *)l->data);
+					ocrpt_layout_output_resolve_image((ocrpt_image *)le);
 					break;
 				case OCRPT_OUTPUT_LE_BARCODE:
-					ocrpt_layout_output_resolve_barcode((ocrpt_barcode *)l->data);
+					ocrpt_layout_output_resolve_barcode((ocrpt_barcode *)le);
 					break;
 				}
 			}
@@ -776,6 +796,9 @@ void ocrpt_layout_output_evaluate(ocrpt_output *output) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
 
 		switch (oe->type) {
+		case OCRPT_OUTPUT_UNSET:
+			assert(0);
+			break;
 		case OCRPT_OUTPUT_LINE: {
 			ocrpt_line *line = (ocrpt_line *)oe;
 
@@ -790,7 +813,10 @@ void ocrpt_layout_output_evaluate(ocrpt_output *output) {
 			for (ocrpt_list *l = line->elements; l; l = l->next) {
 				ocrpt_text *elem = (ocrpt_text *)l->data;
 
-				switch (elem->le_type) {
+				switch (elem->base.le_type) {
+				case OCRPT_OUTPUT_LE_UNSET:
+					assert(0);
+					break;
 				case OCRPT_OUTPUT_LE_TEXT:
 					ocrpt_expr_eval(elem->value);
 					ocrpt_expr_eval(elem->format);
@@ -856,6 +882,9 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 		double font_size;
 
 		switch (oe->type) {
+		case OCRPT_OUTPUT_UNSET:
+			assert(0);
+			break;
 		case OCRPT_OUTPUT_LINE:
 			l->suppress_line = false;
 			if (EXPR_VALID_NUMERIC(l->suppress)) {
@@ -980,6 +1009,9 @@ bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_barcode *bc = (ocrpt_barcode *)oe;
 
 		switch (oe->type) {
+		case OCRPT_OUTPUT_UNSET:
+			assert(0);
+			break;
 		case OCRPT_OUTPUT_LINE: {
 			ocrpt_line *l = (ocrpt_line *)oe;
 
@@ -1542,7 +1574,7 @@ DLL_EXPORT_SYM ocrpt_line *ocrpt_output_add_line(ocrpt_output *output) {
 
 	ocrpt_line *line = ocrpt_mem_malloc(sizeof(ocrpt_line));
 	memset(line, 0, sizeof(ocrpt_line));
-	line->type = OCRPT_OUTPUT_LINE;
+	line->base.type = OCRPT_OUTPUT_LINE;
 	line->output = output;
 	output->output_list = ocrpt_list_append(output->output_list, line);
 
@@ -1555,7 +1587,7 @@ DLL_EXPORT_SYM ocrpt_text *ocrpt_line_add_text(ocrpt_line *line) {
 
 	ocrpt_text *elem = ocrpt_mem_malloc(sizeof(ocrpt_text));
 	memset(elem, 0, sizeof(ocrpt_text));
-	elem->le_type = OCRPT_OUTPUT_LE_TEXT;
+	elem->base.le_type = OCRPT_OUTPUT_LE_TEXT;
 	elem->output = line->output;
 	line->elements = ocrpt_list_append(line->elements, elem);
 
@@ -1568,7 +1600,7 @@ DLL_EXPORT_SYM ocrpt_image *ocrpt_line_add_image(ocrpt_line *line) {
 
 	ocrpt_image *image = ocrpt_mem_malloc(sizeof(ocrpt_image));
 	memset(image, 0, sizeof(ocrpt_image));
-	image->le_type = OCRPT_OUTPUT_LE_IMAGE;
+	image->base.le_type = OCRPT_OUTPUT_LE_IMAGE;
 	image->output = line->output;
 	image->in_line = true;
 	line->elements = ocrpt_list_append(line->elements, image);
@@ -1582,7 +1614,7 @@ DLL_EXPORT_SYM ocrpt_barcode *ocrpt_line_add_barcode(ocrpt_line *line) {
 
 	ocrpt_barcode *bc = ocrpt_mem_malloc(sizeof(ocrpt_barcode));
 	memset(bc, 0, sizeof(ocrpt_barcode));
-	bc->le_type = OCRPT_OUTPUT_LE_BARCODE;
+	bc->base.le_type = OCRPT_OUTPUT_LE_BARCODE;
 	bc->output = line->output;
 	bc->in_line = true;
 	line->elements = ocrpt_list_append(line->elements, bc);
@@ -1596,7 +1628,7 @@ DLL_EXPORT_SYM ocrpt_hline *ocrpt_output_add_hline(ocrpt_output *output) {
 
 	ocrpt_hline *hline = ocrpt_mem_malloc(sizeof(ocrpt_hline));
 	memset(hline, 0, sizeof(ocrpt_hline));
-	hline->type = OCRPT_OUTPUT_HLINE;
+	hline->base.type = OCRPT_OUTPUT_HLINE;
 	hline->output = output;
 	output->output_list = ocrpt_list_append(output->output_list, hline);
 
@@ -1609,7 +1641,7 @@ DLL_EXPORT_SYM ocrpt_image *ocrpt_output_add_image(ocrpt_output *output) {
 
 	ocrpt_image *image = ocrpt_mem_malloc(sizeof(ocrpt_image));
 	memset(image, 0, sizeof(ocrpt_image));
-	image->type = OCRPT_OUTPUT_IMAGE;
+	image->base.type = OCRPT_OUTPUT_IMAGE;
 	image->output = output;
 	output->output_list = ocrpt_list_append(output->output_list, image);
 
@@ -1621,12 +1653,13 @@ DLL_EXPORT_SYM void ocrpt_output_add_image_end(ocrpt_output *output) {
 		return;
 
 	ocrpt_output_element *elem = ocrpt_mem_malloc(sizeof(ocrpt_output_element));
+	memset(elem, 0, sizeof(ocrpt_output_element));
 	elem->type = OCRPT_OUTPUT_IMAGEEND;
 	output->output_list = ocrpt_list_append(output->output_list, elem);
 }
 
 #define SET_IMAGE_EXPR(exprname, report, create_string) { \
-		if (!image || (image->output->o && image->output->o->executing)) \
+		if (!image || !(image->base.type == OCRPT_OUTPUT_IMAGE || image->base.le_type == OCRPT_OUTPUT_LE_IMAGE) || (image->output->o && image->output->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(image->exprname); \
 		image->exprname = expr_string ? ocrpt_layout_expr_parse(image->output->o, image->output->r, expr_string, report, create_string) : NULL; \
@@ -1654,7 +1687,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_height(ocrpt_image *image, const char
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_alignment(ocrpt_image *image, const char *expr_string) {
-	if (!image || (image->output->o && image->output->o->executing))
+	if (!image || !(image->base.type == OCRPT_OUTPUT_IMAGE || image->base.le_type == OCRPT_OUTPUT_LE_IMAGE) || (image->output->o && image->output->o->executing))
 		return NULL;
 
 	if (image->align)
@@ -1685,7 +1718,7 @@ DLL_EXPORT_SYM ocrpt_barcode *ocrpt_output_add_barcode(ocrpt_output *output) {
 
 	ocrpt_barcode *barcode = ocrpt_mem_malloc(sizeof(ocrpt_barcode));
 	memset(barcode, 0, sizeof(ocrpt_barcode));
-	barcode->type = OCRPT_OUTPUT_BARCODE;
+	barcode->base.type = OCRPT_OUTPUT_BARCODE;
 	barcode->output = output;
 	output->output_list = ocrpt_list_append(output->output_list, barcode);
 
@@ -1718,7 +1751,7 @@ static void ocrpt_text_set_rvalue_internal(ocrpt_text *text) {
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_value_string(ocrpt_text *text, const char *string) {
-	if (!text || (text->output->o && text->output->o->executing))
+	if (!text || text->base.le_type != OCRPT_OUTPUT_LE_TEXT || (text->output->o && text->output->o->executing))
 		return NULL;
 
 	ocrpt_expr_free(text->value);
@@ -1728,7 +1761,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_value_string(ocrpt_text *text, const c
 }
 
 #define SET_TEXT_EXPR(exprname, report, create_string) { \
-		if (!text|| (text->output->o && text->output->o->executing)) \
+		if (!text || text->base.le_type != OCRPT_OUTPUT_LE_TEXT || (text->output->o && text->output->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(text->exprname); \
 		text->exprname = expr_string ? ocrpt_layout_expr_parse(text->output->o, text->output->r, expr_string, report, create_string) : NULL; \
@@ -1757,7 +1790,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_width(ocrpt_text *text, const char *ex
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_alignment(ocrpt_text *text, const char *expr_string) {
-	if (!text || (text->output->o && text->output->o->executing))
+	if (!text || text->base.le_type != OCRPT_OUTPUT_LE_TEXT || (text->output->o && text->output->o->executing))
 		return NULL;
 
 	ocrpt_expr_free(text->align);
@@ -1815,7 +1848,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_memo_max_lines(ocrpt_text *text, const
 }
 
 #define SET_BARCODE_EXPR(exprname, report, create_string) { \
-		if (!bc || (bc->output->o && bc->output->o->executing)) \
+		if (!bc || !(bc->base.type == OCRPT_OUTPUT_BARCODE || bc->base.le_type == OCRPT_OUTPUT_LE_BARCODE) || (bc->output->o && bc->output->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(bc->exprname); \
 		bc->exprname = expr_string ? ocrpt_layout_expr_parse(bc->output->o, bc->output->r, expr_string, report, create_string) : NULL; \
@@ -1855,7 +1888,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_bgcolor(ocrpt_barcode *bc, const ch
 }
 
 #define SET_LINE_EXPR(exprname, report, create_string) { \
-		if (!line || (line->output->o && line->output->o->executing)) \
+		if (!line || line->base.type != OCRPT_OUTPUT_LINE || (line->output->o && line->output->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(line->exprname); \
 		line->exprname = expr_string ? ocrpt_layout_expr_parse(line->output->o, line->output->r, expr_string, report, create_string) : NULL; \
@@ -1891,7 +1924,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_bgcolor(ocrpt_line *line, const char *
 }
 
 #define SET_HLINE_EXPR(exprname, report, create_string) { \
-		if (!hline || (hline->output->o && hline->output->o->executing)) \
+		if (!hline || hline->base.type != OCRPT_OUTPUT_HLINE || (hline->output->o && hline->output->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(hline->exprname); \
 		hline->exprname = expr_string ? ocrpt_layout_expr_parse(hline->output->o, hline->output->r, expr_string, report, create_string) : NULL; \
@@ -2145,4 +2178,68 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_height(ocrpt_report *r, const char *
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_fieldheader_priority(ocrpt_report *r, const char *expr_string) {
 	SET_REPORT_EXPR(fieldheader_priority_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_output_element *ocrpt_output_iterate_elements(ocrpt_output *output, void **iter) {
+	if (!output || !iter)
+		return NULL;
+
+	ocrpt_list *iter0 = *iter;
+
+	if (iter0 == NULL)
+		iter0 = output->output_list;
+	else
+		iter0 = iter0->next;
+
+	*iter = iter0;
+	return iter0 ? (ocrpt_output_element *)iter0->data : NULL;
+}
+
+DLL_EXPORT_SYM bool ocrpt_output_element_is_line(ocrpt_output_element *elem) {
+	return (elem && elem->type == OCRPT_OUTPUT_LINE);
+}
+
+DLL_EXPORT_SYM bool ocrpt_output_element_is_hline(ocrpt_output_element *elem) {
+	return (elem && elem->type == OCRPT_OUTPUT_HLINE);
+}
+
+DLL_EXPORT_SYM bool ocrpt_output_element_is_image(ocrpt_output_element *elem) {
+	return (elem && elem->type == OCRPT_OUTPUT_IMAGE);
+}
+
+DLL_EXPORT_SYM bool ocrpt_output_element_is_barcode(ocrpt_output_element *elem) {
+	return (elem && elem->type == OCRPT_OUTPUT_BARCODE);
+}
+
+DLL_EXPORT_SYM ocrpt_line_element *ocrpt_line_iterate_elements(ocrpt_line *line, void **iter) {
+	if (!line || !iter)
+		return NULL;
+
+	ocrpt_list *iter0 = *iter;
+
+	if (iter0 == NULL)
+		iter0 = line->elements;
+	else
+		iter0 = iter0->next;
+
+	*iter = iter0;
+	return iter0 ? (ocrpt_line_element *)iter0->data : NULL;
+}
+
+DLL_EXPORT_SYM bool ocrpt_line_element_is_text(ocrpt_line_element *elem) {
+	ocrpt_output_element *elem0 = (ocrpt_output_element *)elem;
+
+	return (elem0 && elem0->le_type == OCRPT_OUTPUT_LE_TEXT);
+}
+
+DLL_EXPORT_SYM bool ocrpt_line_element_is_image(ocrpt_line_element *elem) {
+	ocrpt_output_element *elem0 = (ocrpt_output_element *)elem;
+
+	return (elem0 && elem0->le_type == OCRPT_OUTPUT_LE_IMAGE);
+}
+
+DLL_EXPORT_SYM bool ocrpt_line_element_is_barcode(ocrpt_line_element *elem) {
+	ocrpt_output_element *elem0 = (ocrpt_output_element *)elem;
+
+	return (elem0 && elem0->le_type == OCRPT_OUTPUT_LE_BARCODE);
 }

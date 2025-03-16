@@ -20,6 +20,7 @@
 #define OCRPT_DEFAULT_FONT_SIZE (12.0)
 
 enum ocrpt_output_type {
+	OCRPT_OUTPUT_UNSET,
 	OCRPT_OUTPUT_LINE,
 	OCRPT_OUTPUT_HLINE,
 	OCRPT_OUTPUT_IMAGE,
@@ -29,19 +30,21 @@ enum ocrpt_output_type {
 typedef enum ocrpt_output_type ocrpt_output_type;
 
 enum ocrpt_output_line_element_type {
+	OCRPT_OUTPUT_LE_UNSET,
 	OCRPT_OUTPUT_LE_TEXT,
 	OCRPT_OUTPUT_LE_IMAGE,
 	OCRPT_OUTPUT_LE_BARCODE
 };
 typedef enum ocrpt_output_line_element_type ocrpt_output_line_element_type;
 
-struct ocrpt_line_element {
+/* The opaque type ocrpt_line_element is identical to ocrpt_output_element */
+struct ocrpt_output_element {
+	ocrpt_output_type type;
 	ocrpt_output_line_element_type le_type;
 };
-typedef struct ocrpt_line_element ocrpt_line_element;
 
 struct ocrpt_text {
-	ocrpt_output_line_element_type le_type;
+	struct ocrpt_output_element base;
 	ocrpt_output *output;
 	ocrpt_expr *value;
 	ocrpt_expr *delayed;
@@ -90,7 +93,7 @@ struct ocrpt_text {
 };
 
 struct ocrpt_line {
-	ocrpt_output_type type;
+	ocrpt_output_element base;
 	bool bold_is_set:1;
 	bool bold_value:1;
 	bool italic_is_set:1;
@@ -116,7 +119,7 @@ struct ocrpt_line {
 };
 
 struct ocrpt_hline {
-	ocrpt_output_type type;
+	ocrpt_output_element base;
 	bool suppress_hline:1;
 	double font_width;
 	ocrpt_output *output;
@@ -140,10 +143,7 @@ struct ocrpt_image_file {
 typedef struct ocrpt_image_file ocrpt_image_file;
 
 struct ocrpt_image {
-	union {
-		ocrpt_output_type type;
-		ocrpt_output_line_element_type le_type;
-	};
+	ocrpt_output_element base;
 	bool in_line:1;
 	bool suppress_image:1;
 	double start;
@@ -164,10 +164,7 @@ struct ocrpt_image {
 };
 
 struct ocrpt_barcode {
-	union {
-		ocrpt_output_type type;
-		ocrpt_output_line_element_type le_type;
-	};
+	ocrpt_output_element base;
 	bool in_line:1;
 	bool suppress_bc:1;
 	double start;
@@ -189,11 +186,6 @@ struct ocrpt_barcode {
 	ocrpt_string *priv;
 	size_t encoded_width;
 };
-
-struct ocrpt_output_element {
-	ocrpt_output_type type;
-};
-typedef struct ocrpt_output_element ocrpt_output_element;
 
 void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output);
 void ocrpt_layout_output_resolve(ocrpt_output *output);

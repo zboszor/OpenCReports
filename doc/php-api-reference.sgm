@@ -2908,6 +2908,9 @@ OpenCReport\ReportBreak::footer(): OpenCReport\Output;</programlisting>
                      ?OpenCReport\Image;
 
     public final add_image_end(): void;
+
+    public final get_first_element():
+                     ?OpenCReport\OutputElement;
 }</programlisting>
 		</para>
 		<sect2 id="phpoutputsetsuppress">
@@ -2993,6 +2996,20 @@ OpenCReport\Output::add_barcode():
 OpenCReport\Output::add_image_end(): void;</programlisting>
 			</para>
 		</sect2>
+		<sect2 id="phpoutputgetfirstelem">
+			<title>Get the first output element</title>
+			<para>
+				Get the first output layout element.
+				It starts an iterator for the output, and
+				return the first element via an
+				<literal>OpenCReport\OutputElement</literal>
+				object, or <literal>null</literal> if there is
+				none. See also <xref linkend="phpoutputelemclass"/>.
+				<programlisting>public final
+OpenCReport\Output::get_first_element():
+                     ?OpenCReport\OutputElement;</programlisting>
+			</para>
+		</sect2>
 	</sect1>
 	<sect1 id="phplineclass">
 		<title>The OpenCReport\Line class</title>
@@ -3034,6 +3051,9 @@ OpenCReport\Output::add_image_end(): void;</programlisting>
 
     public final add_barcode():
                      ?OpenCReport\Barcode;
+
+    public final get_first_element():
+                     ?OpenCReport\LineElement;
 }</programlisting>
 		</para>
 		<sect2 id="phplinesetfontname">
@@ -3153,6 +3173,20 @@ OpenCReport\Line::add_text():
 				<programlisting>public final
 OpenCReport\Line::add_image():
                      ?OpenCReport\Image;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phplinegetfirstelem">
+			<title>Get the first line element</title>
+			<para>
+				Get the first element of the line.
+				It starts an iterator for the output, and
+				return the first element via an
+				<literal>OpenCReport\LineElement</literal>
+				object, or <literal>null</literal> if there is
+				none. See also <xref linkend="phplineelemclass"/>.
+				<programlisting>public final
+OpenCReport\Line::get_first_element():
+                     ?OpenCReport\LineElement;</programlisting>
 			</para>
 		</sect2>
 	</sect1>
@@ -3863,6 +3897,81 @@ OpenCReport\Barcode::set_bgcolor(
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
+	</sect1>
+	<sect1 id="phpoutputelemclass">
+		<title>The OpenCReport\OutputElement class</title>
+		<para>
+			<programlisting>class OpenCReport\OutputElement {
+    public final get_next():
+                     ?OpenCReport\OutputElement;
+
+    public final is_line(): bool;
+
+    public final is_hline(): bool;
+
+    public final is_image(): bool;
+
+    public final is_barcode(): bool;
+
+    public final get_line():
+                     ?OpenCReport\Line;
+
+    public final get_hline():
+                     ?OpenCReport\HorizontalLine;
+
+    public final get_image():
+                     ?OpenCReport\Image;
+
+    public final get_barcode):
+                     ?OpenCReport\Barcode;
+}</programlisting>
+		</para>
+		<para>
+			This class iterates through layout elements defined
+			for the output section used in
+			<literal>OpenCReport\Output::get_first_element()</literal>.
+			An <literal>OpenCReport\OutputElement</literal> object
+			is an "abstract" object in the sense that it encapsulates
+			several explicit object types. These object types can be
+			determined using the <literal>is_*()</literal> methods
+			and the actual objects underlying the abstract object
+			can be acquired using the <literal>get_*()</literal> methods.
+		</para>
+	</sect1>
+	<sect1 id="phplineelemclass">
+		<title>The OpenCReport\LineElement class</title>
+		<para>
+			<programlisting>class OpenCReport\LineElement {
+    public final get_next():
+                     ?OpenCReport\LineElement;
+
+    public final is_text(): bool;
+
+    public final is_image(): bool;
+
+    public final is_barcode(): bool;
+
+    public final get_text():
+                     ?OpenCReport\Line;
+
+    public final get_image():
+                     ?OpenCReport\Image;
+
+    public final get_barcode):
+                     ?OpenCReport\Barcode;
+}</programlisting>
+		</para>
+		<para>
+			This class iterates through line elements defined
+			for the line object used in
+			<literal>OpenCReport\Line::get_first_element()</literal>.
+			An <literal>OpenCReport\LineElement</literal> object
+			is an "abstract" object in the sense that it encapsulates
+			several explicit object types. These object types can be
+			determined using the <literal>is_*()</literal> methods
+			and the actual objects underlying the abstract object
+			can be acquired using the <literal>get_*()</literal> methods.
+		</para>
 	</sect1>
 	<sect1 id="phprlibcompat">
 		<title>RLIB compatibility API</title>

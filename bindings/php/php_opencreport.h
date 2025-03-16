@@ -468,4 +468,56 @@ static inline php_opencreport_barcode_object *php_opencreport_barcode_from_obj(z
 #define Z_OPENCREPORT_BARCODE_P(zv) ((php_opencreport_barcode_object *)zend_object_store_get_object(zv TSRMLS_CC))
 #endif
 
+typedef struct _php_opencreport_output_element_object {
+#if PHP_VERSION_ID < 70000
+	zend_object zo;
+#endif
+	ocrpt_output *output;
+	ocrpt_output_element *elem;
+	void *iter;
+#if PHP_VERSION_ID >= 70000
+	zend_object zo;
+#endif
+} php_opencreport_output_element_object;
+
+static inline php_opencreport_output_element_object *php_opencreport_output_element_from_obj(zend_object *obj) {
+#if PHP_VERSION_ID >= 70000
+	return (php_opencreport_output_element_object *)((char *)(obj) - XtOffsetOf(php_opencreport_output_element_object, zo));
+#else
+	return (php_opencreport_output_element_object *)obj;
+#endif
+}
+
+#if PHP_VERSION_ID >= 70000
+#define Z_OPENCREPORT_OUTPUT_ELEMENT_P(zv)  php_opencreport_output_element_from_obj(Z_OBJ_P((zv)))
+#else
+#define Z_OPENCREPORT_OUTPUT_ELEMENT_P(zv) ((php_opencreport_output_element_object *)zend_object_store_get_object(zv TSRMLS_CC))
+#endif
+
+typedef struct _php_opencreport_line_element_object {
+#if PHP_VERSION_ID < 70000
+	zend_object zo;
+#endif
+	ocrpt_line *line;
+	ocrpt_line_element *elem;
+	void *iter;
+#if PHP_VERSION_ID >= 70000
+	zend_object zo;
+#endif
+} php_opencreport_line_element_object;
+
+static inline php_opencreport_line_element_object *php_opencreport_line_element_from_obj(zend_object *obj) {
+#if PHP_VERSION_ID >= 70000
+	return (php_opencreport_line_element_object *)((char *)(obj) - XtOffsetOf(php_opencreport_line_element_object, zo));
+#else
+	return (php_opencreport_line_element_object *)obj;
+#endif
+}
+
+#if PHP_VERSION_ID >= 70000
+#define Z_OPENCREPORT_LINE_ELEMENT_P(zv)  php_opencreport_line_element_from_obj(Z_OBJ_P((zv)))
+#else
+#define Z_OPENCREPORT_LINE_ELEMENT_P(zv) ((php_opencreport_line_element_object *)zend_object_store_get_object(zv TSRMLS_CC))
+#endif
+
 #endif /* PHP_OPENCREPORT_H */

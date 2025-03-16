@@ -225,7 +225,8 @@ LAYOUT_TESTS = \
 	layout_barcode2_test \
 	layout_barcode3_test \
 	layout_barcode4_test \
-	layout_xml3_ver2_test
+	layout_xml3_ver2_test \
+	layout_xml_mods_test
 
 LAYOUT_CSV_TESTS = \
 	layout_xml17_csv1_test \
@@ -281,7 +282,8 @@ PHP_LAYOUT_TESTS = \
 	layout_code41_test \
 	layout_xml42_test \
 	layout_barcode1_test \
-	layout_barcode1_code_test
+	layout_barcode1_code_test \
+	layout_xml_mods_test
 
 if ENABLE_XLATE_TESTS
 

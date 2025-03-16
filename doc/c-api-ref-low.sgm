@@ -1992,6 +1992,77 @@ ocrpt_layout_report_field_header(ocrpt_report *r);
 ocrpt_output *
 ocrpt_layout_report_field_details(ocrpt_report *r);</programlisting>
 				</para>
+				<sect4 id="reportlayoutiterator">
+					<title>Miscellaneous report layout and line element functions</title>
+					<para>
+						It is possible to load a report XML descriptor and
+						modify the layout contents defined by it using code.
+					</para>
+					<para>
+						The first iterator function loops through toplevel
+						output elements: line, horizontal line, image, barcode.
+						An abstract opaque pointer type is returned by the
+						iterator. Further boolean functions determine the
+						actual element type. The <literal>void **iter</literal>
+						pointer must point to a <literal>NULL</literal>
+						pointer initially and the iterator function returns
+						<literal>NULL</literal> when there are no more
+						elements in the output section. Depending on the
+						boolean function results, the abstract opaque
+						pointer type can be case to the actual output
+						element type: <literal>ocrpt_line *</literal>,
+						<literal>ocrpt_hline *</literal>,
+						<literal>ocrpt_image *</literal> or
+						<literal>ocrpt_barcode *</literal>.
+						<programlisting>struct ocrpt_output_element;
+typedef struct ocrpt_output_element ocrpt_output_element;
+
+ocrpt_output_element *
+ocrpt_output_iterate_elements(ocrpt_output *output, void **iter);
+
+bool
+ocrpt_output_element_is_line(ocrpt_output_element *elem);
+
+bool
+ocrpt_output_element_is_hline(ocrpt_output_element *elem);
+
+bool
+ocrpt_output_element_is_image(ocrpt_output_element *elem);
+
+bool
+ocrpt_output_element_is_barcode(ocrpt_output_element *elem);</programlisting>
+					</para>
+					<para>
+						The second iterator function loops through line
+						elements: text, image and barcode.
+						An abstract opaque pointer type is returned by the
+						iterator. Further boolean functions determine the
+						actual element type. The <literal>void **iter</literal>
+						pointer must point to a <literal>NULL</literal>
+						pointer initially and the iterator function returns
+						<literal>NULL</literal> when there are no more
+						elements in the output section. Depending on the
+						boolean function results, the abstract opaque
+						pointer type can be cast to the actual output
+						element type: <literal>ocrpt_text *</literal>,
+						<literal>ocrpt_image *</literal> or
+						<literal>ocrpt_barcode *</literal>.
+						<programlisting>struct ocrpt_line_element;
+typedef struct ocrpt_line_element ocrpt_line_element;
+
+ocrpt_line_element *
+ocrpt_line_iterate_elements(ocrpt_line *line, void **iter);
+
+bool
+ocrpt_line_element_is_text(ocrpt_line_element *elem);
+
+bool
+ocrpt_line_element_is_image(ocrpt_line_element *elem);
+
+bool
+ocrpt_line_element_is_barcode(ocrpt_line_element *elem);</programlisting>
+					</para>
+				</sect4>
 			</sect3>
 			<sect3 id="breakgetlayoutsections">
 				<title>Get break layout sections</title>
