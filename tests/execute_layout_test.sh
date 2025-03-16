@@ -14,11 +14,16 @@ function compare_pdf () {
 		for i in $(seq 1 "$PAGESEXPEND") ; do
 			DIFF=$(compare -metric AE -fuzz '1%' results/"${TEST}"."${SFX[$TYPE]}".exp."${i}".png results/"${TEST}"."${SFX[$TYPE]}"."${i}".png -colorspace RGB results/"${TEST}"."${SFX[$TYPE]}"."${i}".diff.png 2>&1)
 			DIFF1=$(echo "$DIFF" | sed 's#^\([0-9]*\)compare:.*$#\1#')
-			if [[ $DIFF1 != "0" ]]; then
-				OUTDIFF="Page $i differs"
+			DIFF2=$(echo "$DIFF" | sed 's#^\([0-9]*\) .*$#\1#')
+			if [[ $DIFF1 = "0" ]] || [[ $DIFF2 = "0" ]] ; then
+				:
+			else
+				OUTDIFF="Page $i differs: $DIFF"
 				break
 			fi
-			if [[ "$DIFF" != "$DIFF1" ]]; then
+			if [[ "$DIFF" = "$DIFF1" ]] || [[ "$DIFF" = "$DIFF2" ]]; then
+				:
+			else
 				if [[ -z $WARNINGS ]]; then
 					WARNINGS="$DIFF"
 				else

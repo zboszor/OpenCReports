@@ -35,11 +35,16 @@ if [[ -f ${abs_srcdir}/expected/${TEST}.php.pdf ]]; then
 		for i in $(seq 1 $PAGESEXPEND) ; do
 			DIFF=$(compare -metric AE -fuzz '1%' results/${TEST}.php.pdf.exp.${i}.png results/${TEST}.php.pdf.${i}.png -colorspace RGB results/${TEST}.php.pdf.${i}.diff.png 2>&1)
 			DIFF1=$(echo "$DIFF" | sed 's#^\([0-9]*\)compare:.*$#\1#')
-			if [[ $DIFF1 != "0" ]]; then
+			DIFF2=$(echo "$DIFF" | sed 's#^\([0-9]*\) .*$#\1#')
+			if [[ $DIFF1 = "0" ]] || [[ $DIFF2 = "0" ]] ; then
+				:
+			else
 				OUTDIFF="Page $i differs"
 				break
 			fi
-			if [[ "$DIFF" != "$DIFF1" ]]; then
+			if [[ "$DIFF" = "$DIFF1" ]] || [[ "$DIFF" = "$DIFF2" ]]; then
+				:
+			else
 				if [[ -z $WARNINGS ]]; then
 					WARNINGS="$DIFF"
 				else
