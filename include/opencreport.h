@@ -264,11 +264,15 @@ enum ocrpt_format_type {
 	OCRPT_OUTPUT_TXT,
 	OCRPT_OUTPUT_CSV,
 	OCRPT_OUTPUT_XML,
-	OCRPT_OUTPUT_JSON
+	OCRPT_OUTPUT_JSON,
+	OCRPT_OUTPUT_LAST
 };
 typedef enum ocrpt_format_type ocrpt_format_type;
 
 void ocrpt_set_output_format(opencreport *o, ocrpt_format_type format);
+ocrpt_format_type ocrpt_get_output_format(opencreport *o);
+const char *ocrpt_get_output_format_name(ocrpt_format_type format);
+
 /*
  * Set output parameter
  */

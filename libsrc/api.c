@@ -1548,31 +1548,34 @@ DLL_EXPORT_SYM void ocrpt_spool(opencreport *o) {
 	assert(ret == o->output_buffer->len);
 }
 
+static const char *ocrpt_output_format_name[OCRPT_OUTPUT_LAST] = {
+	"UNKNOWN", "PDF", "HTML", "TXT", "CSV", "XML", "JSON"
+};
+
 DLL_EXPORT_SYM void ocrpt_set_output_format(opencreport *o, ocrpt_format_type format) {
 	if (!o)
 		return;
+
+	if (format < OCRPT_OUTPUT_PDF || format >= OCRPT_OUTPUT_LAST)
+		format = OCRPT_OUTPUT_PDF;
+
 	o->output_format = format;
 	o->rptformat->string->len = 0;
-	switch (format) {
-	case OCRPT_OUTPUT_PDF:
-		ocrpt_mem_string_append_printf(o->rptformat->string, "PDF");
-		break;
-	case OCRPT_OUTPUT_HTML:
-		ocrpt_mem_string_append_printf(o->rptformat->string, "HTML");
-		break;
-	case OCRPT_OUTPUT_TXT:
-		ocrpt_mem_string_append_printf(o->rptformat->string, "TXT");
-		break;
-	case OCRPT_OUTPUT_CSV:
-		ocrpt_mem_string_append_printf(o->rptformat->string, "CSV");
-		break;
-	case OCRPT_OUTPUT_XML:
-		ocrpt_mem_string_append_printf(o->rptformat->string, "XML");
-		break;
-	case OCRPT_OUTPUT_JSON:
-		ocrpt_mem_string_append_printf(o->rptformat->string, "JSON");
-		break;
-	}
+
+	ocrpt_mem_string_append_printf(o->rptformat->string, ocrpt_output_format_name[format]);
+}
+
+DLL_EXPORT_SYM ocrpt_format_type ocrpt_get_output_format(opencreport *o) {
+	return o ? o->output_format : OCRPT_OUTPUT_PDF;
+}
+
+DLL_EXPORT_SYM const char *ocrpt_get_output_format_name(ocrpt_format_type format) {
+	int idx = format;
+
+	if (idx < OCRPT_OUTPUT_PDF || idx >= OCRPT_OUTPUT_LAST)
+		format = 0;
+
+	return ocrpt_output_format_name[idx];
 }
 
 DLL_EXPORT_SYM char *ocrpt_canonicalize_path(const char *path) {

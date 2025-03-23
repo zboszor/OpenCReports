@@ -75,18 +75,29 @@ ocrpt_parse_xml_from_buffer(opencreport *o,
 			<title>Set report output format</title>
 			<para>
 				<programlisting>enum ocrpt_format_type {
-    OCRPT_OUTPUT_UNSET,
-    OCRPT_OUTPUT_PDF,
+    OCRPT_OUTPUT_PDF = 1,
     OCRPT_OUTPUT_HTML,
     OCRPT_OUTPUT_TXT,
     OCRPT_OUTPUT_CSV,
-    OCRPT_OUTPUT_XML
+    OCRPT_OUTPUT_XML,
+    OCRPT_OUTPUT_JSON,
+    OCRPT_OUTPUT_LAST
 };
 typedef enum ocrpt_format_type ocrpt_format_type;
 
 void
 ocrpt_set_output_format(opencreport *o,
                         ocrpt_format_type format);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="getoutpfmt">
+			<title>Get report output format as enum or string</title>
+			<para>
+				<programlisting>ocrpt_format_type
+ocrpt_get_output_format(opencreport *o);
+
+const char *
+ocrpt_get_output_format_name(ocrpt_format_type format);</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="setoutpparam">

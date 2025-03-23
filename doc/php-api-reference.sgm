@@ -41,6 +41,9 @@
     public const OUTPUT_XML;
     public const OUTPUT_JSON;
     public final set_output_format(long $format): void;
+    public final get_output_format(): long;
+    public static final get_output_format_name(long $format):
+                     string;
 
     public final set_output_parameter(
                      string $param,
@@ -211,6 +214,24 @@ OpenCReport::set_output_format(int $format): void;</programlisting>
 				in subclasses. With PHP 8.1 and newer, the
 				<literal>final</literal> flag is added so overriding
 				these constants will throw an exception.
+			</para>
+		</sect2>
+		<sect2 id="phpreportgetoutputformat">
+			<title>Get report output format</title>
+			<para>
+				This method returns the previously set
+				output format, or the default if it wasn't set.
+				<programlisting>public final
+OpenCReport::get_output_format(): long;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportgetoutputformatname">
+			<title>Get report output format name</title>
+			<para>
+				This method returns the name of the output format
+				as string. <programlisting>public static final
+OpenCReport::get_output_format_name(long $format):
+                     string;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpreportsetoutputparam">

@@ -920,6 +920,37 @@ PHP_METHOD(opencreport, set_output_format) {
 	ocrpt_set_output_format(oo->o, format);
 }
 
+PHP_METHOD(opencreport, get_output_format) {
+	zval *object = getThis();
+	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
+
+	if (!oo->o) {
+		zend_throw_error(NULL, "OpenCReport object was freed");
+		RETURN_THROWS();
+	}
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_LONG(ocrpt_get_output_format(oo->o));
+}
+
+PHP_METHOD(opencreport, get_output_format_name) {
+#if PHP_VERSION_ID >= 70000
+	zend_long format;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_LONG(format);
+	ZEND_PARSE_PARAMETERS_END();
+#else
+	long format;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &format) == FAILURE)
+		return;
+#endif
+
+	RETURN_STRING(ocrpt_get_output_format_name(format));
+}
+
 PHP_METHOD(opencreport, set_output_parameter) {
 	zval *object = getThis();
 	php_opencreport_object *oo = Z_OPENCREPORT_P(object);
@@ -2216,6 +2247,12 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_output_format, 
 ZEND_ARG_TYPE_INFO(0, format, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
+OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_get_output_format, 0, 0, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_get_output_format_name, 0, 0, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_set_output_parameter, 0, 2, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, param, IS_STRING, 0)
 ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
@@ -2360,6 +2397,8 @@ ZEND_END_ARG_INFO()
 #define arginfo_opencreport_parse_xml NULL
 #define arginfo_opencreport_parse_xml_from_buffer NULL
 #define arginfo_opencreport_set_output_format NULL
+#define arginfo_opencreport_get_output_format NULL
+#define arginfo_opencreport_get_output_format_name NULL
 #define arginfo_opencreport_set_output_parameter NULL
 #define arginfo_opencreport_execute NULL
 #define arginfo_opencreport_spool NULL
@@ -2405,6 +2444,8 @@ static const zend_function_entry opencreport_class_methods[] = {
 	PHP_ME(opencreport, parse_xml, arginfo_opencreport_parse_xml, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, parse_xml_from_buffer, arginfo_opencreport_parse_xml_from_buffer, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, set_output_format, arginfo_opencreport_set_output_format, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport, get_output_format, arginfo_opencreport_get_output_format, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport, get_output_format_name, arginfo_opencreport_get_output_format_name, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL | ZEND_ACC_STATIC)
 	PHP_ME(opencreport, set_output_parameter, arginfo_opencreport_set_output_parameter, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, execute, arginfo_opencreport_execute, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport, spool, arginfo_opencreport_spool, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
