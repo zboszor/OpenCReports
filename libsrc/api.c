@@ -267,7 +267,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 }
 
 DLL_EXPORT_SYM void ocrpt_set_numeric_precision_bits(opencreport *o, const char *expr_string) {
-	if (!o)
+	if (!o || o->executing)
 		return;
 
 	ocrpt_expr_free(o->precision_expr);
@@ -297,7 +297,7 @@ DLL_EXPORT_SYM mpfr_prec_t ocrpt_get_numeric_precision_bits(opencreport *o) {
 }
 
 DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, const char *expr_string) {
-	if (!o)
+	if (!o || o->executing)
 		return;
 
 	ocrpt_expr_free(o->rounding_mode_expr);
@@ -1835,7 +1835,7 @@ DLL_EXPORT_SYM char *ocrpt_find_file(opencreport *o, const char *filename) {
 }
 
 DLL_EXPORT_SYM void ocrpt_set_output_parameter(opencreport *o, const char *param, const char *value) {
-	if (!o)
+	if (!o || o->executing)
 		return;
 
 	/* HTML output parameters */
@@ -1960,7 +1960,7 @@ DLL_EXPORT_SYM const ocrpt_paper *ocrpt_paper_next(opencreport *o, void **iter) 
 }
 
 DLL_EXPORT_SYM void ocrpt_bindtextdomain(opencreport *o, const char *domainname, const char *dirname) {
-	if (!o || !domainname || !dirname)
+	if (!o || !domainname || !dirname || o->executing)
 		return;
 
 	ocrpt_strfree(o->textdomain);
@@ -1970,7 +1970,7 @@ DLL_EXPORT_SYM void ocrpt_bindtextdomain(opencreport *o, const char *domainname,
 }
 
 DLL_EXPORT_SYM void ocrpt_bindtextdomain_from_expr(opencreport *o, const char *domainname, const char *dirname) {
-	if (!o || !domainname || !dirname)
+	if (!o || !domainname || !dirname || o->executing)
 		return;
 
 	ocrpt_strfree(o->xlate_domain_s);
@@ -1981,7 +1981,7 @@ DLL_EXPORT_SYM void ocrpt_bindtextdomain_from_expr(opencreport *o, const char *d
 }
 
 DLL_EXPORT_SYM void ocrpt_set_locale(opencreport *o, const char *locale) {
-	if (!o || !locale)
+	if (!o || !locale || o->executing)
 		return;
 
 	if (o->locale != o->c_locale)
@@ -1992,7 +1992,7 @@ DLL_EXPORT_SYM void ocrpt_set_locale(opencreport *o, const char *locale) {
 }
 
 DLL_EXPORT_SYM void ocrpt_set_locale_from_expr(opencreport *o, const char *expr_string) {
-	if (!o)
+	if (!o || o->executing)
 		return;
 
 	ocrpt_expr_free(o->locale_expr);
