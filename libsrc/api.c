@@ -1553,7 +1553,7 @@ static const char *ocrpt_output_format_name[OCRPT_OUTPUT_LAST] = {
 };
 
 DLL_EXPORT_SYM void ocrpt_set_output_format(opencreport *o, ocrpt_format_type format) {
-	if (!o)
+	if (!o || o->executing)
 		return;
 
 	if (format < OCRPT_OUTPUT_PDF || format >= OCRPT_OUTPUT_LAST)
