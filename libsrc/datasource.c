@@ -94,7 +94,7 @@ DLL_EXPORT_SYM const ocrpt_input * const ocrpt_input_get(const char *name) {
 }
 
 DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char *source_name, const char *type, const ocrpt_input_connect_parameter *conn_params) {
-	if (!o || !source_name || !*source_name || !type)
+	if (!o || !source_name || !*source_name || !type || o->executing)
 		return NULL;
 
 	const ocrpt_input *input = ocrpt_input_get(type);
@@ -169,7 +169,7 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_get(opencreport *o, const char
 }
 
 DLL_EXPORT_SYM void ocrpt_datasource_set_encoding(ocrpt_datasource *source, const char *encoding) {
-	if (!source || !source->input)
+	if (!source || !source->input || !source->o || source->o->executing)
 		return;
 
 	if (source->input->set_encoding)
@@ -241,7 +241,7 @@ DLL_EXPORT_SYM void *ocrpt_query_get_private(const ocrpt_query *query) {
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_data(ocrpt_datasource *source, const char *name, const void *data, int32_t rows, int32_t cols, const int32_t *types, int32_t types_cols) {
-	if (!source || !name || !data)
+	if (!source || !name || !data || !source->o || source->o->executing)
 		return NULL;
 
 	const ocrpt_input *input = ocrpt_datasource_get_input(source);
@@ -253,7 +253,7 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_data(ocrpt_datasource *source, const
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_symbolic_data(ocrpt_datasource *source, const char *name, const char *array_name, int32_t rows, int32_t cols, const char *types_name, int32_t types_cols) {
-	if (!source || !name || !array_name)
+	if (!source || !name || !array_name || !source->o || source->o->executing)
 		return NULL;
 
 	const ocrpt_input *input = ocrpt_datasource_get_input(source);
@@ -268,14 +268,14 @@ DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_file(ocrpt_datasource *source,
 												const char *name, const char *filename,
 												const int32_t *types,
 												int32_t types_cols) {
-	if (!source || !source->input || !source->input->query_add_file || !name || !filename)
+	if (!source || !source->input || !source->input->query_add_file || !name || !filename || !source->o || source->o->executing)
 		return NULL;
 
 	return source->input->query_add_file(source, name, filename, types, types_cols);
 }
 
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_add_sql(ocrpt_datasource *source, const char *name, const char *querystr) {
-	if (!source || !source->input || !source->input->query_add_sql || !name || !querystr)
+	if (!source || !source->input || !source->input->query_add_sql || !name || !querystr || !source->o || source->o->executing)
 		return NULL;
 
 	return source->input->query_add_sql(source, name, querystr);
@@ -351,6 +351,8 @@ DLL_EXPORT_SYM void ocrpt_query_free(ocrpt_query *q) {
 		return;
 
 	opencreport *o = q->source->o;
+	if (o->executing)
+		return;
 
 	ocrpt_query_free0(q);
 
@@ -563,6 +565,16 @@ static bool ocrpt_query_follower_validity(ocrpt_query *leader, ocrpt_query *foll
 		return false;
 	}
 
+	if (!leader->source->o) {
+		ocrpt_err_printf("%s leader query's source has unset parent report\n", leader->name);
+		return false;
+	}
+
+	if (leader->source->o->executing) {
+		ocrpt_err_printf("%s leader query's parent report is executing\n", leader->name);
+		return false;
+	}
+
 	if (!follower) {
 		ocrpt_err_printf("follower query unset\n");
 		return false;
@@ -570,6 +582,16 @@ static bool ocrpt_query_follower_validity(ocrpt_query *leader, ocrpt_query *foll
 
 	if (!follower->source) {
 		ocrpt_err_printf("%s follower query's source unset\n", follower->name);
+		return false;
+	}
+
+	if (!follower->source->o) {
+		ocrpt_err_printf("%s follower query's source has unset parent report\n", follower->name);
+		return false;
+	}
+
+	if (follower->source->o->executing) {
+		ocrpt_err_printf("%s follower query's parent report is executing\n", follower->name);
 		return false;
 	}
 
