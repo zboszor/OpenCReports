@@ -155,6 +155,8 @@ DLL_EXPORT_SYM void ocrpt_datasource_free(ocrpt_datasource *source) {
 		return;
 
 	opencreport *o = source->o;
+	if (!o || o->executing)
+		return;
 
 	if (source->input && source->input->close)
 		source->input->close(source);
@@ -180,7 +182,7 @@ static void ocrpt_free_mvarentry(const void *ptr) {
 }
 
 DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
-	if (!o)
+	if (!o || o->executing)
 		return;
 
 	int32_t i;
@@ -1456,7 +1458,7 @@ static void ocrpt_execute_parts(opencreport *o) {
 }
 
 DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
-	if (!o)
+	if (!o || o->executing)
 		return false;
 
 	if (o->output_buffer)
@@ -1521,7 +1523,7 @@ DLL_EXPORT_SYM bool ocrpt_execute(opencreport *o) {
 }
 
 DLL_EXPORT_SYM const char *ocrpt_get_output(opencreport *o, size_t *length) {
-	if (!o || !o->output_buffer) {
+	if (!o || !o->output_buffer || o->executing) {
 		if (length)
 			*length = 0;
 		return NULL;
@@ -1534,14 +1536,14 @@ DLL_EXPORT_SYM const char *ocrpt_get_output(opencreport *o, size_t *length) {
 }
 
 DLL_EXPORT_SYM const ocrpt_string **ocrpt_get_content_type(opencreport *o) {
-	if (!o || !o->content_type)
+	if (!o || !o->content_type || o->executing)
 		return NULL;
 
 	return o->content_type;
 }
 
 DLL_EXPORT_SYM void ocrpt_spool(opencreport *o) {
-	if (!o || !o->output_buffer)
+	if (!o || !o->output_buffer || o->executing)
 		return;
 
 	ssize_t ret = write(fileno(stdout), o->output_buffer->str, o->output_buffer->len);
@@ -1728,7 +1730,7 @@ DLL_EXPORT_SYM char *ocrpt_canonicalize_path(const char *path) {
 }
 
 DLL_EXPORT_SYM void ocrpt_add_search_path(opencreport *o, const char *path) {
-	if (!o || !path)
+	if (!o || !path || o->executing)
 		return;
 
 	char *cpath = ocrpt_canonicalize_path(path);
@@ -1756,7 +1758,7 @@ DLL_EXPORT_SYM void ocrpt_add_search_path(opencreport *o, const char *path) {
 }
 
 DLL_EXPORT_SYM void ocrpt_add_search_path_from_expr(opencreport *o, const char *expr_string) {
-	if (!o || !expr_string)
+	if (!o || !expr_string || o->executing)
 		return;
 
 	ocrpt_expr *expr = ocrpt_expr_parse(o, expr_string, NULL);
@@ -1771,6 +1773,9 @@ DLL_EXPORT_SYM void ocrpt_add_search_path_from_expr(opencreport *o, const char *
 }
 
 DLL_EXPORT_SYM void ocrpt_resolve_search_paths(opencreport *o) {
+	if (!o || o->executing)
+		return;
+
 	for (ocrpt_list *l = o->search_paths; l; l = l->next) {
 		ocrpt_search_path *p = (ocrpt_search_path *)l->data;
 
@@ -1929,7 +1934,7 @@ DLL_EXPORT_SYM const ocrpt_paper *ocrpt_get_paper(opencreport *o) {
 }
 
 DLL_EXPORT_SYM void ocrpt_set_paper(opencreport *o, const ocrpt_paper *paper) {
-	if (!o)
+	if (!o || o->executing)
 		return;
 
 	o->paper0 = *paper;
@@ -1937,7 +1942,7 @@ DLL_EXPORT_SYM void ocrpt_set_paper(opencreport *o, const ocrpt_paper *paper) {
 }
 
 DLL_EXPORT_SYM void ocrpt_set_paper_by_name(opencreport *o, const char *papername) {
-	if (!o)
+	if (!o || o->executing)
 		return;
 
 	const ocrpt_paper *paper = ocrpt_get_paper_by_name(papername);
