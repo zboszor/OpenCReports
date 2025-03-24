@@ -1506,7 +1506,7 @@ ocrpt_expr *ocrpt_layout_expr_parse(opencreport *o, ocrpt_report *r, const char 
 }
 
 DLL_EXPORT_SYM void ocrpt_layout_part_page_header_set_report(ocrpt_part *p, ocrpt_report *r) {
-	if (!p)
+	if (!p || !p->o || p->o->executing || (r && r->executing))
 		return;
 
 	p->pageheader.r = r;
@@ -1520,7 +1520,7 @@ DLL_EXPORT_SYM ocrpt_output *ocrpt_layout_part_page_header(ocrpt_part *p) {
 }
 
 DLL_EXPORT_SYM void ocrpt_layout_part_page_footer_set_report(ocrpt_part *p, ocrpt_report *r) {
-	if (!p)
+	if (!p || !p->o || p->o->executing || (r && r->executing))
 		return;
 
 	p->pagefooter.r = r;

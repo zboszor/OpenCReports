@@ -44,7 +44,7 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_env_get_c(opencreport *o, const char *env) {
 }
 
 DLL_EXPORT_SYM void ocrpt_set_mvariable(opencreport *o, const char *name, const char *value) {
-	if (!o || !name)
+	if (!o || !name || o->executing)
 		return;
 
 	ocrpt_mvarentry *e = NULL;

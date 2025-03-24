@@ -1818,7 +1818,7 @@ static bool ocrpt_parse_xml_internal(opencreport *o, xmlTextReaderPtr reader) {
 }
 
 DLL_EXPORT_SYM bool ocrpt_parse_xml(opencreport *o, const char *filename) {
-	if (!o || !filename)
+	if (!o || !filename || o->executing)
 		return false;
 
 	xmlTextReaderPtr reader = xmlReaderForFile(filename, NULL,
@@ -1832,7 +1832,7 @@ DLL_EXPORT_SYM bool ocrpt_parse_xml(opencreport *o, const char *filename) {
 }
 
 DLL_EXPORT_SYM bool ocrpt_parse_xml_from_buffer(opencreport *o, const char *buffer, size_t size) {
-	if (!o || !buffer)
+	if (!o || !buffer || o->executing)
 		return false;
 
 	xmlTextReaderPtr reader = xmlReaderForMemory(buffer, size, NULL, NULL,

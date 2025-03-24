@@ -186,7 +186,7 @@ DLL_EXPORT_SYM void ocrpt_datasource_set_encoding(ocrpt_datasource *source, cons
 DLL_EXPORT_SYM ocrpt_query *ocrpt_query_alloc(const ocrpt_datasource *source, const char *name) {
 	int32_t llen;
 
-	if (!source)
+	if (!source || !source->o || source->o->executing)
 		return NULL;
 
 	ocrpt_query *q = ocrpt_mem_malloc(sizeof(ocrpt_query));
@@ -347,11 +347,11 @@ void ocrpt_query_free0(ocrpt_query *q) {
 }
 
 DLL_EXPORT_SYM void ocrpt_query_free(ocrpt_query *q) {
-	if (!q || !q->source || !q->source->o)
+	if (!q || !q->source)
 		return;
 
 	opencreport *o = q->source->o;
-	if (o->executing)
+	if (!o || o->executing)
 		return;
 
 	ocrpt_query_free0(q);

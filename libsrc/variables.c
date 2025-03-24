@@ -35,6 +35,11 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r, enum ocrpt_re
 		return NULL;
 	}
 
+	if (!r->o || r->o->executing || r->executing) {
+		ocrpt_err_printf("adding a variable definitition during report execution is invalid\n");
+		return NULL;
+	}
+
 	ocrpt_var *var = NULL;
 
 	for (ocrpt_list *ptr = r->variables; ptr; ptr = ptr->next) {
@@ -276,7 +281,7 @@ DLL_EXPORT_SYM void ocrpt_variable_set_precalculate(ocrpt_var *var, const char *
 }
 
 DLL_EXPORT_SYM void ocrpt_variable_resolve(ocrpt_var *v) {
-	if (!v)
+	if (!v || !v->r || !v->r->o || v->r->o->executing || v->r->executing)
 		return;
 
 	if (v->baseexpr) {

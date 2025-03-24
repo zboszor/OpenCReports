@@ -3938,7 +3938,7 @@ DLL_EXPORT_SYM bool ocrpt_function_add(opencreport *o, const char *fname,
 										ocrpt_function_call func, void *user_data,
 										int32_t n_ops, bool commutative, bool associative,
 										bool left_associative, bool dont_optimize) {
-	if (!o || !fname || !*fname || !func)
+	if (!o || !fname || !*fname || !func || o->executing)
 		return false;
 
 	ocrpt_function *new_func;
