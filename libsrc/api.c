@@ -315,7 +315,7 @@ DLL_EXPORT_SYM void ocrpt_set_rounding_mode(opencreport *o, const char *expr_str
 }
 
 DLL_EXPORT_SYM bool ocrpt_add_part_added_cb(opencreport *o, ocrpt_part_cb func, void *data) {
-	if (!o || !func)
+	if (!o || !func || o->executing)
 		return false;
 
 	ocrpt_part_cb_data *ptr = ocrpt_mem_malloc(sizeof(ocrpt_part_cb_data));
@@ -328,7 +328,7 @@ DLL_EXPORT_SYM bool ocrpt_add_part_added_cb(opencreport *o, ocrpt_part_cb func, 
 }
 
 DLL_EXPORT_SYM bool ocrpt_add_report_added_cb(opencreport *o, ocrpt_report_cb func, void *data) {
-	if (!o || !func)
+	if (!o || !func || o->executing)
 		return false;
 
 	ocrpt_report_cb_data *ptr = ocrpt_mem_malloc(sizeof(ocrpt_report_cb_data));

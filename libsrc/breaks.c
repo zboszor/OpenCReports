@@ -22,7 +22,7 @@
 #include "layout.h"
 
 DLL_EXPORT_SYM ocrpt_break *ocrpt_break_new(ocrpt_report *r, const char *name) {
-	if (!r || !name)
+	if (!r || !name || !r->o || r->executing || r->o->executing)
 		return NULL;
 
 	ocrpt_break *br = ocrpt_mem_malloc(sizeof(ocrpt_break));
@@ -61,6 +61,10 @@ DLL_EXPORT_SYM void ocrpt_break_set_headernewpage(ocrpt_break *br, const char *h
 	if (!br)
 		return;
 
+	ocrpt_report *r = br->r;
+	if (!r || !r->o || r->executing || r->o->executing)
+		return;
+
 	ocrpt_expr_free(br->headernewpage_expr);
 	br->headernewpage_expr = NULL;
 	if (headernewpage)
@@ -69,6 +73,10 @@ DLL_EXPORT_SYM void ocrpt_break_set_headernewpage(ocrpt_break *br, const char *h
 
 DLL_EXPORT_SYM void ocrpt_break_set_suppressblank(ocrpt_break *br, const char *suppressblank) {
 	if (!br)
+		return;
+
+	ocrpt_report *r = br->r;
+	if (!r || !r->o || r->executing || r->o->executing)
 		return;
 
 	ocrpt_expr_free(br->suppressblank_expr);
@@ -136,6 +144,10 @@ DLL_EXPORT_SYM bool ocrpt_break_add_breakfield(ocrpt_break *br, ocrpt_expr *bf) 
 	if (!br || !bf || br->r != bf->r)
 		return false;
 
+	ocrpt_report *r = br->r;
+	if (!r || !r->o || r->executing || r->o->executing)
+		return false;
+
 	uint32_t vartypes;
 
 	if (ocrpt_expr_references(bf, OCRPT_VARREF_VVAR, &vartypes)) {
@@ -157,6 +169,10 @@ DLL_EXPORT_SYM bool ocrpt_break_add_breakfield(ocrpt_break *br, ocrpt_expr *bf) 
 
 DLL_EXPORT_SYM void ocrpt_break_resolve_fields(ocrpt_break *br) {
 	if (!br)
+		return;
+
+	ocrpt_report *r = br->r;
+	if (!r || !r->o || r->executing || r->o->executing)
 		return;
 
 	for (ocrpt_list *ptr = br->breakfields; ptr; ptr = ptr->next) {
@@ -266,6 +282,10 @@ DLL_EXPORT_SYM void ocrpt_break_reset_vars(ocrpt_break *br) {
 
 DLL_EXPORT_SYM bool ocrpt_break_add_trigger_cb(ocrpt_break *br, ocrpt_break_trigger_cb func, void *data) {
 	if (!br || !func)
+		return false;
+
+	ocrpt_report *r = br->r;
+	if (!r || !r->o || r->executing || r->o->executing)
 		return false;
 
 	ocrpt_break_trigger_cb_data *ptr = ocrpt_mem_malloc(sizeof(ocrpt_break_trigger_cb_data));
