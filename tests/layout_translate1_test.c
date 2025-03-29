@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
 	ocrpt_query *q = ocrpt_query_add_data(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 
 	ocrpt_part *p = ocrpt_part_new(o);
-	ocrpt_part_set_paper_by_name(p, "A4");
+	ocrpt_part_set_paper_type(p, "A4");
 	ocrpt_part_set_orientation(p, "'landscape'");
 	ocrpt_part_set_font_size(p, "10.0");
 

@@ -1666,24 +1666,48 @@ DLL_EXPORT_SYM void ocrpt_output_add_image_end(ocrpt_output *output) {
 		return image->exprname; \
 	}
 
+#define GET_IMAGE_EXPR(exprname) { \
+		return image ? image->exprname : NULL; \
+	}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_value(ocrpt_image *image, const char *expr_string) {
 	SET_IMAGE_EXPR(value, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_get_value(ocrpt_image *image) {
+	GET_IMAGE_EXPR(value);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_suppress(ocrpt_image *image, const char *expr_string) {
 	SET_IMAGE_EXPR(suppress, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_get_suppress(ocrpt_image *image) {
+	GET_IMAGE_EXPR(suppress);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_type(ocrpt_image *image, const char *expr_string) {
 	SET_IMAGE_EXPR(imgtype, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_get_type(ocrpt_image *image) {
+	GET_IMAGE_EXPR(imgtype);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_width(ocrpt_image *image, const char *expr_string) {
 	SET_IMAGE_EXPR(width, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_get_width(ocrpt_image *image) {
+	GET_IMAGE_EXPR(width);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_height(ocrpt_image *image, const char *expr_string) {
 	SET_IMAGE_EXPR(height, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_get_height(ocrpt_image *image) {
+	GET_IMAGE_EXPR(height);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_alignment(ocrpt_image *image, const char *expr_string) {
@@ -1704,12 +1728,24 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_alignment(ocrpt_image *image, const c
 	return image->align;
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_get_alignment(ocrpt_image *image) {
+	GET_IMAGE_EXPR(align);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_bgcolor(ocrpt_image *image, const char *expr_string) {
 	SET_IMAGE_EXPR(bgcolor, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_get_bgcolor(ocrpt_image *image) {
+	GET_IMAGE_EXPR(bgcolor);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_text_width(ocrpt_image *image, const char *expr_string) {
 	SET_IMAGE_EXPR(text_width, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_get_text_width(ocrpt_image *image) {
+	GET_IMAGE_EXPR(text_width);
 }
 
 DLL_EXPORT_SYM ocrpt_barcode *ocrpt_output_add_barcode(ocrpt_output *output) {
@@ -1769,24 +1805,48 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_value_string(ocrpt_text *text, const c
 		return text->exprname; \
 	}
 
+#define GET_TEXT_EXPR(exprname) { \
+		return text ? text->exprname : NULL; \
+	}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(value, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_value(ocrpt_text *text) {
+	GET_TEXT_EXPR(value);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_value_delayed(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(delayed, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_value_delayed(ocrpt_text *text) {
+	GET_TEXT_EXPR(delayed);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_format(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(format, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_format(ocrpt_text *text) {
+	GET_TEXT_EXPR(format);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_translate(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(translate, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_translate(ocrpt_text *text) {
+	GET_TEXT_EXPR(translate);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_width(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(width, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_width(ocrpt_text *text) {
+	GET_TEXT_EXPR(width);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_alignment(ocrpt_text *text, const char *expr_string) {
@@ -1807,44 +1867,88 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_alignment(ocrpt_text *text, const char
 	return text->align;
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_alignment(ocrpt_text *text) {
+	GET_TEXT_EXPR(align);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_color(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(color, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_color(ocrpt_text *text) {
+	GET_TEXT_EXPR(color);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_bgcolor(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(bgcolor, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_bgcolor(ocrpt_text *text) {
+	GET_TEXT_EXPR(bgcolor);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_font_name(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(font_name, false, true);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_font_name(ocrpt_text *text) {
+	GET_TEXT_EXPR(font_name);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_font_size(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(font_size, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_font_size(ocrpt_text *text) {
+	GET_TEXT_EXPR(font_size);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_bold(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(bold, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_bold(ocrpt_text *text) {
+	GET_TEXT_EXPR(bold);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_italic(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(italic, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_italic(ocrpt_text *text) {
+	GET_TEXT_EXPR(italic);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_link(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(link, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_link(ocrpt_text *text) {
+	GET_TEXT_EXPR(link);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_memo(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(memo_expr, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_memo(ocrpt_text *text) {
+	GET_TEXT_EXPR(memo_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_memo_wrap_chars(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(wrap_chars, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_memo_wrap_chars(ocrpt_text *text) {
+	GET_TEXT_EXPR(wrap_chars);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_memo_max_lines(ocrpt_text *text, const char *expr_string) {
 	SET_TEXT_EXPR(max_lines, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_memo_max_lines(ocrpt_text *text) {
+	GET_TEXT_EXPR(max_lines);
 }
 
 #define SET_BARCODE_EXPR(exprname, report, create_string) { \
@@ -1855,36 +1959,72 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_memo_max_lines(ocrpt_text *text, const
 		return bc->exprname; \
 	}
 
+#define GET_BARCODE_EXPR(exprname) { \
+		return bc ? bc->exprname : NULL; \
+	}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_value(ocrpt_barcode *bc, const char *expr_string) {
 	SET_BARCODE_EXPR(value, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_get_value(ocrpt_barcode *bc) {
+	GET_BARCODE_EXPR(value);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_value_delayed(ocrpt_barcode *bc, const char *expr_string) {
 	SET_BARCODE_EXPR(delayed, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_get_value_delayed(ocrpt_barcode *bc) {
+	GET_BARCODE_EXPR(delayed);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_suppress(ocrpt_barcode *bc, const char *expr_string) {
 	SET_BARCODE_EXPR(suppress, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_get_suppress(ocrpt_barcode *bc) {
+	GET_BARCODE_EXPR(suppress);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_type(ocrpt_barcode *bc, const char *expr_string) {
 	SET_BARCODE_EXPR(bctype, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_get_type(ocrpt_barcode *bc) {
+	GET_BARCODE_EXPR(bctype);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_width(ocrpt_barcode *bc, const char *expr_string) {
 	SET_BARCODE_EXPR(width, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_get_width(ocrpt_barcode *bc) {
+	GET_BARCODE_EXPR(width);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_height(ocrpt_barcode *bc, const char *expr_string) {
 	SET_BARCODE_EXPR(height, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_get_height(ocrpt_barcode *bc) {
+	GET_BARCODE_EXPR(height);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_color(ocrpt_barcode *bc, const char *expr_string) {
 	SET_BARCODE_EXPR(color, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_get_color(ocrpt_barcode *bc) {
+	GET_BARCODE_EXPR(color);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_bgcolor(ocrpt_barcode *bc, const char *expr_string) {
 	SET_BARCODE_EXPR(bgcolor, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_get_bgcolor(ocrpt_barcode *bc) {
+	GET_BARCODE_EXPR(bgcolor);
 }
 
 #define SET_LINE_EXPR(exprname, report, create_string) { \
@@ -1895,32 +2035,64 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_bgcolor(ocrpt_barcode *bc, const ch
 		return line->exprname; \
 	}
 
+#define GET_LINE_EXPR(exprname) { \
+		return line ? line->exprname : NULL; \
+	}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_font_name(ocrpt_line *line, const char *expr_string) {
 	SET_LINE_EXPR(font_name, false, true);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_get_font_name(ocrpt_line *line) {
+	GET_LINE_EXPR(font_name);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_font_size(ocrpt_line *line, const char *expr_string) {
 	SET_LINE_EXPR(font_size, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_get_font_size(ocrpt_line *line) {
+	GET_LINE_EXPR(font_size);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_bold(ocrpt_line *line, const char *expr_string) {
 	SET_LINE_EXPR(bold, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_get_bold(ocrpt_line *line) {
+	GET_LINE_EXPR(bold);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_italic(ocrpt_line *line, const char *expr_string) {
 	SET_LINE_EXPR(italic, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_get_italic(ocrpt_line *line) {
+	GET_LINE_EXPR(italic);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_suppress(ocrpt_line *line, const char *expr_string) {
 	SET_LINE_EXPR(suppress, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_get_suppress(ocrpt_line *line) {
+	GET_LINE_EXPR(suppress);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_color(ocrpt_line *line, const char *expr_string) {
 	SET_LINE_EXPR(color, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_get_color(ocrpt_line *line) {
+	GET_LINE_EXPR(color);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_bgcolor(ocrpt_line *line, const char *expr_string) {
 	SET_LINE_EXPR(bgcolor, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_get_bgcolor(ocrpt_line *line) {
+	GET_LINE_EXPR(bgcolor);
 }
 
 #define SET_HLINE_EXPR(exprname, report, create_string) { \
@@ -1931,32 +2103,64 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_line_set_bgcolor(ocrpt_line *line, const char *
 		return hline->exprname; \
 	}
 
+#define GET_HLINE_EXPR(exprname) { \
+		return hline ? hline->exprname : NULL; \
+	}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_size(ocrpt_hline *hline, const char *expr_string) {
 	SET_HLINE_EXPR(size, true, false);
 }
 
-DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_align(ocrpt_hline *hline, const char *expr_string) {
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_get_size(ocrpt_hline *hline) {
+	GET_HLINE_EXPR(size);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_alignment(ocrpt_hline *hline, const char *expr_string) {
 	SET_HLINE_EXPR(align, true, false);
 }
 
-DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_indent(ocrpt_hline *hline, const char *expr_string) {
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_get_alignment(ocrpt_hline *hline) {
+	GET_HLINE_EXPR(align);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_indentation(ocrpt_hline *hline, const char *expr_string) {
 	SET_HLINE_EXPR(indent, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_get_indentation(ocrpt_hline *hline) {
+	GET_HLINE_EXPR(indent);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_length(ocrpt_hline *hline, const char *expr_string) {
 	SET_HLINE_EXPR(length, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_get_length(ocrpt_hline *hline) {
+	GET_HLINE_EXPR(length);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_font_size(ocrpt_hline *hline, const char *expr_string) {
 	SET_HLINE_EXPR(font_size, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_get_font_size(ocrpt_hline *hline) {
+	GET_HLINE_EXPR(font_size);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_suppress(ocrpt_hline *hline, const char *expr_string) {
 	SET_HLINE_EXPR(suppress, true, false);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_get_suppress(ocrpt_hline *hline) {
+	GET_HLINE_EXPR(suppress);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_color(ocrpt_hline *hline, const char *expr_string) {
 	SET_HLINE_EXPR(color, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_get_color(ocrpt_hline *hline) {
+	GET_HLINE_EXPR(color);
 }
 
 #define SET_OUTPUT_EXPR(exprname, report, create_string) { \
@@ -1967,8 +2171,16 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_hline_set_color(ocrpt_hline *hline, const char 
 		return output->exprname; \
 	}
 
+#define GET_OUTPUT_EXPR(exprname) { \
+		return output ? output->exprname : NULL; \
+	}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_output_set_suppress(ocrpt_output *output, const char *expr_string) {
 	SET_OUTPUT_EXPR(suppress, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_output_get_suppress(ocrpt_output *output) {
+	GET_OUTPUT_EXPR(suppress);
 }
 
 #define SET_O_EXPR_REPORT(exprname) { \
@@ -1984,20 +2196,40 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_output_set_suppress(ocrpt_output *output, const
 		return o->exprname; \
 	}
 
+#define GET_O_EXPR_REPORT(exprname) { \
+		return o ? o->exprname : NULL; \
+	}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_set_noquery_show_nodata(opencreport *o, const char *expr_string) {
 	SET_O_EXPR_REPORT(noquery_show_nodata_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_get_noquery_show_nodata(opencreport *o) {
+	GET_O_EXPR_REPORT(noquery_show_nodata_expr);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_set_report_height_after_last(opencreport *o, const char *expr_string) {
 	SET_O_EXPR_REPORT(report_height_after_last_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_get_report_height_after_last(opencreport *o) {
+	GET_O_EXPR_REPORT(report_height_after_last_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_set_size_unit(opencreport *o, const char *expr_string) {
 	SET_O_EXPR_REPORT(size_unit_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_get_size_unit(opencreport *o) {
+	GET_O_EXPR_REPORT(size_unit_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_set_follower_match_single(opencreport *o, const char *expr_string) {
 	SET_O_EXPR_REPORT(follower_match_single_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_get_follower_match_single(opencreport *o) {
+	GET_O_EXPR_REPORT(follower_match_single_expr);
 }
 
 DLL_EXPORT_SYM void ocrpt_set_follower_match_single_direct(opencreport *o, bool value) {
@@ -2007,12 +2239,20 @@ DLL_EXPORT_SYM void ocrpt_set_follower_match_single_direct(opencreport *o, bool 
 	o->follower_match_single = value;
 }
 
+DLL_EXPORT_SYM bool ocrpt_get_follower_match_single_direct(opencreport *o) {
+	return o ? o->follower_match_single : false;
+}
+
 #define SET_PART_EXPR(exprname) { \
 		if (!p || (p->o && p->o->executing)) \
 			return NULL; \
 		ocrpt_expr_free(p->exprname); \
 		p->exprname = expr_string ? ocrpt_expr_parse(p->o, expr_string, NULL) : NULL; \
 		return p->exprname; \
+	}
+
+#define GET_PART_EXPR(exprname) { \
+		return p ? p->exprname : NULL; \
 	}
 
 #define SET_PART_EXPR_OR_STR(exprname) { \
@@ -2042,44 +2282,88 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_iterations(ocrpt_part *p, const char *
 	SET_PART_EXPR_REPORT(iterations_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_get_iterations(ocrpt_part *p) {
+	GET_PART_EXPR(iterations_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_font_name(ocrpt_part *p, const char *expr_string) {
 	SET_PART_EXPR_OR_STR(font_name_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_get_font_name(ocrpt_part *p) {
+	GET_PART_EXPR(font_name_expr);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_font_size(ocrpt_part *p, const char *expr_string) {
 	SET_PART_EXPR(font_size_expr);
 }
 
-DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_paper_by_name(ocrpt_part *p, const char *expr_string) {
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_get_font_size(ocrpt_part *p) {
+	GET_PART_EXPR(font_size_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_paper_type(ocrpt_part *p, const char *expr_string) {
 	SET_PART_EXPR_OR_STR(paper_type_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_get_paper_type(ocrpt_part *p) {
+	GET_PART_EXPR(paper_type_expr);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_orientation(ocrpt_part *p, const char *expr_string) {
 	SET_PART_EXPR(orientation_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_get_orientation(ocrpt_part *p) {
+	GET_PART_EXPR(orientation_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_top_margin(ocrpt_part *p, const char *expr_string) {
 	SET_PART_EXPR(top_margin_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_get_top_margin(ocrpt_part *p) {
+	GET_PART_EXPR(top_margin_expr);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_bottom_margin(ocrpt_part *p, const char *expr_string) {
 	SET_PART_EXPR(bottom_margin_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_get_bottom_margin(ocrpt_part *p) {
+	GET_PART_EXPR(bottom_margin_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_left_margin(ocrpt_part *p, const char *expr_string) {
 	SET_PART_EXPR(left_margin_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_get_left_margin(ocrpt_part *p) {
+	GET_PART_EXPR(left_margin_expr);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_right_margin(ocrpt_part *p, const char *expr_string) {
 	SET_PART_EXPR(right_margin_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_get_right_margin(ocrpt_part *p) {
+	GET_PART_EXPR(right_margin_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_suppress(ocrpt_part *p, const char *expr_string) {
 	SET_PART_EXPR(suppress_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_get_suppress(ocrpt_part *p) {
+	GET_PART_EXPR(suppress_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p, const char *expr_string) {
 	SET_PART_EXPR(suppress_pageheader_firstpage_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_get_suppress_pageheader_firstpage(ocrpt_part *p) {
+	GET_PART_EXPR(suppress_pageheader_firstpage_expr);
 }
 
 #define SET_PART_ROW_EXPR(exprname) { \
@@ -2090,16 +2374,32 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_pa
 		return pr->exprname; \
 	}
 
+#define GET_PART_ROW_EXPR(exprname) { \
+		return pr ? pr->exprname : NULL; \
+	}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_row_set_suppress(ocrpt_part_row *pr, const char *expr_string) {
 	SET_PART_ROW_EXPR(suppress_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_row_get_suppress(ocrpt_part_row *pr) {
+	GET_PART_ROW_EXPR(suppress_expr);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_row_set_newpage(ocrpt_part_row *pr, const char *expr_string) {
 	SET_PART_ROW_EXPR(newpage_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_row_get_newpage(ocrpt_part_row *pr) {
+	GET_PART_ROW_EXPR(newpage_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_row_set_layout(ocrpt_part_row *pr, const char *expr_string) {
 	SET_PART_ROW_EXPR(layout_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_row_get_layout(ocrpt_part_row *pr) {
+	GET_PART_ROW_EXPR(layout_expr);
 }
 
 #define SET_PART_COLUMN_EXPR(exprname) { \
@@ -2110,32 +2410,64 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_row_set_layout(ocrpt_part_row *pr, const c
 		return pd->exprname; \
 	}
 
+#define GET_PART_COLUMN_EXPR(exprname) { \
+		return pd ? pd->exprname : NULL; \
+	}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_suppress(ocrpt_part_column *pd, const char *expr_string) {
 	SET_PART_COLUMN_EXPR(suppress_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_get_suppress(ocrpt_part_column *pd) {
+	GET_PART_COLUMN_EXPR(suppress_expr);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_width(ocrpt_part_column *pd, const char *expr_string) {
 	SET_PART_COLUMN_EXPR(width_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_get_width(ocrpt_part_column *pd) {
+	GET_PART_COLUMN_EXPR(width_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_height(ocrpt_part_column *pd, const char *expr_string) {
 	SET_PART_COLUMN_EXPR(height_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_get_height(ocrpt_part_column *pd) {
+	GET_PART_COLUMN_EXPR(height_expr);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_border_width(ocrpt_part_column *pd, const char *expr_string) {
 	SET_PART_COLUMN_EXPR(border_width_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_get_border_width(ocrpt_part_column *pd) {
+	GET_PART_COLUMN_EXPR(border_width_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_border_color(ocrpt_part_column *pd, const char *expr_string) {
 	SET_PART_COLUMN_EXPR(border_color_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_get_border_color(ocrpt_part_column *pd) {
+	GET_PART_COLUMN_EXPR(border_color_expr);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd, const char *expr_string) {
 	SET_PART_COLUMN_EXPR(detail_columns_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_get_detail_columns(ocrpt_part_column *pd) {
+	GET_PART_COLUMN_EXPR(detail_columns_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_column_padding(ocrpt_part_column *pd, const char *expr_string) {
 	SET_PART_COLUMN_EXPR(column_pad_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_get_column_padding(ocrpt_part_column *pd) {
+	GET_PART_COLUMN_EXPR(column_pad_expr);
 }
 
 #define SET_REPORT_EXPR(exprname) { \
@@ -2156,28 +2488,56 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_part_column_set_column_padding(ocrpt_part_colum
 		return r->exprname; \
 	}
 
+#define GET_REPORT_EXPR(exprname) { \
+		return r ? r->exprname : NULL; \
+	}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_suppress(ocrpt_report *r, const char *expr_string) {
 	SET_REPORT_EXPR(suppress_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_get_suppress(ocrpt_report *r) {
+	GET_REPORT_EXPR(suppress_expr);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_iterations(ocrpt_report *r, const char *expr_string) {
 	SET_REPORT_EXPR(iterations_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_get_iterations(ocrpt_report *r) {
+	GET_REPORT_EXPR(iterations_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_font_name(ocrpt_report *r, const char *expr_string) {
 	SET_REPORT_EXPR_OR_STR(font_name_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_get_font_name(ocrpt_report *r) {
+	GET_REPORT_EXPR(font_name_expr);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_font_size(ocrpt_report *r, const char *expr_string) {
 	SET_REPORT_EXPR(font_size_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_get_font_size(ocrpt_report *r) {
+	GET_REPORT_EXPR(font_size_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_height(ocrpt_report *r, const char *expr_string) {
 	SET_REPORT_EXPR(height_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_get_height(ocrpt_report *r) {
+	GET_REPORT_EXPR(height_expr);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_fieldheader_priority(ocrpt_report *r, const char *expr_string) {
 	SET_REPORT_EXPR(fieldheader_priority_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_get_fieldheader_priority(ocrpt_report *r) {
+	GET_REPORT_EXPR(fieldheader_priority_expr);
 }
 
 DLL_EXPORT_SYM ocrpt_output_element *ocrpt_output_iterate_elements(ocrpt_output *output, void **iter) {

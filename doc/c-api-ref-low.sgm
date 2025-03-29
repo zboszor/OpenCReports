@@ -1583,7 +1583,7 @@ ocrpt_report_evaluate_expressions(ocrpt_report *r);</programlisting>
 			<sect3 id="layoutglobalopts">
 				<title>Global layout options</title>
 				<sect4 id="layoutsizeunit">
-					<title>Set "size unit" option</title>
+					<title>Set or get "size unit" option</title>
 					<para>
 						See <xref linkend="sizeunit"/>.
 						The expression string must evaluate to
@@ -1597,27 +1597,42 @@ ocrpt_report_evaluate_expressions(ocrpt_report *r);</programlisting>
 ocrpt_set_size_unit(opencreport *o,
                     const char *expr_string);</programlisting>
 					</para>
+					<para>
+						The expression also has a getter function,
+						so its result (value) can be queried.
+						Which may be useful, in case it's set in
+						the report XML description and callbacks
+						and the report processing needs to inspect it.
+						<programlisting>ocrpt_expr *
+ocrpt_get_size_unit(opencreport *o);</programlisting>
+					</para>
 				</sect4>
 				<sect4 id="layoutnqsnd">
-					<title>Set "no query show NoData" option</title>
+					<title>Set or get "no query show NoData" option</title>
 					<para>
 						See <xref linkend="noqueryshownodata"/>.
 						The expression string should evaluate to
 						a boolean value.
 						<programlisting>ocrpt_expr *
 ocrpt_set_noquery_show_nodata(opencreport *o,
-                              const char *expr_string);</programlisting>
+                              const char *expr_string);
+
+ocrpt_expr *
+ocrpt_get_noquery_show_nodata(opencreport *o);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="layoutrhal">
-					<title>Set "report height after last" option</title>
+					<title>Set or get "report height after last" option</title>
 					<para>
 						See <xref linkend="reportheightafterlast"/>.
 						The expression string should evaluate to
 						a boolean value.
 						<programlisting>ocrpt_expr *
 ocrpt_set_report_height_after_last(opencreport *o,
-                                   const char *expr_string);</programlisting>
+                                   const char *expr_string);
+
+ocrpt_expr *
+ocrpt_get_report_height_after_last(opencreport *o);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="followermatchsingle">
@@ -1628,63 +1643,81 @@ ocrpt_set_report_height_after_last(opencreport *o,
 						a boolean value.
 						<programlisting>ocrpt_expr *
 ocrpt_set_follower_match_single(opencreport *o,
-                                const char *expr_string);</programlisting>
+                                const char *expr_string);
+
+ocrpt_expr *
+ocrpt_get_follower_match_single(opencreport *o);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="followermatchsingledirect">
-					<title>Set "follower match single" option directly</title>
+					<title>Set or get "follower match single" option directly</title>
 					<para>
 						See above and <xref linkend="xmlfollowermatchsingle"/>.
 						The  difference is that the modified behaviour
 						is set directly and immediately. Used by unit tests.
 						<programlisting>void
 ocrpt_set_follower_match_single_direct(opencreport *o,
-                                       bool value);</programlisting>
+                                       bool value);
+
+bool
+ocrpt_get_follower_match_single_direct(opencreport *o);</programlisting>
 					</para>
 				</sect4>
 			</sect3>
 			<sect3 id="partopts">
 				<title>Report part options</title>
 				<sect4 id="setpartiter">
-					<title>Set part iterations</title>
+					<title>Set or get part iterations</title>
 					<para>
 						See <xref linkend="partiter"/>.
 						The expression string must evaluate to
 						a numeric value.
 						<programlisting>ocrpt_expr *
 ocrpt_part_set_iterations(ocrpt_part *p,
-                          const char *expr_string);</programlisting>
+                          const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_get_iterations(ocrpt_part *p);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="setpartfontname">
-					<title>Set part font name</title>
+					<title>Set or get part font name</title>
 					<para>
 						See <xref linkend="partfontname"/>.
 						<programlisting>ocrpt_expr *
 ocrpt_part_set_font_name(ocrpt_part *p,
-                         const char *expr_string);</programlisting>
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_get_font_name(ocrpt_part *p);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="setpartfontsize">
-					<title>Set part font size</title>
+					<title>Set or get part font size</title>
 					<para>
 						See <xref linkend="partfontsize"/>.
 						<programlisting>ocrpt_expr *
 ocrpt_part_set_font_size(ocrpt_part *p,
-                         const char *expr_string);</programlisting>
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_get_font_size(ocrpt_part *p);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="setpartpapertype">
-					<title>Set part paper type</title>
+					<title>Set or get part paper type</title>
 					<para>
 						See <xref linkend="papertype"/>.
 						<programlisting>ocrpt_expr *
-ocrpt_part_set_paper_by_name(ocrpt_part *p,
-                             const char *expr_string);</programlisting>
+ocrpt_part_set_paper_type(ocrpt_part *p,
+                             const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_get_paper_type(ocrpt_part *p);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="setpartorientation">
-					<title>Set part paper's orientation</title>
+					<title>Set or get part paper's orientation</title>
 					<para>
 						See <xref linkend="partpageorientation"/>.
 						The expression string must evaluate to a string
@@ -1695,11 +1728,14 @@ ocrpt_part_set_paper_by_name(ocrpt_part *p,
 						orientation.
 						<programlisting>ocrpt_expr *
 ocrpt_part_set_orientation(ocrpt_part *p,
-                           const char *expr_string);</programlisting>
+                           const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_get_orientation(ocrpt_part *p);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="partsetmargins">
-					<title>Set part margins</title>
+					<title>Set or get part margins</title>
 					<para>
 						See <xref linkend="marginsettings"/>.
 						The margin values must be passed in via strings
@@ -1709,67 +1745,91 @@ ocrpt_part_set_top_margin(ocrpt_part *p,
                           const char *expr_string);
 
 ocrpt_expr *
+ocrpt_part_get_top_margin(ocrpt_part *p);
+
+ocrpt_expr *
 ocrpt_part_set_bottom_margin(ocrpt_part *p,
                              const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_get_bottom_margin(ocrpt_part *p);
 
 ocrpt_expr *
 ocrpt_part_set_left_margin(ocrpt_part *p,
                            const char *expr_string);
 
 ocrpt_expr *
+ocrpt_part_get_left_margin(ocrpt_part *p);
+
+ocrpt_expr *
 ocrpt_part_set_right_margin(ocrpt_part *p,
-                            const char *expr_string);</programlisting>
+                            const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_get_right_margin(ocrpt_part *p);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="partsetsuppress">
-					<title>Set part suppression</title>
+					<title>Set or get part suppression</title>
 					<para>
 						See <xref linkend="partsuppress"/>.
 						The expression string must evaluate to
 						a numeric (boolean) value.
 						<programlisting>ocrpt_expr *
 ocrpt_part_set_suppress(ocrpt_part *p,
-                        const char *expr_string);</programlisting>
+                        const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_get_suppress(ocrpt_part *p);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="partsetphsfp">
-					<title>Set part's page header suppressed on the first page</title>
+					<title>Set or get part's page header suppressed on the first page</title>
 					<para>
 						See <xref linkend="suppresspageheaderfirstpage"/>.
 						The expression string must evaluate to
 						a numeric (boolean) value.
 						<programlisting>ocrpt_expr *
 ocrpt_part_set_suppress_pageheader_firstpage(ocrpt_part *p,
-                                             const char *expr_string);</programlisting>
+                                             const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_get_suppress_pageheader_firstpage(ocrpt_part *p);</programlisting>
 					</para>
 				</sect4>
 			</sect3>
 			<sect3 id="partrowopts">
 				<title>Part row options</title>
 				<sect4 id="partrowsetsuppress">
-					<title>Set part row suppression</title>
+					<title>Set or get part row suppression</title>
 					<para>
 						See <xref linkend="partrowsuppress"/>.
 						The expression string must evaluate to
 						a numeric (boolean) value.
 						<programlisting>ocrpt_expr *
 ocrpt_part_row_set_suppress(ocrpt_part_row *pr,
-                            const char *expr_string);</programlisting>
+                            const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_row_get_suppress(ocrpt_part_row *pr);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="partrowsetnewpage">
-					<title>Set part row new page</title>
+					<title>Set or get part row new page</title>
 					<para>
 						See <xref linkend="partrownewpage"/>.
 						The expression string must evaluate to
 						a numeric (boolean) value.
 						<programlisting>ocrpt_expr *
 ocrpt_part_row_set_newpage(ocrpt_part_row *pr,
-                           const char *expr_string);</programlisting>
+                           const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_row_get_newpage(ocrpt_part_row *pr);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="partrowsetlayout">
-					<title>Set part row layout mode</title>
+					<title>Set or get part row layout mode</title>
 					<para>
 						See <xref linkend="partrowlayout"/>.
 						The expression string must evaluate
@@ -1780,116 +1840,146 @@ ocrpt_part_row_set_newpage(ocrpt_part_row *pr,
 						compatibility.
 						<programlisting>ocrpt_expr *
 ocrpt_part_row_set_layout(ocrpt_part_row *pr,
-                          const char *expr_string);</programlisting>
+                          const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_row_get_layout(ocrpt_part_row *pr);</programlisting>
 					</para>
 				</sect4>
 			</sect3>
 			<sect3 id="partcolopts">
 				<title>Part column options</title>
 				<sect4 id="partcolsetsuppress">
-					<title>Set part column suppression</title>
+					<title>Set or get part column suppression</title>
 					<para>
 						See <xref linkend="partcolsuppress"/>.
 						The expression must evaluate to a numeric
 						(boolean) value.
 						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_suppress(ocrpt_part_column *pd,
-                               const char *expr_string);</programlisting>
+                               const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_column_get_suppress(ocrpt_part_column *pd);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="partcolsetwidth">
-					<title>Set part column width</title>
+					<title>Set or get part column width</title>
 					<para>
 						See <xref linkend="partcolwidth"/>.
 						The expression must evaluate to a numeric
 						value.
 						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_width(ocrpt_part_column *pd,
-                            const char *expr_string);</programlisting>
+                            const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_column_get_width(ocrpt_part_column *pd);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="partcolsetheight">
-					<title>Set part column height</title>
+					<title>Set or get part column height</title>
 					<para>
 						See <xref linkend="partcolheight"/>.
 						The expression must evaluate to a numeric
 						value.
 						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_height(ocrpt_part_column *pd,
-                             const char *expr_string);</programlisting>
+                             const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_column_get_height(ocrpt_part_column *pd);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="partcolsetborderwidth">
-					<title>Set part column border width</title>
+					<title>Set or get part column border width</title>
 					<para>
 						See <xref linkend="pdborderwidth"/>.
 						The expression must evaluate to a numeric
 						value.
 						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_border_width(ocrpt_part_column *pd,
-                                   const char *expr_string);</programlisting>
+                                   const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_column_get_border_width(ocrpt_part_column *pd);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="partcolsetbordercolor">
-					<title>Set part column border color</title>
+					<title>Set or get part column border color</title>
 					<para>
 						See <xref linkend="pdbordercolor"/>.
 						The expression must evaluate to a string
 						value with a valid color name or specification.
 						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_border_color(ocrpt_part_column *pd,
-                                   const char *expr_string);</programlisting>
+                                   const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_column_get_border_color(ocrpt_part_column *pd);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="partcolsetcolumns">
-					<title>Set part column's number of detail columns</title>
+					<title>Set or get part column's number of detail columns</title>
 					<para>
 						See <xref linkend="detailcolumns"/>.
 						The expression must evaluate to a numeric
 						value.
 						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_detail_columns(ocrpt_part_column *pd,
-                                     const char *expr_string);</programlisting>
+                                     const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_column_get_detail_columns(ocrpt_part_column *pd);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="partcolsetpadding">
-					<title>Set part column's detail column padding</title>
+					<title>Set or get part column's detail column padding</title>
 					<para>
 						See <xref linkend="columnpadding"/>.
 						The expression must evaluate to a numeric
 						value.
 						<programlisting>ocrpt_expr *
 ocrpt_part_column_set_column_padding(ocrpt_part_column *pd,
-                                     const char *expr_string);</programlisting>
+                                     const char *expr_string);
+
+ocrpt_expr *
+ocrpt_part_column_get_column_padding(ocrpt_part_column *pd);</programlisting>
 					</para>
 				</sect4>
 			</sect3>
 			<sect3 id="reportsopts">
 				<title>Report options</title>
 				<sect4 id="reportsetsuppress">
-					<title>Set report suppression</title>
+					<title>Set or get report suppression</title>
 					<para>
 						See <xref linkend="reportsuppress"/>.
 						The expression must evaluate to a numeric
 						(boolean) value.
 						<programlisting>ocrpt_expr *
 ocrpt_report_set_suppress(ocrpt_report *r,
-                          const char *expr_string);</programlisting>
+                          const char *expr_string);
+
+ocrpt_expr *
+ocrpt_report_get_suppress(ocrpt_report *r);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="reportsetiteration">
-					<title>Set report iterations</title>
+					<title>Set or get report iterations</title>
 					<para>
 						See <xref linkend="reportiter"/>.
 						The expression must evaluate to a numeric
 						value.
 						<programlisting>ocrpt_expr *
 ocrpt_report_set_iterations(ocrpt_report *r,
-                            const char *expr_string);</programlisting>
+                            const char *expr_string);
+
+ocrpt_expr *
+ocrpt_report_get_iterations(ocrpt_report *r);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="reportsetfontname">
-					<title>Set report font name</title>
+					<title>Set or get report font name</title>
 					<para>
 						See <xref linkend="reportfontname"/>.
 						The expression must evaluate to a string
@@ -1898,33 +1988,42 @@ ocrpt_report_set_iterations(ocrpt_report *r,
 						string is taken as is.
 						<programlisting>ocrpt_expr *
 ocrpt_report_set_font_name(ocrpt_report *r,
-                           const char *expr_string);</programlisting>
+                           const char *expr_string);
+
+ocrpt_expr *
+ocrpt_report_get_font_name(ocrpt_report *r);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="reportsetfontsize">
-					<title>Set report font size</title>
+					<title>Set or get report font size</title>
 					<para>
 						See <xref linkend="reportfontsize"/>.
 						The expression must evaluate to a numeric
 						value.
 						<programlisting>ocrpt_expr *
 ocrpt_report_set_font_size(ocrpt_report *r,
-                           const char *expr_string);</programlisting>
+                           const char *expr_string);
+
+ocrpt_expr *
+ocrpt_report_get_font_size(ocrpt_report *r);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="reportsetheight">
-					<title>Set report height</title>
+					<title>Set or get report height</title>
 					<para>
 						See <xref linkend="reportheight"/>.
 						The expression must evaluate to a numeric
 						value.
 						<programlisting>ocrpt_expr *
 ocrpt_report_set_height(ocrpt_report *r,
-                        const char *expr_string);</programlisting>
+                        const char *expr_string);
+
+ocrpt_expr *
+ocrpt_report_get_height(ocrpt_report *r);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="reportsetfhprio">
-					<title>Set report's field header priority</title>
+					<title>Set or get report's field header priority</title>
 					<para>
 						See <xref linkend="reportfhpriority"/>.
 						The expression must evaluate to a string
@@ -1933,7 +2032,10 @@ ocrpt_report_set_height(ocrpt_report *r,
 						<literal>low</literal>.
 						<programlisting>ocrpt_expr *
 ocrpt_report_set_fieldheader_priority(ocrpt_report *r,
-                                      const char *expr_string);</programlisting>
+                                      const char *expr_string);
+
+ocrpt_expr *
+ocrpt_report_get_fieldheader_priority(ocrpt_report *r);</programlisting>
 					</para>
 				</sect4>
 			</sect3>
@@ -2088,12 +2190,15 @@ ocrpt_break_get_footer(ocrpt_break *br);</programlisting>
 					See <xref linkend="expressions"/>.
 				</para>
 				<sect4 id="outputsetsuppress">
-					<title>Set output section suppression</title>
+					<title>Set or get output section suppression</title>
 					<para>
 						Set suppression from an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_output_set_suppress(ocrpt_output *output,
-                          const char *expr_string);</programlisting>
+                          const char *expr_string);
+
+ocrpt_expr *
+ocrpt_output_get_suppress(ocrpt_output *output);</programlisting>
 					</para>
 				</sect4>
 			</sect3>
@@ -2114,13 +2219,16 @@ ocrpt_output_add_line(ocrpt_output *output);</programlisting>
 					See <xref linkend="expressions"/>.
 				</para>
 				<sect4 id="linesetfontname">
-					<title>Set line font name</title>
+					<title>Set or get line font name</title>
 					<para>
 						Set the text line's font name from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_line_set_font_name(ocrpt_line *line,
-                         const char *expr_string);</programlisting>
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_line_get_font_name(ocrpt_line *line);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="linesetfontsize">
@@ -2130,57 +2238,75 @@ ocrpt_line_set_font_name(ocrpt_line *line,
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_line_set_font_size(ocrpt_line *line,
-                         const char *expr_string);</programlisting>
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_line_get_font_size(ocrpt_line *line);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="linesetbold">
-					<title>Set line bold value</title>
+					<title>Set or get line bold value</title>
 					<para>
 						Set the text line's bold value from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_line_set_bold(ocrpt_line *line,
-                    const char *expr_string);</programlisting>
+                    const char *expr_string);
+
+ocrpt_expr *
+ocrpt_line_get_bold(ocrpt_line *line);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="linesetitalic">
-					<title>Set line italic value</title>
+					<title>Set or get line italic value</title>
 					<para>
 						Set the text line's italic value from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_line_set_italic(ocrpt_line *line,
-                      const char *expr_string);</programlisting>
+                      const char *expr_string);
+
+ocrpt_expr *
+ocrpt_line_get_italic(ocrpt_line *line);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="linesetsuppress">
-					<title>Set line suppression</title>
+					<title>Set or get line suppression</title>
 					<para>
 						Set the text line's suppression value from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_line_set_suppress(ocrpt_line *line,
-                        const char *expr_string);</programlisting>
+                        const char *expr_string);
+
+ocrpt_expr *
+ocrpt_line_get_suppress(ocrpt_line *line);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="linessettextcolor">
-					<title>Set line text color</title>
+					<title>Set or get line text color</title>
 					<para>
 						Set the text line's text color from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_line_set_color(ocrpt_line *line,
-                     const char *expr_string);</programlisting>
+                     const char *expr_string);
+
+ocrpt_expr *
+ocrpt_line_get_color(ocrpt_line *line);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="linesetbgcolor">
-					<title>Set line background color</title>
+					<title>Set or get line background color</title>
 					<para>
-						Set the text line's background color from
+						Set or get the text line's background color from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_line_set_bgcolor(ocrpt_line *line,
-                       const char *expr_string);</programlisting>
+                       const char *expr_string);
+
+ocrpt_expr *
+ocrpt_line_get_bgcolor(ocrpt_line *line);</programlisting>
 					</para>
 				</sect4>
 			</sect3>
@@ -2211,7 +2337,7 @@ ocrpt_text_set_value_string(ocrpt_text *text,
 					</para>
 				</sect4>
 				<sect4 id="textsetvalue">
-					<title>Set text element value</title>
+					<title>Set or get text element value</title>
 					<para>
 						Set the text element's value from
 						an expression string.
@@ -2219,35 +2345,52 @@ ocrpt_text_set_value_string(ocrpt_text *text,
 ocrpt_text_set_value_expr(ocrpt_text *text,
                           const char *expr_string);</programlisting>
 					</para>
+					<para>
+						The getter function for the text element's
+						value also works when the text value is set
+						as a literal.
+						<programlisting>ocrpt_expr *
+ocrpt_text_get_value(ocrpt_text *text);</programlisting>
+					</para>
 				</sect4>
 				<sect4 id="textsetdelayed">
-					<title>Set text element value's delayed property</title>
+					<title>Set or get text element value's delayed property</title>
 					<para>
 						Set the text element value's delayed
 						property from an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_value_delayed(ocrpt_text *text,
-                             const char *expr_string);</programlisting>
+                             const char *expr_string);
+
+
+ocrpt_expr *
+ocrpt_text_get_value_delayed(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="textsetformatstring">
-					<title>Set text element format string</title>
+					<title>Set or get text element format string</title>
 					<para>
 						Set the text element's format string from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_format(ocrpt_text *text,
-                      const char *expr_string);</programlisting>
+                      const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_format(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="textsetxlate">
-					<title>Set text element translation</title>
+					<title>Set or get text element translation</title>
 					<para>
 						Set the text element's translation from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_translate(ocrpt_text *text,
-                         const char *expr_string);</programlisting>
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_translate(ocrpt_text *text);</programlisting>
 					</para>
 					<para>
 						OpenCReports will attempt to translate
@@ -2256,23 +2399,29 @@ ocrpt_text_set_translate(ocrpt_text *text,
 					</para>
 				</sect4>
 				<sect4 id="textsetwidth">
-					<title>Set text element field width</title>
+					<title>Set or get text element field width</title>
 					<para>
 						Set the text element's field width from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_width(ocrpt_text *text,
-                     const char *expr_string);</programlisting>
+                     const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_width(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="textsetalignment">
-					<title>Set text element alignment</title>
+					<title>Set or get text element alignment</title>
 					<para>
 						Set the text element's alignment from
 						a string or an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_alignment(ocrpt_text *text,
-                         const char *expr_string);</programlisting>
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_alignment(ocrpt_text *text);</programlisting>
 					</para>
 					<para>
 						String values <literal>left</literal>,
@@ -2283,88 +2432,112 @@ ocrpt_text_set_alignment(ocrpt_text *text,
 					</para>
 				</sect4>
 				<sect4 id="textsetcolor">
-					<title>Set text element text color</title>
+					<title>Set or get text element text color</title>
 					<para>
 						Set the text element's text color from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_color(ocrpt_text *text,
-                     const char *expr_string);</programlisting>
+                     const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_color(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="textsetbgcolor">
-					<title>Set text element background color</title>
+					<title>Set or get text element background color</title>
 					<para>
 						Set the text element's background color from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_bgcolor(ocrpt_text *text,
-                       const char *expr_string);</programlisting>
+                       const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_bgcolor(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="textsetfontname">
-					<title>Set text element font name</title>
+					<title>Set or get text element font name</title>
 					<para>
 						Set the text element's font name from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_font_name(ocrpt_text *text,
-                         const char *expr_string);</programlisting>
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_font_name(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="textsetfontsize">
-					<title>Set text element font size</title>
+					<title>Set or get text element font size</title>
 					<para>
 						Set the text element's font size from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_font_size(ocrpt_text *text,
-                         const char *expr_string);</programlisting>
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_font_size(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="textsetbold">
-					<title>Set text element bold value</title>
+					<title>Set or get text element bold value</title>
 					<para>
 						Set the text element's bold value from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_bold(ocrpt_text *text,
-                    const char *expr_string);</programlisting>
+                    const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_bold(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="textsetitalic">
-					<title>Set text element italic value</title>
+					<title>Set or get text element italic value</title>
 					<para>
 						Set the text element's italic value from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_italic(ocrpt_text *text,
-                      const char *expr_string);</programlisting>
+                      const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_italic(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="textsetlink">
-					<title>Set text element link URL</title>
+					<title>Set or get text element link URL</title>
 					<para>
 						Set the text element's link URL from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_link(ocrpt_text *text,
-                    const char *expr_string);</programlisting>
+                    const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_link(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="textsetmemo">
-					<title>Set text element multiline property</title>
+					<title>Set or get text element multiline property</title>
 					<para>
 						Set the text element's multiline property
 						from an expression string. The expression
 						must evaluate to a numeric (boolean) value.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_memo(ocrpt_text *text,
-                    const char *expr_string);</programlisting>
+                    const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_memo(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="textsetmemowrap">
-					<title>Set text element "wrap at characters" property</title>
+					<title>Set or get text element "wrap at characters" property</title>
 					<para>
 						Set the text element's "wrap at characters"
 						property from an expression string.
@@ -2375,11 +2548,14 @@ ocrpt_text_set_memo(ocrpt_text *text,
 						fields wrap at word boundaries.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_memo_wrap_chars(ocrpt_text *text,
-                               const char *expr_string);</programlisting>
+                               const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_memo_wrap_chars(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="textsetmemolines">
-					<title>Set text element maximum lines</title>
+					<title>Set or get text element maximum lines</title>
 					<para>
 						Set the text element's maximum lines
 						property from an expression string.
@@ -2394,7 +2570,10 @@ ocrpt_text_set_memo_wrap_chars(ocrpt_text *text,
 						number of lines the field value is rendered into.
 						<programlisting>ocrpt_expr *
 ocrpt_text_set_memo_max_lines(ocrpt_text *text,
-                              const char *expr_string);</programlisting>
+                              const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_memo_max_lines(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
 			</sect3>
@@ -2415,17 +2594,20 @@ ocrpt_output_add_hline(ocrpt_output *output);</programlisting>
 					See <xref linkend="expressions"/>.
 				</para>
 				<sect4 id="hlinesetwidth">
-					<title>Set horizontal line size (width)</title>
+					<title>Set or get horizontal line size (width)</title>
 					<para>
 						Set the horizontal line's size (width) from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_hline_set_size(ocrpt_hline *hline,
-                     const char *expr_string);</programlisting>
+                     const char *expr_string);
+
+ocrpt_expr *
+ocrpt_hline_get_size(ocrpt_hline *hline);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="hlinesetalign">
-					<title>Set horizontal line alignment</title>
+					<title>Set or get horizontal line alignment</title>
 					<para>
 						Set the horizontal line's alignment from
 						an expression string. Possibly values are
@@ -2437,33 +2619,42 @@ ocrpt_hline_set_size(ocrpt_hline *hline,
 						length is shorter than the designated page
 						or column width without the margins.
 						<programlisting>ocrpt_expr *
-ocrpt_hline_set_align(ocrpt_hline *hline,
-                      const char *expr_string);</programlisting>
+ocrpt_hline_set_alignment(ocrpt_hline *hline,
+                      const char *expr_string);
+
+ocrpt_expr *
+ocrpt_hline_get_alignment(ocrpt_hline *hline);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="hlinesetindentation">
-					<title>Set horizontal line indentation</title>
+					<title>Set or get horizontal line indentation</title>
 					<para>
 						Set the horizontal line's indentation value from
 						an expression string. The indentation is used if
 						<literal>left</literal> alignment is set.
 						<programlisting>ocrpt_expr *
-ocrpt_hline_set_indent(ocrpt_hline *hline,
-                       const char *expr_string);</programlisting>
+ocrpt_hline_set_indentation(ocrpt_hline *hline,
+                       const char *expr_string);
+
+ocrpt_expr *
+ocrpt_hline_get_indentation(ocrpt_hline *hline);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="hlinesetlength">
-					<title>Set horizontal line length</title>
+					<title>Set or get horizontal line length</title>
 					<para>
 						Set the horizontal line's length from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_hline_set_length(ocrpt_hline *hline,
-                       const char *expr_string);</programlisting>
+                       const char *expr_string);
+
+ocrpt_expr *
+ocrpt_hline_get_length(ocrpt_hline *hline);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="hlinesetfontsize">
-					<title>Set horizontal line font size</title>
+					<title>Set or get horizontal line font size</title>
 					<para>
 						Set the horizontal line's font size from
 						an expression string. It's used in indentation
@@ -2471,27 +2662,36 @@ ocrpt_hline_set_length(ocrpt_hline *hline,
 						is set to <literal>rlib</literal>.
 						<programlisting>ocrpt_expr *
 ocrpt_hline_set_font_size(ocrpt_hline *hline,
-                          const char *expr_string);</programlisting>
+                          const char *expr_string);
+
+ocrpt_expr *
+ocrpt_hline_get_font_size(ocrpt_hline *hline);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="hlinesetsuppress">
-					<title>Set horizontal line suppression</title>
+					<title>Set or get horizontal line suppression</title>
 					<para>
 						Set the horizontal line's suppression from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_hline_set_suppress(ocrpt_hline *hline,
-                         const char *expr_string);</programlisting>
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_hline_get_suppress(ocrpt_hline *hline);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="hlinesetcolor">
-					<title>Set horizontal line color</title>
+					<title>Set or get horizontal line color</title>
 					<para>
 						Set the horizontal line's color from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_hline_set_color(ocrpt_hline *hline,
-                      const char *expr_string);</programlisting>
+                      const char *expr_string);
+
+ocrpt_expr *
+ocrpt_hline_get_color(ocrpt_hline *hline);</programlisting>
 					</para>
 				</sect4>
 			</sect3>
@@ -2512,7 +2712,7 @@ ocrpt_line_add_barcode(ocrpt_line *line);</programlisting>
 			<sect3 id="barcodesettings">
 				<title>Barcode settings</title>
 				<sect4 id="barcodesetvalue">
-					<title>Set barcode value</title>
+					<title>Set or get barcode value</title>
 					<para>
 						Set the barcode's value from
 						an expression string. The expression
@@ -2521,29 +2721,38 @@ ocrpt_line_add_barcode(ocrpt_line *line);</programlisting>
 						as a barcode.
 						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_value(ocrpt_barcode *bc,
-                        const char *expr_string);</programlisting>
+                        const char *expr_string);
+
+ocrpt_expr *
+ocrpt_barcode_get_value(ocrpt_barcode *bc);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="barcodesetvaluedelayed">
-					<title>Set barcode value delayed</title>
+					<title>Set or get barcode value delayed</title>
 					<para>
 						Set the barcode's value delayed from
 						an expression string. The expression
 						must evaluate to a boolean value.
 						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_value_delayed(ocrpt_barcode *bc,
-                                const char *expr_string);</programlisting>
+                                const char *expr_string);
+
+ocrpt_expr *
+ocrpt_barcode_get_value_delayed(ocrpt_barcode *bc);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="barcodesetsuppress">
-					<title>Set barcode suppression</title>
+					<title>Set or get barcode suppression</title>
 					<para>
 						Set the barcode's suppression value from
 						an expression string. The expression
 						must evaluate to a boolean value.
 						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_suppress(ocrpt_barcode *bc,
-                           const char *expr_string);</programlisting>
+                           const char *expr_string);
+
+ocrpt_expr *
+ocrpt_barcode_get_suppress(ocrpt_barcode *bc);</programlisting>
 					</para>
 					<para>
 						Default value is <literal>false</literal>,
@@ -2551,13 +2760,16 @@ ocrpt_barcode_set_suppress(ocrpt_barcode *bc,
 					</para>
 				</sect4>
 				<sect4 id="barcodesettype">
-					<title>Set barcode type</title>
+					<title>Set or get barcode type</title>
 					<para>
 						Set the barcode's type from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_type(ocrpt_barcode *bc,
-                       const char *expr_string);</programlisting>
+                       const char *expr_string);
+
+ocrpt_expr *
+ocrpt_barcode_get_type(ocrpt_barcode *bc);</programlisting>
 					</para>
 					<para>
 						The type may be optional, in which
@@ -2589,13 +2801,16 @@ ocrpt_barcode_set_type(ocrpt_barcode *bc,
 					</para>
 				</sect4>
 				<sect4 id="barcodesetwidth">
-					<title>Set barcode width</title>
+					<title>Set or get barcode width</title>
 					<para>
 						Set the barcode's width from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_width(ocrpt_barcode *bc,
-                        const char *expr_string);</programlisting>
+                        const char *expr_string);
+
+ocrpt_expr *
+ocrpt_barcode_get_width(ocrpt_barcode *bc);</programlisting>
 					</para>
 					<para>
 						The width is set according to
@@ -2606,13 +2821,16 @@ ocrpt_barcode_set_width(ocrpt_barcode *bc,
 					</para>
 				</sect4>
 				<sect4 id="barcodesetheight">
-					<title>Set barcode width</title>
+					<title>Set or get barcode width</title>
 					<para>
 						Set the barcode's height from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_height(ocrpt_barcode *bc,
-                         const char *expr_string);</programlisting>
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_barcode_get_height(ocrpt_barcode *bc);</programlisting>
 					</para>
 					<para>
 						This setting is always in points, i.e.
@@ -2627,23 +2845,29 @@ ocrpt_barcode_set_height(ocrpt_barcode *bc,
 					</para>
 				</sect4>
 				<sect4 id="barcodesetcolor">
-					<title>Set barcode line color</title>
+					<title>Set or get barcode line color</title>
 					<para>
 						Set the barcode's line color from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_color(ocrpt_barcode *bc,
-                         const char *expr_string);</programlisting>
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_barcode_get_color(ocrpt_barcode *bc);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="barcodesetbgcolor">
-					<title>Set barcode background color</title>
+					<title>Set or get barcode background color</title>
 					<para>
 						Set the barcode's background color from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_barcode_set_bgcolor(ocrpt_barcode *bc,
-                         const char *expr_string);</programlisting>
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_barcode_get_bgcolor(ocrpt_barcode *bc);</programlisting>
 					</para>
 				</sect4>
 			</sect3>
@@ -2671,37 +2895,46 @@ ocrpt_line_add_image(ocrpt_line *line);</programlisting>
 					See <xref linkend="expressions"/>.
 				</para>
 				<sect4 id="imagesetvalue">
-					<title>Set image value</title>
+					<title>Set or get image value</title>
 					<para>
 						Set the image's value (filename) from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_image_set_value(ocrpt_image *image,
-                      const char *expr_string);</programlisting>
+                      const char *expr_string);
+
+ocrpt_expr *
+ocrpt_image_get_value(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="imagesetsuppress">
-					<title>Set image suppression</title>
+					<title>Set or get image suppression</title>
 					<para>
 						Set the image's suppression from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_image_set_suppress(ocrpt_image *image,
-                         const char *expr_string);</programlisting>
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_image_get_suppress(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="imagesettype">
-					<title>Set image type</title>
+					<title>Set or get image type</title>
 					<para>
 						Set the image's type from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_image_set_type(ocrpt_image *image,
-                     const char *expr_string);</programlisting>
+                     const char *expr_string);
+
+ocrpt_expr *
+ocrpt_image_get_type(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="imagesetwidth">
-					<title>Set image width</title>
+					<title>Set or get image width</title>
 					<para>
 						Set the image's width from
 						an expression string. Used when
@@ -2709,11 +2942,14 @@ ocrpt_image_set_type(ocrpt_image *image,
 						an output section.
 						<programlisting>ocrpt_expr *
 ocrpt_image_set_width(ocrpt_image *image,
-                      const char *expr_string);</programlisting>
+                      const char *expr_string);
+
+ocrpt_expr *
+ocrpt_image_get_width(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="imagesetheight">
-					<title>Set image height</title>
+					<title>Set or get image height</title>
 					<para>
 						Set the image's width from
 						an expression string. Used when
@@ -2721,39 +2957,51 @@ ocrpt_image_set_width(ocrpt_image *image,
 						an output section.
 						<programlisting>ocrpt_expr *
 ocrpt_image_set_height(ocrpt_image *image,
-                       const char *expr_string);</programlisting>
+                       const char *expr_string);
+
+ocrpt_expr *
+ocrpt_image_get_height(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="imagesetalignment">
-					<title>Set image alignment</title>
+					<title>Set or get image alignment</title>
 					<para>
 						Set the image's alignment from
 						an expression string. Used when
 						the image is added to text line.
 						<programlisting>ocrpt_expr *
-ocrpt_image_set_align(ocrpt_image *image,
-                      const char *expr_string);</programlisting>
+ocrpt_image_set_alignment(ocrpt_image *image,
+                      const char *expr_string);
+
+ocrpt_expr *
+ocrpt_image_get_alignment(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="imagesetbgcolor">
-					<title>Set image background color</title>
+					<title>Set or get image background color</title>
 					<para>
 						Set the image's background color from
 						an expression string.
 						<programlisting>ocrpt_expr *
 ocrpt_image_set_bgcolor(ocrpt_image *image,
-                        const char *expr_string);</programlisting>
+                        const char *expr_string);
+
+ocrpt_expr *
+ocrpt_image_get_bgcolor(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
 				<sect4 id="imagessetfieldwidth">
-					<title>Set image field width</title>
+					<title>Set or get image field width</title>
 					<para>
 						Set the image's field width from
 						an expression string. Used when
-						the image is added to text line.
+						the image is added to a text line.
 						<programlisting>ocrpt_expr *
 ocrpt_image_set_text_width(ocrpt_image *image,
-                           const char *expr_string);</programlisting>
+                           const char *expr_string);
+
+ocrpt_expr *
+ocrpt_image_get_text_width(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
 			</sect3>

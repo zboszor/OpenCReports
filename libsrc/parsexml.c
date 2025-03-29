@@ -667,8 +667,8 @@ static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt
 	}
 
 	ocrpt_hline_set_size(hline, (char *)size);
-	ocrpt_hline_set_align(hline, (char *)align);
-	ocrpt_hline_set_indent(hline, (char *)indent);
+	ocrpt_hline_set_alignment(hline, (char *)align);
+	ocrpt_hline_set_indentation(hline, (char *)indent);
 	ocrpt_hline_set_length(hline, (char *)length);
 	ocrpt_hline_set_font_size(hline, (char *)font_size);
 	ocrpt_hline_set_suppress(hline, (char *)suppress);
@@ -1183,7 +1183,7 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 		ocrpt_part_set_right_margin(p, (char *)right_margin);
 
 	if (!p->paper_type_expr && paper_type)
-		ocrpt_part_set_paper_by_name(p, (char *)paper_type);
+		ocrpt_part_set_paper_type(p, (char *)paper_type);
 
 	if (iterations)
 		ocrpt_report_set_iterations(r, (char *)iterations);
@@ -1592,7 +1592,7 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader, bool 
 		ocrpt_part_set_right_margin(p, (char *)right_margin);
 
 	if (!p->paper_type_expr && paper_type)
-		ocrpt_part_set_paper_by_name(p, (char *)paper_type);
+		ocrpt_part_set_paper_type(p, (char *)paper_type);
 
 	if (iterations)
 		ocrpt_part_set_iterations(p, (char *)iterations);
