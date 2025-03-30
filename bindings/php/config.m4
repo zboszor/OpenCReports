@@ -48,7 +48,7 @@ if test "$PHP_OPENCREPORTS" != "no"; then
 ocrpt-object.c ds-object.c query-object.c qresult-object.c expr-object.c eresult-object.c \
 part-object.c row-object.c col-object.c report-object.c \
 variable-object.c break-object.c \
-output-object.c],
+output-object.c line-object.c],
 		$ext_shared)
 	PHP_EVAL_INCLINE($CFLAGS)
 	PHP_EVAL_LIBLINE($LDFLAGS, OPENCREPORTS_SHARED_LIBADD)
