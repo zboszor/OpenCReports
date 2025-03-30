@@ -210,6 +210,8 @@ static inline php_opencreport_object *php_opencreport_from_obj(zend_object *obj)
 #define Z_OPENCREPORT_P(zv) ((php_opencreport_object *)zend_object_store_get_object(zv TSRMLS_CC))
 #endif
 
+extern zend_class_entry *opencreport_ce;
+
 typedef struct _php_opencreport_ds_object {
 #if PHP_VERSION_ID < 70000
 	zend_object zo;
@@ -691,6 +693,30 @@ static inline php_opencreport_line_element_object *php_opencreport_line_element_
 #define Z_OPENCREPORT_LINE_ELEMENT_P(zv) ((php_opencreport_line_element_object *)zend_object_store_get_object(zv TSRMLS_CC))
 #endif
 
+extern zend_class_entry *opencreport_ce;
+extern zend_class_entry *opencreport_ds_ce;
+extern zend_class_entry *opencreport_query_ce;
+extern zend_class_entry *opencreport_query_result_ce;
+extern zend_class_entry *opencreport_expr_ce;
+extern zend_class_entry *opencreport_result_ce;
+extern zend_class_entry *opencreport_part_ce;
+extern zend_class_entry *opencreport_row_ce;
+extern zend_class_entry *opencreport_col_ce;
+extern zend_class_entry *opencreport_report_ce;
+extern zend_class_entry *opencreport_variable_ce;
+extern zend_class_entry *opencreport_break_ce;
+extern zend_class_entry *opencreport_output_ce;
+extern zend_class_entry *opencreport_line_ce;
+extern zend_class_entry *opencreport_hline_ce;
+extern zend_class_entry *opencreport_image_ce;
+extern zend_class_entry *opencreport_text_ce;
+extern zend_class_entry *opencreport_barcode_ce;
+extern zend_class_entry *opencreport_output_element_ce;
+extern zend_class_entry *opencreport_line_element_ce;
+
+extern const zend_function_entry opencreport_functions[];
+
 bool opencreport_init(void);
+void opencreport_object_deinit(php_opencreport_object *oo);
 
 #endif /* PHP_OPENCREPORT_H */
