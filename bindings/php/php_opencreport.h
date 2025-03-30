@@ -719,4 +719,36 @@ extern const zend_function_entry opencreport_functions[];
 bool opencreport_init(void);
 void opencreport_object_deinit(php_opencreport_object *oo);
 
+#if PHP_VERSION_ID >= 70000
+OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_add_any_cb, 0, 1, IS_VOID, 0)
+ZEND_ARG_TYPE_INFO(0, callback, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+#else
+#define arginfo_opencreport_add_any_cb NULL
+#endif
+
+void register_opencreport_ce(void);
+void register_opencreport_ds_ce(void);
+void register_opencreport_query_ce(void);
+void register_opencreport_query_result_ce(void);
+void register_opencreport_expr_ce(void);
+void register_opencreport_result_ce(void);
+void register_opencreport_part_ce(void);
+void register_opencreport_row_ce(void);
+void register_opencreport_col_ce(void);
+void register_opencreport_report_ce(void);
+void register_opencreport_variable_ce(void);
+void register_opencreport_break_ce(void);
+void register_opencreport_output_ce(void);
+void register_opencreport_line_ce(void);
+void register_opencreport_hline_ce(void);
+void register_opencreport_image_ce(void);
+void register_opencreport_text_ce(void);
+void register_opencreport_barcode_ce(void);
+void register_opencreport_output_element_ce(void);
+void register_opencreport_line_element_ce(void);
+
+void opencreport_part_cb(opencreport *o, ocrpt_part *p, void *data);
+void opencreport_report_cb(opencreport *o, ocrpt_report *r, void *data);
+
 #endif /* PHP_OPENCREPORT_H */

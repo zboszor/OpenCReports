@@ -43,7 +43,7 @@ if test "$PHP_OPENCREPORTS" != "no"; then
 	CFLAGS="-Wall -Werror $CFLAGS $OPENCREPORTS_CFLAGS"
 	LDFLAGS="$OPENCREPORTS_LIBS $LDFLAGS"
 
-	PHP_NEW_EXTENSION(opencreports, [opencreport.c ocrptinit.c rlibcompat.c], $ext_shared)
+	PHP_NEW_EXTENSION(opencreports, [opencreport.c ocrptinit.c rlibcompat.c ocrpt-object.c], $ext_shared)
 	PHP_EVAL_INCLINE($CFLAGS)
 	PHP_EVAL_LIBLINE($LDFLAGS, OPENCREPORTS_SHARED_LIBADD)
 fi
