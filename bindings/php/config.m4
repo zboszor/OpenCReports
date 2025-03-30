@@ -49,7 +49,7 @@ ocrpt-object.c ds-object.c query-object.c qresult-object.c expr-object.c eresult
 variable-object.c break-object.c \
 part-object.c row-object.c col-object.c report-object.c output-object.c \
 line-object.c hline-object.c image-object.c text-object.c barcode-object.c \
-output-element-object.c],
+output-element-object.c line-element-object.c],
 		$ext_shared)
 	PHP_EVAL_INCLINE($CFLAGS)
 	PHP_EVAL_LIBLINE($LDFLAGS, OPENCREPORTS_SHARED_LIBADD)
