@@ -7,4 +7,4 @@ Name: opencreports
 Description: OpenCReports library
 Version: @VERSION@
 Libs: -L${libdir} -lopencreport
-Cflags: -I${includedir} -rdynamic
+Cflags: -I${includedir} @DYNAMIC_LINK_FLAG@
