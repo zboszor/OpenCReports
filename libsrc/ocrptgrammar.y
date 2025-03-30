@@ -556,6 +556,7 @@ static ocrpt_expr *ocrpt_expr_parse_internal(opencreport *o, ocrpt_report *r, co
 
 	yyextra.last_expr->o = o;
 	yyextra.last_expr->r = r;
+	yyextra.last_expr->expr_string = ocrpt_mem_strdup(expr_string);
 	return yyextra.last_expr;
 }
 
@@ -778,6 +779,15 @@ static ocrpt_expr *parseembeddedexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt
 
 	char *err = NULL;
 	ocrpt_expr *e = ocrpt_expr_parse_internal(extra->o, extra->r, EXPR_STRING_VAL(arg1), &err);
+
+	if (e) {
+		/*
+		 * No need to keep the original string passed to eval(),
+		 * the parent expression stores the whole expression string.
+		 */
+		ocrpt_mem_free(e->expr_string);
+		e->expr_string = NULL;
+	}
 
 	extra->parsed_exprs = ocrpt_list_remove(extra->parsed_exprs, func);
 	ocrpt_expr_free(func);

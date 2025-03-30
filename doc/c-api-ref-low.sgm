@@ -758,6 +758,15 @@ ocrpt_report_expr_parse(ocrpt_report *r,
 ocrpt_expr_free(ocrpt_expr *e);</programlisting>
 				</para>
 			</sect3>
+			<sect3 id="exprgetstring">
+				<title>Get the original expression string</title>
+				<para>
+					Get the original expression string from an
+					expression parse tree.
+					<programlisting>const char *
+ocrpt_expr_get_expr_string(ocrpt_expr *e);</programlisting>
+				</para>
+			</sect3>
 			<sect3 id="resolveexpr">
 				<title>Resolve expression references</title>
 				<para>

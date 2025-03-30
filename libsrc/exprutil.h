@@ -48,6 +48,7 @@ enum ocrpt_expr_type {
 struct ocrpt_expr {
 	opencreport *o;
 	ocrpt_report *r;
+	char *expr_string;
 	struct ocrpt_result *result[OCRPT_EXPR_RESULTS];
 	struct ocrpt_result *delayed_result;
 	union {

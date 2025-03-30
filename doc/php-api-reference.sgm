@@ -1243,6 +1243,8 @@ OpenCReport\QueryResult::column_result(long $index):
 			<programlisting>class OpenCReport\Expr {
     public final free(): void;
 
+    public final get_expr_string(): string;
+
     public final print(): void;
 
     public final nodes(): long;
@@ -1303,6 +1305,13 @@ OpenCReport\QueryResult::column_result(long $index):
 				Used by unit tests.
 				<programlisting>public final
 OpenCReport\Expr::free(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprgetexprstring">
+			<title>Get the original expression string</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Expr::get_expr_string(): string;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpexprprint">

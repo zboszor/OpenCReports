@@ -523,6 +523,10 @@ ocrpt_expr *ocrpt_report_expr_parse(ocrpt_report *r, const char *expr_string, ch
  */
 void ocrpt_expr_free(ocrpt_expr *e);
 /*
+ * Get the original expression string
+ */
+const char *ocrpt_expr_get_expr_string(ocrpt_expr *e);
+/*
  * Resolve variable references in the expression
  */
 void ocrpt_expr_resolve(ocrpt_expr *e);

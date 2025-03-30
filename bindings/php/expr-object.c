@@ -45,6 +45,15 @@ PHP_METHOD(opencreport_expr, free) {
 	eo->e = NULL;
 }
 
+PHP_METHOD(opencreport_expr, get_expr_string) {
+	zval *object = getThis();
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_STRING(ocrpt_expr_get_expr_string(eo->e));
+}
+
 PHP_METHOD(opencreport_expr, print) {
 	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
@@ -545,6 +554,9 @@ PHP_METHOD(opencreport_expr, set_delayed) {
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_free, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
+OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_get_expr_string, 0, 0, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_print, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
@@ -632,6 +644,7 @@ ZEND_END_ARG_INFO()
 #else
 
 #define arginfo_opencreport_expr_free NULL
+#define arginfo_opencreport_expr_get_expr_string NULL
 #define arginfo_opencreport_expr_print NULL
 #define arginfo_opencreport_expr_nodes NULL
 #define arginfo_opencreport_expr_optimize NULL
@@ -660,6 +673,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry opencreport_expr_class_methods[] = {
 	PHP_ME(opencreport_expr, free, arginfo_opencreport_expr_free, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, get_expr_string, arginfo_opencreport_expr_get_expr_string, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, print, arginfo_opencreport_expr_print, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, nodes, arginfo_opencreport_expr_nodes, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, optimize, arginfo_opencreport_expr_optimize, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)

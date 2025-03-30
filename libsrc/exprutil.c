@@ -64,7 +64,7 @@ ocrpt_expr *ocrpt_newstring(opencreport *o, ocrpt_report *r, const char *string)
 	ocrpt_expr *e = newblankexpr(o, r, OCRPT_EXPR_STRING, 0);
 
 	ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
-	ocrpt_mem_string_append_printf(EXPR_STRING(e), "%s", string);
+	ocrpt_mem_string_append_printf(EXPR_STRING(e), "%s", string ? string : "");
 	EXPR_STRING_OWNED(e) = true;
 	EXPR_NEXT_RESULT(e) = EXPR_RESULT(e);
 	EXPR_PREV_RESULT(e) = EXPR_RESULT(e);
@@ -74,6 +74,8 @@ ocrpt_expr *ocrpt_newstring(opencreport *o, ocrpt_report *r, const char *string)
 		e->result_index = r->num_expressions++;
 		e->result_index_set = true;
 	}
+
+	e->expr_string = ocrpt_mem_strdup(string ? string : "");
 
 	return e;
 }
@@ -1636,4 +1638,8 @@ void ocrpt_expr_set_plain_iterative_to_null(ocrpt_report *r) {
 					e->result[i]->isnull = true;
 		}
 	}
+}
+
+DLL_EXPORT_SYM const char *ocrpt_expr_get_expr_string(ocrpt_expr *e) {
+	return e ? e->expr_string : NULL;
 }

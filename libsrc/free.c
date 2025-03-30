@@ -112,6 +112,7 @@ void ocrpt_expr_free_internal(ocrpt_expr *e, bool free_from_list) {
 		if (ocrpt_expr_get_result_owned(e, i))
 			ocrpt_mem_free(e->result[i]);
 	ocrpt_result_free(e->delayed_result);
+	ocrpt_mem_free(e->expr_string);
 	ocrpt_mem_free(e);
 }
 
