@@ -691,4 +691,6 @@ static inline php_opencreport_line_element_object *php_opencreport_line_element_
 #define Z_OPENCREPORT_LINE_ELEMENT_P(zv) ((php_opencreport_line_element_object *)zend_object_store_get_object(zv TSRMLS_CC))
 #endif
 
+bool opencreport_init(void);
+
 #endif /* PHP_OPENCREPORT_H */

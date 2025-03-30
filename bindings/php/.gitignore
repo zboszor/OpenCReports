@@ -9,6 +9,6 @@ configure.in
 include/
 mkinstalldirs
 modules/
-opencreport.dep
+*.dep
 run-tests.php
 1/
