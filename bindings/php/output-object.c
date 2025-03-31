@@ -157,8 +157,8 @@ PHP_METHOD(opencreport_output, get_first_element) {
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
-	void *iter = NULL;
-	ocrpt_output_element *oe = ocrpt_output_iterate_elements(oo->output, &iter);
+	ocrpt_list *iter = NULL;
+	ocrpt_output_element *oe = ocrpt_output_element_get_next(oo->output, &iter);
 	if (!oe)
 		RETURN_NULL();
 

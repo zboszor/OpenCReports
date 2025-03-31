@@ -365,8 +365,8 @@ PHP_METHOD(opencreport_line, get_first_element) {
 
 	ZEND_PARSE_PARAMETERS_NONE();
 
-	void *iter = NULL;
-	ocrpt_line_element *le = ocrpt_line_iterate_elements(lo->line, &iter);
+	ocrpt_list *iter = NULL;
+	ocrpt_line_element *le = ocrpt_line_element_get_next(lo->line, &iter);
 	if (!le)
 		RETURN_NULL();
 

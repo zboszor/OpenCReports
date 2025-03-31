@@ -2540,19 +2540,12 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_get_fieldheader_priority(ocrpt_report *r
 	GET_REPORT_EXPR(fieldheader_priority_expr);
 }
 
-DLL_EXPORT_SYM ocrpt_output_element *ocrpt_output_iterate_elements(ocrpt_output *output, void **iter) {
-	if (!output || !iter)
+DLL_EXPORT_SYM ocrpt_output_element *ocrpt_output_element_get_next(ocrpt_output *output, ocrpt_list **list) {
+	if (!output || !list)
 		return NULL;
 
-	ocrpt_list *iter0 = *iter;
-
-	if (iter0 == NULL)
-		iter0 = output->output_list;
-	else
-		iter0 = iter0->next;
-
-	*iter = iter0;
-	return iter0 ? (ocrpt_output_element *)iter0->data : NULL;
+	*list = *list ? (*list)->next : output->output_list;
+	return (ocrpt_output_element *)(*list ? (*list)->data : NULL);
 }
 
 DLL_EXPORT_SYM bool ocrpt_output_element_is_line(ocrpt_output_element *elem) {
@@ -2571,19 +2564,12 @@ DLL_EXPORT_SYM bool ocrpt_output_element_is_barcode(ocrpt_output_element *elem) 
 	return (elem && elem->type == OCRPT_OUTPUT_BARCODE);
 }
 
-DLL_EXPORT_SYM ocrpt_line_element *ocrpt_line_iterate_elements(ocrpt_line *line, void **iter) {
-	if (!line || !iter)
+DLL_EXPORT_SYM ocrpt_line_element *ocrpt_line_element_get_next(ocrpt_line *line, ocrpt_list **list) {
+	if (!line || !list)
 		return NULL;
 
-	ocrpt_list *iter0 = *iter;
-
-	if (iter0 == NULL)
-		iter0 = line->elements;
-	else
-		iter0 = iter0->next;
-
-	*iter = iter0;
-	return iter0 ? (ocrpt_line_element *)iter0->data : NULL;
+	*list = *list ? (*list)->next : line->elements;
+	return (ocrpt_line_element *)(*list ? (*list)->data : NULL);
 }
 
 DLL_EXPORT_SYM bool ocrpt_line_element_is_text(ocrpt_line_element *elem) {

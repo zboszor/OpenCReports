@@ -650,7 +650,7 @@ typedef struct _php_opencreport_output_element_object {
 #endif
 	ocrpt_output *output;
 	ocrpt_output_element *elem;
-	void *iter;
+	ocrpt_list *iter;
 #if PHP_VERSION_ID >= 70000
 	zend_object zo;
 #endif
@@ -676,7 +676,7 @@ typedef struct _php_opencreport_line_element_object {
 #endif
 	ocrpt_line *line;
 	ocrpt_line_element *elem;
-	void *iter;
+	ocrpt_list *iter;
 #if PHP_VERSION_ID >= 70000
 	zend_object zo;
 #endif

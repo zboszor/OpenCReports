@@ -1123,7 +1123,7 @@ void ocrpt_output_add_image_end(ocrpt_output *output);
  * When every check below returns false, ignore the element returned
  * by the iterator.
  */
-ocrpt_output_element *ocrpt_output_iterate_elements(ocrpt_output *output, void **iter);
+ocrpt_output_element *ocrpt_output_element_get_next(ocrpt_output *output, ocrpt_list **list);
 
 bool ocrpt_output_element_is_line(ocrpt_output_element *elem);
 bool ocrpt_output_element_is_hline(ocrpt_output_element *elem);
@@ -1140,7 +1140,7 @@ bool ocrpt_output_element_is_barcode(ocrpt_output_element *elem);
  * casted to ocrpt_text *, ocrpt_image * or ocrpt_barcode *,
  * depending on the result of the checks below.
  */
-ocrpt_line_element *ocrpt_line_iterate_elements(ocrpt_line *line, void **iter);
+ocrpt_line_element *ocrpt_line_element_get_next(ocrpt_line *line, ocrpt_list **iter);
 
 bool ocrpt_line_element_is_text(ocrpt_line_element *elem);
 bool ocrpt_line_element_is_image(ocrpt_line_element *elem);

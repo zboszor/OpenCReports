@@ -32,10 +32,10 @@ int main(int argc, char **argv) {
 	 */
 	ocrpt_report *r = get_first_report(o);
 	ocrpt_output *output = ocrpt_layout_report_nodata(r);
-	void *iter = NULL;
+	ocrpt_list *iter = NULL;
 	ocrpt_output_element *elem;
 
-	while ((elem = ocrpt_output_iterate_elements(output, &iter))) {
+	while ((elem = ocrpt_output_element_get_next(output, &iter))) {
 		if (ocrpt_output_element_is_hline(elem)) {
 			ocrpt_hline *hline = (ocrpt_hline *)elem;
 
@@ -43,10 +43,10 @@ int main(int argc, char **argv) {
 		} else if (ocrpt_output_element_is_line(elem)) {
 			/* Modify all text entries in the line to a custom string. */
 			ocrpt_line *line = (ocrpt_line *)elem;
-			void *iter1 = NULL;
+			ocrpt_list *iter1 = NULL;
 			ocrpt_line_element *lelem;
 
-			while ((lelem = ocrpt_line_iterate_elements(line, &iter1))) {
+			while ((lelem = ocrpt_line_element_get_next(line, &iter1))) {
 				if (ocrpt_line_element_is_text(lelem)) {
 					ocrpt_text *text = (ocrpt_text *)lelem;
 

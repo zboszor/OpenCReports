@@ -43,9 +43,9 @@ PHP_METHOD(opencreport_output_element, get_next) {
 
 	ocrpt_output *output = oeo->output;
 
-	void *iter = oeo->iter;
+	ocrpt_list *iter = oeo->iter;
 
-	ocrpt_output_element *oe = ocrpt_output_iterate_elements(output, &iter);
+	ocrpt_output_element *oe = ocrpt_output_element_get_next(output, &iter);
 	if (!oe)
 		RETURN_NULL();
 

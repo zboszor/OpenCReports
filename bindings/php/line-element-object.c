@@ -43,9 +43,9 @@ PHP_METHOD(opencreport_line_element, get_next) {
 
 	ocrpt_line *line = leo->line;
 
-	void *iter = leo->iter;
+	ocrpt_list *iter = leo->iter;
 
-	ocrpt_line_element *le = ocrpt_line_iterate_elements(line, &iter);
+	ocrpt_line_element *le = ocrpt_line_element_get_next(line, &iter);
 	if (!le)
 		RETURN_NULL();
 

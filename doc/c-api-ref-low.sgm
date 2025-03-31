@@ -2142,7 +2142,7 @@ ocrpt_layout_report_field_details(ocrpt_report *r);</programlisting>
 typedef struct ocrpt_output_element ocrpt_output_element;
 
 ocrpt_output_element *
-ocrpt_output_iterate_elements(ocrpt_output *output, void **iter);
+ocrpt_output_element_get_next(ocrpt_output *output, ocrpt_list **iter);
 
 bool
 ocrpt_output_element_is_line(ocrpt_output_element *elem);
@@ -2175,7 +2175,7 @@ ocrpt_output_element_is_barcode(ocrpt_output_element *elem);</programlisting>
 typedef struct ocrpt_line_element ocrpt_line_element;
 
 ocrpt_line_element *
-ocrpt_line_iterate_elements(ocrpt_line *line, void **iter);
+ocrpt_line_element_get_next(ocrpt_line *line, void **iter);
 
 bool
 ocrpt_line_element_is_text(ocrpt_line_element *elem);
