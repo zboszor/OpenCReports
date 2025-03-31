@@ -273,7 +273,7 @@ void ocrpt_variables_free(ocrpt_report *r) {
 }
 
 DLL_EXPORT_SYM void ocrpt_variable_set_precalculate(ocrpt_var *var, const char *expr_string) {
-	if (!var)
+	if (!var || !var->r || !var->r->o || var->r->o->executing)
 		return;
 
 	ocrpt_expr_free(var->precalculate_expr);
