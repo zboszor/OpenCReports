@@ -451,6 +451,9 @@ typedef struct _php_opencreport_variable_object {
 	zend_object zo;
 #endif
 	ocrpt_var *v;
+	ocrpt_report *r;
+	ocrpt_list *iter;
+	bool is_iterator;
 #if PHP_VERSION_ID >= 70000
 	zend_object zo;
 #endif

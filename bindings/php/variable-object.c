@@ -119,6 +119,21 @@ PHP_METHOD(opencreport_variable, set_precalculate) {
 	ocrpt_variable_set_precalculate(vo->v, expr_string ? ZSTR_VAL(expr_string) : NULL);
 }
 
+PHP_METHOD(opencreport_variable, get_precalculate) {
+	zval *object = getThis();
+	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_expr *e = ocrpt_variable_get_precalculate(vo->v);
+	if (!e)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
+}
+
 PHP_METHOD(opencreport_variable, resolve) {
 	zval *object = getThis();
 	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(object);
@@ -135,6 +150,29 @@ PHP_METHOD(opencreport_variable, eval) {
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	ocrpt_variable_evaluate(vo->v);
+}
+
+PHP_METHOD(opencreport_variable, get_next) {
+	zval *object = getThis();
+	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if (!vo->is_iterator)
+		RETURN_NULL();
+
+	ocrpt_report *r = vo->r;
+	ocrpt_list *iter = vo->iter;
+	ocrpt_var *v = ocrpt_variable_get_next(r, &iter);
+	if (!v)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_variable_ce);
+	vo = Z_OPENCREPORT_VARIABLE_P(return_value);
+	vo->v = v;
+	vo->r = r;
+	vo->is_iterator = true;
+	vo->iter = iter;
 }
 
 #if PHP_VERSION_ID >= 70000
@@ -155,10 +193,16 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_variable_set_precal
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_variable_get_precalculate, 0, 0, OpenCReport\\Expr, 1)
+ZEND_END_ARG_INFO()
+
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_variable_resolve, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_variable_eval, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
+
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_variable_get_next, 0, 0, OpenCReport\\Variable, 1)
 ZEND_END_ARG_INFO()
 
 #else
@@ -168,8 +212,10 @@ ZEND_END_ARG_INFO()
 #define arginfo_opencreport_variable_intermed2expr NULL
 #define arginfo_opencreport_variable_resultexpr NULL
 #define arginfo_opencreport_variable_set_precalculate NULL
+#define arginfo_opencreport_variable_get_precalculate NULL
 #define arginfo_opencreport_variable_resolve NULL
 #define arginfo_opencreport_variable_eval NULL
+#define arginfo_opencreport_variable_get_next NULL
 
 #endif
 
@@ -179,8 +225,10 @@ static const zend_function_entry opencreport_variable_class_methods[] = {
 	PHP_ME(opencreport_variable, intermed2expr, arginfo_opencreport_variable_intermed2expr, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_variable, resultexpr, arginfo_opencreport_variable_resultexpr, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_variable, set_precalculate, arginfo_opencreport_variable_set_precalculate, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_variable, get_precalculate, arginfo_opencreport_variable_get_precalculate, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_variable, resolve, arginfo_opencreport_variable_resolve, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_variable, eval, arginfo_opencreport_variable_eval, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_variable, get_next, arginfo_opencreport_variable_get_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 

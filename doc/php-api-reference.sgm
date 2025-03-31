@@ -2371,6 +2371,9 @@ OpenCReport\Column::get_column_padding():
                      ?string $reset_on_break_name = null):
                      OpenCReport\Variable;
 
+    public full variable_get_first():
+                     ?OpenCReport\Variable;
+
     public final expr_parse(
                      string $expr_string):
                      ?OpenCReport\Expr;
@@ -2534,6 +2537,20 @@ OpenCReport\Report::variable_new_full(
                      ?string $resultexpr = null,
                      ?string $reset_on_break_name = null):
                      OpenCReport\Variable;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportvargetfirst">
+			<title>Get the first variable of a report</title>
+			<para>
+				Get the first variable object in the
+				chain of variables of the report.
+				The object is marked internally
+				as an iterator, so
+				<literal>OpenCReport\Variable::get_next()</literal>
+				may be used on it.
+				<programlisting>public final
+OpenCReport\Report::variable_get_first():
+                     ?OpenCReport\Variable;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpreportexprparse">
@@ -2932,8 +2949,14 @@ OpenCReport\Report::field_details(): OpenCReport\Output;</programlisting>
                      ?string $expr_string = null):
                      void;
 
+    public final get_precalculate():
+                     ?OpenCReport\Expr;
+
     public final resolve(): void;
     public final eval(): void;
+
+    public final get_next():
+                     ?OpenCReport\Variable;
 }</programlisting>
 		</para>
 		<sect2 id="phpvarbaseexpr">
@@ -2981,7 +3004,7 @@ OpenCReport\Variable::resultexpr():
 			</para>
 		</sect2>
 		<sect2 id="phpvarsetprecalc">
-			<title>Set the variable precalculated</title>
+			<title>Set or get the variable precalculated flag</title>
 			<para>
 				Set the variable precalculated.
 				A precalculated variable's value (or set of values)
@@ -2997,7 +3020,11 @@ OpenCReport\Variable::resultexpr():
 				<programlisting>public final
 OpenCReport\Variable::set_precalculate(
                      ?string $expr_string = null):
-                     void;</programlisting>
+                     void;
+
+public final
+OpenCReport\Variable::get_precalculate():
+                     ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpvarresolve">
@@ -3016,6 +3043,20 @@ OpenCReport\Variable::resolve(): void;</programlisting>
 				of a single variable. Used by unit tests.
 				<programlisting>public final
 OpenCReport\Variable::eval(): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpvargetnext">
+			<title>Get the next variable of the same report</title>
+			<para>
+				Get the next variable object from the chain of
+				variables in the report this variable belongs to.
+				This method may only be called on an
+				object that was marked as an iterator,
+				i.e. one that was created by
+				<literal>OpenCReport\Report::variable_get_first()</literal>.
+				<programlisting>public final
+OpenCReport\Variable::get_next():
+                     ?OpenCReport\Variable;</programlisting>
 			</para>
 		</sect2>
 	</sect1>

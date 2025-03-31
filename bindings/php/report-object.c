@@ -110,6 +110,9 @@ PHP_METHOD(opencreport_report, variable_new) {
 	object_init_ex(return_value, opencreport_variable_ce);
 	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(return_value);
 	vo->v = v;
+	vo->r = pro->r;
+	vo->is_iterator = false;
+	vo->iter = NULL;
 }
 
 PHP_METHOD(opencreport_report, variable_new_full) {
@@ -162,6 +165,29 @@ PHP_METHOD(opencreport_report, variable_new_full) {
 	object_init_ex(return_value, opencreport_variable_ce);
 	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(return_value);
 	vo->v = v;
+	vo->r = pro->r;
+	vo->is_iterator = false;
+	vo->iter = NULL;
+}
+
+PHP_METHOD(opencreport_report, variable_get_first) {
+	zval *object = getThis();
+	php_opencreport_report_object *pro = Z_OPENCREPORT_REPORT_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_list *iter = NULL;
+	ocrpt_var *v = ocrpt_variable_get_next(pro->r, &iter);
+
+	if (!v)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_variable_ce);
+	php_opencreport_variable_object *vo = Z_OPENCREPORT_VARIABLE_P(return_value);
+	vo->v = v;
+	vo->r = pro->r;
+	vo->is_iterator = true;
+	vo->iter = iter;
 }
 
 PHP_METHOD(opencreport_report, expr_parse) {
@@ -787,14 +813,14 @@ PHP_METHOD(opencreport_report, field_details) {
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_get_next, 0, 0, OpenCReport\\Report, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_variable_new, 0, 3, OpenCReport\\Variable, 1)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_variable_new, 0, 3, OpenCReport\\Variable, 1)
 ZEND_ARG_TYPE_INFO(0, variable_type, IS_LONG, 0)
 ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 ZEND_ARG_TYPE_INFO(0, expr, IS_STRING, 0)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, reset_on_break_name, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_variable_new_full, 0, 2, OpenCReport\\Variable, 1)
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_variable_new_full, 0, 2, OpenCReport\\Variable, 1)
 ZEND_ARG_TYPE_INFO(0, result_type, IS_LONG, 0)
 ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, baseexpr, IS_STRING, 1)
@@ -802,6 +828,9 @@ ZEND_ARG_VARIADIC_TYPE_INFO(0, intermedexpr, IS_STRING, 1)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, intermed2expr, IS_STRING, 1)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, resultexpr, IS_STRING, 1)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, reset_on_break_name, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_variable_get_first, 0, 0, OpenCReport\\Variable, 1)
 ZEND_END_ARG_INFO()
 
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_expr_parse, 0, 1, OpenCReport\\Expr, 1)
@@ -906,8 +935,9 @@ ZEND_END_ARG_INFO()
 #else
 
 #define arginfo_opencreport_report_get_next NULL
-#define arginfo_opencreport_variable_new NULL
-#define arginfo_opencreport_variable_new_full NULL
+#define arginfo_opencreport_report_variable_new NULL
+#define arginfo_opencreport_report_variable_new_full NULL
+#define arginfo_opencreport_report_variable_get_first NULL
 #define arginfo_opencreport_report_expr_parse NULL
 #define arginfo_opencreport_report_expr_error NULL
 #define arginfo_opencreport_report_resolve_variables NULL
@@ -944,8 +974,9 @@ static const zend_function_entry opencreport_report_class_methods[] = {
 	PHP_ME(opencreport_report, get_next, arginfo_opencreport_report_get_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_report, set_main_query, arginfo_opencreport_report_set_main_query, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_report, set_main_query_by_name, arginfo_opencreport_report_set_main_query_by_name, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_report, variable_new, arginfo_opencreport_variable_new, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_report, variable_new_full, arginfo_opencreport_variable_new_full, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_report, variable_new, arginfo_opencreport_report_variable_new, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_report, variable_new_full, arginfo_opencreport_report_variable_new_full, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_report, variable_get_first, arginfo_opencreport_report_variable_get_first, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_report, expr_parse, arginfo_opencreport_report_expr_parse, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_report, expr_error, arginfo_opencreport_report_expr_error, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_report, resolve_variables, arginfo_opencreport_report_resolve_variables, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)

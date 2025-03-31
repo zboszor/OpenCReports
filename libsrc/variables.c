@@ -280,6 +280,10 @@ DLL_EXPORT_SYM void ocrpt_variable_set_precalculate(ocrpt_var *var, const char *
 	var->precalculate_expr = expr_string ? ocrpt_report_expr_parse(var->r, expr_string, NULL) : NULL;
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_variable_get_precalculate(ocrpt_var *var) {
+	return var ? var->precalculate_expr : NULL;
+}
+
 DLL_EXPORT_SYM void ocrpt_variable_resolve(ocrpt_var *v) {
 	if (!v || !v->r || !v->r->o || v->r->o->executing || v->r->executing)
 		return;
@@ -418,4 +422,12 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_variable_intermed2expr(ocrpt_var *v) {
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_variable_resultexpr(ocrpt_var *v) {
 	return v ? v->resultexpr : NULL;
+}
+
+DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_get_next(ocrpt_report *r, ocrpt_list **list) {
+	if (!r || !list)
+		return NULL;
+
+	*list = *list ? (*list)->next : r->variables;
+	return (ocrpt_var *)(*list ? (*list)->data : NULL);
 }

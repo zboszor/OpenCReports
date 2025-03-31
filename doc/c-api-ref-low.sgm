@@ -1237,13 +1237,16 @@ ocrpt_variable_resultexpr(ocrpt_var *v);</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="uservarsetprecalc">
-				<title>Set precalculate flag for a variable</title>
+				<title>Set or get precalculate flag for a variable</title>
 				<para>
 					The expression must evaluate to a
 					numeric (boolean) value.
 					<programlisting>void
 ocrpt_variable_set_precalculate(ocrpt_var *var, 
-                                const char *expr_string);</programlisting>
+                                const char *expr_string);
+
+ocrpt_expr *
+ocrpt_variable_get_precalculate(ocrpt_var *var);</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="uservarresolve">
@@ -1263,6 +1266,16 @@ ocrpt_variable_resolve(ocrpt_var *v);</programlisting>
 					<literal>ocrpt_variable_resultexpr()</literal>.
 					<programlisting>void
 ocrpt_variable_evaluate(ocrpt_var *v);</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="uservariter">
+				<title>Iterate over variables of a report</title>
+				<para>
+					Iterate over variables of a report. The first call
+					needs the iterator list pointer to be set to NULL.
+					<programlisting>ocrpt_var *
+ocrpt_variable_get_next(ocrpt_report *r,
+                     ocrpt_list **list);</programlisting>
 				</para>
 			</sect3>
 		</sect2>
