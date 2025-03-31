@@ -151,6 +151,7 @@ struct ocrpt_break;
 typedef struct ocrpt_break ocrpt_break;
 
 enum ocrpt_var_type {
+	OCRPT_VARIABLE_INVALID,
 	OCRPT_VARIABLE_EXPRESSION,
 	OCRPT_VARIABLE_COUNT,
 	OCRPT_VARIABLE_COUNTALL,
@@ -673,20 +674,25 @@ bool ocrpt_result_datetime_is_time_valid(ocrpt_result *result);
  */
 ocrpt_var *ocrpt_variable_new(ocrpt_report *r,
 			ocrpt_var_type type, const char *name,
-			const char *expr,
+			const char *expr, const char *ignoreexpr,
 			const char *reset_on_break_name);
 /*
  * Create a names custom variable
  */
 ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r,
 			enum ocrpt_result_type type, const char *name,
-			const char *baseexpr, const char *intermedexpr,
-			const char *intermed2expr, const char *resultexpr,
-			const char *reset_on_break_name);
+			const char *baseexpr, const char *ignoreexpr,
+			const char *intermedexpr, const char *intermed2expr,
+			const char *resultexpr, const char *reset_on_break_name);
+/*
+ * Get the type of the variable
+ */
+ocrpt_var_type ocrpt_variable_get_type(ocrpt_var *v);
 /*
  * Get various variable subexpressions 
  */
 ocrpt_expr *ocrpt_variable_baseexpr(ocrpt_var *v);
+ocrpt_expr *ocrpt_variable_ignoreexpr(ocrpt_var *v);
 ocrpt_expr *ocrpt_variable_intermedexpr(ocrpt_var *v);
 ocrpt_expr *ocrpt_variable_intermed2expr(ocrpt_var *v);
 ocrpt_expr *ocrpt_variable_resultexpr(ocrpt_var *v);

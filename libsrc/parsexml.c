@@ -368,7 +368,7 @@ static void ocrpt_parse_datasources_node(opencreport *o, xmlTextReaderPtr reader
 }
 
 static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextReaderPtr reader) {
-	xmlChar *name, *baseexpr, *intermedexpr, *intermed2expr, *resultexpr;
+	xmlChar *name, *baseexpr, *ignoreexpr, *intermedexpr, *intermed2expr, *resultexpr;
 	xmlChar *type, *basetype, *resetonbreak, *precalculate;
 	ocrpt_var_type vtype = OCRPT_VARIABLE_EXPRESSION; /* default if left out */
 	enum ocrpt_result_type rtype = OCRPT_RESULT_NUMBER;
@@ -380,6 +380,7 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 	} xmlattrs[] = {
 		{ { "name" }, &name },
 		{ { "baseexpr", "value" }, &baseexpr },
+		{ { "ignore" }, &ignoreexpr },
 		{ { "intermedexpr" }, &intermedexpr },
 		{ { "intermed2expr" }, &intermed2expr },
 		{ { "resultexpr" }, &resultexpr },
@@ -439,9 +440,9 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 			vtype = OCRPT_VARIABLE_EXPRESSION;
 
 		if (vtype == OCRPT_VARIABLE_CUSTOM)
-			v = ocrpt_variable_new_full(r, rtype, (char *)name, (char *)baseexpr, (char *)intermedexpr, (char *)intermed2expr, (char *)resultexpr, (char *)resetonbreak);
+			v = ocrpt_variable_new_full(r, rtype, (char *)name, (char *)baseexpr, (char *)ignoreexpr, (char *)intermedexpr, (char *)intermed2expr, (char *)resultexpr, (char *)resetonbreak);
 		else
-			v = ocrpt_variable_new(r, vtype, (char *)name, (char *)baseexpr, (char *)resetonbreak);
+			v = ocrpt_variable_new(r, vtype, (char *)name, (char *)baseexpr, (char *)ignoreexpr, (char *)resetonbreak);
 
 		if (precalculate)
 			ocrpt_variable_set_precalculate(v, (char *)precalculate);

@@ -652,7 +652,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *or
 					}
 				}
 			} else if (strcmp(e->name->str, "baseexpr") == 0) {
-				if (var && (orig_e == var->intermedexpr || orig_e == var->intermed2expr || orig_e == var->resultexpr)) {
+				if (var && (orig_e == var->ignoreexpr || orig_e == var->intermedexpr || orig_e == var->intermed2expr || orig_e == var->resultexpr)) {
 					e->var = var;
 					if (var->baseexpr) {
 						ocrpt_expr_resolve_worker(e->var->baseexpr, query, e->var->baseexpr, var, varref_exclude_mask, warn, unresolved);
@@ -666,6 +666,21 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *or
 					}
 				} else
 					assert(!"illegal reference to r.baseexpr");
+			} else if (strcmp(e->name->str, "ignoreexpr") == 0) {
+				if (var && (orig_e == var->intermedexpr || orig_e == var->intermed2expr || orig_e == var->resultexpr)) {
+					e->var = var;
+					if (var->ignoreexpr) {
+						ocrpt_expr_resolve_worker(e->var->ignoreexpr, query, e->var->ignoreexpr, var, varref_exclude_mask, warn, unresolved);
+						for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+							if (!e->result[i]) {
+								//assert(var->ignoreexpr->result[i]);
+								e->result[i] = var->ignoreexpr->result[i];
+								ocrpt_expr_set_result_owned(e, i, false);
+							}
+						}
+					}
+				} else
+					assert(!"illegal reference to r.ignoreexpr");
 			} else if (strcmp(e->name->str, "intermedexpr") == 0) {
 				if (var && (orig_e == var->intermed2expr || orig_e == var->resultexpr)) {
 					e->var = var;
@@ -772,12 +787,22 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *or
 
 				for (ptr = e->r ? e->r->variables : NULL; ptr; ptr = ptr->next) {
 					ocrpt_var *v = (ocrpt_var *)ptr->data;
+
+					/*
+					 * A variable can only reference another variable
+					 * if the references one is declared earlier.
+					 * Therefore jump out of the loop if the referencing
+					 * variable is found earlier.
+					 */
+					if (var && v == var)
+						break;
+
 					if (strcasecmp(e->name->str, v->name) == 0) {
 						e->var = v;
 						break;
 					}
 				}
-				if (!ptr) {
+				if (!e->var) {
 					if (unresolved)
 						*unresolved = true;
 					/* No such identifier, turn it into a string. */

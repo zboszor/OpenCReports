@@ -1,0 +1,154 @@
+Result expression for 'var1' reprinted: add(r.'self',iif(lor(r.'ignoreexpr',isnull(r.'baseexpr')),0.000000,1.000000))
+
+Variable expression reprinted: v.'var1'
+
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 1.000000)
+	Col #1: 'name': string value: Fred Flintstone
+	Col #2: 'property': string value: strong
+	Col #3: 'age': string value: NULL (converted to number: 31.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: v.'var1'
+Evaluated: (number)1.000000
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 2.000000)
+	Col #1: 'name': string value: Wilma Flintstone
+	Col #2: 'property': string value: charming
+	Col #3: 'age': string value: NULL (converted to number: 28.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: v.'var1'
+Evaluated: (number)2.000000
+
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 3.000000)
+	Col #1: 'name': string value: Pebbles Flintstone
+	Col #2: 'property': string value: young
+	Col #3: 'age': string value: NULL (converted to number: 0.500000)
+	Col #4: 'adult': string value: NULL (converted to number: 0.000000)
+
+Expression: v.'var1'
+Evaluated: (number)2.000000
+
+============================================
+
+Result expression for 'var1' reprinted: add(r.'self',iif(lor(r.'ignoreexpr',isnull(r.'baseexpr')),0.000000,1.000000))
+
+Variable expression reprinted: v.'var1'
+
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 1.000000)
+	Col #1: 'name': string value: Fred Flintstone
+	Col #2: 'property': string value: strong
+	Col #3: 'age': string value: NULL (converted to number: 31.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: v.'var1'
+Evaluated: (number)1.000000
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 2.000000)
+	Col #1: 'name': string value: Wilma Flintstone
+	Col #2: 'property': string value: charming
+	Col #3: 'age': string value: NULL (converted to number: 28.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: v.'var1'
+Evaluated: (number)2.000000
+
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 3.000000)
+	Col #1: 'name': string value: Pebbles Flintstone
+	Col #2: 'property': string value: young
+	Col #3: 'age': string value: NULL (converted to number: 0.500000)
+	Col #4: 'adult': string value: NULL (converted to number: 0.000000)
+
+Expression: v.'var1'
+Evaluated: (number)2.000000
+
+============================================
+
+Result expression for 'var1' reprinted: add(r.'self',iif(lor(r.'ignoreexpr',isnull(r.'baseexpr')),0.000000,1.000000))
+
+Variable expression reprinted: v.'var1'
+
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 1.000000)
+	Col #1: 'name': string value: Fred Flintstone
+	Col #2: 'property': string value: strong
+	Col #3: 'age': string value: NULL (converted to number: 31.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: v.'var1'
+Evaluated: (number)0.000000
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 2.000000)
+	Col #1: 'name': string value: Wilma Flintstone
+	Col #2: 'property': string value: charming
+	Col #3: 'age': string value: NULL (converted to number: 28.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: v.'var1'
+Evaluated: (number)1.000000
+
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 3.000000)
+	Col #1: 'name': string value: Pebbles Flintstone
+	Col #2: 'property': string value: young
+	Col #3: 'age': string value: NULL (converted to number: 0.500000)
+	Col #4: 'adult': string value: NULL (converted to number: 0.000000)
+
+Expression: v.'var1'
+Evaluated: (number)1.000000
+
+============================================
+
+Result expression for 'var1' reprinted: add(r.'self',iif(lor(r.'ignoreexpr',isnull(r.'baseexpr')),0.000000,1.000000))
+
+Variable expression reprinted: v.'var1'
+
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 1.000000)
+	Col #1: 'name': string value: Fred Flintstone
+	Col #2: 'property': string value: strong
+	Col #3: 'age': string value: NULL (converted to number: 31.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: v.'var1'
+Evaluated: (number)0.000000
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 2.000000)
+	Col #1: 'name': string value: Wilma Flintstone
+	Col #2: 'property': string value: charming
+	Col #3: 'age': string value: NULL (converted to number: 28.000000)
+	Col #4: 'adult': string value: NULL (converted to number: 1.000000)
+
+Expression: v.'var1'
+Evaluated: (number)0.000000
+
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 3.000000)
+	Col #1: 'name': string value: Pebbles Flintstone
+	Col #2: 'property': string value: young
+	Col #3: 'age': string value: NULL (converted to number: 0.500000)
+	Col #4: 'adult': string value: NULL (converted to number: 0.000000)
+
+Expression: v.'var1'
+Evaluated: (number)0.000000
+

@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	ocrpt_variable_new(r, OCRPT_VARIABLE_SUM, "var1", "a.num", NULL);
+	ocrpt_variable_new(r, OCRPT_VARIABLE_SUM, "var1", "a.num", NULL, NULL);
 
 	rd.e = ocrpt_report_expr_parse(r, "v.var1", NULL);
 	ocrpt_expr_resolve(rd.e);

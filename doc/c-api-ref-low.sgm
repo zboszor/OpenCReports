@@ -1182,6 +1182,7 @@ ocrpt_result_datetime_is_time_valid(ocrpt_result *result);</programlisting>
 					may be created. For a custom variable,
 					see the next function.
 					<programlisting>enum ocrpt_var_type {
+    OCRPT_VARIABLE_INVALID,
     OCRPT_VARIABLE_EXPRESSION,
     OCRPT_VARIABLE_COUNT,
     OCRPT_VARIABLE_COUNTALL,
@@ -1199,6 +1200,7 @@ ocrpt_variable_new(ocrpt_report *r,
                    ocrpt_var_type type,
                    const char *name,
                    const char *expr,
+                   const char *ignoreexpr,
                    const char *reset_on_break_name);</programlisting>
 				</para>
 			</sect3>
@@ -1212,10 +1214,19 @@ ocrpt_variable_new_full(ocrpt_report *r,
                         enum ocrpt_result_type type,
                         const char *name,
                         const char *baseexpr,
+                        const char *ignoreexpr,
                         const char *intermedexpr,
                         const char *intermed2expr,
                         const char *resultexpr,
                         const char *reset_on_break_name);</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="uservargettype">
+				<title>Get the variable type</title>
+				<para>
+					Get the type of the variable.
+					<programlisting>ocrpt_var_type
+ocrpt_variable_get_type(ocrpt_var *v);</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="uservargetsubexprs">
@@ -1225,6 +1236,9 @@ ocrpt_variable_new_full(ocrpt_report *r,
 					basic or custom variable.
 					<programlisting>ocrpt_expr *
 ocrpt_variable_baseexpr(ocrpt_var *v);
+
+ocrpt_expr *
+ocrpt_variable_ignoreexpr(ocrpt_var *v);
 
 ocrpt_expr *
 ocrpt_variable_intermedexpr(ocrpt_var *v);

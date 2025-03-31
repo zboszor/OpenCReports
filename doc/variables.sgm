@@ -47,7 +47,7 @@
 			The variable allows typing the expression once, then
 			the variable can be used in other expressions.
 			This not only saves on typing. The expression value of the
-			varable is calculated once, and referencing the variable
+			variable is calculated once, and referencing the variable
 			simply uses the already calculated value, thereby saving
 			report execution time.
 		</para>

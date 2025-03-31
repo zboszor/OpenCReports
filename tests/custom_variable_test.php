@@ -30,7 +30,7 @@ $r = $o->part_new()->row_new()->column_new()->report_new();
 $q = $ds->query_add("a", "array", "coltypes");
 $qr = $q->get_result();
 
-$v = $r->variable_new_full(OpenCReport::RESULT_STRING, "var1", "upper(left(a.text, 1))", NULL, NULL, "r.self + r.baseexpr", NULL);
+$v = $r->variable_new_full(OpenCReport::RESULT_STRING, "var1", "upper(left(a.text, 1))", NULL, NULL, NULL, "r.self + r.baseexpr", NULL);
 
 echo "Base expression for 'var1' reprinted: "; flush();
 $v->baseexpr()->print();

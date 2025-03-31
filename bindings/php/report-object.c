@@ -83,27 +83,30 @@ PHP_METHOD(opencreport_report, variable_new) {
 	zend_long variable_type;
 	zend_string *name;
 	zend_string *expr;
+	zend_string *ignoreexpr = NULL;
 	zend_string *reset_on_break_name = NULL;
 
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3,4)
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 3, 5)
 		Z_PARAM_LONG(variable_type);
 		Z_PARAM_STR(name);
 		Z_PARAM_STR(expr);
 		Z_PARAM_OPTIONAL;
+		Z_PARAM_STR_EX(ignoreexpr, 1, 0);
 		Z_PARAM_STR_EX(reset_on_break_name, 1, 0);
 	ZEND_PARSE_PARAMETERS_END();
 #else
 	long variable_type;
 	char *name;
 	char *expr;
+	char *ignoreexpr = NULL;
 	char *reset_on_break_name = NULL;
-	int name_len, expr_len, reset_on_break_name_len;
+	int name_len, expr_len, ignoreexpr_len, reset_on_break_name_len;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lss|s!", &variable_type, &name, &name_len, &expr, &expr_len, &reset_on_break_name, &reset_on_break_name_len)== FAILURE)
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lss|s!s!", &variable_type, &name, &name_len, &expr, &expr_len, &ignoreexpr, &ignoreexpr_len, &reset_on_break_name, &reset_on_break_name_len)== FAILURE)
 		return;
 #endif
 
-	ocrpt_var *v = ocrpt_variable_new(pro->r, variable_type, ZSTR_VAL(name), ZSTR_VAL(expr), reset_on_break_name ? ZSTR_VAL(reset_on_break_name) : NULL);
+	ocrpt_var *v = ocrpt_variable_new(pro->r, variable_type, ZSTR_VAL(name), ZSTR_VAL(expr), ignoreexpr ? ZSTR_VAL(ignoreexpr) : NULL, reset_on_break_name ? ZSTR_VAL(reset_on_break_name) : NULL);
 	if (!v)
 		RETURN_NULL();
 
@@ -122,16 +125,18 @@ PHP_METHOD(opencreport_report, variable_new_full) {
 	zend_long result_type;
 	zend_string *name;
 	zend_string *baseexpr = NULL;
+	zend_string *ignoreexpr = NULL;
 	zend_string *intermedexpr = NULL;
 	zend_string *intermed2expr = NULL;
 	zend_string *resultexpr = NULL;
 	zend_string *reset_on_break_name = NULL;
 
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 7)
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 8)
 		Z_PARAM_LONG(result_type);
 		Z_PARAM_STR(name);
 		Z_PARAM_OPTIONAL;
 		Z_PARAM_STR_EX(baseexpr, 1, 0);
+		Z_PARAM_STR_EX(ignoreexpr, 1, 0);
 		Z_PARAM_STR_EX(intermedexpr, 1, 0);
 		Z_PARAM_STR_EX(intermed2expr, 1, 0);
 		Z_PARAM_STR_EX(resultexpr, 1, 0);
@@ -141,19 +146,21 @@ PHP_METHOD(opencreport_report, variable_new_full) {
 	long result_type;
 	char *name;
 	char *baseexpr = NULL;
+	char *ignoreexpr = NULL;
 	char *intermedexpr = NULL;
 	char *intermed2expr = NULL;
 	char *resultexpr = NULL;
 	char *reset_on_break_name = NULL;
-	int name_len, baseexpr_len, intermedexpr_len, intermed2expr_len;
+	int name_len, baseexpr_len, ignoreexpr_len, intermedexpr_len, intermed2expr_len;
 	int resultexpr_len, reset_on_break_name_len;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ls|s!s!s!s!s!", &result_type, &name, &name_len, &baseexpr, &baseexpr_len, &intermedexpr, &intermedexpr_len, &intermed2expr, &intermed2expr_len, &resultexpr, &resultexpr_len, &reset_on_break_name, &reset_on_break_name_len) == FAILURE)
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ls|s!s!s!s!s!s!", &result_type, &name, &name_len, &baseexpr, &baseexpr_len, &ignoreexpr, &ignoreexpr_len, &intermedexpr, &intermedexpr_len, &intermed2expr, &intermed2expr_len, &resultexpr, &resultexpr_len, &reset_on_break_name, &reset_on_break_name_len) == FAILURE)
 		return;
 #endif
 
 	ocrpt_var *v = ocrpt_variable_new_full(pro->r, result_type, ZSTR_VAL(name),
 												baseexpr ? ZSTR_VAL(baseexpr) : NULL,
+												ignoreexpr ? ZSTR_VAL(ignoreexpr) : NULL,
 												intermedexpr ? ZSTR_VAL(intermedexpr) : NULL,
 												intermed2expr ? ZSTR_VAL(intermed2expr) : NULL,
 												resultexpr ? ZSTR_VAL(resultexpr) : NULL,
@@ -817,6 +824,7 @@ OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_variable_new,
 ZEND_ARG_TYPE_INFO(0, variable_type, IS_LONG, 0)
 ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 ZEND_ARG_TYPE_INFO(0, expr, IS_STRING, 0)
+ZEND_ARG_VARIADIC_TYPE_INFO(0, ignoreexpr, IS_STRING, 1)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, reset_on_break_name, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
@@ -824,6 +832,7 @@ OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_variable_new_
 ZEND_ARG_TYPE_INFO(0, result_type, IS_LONG, 0)
 ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, baseexpr, IS_STRING, 1)
+ZEND_ARG_VARIADIC_TYPE_INFO(0, ignoreexpr, IS_STRING, 1)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, intermedexpr, IS_STRING, 1)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, intermed2expr, IS_STRING, 1)
 ZEND_ARG_VARIADIC_TYPE_INFO(0, resultexpr, IS_STRING, 1)

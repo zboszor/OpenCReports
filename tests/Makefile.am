@@ -61,6 +61,8 @@ TESTS = \
 	locale_test \
 	variable_expression_test variable_expression_xml_test \
 	variable_check_test \
+	variable_ignoreexpr_test \
+	variable_ignoreexpr2_test \
 	break_test break_xml_test break_xml2_test \
 	break_xml3_test \
 	iterative_expr_test \

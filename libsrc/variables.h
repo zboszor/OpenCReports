@@ -15,6 +15,7 @@ struct ocrpt_var {
 	ocrpt_break *br;
 	ocrpt_expr *precalculate_expr;
 	ocrpt_expr *baseexpr;
+	ocrpt_expr *ignoreexpr;
 	ocrpt_expr *intermedexpr;
 	ocrpt_expr *intermed2expr;
 	ocrpt_expr *resultexpr;

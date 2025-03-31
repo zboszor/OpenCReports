@@ -497,16 +497,17 @@ lekérdezés.mező_név</programlisting>
 					<title>Subexpressions of user-defined variables</title>
 					<para>
 						<programlisting>r.baseexpr
+r.ignoreexpr
 r.intermedexpr
 r.intermed2expr</programlisting>
-						These variables are references for the three
+						These variables are references for the four
 						subexpressions that potentially make up a
 						user-defined custom variable. The expressions in
-						order are: base expression, and two intermediary
-						expressions.
+						order are: base expression, the row ignoring
+						expression and two intermediary expressions.
 					</para>
 					<para>
-						Actually, there's a fourth subexpression that exists
+						Actually, there's a fifth subexpression that exists
 						in every user defined variable, namely the result
 						expression. It's reference is simply the user variable
 						reference, see <xref linkend="uservariables"/> and
@@ -521,8 +522,22 @@ r.intermed2expr</programlisting>
 								</para>
 								<para>
 									The base expression must not reference
-									any of the others of <literal>r.intermedexpr</literal>
+									any of the others of
+									<literal>r.ignoreexpr</literal>,
+									<literal>r.intermedexpr</literal>,
 									and <literal>r.intermed2expr</literal>.
+								</para>
+							</listitem>
+							<listitem override="bullet">
+								<para>
+									<literal>r.ignoreexpr</literal>
+								</para>
+								<para>
+									The data row ignoring expression must not reference
+									<literal>r.intermedexpr</literal> and
+									<literal>r.intermed2expr</literal>,
+									but it can reference
+									<literal>r.baseexpr</literal>.
 								</para>
 							</listitem>
 							<listitem override="bullet">
@@ -532,6 +547,7 @@ r.intermed2expr</programlisting>
 								<para>
 									The first intermediary expression can
 									reference <literal>r.baseexpr</literal>
+									and <literal>r.ignoreexpr</literal>,
 									but it must not reference <literal>r.intermed2expr</literal>.
 								</para>
 							</listitem>
@@ -541,7 +557,9 @@ r.intermed2expr</programlisting>
 								</para>
 								<para>
 									The second intermediary expression can
-									reference both <literal>r.baseexpr</literal>
+									reference any of
+									<literal>r.baseexpr</literal>,
+									<literal>r.ignoreexpr</literal>,
 									and <literal>r.intermedexpr</literal>.
 								</para>
 							</listitem>
@@ -550,6 +568,7 @@ r.intermed2expr</programlisting>
 									The result expression, which has no internal
 									variable name. It can reference all of
 									<literal>r.baseexpr</literal>,
+									<literal>r.ignoreexpr</literal>,
 									<literal>r.intermedexpr</literal> and
 									<literal>r.intermed2expr</literal>.
 								</para>

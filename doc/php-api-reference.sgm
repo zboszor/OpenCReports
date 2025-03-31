@@ -2358,6 +2358,7 @@ OpenCReport\Column::get_column_padding():
                      long $variable_type,
                      string $name,
                      string $expr,
+                     ?string $ignoreexpr = null,
                      ?string $reset_on_break_name = null):
                      OpenCReport\Variable;
 
@@ -2365,6 +2366,7 @@ OpenCReport\Column::get_column_padding():
                      long $result_type,
                      string $name,
                      ?string $baseexpr = null,
+                     ?string $ignoreexpr = null,
                      ?string $intermedexpr = null,
                      ?string $intermed2expr = null,
                      ?string $resultexpr = null,
@@ -2511,6 +2513,7 @@ OpenCReport\Report::variable_new(
                      long $variable_type,
                      string $name,
                      string $expr,
+                     ?string $ignoreexpr,
                      ?string $reset_on_break_name = null):
                      OpenCReport\Variable;</programlisting>
 			</para>
@@ -2532,6 +2535,7 @@ OpenCReport\Report::variable_new_full(
                      long $result_type,
                      string $name,
                      ?string $baseexpr = null,
+                     ?string $ignoreexpr,
                      ?string $intermedexpr = null,
                      ?string $intermed2expr = null,
                      ?string $resultexpr = null,
@@ -2936,6 +2940,9 @@ OpenCReport\Report::field_details(): OpenCReport\Output;</programlisting>
     public final baseexpr():
                      ?OpenCReport\Expr;
 
+    public final ignoreexpr():
+                     ?OpenCReport\Expr;
+
     public final intermedexpr():
                      ?OpenCReport\Expr;
 
@@ -2944,6 +2951,8 @@ OpenCReport\Report::field_details(): OpenCReport\Output;</programlisting>
 
     public final resultexpr():
                      ?OpenCReport\Expr;
+
+    public final get_type(): long;
 
     public final set_precalculate(
                      ?string $expr_string = null):
@@ -2967,6 +2976,17 @@ OpenCReport\Report::field_details(): OpenCReport\Output;</programlisting>
 				see <xref linkend="phpexprclass"/>
 				<programlisting>public final
 OpenCReport\Variable::baseexpr():
+                     ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpvarignoreexpr">
+			<title>Get the ignore expression of a variable</title>
+			<para>
+				Used by unit tests.
+				For class methods of <literal>OpenCReport\Expr</literal>,
+				see <xref linkend="phpexprclass"/>
+				<programlisting>public final
+OpenCReport\Variable::ignoreexpr():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
@@ -3001,6 +3021,13 @@ OpenCReport\Variable::intermed2expr():
 				<programlisting>public final
 OpenCReport\Variable::resultexpr():
                      ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpvargettype">
+			<title>Get the variable type</title>
+			<para>
+				<programlisting>public final
+OpenCReport\Variable::get_type(): long;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpvarsetprecalc">

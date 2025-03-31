@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
 			rs = ocrpt_expr_eval(e[i]);
 #if 0
 			printf("Deep print: ");
-			ocrpt_expr_result_deep_print(o, e[i]);
+			ocrpt_expr_result_deep_print(e[i]);
 #endif
 			printf("Evaluated: ");
 			ocrpt_result_print(rs);
