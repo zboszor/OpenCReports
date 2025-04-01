@@ -790,7 +790,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *or
 
 					/*
 					 * A variable can only reference another variable
-					 * if the references one is declared earlier.
+					 * if the referenced one is declared earlier.
 					 * Therefore jump out of the loop if the referencing
 					 * variable is found earlier.
 					 */
