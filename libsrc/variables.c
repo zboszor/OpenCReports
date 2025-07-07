@@ -350,6 +350,8 @@ void ocrpt_variable_reset(ocrpt_var *v) {
 		return;
 
 	/* Don't initialize ocrpt_result pointers on baseexpr */
+	if (v->ignoreexpr)
+		ocrpt_expr_init_iterative_results(v->ignoreexpr, OCRPT_RESULT_NUMBER);
 	if (v->intermedexpr)
 		ocrpt_expr_init_iterative_results(v->intermedexpr, v->basetype);
 	if (v->intermed2expr)

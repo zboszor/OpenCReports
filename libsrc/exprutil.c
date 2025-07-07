@@ -203,6 +203,8 @@ void ocrpt_expr_result_deep_print_worker(ocrpt_expr *e, ocrpt_printf_func func) 
 		assert(e->var);
 		if (e->var->baseexpr)
 			ocrpt_expr_result_deep_print_worker(e->var->baseexpr, func);
+		if (e->var->ignoreexpr)
+			ocrpt_expr_result_deep_print_worker(e->var->ignoreexpr, func);
 		if (e->var->intermedexpr)
 			ocrpt_expr_result_deep_print_worker(e->var->intermedexpr, func);
 		if (e->var->intermed2expr)
