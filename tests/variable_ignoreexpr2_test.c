@@ -80,12 +80,12 @@ int main(int argc, char **argv) {
 		return  1;
 	}
 
-	v = ocrpt_variable_new(r, OCRPT_VARIABLE_AVERAGE, "var1", "age", NULL, NULL);
+	v = ocrpt_variable_new(r, OCRPT_VARIABLE_AVERAGE, "var1", "age", NULL, NULL, false);
 	printf("Result expression for 'var1' reprinted: ");
 	ocrpt_expr_print(ocrpt_variable_resultexpr(v));
 	printf("\n");
 
-	v2 = ocrpt_variable_new(r, OCRPT_VARIABLE_COUNT, "var2", "1", "abs(v.var1 - age) > 10", NULL);
+	v2 = ocrpt_variable_new(r, OCRPT_VARIABLE_COUNT, "var2", "1", "abs(v.var1 - age) > 10", NULL, false);
 	printf("Result expression for 'var2' reprinted: ");
 	ocrpt_expr_print(ocrpt_variable_resultexpr(v2));
 	printf("\n");
@@ -129,15 +129,13 @@ int main(int argc, char **argv) {
 		return  1;
 	}
 
-	v = ocrpt_variable_new(r, OCRPT_VARIABLE_AVERAGE, "var1", "age", NULL, NULL);
-
-	ocrpt_variable_set_precalculate(v, "yes");
+	v = ocrpt_variable_new(r, OCRPT_VARIABLE_AVERAGE, "var1", "age", NULL, NULL, true);
 
 	printf("Result expression for 'var1' reprinted: ");
 	ocrpt_expr_print(ocrpt_variable_resultexpr(v));
 	printf("\n");
 
-	v2 = ocrpt_variable_new(r, OCRPT_VARIABLE_COUNT, "var2", "1", "abs(v.var1 - age) > 10", NULL);
+	v2 = ocrpt_variable_new(r, OCRPT_VARIABLE_COUNT, "var2", "1", "abs(v.var1 - age) > 10", NULL, false);
 	printf("Result expression for 'var2' reprinted: ");
 	ocrpt_expr_print(ocrpt_variable_resultexpr(v2));
 	printf("\n");

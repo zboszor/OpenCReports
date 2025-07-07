@@ -675,7 +675,8 @@ bool ocrpt_result_datetime_is_time_valid(ocrpt_result *result);
 ocrpt_var *ocrpt_variable_new(ocrpt_report *r,
 			ocrpt_var_type type, const char *name,
 			const char *expr, const char *ignoreexpr,
-			const char *reset_on_break_name);
+			const char *reset_on_break_name,
+			bool precalculate);
 /*
  * Create a names custom variable
  */
@@ -683,7 +684,8 @@ ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r,
 			enum ocrpt_result_type type, const char *name,
 			const char *baseexpr, const char *ignoreexpr,
 			const char *intermedexpr, const char *intermed2expr,
-			const char *resultexpr, const char *reset_on_break_name);
+			const char *resultexpr, const char *reset_on_break_name,
+			bool precalculate);
 /*
  * Get the type of the variable
  */
@@ -697,15 +699,9 @@ ocrpt_expr *ocrpt_variable_intermedexpr(ocrpt_var *v);
 ocrpt_expr *ocrpt_variable_intermed2expr(ocrpt_var *v);
 ocrpt_expr *ocrpt_variable_resultexpr(ocrpt_var *v);
 /*
- * Set precalculate property
- * When set to "yes", it will also imply delayed="yes"
- * for expressions using this variable.
- */
-void ocrpt_variable_set_precalculate(ocrpt_var *var, const char *expr_string);
-/*
  * Get precalculate property
  */
-ocrpt_expr *ocrpt_variable_get_precalculate(ocrpt_var *var);
+bool ocrpt_variable_get_precalculate(ocrpt_var *var);
 /*
  * Resolve a variable
  */

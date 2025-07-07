@@ -1201,7 +1201,8 @@ ocrpt_variable_new(ocrpt_report *r,
                    const char *name,
                    const char *expr,
                    const char *ignoreexpr,
-                   const char *reset_on_break_name);</programlisting>
+                   const char *reset_on_break_name,
+                   bool precalculate);</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="createcustomuservar">
@@ -1218,7 +1219,8 @@ ocrpt_variable_new_full(ocrpt_report *r,
                         const char *intermedexpr,
                         const char *intermed2expr,
                         const char *resultexpr,
-                        const char *reset_on_break_name);</programlisting>
+                        const char *reset_on_break_name,
+                        bool precalculate);</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="uservargettype">
@@ -1250,16 +1252,10 @@ ocrpt_expr *
 ocrpt_variable_resultexpr(ocrpt_var *v);</programlisting>
 				</para>
 			</sect3>
-			<sect3 id="uservarsetprecalc">
-				<title>Set or get precalculate flag for a variable</title>
+			<sect3 id="uservargetprecalc">
+				<title>Get precalculate flag for a variable</title>
 				<para>
-					The expression must evaluate to a
-					numeric (boolean) value.
-					<programlisting>void
-ocrpt_variable_set_precalculate(ocrpt_var *var, 
-                                const char *expr_string);
-
-ocrpt_expr *
+					<programlisting>bool
 ocrpt_variable_get_precalculate(ocrpt_var *var);</programlisting>
 				</para>
 			</sect3>

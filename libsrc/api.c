@@ -987,15 +987,6 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 					ocrpt_layout_output_evaluate_expr_params(&br->header);
 					ocrpt_layout_output_evaluate_expr_params(&br->footer);
 				}
-
-				for (ocrpt_list *vl = r->variables; vl; vl = vl->next) {
-					ocrpt_var *var = (ocrpt_var *)vl->data;
-
-					ocrpt_expr_resolve(var->precalculate_expr);
-					ocrpt_expr_optimize(var->precalculate_expr);
-					if (var->precalculate_expr)
-						var->precalculate = !!ocrpt_expr_get_long(var->precalculate_expr);
-				}
 			}
 		}
 	}

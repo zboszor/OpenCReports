@@ -2359,7 +2359,8 @@ OpenCReport\Column::get_column_padding():
                      string $name,
                      string $expr,
                      ?string $ignoreexpr = null,
-                     ?string $reset_on_break_name = null):
+                     ?string $reset_on_break_name = null,
+                     ?bool $precalculate = false):
                      OpenCReport\Variable;
 
     public final variable_new_full(
@@ -2370,7 +2371,8 @@ OpenCReport\Column::get_column_padding():
                      ?string $intermedexpr = null,
                      ?string $intermed2expr = null,
                      ?string $resultexpr = null,
-                     ?string $reset_on_break_name = null):
+                     ?string $reset_on_break_name = null,
+                     ?bool $precalculate = fals):
                      OpenCReport\Variable;
 
     public full variable_get_first():
@@ -2514,8 +2516,21 @@ OpenCReport\Report::variable_new(
                      string $name,
                      string $expr,
                      ?string $ignoreexpr,
-                     ?string $reset_on_break_name = null):
+                     ?string $reset_on_break_name = null,
+                     ?bool $precalculate = false):
                      OpenCReport\Variable;</programlisting>
+			</para>
+			<para>
+				A precalculated variable's value (or set of values)
+				is calculated during the precalculation phase
+				of report execution. When the report is being
+				rendered, the precalculated values are used.
+				This allows using an end value in a header,
+				e.g. a report header may contain a summary of
+				bottom line values. Similarly, break headers
+				may show values that would otherwise be shown
+				only in break footer sections for variables
+				that are reset on a break.
 			</para>
 		</sect2>
 		<sect2 id="phpreportvarnewfull">
@@ -2539,7 +2554,8 @@ OpenCReport\Report::variable_new_full(
                      ?string $intermedexpr = null,
                      ?string $intermed2expr = null,
                      ?string $resultexpr = null,
-                     ?string $reset_on_break_name = null):
+                     ?string $reset_on_break_name = null,
+                     ?bool $precalculate = false):
                      OpenCReport\Variable;</programlisting>
 			</para>
 		</sect2>
@@ -2954,12 +2970,7 @@ OpenCReport\Report::field_details(): OpenCReport\Output;</programlisting>
 
     public final get_type(): long;
 
-    public final set_precalculate(
-                     ?string $expr_string = null):
-                     void;
-
-    public final get_precalculate():
-                     ?OpenCReport\Expr;
+    public final get_precalculate(): bool;
 
     public final resolve(): void;
     public final eval(): void;
@@ -3030,28 +3041,12 @@ OpenCReport\Variable::resultexpr():
 OpenCReport\Variable::get_type(): long;</programlisting>
 			</para>
 		</sect2>
-		<sect2 id="phpvarsetprecalc">
-			<title>Set or get the variable precalculated flag</title>
+		<sect2 id="phpvargetprecalc">
+			<title>Get the variable precalculated flag</title>
 			<para>
-				Set the variable precalculated.
-				A precalculated variable's value (or set of values)
-				is calculated during the precalculation phase
-				of report execution. When the report is being
-				rendered, the precalculated values are used.
-				This allows using an end value in a header,
-				e.g. a report header may contain a summary of
-				bottom line values. Similarly, break headers
-				may show values that would otherwise be shown
-				only in break footer sections for variables
-				that are reset on a break.
+				Get the variable's precalculated flag.
 				<programlisting>public final
-OpenCReport\Variable::set_precalculate(
-                     ?string $expr_string = null):
-                     void;
-
-public final
-OpenCReport\Variable::get_precalculate():
-                     ?OpenCReport\Expr;</programlisting>
+OpenCReport\Variable::get_precalculate(): bool;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpvarresolve">

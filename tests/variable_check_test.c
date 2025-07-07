@@ -33,24 +33,24 @@ int main(int argc, char **argv) {
 
 	q = ocrpt_query_add_data(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 
-	ocrpt_variable_new(r, OCRPT_VARIABLE_EXPRESSION, "var1", "id + 1", NULL, NULL);
+	ocrpt_variable_new(r, OCRPT_VARIABLE_EXPRESSION, "var1", "id + 1", NULL, NULL, false);
 
 	/* Exercise duplicate variable name */
-	ocrpt_variable_new(r, OCRPT_VARIABLE_EXPRESSION, "var1", "id + 1", NULL, NULL);
+	ocrpt_variable_new(r, OCRPT_VARIABLE_EXPRESSION, "var1", "id + 1", NULL, NULL, false);
 
 	/* Exercise expression variable containing another (known) expression variable */
-	v = ocrpt_variable_new(r, OCRPT_VARIABLE_EXPRESSION, "var2", "v.var1", NULL, NULL);
+	v = ocrpt_variable_new(r, OCRPT_VARIABLE_EXPRESSION, "var2", "v.var1", NULL, NULL, false);
 	printf("adding 'var2' %s\n", v ? "succeeded" : "failed");
 
 	/* Exercise other variable containing expression variable */
-	v = ocrpt_variable_new(r, OCRPT_VARIABLE_SUM, "var3", "v.var1", NULL, NULL);
+	v = ocrpt_variable_new(r, OCRPT_VARIABLE_SUM, "var3", "v.var1", NULL, NULL, false);
 	printf("adding 'var3' %s\n", v ? "succeeded" : "failed");
 
 	/* Exercise another variable type containing non-expression-type variable */
-	ocrpt_variable_new(r, OCRPT_VARIABLE_HIGHEST, "var4", "v.var3", NULL, NULL);
+	ocrpt_variable_new(r, OCRPT_VARIABLE_HIGHEST, "var4", "v.var3", NULL, NULL, false);
 
 	/* Exercise another variable type containing unknown variable */
-	ocrpt_variable_new(r, OCRPT_VARIABLE_HIGHEST, "var5", "v.varX", NULL, NULL);
+	ocrpt_variable_new(r, OCRPT_VARIABLE_HIGHEST, "var5", "v.varX", NULL, NULL, false);
 
 	ocrpt_free(o);
 

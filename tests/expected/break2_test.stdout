@@ -1,0 +1,4 @@
+adding breakfield failed for expr: v.var1
+adding breakfield failed for expr: v.var2
+adding breakfield failed for expr: v.var3
+adding breakfield succeeded for expr: v.var4

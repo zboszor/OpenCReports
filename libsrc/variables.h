@@ -13,7 +13,6 @@ struct ocrpt_var {
 	const char *name;
 	char *br_name;
 	ocrpt_break *br;
-	ocrpt_expr *precalculate_expr;
 	ocrpt_expr *baseexpr;
 	ocrpt_expr *ignoreexpr;
 	ocrpt_expr *intermedexpr;

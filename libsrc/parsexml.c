@@ -434,18 +434,19 @@ static void ocrpt_parse_variable_node(opencreport *o, ocrpt_report *r, xmlTextRe
 	}
 
 	if (baseexpr) {
-		ocrpt_var *v;
+		ocrpt_expr *precalculate_e;
+		int32_t precalculate_i;
+
+		get_int(o, precalculate);
+		ocrpt_expr_free(precalculate_e);
 
 		if (!intermedexpr && !intermed2expr && !resultexpr && vtype == OCRPT_VARIABLE_CUSTOM)
 			vtype = OCRPT_VARIABLE_EXPRESSION;
 
 		if (vtype == OCRPT_VARIABLE_CUSTOM)
-			v = ocrpt_variable_new_full(r, rtype, (char *)name, (char *)baseexpr, (char *)ignoreexpr, (char *)intermedexpr, (char *)intermed2expr, (char *)resultexpr, (char *)resetonbreak);
+			ocrpt_variable_new_full(r, rtype, (char *)name, (char *)baseexpr, (char *)ignoreexpr, (char *)intermedexpr, (char *)intermed2expr, (char *)resultexpr, (char *)resetonbreak, !!precalculate_i);
 		else
-			v = ocrpt_variable_new(r, vtype, (char *)name, (char *)baseexpr, (char *)ignoreexpr, (char *)resetonbreak);
-
-		if (precalculate)
-			ocrpt_variable_set_precalculate(v, (char *)precalculate);
+			ocrpt_variable_new(r, vtype, (char *)name, (char *)baseexpr, (char *)ignoreexpr, (char *)resetonbreak, !!precalculate_i);
 	}
 
 	for (i = 0; xmlattrs[i].attrp; i++)

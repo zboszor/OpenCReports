@@ -27,7 +27,7 @@
  *
  * Returns ocrpt_var pointer or NULL in case of an error.
  */
-DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r, enum ocrpt_result_type type, const char *name, const char *baseexpr, const char *ignoreexpr, const char *intermedexpr, const char *intermed2expr, const char *resultexpr, const char *reset_on_break_name) {
+DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r, enum ocrpt_result_type type, const char *name, const char *baseexpr, const char *ignoreexpr, const char *intermedexpr, const char *intermed2expr, const char *resultexpr, const char *reset_on_break_name, bool precalculate) {
 	if (!r) {
 		ocrpt_err_printf("invalid variable definitition: valid ocrpt_report pointer expected\n");
 		return NULL;
@@ -64,6 +64,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r, enum ocrpt_re
 	var->break_index = SHRT_MAX;
 	var->type = OCRPT_VARIABLE_CUSTOM;
 	var->basetype = type;
+	var->precalculate = precalculate;
 
 	if (reset_on_break_name && *reset_on_break_name)
 		var->br_name = ocrpt_mem_strdup(reset_on_break_name);
@@ -142,7 +143,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r, enum ocrpt_re
  * When returning NULL, the expression is freed so the caller
  * doesn't have to distinguish between different types of error.
  */
-DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type type, const char *name, const char *expr, const char *ignoreexpr, const char *reset_on_break_name) {
+DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type type, const char *name, const char *expr, const char *ignoreexpr, const char *reset_on_break_name, bool precalculate) {
 	ocrpt_expr *e = NULL;
 	ocrpt_string *exprstr, *expr1str;
 	ocrpt_var *var = NULL;
@@ -169,13 +170,13 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 
 	switch (type) {
 	case OCRPT_VARIABLE_EXPRESSION:
-		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, NULL, NULL, "r.ignoreexpr ? nulln() : r.baseexpr", reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, NULL, NULL, "r.ignoreexpr ? nulln() : r.baseexpr", reset_on_break_name, precalculate);
 		break;
 	case OCRPT_VARIABLE_COUNT:
-		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr ? expr : "1", ignoreexpr, NULL, NULL, "r.self + ((r.ignoreexpr || isnull(r.baseexpr)) ? 0 : 1)", reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr ? expr : "1", ignoreexpr, NULL, NULL, "r.self + ((r.ignoreexpr || isnull(r.baseexpr)) ? 0 : 1)", reset_on_break_name, precalculate);
 		break;
 	case OCRPT_VARIABLE_COUNTALL:
-		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, NULL, ignoreexpr, NULL, NULL, "r.self + (r.ignoreexpr ? 0 : 1)", reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, NULL, ignoreexpr, NULL, NULL, "r.self + (r.ignoreexpr ? 0 : 1)", reset_on_break_name, precalculate);
 		break;
 	case OCRPT_VARIABLE_SUM:
 		exprstr = ocrpt_mem_string_new_printf("(%s%s%s == 1 ? 0 : r.self) + (r.ignoreexpr ? 0 : (isnull(r.baseexpr) ? 0 : r.baseexpr))",
@@ -183,7 +184,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 						reset_on_break_name ? reset_on_break_name : "",
 						reset_on_break_name ? "')" : "");
 
-		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, NULL, NULL, exprstr->str, reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, NULL, NULL, exprstr->str, reset_on_break_name, precalculate);
 		ocrpt_mem_string_free(exprstr, true);
 		break;
 	case OCRPT_VARIABLE_AVERAGE:
@@ -191,7 +192,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 						reset_on_break_name ? "brrownum('" : "r.lineno",
 						reset_on_break_name ? reset_on_break_name : "",
 						reset_on_break_name ? "')" : "");
-		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, exprstr->str, "r.self + ((r.ignoreexpr || isnull(r.baseexpr)) ? 0 : 1)", "r.intermedexpr / r.intermed2expr", reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, exprstr->str, "r.self + ((r.ignoreexpr || isnull(r.baseexpr)) ? 0 : 1)", "r.intermedexpr / r.intermed2expr", reset_on_break_name, precalculate);
 		ocrpt_mem_string_free(exprstr, true);
 		break;
 	case OCRPT_VARIABLE_AVERAGEALL:
@@ -203,7 +204,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 						reset_on_break_name ? "brrownum('" : "r.lineno",
 						reset_on_break_name ? reset_on_break_name : "",
 						reset_on_break_name ? "')" : "");
-		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, exprstr->str, NULL, expr1str->str, reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, exprstr->str, NULL, expr1str->str, reset_on_break_name, precalculate);
 		ocrpt_mem_string_free(exprstr, true);
 		ocrpt_mem_string_free(expr1str, true);
 		break;
@@ -221,7 +222,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 						reset_on_break_name ? "brrownum('" : "r.lineno",
 						reset_on_break_name ? reset_on_break_name : "",
 						reset_on_break_name ? "')" : "");
-		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, NULL, NULL, exprstr->str, reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, NULL, NULL, exprstr->str, reset_on_break_name, precalculate);
 		ocrpt_mem_string_free(exprstr, true);
 		break;
 	case OCRPT_VARIABLE_HIGHEST:
@@ -238,7 +239,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 						reset_on_break_name ? "brrownum('" : "r.lineno",
 						reset_on_break_name ? reset_on_break_name : "",
 						reset_on_break_name ? "')" : "");
-		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, NULL, NULL, exprstr->str, reset_on_break_name);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, NULL, NULL, exprstr->str, reset_on_break_name, precalculate);
 		ocrpt_mem_string_free(exprstr, true);
 		break;
 	default:
@@ -248,6 +249,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 
 	if (var)
 		var->type = type;
+
 	return var;
 }
 
@@ -278,16 +280,8 @@ void ocrpt_variables_free(ocrpt_report *r) {
 	r->variables = NULL;
 }
 
-DLL_EXPORT_SYM void ocrpt_variable_set_precalculate(ocrpt_var *var, const char *expr_string) {
-	if (!var || !var->r || !var->r->o || var->r->o->executing)
-		return;
-
-	ocrpt_expr_free(var->precalculate_expr);
-	var->precalculate_expr = expr_string ? ocrpt_report_expr_parse(var->r, expr_string, NULL) : NULL;
-}
-
-DLL_EXPORT_SYM ocrpt_expr *ocrpt_variable_get_precalculate(ocrpt_var *var) {
-	return var ? var->precalculate_expr : NULL;
+DLL_EXPORT_SYM bool ocrpt_variable_get_precalculate(ocrpt_var *var) {
+	return var ? var->precalculate : false;
 }
 
 DLL_EXPORT_SYM void ocrpt_variable_resolve(ocrpt_var *v) {

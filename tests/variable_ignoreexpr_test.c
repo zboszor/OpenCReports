@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 	q = ocrpt_query_add_data(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 	qr = ocrpt_query_get_result(q, &cols);
 
-	v = ocrpt_variable_new(r, OCRPT_VARIABLE_COUNT, "var1", "age", "age < 10", NULL);
+	v = ocrpt_variable_new(r, OCRPT_VARIABLE_COUNT, "var1", "age", "age < 10", NULL, false);
 
 	printf("Result expression for 'var1' reprinted: ");
 	ocrpt_expr_print(ocrpt_variable_resultexpr(v));
@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
 	q = ocrpt_query_add_data(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 	qr = ocrpt_query_get_result(q, &cols);
 
-	v = ocrpt_variable_new(r, OCRPT_VARIABLE_COUNT, "var1", "age", "r.baseexpr < 10", NULL);
+	v = ocrpt_variable_new(r, OCRPT_VARIABLE_COUNT, "var1", "age", "r.baseexpr < 10", NULL, false);
 
 	printf("Result expression for 'var1' reprinted: ");
 	ocrpt_expr_print(ocrpt_variable_resultexpr(v));
@@ -146,7 +146,7 @@ int main(int argc, char **argv) {
 	q = ocrpt_query_add_data(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 	qr = ocrpt_query_get_result(q, &cols);
 
-	v = ocrpt_variable_new(r, OCRPT_VARIABLE_COUNT, "var1", "age", "r.baseexpr < 10 || r.baseexpr > 30", NULL);
+	v = ocrpt_variable_new(r, OCRPT_VARIABLE_COUNT, "var1", "age", "r.baseexpr < 10 || r.baseexpr > 30", NULL, false);
 
 	printf("Result expression for 'var1' reprinted: ");
 	ocrpt_expr_print(ocrpt_variable_resultexpr(v));
@@ -199,7 +199,7 @@ int main(int argc, char **argv) {
 	q = ocrpt_query_add_data(ds, "a", (const char **)array, ROWS, COLS, coltypes, COLS);
 	qr = ocrpt_query_get_result(q, &cols);
 
-	v = ocrpt_variable_new(r, OCRPT_VARIABLE_COUNT, "var1", "age", "r.baseexpr < 100", NULL);
+	v = ocrpt_variable_new(r, OCRPT_VARIABLE_COUNT, "var1", "age", "r.baseexpr < 100", NULL, false);
 
 	printf("Result expression for 'var1' reprinted: ");
 	ocrpt_expr_print(ocrpt_variable_resultexpr(v));
