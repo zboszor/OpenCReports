@@ -353,10 +353,9 @@ static void ocrpt_print_reportheader(opencreport *o, ocrpt_part *p, ocrpt_part_r
 }
 
 static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
-	ocrpt_list *brl_start = NULL;
-	unsigned int rows = 0;
+	uint32_t rows = 0;
+	uint32_t rounds = (o->precalculate ? r->precalc_var_rounds : 0) + 1, round;
 	bool is_tabular = r->fieldheader.output_list || r->fielddetails.output_list;
-	bool have_row;
 
 	for (ocrpt_list *brl = r->breaks; !is_tabular && brl; brl = brl->next) {
 		ocrpt_break *br = (ocrpt_break *)brl->data;
@@ -367,168 +366,175 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		}
 	}
 
-	ocrpt_query_navigate_start(r->query);
-	have_row = ocrpt_query_navigate_next(r->query);
+	for (round = 0; round < rounds; round++) {
+		ocrpt_list *brl_start = NULL;
+		bool have_row;
 
-	ocrpt_expr_init_iterative_results(r->detailcnt, OCRPT_RESULT_NUMBER);
+		rows = 0;
 
-	ocrpt_expr_set_plain_iterative_to_null(r);
+		ocrpt_query_navigate_start(r->query);
+		have_row = ocrpt_query_navigate_next(r->query);
 
-	for (ocrpt_list *vl = r->variables; vl; vl = vl->next)
-		ocrpt_variable_reset((ocrpt_var *)vl->data);
+		ocrpt_expr_init_iterative_results(r->detailcnt, OCRPT_RESULT_NUMBER);
 
-	while (have_row) {
-		ocrpt_list *brl;
-		bool last_row = !ocrpt_query_navigate_next(r->query);
+		ocrpt_expr_set_plain_iterative_to_null(r);
 
-		o->residx = ocrpt_expr_prev_residx(o->residx);
+		for (ocrpt_list *vl = r->variables; vl; vl = vl->next)
+			ocrpt_variable_reset((ocrpt_var *)vl->data);
 
-		rows++;
+		while (have_row) {
+			ocrpt_list *brl;
+			bool last_row = !ocrpt_query_navigate_next(r->query);
 
-		brl_start = NULL;
-		for (brl = r->breaks; brl; brl = brl->next) {
-			ocrpt_break *br = (ocrpt_break *)brl->data;
+			o->residx = ocrpt_expr_prev_residx(o->residx);
 
-			br->cb_triggered = false;
+			rows++;
 
-			if (ocrpt_break_check_fields(br)) {
-				if (!brl_start)
-					brl_start = brl;
+			brl_start = NULL;
+			for (brl = r->breaks; brl; brl = brl->next) {
+				ocrpt_break *br = (ocrpt_break *)brl->data;
 
-				br->blank = br->suppressblank && ocrpt_break_check_blank(br, false);
-			}
-		}
+				br->cb_triggered = false;
 
-		if (brl_start) {
-			if (rows > 1) {
-				/* Use the previous row data temporarily */
-				o->residx = ocrpt_expr_prev_residx(o->residx);
+				if (ocrpt_break_check_fields(br)) {
+					if (!brl_start)
+						brl_start = brl;
 
-				if (o->precalculate)
-					ocrpt_variables_add_precalculated_results(r, brl_start, last_row);
-
-				/* Switch back to the current row data */
-				o->residx = ocrpt_expr_next_residx(o->residx);
-
-				for (brl = brl_start; brl; brl = brl->next)
-					ocrpt_break_reset_vars((ocrpt_break *)brl->data);
-
-				if (!o->precalculate)
-					ocrpt_variables_advance_precalculated_results(r, brl_start);
-			}
-		}
-
-		ocrpt_report_evaluate_variables(r);
-		ocrpt_report_evaluate_expressions(r);
-
-		for (brl = last_row ? r->breaks : brl_start; brl; brl = brl->next) {
-			ocrpt_break *br = (ocrpt_break *)brl->data;
-			ocrpt_list *brcbl;
-
-			br->cb_triggered = true;
-			if (!o->precalculate) {
-				for (brcbl = br->callbacks; brcbl; brcbl = brcbl->next) {
-					ocrpt_break_trigger_cb_data *cbd = (ocrpt_break_trigger_cb_data *)brcbl->data;
-
-					cbd->func(o, r, br, cbd->data);
+					br->blank = br->suppressblank && ocrpt_break_check_blank(br, false);
 				}
 			}
-		}
 
-		if (rows == 1 && !*newpage)
-			ocrpt_print_reportheader(o, p, pr, pd, r, rows, newpage, page_indent, page_position, old_page_position);
-
-		if (is_tabular) {
-			if (r->fieldheader_high_priority && rows == 1) {
-				ocrpt_layout_output_init(&r->fieldheader);
-				ocrpt_layout_output(o, p, pr, pd, r, NULL, &r->fieldheader, rows, newpage, page_indent, page_position, old_page_position);
-			}
-
-			if (rows > 1 && brl_start) {
-				/* Use the previous row data temporarily */
-				o->residx = ocrpt_expr_prev_residx(o->residx);
-
-				for (brl = r->breaks_reverse; brl; brl = brl->next) {
-					ocrpt_break *br = (ocrpt_break *)brl->data;
-
-					if (!br->suppressblank || (br->suppressblank && !br->blank_prev)) {
-						ocrpt_layout_output_init(&br->footer);
-						ocrpt_layout_output(o, p, pr, pd, r, br, &br->footer, rows, newpage, page_indent, page_position, old_page_position);
-					}
-
-					if (br == brl_start->data)
-						break;
-				}
-
-				/* Switch back to the current row data */
-				o->residx = ocrpt_expr_next_residx(o->residx);
-			}
-
-			for (brl = (rows == 1 ? r->breaks : brl_start); brl; brl = brl->next) {
-				ocrpt_break *br __attribute__((unused)) = (ocrpt_break *)brl->data;
-
-				if (br->cb_triggered) {
-					if (!br->suppressblank || (br->suppressblank && !br->blank)) {
-						if (rows > 1 && br->headernewpage) {
-							if (o->output_functions.supports_page_break)
-								*newpage = true;
-						}
-						ocrpt_layout_output_init(&br->header);
-						ocrpt_layout_output(o, p, pr, pd, r, br, &br->header, rows, newpage, page_indent, page_position, old_page_position);
-					}
-					br->blank_prev = br->blank;
-				}
-			}
-		}
-
-		if (!o->precalculate) {
-			ocrpt_list *cbl;
-
-			for (cbl = r->newrow_callbacks; cbl; cbl = cbl->next) {
-				ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
-
-				cbd->func(o, r, cbd->data);
-			}
-
-			for (cbl = o->report_newrow_callbacks; cbl; cbl = cbl->next) {
-				ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
-
-				cbd->func(o, r, cbd->data);
-			}
-		}
-
-		if (is_tabular) {
-			if (!r->fieldheader_high_priority && (rows == 1 || brl_start)) {
-				/*
-				 * Debatable preference in taste:
-				 * a) field headers have higher precedence than break headers
-				 *    and break footers, meaning the field headers are printed
-				 *    once per page at the top, with break headers and footers
-				 *    printed after it, or
-				 * b) break headers and footers have higher precedence than
-				 *    field headers, with break headers printed first, then
-				 *    the field headers, followed by all the field details,
-				 *    then finally the break footers.
-				 *
-				 * It is configurable via <Report field_header_preference="high/low">
-				 * with the default "high" value.
-				 */
+			if (brl_start) {
 				if (rows > 1) {
-					ocrpt_expr_init_iterative_results(r->detailcnt, OCRPT_RESULT_NUMBER);
-					ocrpt_expr_eval(r->detailcnt);
-					ocrpt_report_evaluate_detailcnt_dependees(r);
-				}
-				ocrpt_layout_output_init(&r->fieldheader);
-				ocrpt_layout_output(o, p, pr, pd, r, NULL, &r->fieldheader, rows, newpage, page_indent, page_position, old_page_position);
-			}
-			ocrpt_layout_output_init(&r->fielddetails);
-			ocrpt_layout_output(o, p, pr, pd, r, NULL, &r->fielddetails, rows, newpage, page_indent, page_position, old_page_position);
-		} else {
-			/* TODO: Feed rows to Graph / Chart  */
-		}
+					/* Use the previous row data temporarily */
+					o->residx = ocrpt_expr_prev_residx(o->residx);
 
-		have_row = !last_row;
-		o->residx = ocrpt_expr_next_residx(o->residx);
+					if (o->precalculate)
+						ocrpt_variables_add_precalculated_results(r, brl_start, last_row);
+
+					/* Switch back to the current row data */
+					o->residx = ocrpt_expr_next_residx(o->residx);
+
+					for (brl = brl_start; brl; brl = brl->next)
+						ocrpt_break_reset_vars((ocrpt_break *)brl->data);
+
+					if (!o->precalculate)
+						ocrpt_variables_advance_precalculated_results(r, brl_start);
+				}
+			}
+
+			ocrpt_report_evaluate_variables(r);
+			ocrpt_report_evaluate_expressions(r);
+
+			for (brl = last_row ? r->breaks : brl_start; brl; brl = brl->next) {
+				ocrpt_break *br = (ocrpt_break *)brl->data;
+				ocrpt_list *brcbl;
+
+				br->cb_triggered = true;
+				if (!o->precalculate) {
+					for (brcbl = br->callbacks; brcbl; brcbl = brcbl->next) {
+						ocrpt_break_trigger_cb_data *cbd = (ocrpt_break_trigger_cb_data *)brcbl->data;
+
+						cbd->func(o, r, br, cbd->data);
+					}
+				}
+			}
+
+			if (rows == 1 && !*newpage)
+				ocrpt_print_reportheader(o, p, pr, pd, r, rows, newpage, page_indent, page_position, old_page_position);
+
+			if (is_tabular) {
+				if (r->fieldheader_high_priority && rows == 1) {
+					ocrpt_layout_output_init(&r->fieldheader);
+					ocrpt_layout_output(o, p, pr, pd, r, NULL, &r->fieldheader, rows, newpage, page_indent, page_position, old_page_position);
+				}
+
+				if (rows > 1 && brl_start) {
+					/* Use the previous row data temporarily */
+					o->residx = ocrpt_expr_prev_residx(o->residx);
+
+					for (brl = r->breaks_reverse; brl; brl = brl->next) {
+						ocrpt_break *br = (ocrpt_break *)brl->data;
+
+						if (!br->suppressblank || (br->suppressblank && !br->blank_prev)) {
+							ocrpt_layout_output_init(&br->footer);
+							ocrpt_layout_output(o, p, pr, pd, r, br, &br->footer, rows, newpage, page_indent, page_position, old_page_position);
+						}
+
+						if (br == brl_start->data)
+							break;
+					}
+
+					/* Switch back to the current row data */
+					o->residx = ocrpt_expr_next_residx(o->residx);
+				}
+
+				for (brl = (rows == 1 ? r->breaks : brl_start); brl; brl = brl->next) {
+					ocrpt_break *br __attribute__((unused)) = (ocrpt_break *)brl->data;
+
+					if (br->cb_triggered) {
+						if (!br->suppressblank || (br->suppressblank && !br->blank)) {
+							if (rows > 1 && br->headernewpage) {
+								if (o->output_functions.supports_page_break)
+									*newpage = true;
+							}
+							ocrpt_layout_output_init(&br->header);
+							ocrpt_layout_output(o, p, pr, pd, r, br, &br->header, rows, newpage, page_indent, page_position, old_page_position);
+						}
+						br->blank_prev = br->blank;
+					}
+				}
+			}
+
+			if (!o->precalculate) {
+				ocrpt_list *cbl;
+
+				for (cbl = r->newrow_callbacks; cbl; cbl = cbl->next) {
+					ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+					cbd->func(o, r, cbd->data);
+				}
+
+				for (cbl = o->report_newrow_callbacks; cbl; cbl = cbl->next) {
+					ocrpt_report_cb_data *cbd = (ocrpt_report_cb_data *)cbl->data;
+
+					cbd->func(o, r, cbd->data);
+				}
+			}
+
+			if (is_tabular) {
+				if (!r->fieldheader_high_priority && (rows == 1 || brl_start)) {
+					/*
+					 * Debatable preference in taste:
+					 * a) field headers have higher precedence than break headers
+					 *    and break footers, meaning the field headers are printed
+					 *    once per page at the top, with break headers and footers
+					 *    printed after it, or
+					 * b) break headers and footers have higher precedence than
+					 *    field headers, with break headers printed first, then
+					 *    the field headers, followed by all the field details,
+					 *    then finally the break footers.
+					 *
+					 * It is configurable via <Report field_header_preference="high/low">
+					 * with the default "high" value.
+					 */
+					if (rows > 1) {
+						ocrpt_expr_init_iterative_results(r->detailcnt, OCRPT_RESULT_NUMBER);
+						ocrpt_expr_eval(r->detailcnt);
+						ocrpt_report_evaluate_detailcnt_dependees(r);
+					}
+					ocrpt_layout_output_init(&r->fieldheader);
+					ocrpt_layout_output(o, p, pr, pd, r, NULL, &r->fieldheader, rows, newpage, page_indent, page_position, old_page_position);
+				}
+				ocrpt_layout_output_init(&r->fielddetails);
+				ocrpt_layout_output(o, p, pr, pd, r, NULL, &r->fielddetails, rows, newpage, page_indent, page_position, old_page_position);
+			} else {
+				/* TODO: Feed rows to Graph / Chart  */
+			}
+
+			have_row = !last_row;
+			o->residx = ocrpt_expr_next_residx(o->residx);
+		}
 	}
 
 	if (rows) {
