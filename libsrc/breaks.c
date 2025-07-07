@@ -158,16 +158,16 @@ DLL_EXPORT_SYM bool ocrpt_break_add_breakfield(ocrpt_break *br, ocrpt_expr *bf) 
 			ocrpt_list_free(var_list);
 			return false;
 		}
-		if ((vartypes & ~OCRPT_VARIABLE_EXPRESSION_BIT) != 0) {
-			ocrpt_err_printf("breakfield for '%s' may only reference expression variables\n", br->name);
-			ocrpt_expr_free(bf);
-			ocrpt_list_free(var_list);
-			return false;
-		}
 
 		for (ocrpt_list *ptr = var_list; ptr; ptr = ptr->next) {
 			ocrpt_var *var = (ocrpt_var *)ptr->data;
 
+			if (var->type != OCRPT_VARIABLE_EXPRESSION) {
+				ocrpt_err_printf("breakfield for '%s' may only reference expression variables (illegal reference: v.%s)\n", br->name, var->name);
+				ocrpt_expr_free(bf);
+				ocrpt_list_free(var_list);
+				return false;
+			}
 			if (var->precalculate) {
 				ocrpt_err_printf("breakfield for '%s' references a precalculated variable '%s'\n", br->name, var->name);
 				ocrpt_expr_free(bf);

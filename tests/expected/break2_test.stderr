@@ -1,3 +1,3 @@
-breakfield for 'age' may only reference expression variables
-breakfield for 'age' may only reference expression variables
+breakfield for 'age' may only reference expression variables (illegal reference: v.var1)
+breakfield for 'age' may only reference expression variables (illegal reference: v.var2)
 breakfield for 'age' references a precalculated variable 'var3'
