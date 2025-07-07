@@ -20,6 +20,11 @@ struct ocrpt_var {
 	ocrpt_expr *resultexpr;
 	ocrpt_list *precalc_results;
 	ocrpt_list *precalc_rptr;
+	/*
+	 * If this report variable is precalculated,
+	 * compute the value in the nth round.
+	 */
+	uint32_t precalc_round;
 	unsigned int break_index:16;
 	enum ocrpt_var_type type:4;
 	enum ocrpt_result_type basetype:2;

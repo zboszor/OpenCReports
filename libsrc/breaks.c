@@ -151,7 +151,7 @@ DLL_EXPORT_SYM bool ocrpt_break_add_breakfield(ocrpt_break *br, ocrpt_expr *bf) 
 	uint32_t vartypes = 0;
 	ocrpt_list *var_list = NULL;
 
-	if (ocrpt_expr_reference_worker(bf, OCRPT_VARREF_VVAR, &vartypes, &var_list)) {
+	if (ocrpt_expr_reference_worker(bf, OCRPT_VARREF_VVAR, &vartypes, &var_list, false)) {
 		if ((vartypes & OCRPT_VARIABLE_UNKNOWN_BIT)) {
 			ocrpt_err_printf("breakfield for '%s' references an unknown variable name\n", br->name);
 			ocrpt_expr_free(bf);

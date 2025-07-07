@@ -102,6 +102,7 @@ struct ocrpt_report {
 	 * including internal ones created for variables
 	 */
 	uint32_t num_expressions;
+	uint32_t precalc_var_rounds;
 	bool have_delayed_expr:1;
 	bool suppress:1;
 	bool executing:1;

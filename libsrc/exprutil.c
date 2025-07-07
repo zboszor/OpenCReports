@@ -863,7 +863,7 @@ DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exc
 	ocrpt_expr_resolve_worker(e, NULL, e, NULL, varref_exclude_mask, true, NULL);
 }
 
-bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask, ocrpt_list **var_list) {
+bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask, ocrpt_list **var_list, bool indirect_vars) {
 	if (!e)
 		return false;
 
@@ -898,6 +898,14 @@ bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_mask, ui
 					*varref_vartype_mask |= (1 << e->var->type);
 				if (var_list) {
 					*var_list = ocrpt_list_append(*var_list, e->var);
+				}
+
+				if (indirect_vars) {
+					ocrpt_expr_reference_worker(e->var->baseexpr, varref_include_mask, varref_vartype_mask, var_list, indirect_vars);
+					ocrpt_expr_reference_worker(e->var->ignoreexpr, varref_include_mask, varref_vartype_mask, var_list, indirect_vars);
+					ocrpt_expr_reference_worker(e->var->intermedexpr, varref_include_mask, varref_vartype_mask, var_list, indirect_vars);
+					ocrpt_expr_reference_worker(e->var->intermed2expr, varref_include_mask, varref_vartype_mask, var_list, indirect_vars);
+					ocrpt_expr_reference_worker(e->var->resultexpr, varref_include_mask, varref_vartype_mask, var_list, indirect_vars);
 				}
 			} else {
 				if (varref_vartype_mask)
@@ -949,7 +957,7 @@ bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_mask, ui
 		break;
 	case OCRPT_EXPR:
 		for (int32_t i = 0; i < e->n_ops; i++) {
-			bool found1 = ocrpt_expr_reference_worker(e->ops[i], varref_include_mask, varref_vartype_mask, var_list);
+			bool found1 = ocrpt_expr_reference_worker(e->ops[i], varref_include_mask, varref_vartype_mask, var_list, indirect_vars);
 			found = found || found1;
 		}
 		break;
@@ -963,7 +971,7 @@ bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_mask, ui
 bool ocrpt_expr_references(ocrpt_expr *e, int32_t varref_include_mask, uint32_t *varref_vartype_mask) {
 	if (varref_vartype_mask)
 		*varref_vartype_mask = 0;
-	return ocrpt_expr_reference_worker(e, varref_include_mask, varref_vartype_mask, NULL);
+	return ocrpt_expr_reference_worker(e, varref_include_mask, varref_vartype_mask, NULL, false);
 }
 
 void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {

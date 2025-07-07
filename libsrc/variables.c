@@ -76,15 +76,17 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r, enum ocrpt_re
 
 	struct {
 		const char *expr;
+		ocrpt_expr **varexpr;
 		char *error;
 	} exprs[VAR_SUBEXPRS] = {
-		{ baseexpr, "base expression not specified" },
-		{ ignoreexpr, "ignore expression not specified" },
-		{ intermedexpr, "intermediate expression not specified" },
-		{ intermed2expr, "second intermediate expression not specified" },
-		{ resultexpr, "result expression not specified" }
+		{ baseexpr, &var->baseexpr, "base expression not specified" },
+		{ ignoreexpr, &var->ignoreexpr, "ignore expression not specified" },
+		{ intermedexpr, &var->intermedexpr, "intermediate expression not specified" },
+		{ intermed2expr, &var->intermed2expr, "second intermediate expression not specified" },
+		{ resultexpr, &var->resultexpr, "result expression not specified" }
 	};
 
+	uint32_t precalc_round = 0;
 	for (int32_t i = 0; i < VAR_SUBEXPRS; i++) {
 		ocrpt_expr *e = NULL;
 		char *err = NULL;
@@ -115,14 +117,27 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r, enum ocrpt_re
 			if (free_err)
 				ocrpt_strfree(err);
 		}
-		switch (i) {
-		case 0: var->baseexpr = e; break;
-		case 1: var->ignoreexpr = e; break;
-		case 2: var->intermedexpr = e; break;
-		case 3: var->intermed2expr = e; break;
-		case 4: var->resultexpr = e; break;
+
+		*exprs[i].varexpr = e;
+
+		uint32_t vartypes = 0;
+		ocrpt_list *var_list = NULL;
+
+		if (precalculate && (ignoreexpr || var->br_name) && ocrpt_expr_reference_worker(e, OCRPT_VARREF_VVAR, &vartypes, &var_list, true)) {
+			for (ocrpt_list *ptr = var_list; ptr; ptr = ptr->next) {
+				ocrpt_var *refvar = (ocrpt_var *)ptr->data;
+
+				if (refvar->precalculate && precalc_round < refvar->precalc_round + 1)
+					precalc_round = refvar->precalc_round + 1;
+			}
 		}
+
+		ocrpt_list_free(var_list);
 	}
+
+	var->precalc_round = precalc_round;
+	if (r->precalc_var_rounds < var->precalc_round)
+		r->precalc_var_rounds = var->precalc_round;
 
 	r->dont_add_exprs = false;
 
