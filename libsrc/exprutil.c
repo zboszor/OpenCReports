@@ -863,7 +863,7 @@ DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exc
 	ocrpt_expr_resolve_worker(e, NULL, e, NULL, varref_exclude_mask, true, NULL);
 }
 
-static bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask) {
+bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask, ocrpt_list **var_list) {
 	if (!e)
 		return false;
 
@@ -896,6 +896,9 @@ static bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_m
 			if (e->var) {
 				if (varref_vartype_mask)
 					*varref_vartype_mask |= (1 << e->var->type);
+				if (var_list) {
+					*var_list = ocrpt_list_append(*var_list, e->var);
+				}
 			} else {
 				if (varref_vartype_mask)
 					*varref_vartype_mask |= OCRPT_VARIABLE_UNKNOWN_BIT;
@@ -946,7 +949,7 @@ static bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_m
 		break;
 	case OCRPT_EXPR:
 		for (int32_t i = 0; i < e->n_ops; i++) {
-			bool found1 = ocrpt_expr_reference_worker(e->ops[i], varref_include_mask, varref_vartype_mask);
+			bool found1 = ocrpt_expr_reference_worker(e->ops[i], varref_include_mask, varref_vartype_mask, var_list);
 			found = found || found1;
 		}
 		break;
@@ -957,10 +960,10 @@ static bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_m
 	return found;
 }
 
-DLL_EXPORT_SYM bool ocrpt_expr_references(ocrpt_expr *e, int32_t varref_include_mask, uint32_t *varref_vartype_mask) {
+bool ocrpt_expr_references(ocrpt_expr *e, int32_t varref_include_mask, uint32_t *varref_vartype_mask) {
 	if (varref_vartype_mask)
 		*varref_vartype_mask = 0;
-	return ocrpt_expr_reference_worker(e, varref_include_mask, varref_vartype_mask);
+	return ocrpt_expr_reference_worker(e, varref_include_mask, varref_vartype_mask, NULL);
 }
 
 void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
