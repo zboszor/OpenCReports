@@ -185,7 +185,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 
 	switch (type) {
 	case OCRPT_VARIABLE_EXPRESSION:
-		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, NULL, NULL, "r.ignoreexpr ? nulln() : r.baseexpr", reset_on_break_name, precalculate);
+		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr, ignoreexpr, NULL, NULL, "r.ignoreexpr ? null(r.baseexpr) : r.baseexpr", reset_on_break_name, precalculate);
 		break;
 	case OCRPT_VARIABLE_COUNT:
 		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, expr ? expr : "1", ignoreexpr, NULL, NULL, "r.self + ((r.ignoreexpr || isnull(r.baseexpr)) ? 0 : 1)", reset_on_break_name, precalculate);
@@ -194,7 +194,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 		var = ocrpt_variable_new_full(r, OCRPT_RESULT_NUMBER, name, NULL, ignoreexpr, NULL, NULL, "r.self + (r.ignoreexpr ? 0 : 1)", reset_on_break_name, precalculate);
 		break;
 	case OCRPT_VARIABLE_SUM:
-		exprstr = ocrpt_mem_string_new_printf("(%s%s%s == 1 ? 0 : r.self) + (r.ignoreexpr ? 0 : (isnull(r.baseexpr) ? 0 : r.baseexpr))",
+		exprstr = ocrpt_mem_string_new_printf("(%s%s%s == 1 ? 0 : r.self) + ((r.ignoreexpr || isnull(r.baseexpr)) ? 0 : r.baseexpr)",
 						reset_on_break_name ? "brrownum('" : "r.lineno",
 						reset_on_break_name ? reset_on_break_name : "",
 						reset_on_break_name ? "')" : "");
@@ -203,7 +203,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 		ocrpt_mem_string_free(exprstr, true);
 		break;
 	case OCRPT_VARIABLE_AVERAGE:
-		exprstr = ocrpt_mem_string_new_printf("(%s%s%s == 1 ? 0 : r.self) +  (r.ignoreexpr ? 0 : (isnull(r.baseexpr) ? 0 : r.baseexpr))",
+		exprstr = ocrpt_mem_string_new_printf("(%s%s%s == 1 ? 0 : r.self) + ((r.ignoreexpr || isnull(r.baseexpr)) ? 0 : r.baseexpr)",
 						reset_on_break_name ? "brrownum('" : "r.lineno",
 						reset_on_break_name ? reset_on_break_name : "",
 						reset_on_break_name ? "')" : "");
@@ -211,7 +211,7 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new(ocrpt_report *r, ocrpt_var_type typ
 		ocrpt_mem_string_free(exprstr, true);
 		break;
 	case OCRPT_VARIABLE_AVERAGEALL:
-		exprstr = ocrpt_mem_string_new_printf("(%s%s%s == 1 ? 0 : r.self) + (r.ignoreexpr ? 0 : (isnull(r.baseexpr) ? 0 : r.baseexpr))",
+		exprstr = ocrpt_mem_string_new_printf("(%s%s%s == 1 ? 0 : r.self) + ((r.ignoreexpr || isnull(r.baseexpr)) ? 0 : r.baseexpr)",
 						reset_on_break_name ? "brrownum('" : "r.lineno",
 						reset_on_break_name ? reset_on_break_name : "",
 						reset_on_break_name ? "')" : "");

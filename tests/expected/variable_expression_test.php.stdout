@@ -1,4 +1,4 @@
-Base expression for 'var1' reprinted: iif(r.'ignoreexpr',nulln(),r.'baseexpr')
+Base expression for 'var1' reprinted: iif(r.'ignoreexpr',null(r.'baseexpr'),r.'baseexpr')
 
 Variable expression reprinted: v.'var1'
 
