@@ -63,6 +63,8 @@ TESTS = \
 	variable_check_test \
 	variable_ignoreexpr_test \
 	variable_ignoreexpr2_test \
+	variable_ignoreexpr3_test \
+	variable_ignoreexpr4_test \
 	break_test \
 	break2_test \
 	break_xml_test \

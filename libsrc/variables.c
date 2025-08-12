@@ -136,8 +136,8 @@ DLL_EXPORT_SYM ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r, enum ocrpt_re
 	}
 
 	var->precalc_round = precalc_round;
-	if (r->precalc_var_rounds < var->precalc_round)
-		r->precalc_var_rounds = var->precalc_round;
+	if (r->precalc_rounds < var->precalc_round)
+		r->precalc_rounds = var->precalc_round;
 
 	r->dont_add_exprs = false;
 
@@ -341,16 +341,19 @@ DLL_EXPORT_SYM void ocrpt_variable_evaluate(ocrpt_var *v) {
 	if (!v)
 		return;
 
+	if (v->precalculate && v->precalc_rptr)
+		return;
+
 	if (v->r->o->precalculate || !v->precalculate) {
 		if (v->baseexpr)
-			ocrpt_expr_eval_worker(v->baseexpr, v->baseexpr, v);
+			ocrpt_expr_eval_worker(v->baseexpr, v->baseexpr, v, v->r->cur_precalc_round);
 		if (v->ignoreexpr)
-			ocrpt_expr_eval_worker(v->ignoreexpr, v->ignoreexpr, v);
+			ocrpt_expr_eval_worker(v->ignoreexpr, v->ignoreexpr, v, v->r->cur_precalc_round);
 		if (v->intermedexpr)
-			ocrpt_expr_eval_worker(v->intermedexpr, v->intermedexpr, v);
+			ocrpt_expr_eval_worker(v->intermedexpr, v->intermedexpr, v, v->r->cur_precalc_round);
 		if (v->intermed2expr)
-			ocrpt_expr_eval_worker(v->intermed2expr, v->intermed2expr, v);
-		ocrpt_expr_eval_worker(v->resultexpr, v->resultexpr, v);
+			ocrpt_expr_eval_worker(v->intermed2expr, v->intermed2expr, v, v->r->cur_precalc_round);
+		ocrpt_expr_eval_worker(v->resultexpr, v->resultexpr, v, v->r->cur_precalc_round);
 	}
 }
 
@@ -368,13 +371,13 @@ void ocrpt_variable_reset(ocrpt_var *v) {
 	ocrpt_expr_init_iterative_results(v->resultexpr, v->basetype);
 }
 
-void ocrpt_variables_add_precalculated_results(ocrpt_report *r, ocrpt_list *brl_start, bool last_row) {
+void ocrpt_variables_add_precalculated_results(ocrpt_report *r, ocrpt_list *brl_start, bool last_row, uint32_t round) {
 	if (!r)
 		return;
 
 	for (ocrpt_list *l = r->variables; l; l = l->next) {
 		ocrpt_var *var = (ocrpt_var *)l->data;
-		if (var->precalculate) {
+		if (var->precalculate && (var->precalc_round == round || r->precalc_rounds < round)) {
 			ocrpt_list *brl;
 			bool var_br_triggered = false;
 
@@ -397,13 +400,13 @@ void ocrpt_variables_add_precalculated_results(ocrpt_report *r, ocrpt_list *brl_
 	}
 }
 
-void ocrpt_variables_advance_precalculated_results(ocrpt_report *r, ocrpt_list *brl_start) {
+void ocrpt_variables_advance_precalculated_results(ocrpt_report *r, ocrpt_list *brl_start, uint32_t older_than_round) {
 	if (!r)
 		return;
 
 	for (ocrpt_list *l = r->variables; l; l = l->next) {
 		ocrpt_var *var = (ocrpt_var *)l->data;
-		if (var->precalculate) {
+		if (var->precalculate && var->precalc_round < older_than_round) {
 			if (var->br) {
 				if (!var->precalc_rptr)
 					var->precalc_rptr = var->precalc_results;

@@ -354,7 +354,7 @@ static void ocrpt_print_reportheader(opencreport *o, ocrpt_part *p, ocrpt_part_r
 
 static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, bool *newpage, double *page_indent, double *page_position, double *old_page_position) {
 	uint32_t rows = 0;
-	uint32_t rounds = (o->precalculate ? r->precalc_var_rounds : 0) + 1, round;
+	uint32_t rounds = (o->precalculate ? r->precalc_rounds : 0) + 1, round;
 	bool is_tabular = r->fieldheader.output_list || r->fielddetails.output_list;
 
 	for (ocrpt_list *brl = r->breaks; !is_tabular && brl; brl = brl->next) {
@@ -371,16 +371,28 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		bool have_row;
 
 		rows = 0;
+		r->cur_precalc_round = round;
 
 		ocrpt_query_navigate_start(r->query);
+		/* Reset queries and breaks */
+		for (ocrpt_list *brl = r->breaks; brl; brl = brl->next)
+			ocrpt_break_reset_vars((ocrpt_break *)brl->data);
+
 		have_row = ocrpt_query_navigate_next(r->query);
 
 		ocrpt_expr_init_iterative_results(r->detailcnt, OCRPT_RESULT_NUMBER);
 
 		ocrpt_expr_set_plain_iterative_to_null(r);
 
-		for (ocrpt_list *vl = r->variables; vl; vl = vl->next)
-			ocrpt_variable_reset((ocrpt_var *)vl->data);
+		for (ocrpt_list *vl = r->variables; vl; vl = vl->next) {
+			ocrpt_var *v = (ocrpt_var *)vl->data;
+
+			ocrpt_variable_reset(v);
+			v->precalc_rptr = NULL;
+		}
+
+		if ((o->precalculate && round > 0) || !o->precalculate)
+			ocrpt_variables_advance_precalculated_results(r, NULL, o->precalculate ? round : r->precalc_rounds + 1);
 
 		while (have_row) {
 			ocrpt_list *brl;
@@ -410,7 +422,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 					o->residx = ocrpt_expr_prev_residx(o->residx);
 
 					if (o->precalculate)
-						ocrpt_variables_add_precalculated_results(r, brl_start, last_row);
+						ocrpt_variables_add_precalculated_results(r, brl_start, false, round);
 
 					/* Switch back to the current row data */
 					o->residx = ocrpt_expr_next_residx(o->residx);
@@ -418,8 +430,8 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 					for (brl = brl_start; brl; brl = brl->next)
 						ocrpt_break_reset_vars((ocrpt_break *)brl->data);
 
-					if (!o->precalculate)
-						ocrpt_variables_advance_precalculated_results(r, brl_start);
+					if (!o->precalculate || round > 0)
+						ocrpt_variables_advance_precalculated_results(r, brl_start, o->precalculate ? round : r->precalc_rounds + 1);
 				}
 			}
 
@@ -535,16 +547,23 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			have_row = !last_row;
 			o->residx = ocrpt_expr_next_residx(o->residx);
 		}
+
+		if (o->precalculate) {
+			/* Use the previous row data temporarily */
+			o->residx = ocrpt_expr_prev_residx(o->residx);
+
+			ocrpt_variables_add_precalculated_results(r, r->breaks, true, round);
+			if (round == r->precalc_rounds)
+				ocrpt_report_expressions_add_delayed_results(r);
+
+			/* Switch back to the current row data */
+			o->residx = ocrpt_expr_next_residx(o->residx);
+		}
 	}
 
 	if (rows) {
 		/* Use the previous row data temporarily */
 		o->residx = ocrpt_expr_prev_residx(o->residx);
-
-		if (o->precalculate) {
-			ocrpt_variables_add_precalculated_results(r, r->breaks, true);
-			ocrpt_report_expressions_add_delayed_results(r);
-		}
 
 		if (is_tabular) {
 			for (ocrpt_list *brl = r->breaks_reverse; brl; brl = brl->next) {
@@ -1210,15 +1229,6 @@ static void ocrpt_execute_parts(opencreport *o) {
 							ocrpt_query_navigate_start(r->query);
 							if (r->query) {
 								r->data_rows = ocrpt_execute_one_report(o, p, pr, pd, r, &newpage, &page_indent, &page_position, &old_page_position);
-
-								if (o->precalculate) {
-									ocrpt_variables_advance_precalculated_results(r, NULL);
-
-									/* Reset queries and breaks */
-									ocrpt_query_navigate_start(r->query);
-									for (ocrpt_list *brl = r->breaks; brl; brl = brl->next)
-										ocrpt_break_reset_vars((ocrpt_break *)brl->data);
-								}
 
 								if (!r->data_rows) {
 									ocrpt_print_reportheader(o, p, pr, pd, r, 0, &newpage, &page_indent, &page_position, &old_page_position);

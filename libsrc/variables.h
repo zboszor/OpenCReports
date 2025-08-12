@@ -32,8 +32,8 @@ struct ocrpt_var {
 };
 
 void ocrpt_variable_reset(ocrpt_var *v);
-void ocrpt_variables_add_precalculated_results(ocrpt_report *r, ocrpt_list *brl_start, bool last_row);
-void ocrpt_variables_advance_precalculated_results(ocrpt_report *r, ocrpt_list *brl_start);
+void ocrpt_variables_add_precalculated_results(ocrpt_report *r, ocrpt_list *brl_start, bool last_row, uint32_t round);
+void ocrpt_variables_advance_precalculated_results(ocrpt_report *r, ocrpt_list *brl_start, uint32_t older_than_round);
 void ocrpt_variable_free(ocrpt_var *var);
 void ocrpt_variables_free(ocrpt_report *r);
 

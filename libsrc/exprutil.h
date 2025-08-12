@@ -134,7 +134,7 @@ static inline void ocrpt_expr_resolve_nowarn(ocrpt_expr *e) {
 void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exclude_mask);
 bool ocrpt_expr_references(ocrpt_expr *e, int32_t varref_include_mask, uint32_t *varref_vartype_mask);
 bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask, ocrpt_list **var_list, bool indirect_vars);
-void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var);
+void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, uint32_t precalc_round);
 bool ocrpt_expr_get_precalculate(ocrpt_expr *e);
 void ocrpt_report_expressions_add_delayed_results(ocrpt_report *r);
 void ocrpt_expr_init_iterative_results(ocrpt_expr *e, enum ocrpt_result_type type);

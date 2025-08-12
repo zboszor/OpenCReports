@@ -974,7 +974,7 @@ bool ocrpt_expr_references(ocrpt_expr *e, int32_t varref_include_mask, uint32_t 
 	return ocrpt_expr_reference_worker(e, varref_include_mask, varref_vartype_mask, NULL, false);
 }
 
-void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
+void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, uint32_t precalc_round) {
 	if (!e || !orig_e)
 		return;
 
@@ -994,7 +994,7 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 	switch (e->type) {
 	case OCRPT_EXPR:
 		for (i = 0; i < e->n_ops; i++)
-			ocrpt_expr_eval_worker(e->ops[i], orig_e, var);
+			ocrpt_expr_eval_worker(e->ops[i], orig_e, var, precalc_round);
 
 		if (e->func && e->func->func)
 			e->func->func(e, e->func->user_data);
@@ -1005,17 +1005,16 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 	case OCRPT_EXPR_VVAR:
 		assert(e->var);
 
-		if (e->o->precalculate || !e->var->precalculate) {
+		if (e->var->precalculate && e->var->precalc_rptr)
+			EXPR_RESULT(e) = (ocrpt_result *)e->var->precalc_rptr->data;
+		else {
 			if (!ocrpt_expr_get_result_evaluated(e->var->resultexpr, e->o->residx))
-				ocrpt_expr_eval_worker(e->var->resultexpr, e->var->resultexpr, e->var);
+				ocrpt_expr_eval_worker(e->var->resultexpr, e->var->resultexpr, e->var, precalc_round);
 
 			if (!EXPR_RESULT(e)) {
 				assert(EXPR_RESULT(e->var->resultexpr));
 				EXPR_RESULT(e) = EXPR_RESULT(e->var->resultexpr);
 			}
-		} else {
-			assert(e->var->precalc_rptr);
-			EXPR_RESULT(e) = (ocrpt_result *)e->var->precalc_rptr->data;
 		}
 		break;
 
@@ -1049,7 +1048,7 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 		} else if (strcmp(e->name->str, "baseexpr") == 0) {
 			assert(e->var);
 			if (e->var->baseexpr) {
-				ocrpt_expr_eval_worker(e->var->baseexpr, e->var->baseexpr, e->var);
+				ocrpt_expr_eval_worker(e->var->baseexpr, e->var->baseexpr, e->var, precalc_round);
 
 				if (!EXPR_RESULT(e)) {
 					assert(EXPR_RESULT(e->var->baseexpr));
@@ -1059,7 +1058,7 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 		} else if (strcmp(e->name->str, "intermedexpr") == 0) {
 			assert(e->var);
 			if (e->var->intermedexpr) {
-				ocrpt_expr_eval_worker(e->var->intermedexpr, e->var->intermedexpr, e->var);
+				ocrpt_expr_eval_worker(e->var->intermedexpr, e->var->intermedexpr, e->var, precalc_round);
 
 				if (!EXPR_RESULT(e)) {
 					assert(EXPR_RESULT(e->var->intermedexpr));
@@ -1069,7 +1068,7 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var) {
 		} else if (strcmp(e->name->str, "intermed2expr") == 0) {
 			assert(e->var);
 			if (e->var->intermed2expr) {
-				ocrpt_expr_eval_worker(e->var->intermed2expr, e->var->intermed2expr, e->var);
+				ocrpt_expr_eval_worker(e->var->intermed2expr, e->var->intermed2expr, e->var, precalc_round);
 
 				if (!EXPR_RESULT(e)) {
 					assert(EXPR_RESULT(e->var->intermed2expr));
@@ -1093,7 +1092,7 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_eval(ocrpt_expr *e) {
 	if (!e)
 		return NULL;
 
-	ocrpt_expr_eval_worker(e, e, NULL);
+	ocrpt_expr_eval_worker(e, e, NULL, e->r ? (e->r->executing ? e->r->precalc_rounds : UINT32_MAX) : UINT32_MAX);
 
 	if (e->o->precalculate || !e->delayed)
 		return EXPR_RESULT(e);

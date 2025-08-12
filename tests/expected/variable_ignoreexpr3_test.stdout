@@ -1,0 +1,162 @@
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 1.000000)
+	Col #1: 'firstname': string value: Fred
+	Col #2: 'lastname': string value: Flintstone
+	Col #3: 'age': string value: NULL (converted to number: 31.000000)
+
+Expression: .'lastname'
+Evaluated: (string)Flintstone
+Expression: v.'var1'
+Evaluated: (number)1200.000000
+Expression: v.'var2'
+Evaluated: (number)159.833333
+Expression: v.'var3'
+Evaluated: (number)19.833333
+Expression: v.'var4'
+Evaluated: (number)29.812500
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 2.000000)
+	Col #1: 'firstname': string value: Wilma
+	Col #2: 'lastname': string value: Flintstone
+	Col #3: 'age': string value: NULL (converted to number: 28.000000)
+
+Expression: .'lastname'
+Evaluated: (string)Flintstone
+Expression: v.'var1'
+Evaluated: (number)1200.000000
+Expression: v.'var2'
+Evaluated: (number)159.833333
+Expression: v.'var3'
+Evaluated: (number)19.833333
+Expression: v.'var4'
+Evaluated: (number)29.812500
+
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 3.000000)
+	Col #1: 'firstname': string value: Pebbles
+	Col #2: 'lastname': string value: Flintstone
+	Col #3: 'age': string value: NULL (converted to number: 0.500000)
+
+Expression: .'lastname'
+Evaluated: (string)Flintstone
+Expression: v.'var1'
+Evaluated: (number)1200.000000
+Expression: v.'var2'
+Evaluated: (number)159.833333
+Expression: v.'var3'
+Evaluated: (number)19.833333
+Expression: v.'var4'
+Evaluated: (number)29.812500
+
+Row #3
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 4.000000)
+	Col #1: 'firstname': string value: Betty
+	Col #2: 'lastname': string value: Rubble
+	Col #3: 'age': string value: NULL (converted to number: 27.000000)
+
+Expression: .'lastname'
+Evaluated: (string)Rubble
+Expression: v.'var1'
+Evaluated: (number)1200.000000
+Expression: v.'var2'
+Evaluated: (number)159.833333
+Expression: v.'var3'
+Evaluated: (number)28.000000
+Expression: v.'var4'
+Evaluated: (number)29.812500
+
+Row #4
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 5.000000)
+	Col #1: 'firstname': string value: Barney
+	Col #2: 'lastname': string value: Rubble
+	Col #3: 'age': string value: NULL (converted to number: 29.000000)
+
+Expression: .'lastname'
+Evaluated: (string)Rubble
+Expression: v.'var1'
+Evaluated: (number)1200.000000
+Expression: v.'var2'
+Evaluated: (number)159.833333
+Expression: v.'var3'
+Evaluated: (number)28.000000
+Expression: v.'var4'
+Evaluated: (number)29.812500
+
+Row #5
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 6.000000)
+	Col #1: 'firstname': string value: George
+	Col #2: 'lastname': string value: Slate
+	Col #3: 'age': string value: NULL (converted to number: 53.000000)
+
+Expression: .'lastname'
+Evaluated: (string)Slate
+Expression: v.'var1'
+Evaluated: (number)1200.000000
+Expression: v.'var2'
+Evaluated: (number)159.833333
+Expression: v.'var3'
+Evaluated: (number)53.000000
+Expression: v.'var4'
+Evaluated: (number)29.812500
+
+Row #6
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 7.000000)
+	Col #1: 'firstname': string value: Joe
+	Col #2: 'lastname': string value: Rockhead
+	Col #3: 'age': string value: NULL (converted to number: 33.000000)
+
+Expression: .'lastname'
+Evaluated: (string)Rockhead
+Expression: v.'var1'
+Evaluated: (number)1200.000000
+Expression: v.'var2'
+Evaluated: (number)159.833333
+Expression: v.'var3'
+Evaluated: (number)33.000000
+Expression: v.'var4'
+Evaluated: (number)29.812500
+
+Row #7
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 8.000000)
+	Col #1: 'firstname': string value: Sam
+	Col #2: 'lastname': string value: Slagheap
+	Col #3: 'age': string value: NULL (converted to number: 37.000000)
+
+Expression: .'lastname'
+Evaluated: (string)Slagheap
+Expression: v.'var1'
+Evaluated: (number)1200.000000
+Expression: v.'var2'
+Evaluated: (number)159.833333
+Expression: v.'var3'
+Evaluated: (number)37.000000
+Expression: v.'var4'
+Evaluated: (number)29.812500
+
+Row #8
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 9.000000)
+	Col #1: 'firstname': string value: The Great
+	Col #2: 'lastname': string value: Gazoo
+	Col #3: 'age': string value: NULL (converted to number: 1200.000000)
+
+Expression: .'lastname'
+Evaluated: (string)Gazoo
+Expression: v.'var1'
+Evaluated: (number)1200.000000
+Expression: v.'var2'
+Evaluated: (number)159.833333
+Expression: v.'var3'
+Evaluated: (number)NAN
+Expression: v.'var4'
+Evaluated: (number)29.812500
+
