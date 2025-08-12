@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <table>
+      <tr>
+        <td width="813.09">
+          <report>
+            <field_details>
+              <output>
+                <line>
+                  <data width="9.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="36.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Fred</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="76.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Flintstone</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="49.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">31.000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1200.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="85.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">159.833333</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1080.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="76.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">19.833333</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="262.09" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">29.812500</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="9.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">2</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="51.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Wilma</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="76.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Flintstone</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="49.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">28.000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1200.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="85.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">159.833333</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1080.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="76.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">19.833333</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="247.09" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">29.812500</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="9.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">3</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="60.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Pebbles</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="76.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Flintstone</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="40.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">0.500</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1200.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="85.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">159.833333</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1080.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="76.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">19.833333</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="247.09" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">29.812500</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="9.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">4</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="40.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Betty</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="54.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Rubble</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="49.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">27.000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1200.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="85.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">159.833333</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1080.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="76.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">28.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="280.09" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">29.812500</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="9.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">5</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="55.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Barney</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="54.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Rubble</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="49.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">29.000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1200.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="85.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">159.833333</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1080.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="76.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">28.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="265.09" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">29.812500</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="9.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">6</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="55.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">George</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="38.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Slate</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="49.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">53.000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1200.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="85.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">159.833333</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1080.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="76.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">53.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="281.09" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">29.812500</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="9.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">7</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="24.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Joe</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="74.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Rockhead</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="49.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">33.000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1200.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="85.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">159.833333</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1080.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="76.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">33.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="276.09" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">29.812500</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="9.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">8</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="33.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Sam</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="70.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Slagheap</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="49.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">37.000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1200.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="85.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">159.833333</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1080.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="76.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">37.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="271.09" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">29.812500</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="9.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">9</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="76.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">The Great</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="46.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Gazoo</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="67.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1200.000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1200.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="85.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">159.833333</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="94.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">1080.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="0.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">37.000000</data>
+                  <data width="4.00" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="310.09" font_point="10.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">29.812500</data>
+                </line>
+              </output>
+            </field_details>
+          </report>
+        </td>
+      </tr>
+    </table>
+  </part>
+</ocrpt>
