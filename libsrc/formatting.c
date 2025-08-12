@@ -781,14 +781,14 @@ void ocrpt_format_string(opencreport *o, ocrpt_expr *e, ocrpt_string *string0, o
 					goto end_inner_loop;
 				break;
 			case OCRPT_FORMAT_NUMBER:
-				if (!data->isnull && mpfr_asprintf(&result, tmp->str, data->number) >= 0) {
+				if (!data->isnull && !mpfr_nan_p(data->number) && mpfr_asprintf(&result, tmp->str, data->number) >= 0) {
 					ocrpt_mem_string_append(string, result);
 					mpfr_free_str(result);
 				}
 				data_handled = true;
 				break;
 			case OCRPT_FORMAT_MONEY:
-				if (!data->isnull && (len = ocrpt_mpfr_strfmon(o, NULL, 0, tmp->str, data->number)) >= 0) {
+				if (!data->isnull && !mpfr_nan_p(data->number) && (len = ocrpt_mpfr_strfmon(o, NULL, 0, tmp->str, data->number)) >= 0) {
 					result = ocrpt_mem_malloc(len + 1);
 					ocrpt_mpfr_strfmon(o, result, len, tmp->str, data->number);
 					result[len] = 0;
