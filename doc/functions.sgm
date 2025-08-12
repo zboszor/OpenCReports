@@ -966,6 +966,15 @@
 				is a shortcut for this function.
 			</para>
 		</sect2>
+		<sect2 id="isnanfunc">
+			<title>isnan()</title>
+			<para>
+				Returns numeric 1 if the operand is numeric
+				and it represents a NAN value (not-a-number),
+				0 otherwise. It takes one operand of any
+				type.
+			</para>
+		</sect2>
 		<sect2 id="isnullfunc">
 			<title>isnull()</title>
 			<para>

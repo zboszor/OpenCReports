@@ -988,6 +988,21 @@ OCRPT_STATIC_FUNCTION(ocrpt_val) {
 	}
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_isnan) {
+	if (e->n_ops != 1) {
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+		return;
+	}
+
+	if (EXPR_RESULT(e->ops[0]) && EXPR_TYPE(e->ops[0]) == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(e, EXPR_STRING_VAL(e->ops[0]));
+		return;
+	}
+
+	ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
+	mpfr_set_ui(EXPR_NUMERIC(e), EXPR_VALID_NUMERIC(e->ops[0]) && mpfr_nan_p(EXPR_NUMERIC(e->ops[0])), EXPR_RNDMODE(e));
+}
+
 OCRPT_STATIC_FUNCTION(ocrpt_isnull) {
 	if (e->n_ops != 1) {
 		ocrpt_expr_make_error_result(e, "invalid operand(s)");
@@ -3855,6 +3870,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "iif",		ocrpt_iif,	NULL,	3,	false,	false,	false,	false },
 	{ "inc",		ocrpt_inc,	NULL,	1,	false,	false,	false,	false },
 	{ "interval",	ocrpt_interval,	NULL,	-1,	false,	false,	false,	false },
+	{ "isnan",		ocrpt_isnan,	NULL,	1,	false,	false,	false,	false },
 	{ "isnull",		ocrpt_isnull,	NULL,	1,	false,	false,	false,	false },
 	{ "land",		ocrpt_land,	NULL,	-1,	true,	true,	false,	false },
 	{ "le",			ocrpt_le,	NULL,	2,	false,	false,	false,	false },
