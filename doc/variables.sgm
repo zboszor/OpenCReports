@@ -244,5 +244,18 @@
 		<para>
 			See <xref linkend="precalcvarattr"/> for an example.
 		</para>
+		<para>
+			Variables can reference other variables. When
+			certain combinations are encountered, it's necessary
+			to calculate the variables' values in multiple
+			rounds. For example, when a precalculated variable
+			is referenced by another precalculated variable that
+			also has its ignore expression set (especially if
+			the ignore expression references that other
+			variable), or its value is reset on a break boundary,
+			the referred variable's value needs to be computed
+			first, in order for the referring variable value
+			to be intuitively correct.
+		</para>
 	</sect1>
 </chapter>
