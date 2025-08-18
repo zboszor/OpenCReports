@@ -5,9 +5,9 @@ PHP_ARG_WITH([opencreports-static-array],[whether to use static arrays],
 [  --with-opencreports-static-array
                              Use PHP arrays with statically discovered data],[no],[no])
 if test "$PHP_OPENCREPORTS_STATIC_ARRAY" != "no"; then
-	PHP_DEFINE(opencreports_use_static_array,[1])
+	AC_DEFINE(opencreports_use_static_array,[1],[OpenCReports PHP module uses static array])
 else
-	PHP_DEFINE(opencreports_use_static_array,[0])
+	AC_DEFINE(opencreports_use_static_array,[0],[OpenCReports PHP module uses dynamic array if possible])
 fi
 
 if test "$PHP_OPENCREPORTS" != "no"; then
