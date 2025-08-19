@@ -119,6 +119,8 @@ AS_IF(
 
 AC_SUBST(COMPILE_SYMBOL)
 
+old_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -Wno-c23-extensions"
 AC_LIBTOOL_LINKER_OPTION([for linker support for -Wl,--export-dynamic],[ac_cv_Wl_dash_dash_export_dynamic],[-Wl,--export-dynamic],
 	[DYNAMIC_LINK_FLAG="-Wl,--export-dynamic"],
 	[AC_LIBTOOL_LINKER_OPTION([for linker support for -Wl,-export-dynamic],[ac_cv_Wl_dash_export_dynamic],[-Wl,-export-dynamic],
@@ -126,6 +128,7 @@ AC_LIBTOOL_LINKER_OPTION([for linker support for -Wl,--export-dynamic],[ac_cv_Wl
 		[AC_LIBTOOL_LINKER_OPTION([for linker support for -rdynamic],[ac_cv_WL_rdynamic],[-rdynamic],
 			[DYNAMIC_LINK_FLAG="-rdynamic"],
 			[AC_MSG_ERROR([Working dynamic linker option not found])])])])
+CFLAGS="$old_CFLAGS"
 AC_SUBST(DYNAMIC_LINK_FLAG)
 
 gl_VISIBILITY
