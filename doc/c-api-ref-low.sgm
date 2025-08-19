@@ -260,6 +260,65 @@ ocrpt_datasource_add(opencreport *o,
 };</programlisting>
 					</para>
 					<para>
+						There are also two optional parameters that control
+						the behaviour of the PostgreSQL driver in OpenCReports,
+						rather than being actual connection parameters to a
+						PostgreSQL server. These parameters may be used with
+						any of the above connection methods.
+						<itemizedlist>
+							<listitem override="bullet">
+								<para>
+									The parameter
+									<literal>usecursor</literal>
+									may have a boolean value:
+									<literal>true</literal>,
+									<literal>false</literal>,
+									<literal>yes</literal>,
+									<literal>no</literal>, or
+									a numeric value interpreted
+									as a boolean value: non-zero
+									values mean <literal>true</literal>,
+									zero means <literal>false</literal>.
+								</para>
+								<para>
+									When <literal>usecursor</literal> is enabled,
+									the SQL query will be wrapped in
+									a cursor, and the result is retrieved
+									in parts. Otherwise, the SQL query is
+									executed as is and the result is
+									retrieved in whole.
+								</para>
+								<para>
+									The default value is usually <literal>true</literal>
+									but this can be controlled when OpenCReports is built.
+								</para>
+							</listitem>
+							<listitem override="bullet">
+								<para>
+									When <literal>usecursor</literal> is enabled,
+									the parameter <literal>fetchsize</literal>
+									controls the number of rows retrieved
+									at once. Default value is 1024.
+									
+								</para>
+							</listitem>
+						</itemizedlist>
+					</para>
+					<para>
+						Using a cursor as a regular SQL query is a PostgreSQL
+						extension. Other SQL databases only allow it in stored
+						procedures. But this allows a trade-off: queries
+						that return a large number of rows may be processed
+						without the risk of running out of memory, with
+						marginally lower performance.
+					</para>
+					<para>
+						SQL queries added to the same PostgreSQL
+						datasource (connection) will behave the same
+						way. Either all of them are executed as is,
+						or all of them will use a cursor.
+					</para>
+					<para>
 						These connection parameters can be used as XML node
 						attributes, see <xref linkend="postgresqlds"/>.
 					</para>

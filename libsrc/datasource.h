@@ -7,14 +7,22 @@
 #ifndef _DATASOURCE_H_
 #define _DATASOURCE_H_
 
+#include <config.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 
 #include "opencreport.h"
 
+#if HAVE_POSTGRESQL
 extern const ocrpt_input ocrpt_postgresql_input;
+#endif
+#if HAVE_MYSQL
 extern const ocrpt_input ocrpt_mariadb_input;
+#endif
+#if HAVE_ODBC
 extern const ocrpt_input ocrpt_odbc_input;
+#endif
 extern const ocrpt_input ocrpt_array_input;
 extern const ocrpt_input ocrpt_csv_input;
 extern const ocrpt_input ocrpt_json_input;

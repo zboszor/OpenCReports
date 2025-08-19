@@ -2082,9 +2082,15 @@ static void initialize_ocrpt(void) {
 	ocrpt_input_register(&ocrpt_csv_input);
 	ocrpt_input_register(&ocrpt_xml_input);
 	ocrpt_input_register(&ocrpt_json_input);
+#if HAVE_MYSQL
 	ocrpt_input_register(&ocrpt_mariadb_input);
+#endif
+#if HAVE_POSTGRESQL
 	ocrpt_input_register(&ocrpt_postgresql_input);
+#endif
+#if HAVE_ODBC
 	ocrpt_input_register(&ocrpt_odbc_input);
+#endif
 
 	LIBXML_TEST_VERSION;
 	xmlInitParser();

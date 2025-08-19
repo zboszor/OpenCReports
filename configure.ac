@@ -177,22 +177,43 @@ PKG_CHECK_MODULES(PDFGEN, cairo >= 1.6 cairo-pdf pangocairo >= 1.10 librsvg-2.0 
 AC_SUBST(PDFGEN_CFLAGS)
 AC_SUBST(PDFGEN_LIBS)
 
-enable_pgsql_tests=no
+found_pgsql=no
 PKG_CHECK_MODULES(POSTGRESQL, libpq,
-	[enable_pgsql_tests=yes
-	 AC_DEFINE(HAVE_POSTGRESQL,[1],[Have recent enough PostgreSQL])],
+	[found_pgsql=yes
+	 AC_DEFINE(HAVE_POSTGRESQL,[1],[Have PostgreSQL])],
 	[AC_CHECK_HEADERS(libpq-fe.h,
+		[AC_CHECK_LIB(pq, PQexec,
+			[found_pgsql=yes
+			 POSTGRESQL_LIBS="-lpq"
+			 AC_DEFINE(HAVE_POSTGRESQL,[1],[Have PostgreSQL])])])])
+
+AC_ARG_ENABLE([old-pgsql],
+	[AS_HELP_STRING([--enable-old-pgsql],
+		[Use old PostgreSQL client method @<:@default=autodetect@:>@])],
+	[AS_IF([test x$enable_old_pgsql = xyes],
+		[AC_DEFINE(USE_PQEXEC,[1],[Use PQexec])
+		 AC_DEFINE(USE_PQCONNECTDB,[1],[Use PQconnectdb instead of PQconnectdbParams])])],
+	[AS_IF([test x$found_pgsql = xyes],
 		[AC_CHECK_LIB(pq, PQdescribePortal,
-			[POSTGRESQL_LIBS="-lpq"
-			 enable_pgsql_tests=yes
-			 AC_DEFINE(HAVE_POSTGRESQL,[1],[Have recent enough PostgreSQL])],
-			[AC_MSG_NOTICE([PostgreSQL is not installed or older than 8.2.0])])],
-		[AC_MSG_NOTICE([PostgreSQL is not installed or older than 8.2.0])])])
+			[],
+			[AC_DEFINE(USE_PQEXEC,[1],[Use PQexec])])
+		 AC_CHECK_LIB(pq, PQconnectdbParams,
+			[],
+			[AC_DEFINE(USE_PQCONNECTDB,[1],[Use PQconnectdb instead of PQconnectdbParams])])
+		])])
+
+AC_ARG_ENABLE([pgsql-cursor],
+	[AS_HELP_STRING([--disable-pgsql-cursor],[Don't use cursor for PostgreSQL queries by default])],
+	[AS_IF([test x$enable_pgsql_cursor = xyes],
+		[AC_DEFINE(USE_PGSQL_CURSOR,[1],[Use PostgreSQL cursor for queries by default])])],
+	[AC_DEFINE(USE_PGSQL_CURSOR,[1],[Use PostgreSQL cursor for queries by default])])
+
 AC_SUBST(POSTGRESQL_CFLAGS)
 AC_SUBST(POSTGRESQL_LIBS)
-AM_CONDITIONAL(ENABLE_PGSQL_TESTS, [test x$enable_pgsql_tests = xyes])
+AM_CONDITIONAL(ENABLE_PGSQL_TESTS, [test x$found_pgsql = xyes])
 
 MYSQL_CLIENT([5.0.3],[thread-safe])
+AS_IF([test -n "$MYSQL_CLIENT_LIBS"],[AC_DEFINE(HAVE_MYSQL,[1],[Have MySQL or MariaDB])])
 
 AC_ARG_WITH([odbcmanager],
 	[AS_HELP_STRING([--with-odbcmanager={unixodbc|iodbc}],
@@ -201,15 +222,17 @@ AC_ARG_WITH([odbcmanager],
 	[odbcmanager=unixodbc])
 AS_IF(
 	[test x$odbcmanager = xunixodbc],
-		[PKG_CHECK_MODULES(ODBC, odbc,,
+		[PKG_CHECK_MODULES(ODBC, odbc,
+			[AC_DEFINE(HAVE_ODBC,[1],[Have ODBC manager])],
 			[AC_CHECK_HEADERS(sql.h sqlext.h sqltypes.h,
 				[AC_CHECK_LIB(odbc, SQLSetConnectAttr,
-					[ODBC_LIBS="-lodbc"],
-					[AC_MSG_ERROR([ODBC library is not installed])])],
-				[AC_MSG_ERROR([ODBC headers are not installed])])])],
-	[test x$odbcmanager = xiodbc],[PKG_CHECK_MODULES(ODBC, libiodbc)],
+					[ODBC_LIBS="-lodbc"
+					 AC_DEFINE(HAVE_ODBC,[1],[Have ODBC manager])])])])],
+	[test x$odbcmanager = xiodbc],
+		[PKG_CHECK_MODULES(ODBC, libiodbc,
+			[AC_DEFINE(HAVE_ODBC,[1],[Have ODBC manager])])],
 	[AC_MSG_ERROR([Invalid ODBC manager type])])
-AC_MSG_NOTICE([ODBC manager is $odbcmanager])
+AS_IF([test -n "$ODBC_LIBS"],[AC_MSG_NOTICE([ODBC manager is $odbcmanager])])
 AC_SUBST(ODBC_CFLAGS)
 AC_SUBST(ODBC_LIBS)
 

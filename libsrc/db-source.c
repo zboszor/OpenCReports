@@ -20,10 +20,24 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#ifdef HAVE_POSTGRESQL
+#if HAVE_POSTGRESQL
 #include <libpq-fe.h>
+#ifndef USE_PGSQL_CURSOR
+#define USE_PGSQL_CURSOR 0
 #endif
+#ifndef USE_PQEXEC
+#define USE_PQEXEC 0
+#endif
+#ifndef USE_PQCONNECTDB
+#define USE_PQCONNECTDB 0
+#endif
+#endif
+
+#if HAVE_MYSQL
 #include <mysql.h>
+#endif
+
+#if HAVE_ODBC
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
@@ -46,6 +60,7 @@
 #ifndef SQL_DD_CP_UTF16
 #define SQL_DD_CP_UTF16 SQL_DD_CP_UCS2
 #endif
+#endif /* HAVE_ODBC */
 
 #include "opencreport.h"
 #include "ocrpt-private.h"
@@ -55,6 +70,13 @@
 #if HAVE_POSTGRESQL
 /* Fetch (cache) this many rows at once from the cursor */
 #define PGFETCHSIZE (1024)
+
+struct ocrpt_postgresql_conn_private {
+	PGconn *conn;
+	int32_t fetchsize;
+	bool use_cursor;
+};
+typedef struct ocrpt_postgresql_conn_private ocrpt_postgresql_conn_private;
 
 struct ocrpt_postgresql_results {
 	ocrpt_query_result *result;
@@ -71,6 +93,8 @@ typedef struct ocrpt_postgresql_results ocrpt_postgresql_results;
 
 static const ocrpt_input_connect_parameter ocrpt_postgresql_connect_method1[] = {
 	{ .param_name = "connstr", { .optional = false } },
+	{ .param_name = "usecursor", { .optional = true } },
+	{ .param_name = "fetchsize", { .optional = true } },
 	{ .param_name = NULL }
 };
 
@@ -79,6 +103,8 @@ static const ocrpt_input_connect_parameter ocrpt_postgresql_connect_method2[] = 
 	{ .param_name = "dbname", { .optional = false } },
 	{ .param_name = "user", { .optional = true } },
 	{ .param_name = "password", { .optional = true } },
+	{ .param_name = "usecursor", { .optional = true } },
+	{ .param_name = "fetchsize", { .optional = true } },
 	{ .param_name = NULL }
 };
 
@@ -88,32 +114,40 @@ static const ocrpt_input_connect_parameter ocrpt_postgresql_connect_method3[] = 
 	{ .param_name = "port", { .optional = true } },
 	{ .param_name = "user", { .optional = true } },
 	{ .param_name = "password", { .optional = true } },
+	{ .param_name = "usecursor", { .optional = true } },
+	{ .param_name = "fetchsize", { .optional = true } },
 	{ .param_name = NULL }
 };
-#endif
+
+static PGresult *ocrpt_postgresql_fetch(ocrpt_query *query);
 
 static bool ocrpt_postgresql_connect(ocrpt_datasource *source, const ocrpt_input_connect_parameter *params) {
-#if HAVE_POSTGRESQL
 	if (!source || !params)
 		return false;
 
-#define PG_APPNAMEIDX (1)
-#define PG_DBNAMEIDX (2)
+#define PG_DBNAMEIDX (1)
 
-	int32_t i, n_keywords = 3;
-	const char *keywords[8] = { "client_encoding", "application_name", "dbname", NULL };
+	int32_t i, n_keywords = 2;
+	const char *keywords[8] = { "client_encoding", "dbname", NULL, NULL };
 	const char *values[8] = { "UTF-8", NULL, NULL, NULL };
-	char *appname;
 
+#if !USE_PQCONNECTDB
 	const char *dsname = ocrpt_datasource_get_name(source);
 	int32_t len = snprintf(NULL, 0, PACKAGE_STRING " datasource %s", dsname);
-	appname = alloca(len + 1);
+	char *appname = alloca(len + 1);
 	snprintf(appname, len + 1, PACKAGE_STRING " datasource %s", dsname);
-	values[PG_APPNAMEIDX] = appname;
+	keywords[n_keywords] = "application_name";
+	values[n_keywords] = appname;
+	n_keywords++;
+#endif
 
 	for (i = 0; params[i].param_name; i++) {
-		if (strcasecmp(params[i].param_name, "connstr") == 0 ||
-				strcasecmp(params[i].param_name, "dbname") == 0 ||
+		if (strcasecmp(params[i].param_name, "connstr") == 0) {
+#if USE_PQCONNECTDB
+			keywords[PG_DBNAMEIDX] = "connstr";
+#endif
+			values[PG_DBNAMEIDX] = params[i].param_value;
+		} else if (strcasecmp(params[i].param_name, "dbname") == 0 ||
 				strcasecmp(params[i].param_name, "unix_socket") == 0)
 			values[PG_DBNAMEIDX] = params[i].param_value;
 	}
@@ -135,42 +169,194 @@ static bool ocrpt_postgresql_connect(ocrpt_datasource *source, const ocrpt_input
 	keywords[n_keywords] = NULL;
 	values[n_keywords] = NULL;
 
-	PGconn *conn = PQconnectdbParams(keywords, values, 1);
-	if (PQstatus(conn) != CONNECTION_OK) {
-		PQfinish(conn);
+	ocrpt_postgresql_conn_private *priv = ocrpt_mem_malloc(sizeof(ocrpt_postgresql_conn_private));
+
+	if (!priv)
+		return false;
+
+#if USE_PQCONNECTDB
+	ocrpt_string *conninfo = ocrpt_mem_string_new_with_len("", 1024);
+	bool added_param = false;
+
+	for (i = 0; i < n_keywords; i++) {
+		if (added_param)
+			ocrpt_mem_string_append(conninfo, " ");
+
+		const char *value = values[i];
+
+		if (value) {
+			if (strcasecmp(keywords[i], "connstr") == 0)
+				ocrpt_mem_string_append(conninfo, value);
+			else {
+				ocrpt_mem_string_append_printf(conninfo, "%s='", keywords[i]);
+
+				for (int32_t j = 0; value[j]; j++) {
+					if (value[j] == '\'' || value[j] == '\\')
+						ocrpt_mem_string_append_c(conninfo, '\\');
+					ocrpt_mem_string_append_c(conninfo, value[j]);
+				}
+				ocrpt_mem_string_append(conninfo, "'");
+			}
+
+			added_param = true;
+		}
+	}
+
+	priv->conn = PQconnectdb(conninfo->str);
+	ocrpt_mem_string_free(conninfo, true);
+#else
+	priv->conn = PQconnectdbParams(keywords, values, 1);
+#endif
+	if (PQstatus(priv->conn) != CONNECTION_OK) {
+		PQfinish(priv->conn);
+		ocrpt_mem_free(priv);
 		return false;
 	}
 
-	ocrpt_datasource_set_private(source, conn);
+	priv->fetchsize = PGFETCHSIZE;
+#if USE_PGSQL_CURSOR
+	priv->use_cursor = true;
+#else
+	priv->use_cursor = false;
+#endif
+
+	for (i = 0; params[i].param_name; i++) {
+		if (strcasecmp(params[i].param_name, "usecursor") == 0) {
+			if (strcasecmp(params[i].param_value, "yes") == 0 ||
+				strcasecmp(params[i].param_value, "true") == 0)
+				priv->use_cursor = true;
+			else if (strcasecmp(params[i].param_value, "no") == 0 ||
+				strcasecmp(params[i].param_value, "false") == 0)
+				priv->use_cursor = false;
+			else
+				priv->use_cursor = !!atoi(params[i].param_value ? params[i].param_value : "1");
+		} else if (strcasecmp(params[i].param_name, "fetchsize") == 0) {
+			uint32_t fetchsize = params[i].param_value ? atoi(params[i].param_value) : PGFETCHSIZE;
+
+			if (fetchsize == 0)
+				fetchsize = PGFETCHSIZE;
+			else if (fetchsize < 0)
+				fetchsize = -1;
+
+			priv->fetchsize = fetchsize;
+		}
+	}
+
+	if (priv->fetchsize < 0)
+		priv->use_cursor = false;
+
+	ocrpt_datasource_set_private(source, priv);
 
 	return true;
-#else
-	return false;
-#endif
 }
 
-#ifdef HAVE_POSTGRESQL
+static ocrpt_query_result *ocrpt_postgresql_describe_base(ocrpt_query *query, PGresult *res) {
+	ocrpt_datasource *source = ocrpt_query_get_source(query);
+	opencreport *o = ocrpt_datasource_get_opencreport(source);
+	ocrpt_postgresql_results *result = ocrpt_query_get_private(query);
+	ocrpt_query_result *qr;
+	int32_t i;
+
+	result->cols = PQnfields(res);
+
+	qr = ocrpt_mem_malloc(OCRPT_EXPR_RESULTS * result->cols * sizeof(ocrpt_query_result));
+
+	if (!qr)
+		return NULL;
+
+	memset(qr, 0, OCRPT_EXPR_RESULTS * result->cols * sizeof(ocrpt_query_result));
+
+	for (i = 0; i < result->cols; i++) {
+		enum ocrpt_result_type type;
+
+		switch (PQftype(res, i)) {
+		case 16: /* bool */
+		case 20: /* int8 */
+		case 21: /* int2 */
+		case 23: /* int4 */
+		case 26: /* oid */
+		case 700: /* float4 */
+		case 701: /* float8 */
+		case 1700: /* numeric */
+			type = OCRPT_RESULT_NUMBER;
+			break;
+		case 18: /* char */
+		case 19: /* name */
+		case 25: /* text */
+		case 1042: /* bpchar */
+		case 1043: /* varchar */
+		case 1560: /* bit */
+		case 1562: /* varbit */
+			type = OCRPT_RESULT_STRING;
+			break;
+		case 1082: /* date */
+		case 1083: /* time */
+		case 1114: /* timestamp */
+		case 1184: /* timestamptz */
+		case 1186: /* interval */
+		case 1266: /* timetz */
+			type = OCRPT_RESULT_DATETIME;
+			break;
+		default:
+			ocrpt_err_printf("type %d\n", PQftype(res, i));
+			type = OCRPT_RESULT_STRING;
+			break;
+		}
+
+		for (int j = 0; j < OCRPT_EXPR_RESULTS; j++) {
+			int32_t idx = j * result->cols + i;
+
+			qr[idx].name = PQfname(res, i);
+			qr[idx].result.o = o;
+			qr[idx].result.type = type;
+			qr[idx].result.orig_type = type;
+
+			if (qr[idx].result.type == OCRPT_RESULT_NUMBER) {
+				mpfr_init2(qr[idx].result.number, ocrpt_get_numeric_precision_bits(o));
+				qr[idx].result.number_initialized = true;
+			}
+
+			qr[idx].result.isnull = true;
+		}
+	}
+
+	return qr;
+}
+
 static ocrpt_query *ocrpt_postgresql_query_add(ocrpt_datasource *source, const char *name, const char *querystr) {
 	if (!source || !name || !*name || !querystr || !*querystr)
 		return NULL;
 
-	int32_t len = snprintf(NULL, 0, "DECLARE \"%s\" SCROLL CURSOR WITH HOLD FOR %s", name, querystr);
-	char *cursor = alloca(len + 1);
-	snprintf(cursor, len + 1, "DECLARE \"%s\" SCROLL CURSOR WITH HOLD FOR %s", name, querystr);
-	cursor[len] = 0;
+	ocrpt_postgresql_conn_private *priv = ocrpt_datasource_get_private(source);
+	PGresult *res;
+	char *cursor = NULL;
+	int32_t len = 0;
 
-	PGconn *conn = (PGconn *)ocrpt_datasource_get_private(source);
-	PGresult *res = PQexec(conn, cursor);
+	if (priv->use_cursor) {
+		len = snprintf(NULL, 0, "DECLARE \"%s\" SCROLL CURSOR WITH HOLD FOR %s", name, querystr);
+		cursor = alloca(len + 1);
+		snprintf(cursor, len + 1, "DECLARE \"%s\" SCROLL CURSOR WITH HOLD FOR %s", name, querystr);
+		cursor[len] = 0;
+
+		res = PQexec(priv->conn, cursor);
+	} else
+		res = PQexec(priv->conn, querystr);
+
 	switch (PQresultStatus(res)) {
 	case PGRES_COMMAND_OK:
 	case PGRES_NONFATAL_ERROR:
+	case PGRES_TUPLES_OK:
 		break;
 	default:
-		ocrpt_err_printf("failed to execute query: %s\nwith error message: %s", querystr, PQerrorMessage(conn));
+		ocrpt_err_printf("failed to execute query: %s\nwith error message: %s", querystr, PQerrorMessage(priv->conn));
 		PQclear(res);
 		return NULL;
 	}
-	PQclear(res);
+
+	if (priv->use_cursor) {
+		PQclear(res);
+		res = NULL;
+	}
 
 	ocrpt_query *query = ocrpt_query_alloc(source, name);
 	if (!query)
@@ -184,34 +370,48 @@ static ocrpt_query *ocrpt_postgresql_query_add(ocrpt_datasource *source, const c
 
 	memset(result, 0, sizeof(ocrpt_postgresql_results));
 
-	snprintf(cursor, len + 1, "FETCH %d FROM \"%s\"", PGFETCHSIZE, name);
-	result->fetchquery = ocrpt_mem_strdup(cursor);
-	result->chunk = -1;
 	result->row = -1;
 	ocrpt_query_set_private(query, result);
+
+	if (priv->use_cursor) {
+		if (priv->fetchsize > 0)
+			snprintf(cursor, len + 1, "FETCH %d FROM \"%s\"", priv->fetchsize, name);
+		else
+			snprintf(cursor, len + 1, "FETCH ALL FROM \"%s\"", name);
+		result->fetchquery = ocrpt_mem_strdup(cursor);
+		result->chunk = -1;
+
+#if USE_PQEXEC
+		result->res = ocrpt_postgresql_fetch(query);
+#endif
+	} else {
+		result->res = res;
+		query->result = result->result = ocrpt_postgresql_describe_base(query, res);
+		query->cols = result->cols;
+	}
 
 	return query;
 
 	out_error:
 
-	snprintf(cursor, len + 1, "CLOSE \"%s\"", name);
-	res = PQexec(conn, cursor);
-	PQclear(res);
+	if (priv->use_cursor) {
+		snprintf(cursor, len + 1, "CLOSE \"%s\"", name);
+		res = PQexec(priv->conn, cursor);
+		PQclear(res);
+	}
+
 	return NULL;
 }
 
 static void ocrpt_postgresql_describe(ocrpt_query *query, ocrpt_query_result **qresult, int32_t *cols) {
 	ocrpt_postgresql_results *result = ocrpt_query_get_private(query);
-	ocrpt_datasource *source = ocrpt_query_get_source(query);
-	PGconn *conn = ocrpt_datasource_get_private(source);
-	opencreport *o = ocrpt_datasource_get_opencreport(source);
 
 	if (!result->result) {
-		PGresult *res;
-		ocrpt_query_result *qr;
-		int32_t i;
+#if !USE_PQEXEC
+		ocrpt_datasource *source = ocrpt_query_get_source(query);
+		ocrpt_postgresql_conn_private *priv = ocrpt_datasource_get_private(source);
+		PGresult *res = PQdescribePortal(priv->conn, ocrpt_query_get_name(query));
 
-		res = PQdescribePortal(conn, ocrpt_query_get_name(query));
 		if (PQresultStatus(res) != PGRES_COMMAND_OK) {
 			PQclear(res);
 			if (qresult)
@@ -221,78 +421,11 @@ static void ocrpt_postgresql_describe(ocrpt_query *query, ocrpt_query_result **q
 			return;
 		}
 
-		result->cols = PQnfields(res);
-		qr = ocrpt_mem_malloc(OCRPT_EXPR_RESULTS * result->cols * sizeof(ocrpt_query_result));
-
-		if (!qr) {
-			PQclear(res);
-			if (qresult)
-				*qresult = NULL;
-			if (cols)
-				*cols = 0;
-			return;
-		}
-
-		memset(qr, 0, OCRPT_EXPR_RESULTS * result->cols * sizeof(ocrpt_query_result));
-
-		for (i = 0; i < result->cols; i++) {
-			enum ocrpt_result_type type;
-
-			switch (PQftype(res, i)) {
-			case 16: /* bool */
-			case 20: /* int8 */
-			case 21: /* int2 */
-			case 23: /* int4 */
-			case 26: /* oid */
-			case 700: /* float4 */
-			case 701: /* float8 */
-			case 1700: /* numeric */
-				type = OCRPT_RESULT_NUMBER;
-				break;
-			case 18: /* char */
-			case 19: /* name */
-			case 25: /* text */
-			case 1042: /* bpchar */
-			case 1043: /* varchar */
-			case 1560: /* bit */
-			case 1562: /* varbit */
-				type = OCRPT_RESULT_STRING;
-				break;
-			case 1082: /* date */
-			case 1083: /* time */
-			case 1114: /* timestamp */
-			case 1184: /* timestamptz */
-			case 1186: /* interval */
-			case 1266: /* timetz */
-				type = OCRPT_RESULT_DATETIME;
-				break;
-			default:
-				ocrpt_err_printf("type %d\n", PQftype(res, i));
-				type = OCRPT_RESULT_STRING;
-				break;
-			}
-
-
-
-			for (int j = 0; j < OCRPT_EXPR_RESULTS; j++) {
-				int32_t idx = j * result->cols + i;
-
-				qr[idx].name = PQfname(res, i);
-				qr[idx].result.o = o;
-				qr[idx].result.type = type;
-				qr[idx].result.orig_type = type;
-
-				if (qr[idx].result.type == OCRPT_RESULT_NUMBER) {
-					mpfr_init2(qr[idx].result.number, ocrpt_get_numeric_precision_bits(o));
-					qr[idx].result.number_initialized = true;
-				}
-
-				qr[idx].result.isnull = true;
-			}
-		}
-
-		result->result = qr;
+		result->result = ocrpt_postgresql_describe_base(query, res);
 		result->desc = res;
+#else
+		result->result = ocrpt_postgresql_describe_base(query, result->res);
+#endif
 	}
 
 	if (qresult)
@@ -304,7 +437,7 @@ static void ocrpt_postgresql_describe(ocrpt_query *query, ocrpt_query_result **q
 static PGresult *ocrpt_postgresql_fetch(ocrpt_query *query) {
 	ocrpt_postgresql_results *result = ocrpt_query_get_private(query);
 	ocrpt_datasource *source = ocrpt_query_get_source(query);
-	PGconn *conn = ocrpt_datasource_get_private(source);
+	ocrpt_postgresql_conn_private *priv = ocrpt_datasource_get_private(source);
 	PGresult *res;
 
 	if (result->res) {
@@ -312,7 +445,7 @@ static PGresult *ocrpt_postgresql_fetch(ocrpt_query *query) {
 		result->res = NULL;
 	}
 
-	res = PQexec(conn, result->fetchquery);
+	res = PQexec(priv->conn, result->fetchquery);
 	if (PQresultStatus(res) != PGRES_TUPLES_OK) {
 		PQclear(res);
 		return NULL;
@@ -328,31 +461,33 @@ static PGresult *ocrpt_postgresql_fetch(ocrpt_query *query) {
 static void ocrpt_postgresql_rewind(ocrpt_query *query) {
 	ocrpt_postgresql_results *result = ocrpt_query_get_private(query);
 	ocrpt_datasource *source = ocrpt_query_get_source(query);
-	PGconn *conn = ocrpt_datasource_get_private(source);
+	ocrpt_postgresql_conn_private *priv = ocrpt_datasource_get_private(source);
 
-	if (result->chunk > 0) {
-		if (!result->rewindquery) {
-			int len = snprintf(NULL, 0, "MOVE ABSOLUTE 0 IN \"%s\"", query->name);
+	if (priv->use_cursor) {
+		if (result->chunk > 0) {
+			if (!result->rewindquery) {
+				int len = snprintf(NULL, 0, "MOVE ABSOLUTE 0 IN \"%s\"", query->name);
 
-			result->rewindquery = ocrpt_mem_malloc(len + 1);
-			if (result->rewindquery) {
-				len = snprintf(result->rewindquery, len + 1, "MOVE ABSOLUTE 0 IN \"%s\"", query->name);
-				result->rewindquery[len] = 0;
+				result->rewindquery = ocrpt_mem_malloc(len + 1);
+				if (result->rewindquery) {
+					len = snprintf(result->rewindquery, len + 1, "MOVE ABSOLUTE 0 IN \"%s\"", query->name);
+					result->rewindquery[len] = 0;
+				}
 			}
+
+			if (result->rewindquery) {
+				PGresult *res = PQexec(priv->conn, result->rewindquery);
+				PQclear(res);
+			}
+
+			PQclear(result->res);
+			result->res = NULL;
+			result->chunk = -1;
 		}
 
-		if (result->rewindquery) {
-			PGresult *res = PQexec(conn, result->rewindquery);
-			PQclear(res);
-		}
-
-		PQclear(result->res);
-		result->res = NULL;
-		result->chunk = -1;
+		if (result->chunk == -1)
+			result->res = ocrpt_postgresql_fetch(query);
 	}
-
-	if (result->chunk == -1)
-		result->res = ocrpt_postgresql_fetch(query);
 
 	result->row = -1;
 	result->isdone = false;
@@ -380,16 +515,23 @@ static bool ocrpt_postgresql_populate_result(ocrpt_query *query) {
 
 static bool ocrpt_postgresql_next(ocrpt_query *query) {
 	ocrpt_postgresql_results *result = ocrpt_query_get_private(query);
+	ocrpt_datasource *source = ocrpt_query_get_source(query);
+	ocrpt_postgresql_conn_private *priv = ocrpt_datasource_get_private(source);
 
 	if (result->isdone)
 		return false;
 
-	if (result->res == NULL || (result->res != NULL && (result->row == PGFETCHSIZE - 1)))
-		ocrpt_postgresql_fetch(query);
+	if (priv->use_cursor) {
+		if (result->res == NULL || (result->res != NULL && (result->row == priv->fetchsize - 1)))
+			ocrpt_postgresql_fetch(query);
+	}
 
 	result->row++;
 
-	result->isdone = (result->row < PGFETCHSIZE && result->row == PQntuples(result->res));
+	if (priv->use_cursor)
+		result->isdone = (result->row < priv->fetchsize && result->row == PQntuples(result->res));
+	else
+		result->isdone = (result->row == PQntuples(result->res));
 	return ocrpt_postgresql_populate_result(query);
 }
 
@@ -402,7 +544,7 @@ static bool ocrpt_postgresql_isdone(ocrpt_query *query) {
 static void ocrpt_postgresql_free(ocrpt_query *query) {
 	ocrpt_postgresql_results *result = ocrpt_query_get_private(query);
 	ocrpt_datasource *source = ocrpt_query_get_source(query);
-	PGconn *conn = ocrpt_datasource_get_private(source);
+	ocrpt_postgresql_conn_private *priv = ocrpt_datasource_get_private(source);
 	PGresult *res;
 	char *cursor;
 	int32_t len;
@@ -412,22 +554,26 @@ static void ocrpt_postgresql_free(ocrpt_query *query) {
 	PQclear(result->desc);
 	PQclear(result->res);
 
-	len = snprintf(NULL, 0, "CLOSE \"%s\"", query->name);
-	cursor = alloca(len + 1);
-	len = snprintf(cursor, len + 1, "CLOSE \"%s\"", query->name);
-	cursor[len] = 0;
+	if (priv->use_cursor) {
+		len = snprintf(NULL, 0, "CLOSE \"%s\"", query->name);
+		cursor = alloca(len + 1);
+		len = snprintf(cursor, len + 1, "CLOSE \"%s\"", query->name);
+		cursor[len] = 0;
 
-	res = PQexec(conn, cursor);
-	PQclear(res);
+		res = PQexec(priv->conn, cursor);
+		PQclear(res);
+	}
 
 	ocrpt_mem_free(result);
 	ocrpt_query_set_private(query, NULL);
 }
 
 static void ocrpt_postgresql_close(const ocrpt_datasource *ds) {
-	PGconn *conn = ocrpt_datasource_get_private(ds);
+	ocrpt_postgresql_conn_private *priv = ocrpt_datasource_get_private(ds);
 
-	PQfinish(conn);
+	PQfinish(priv->conn);
+
+	ocrpt_mem_free(priv);
 }
 
 static const ocrpt_input_connect_parameter *ocrpt_postgresql_connect_methods[] = {
@@ -436,17 +582,13 @@ static const ocrpt_input_connect_parameter *ocrpt_postgresql_connect_methods[] =
 	ocrpt_postgresql_connect_method3,
 	NULL
 };
-#endif
 
 static const char *ocrpt_postgresql_input_names[] = { "postgresql", NULL };
 
 const ocrpt_input ocrpt_postgresql_input = {
 	.names = ocrpt_postgresql_input_names,
-#ifdef HAVE_POSTGRESQL
 	.connect_parameters = ocrpt_postgresql_connect_methods,
-#endif
 	.connect = ocrpt_postgresql_connect,
-#ifdef HAVE_POSTGRESQL
 	.query_add_sql = ocrpt_postgresql_query_add,
 	.describe = ocrpt_postgresql_describe,
 	.rewind = ocrpt_postgresql_rewind,
@@ -455,9 +597,10 @@ const ocrpt_input ocrpt_postgresql_input = {
 	.isdone = ocrpt_postgresql_isdone,
 	.free = ocrpt_postgresql_free,
 	.close = ocrpt_postgresql_close
-#endif
 };
+#endif /* HAVE_POSTGRESQL */
 
+#if HAVE_MYSQL
 struct ocrpt_mariadb_results {
 	ocrpt_query_result *result;
 	MYSQL_RES *res;
@@ -757,7 +900,9 @@ const ocrpt_input ocrpt_mariadb_input = {
 	.free = ocrpt_mariadb_free,
 	.close = ocrpt_mariadb_close
 };
+#endif /* HAVE_MYSQL */
 
+#if HAVE_ODBC
 struct ocrpt_odbc_private {
 	SQLHENV env;
 	SQLHDBC dbc;
@@ -1241,3 +1386,4 @@ const ocrpt_input ocrpt_odbc_input = {
 	.set_encoding = ocrpt_odbc_set_encoding,
 	.close = ocrpt_odbc_close
 };
+#endif /* HAVE_ODBC */
