@@ -215,7 +215,9 @@ AC_SUBST(POSTGRESQL_CFLAGS)
 AC_SUBST(POSTGRESQL_LIBS)
 AM_CONDITIONAL(ENABLE_PGSQL_TESTS, [test x$found_pgsql = xyes])
 
-MYSQL_CLIENT([5.0.3],[thread-safe])
+AC_CHECK_PROG(MYSQL_CONFIG,[mysql_config],[mysql_config],[false])
+AS_IF([test "$MYSQL_CONFIG" = "mysql_config"],
+	[MYSQL_CLIENT([5.0.3],[thread-safe])])
 AS_IF([test -n "$MYSQL_CLIENT_LIBS"],
 	[AC_DEFINE(HAVE_MYSQL,[1],[Have MySQL or MariaDB])
 	 found_mysql=yes])
