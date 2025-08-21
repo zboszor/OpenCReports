@@ -216,26 +216,68 @@ AC_SUBST(POSTGRESQL_LIBS)
 AM_CONDITIONAL(ENABLE_PGSQL_TESTS, [test x$found_pgsql = xyes])
 
 MYSQL_CLIENT([5.0.3],[thread-safe])
-AS_IF([test -n "$MYSQL_CLIENT_LIBS"],[AC_DEFINE(HAVE_MYSQL,[1],[Have MySQL or MariaDB])])
+AS_IF([test -n "$MYSQL_CLIENT_LIBS"],
+	[AC_DEFINE(HAVE_MYSQL,[1],[Have MySQL or MariaDB])
+	 found_mysql=yes])
 
 AC_ARG_WITH([odbcmanager],
 	[AS_HELP_STRING([--with-odbcmanager={unixodbc|iodbc}],
-		[specify ODBC manager library @<:@default=unixodbc@:>@])],
+		[specify ODBC manager library @<:@default=autodetect@:>@])],
 	[odbcmanager=$with_odbcmanager],
-	[odbcmanager=unixodbc])
-AS_IF(
-	[test x$odbcmanager = xunixodbc],
-		[PKG_CHECK_MODULES(ODBC, odbc,
-			[AC_DEFINE(HAVE_ODBC,[1],[Have ODBC manager])],
-			[AC_CHECK_HEADERS(sql.h sqlext.h sqltypes.h,
-				[AC_CHECK_LIB(odbc, SQLSetConnectAttr,
-					[ODBC_LIBS="-lodbc"
-					 AC_DEFINE(HAVE_ODBC,[1],[Have ODBC manager])])])])],
-	[test x$odbcmanager = xiodbc],
-		[PKG_CHECK_MODULES(ODBC, libiodbc,
-			[AC_DEFINE(HAVE_ODBC,[1],[Have ODBC manager])])],
-	[AC_MSG_ERROR([Invalid ODBC manager type])])
-AS_IF([test -n "$ODBC_LIBS"],[AC_MSG_NOTICE([ODBC manager is $odbcmanager])])
+	[odbcmanager=auto])
+
+AS_IF([test "x$odbcmanager" = "xyes"],[odbcmanager=auto],
+	[test "x$odbcmanager" = "xno"],[odbcmanager=])
+
+AC_ARG_WITH([unixodbc-headers],
+	[AS_HELP_STRING([--with-unixodbc-headers=@<:@path@:>@],
+		[specify location of unixODBC headers])],
+	[AS_IF([test "x$with_unixodbc_headers" = "xyes" -o "x$with_unixodbc_headers" = "xno"],
+		[with_unixodbc_headers=])])
+
+AC_ARG_WITH([iodbc-headers],
+	[AS_HELP_STRING([--with-iodbc-headers=@<:@path@:>@],
+		[specify location of iODBC headers])],
+	[AS_IF([test "x$with_iodbc_headers" = "xyes" -o "x$with_iodbc_headers" = "xno"],
+		[with_iodbc_headers=])])
+
+AS_IF([test "x$odbcmanager" = "xunixodbc" -o "x$odbcmanager" = "xauto"],
+	[PKG_CHECK_MODULES(ODBC, odbc,
+		[AC_DEFINE(HAVE_ODBC,[1],[Have ODBC manager])
+		 odbcmanager=unixodbc],
+		[AC_CHECK_LIB(odbc, SQLSetConnectAttr,
+			[old_CFLAGS="$CFLAGS"
+			 AS_IF([test -n "$with_unixodbc_headers"],[CFLAGS="$CFLAGS -I$with_unixodbc_headers"])
+			 AC_CHECK_HEADERS(sql.h sqlext.h sqltypes.h,
+				[ODBC_LIBS="-lodbc"
+				 AC_DEFINE(HAVE_ODBC,[1],[Have ODBC manager])
+				 odbcmanager=unixodbc],
+				[AS_IF([test "x$odbcmanager" = "xunixodbc"],
+					[AC_MSG_ERROR([unixODBC was requested but not found])])])
+			 CFLAGS="$old_CFLAGS"],
+			[AS_IF([test "x$odbcmanager" = "xunixodbc"],
+				[AC_MSG_ERROR([unixODBC was requested but not found])])])])])
+
+AS_IF([test "x$odbcmanager" = "xiodbc" -o "x$odbcmanager" = "xauto"],
+	[PKG_CHECK_MODULES(ODBC, libiodbc,
+		[AC_DEFINE(HAVE_ODBC,[1],[Have ODBC manager])
+		 odbcmanager=iodbc],
+		[AC_CHECK_LIB(iodbc, SQLSetConnectAttr,
+			[old_CFLAGS="$CFLAGS"
+			 AS_IF([test -n "$with_iodbc_headers"],[CFLAGS="$CFLAGS -I$with_iodbc_headers"])
+			 AC_CHECK_HEADERS(sql.h sqlext.h sqltypes.h,
+				[AC_DEFINE(HAVE_ODBC,[1],[Have ODBC manager])
+				 ODBC_CFLAGS="-I$with_iodbc_headers"
+				 ODBC_LIBS="-liodbc"
+				 odbcmanager=iodbc],
+				[AS_IF([test "x$odbcmanager" = "xiodbc"],
+					[AC_MSG_ERROR([iODBC was requested but not found])])])
+			 CFLAGS="$old_CFLAGS"],
+			[AS_IF([test "x$odbcmanager" = "xiodbc"],
+				[AC_MSG_ERROR([iODBC was requested but not found])])])])])
+
+AS_IF([test "x$odbcmanager" = "xauto"],[odbcmanager=])
+
 AC_SUBST(ODBC_CFLAGS)
 AC_SUBST(ODBC_LIBS)
 
@@ -292,3 +334,37 @@ AC_CONFIG_FILES([
 	tests/Makefile
 ])
 AC_OUTPUT
+
+AC_DEFUN([SUMMARY],
+	 [pretty="$2"
+	  if test "$pretty" = "unixodbc"; then
+		pretty="yes, unixODBC"
+	  elif test "$pretty" = "iodbc"; then
+		pretty="yes, iODBC"
+	  elif test "$pretty" = ""; then
+		pretty=no
+	  fi
+	  echo "AS_HELP_STRING([$1:],[$pretty])"])
+
+echo
+echo "Summary"
+echo
+echo "Input drivers:"
+echo
+SUMMARY([PostgreSQL],[$found_pgsql])
+SUMMARY([MySQL/MariaDB],[$found_mysql])
+SUMMARY([ODBC],[$odbcmanager])
+SUMMARY([Memory arrays],[always])
+SUMMARY([CSV],[always])
+SUMMARY([XML],[always])
+SUMMARY([JSON],[always])
+echo
+echo "Output formats:"
+echo
+SUMMARY([PDF],[always])
+SUMMARY([HTML],[always])
+SUMMARY([TXT],[always])
+SUMMARY([CSV],[always])
+SUMMARY([XML],[always])
+SUMMARY([JSON],[always])
+echo
