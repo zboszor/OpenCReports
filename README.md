@@ -39,7 +39,7 @@ About commercial licensing and billing, contact me at the email address at the e
 
 The dependencies to build OpenCReports are:
 
-* automake and autoconf
+* automake, autoconf and libtool
 * GNU GMP and MPFR
 * utf8proc
 * libxml2
