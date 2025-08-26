@@ -1582,7 +1582,7 @@ DLL_EXPORT_SYM const char *ocrpt_get_output_format_name(ocrpt_format_type format
 	int idx = format;
 
 	if (idx < OCRPT_OUTPUT_PDF || idx >= OCRPT_OUTPUT_LAST)
-		format = 0;
+		idx = 0;
 
 	return ocrpt_output_format_name[idx];
 }
