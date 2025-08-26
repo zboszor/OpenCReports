@@ -1020,7 +1020,14 @@ void ocrpt_expr_eval_worker(ocrpt_expr *e, ocrpt_expr *orig_e, ocrpt_var *var, u
 
 	case OCRPT_EXPR_RVAR:
 		if (strcmp(e->name->str, "lineno") == 0) {
-			if (e->r->query && e->r->query->rownum) {
+			if (!e->r) {
+				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+					if (!e->result[i]) {
+						e->result[i] = e->o->one;
+						ocrpt_expr_set_result_owned(e, i, false);
+					}
+				}
+			} else if (e->r->query && e->r->query->rownum) {
 				for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
 					if (!e->result[i] && e->r->query->rownum->result[i]) {
 						e->result[i] = e->r->query->rownum->result[i];
