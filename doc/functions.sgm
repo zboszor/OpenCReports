@@ -966,6 +966,22 @@
 				is a shortcut for this function.
 			</para>
 		</sect2>
+		<sect2 id="isdatetimefunc">
+			<title>isdatetime()</title>
+			<para>
+				Returns numeric 1 if the operand is datetime,
+				0 otherwise. It takes one operand of any
+				type.
+			</para>
+		</sect2>
+		<sect2 id="iserrorfunc">
+			<title>iserror()</title>
+			<para>
+				Returns numeric 1 if the operand is an error,
+				0 otherwise. It takes one operand of any
+				type.
+			</para>
+		</sect2>
 		<sect2 id="isnanfunc">
 			<title>isnan()</title>
 			<para>
@@ -980,6 +996,20 @@
 			<para>
 				Returns numeric 1 if the operand is NULL, 0 otherwise.
 				It takes one operand of any type.
+			</para>
+		</sect2>
+		<sect2 id="isnumericfunc">
+			<title>isnumeric()</title>
+			<para>
+				Returns numeric 1 if the operand is a numeric value,
+				0 otherwise. It takes one operand of any type.
+			</para>
+		</sect2>
+		<sect2 id="isstringfunc">
+			<title>isstring()</title>
+			<para>
+				Returns numeric 1 if the operand is a string value,
+				0 otherwise. It takes one operand of any type.
 			</para>
 		</sect2>
 		<sect2 id="nullfunc">
