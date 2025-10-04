@@ -14,11 +14,20 @@
 
 #include "opencreport.h"
 
+#ifndef HAVE_POSTGRESQL
+#define HAVE_POSTGRESQL 0
+#endif
 #if HAVE_POSTGRESQL
 extern const ocrpt_input ocrpt_postgresql_input;
 #endif
+#ifndef HAVE_MYSQL
+#define HAVE_MYSQL 0
+#endif
 #if HAVE_MYSQL
 extern const ocrpt_input ocrpt_mariadb_input;
+#endif
+#ifndef HAVE_ODBC
+#define HAVE_ODBC 0
 #endif
 #if HAVE_ODBC
 extern const ocrpt_input ocrpt_odbc_input;

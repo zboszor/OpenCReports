@@ -20,6 +20,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "opencreport.h"
+#include "ocrpt-private.h"
+#include "listutil.h"
+#include "datasource.h"
+
 #if HAVE_POSTGRESQL
 #include <libpq-fe.h>
 #ifndef USE_PGSQL_CURSOR
@@ -61,11 +66,6 @@
 #define SQL_DD_CP_UTF16 SQL_DD_CP_UCS2
 #endif
 #endif /* HAVE_ODBC */
-
-#include "opencreport.h"
-#include "ocrpt-private.h"
-#include "listutil.h"
-#include "datasource.h"
 
 #if HAVE_POSTGRESQL
 /* Fetch (cache) this many rows at once from the cursor */
