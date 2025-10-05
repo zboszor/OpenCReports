@@ -6,7 +6,6 @@
 #ifndef _OCRPT_PRIVATE_H_
 #define _OCRPT_PRIVATE_H_
 
-#include <time.h>
 #include "opencreport.h"
 #include "output.h"
 #include "color.h"
