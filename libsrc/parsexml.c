@@ -331,7 +331,7 @@ static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader)
 
 	error_out:
 
-	/* Free fixed expected atttributes */
+	/* Free fixed expected attributes */
 	for (i = 0; xmlattrs[i].attrp; i++)
 		xmlFree(*xmlattrs[i].attrp);
 
