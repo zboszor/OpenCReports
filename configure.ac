@@ -283,8 +283,10 @@ AS_IF([test "x$odbcmanager" = "xauto"],[odbcmanager=])
 AC_SUBST(ODBC_CFLAGS)
 AC_SUBST(ODBC_LIBS)
 
+found_python=no
 PKG_CHECK_MODULES(PYTHON, python3-embed,
-	[AC_DEFINE(HAVE_LIBPYTHON,[1],[Have embedded python])])
+	[AC_DEFINE(HAVE_LIBPYTHON,[1],[Have embedded python])
+	 found_python=yes])
 AC_SUBST(PYTHON_CFLAGS)
 AC_SUBST(PYTHON_LIBS)
 
@@ -361,6 +363,7 @@ echo
 SUMMARY([PostgreSQL],[$found_pgsql])
 SUMMARY([MySQL/MariaDB],[$found_mysql])
 SUMMARY([ODBC],[$odbcmanager])
+SUMMARY([Python / Pandas (XLS, XLSX, ODS)],[$found_python])
 SUMMARY([Memory arrays],[always])
 SUMMARY([CSV],[always])
 SUMMARY([XML],[always])

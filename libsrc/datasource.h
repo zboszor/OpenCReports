@@ -32,6 +32,12 @@ extern const ocrpt_input ocrpt_mariadb_input;
 #if HAVE_ODBC
 extern const ocrpt_input ocrpt_odbc_input;
 #endif
+#ifndef HAVE_LIBPYTHON
+#define HAVE_LIBPYTHON 0
+#endif
+#if HAVE_LIBPYTHON
+extern const ocrpt_input ocrpt_pandas_input;
+#endif
 extern const ocrpt_input ocrpt_array_input;
 extern const ocrpt_input ocrpt_csv_input;
 extern const ocrpt_input ocrpt_json_input;
