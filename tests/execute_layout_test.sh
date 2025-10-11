@@ -66,7 +66,7 @@ esac
 
 export ASAN_OPTIONS="log_path=results/${TEST}.${SFX[$TYPE]}.asanout,fast_unwind_on_malloc=0"
 export UBSAN_OPTIONS=print_stacktrace=true
-export LSAN_OPTIONS="suppressions=${top_srcdir}/fontconfig.supp"
+export LSAN_OPTIONS="suppressions=${top_srcdir}/ignore.supp"
 "./${TEST}" "${TYPE}" 2>"results/${TEST}.${SFX[$TYPE]}.stderr" >"results/${TEST}.${SFX[$TYPE]}"
 
 WARNINGS=

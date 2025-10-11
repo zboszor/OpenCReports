@@ -20,7 +20,7 @@ mkdir -p ${abs_builddir}/results
 rm -f results/${TEST}.stdout.*.png results/${TEST}.asanout.*
 export ASAN_OPTIONS="log_path=results/${TEST}.asanout,fast_unwind_on_malloc=0"
 export UBSAN_OPTIONS=print_stacktrace=true
-export LSAN_OPTIONS="suppressions=${top_srcdir}/fontconfig.supp"
+export LSAN_OPTIONS="suppressions=${top_srcdir}/ignore.supp"
 ./${TEST} 2>results/${TEST}.stderr >results/${TEST}.stdout
 
 if [[ -f ${abs_srcdir}/expected/${TEST}.stdout ]]; then
