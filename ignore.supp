@@ -1,3 +1,4 @@
 leak:FcPatternObjectInsertElt
 leak:Py_InitializeFromConfig
 leak:PyImport_ImportModuleLevel
+leak:arraydescr_richcompare
