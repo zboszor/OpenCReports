@@ -53,6 +53,7 @@ The dependencies to build OpenCReports are:
 * libpq (the PostgreSQL client library, optional)
 * mariadb-connector-c (the MariaDB client library, optional)
 * unixODBC (preferred) or iodbc (optional)
+* libpython for spreadsheet support (optional) - pandas and other supporting spreadsheet backend modules are also needed (e.g. xlrd, pyopenxl, odfpy, etc.)
 
 ### Build OpenCReports from sources
 
