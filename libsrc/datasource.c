@@ -453,8 +453,10 @@ DLL_EXPORT_SYM void ocrpt_query_result_set_value(ocrpt_query *q, int32_t i, bool
 	enum ocrpt_result_type type = r->orig_type;
 	switch (type) {
 	case OCRPT_RESULT_NUMBER:
-		if (!r->number_initialized)
+		if (!r->number_initialized) {
 			mpfr_init2(r->number, o->prec);
+			r->number_initialized = true;
+		}
 		if (!strcmp(str, "yes") || !strcmp(str, "true") || !strcmp(str, "t"))
 			str = "1";
 		if (!strcmp(str, "no") || !strcmp(str, "false") || !strcmp(str, "f"))
