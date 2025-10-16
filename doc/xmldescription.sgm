@@ -685,6 +685,34 @@ user=myuser
 				later under <literal>&lt;Queries&gt;</literal>.
 			</para>
 		</sect2>
+		<sect2 id="xmlpandasds">
+			<title>Spreadsheet file datasource</title>
+			<para>
+				Declaring the spreadsheet based file datasource is
+				also very simple: <programlisting>&lt;Datasource
+  name="mysource"
+  type="'spreadsheet'"
+  filename="'myfile.xlsx'" /&gt;</programlisting>
+				or <programlisting>&lt;Datasource
+  name="mysource"
+  type="'pandas'"
+  filename="'myfile.xlsx'" /&gt;</programlisting>
+			</para>
+			<para>
+				Since the spreadsheet file may contain multiple
+				sheets, the datasource declaration must specify the
+				file name, and the query will need to specify the
+				sheet label. An example can be seen under
+				<literal>&lt;Queries&gt;</literal>.
+			</para>
+			<para>
+				If the sheets that the report uses are in different
+				files, multiple spreadsheet datasources must be declared,
+				one for each file. If the sheets are in the same file,
+				then the same datasource can be used for multiple queries,
+				one query for every sheet.
+			</para>
+		</sect2>
 		<sect2 id="arrayds">
 			<title>Array datasource</title>
 			<para>
@@ -796,18 +824,21 @@ SELECT * FROM some_table
 		<sect2 id="xmlfilequeries" xreflabel="File based queries">
 			<title>Queries for file based datasources</title>
 			<para>
-				Queries for CSV, XML and JSON datasources may
-				be declared two ways. Either as the XML value for
+				Queries for CSV, XML, JSON and spreadsheet datasources
+				may be declared two ways. Either as the XML value for
 				<literal>&lt;Query&gt;</literal>:
+				<programlisting>&lt;Query name="myquery" datasource="mysource" &gt;xmldata.xml&lt;/Query&gt;</programlisting>
+				or as the <literal>value</literal> attribute:
 				<programlisting>&lt;Query
     name="myquery"
     datasource="mysource"
-&gt;xmldata.xml&lt;/Query&gt;</programlisting>
-					or as the <literal>value</literal> attribute:
-					<programlisting>&lt;Query
-    name="myquery"
-    datasource="mysource"
     value="'xmldata.xml'" /&gt;</programlisting>
+			</para>
+			<para>
+				Example query for a spreadsheet: <programlisting>&lt;Query
+    name="mysheet"
+    datasource="mysource"
+    value="'Sheet1'" /&gt;</programlisting>
 			</para>
 			<para>
 				Notes:
@@ -831,8 +862,16 @@ SELECT * FROM some_table
 					</listitem>
 					<listitem override="bullet">
 						<para>
-							The declaration must specify a file in the
-							correct format for the datasource type.
+							For CSV, XML and  JSON files, the <literal>value</literal>
+							in the query declaration is the file name.
+							This file must be in the correct format for the
+							datasource type.
+						</para>
+					</listitem>
+					<listitem override="bullet">
+						<para>
+							For spreadsheets, the <literal>value</literal>
+							in the query declaration is the sheet label.
 						</para>
 					</listitem>
 					<listitem override="bullet">

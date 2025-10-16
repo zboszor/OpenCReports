@@ -178,6 +178,11 @@
 							a.k.a. <literal>JSON</literal>
 						</para>
 					</listitem>
+					<listitem override="bullet">
+						<para>
+							spreadsheet formats, like XLS, XLSX and ODS
+						</para>
+					</listitem>
 				</itemizedlist>
 			</para>
 			<para>
@@ -317,6 +322,21 @@
 					indicators may be added along with the XML input file,
 					so the explicit conversion functions may be omitted from
 					expressions using the data.
+				</para>
+			</sect3>
+			<sect3 id="ssheetds" xreflabel="Spreadsheet file type">
+				<title>Spreadsheet file types</title>
+				<para>
+					OpenCReports also supports various spreadsheet formats
+					as datasources. For that, it relies on the Python
+					<literal>pandas</literal> module and the supporting
+					modules for the actual spreadsheet file format.
+					Such Python modules are <literal>xlrd</literal> for
+					the older Microsoft XLS format,
+					<literal>pyopenxl</literal> for the newer Microsoft
+					XLSX format, and <literal>odfpy</literal> for LibreOffice
+					ODS format. Other modules may also be used to support
+					other spreadsheet file formats.
 				</para>
 			</sect3>
 		</sect2>

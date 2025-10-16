@@ -364,6 +364,21 @@ ocrpt_datasource_add(opencreport *o,
 						attributes, see <xref linkend="odbcds"/>.
 					</para>
 				</sect4>
+				<sect4 id="ssheetconnparams">
+					<title>Spreadsheet connection parameters</title>
+					<para>
+						There is only one connection parameter for
+						spreadsheet based datasources, the file name.
+						<programlisting>ocrpt_input_connect_parameter conn_params[] = {
+    { .param_name = "filename", .param_value = "..." },
+    { .param_name = NULL }
+};</programlisting>
+					</para>
+					<para>
+						This parameter can be used as an XML node attribute,
+						see <xref linkend="ssheetds"/>.
+					</para>
+				</sect4>
 			</sect3>
 			<sect3 id="findds">
 				<title>Find a datasource</title>
