@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="pandas" type="'pandas'" filename="test.xls" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="pandas" value="'Sheet1'" />
+	</Queries>
+</OpenCReport>
