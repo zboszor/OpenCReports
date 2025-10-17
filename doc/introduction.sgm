@@ -115,7 +115,7 @@
 			<para>
 				A report break is a form of data grouping based on
 				value changes. A break (break boundary) occurs when the
-				value of a watched expression value changes from one
+				value of a watched expression changes from one
 				data row to the next. OpenCReports supports report breaks
 				defined on arbitrary expressions. Report variables can
 				reset their value on break boundaries. See
