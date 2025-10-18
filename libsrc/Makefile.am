@@ -47,6 +47,7 @@ libopencreport_la_SOURCES = \
 	xml-output.c csv-output.c json-output.c
 
 libopencreport_la_LIBADD = \
+	-lm \
 	libopencreport_grammar.la \
 	$(MPFR_LIBS) $(PAPER_LIBS) $(UTF8PROC_LIBS) $(LIBXML_LIBS) \
 	$(CSV_LIBS) $(YAJL_LIBS) $(POSTGRESQL_LIBS) $(MYSQL_CLIENT_LIBS) \
