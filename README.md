@@ -52,7 +52,7 @@ The dependencies to build OpenCReports are:
 * Pango build with Cairo support a.k.a. PangoCairo
 * libpq (the PostgreSQL client library, optional)
 * mariadb-connector-c (the MariaDB client library, optional)
-* unixODBC (preferred) or iodbc (optional)
+* unixODBC or iodbc (optional, unixODBC is preferred)
 * libpython for spreadsheet support (optional) - pandas and other supporting spreadsheet backend modules are also needed (e.g. xlrd, pyopenxl, odfpy, etc.)
 
 ### Build OpenCReports from sources
