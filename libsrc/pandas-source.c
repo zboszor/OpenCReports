@@ -417,7 +417,6 @@ static bool ocrpt_pandas_populate_result(ocrpt_query *query) {
 				r->type = r->orig_type;
 				r->isnull = true;
 			} else {
-				r->isnull = false;
 				r->type = OCRPT_RESULT_NUMBER;
 
 				if (!r->number_initialized) {
