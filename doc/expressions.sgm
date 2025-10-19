@@ -270,10 +270,10 @@ false</programlisting>
 				<programlisting>field_name
 field_name5
 myquery1.field_name
-mező_név
-lekérdezés.mező_név</programlisting>
+oszlop_név
+lekérdezés.oszlop_név</programlisting>
 				In the above example,
-				<literal>mező_név</literal> means
+				<literal>oszlop_név</literal> means
 				<literal>field_name</literal>, and
 				<literal>lekérdezés.oszlop_név</literal> means
 				<literal>query.field_name</literal> in Hungarian.
