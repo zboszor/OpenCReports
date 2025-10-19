@@ -43,7 +43,7 @@ void ocrpt_layout_compute_text(opencreport *o, ocrpt_text *le) {
 		has_translate = !!mpfr_get_si(EXPR_NUMERIC(le->translate), EXPR_RNDMODE(le->translate));
 	}
 
-	if (EXPR_VALID_STRING(le->format))
+	if (EXPR_VALID_STRING(le->format) && !EXPR_ISNULL(le->format))
 		has_format = true;
 
 	if (EXPR_VALID_NOT_NULL(le->value) && (EXPR_VALID_STRING(le->value) || EXPR_VALID_NUMERIC(le->value) || EXPR_VALID_DATETIME(le->value)))
