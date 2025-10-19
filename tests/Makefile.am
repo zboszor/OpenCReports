@@ -183,6 +183,7 @@ LAYOUT_TESTS = \
 	layout_xml11_test \
 	layout_xml12_test \
 	layout_xml13_test \
+	layout_xml13_include_test \
 	layout_xml14_test \
 	layout_xml15_test \
 	layout_xml16_test \
@@ -259,6 +260,7 @@ PHP_LAYOUT_TESTS = \
 	layout_xml11_test \
 	layout_xml12_test \
 	layout_xml13_test \
+	layout_xml13_include_test \
 	layout_xml14_test \
 	layout_xml15_test \
 	layout_xml16_test \
