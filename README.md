@@ -7,6 +7,10 @@ The most up-to-date original repository was at https://github.com/SICOM/rlib
 which was (together with many others under https://github.com/SICOM)
 recently deleted. Ancient versions of RLIB are at https://sourceforge.net/projects/rlib
 
+The name OpenCReports came from the fact that it's implemented
+in the C programming language in an open way, and using a free
+software license.
+
 ## Currently missing features
 
 * language bindings other than C and PHP
