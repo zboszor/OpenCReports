@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="pandas" type="'pandas'" filename="test1.xlsx" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="pandas" value="'Sheet1'" />
+	</Queries>
+	<Report>
+		<ReportHeader>
+			<Output>
+				<Line>
+					<literal>XLSX mixed values test</literal>
+				</Line>
+			</Output>
+		</ReportHeader>
+		<Detail>
+			<FieldHeaders>
+				<Output>
+					<HorizontalLine size="1" bgcolor="'black'"/>
+					<Line bgcolor="'0xe5e5e5'">
+						<literal width="25">Value</literal>
+						<literal width="1"/>
+						<literal width="4">Text</literal>
+						<literal width="1"/>
+						<literal width="7">Numeric</literal>
+						<literal width="1"/>
+						<literal width="8">Datetime</literal>
+						<literal width="1"/>
+						<literal width="4">Null</literal>
+					</Line>
+					<HorizontalLine size="1" bgcolor="'black'"/>
+					<HorizontalLine size="4" bgcolor="'white'"/>
+				</Output>
+			</FieldHeaders>
+			<FieldDetails>
+				<Output>
+					<Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+						<field value="value" width="25" format="isnumeric(r.value) ? '%.4d' : nulls()" align="isnumeric(r.value) ? 'right' : 'left'"/>
+						<literal width="1"/>
+						<field value="isstring(value) ? '*' :  ' '" width="4" align="center"/>
+						<literal width="1"/>
+						<field value="isnumeric(value) ? '*' :  ' '" width="7" align="center"/>
+						<literal width="1"/>
+						<field value="isdatetime(value) ? '*' :  ' '" width="8" align="center"/>
+						<literal width="1"/>
+						<field value="isnull(value) ? '*' :  ' '" width="4" align="center"/>
+					</Line>
+				</Output>
+			</FieldDetails>
+		</Detail>
+	</Report>
+</OpenCReport>

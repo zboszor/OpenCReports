@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <table>
+      <tr>
+        <td width="566.48">
+          <report>
+            <report_header>
+              <output>
+                <line>
+                  <data width="566.48" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">XLSX mixed values test</data>
+                </line>
+              </output>
+            </report_header>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="180.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Value</data>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Text</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Numeric</data>
+                  <data width="57.60" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Datetime</data>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Null</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="180.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Some text</data>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">*</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000"> </data>
+                  <data width="57.60" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000"> </data>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000"> </data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="180.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="right" bgcolor="#ffffff" color="#000000">65.3000</data>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">*</data>
+                  <data width="57.60" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000"> </data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="180.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">10/19/25 10:50:37</data>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000"> </data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000"> </data>
+                  <data width="57.60" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">*</data>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000"> </data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="180.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">10/19/25 10:50:37</data>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">*</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="57.60" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000"> </data>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ffffff" color="#000000">*</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="180.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#e5e5e5" color="#000000">Some text 2</data>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000">*</data>
+                  <data width="50.40" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000"> </data>
+                  <data width="57.60" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000"> </data>
+                  <data width="28.80" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#e5e5e5" color="#000000"> </data>
+                </line>
+              </output>
+            </field_details>
+          </report>
+        </td>
+      </tr>
+    </table>
+  </part>
+</ocrpt>

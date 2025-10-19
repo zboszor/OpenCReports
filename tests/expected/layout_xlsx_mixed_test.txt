@@ -1,0 +1,7 @@
+XLSX mixed values test
+Value                     Text Numeric Datetime Null
+Some text                  *                        
+                  65.3000         *                 
+10/19/25 10:50:37                         *         
+                           *                     *  
+Some text 2                *                        
