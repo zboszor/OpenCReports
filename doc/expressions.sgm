@@ -307,8 +307,8 @@ lekérdezés.oszlop_név</programlisting>
 			<title>User defined variables</title>
 			<para>
 				Domain <literal>v</literal> signifies user defined
-				report variables, which can be used in breaks or
-				to shortcut expressions. Example:
+				report variables, which can be used to shortcut expressions.
+				Example:
 				<programlisting>v.my_variable</programlisting>
 			</para>
 			<para>
