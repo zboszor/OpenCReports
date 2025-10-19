@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="pandas" type="'pandas'" filename="test.xls" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="pandas" value="'Sheet1'" />
+	</Queries>
+	<Report orientation="landscape">
+		<ReportHeader>
+			<Output>
+				<Line>
+					<literal>XLS test</literal>
+				</Line>
+			</Output>
+		</ReportHeader>
+		<Detail>
+			<FieldHeaders>
+				<Output>
+					<HorizontalLine size="1" bgcolor="'black'"/>
+					<Line bgcolor="'0xe5e5e5'">
+						<literal width="4" col="1">ID</literal>
+						<literal width="1"/>
+						<literal width="20" col="2">Name</literal>
+						<literal width="1"/>
+						<literal width="24" col="2">Date</literal>
+						<literal width="1"/>
+						<literal width="10" col="2">Time</literal>
+						<literal width="1"/>
+						<literal width="24" col="2">DateTime</literal>
+						<literal width="1"/>
+						<literal width="6" col="4">Age</literal>
+						<literal width="1"/>
+						<literal width="6" col="4">Age2</literal>
+						<literal width="1"/>
+						<literal width="5" col="5">Adult</literal>
+					</Line>
+					<HorizontalLine size="1" bgcolor="'black'"/>
+					<HorizontalLine size="4" bgcolor="'white'"/>
+				</Output>
+			</FieldHeaders>
+			<FieldDetails>
+				<Output>
+					<Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+						<field value="id" width="4" align="right"/>
+						<literal width="1"/>
+						<field value="name" width="20" align="left"/>
+						<literal width="1"/>
+						<field value="bday" width="24" align="left"/>
+						<literal width="1"/>
+						<field value="btime" width="10" align="left"/>
+						<literal width="1"/>
+						<field value="bts" width="24" align="left"/>
+						<literal width="1"/>
+						<field value="age" width="6" format="'%.2d'" align="'right'"/>
+						<literal width="1"/>
+						<field value="age2" width="6" format="'%.2d'" align="'right'"/>
+						<literal width="1"/>
+						<field value="adult ? 'yes' : 'no'" width="5" align="'center'"/>
+					</Line>
+				</Output>
+			</FieldDetails>
+		</Detail>
+	</Report>
+</OpenCReport>

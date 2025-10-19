@@ -93,7 +93,12 @@ void ocrpt_layout_compute_text(opencreport *o, ocrpt_text *le) {
 			ocrpt_format_string(o, NULL, rstring, fstring, &le->value, 1);
 			break;
 		case OCRPT_RESULT_DATETIME:
-			ocrpt_mem_string_append_printf(fstring, "%s", nl_langinfo_l(D_FMT, o->locale));
+			if (EXPR_RESULT(le->value)->date_valid && EXPR_RESULT(le->value)->time_valid)
+				ocrpt_mem_string_append_printf(fstring, "%s %s", nl_langinfo_l(D_FMT, o->locale), nl_langinfo_l(T_FMT, o->locale));
+			else if (EXPR_RESULT(le->value)->date_valid)
+				ocrpt_mem_string_append_printf(fstring, "%s", nl_langinfo_l(D_FMT, o->locale));
+			else if (EXPR_RESULT(le->value)->time_valid)
+				ocrpt_mem_string_append_printf(fstring, "%s", nl_langinfo_l(T_FMT, o->locale));
 			ocrpt_format_string(o, NULL, rstring, fstring, &le->value, 1);
 			break;
 		}

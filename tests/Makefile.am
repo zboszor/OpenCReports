@@ -217,6 +217,9 @@ LAYOUT_TESTS = \
 	layout_code41_test \
 	layout_xml42_test \
 	layout_xml43_test \
+	layout_xls_test \
+	layout_xlsx_test \
+	layout_ods_test \
 	layout_variable_ignoreexpr_test \
 	header_query_test \
 	header_query2_test \
