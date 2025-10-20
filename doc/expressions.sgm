@@ -410,7 +410,7 @@ lekérdezés.oszlop_név</programlisting>
 					</para>
 					<para>
 						It can be thought as an alias to the
-						<xref linkend="rownumfunc"/> function which does
+						<xref linkend="rownumfunc"/> which does
 						the same by default. But functions may be overridden
 						by user defined functions, while this variable will
 						always work as described.
