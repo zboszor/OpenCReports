@@ -165,7 +165,7 @@ static zend_always_inline void *zend_object_alloc(size_t obj_size, zend_class_en
 #endif
 
 /* Introduced in PHP 8.0 */
-#if PHP_VERSION_ID < 80100
+#if PHP_VERSION_ID < 80000
 typedef int zend_result;
 #define RETURN_THROWS() do { ZEND_ASSERT(EG(exception)); (void) return_value; return; } while (0)
 #define Z_PARAM_ARRAY_HT_OR_NULL(dest) Z_PARAM_ARRAY_HT_EX(dest, 1, 0)
