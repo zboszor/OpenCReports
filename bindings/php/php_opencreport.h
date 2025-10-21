@@ -28,9 +28,8 @@
  * With PHP 7.3 or newer, --with-opencreports-static-array
  * can switch back to this older method.
  */
-#if PHP_VERSION_ID >= 70300
-#include "include/php_opencreports_use_static_array.h"
-#else
+#if PHP_VERSION_ID < 70300
+#undef opencreports_use_static_array
 #define opencreports_use_static_array 1
 #endif
 
