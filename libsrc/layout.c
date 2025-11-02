@@ -550,6 +550,13 @@ void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output) {
 							if (elem->wrap_chars)
 								elem->memo_wrap_chars = !!ocrpt_expr_get_long(elem->wrap_chars);
 
+							ocrpt_expr_resolve(elem->hyphenate);
+							ocrpt_expr_optimize(elem->hyphenate);
+							if (elem->hyphenate)
+								elem->memo_hyphenate = !!ocrpt_expr_get_long(elem->hyphenate);
+							else
+								elem->memo_hyphenate = true;
+
 							ocrpt_expr_resolve(elem->max_lines);
 							ocrpt_expr_optimize(elem->max_lines);
 							if (elem->max_lines)
@@ -1938,6 +1945,14 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_memo(ocrpt_text *text, const char *exp
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_memo(ocrpt_text *text) {
 	GET_TEXT_EXPR(memo_expr);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_memo_hyphenate(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(hyphenate, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_memo_hyphenate(ocrpt_text *text) {
+	GET_TEXT_EXPR(hyphenate);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_memo_wrap_chars(ocrpt_text *text, const char *expr_string) {

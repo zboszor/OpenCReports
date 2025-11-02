@@ -49,6 +49,7 @@ struct ocrpt_text {
 	ocrpt_expr *value;
 	ocrpt_expr *delayed;
 	ocrpt_expr *memo_expr;
+	ocrpt_expr *hyphenate;
 	ocrpt_expr *wrap_chars;
 	ocrpt_expr *max_lines;
 	ocrpt_expr *format;
@@ -88,6 +89,7 @@ struct ocrpt_text {
 	bool italic_val:1;
 	bool memo:1;
 	bool memo_wrap_chars:1;
+	bool memo_hyphenate:1;
 	bool use_bb:1;
 	bool justified:1;
 };

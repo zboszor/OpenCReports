@@ -154,6 +154,7 @@
 	italics CDATA #IMPLIED
 	link CDATA #IMPLIED
 	memo CDATA #IMPLIED
+	memo_hyphenate CDATA #IMPLIED
 	memo_wrap_chars CDATA #IMPLIED
 	memo_max_lines CDATA #IMPLIED
 	translate CDATA #IMPLIED
@@ -177,6 +178,7 @@
 	italics CDATA #IMPLIED
 	link CDATA #IMPLIED
 	memo CDATA #IMPLIED
+	memo_hyphenate CDATA #IMPLIED
 	memo_wrap_chars CDATA #IMPLIED
 	memo_max_lines CDATA #IMPLIED
 	translate CDATA #IMPLIED

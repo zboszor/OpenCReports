@@ -239,7 +239,10 @@ void ocrpt_common_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 				free_alist = true;
 			}
 
-			PangoAttribute *nohyph = pango_attr_insert_hyphens_new(TRUE);
+			/*
+			 * When memo_wrap_chars="yes" is set, do not insert hyphens.
+			 */
+			PangoAttribute *nohyph = pango_attr_insert_hyphens_new((!le->memo_wrap_chars && le->memo_hyphenate) ? TRUE : FALSE);
 			pango_attr_list_insert(alist, nohyph);
 			pango_layout_set_attributes(le->layout, alist);
 

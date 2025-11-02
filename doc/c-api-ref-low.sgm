@@ -2642,6 +2642,29 @@ ocrpt_expr *
 ocrpt_text_get_memo(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
+				<sect4 id="textsetmemohyphenate">
+					<title>Set or get text element "hyphenate" property</title>
+					<para>
+						Set the text element's "hyphenate"
+						property from an expression string.
+						The expression must evaluate to a numeric
+						(boolean) value. This setting is only used
+						for multiline fields. When set to
+						<literal>false</literal>, words at the end
+						of the lines in the multiline text field
+						would break over to the next line as a whole.
+						When set to <literal>true</literal>, the word
+						will be hyphenated. Default is
+						<literal>true</literal>. When character wrapping
+						is in used (see below), this setting in not used.
+						<programlisting>ocrpt_expr *
+ocrpt_text_set_memo_hyphenate(ocrpt_text *text,
+                              const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_memo_hyphenate(ocrpt_text *text);</programlisting>
+					</para>
+				</sect4>
 				<sect4 id="textsetmemowrap">
 					<title>Set or get text element "wrap at characters" property</title>
 					<para>

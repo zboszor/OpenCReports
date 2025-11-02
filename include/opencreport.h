@@ -1045,6 +1045,8 @@ ocrpt_expr *ocrpt_text_set_link(ocrpt_text *text, const char *expr_string);
 ocrpt_expr *ocrpt_text_get_link(ocrpt_text *text);
 ocrpt_expr *ocrpt_text_set_memo(ocrpt_text *text, const char *expr_string);
 ocrpt_expr *ocrpt_text_get_memo(ocrpt_text *text);
+ocrpt_expr *ocrpt_text_set_memo_hyphenate(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_get_memo_hyphenate(ocrpt_text *text);
 ocrpt_expr *ocrpt_text_set_memo_wrap_chars(ocrpt_text *text, const char *expr_string);
 ocrpt_expr *ocrpt_text_get_memo_wrap_chars(ocrpt_text *text);
 ocrpt_expr *ocrpt_text_set_memo_max_lines(ocrpt_text *text, const char *expr_string);

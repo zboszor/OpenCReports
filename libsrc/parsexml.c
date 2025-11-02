@@ -486,7 +486,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 
 	xmlChar *value, *delayed, *format, *width, *align;
 	xmlChar *color, *bgcolor, *font_name, *font_size;
-	xmlChar *bold, *italic, *link, *memo, *memo_wrap_chars, *memo_max_lines;
+	xmlChar *bold, *italic, *link, *memo, *hyphenate, *memo_wrap_chars, *memo_max_lines;
 	xmlChar *translate;
 	struct {
 		char *attrs[3];
@@ -505,6 +505,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 		{ { "italic", "italics" }, &italic },
 		{ { "link" }, &link },
 		{ { "memo" }, &memo },
+		{ { "memo_hyphenate" }, &hyphenate },
 		{ { "memo_wrap_chars" }, &memo_wrap_chars },
 		{ { "memo_max_lines" }, &memo_max_lines },
 		{ { "translate" }, &translate },
@@ -563,6 +564,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	ocrpt_text_set_translate(elem, (char *)translate);
 
 	ocrpt_text_set_memo(elem, (char *)memo);
+	ocrpt_text_set_memo_hyphenate(elem, (char *)hyphenate);
 	ocrpt_text_set_memo_wrap_chars(elem, (char *)memo_wrap_chars);
 	ocrpt_text_set_memo_max_lines(elem, (char *)memo_max_lines);
 

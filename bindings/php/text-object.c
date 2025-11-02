@@ -606,6 +606,45 @@ PHP_METHOD(opencreport_text, get_memo) {
 	eo->e = e;
 }
 
+PHP_METHOD(opencreport_text, set_memo_hyphenate) {
+	zval *object = getThis();
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
+
+	ocrpt_expr *e = ocrpt_text_set_memo_hyphenate(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
+}
+
+PHP_METHOD(opencreport_text, get_memo_hyphenate) {
+	zval *object = getThis();
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_expr *e = ocrpt_text_get_memo_hyphenate(to->text);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
+}
+
 PHP_METHOD(opencreport_text, set_memo_wrap_chars) {
 	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
@@ -788,6 +827,13 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_get_memo, 0, 0, OpenCReport\\Expr, 1)
 ZEND_END_ARG_INFO()
 
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_memo_hyphenate, 0, 1, OpenCReport\\Expr, 1)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_get_memo_hyphenate, 0, 0, OpenCReport\\Expr, 1)
+ZEND_END_ARG_INFO()
+
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_memo_wrap_chars, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
@@ -833,6 +879,8 @@ ZEND_END_ARG_INFO()
 #define arginfo_opencreport_text_get_link NULL
 #define arginfo_opencreport_text_set_memo NULL
 #define arginfo_opencreport_text_get_memo NULL
+#define arginfo_opencreport_text_set_memo_hyphenate NULL
+#define arginfo_opencreport_text_get_memo_hyphenate NULL
 #define arginfo_opencreport_text_set_memo_wrap_chars NULL
 #define arginfo_opencreport_text_get_memo_wrap_chars NULL
 #define arginfo_opencreport_text_set_memo_max_lines NULL
@@ -870,6 +918,8 @@ static const zend_function_entry opencreport_text_class_methods[] = {
 	PHP_ME(opencreport_text, get_link, arginfo_opencreport_text_get_link, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_text, set_memo, arginfo_opencreport_text_set_memo, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_text, get_memo, arginfo_opencreport_text_get_memo, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_memo_hyphenate, arginfo_opencreport_text_set_memo_hyphenate, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, get_memo_hyphenate, arginfo_opencreport_text_get_memo_hyphenate, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_text, set_memo_wrap_chars, arginfo_opencreport_text_set_memo_wrap_chars, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_text, get_memo_wrap_chars, arginfo_opencreport_text_get_memo_wrap_chars, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_text, set_memo_max_lines, arginfo_opencreport_text_set_memo_max_lines, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)

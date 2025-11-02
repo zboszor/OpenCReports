@@ -3842,6 +3842,26 @@ SELECT * FROM some_table
 					<xref linkend="textelemalign"/>.
 				</para>
 			</sect3>
+			<sect3 id="memohyphenate">
+				<title>Multi-line field hyphenation</title>
+				<para>
+					This attribute allows wrapping multi-line text somewhere
+					in the middle of the words with hyphenation. The text
+					rendering library may need extra supporting libraries
+					so the hyphenation in the report locale is correct.
+					<programlisting>&lt;field value="'This is a long text...'"
+       width="12" memo="yes" memo_hyphenate="no" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is <literal>true</literal>, i.e. the field
+					is hyphenated. When character wrapping is used,
+					this setting is not used.
+				</para>
+				<para>
+					In OpenCReports, character wrapping adds hyphenation.
+					This is an improvement over RLIB.
+				</para>
+			</sect3>
 			<sect3 id="memowrap">
 				<title>Multi-line field wrapping</title>
 				<para>

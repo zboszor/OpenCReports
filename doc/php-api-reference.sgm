@@ -4027,6 +4027,13 @@ OpenCReport\Image::get_text_width():
     public final get_memo():
                      ?OpenCReport\Expr;
 
+    public final set_memo_hyphenate(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+
+    public final get_memo_hyphenate():
+                     ?OpenCReport\Expr;
+
     public final set_memo_wrap_chars(
                      ?string $expr_string = null):
                      ?OpenCReport\Expr;
@@ -4273,6 +4280,29 @@ OpenCReport\Text::set_memo(
 
 public final
 OpenCReport\Text::get_memo():
+                     ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetmemohyphenate">
+			<title>Set or get the field's "hyphenate" flag</title>
+			<para>
+				Set the field's "hyphenate" flag.
+				Only used when the memo flag is set to
+				<literal>true</literal>.
+				When set to <literal>false</literal>, words at the end
+				of the lines in the multiline text field would break
+				over to the next line as a whole. When set to
+				<literal>true</literal>, the word will be hyphenated.
+				Default is <literal>true</literal>. When character wrapping
+				is used (see below), this setting is not used.
+				See <xref linkend="memohyphenate"/>
+				<programlisting>public final
+OpenCReport\Text::set_memo_hyphenate(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+
+public final
+OpenCReport\Text::get_memo_hyphenate():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
