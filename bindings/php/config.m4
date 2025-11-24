@@ -22,12 +22,7 @@ if test "$PHP_OPENCREPORTS" != "no"; then
 	AC_MSG_RESULT(found)
 
 	AC_MSG_CHECKING([whether opencreports is available])
-
-	PHP_TEST_BUILD(ocrpt_init,
-		[AC_MSG_RESULT([yes])],
-		[AC_MSG_RESULT([no])
-		 AC_MSG_ERROR([build test failed.  Please check the config.log for details.])],
-		[-lopencreport])
+	AC_CHECK_LIB(opencreport, ocrpt_init, [AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no])])
 
 	AC_MSG_CHECKING(for opencreports via pkgconfig)
 	if $PKG_CONFIG --exists opencreports; then
