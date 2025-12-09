@@ -84,11 +84,16 @@ DLL_EXPORT_SYM void ocrpt_get_color(const char *cname, ocrpt_color *color, bool 
 		ocrpt_parse_html_color(cname + 2, &nc);
 		*color = nc.c;
 	}  else {
-		ocrpt_named_color *c;
+		ocrpt_named_color *c = bsearch(cname, &compat_color_names, compat_color_names_n, sizeof(ocrpt_named_color), colorfindcmp);
 
-		while (!(c = bsearch(cname, &compat_color_names, compat_color_names_n, sizeof(ocrpt_named_color), colorfindcmp)))
-			cname = bgcolor ? "White" : "Black";
+		if (!c)
+			c = bsearch(bgcolor ? "White" : "Black", &compat_color_names, compat_color_names_n, sizeof(ocrpt_named_color), colorfindcmp);
 
-		*color = (*c).c;
+		if (c)
+			*color = (*c).c;
+		else {
+			memset(&nc.c, 0, sizeof(ocrpt_color));
+			*color = nc.c;
+		}
 	}
 }
