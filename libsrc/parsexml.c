@@ -83,9 +83,9 @@ static void ocrpt_ignore_child_nodes(opencreport *o, xmlTextReaderPtr reader, in
 }
 
 static void ocrpt_parse_query_node(opencreport *o, xmlTextReaderPtr reader) {
-	xmlChar *name, *value_att, *value = NULL;
-	xmlChar *datasource, *follower_for, *follower_expr;
-	xmlChar *cols, *rows, *coltypes;
+	xmlChar *name = NULL, *value_att = NULL, *value = NULL;
+	xmlChar *datasource = NULL, *follower_for = NULL, *follower_expr = NULL;
+	xmlChar *cols = NULL, *rows = NULL, *coltypes = NULL;
 
 	ocrpt_expr *name_e, *value_e, *datasource_e;
 	ocrpt_expr *follower_for_e, *follower_expr_e;
@@ -229,7 +229,7 @@ static void ocrpt_parse_queries_node(opencreport *o, xmlTextReaderPtr reader) {
 }
 
 static void ocrpt_parse_datasource_node(opencreport *o, xmlTextReaderPtr reader) {
-	xmlChar *name, *type, *encoding;
+	xmlChar *name = NULL, *type = NULL, *encoding = NULL;
 	ocrpt_expr *name_e, *type_e, *encoding_e;
 	char *name_s, *type_s, *encoding_s;
 
@@ -484,10 +484,10 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	ocrpt_text *elem = ocrpt_line_add_text(line);
 	int ret;
 
-	xmlChar *value, *delayed, *format, *width, *align;
-	xmlChar *color, *bgcolor, *font_name, *font_size;
-	xmlChar *bold, *italic, *link, *memo, *hyphenate, *memo_wrap_chars, *memo_max_lines;
-	xmlChar *translate;
+	xmlChar *value = NULL, *delayed = NULL, *format = NULL, *width = NULL, *align = NULL;
+	xmlChar *color = NULL, *bgcolor = NULL, *font_name = NULL, *font_size = NULL;
+	xmlChar *bold = NULL, *italic = NULL, *link = NULL, *memo = NULL, *hyphenate = NULL, *memo_wrap_chars = NULL, *memo_max_lines = NULL;
+	xmlChar *translate = NULL;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
@@ -578,7 +578,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 static void ocrpt_parse_output_line_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
 	ocrpt_line *line = ocrpt_output_add_line(output);
 
-	xmlChar *font_name, *font_size, *bold, *italic, *suppress, *color, *bgcolor;
+	xmlChar *font_name = NULL, *font_size = NULL, *bold = NULL, *italic = NULL, *suppress = NULL, *color = NULL, *bgcolor = NULL;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
@@ -646,7 +646,7 @@ static void ocrpt_parse_output_line_node(opencreport *o, ocrpt_report *r, ocrpt_
 
 static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
 	ocrpt_hline *hline = ocrpt_output_add_hline(output);
-	xmlChar *size, *align, *indent, *length, *font_size, *suppress, *color;
+	xmlChar *size = NULL, *align = NULL, *indent = NULL, *length = NULL, *font_size = NULL, *suppress = NULL, *color = NULL;
 	struct {
 		char *attrs[5];
 		xmlChar **attrp;
@@ -686,7 +686,7 @@ static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt
 
 static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, xmlTextReaderPtr reader) {
 	ocrpt_image *img;
-	xmlChar *value, *suppress, *type, *width, *height, *align, *bgcolor, *text_width;
+	xmlChar *value = NULL, *suppress = NULL, *type = NULL, *width = NULL, *height = NULL, *align = NULL, *bgcolor = NULL, *text_width = NULL;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
@@ -739,7 +739,7 @@ static void ocrpt_parse_output_imageend_node(opencreport *o, ocrpt_report *r, oc
 
 static void ocrpt_parse_output_barcode_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, xmlTextReaderPtr reader) {
 	ocrpt_barcode *bc;
-	xmlChar *value, *delayed, *suppress, *type, *width, *height, *color, *bgcolor;
+	xmlChar *value = NULL, *delayed = NULL, *suppress = NULL, *type = NULL, *width = NULL, *height = NULL, *color = NULL, *bgcolor = NULL;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
@@ -1089,12 +1089,12 @@ static ocrpt_report *ocrpt_parse_report_node(opencreport *o, ocrpt_part *p, ocrp
 	r->rlib_compat = !called_from_ocrpt_node;
 	r->noquery_show_nodata = called_from_ocrpt_node;
 
-	xmlChar *font_name, *font_size;
-	xmlChar *size_unit, *noquery_show_nodata, *report_height_after_last, *follower_match_single;
-	xmlChar *orientation, *top_margin, *bottom_margin, *left_margin, *right_margin;
-	xmlChar *paper_type, *iterations, *suppress, *suppress_pageheader_firstpage;
-	xmlChar *query, *field_header_priority, *height;
-	xmlChar *border_width, *border_color, *detail_columns, *column_pad;
+	xmlChar *font_name = NULL, *font_size = NULL;
+	xmlChar *size_unit = NULL, *noquery_show_nodata = NULL, *report_height_after_last = NULL, *follower_match_single = NULL;
+	xmlChar *orientation = NULL, *top_margin = NULL, *bottom_margin = NULL, *left_margin = NULL, *right_margin = NULL;
+	xmlChar *paper_type = NULL, *iterations = NULL, *suppress = NULL, *suppress_pageheader_firstpage = NULL;
+	xmlChar *query = NULL, *field_header_priority = NULL, *height = NULL;
+	xmlChar *border_width = NULL, *border_color = NULL, *detail_columns = NULL, *column_pad = NULL;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
@@ -1336,7 +1336,7 @@ bool ocrpt_parse_report_node_for_load(ocrpt_report *r) {
 }
 
 static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, xmlTextReaderPtr reader_parent, bool called_from_ocrpt_node) {
-	xmlChar *filename, *query, *iterations;
+	xmlChar *filename = NULL, *query = NULL, *iterations = NULL;
 	struct {
 		char *attr;
 		xmlChar **attrp;
@@ -1378,8 +1378,8 @@ static void ocrpt_parse_load(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, 
 static void ocrpt_parse_pd_node(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, xmlTextReaderPtr reader, bool called_from_ocrpt_node) {
 	ocrpt_part_column *pd = ocrpt_part_row_new_column(pr);
 
-	xmlChar *width, *height, *border_width, *border_color;
-	xmlChar *detail_columns, *column_pad, *suppress;
+	xmlChar *width = NULL, *height = NULL, *border_width = NULL, *border_color = NULL;
+	xmlChar *detail_columns = NULL, *column_pad = NULL, *suppress = NULL;
 	struct {
 		char *attr;
 		xmlChar **attrp;
@@ -1455,7 +1455,7 @@ static void ocrpt_parse_part_row_node(opencreport *o, ocrpt_part *p, xmlTextRead
 
 	ocrpt_part_row *pr = ocrpt_part_new_row(p);
 
-	xmlChar *layout, *newpage, *suppress;
+	xmlChar *layout = NULL, *newpage = NULL, *suppress = NULL;
 	struct {
 		char *attr;
 		xmlChar **attrp;
@@ -1510,10 +1510,10 @@ static void ocrpt_parse_part_node(opencreport *o, xmlTextReaderPtr reader, bool 
 
 	ocrpt_part *p = ocrpt_part_new(o);
 
-	xmlChar *font_name, *font_size;
-	xmlChar *size_unit, *noquery_show_nodata, *report_height_after_last, *follower_match_single;
-	xmlChar *orientation, *top_margin, *bottom_margin, *left_margin, *right_margin;
-	xmlChar *paper_type, *iterations, *suppress, *suppress_pageheader_firstpage;
+	xmlChar *font_name = NULL, *font_size = NULL;
+	xmlChar *size_unit = NULL, *noquery_show_nodata = NULL, *report_height_after_last = NULL, *follower_match_single = NULL;
+	xmlChar *orientation = NULL, *top_margin = NULL, *bottom_margin = NULL, *left_margin = NULL, *right_margin = NULL;
+	xmlChar *paper_type = NULL, *iterations = NULL, *suppress = NULL, *suppress_pageheader_firstpage = NULL;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
@@ -1696,9 +1696,9 @@ static void ocrpt_parse_paths_node(opencreport *o, xmlTextReaderPtr reader) {
 }
 
 static void ocrpt_parse_opencreport_node(opencreport *o, xmlTextReaderPtr reader) {
-	xmlChar *size_unit, *noquery_show_nodata, *report_height_after_last;
-	xmlChar *follower_match_single, *precision_bits, *rounding_mode;
-	xmlChar *locale, *xlate_domain, *xlate_dir;
+	xmlChar *size_unit = NULL, *noquery_show_nodata = NULL, *report_height_after_last = NULL;
+	xmlChar *follower_match_single = NULL, *precision_bits = NULL, *rounding_mode = NULL;
+	xmlChar *locale = NULL, *xlate_domain = NULL, *xlate_dir = NULL;
 
 	struct {
 		char *attrs;
