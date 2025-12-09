@@ -446,6 +446,9 @@ static void ocrpt_barcode_ean_encode(opencreport *o, ocrpt_barcode *bc, ocrpt_st
 		char *e_to_a = ocrpt_barcode_upc_e_to_a(barcode->str, len);
 		char *a_to_e = ocrpt_barcode_upc_a_to_e(e_to_a, strlen(e_to_a));
 
+		assert(e_to_a != NULL);
+		assert(a_to_e != NULL);
+
 		strcpy(text, a_to_e);
 		len = strlen(text);
 
