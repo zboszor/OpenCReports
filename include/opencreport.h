@@ -141,7 +141,7 @@ struct ocrpt_barcode;
 typedef struct ocrpt_barcode ocrpt_barcode;
 
 struct ocrpt_paper {
-	const char *name;
+	char name[64];
 	double width;
 	double height;
 };

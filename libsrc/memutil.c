@@ -151,7 +151,7 @@ DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_with_len(const char *str, size
 DLL_EXPORT_SYM ocrpt_string *ocrpt_mem_string_new_vnprintf(size_t len, const char *format, va_list va) {
 	ocrpt_string *string;
 
-	if (len <= 0)
+	if (!format || len <= 0)
 		return NULL;
 
 	string = ocrpt_mem_string_new_with_len(NULL, len + 1);
@@ -310,7 +310,8 @@ DLL_EXPORT_SYM void ocrpt_mem_string_append_printf(ocrpt_string *string, const c
 	newstr = ocrpt_mem_string_new_vnprintf(len, format, va);
 	va_end(va);
 
-	ocrpt_mem_string_append_len(string, newstr->str, newstr->len);
+	if (newstr)
+		ocrpt_mem_string_append_len(string, newstr->str, newstr->len);
 
 	ocrpt_mem_string_free(newstr, true);
 }

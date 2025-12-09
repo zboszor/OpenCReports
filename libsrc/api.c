@@ -1822,7 +1822,7 @@ DLL_EXPORT_SYM char *ocrpt_find_file(opencreport *o, const char *filename) {
 
 		char *file = ocrpt_canonicalize_path(s->str);
 
-		if (stat(file, &st) == 0 && S_ISREG(st.st_mode)) {
+		if (file && stat(file, &st) == 0 && S_ISREG(st.st_mode)) {
 			ocrpt_mem_string_free(s, true);
 			return file;
 		}
@@ -1831,6 +1831,9 @@ DLL_EXPORT_SYM char *ocrpt_find_file(opencreport *o, const char *filename) {
 	}
 
 	char *cwd = ocrpt_mem_malloc(PATH_MAX);
+
+	if (!cwd)
+		return NULL;
 
 	if (!getcwd(cwd, PATH_MAX)) {
 		ocrpt_mem_free(cwd);
@@ -1842,7 +1845,7 @@ DLL_EXPORT_SYM char *ocrpt_find_file(opencreport *o, const char *filename) {
 
 	char *file = ocrpt_canonicalize_path(s->str);
 
-	if (stat(file, &st) == 0 && S_ISREG(st.st_mode)) {
+	if (file && stat(file, &st) == 0 && S_ISREG(st.st_mode)) {
 		ocrpt_mem_string_free(s, true);
 		return file;
 	}
@@ -2068,17 +2071,21 @@ static void initialize_ocrpt(void) {
 	/* Cannot use ocrpt_mem_malloc() here and in the destructor */
 	papersizes = malloc(i * sizeof(ocrpt_paper));
 
-	for (i = 0, paper_info = paperfirst(); paper_info; i++, paper_info = papernext(paper_info)) {
-		papersizes[i].name = strdup(papername(paper_info));
-		papersizes[i].width = paperpswidth(paper_info);
-		papersizes[i].height = paperpsheight(paper_info);
+	if (papersizes) {
+		for (i = 0, paper_info = paperfirst(); paper_info; i++, paper_info = papernext(paper_info)) {
+			char *end = stpncpy(papersizes[i].name, papername(paper_info), sizeof(papersizes[i].name));
+
+			*end = '\0';
+			papersizes[i].width = paperpswidth(paper_info);
+			papersizes[i].height = paperpsheight(paper_info);
+		}
+
+		qsort(papersizes, n_papersizes, sizeof(ocrpt_paper), papersortcmp);
+
+		system_paper_name = systempapername();
+		system_paper = ocrpt_get_paper_by_name(system_paper_name);
+		free((void *)system_paper_name);
 	}
-
-	qsort(papersizes, n_papersizes, sizeof(ocrpt_paper), papersortcmp);
-
-	system_paper_name = systempapername();
-	system_paper = ocrpt_get_paper_by_name(system_paper_name);
-	free((void *)system_paper_name);
 
 	paperdone();
 
@@ -2108,10 +2115,6 @@ static void initialize_ocrpt(void) {
 
 __attribute__((destructor))
 static void uninitialize_ocrpt(void) {
-	int i;
-
-	for (i = 0; i < n_papersizes; i++)
-		free((void *)papersizes[i].name);
 	free(papersizes);
 
 	xmlCleanupParser();
