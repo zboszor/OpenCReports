@@ -479,7 +479,7 @@ void ocrpt_json_init(opencreport *o) {
 			priv->cwd = NULL;
 			priv->cwdlen = 0;
 		} else
-			priv->cwdlen = strlen(priv->cwd);
+			priv->cwdlen = priv->cwd ? strlen(priv->cwd) : 0;
 	}
 
 	priv->yajl_gen = yajl_gen_alloc(&ocrpt_yajl_alloc_funcs);

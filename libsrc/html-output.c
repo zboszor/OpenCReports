@@ -589,7 +589,7 @@ void ocrpt_html_init(opencreport *o) {
 			priv->cwd = NULL;
 			priv->cwdlen = 0;
 		} else
-			priv->cwdlen = strlen(priv->cwd);
+			priv->cwdlen = priv->cwd ? strlen(priv->cwd) : 0;
 	}
 
 	priv->png = ocrpt_mem_string_new_with_len(NULL, 1024);

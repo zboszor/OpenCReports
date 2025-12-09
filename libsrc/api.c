@@ -1610,6 +1610,9 @@ DLL_EXPORT_SYM char *ocrpt_canonicalize_path(const char *path) {
 	if (*path != '/') {
 		char *cwd = ocrpt_mem_malloc(PATH_MAX);
 
+		if (!cwd)
+			return NULL;
+
 		if (!getcwd(cwd, PATH_MAX)) {
 			ocrpt_mem_free(cwd);
 			return NULL;
