@@ -2076,7 +2076,7 @@ static void initialize_ocrpt(void) {
 
 	if (papersizes) {
 		for (i = 0, paper_info = paperfirst(); paper_info; i++, paper_info = papernext(paper_info)) {
-			char *end = stpncpy(papersizes[i].name, papername(paper_info), sizeof(papersizes[i].name));
+			char *end = stpncpy(papersizes[i].name, papername(paper_info), sizeof(papersizes[i].name) - 1);
 
 			*end = '\0';
 			papersizes[i].width = paperpswidth(paper_info);
