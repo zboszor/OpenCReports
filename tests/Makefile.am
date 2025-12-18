@@ -22,6 +22,22 @@ PGSQL_TESTS = \
 
 endif
 
+if ENABLE_PYTHON_TESTS
+
+PYTHON_TESTS = \
+	xls_test \
+	xls2_test \
+	xls3_test \
+	xls4_test
+
+LAYOUT_PYTHON_TESTS = \
+	layout_xls_test \
+	layout_xlsx_test \
+	layout_xlsx_mixed_test \
+	layout_ods_test
+
+endif
+
 TESTS = \
 	compiler_test \
 	compiler_cc_test \
@@ -44,10 +60,7 @@ TESTS = \
 	odbc5_test odbc6_test odbc7_test \
 	odbc_xml_test odbc_xml2_test odbc_xml3_test \
 	odbc_xml4_test \
-	xls_test \
-	xls2_test \
-	xls3_test \
-	xls4_test \
+	$(PYTHON_TESTS) \
 	follower_circular_test \
 	follower_invalidref_test \
 	follower_test1_test follower_test2_test \
@@ -217,10 +230,7 @@ LAYOUT_TESTS = \
 	layout_code41_test \
 	layout_xml42_test \
 	layout_xml43_test \
-	layout_xls_test \
-	layout_xlsx_test \
-	layout_xlsx_mixed_test \
-	layout_ods_test \
+	$(LAYOUT_PYTHON_TESTS) \
 	layout_variable_ignoreexpr_test \
 	header_query_test \
 	header_query2_test \
