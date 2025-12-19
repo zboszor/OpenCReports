@@ -1625,6 +1625,7 @@ DLL_EXPORT_SYM char *ocrpt_canonicalize_path(const char *path) {
 		}
 
 		len = sprintf(path_copy, "%s/", cwd);
+		assert(len >= 0);
 		ocrpt_mem_free(cwd);
 	} else {
 		path_copy = ocrpt_mem_malloc(len0 + 1);
