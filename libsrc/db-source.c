@@ -260,6 +260,18 @@ static ocrpt_query_result *ocrpt_postgresql_describe_base(ocrpt_query *query, PG
 
 	result->cols = PQnfields(res);
 
+	/*
+	 * Too many columns, we can't handle it.
+	 *
+	 * 2147483647 / 3 - 1 ~ 715 million columns in a query
+	 * should be enough for everyone(TM).
+	 */
+	if (result->cols >= INT_MAX / OCRPT_EXPR_RESULTS - 1)
+		return NULL;
+
+	/* Some static analyzers are too stupid to deduce this from the above. */
+	assert(result->cols < INT_MAX / OCRPT_EXPR_RESULTS - 1);
+
 	qr = ocrpt_mem_malloc(OCRPT_EXPR_RESULTS * result->cols * sizeof(ocrpt_query_result));
 
 	if (!qr)
