@@ -8,6 +8,7 @@
 #include <config.h>
 
 #include <alloca.h>
+#include <assert.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -334,6 +335,7 @@ static ocrpt_query *ocrpt_postgresql_query_add(ocrpt_datasource *source, const c
 
 	if (priv->use_cursor) {
 		len = snprintf(NULL, 0, "DECLARE \"%s\" SCROLL CURSOR WITH HOLD FOR %s", name, querystr);
+		assert(len >= 0);
 		cursor = alloca(len + 1);
 		snprintf(cursor, len + 1, "DECLARE \"%s\" SCROLL CURSOR WITH HOLD FOR %s", name, querystr);
 		cursor[len] = 0;
@@ -471,6 +473,7 @@ static void ocrpt_postgresql_rewind(ocrpt_query *query) {
 				result->rewindquery = ocrpt_mem_malloc(len + 1);
 				if (result->rewindquery) {
 					len = snprintf(result->rewindquery, len + 1, "MOVE ABSOLUTE 0 IN \"%s\"", query->name);
+					assert(len >= 0);
 					result->rewindquery[len] = 0;
 				}
 			}
@@ -558,6 +561,7 @@ static void ocrpt_postgresql_free(ocrpt_query *query) {
 		len = snprintf(NULL, 0, "CLOSE \"%s\"", query->name);
 		cursor = alloca(len + 1);
 		len = snprintf(cursor, len + 1, "CLOSE \"%s\"", query->name);
+		assert(len >= 0);
 		cursor[len] = 0;
 
 		res = PQexec(priv->conn, cursor);
