@@ -349,13 +349,15 @@ static ocrpt_string eanupc_supp_guard[] = {
  * Return NULL if impossible, the UPC-E barcode if possible.
  */
 static char *ocrpt_barcode_upc_a_to_e(char *barcode, size_t len) {
-	static char	result[16];
+	char *result, *endptr;
 	int chksum;
+
+	result = ocrpt_mem_malloc(16);
 
 	switch (len) {
 	case 12:
-		strcpy(result, barcode);
-		result[11] = '\0';
+		endptr = stpncpy(result, barcode, 12);
+		*endptr = '\0';
 		chksum = ocrpt_barcode_ean_csum(result, len, false);
 		if (barcode[11] != (chksum - '0'))
 			return NULL;
@@ -440,7 +442,7 @@ static void ocrpt_barcode_ean_encode(opencreport *o, ocrpt_barcode *bc, ocrpt_st
 	if (is_upca) {
 		/* add the leading 0 */
 		text[0] = '0';
-		strcpy(text + 1, barcode->str);
+		strncpy(text + 1, barcode->str, barcode->len);
 		extralen = 1;
 	} else if (is_upce) {
 		char *e_to_a = ocrpt_barcode_upc_e_to_a(barcode->str, len);
@@ -455,7 +457,7 @@ static void ocrpt_barcode_ean_encode(opencreport *o, ocrpt_barcode *bc, ocrpt_st
 		ocrpt_mem_free(a_to_e);
 		ocrpt_mem_free(e_to_a);
 	} else
-		strcpy(text, barcode->str);
+		strncpy(text, barcode->str, barcode->len);
 
 	/* Build the checksum and the bars */
 	if (is_upca || is_ean13 || is_isbn) {
@@ -571,7 +573,7 @@ static void ocrpt_barcode_ean_encode(opencreport *o, ocrpt_barcode *bc, ocrpt_st
 	 */
 	if (space) {
 		space++;
-		strcpy(text, space);
+		strncpy(text, space, sizeof(text) - addon);
 
 		const char *mirrorstr;
 		if (addon == 5) {
