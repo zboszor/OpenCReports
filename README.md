@@ -53,7 +53,7 @@ The dependencies to build OpenCReports are:
 * libgdk_pixbuf
 * librsvg
 * Cairo built with Pango and PDF support
-* Pango build with Cairo support a.k.a. PangoCairo
+* Pango built with Cairo support a.k.a. PangoCairo
 * libpq (the PostgreSQL client library, optional)
 * mariadb-connector-c (the MariaDB client library, optional)
 * unixODBC or iodbc (optional, unixODBC is preferred)
