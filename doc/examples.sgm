@@ -169,7 +169,7 @@ rlib_spool($r);</programlisting>
         &lt;/PageFooter&gt;
 
         &lt;Detail&gt;
-            &lt;FieldHeaders&gt;
+            &lt;FieldHeader&gt;
                 &lt;Output&gt;
                     &lt;Line&gt;
                         &lt;literal width="4" align="'right'"&gt;ID&lt;/literal&gt;
@@ -183,9 +183,9 @@ rlib_spool($r);</programlisting>
                         &lt;literal width="5" align="'center'"&gt;Adult&lt;/literal&gt;
                     &lt;/Line&gt;
                 &lt;/Output&gt;
-            &lt;/FieldHeaders&gt;
+            &lt;/FieldHeader&gt;
 
-            &lt;FieldDetails&gt;
+            &lt;FieldDetail&gt;
                 &lt;Output&gt;
                     &lt;Line&gt;
                         &lt;field width="4" align="right" value="id" /&gt;
@@ -199,7 +199,7 @@ rlib_spool($r);</programlisting>
                         &lt;field value="adult ? 'yes' : 'no'" width="5" align="'center'"/&gt;
                     &lt;/Line&gt;
                 &lt;/Output&gt;
-            &lt;/FieldDetails&gt;
+            &lt;/FieldDetail&gt;
         &lt;/Detail&gt;
     &lt;/Report&gt;
 &lt;/OpenCReport&gt;</programlisting>
@@ -350,7 +350,7 @@ rlib_spool($r);</programlisting>
         &lt;/PageFooter&gt;
 
         &lt;Detail&gt;
-            &lt;FieldHeaders&gt;
+            &lt;FieldHeader&gt;
                 &lt;Output&gt;
                     &lt;Line&gt;
                         &lt;literal width="4" align="'right'"&gt;ID&lt;/literal&gt;
@@ -364,9 +364,9 @@ rlib_spool($r);</programlisting>
                         &lt;literal width="5" align="'center'"&gt;Adult&lt;/literal&gt;
                     &lt;/Line&gt;
                 &lt;/Output&gt;
-            &lt;/FieldHeaders&gt;
+            &lt;/FieldHeader&gt;
 
-            &lt;FieldDetails&gt;
+            &lt;FieldDetail&gt;
                 &lt;Output&gt;
                     &lt;Line&gt;
                         &lt;field width="4" align="right" value="id" /&gt;
@@ -380,7 +380,7 @@ rlib_spool($r);</programlisting>
                         &lt;field value="adult ? 'yes' : 'no'" width="5" align="'center'"/&gt;
                     &lt;/Line&gt;
                 &lt;/Output&gt;
-            &lt;/FieldDetails&gt;
+            &lt;/FieldDetail&gt;
         &lt;/Detail&gt;
     &lt;/Report&gt;
 &lt;/OpenCReport&gt;</programlisting>
@@ -565,7 +565,7 @@ rlib_spool($r);</programlisting>
         &lt;/PageFooter&gt;
 
         &lt;Detail&gt;
-            &lt;FieldHeaders&gt;
+            &lt;FieldHeader&gt;
                 &lt;Output&gt;
                     &lt;HorizontalLine size="2" color="'black'" /&gt;
                     &lt;HorizontalLine size="2" color="'green'" /&gt;
@@ -578,9 +578,9 @@ rlib_spool($r);</programlisting>
                     &lt;HorizontalLine size="2" color="'black'" /&gt;
                     &lt;HorizontalLine size="2" color="'white'" /&gt;
                 &lt;/Output&gt;
-            &lt;/FieldHeaders&gt;
+            &lt;/FieldHeader&gt;
 
-            &lt;FieldDetails&gt;
+            &lt;FieldDetail&gt;
                 &lt;Output&gt;
                     &lt;Line fontSize="18"&gt;
                         &lt;Image textWidth="7" bgcolor="'yellow'" align="'center'" value="filename" /&gt;
@@ -588,7 +588,7 @@ rlib_spool($r);</programlisting>
                         &lt;field color="'red'" bgcolor="'yellow'" value="name" /&gt;
                     &lt;/Line&gt;
                 &lt;/Output&gt;
-            &lt;/FieldDetails&gt;
+            &lt;/FieldDetail&gt;
         &lt;/Detail&gt;
     &lt;/Report&gt;
 &lt;/OpenCReport&gt;</programlisting>
@@ -748,7 +748,7 @@ rlib_spool($r);</programlisting>
         &lt;/Breaks&gt;
 
         &lt;Detail&gt;
-            &lt;FieldHeaders&gt;
+            &lt;FieldHeader&gt;
                 &lt;Output&gt;
                     &lt;HorizontalLine size="2" color="'black'" /&gt;
                     &lt;HorizontalLine size="2" color="'white'" /&gt;
@@ -780,9 +780,9 @@ rlib_spool($r);</programlisting>
                     &lt;HorizontalLine size="2" color="'black'" /&gt;
                     &lt;HorizontalLine size="2" color="'white'" /&gt;
                 &lt;/Output&gt;
-            &lt;/FieldHeaders&gt;
+            &lt;/FieldHeader&gt;
 
-            &lt;FieldDetails&gt;
+            &lt;FieldDetail&gt;
                 &lt;Output&gt;
                     &lt;Line&gt;
                         &lt;field width="2" align="'right'" value="id" /&gt;
@@ -797,7 +797,7 @@ rlib_spool($r);</programlisting>
                         &lt;field width="8" value="v.var5" format="'%.2d'" align="'right'" /&gt;
                     &lt;/Line&gt;
                 &lt;/Output&gt;
-            &lt;/FieldDetails&gt;
+            &lt;/FieldDetail&gt;
         &lt;/Detail&gt;
     &lt;/Report&gt;
 &lt;/OpenCReport&gt;</programlisting>
@@ -983,7 +983,7 @@ rlib_spool($r);</programlisting>
 &lt;OpenCReport&gt;
     &lt;Report query="q1"&gt;
         &lt;Detail&gt;
-            &lt;FieldHeaders&gt;
+            &lt;FieldHeader&gt;
                 &lt;Output&gt;
                     &lt;HorizontalLine size="2" color="'black'" /&gt;
                     &lt;HorizontalLine size="2" color="'white'" /&gt;
@@ -995,16 +995,16 @@ rlib_spool($r);</programlisting>
                     &lt;HorizontalLine size="2" color="'black'" /&gt;
                     &lt;HorizontalLine size="2" color="'white'" /&gt;
                 &lt;/Output&gt;
-            &lt;/FieldHeaders&gt;
+            &lt;/FieldHeader&gt;
 
-            &lt;FieldDetails&gt;
+            &lt;FieldDetail&gt;
                 &lt;Output&gt;
                     &lt;Line&gt;
                         &lt;field width="20" value="q1.firstname" /&gt;
                         &lt;field width="20" value="q2.lastname" /&gt;
                     &lt;/Line&gt;
                 &lt;/Output&gt;
-            &lt;/FieldDetails&gt;
+            &lt;/FieldDetail&gt;
         &lt;/Detail&gt;
     &lt;/Report&gt;
 &lt;/OpenCReport&gt;</programlisting>
@@ -1235,7 +1235,7 @@ rlib_spool($r);</programlisting>
 &lt;OpenCReport&gt;
 &lt;Report orientation="landscape"&gt;
     &lt;Detail&gt;
-        &lt;FieldHeaders&gt;
+        &lt;FieldHeader&gt;
             &lt;Output&gt;
                 &lt;Line&gt;
                     &lt;literal width="30"&gt;Boss name&lt;/literal&gt;
@@ -1245,8 +1245,8 @@ rlib_spool($r);</programlisting>
                     &lt;literal width="30"&gt;Sidekick's sidekick name&lt;/literal&gt;
                 &lt;/Line&gt;
             &lt;/Output&gt;
-        &lt;/FieldHeaders&gt;
-        &lt;FieldDetails&gt;
+        &lt;/FieldHeader&gt;
+        &lt;FieldDetail&gt;
             &lt;Output&gt;
                 &lt;Line&gt;
                     &lt;field value="q1.name" width="30" align="left" /&gt;
@@ -1256,7 +1256,7 @@ rlib_spool($r);</programlisting>
                     &lt;field value="q3.name" width="30" align="left" /&gt;
                 &lt;/Line&gt;
             &lt;/Output&gt;
-        &lt;/FieldDetails&gt;
+        &lt;/FieldDetail&gt;
     &lt;/Detail&gt;
 &lt;/Report&gt;
 &lt;/OpenCReport&gt;</programlisting>
@@ -1438,7 +1438,7 @@ rlib_spool($r);</programlisting>
 &lt;!DOCTYPE report &gt;
 &lt;Report orientation="landscape"&gt;
     &lt;Detail&gt;
-        &lt;FieldHeaders&gt;
+        &lt;FieldHeader&gt;
             &lt;Output&gt;
                 &lt;Line&gt;
                     &lt;literal width="30"&gt;Boss name&lt;/literal&gt;
@@ -1448,8 +1448,8 @@ rlib_spool($r);</programlisting>
                     &lt;literal width="30"&gt;Sidekick's sidekick name&lt;/literal&gt;
                 &lt;/Line&gt;
             &lt;/Output&gt;
-        &lt;/FieldHeaders&gt;
-        &lt;FieldDetails&gt;
+        &lt;/FieldHeader&gt;
+        &lt;FieldDetail&gt;
             &lt;Output&gt;
                 &lt;Line&gt;
                     &lt;field value="q1.name" width="30" align="left" /&gt;
@@ -1459,7 +1459,7 @@ rlib_spool($r);</programlisting>
                     &lt;field value="q3.name" width="30" align="left" /&gt;
                 &lt;/Line&gt;
             &lt;/Output&gt;
-        &lt;/FieldDetails&gt;
+        &lt;/FieldDetail&gt;
     &lt;/Detail&gt;
 &lt;/Report&gt;</programlisting>
 			</para>

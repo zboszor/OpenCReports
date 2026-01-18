@@ -2183,8 +2183,8 @@ ocrpt_layout_part_page_footer_set_report(ocrpt_part *p,
 					<literal>&lt;NoData&gt;</literal>,
 					<literal>&lt;ReportHeader&gt;</literal>,
 					<literal>&lt;ReportFooter&gt;</literal>,
-					<literal>&lt;FieldHeaders&gt;</literal> or
-					<literal>&lt;FieldDetails&gt;</literal>.
+					<literal>&lt;FieldHeader&gt;</literal> or
+					<literal>&lt;FieldDetail&gt;</literal>.
 					<programlisting>ocrpt_output *
 ocrpt_layout_report_nodata(ocrpt_report *r);
 

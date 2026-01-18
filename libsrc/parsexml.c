@@ -1056,10 +1056,10 @@ static void ocrpt_parse_detail_node(opencreport *o, ocrpt_report *r, xmlTextRead
 		}
 
 		if (nodetype == XML_READER_TYPE_ELEMENT) {
-			if (!strcmp((char *)name, "FieldHeaders"))
-				ocrpt_parse_output_parent_node(o, r, "FieldHeaders", &r->fieldheader, reader);
-			else if (!strcmp((char *)name, "FieldDetails"))
-				ocrpt_parse_output_parent_node(o, r, "FieldDetails", &r->fielddetails, reader);
+			if (!strcmp((char *)name, "FieldHeader") || !strcmp((char *)name, "FieldHeaders"))
+				ocrpt_parse_output_parent_node(o, r, (char *)name, &r->fieldheader, reader);
+			else if (!strcmp((char *)name, "FieldDetail") || !strcmp((char *)name, "FieldDetails"))
+				ocrpt_parse_output_parent_node(o, r, (char *)name, &r->fielddetails, reader);
 		}
 
 		xmlFree(name);

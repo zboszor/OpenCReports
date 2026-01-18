@@ -2011,8 +2011,8 @@ SELECT * FROM some_table
 					<xref linkend="reportpagefooter"/>,
 					<xref linkend="repheader"/>,
 					<xref linkend="repfooter"/>,
-					<literal>&lt;FieldHeaders&gt;</literal> and
-					<literal>&lt;FieldDetails&gt;</literal> in
+					<literal>&lt;FieldHeader&gt;</literal> and
+					<literal>&lt;FieldDetail&gt;</literal> in
 					<xref linkend="detailnode"/>,
 					and also in <xref linkend="breaknode"/>s and
 					<xref linkend="variablenode"/>s.
@@ -2268,27 +2268,34 @@ SELECT * FROM some_table
 					an <xref linkend="outputnode"/>.
 					<programlisting>&lt;Report&gt;
     &lt;Detail&gt;
-        &lt;FieldHeaders&gt;
+        &lt;FieldHeader&gt;
             &lt;Output&gt;
                 ...
             &lt;/Output&gt;
-        &lt;/FieldHeaders&gt;
-        &lt;FieldDetails&gt;
+        &lt;/FieldHeader&gt;
+        &lt;FieldDetail&gt;
             &lt;Output&gt;
                 ...
             &lt;/Output&gt;
-        &lt;/FieldDetails&gt;
+        &lt;/FieldDetail&gt;
     &lt;/Detail&gt;
 &lt;/Part&gt;</programlisting>
 				</para>
 				<para>
-					<literal>&lt;FieldHeaders&gt;</literal> is used
+					<literal>&lt;FieldHeader&gt;</literal> is used
 					to describe the header for data rows.
 				</para>
 				<para>
-					<literal>&lt;FieldDetails&gt;</literal> is used
+					<literal>&lt;FieldDetail&gt;</literal> is used
 					to show data that is derived from the current data row
 					produced by the report query.
+				</para>
+				<para>
+					Note that both <literal>&lt;FieldHeader&gt;</literal>
+					and <literal>&lt;FieldDetail&gt;</literal> are also
+					accepted with plural spelling for RLIB compatibiliy, i.e.
+					<literal>&lt;FieldHeaders&gt;</literal> and
+					<literal>&lt;FieldDetails&gt;</literal>, respectively.
 				</para>
 			</sect3>
 			<sect3 id="nodatanode" xreflabel="NoData node">
@@ -2498,13 +2505,13 @@ SELECT * FROM some_table
     &lt;/Variables&gt;
 
     &lt;Detail&gt;
-        &lt;FieldHeaders&gt;
+        &lt;FieldHeader&gt;
             &lt;literal value="'My variable'" /&gt;
-        &lt;/FieldHeaders&gt;
+        &lt;/FieldHeader&gt;
 
-        &lt;FieldDetails&gt;
+        &lt;FieldDetail&gt;
             &lt;field value="v.var1" /&gt;
-        &lt;/FieldDetails&gt;
+        &lt;/FieldDetail&gt;
     &lt;/Detail&gt;
 &lt;/Report&gt;</programlisting>
 					</para>
@@ -2529,13 +2536,13 @@ SELECT * FROM some_table
     &lt;/Variables&gt;
 
     &lt;Detail&gt;
-        &lt;FieldHeaders&gt;
+        &lt;FieldHeader&gt;
             &lt;literal value="'My variable'" /&gt;
-        &lt;/FieldHeaders&gt;
+        &lt;/FieldHeader&gt;
 
-        &lt;FieldDetails&gt;
+        &lt;FieldDetail&gt;
             &lt;field value="v.var1" /&gt;
-        &lt;/FieldDetails&gt;
+        &lt;/FieldDetail&gt;
     &lt;/Detail&gt;
 &lt;/Report&gt;</programlisting>
 					</para>
@@ -2580,13 +2587,13 @@ SELECT * FROM some_table
     &lt;/Variables&gt;
 
     &lt;Detail&gt;
-        &lt;FieldHeaders&gt;
+        &lt;FieldHeader&gt;
             &lt;literal value="'My variable'" /&gt;
-        &lt;/FieldHeaders&gt;
+        &lt;/FieldHeader&gt;
 
-        &lt;FieldDetails&gt;
+        &lt;FieldDetail&gt;
             &lt;field value="v.var1" /&gt;
-        &lt;/FieldDetails&gt;
+        &lt;/FieldDetail&gt;
     &lt;/Detail&gt;
 &lt;/Report&gt;</programlisting>
 					</para>
@@ -2780,7 +2787,7 @@ SELECT * FROM some_table
 				<para>
 					Precalculated variables may be used to show totals in
 					e.g. <xref linkend="repheader"/>,
-					in <literal>&lt;FieldHeaders&gt;</literal> in
+					in <literal>&lt;FieldHeader&gt;</literal> in
 					<xref linkend="detailnode"/>,
 					in <xref linkend="breakheadernode"/>
 					and in
@@ -3051,23 +3058,23 @@ SELECT * FROM some_table
 
     &lt;Detail&gt;
 
-        &lt;FieldHeaders&gt;
+        &lt;FieldHeader&gt;
             &lt;Output&gt;
                 &lt;Line&gt;
                     &lt;literal width="60" /&gt;
                     &lt;literal&gt;Employee name&lt;/literal&gt;
                 &lt;/Line&gt;
             &lt;/Output&gt;
-        &lt;/FieldHeaders&gt;
+        &lt;/FieldHeader&gt;
 
-        &lt;FieldDetails&gt;
+        &lt;FieldDetail&gt;
             &lt;Output&gt;
                 &lt;Line&gt;
                     &lt;literal width="60" /&gt;
                     &lt;field value="query1.employee" /&gt;
                 &lt;/Line&gt;
             &lt;/Output&gt;
-        &lt;/FieldDetails&gt;
+        &lt;/FieldDetail&gt;
 
     &lt;Detail&gt;
 
@@ -3083,7 +3090,7 @@ SELECT * FROM some_table
 					<listitem>
 						<para>
 							Before the first row on every page, the contents
-							of <literal>&lt;FieldHeaders&gt;</literal> is
+							of <literal>&lt;FieldHeader&gt;</literal> is
 							printed.
 						</para>
 					</listitem>
@@ -3099,7 +3106,7 @@ SELECT * FROM some_table
 					<listitem>
 						<para>
 							The contents of
-							<literal>&lt;FieldDetails&gt;</literal>
+							<literal>&lt;FieldDetail&gt;</literal>
 							is printed for the current row. Repeat until
 							a value change is observed between
 							adjacent rows for a break's expression.
@@ -3325,7 +3332,7 @@ SELECT * FROM some_table
 				<para>
 					Text lines may be suppressed. If the parent
 					<literal>&lt;Output&gt;</literal> node is in
-					<literal>&lt;FieldDetails&gt;</literal>, the
+					<literal>&lt;FieldDetail&gt;</literal>, the
 					expression may be derived from a query field.
 					<programlisting>&lt;Line suppress="yes"&gt;</programlisting>
 				</para>
@@ -4052,7 +4059,7 @@ SELECT * FROM some_table
 				<para>
 					Horizontal lines may be suppressed. If the parent
 					<literal>&lt;Output&gt;</literal> node is in
-					<literal>&lt;FieldDetails&gt;</literal>, the
+					<literal>&lt;FieldDetail&gt;</literal>, the
 					expression may be derived from a query field.
 					<programlisting>&lt;HorizontalLine suppress="yes" /&gt;</programlisting>
 				</para>
@@ -4355,7 +4362,7 @@ SELECT * FROM some_table
 					<literal>&lt;ReportHeader&gt;</literal>,
 					<literal>&lt;ReportFooter&gt;</literal>,
 					<literal>&lt;Fieldheaders&gt;</literal>
-					<literal>&lt;FieldDetails&gt;</literal>,
+					<literal>&lt;FieldDetail&gt;</literal>,
 					since they are the ones under the
 					<literal>&lt;Report&gt;</literal> scope
 					with a query.
