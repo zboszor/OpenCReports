@@ -288,7 +288,7 @@ AC_ARG_WITH([pandas-source],
 	[AS_HELP_STRING([--without-pandas-source],
 		[Disable use of Python / Pandas for spreadsheet datasource @<:@default=autodetect@:>@])])
 
-AS_IF([test x$enable_pandas_source != xno],
+AS_IF([test x$with_pandas_source != xno],
 	[PKG_CHECK_MODULES(PYTHON, python3-embed,
 	 	[AC_DEFINE(HAVE_LIBPYTHON,[1],[Have embedded python])
 	 	 found_python=yes])])
