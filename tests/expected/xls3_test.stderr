@@ -1,1 +1,3 @@
+cannot find file 'notexist.xls'
+cannot connect to datasource 'pandas:pandas'
 Failed to add a pandas datasource.

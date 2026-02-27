@@ -98,20 +98,26 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char
 		return NULL;
 
 	const ocrpt_input *input = ocrpt_input_get(type);
-	if (!input)
+	if (!input) {
+		ocrpt_err_printf("no such input type: %s\n", type);
 		return NULL;
+	}
 
 	ocrpt_datasource *s = ocrpt_datasource_get(o, source_name);
 	if (s) {
 		if (s->input == input)
 			return s;
+		ocrpt_err_printf("datasource '%s' already exist with mismatched type (existing '%s', expected '%s')\n",
+			source_name, (s->input->names && s->input->names[0]) ? s->input->names[0] : "<unknown>", type);
 		return NULL;
 	}
 
 	s = ocrpt_mem_malloc(sizeof(ocrpt_datasource));
 
-	if (!s)
+	if (!s) {
+		ocrpt_err_printf("out of memory\n");
 		return NULL;
+	}
 
 	memset(s, 0, sizeof(ocrpt_datasource));
 	s->name = ocrpt_mem_strdup(source_name);
@@ -121,8 +127,10 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char
 	bool connected = input->connect ? input->connect(s, conn_params) : true;
 
 	if (!connected) {
+		ocrpt_err_printf("cannot connect to datasource '%s:%s'\n",
+			(s->input->names && s->input->names[0]) ? s->input->names[0] : "<unknown>", s->name);
 		ocrpt_strfree(s->name);
-		ocrpt_mem_free(s);;
+		ocrpt_mem_free(s);
 		return NULL;
 	}
 

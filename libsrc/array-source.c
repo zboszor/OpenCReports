@@ -424,6 +424,12 @@ static ocrpt_query *ocrpt_csv_query_add(ocrpt_datasource *source,
 	if (!source || !name || !filename)
 		return NULL;
 
+	char *real_filename = ocrpt_find_file(source->o, filename);
+	if (!real_filename) {
+		ocrpt_err_printf("cannot find file '%s'\n", filename);
+		return NULL;
+	}
+
 	struct stat st;
 	struct csv_parser csv;
 	char *buf;
@@ -434,14 +440,18 @@ static ocrpt_query *ocrpt_csv_query_add(ocrpt_datasource *source,
 	size_t parser_retval;
 	int32_t fd, row;
 
-	if (stat(filename, &st) != 0) {
-		ocrpt_err_printf("error opening file\n");
+	if (stat(real_filename, &st) != 0) {
+		/* This cannot happen due to ocrpt_find_file() above. */
+		ocrpt_err_printf("error opening file '%s'\n", filename);
 		return NULL;
 	}
 
-	fd = open(filename, O_RDONLY);
+	fd = open(real_filename, O_RDONLY);
+
+	ocrpt_mem_free(real_filename);
+
 	if (fd < 0) {
-		ocrpt_err_printf("error opening file\n");
+		ocrpt_err_printf("error opening file '%s'\n", filename);
 		return NULL;
 	}
 
@@ -746,6 +756,12 @@ static ocrpt_query *ocrpt_json_query_add(ocrpt_datasource *source,
 	if (!source || !name || !filename)
 		return NULL;
 
+	char *real_filename = ocrpt_find_file(source->o, filename);
+	if (!real_filename) {
+		ocrpt_err_printf("cannot find file '%s'\n", filename);
+		return NULL;
+	}
+
 	struct stat st;
 	char *buf;
 	const char **array;
@@ -757,13 +773,16 @@ static ocrpt_query *ocrpt_json_query_add(ocrpt_datasource *source,
 	int32_t fd, row;
 
 	if (stat(filename, &st) != 0) {
-		ocrpt_err_printf("error opening file\n");
+		ocrpt_err_printf("error opening file '%s'\n", filename);
 		return NULL;
 	}
 
-	fd = open(filename, O_RDONLY);
+	fd = open(real_filename, O_RDONLY);
+
+	ocrpt_mem_free(real_filename);
+
 	if (fd < 0) {
-		ocrpt_err_printf("error opening file\n");
+		ocrpt_err_printf("error opening file '%s'\n", filename);
 		return NULL;
 	}
 
@@ -777,7 +796,7 @@ static ocrpt_query *ocrpt_json_query_add(ocrpt_datasource *source,
 	if (read(fd, buf, st.st_size) != st.st_size) {
 		close(fd);
 		ocrpt_mem_free(buf);
-		ocrpt_err_printf("error reading file\n");
+		ocrpt_err_printf("error reading file '%s'\n", filename);
 		return NULL;
 	}
 
@@ -1132,6 +1151,12 @@ static ocrpt_query *ocrpt_xml_query_add(ocrpt_datasource *source,
 	if (!source || !name || !filename)
 		return NULL;
 
+	char *real_filename = ocrpt_find_file(source->o, filename);
+	if (!real_filename) {
+		ocrpt_err_printf("cannot find file '%s'\n", filename);
+		return NULL;
+	}
+
 	const char **array;
 	ocrpt_query *retval;
 	ocrpt_file_query fq;
@@ -1139,9 +1164,11 @@ static ocrpt_query *ocrpt_xml_query_add(ocrpt_datasource *source,
 	ocrpt_list *rowptr;
 	int32_t ret, err, row;
 
-	reader = xmlReaderForFile(filename, NULL, XML_PARSE_RECOVER |
+	reader = xmlReaderForFile(real_filename, NULL, XML_PARSE_RECOVER |
 								XML_PARSE_NOENT | XML_PARSE_NOBLANKS |
 								XML_PARSE_XINCLUDE | XML_PARSE_NOXINCNODE);
+
+	ocrpt_mem_free(real_filename);
 
 	if (!reader) {
 		return NULL;

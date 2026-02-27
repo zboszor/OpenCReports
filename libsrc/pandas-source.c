@@ -99,14 +99,22 @@ static bool ocrpt_pandas_connect(ocrpt_datasource *source, const ocrpt_input_con
 	if (!filename)
 		return false;
 
+	char *real_filename = ocrpt_find_file(source->o, filename);
+	if (!real_filename) {
+		ocrpt_err_printf("cannot find file '%s'\n", filename);
+		return false;
+	}
+
 	PyObject *args = PyTuple_New(1);
 
-	PyObject *value = PyUnicode_FromString(filename);
+	PyObject *value = PyUnicode_FromString(real_filename);
 	PyTuple_SetItem(args, 0, value);
 
 	PyObject *sheet_file = PyObject_CallObject(pandas_excelfile_fn, args);
 
 	Py_DecRef(args);
+
+	ocrpt_mem_free(real_filename);
 
 	if (!sheet_file || PyErr_Occurred()) {
 		PyErr_Clear();
