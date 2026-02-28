@@ -74,6 +74,27 @@ DLL_EXPORT_SYM bool ocrpt_input_register(const ocrpt_input * const input) {
 	return true;
 }
 
+DLL_EXPORT_SYM void ocrpt_input_unregister(const ocrpt_input * const input) {
+	if (!input)
+		return;
+
+	pthread_mutex_lock(&input_register_mutex);
+
+	int32_t i;
+
+	for (i = 0; i < n_ocrpt_inputs; i++)
+		if (ocrpt_inputs[i] == input)
+			break;
+
+	for (i++; i < n_ocrpt_inputs; i++)
+		ocrpt_inputs[i - 1] = ocrpt_inputs[i];
+
+	if (n_ocrpt_inputs > 0)
+		n_ocrpt_inputs--;
+
+	pthread_mutex_unlock(&input_register_mutex);
+}
+
 DLL_EXPORT_SYM const ocrpt_input * const ocrpt_input_get(const char *name) {
 	const ocrpt_input *input = NULL;
 
@@ -98,26 +119,20 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char
 		return NULL;
 
 	const ocrpt_input *input = ocrpt_input_get(type);
-	if (!input) {
-		ocrpt_err_printf("no such input type: %s\n", type);
+	if (!input)
 		return NULL;
-	}
 
 	ocrpt_datasource *s = ocrpt_datasource_get(o, source_name);
 	if (s) {
 		if (s->input == input)
 			return s;
-		ocrpt_err_printf("datasource '%s' already exist with mismatched type (existing '%s', expected '%s')\n",
-			source_name, (s->input->names && s->input->names[0]) ? s->input->names[0] : "<unknown>", type);
 		return NULL;
 	}
 
 	s = ocrpt_mem_malloc(sizeof(ocrpt_datasource));
 
-	if (!s) {
-		ocrpt_err_printf("out of memory\n");
+	if (!s)
 		return NULL;
-	}
 
 	memset(s, 0, sizeof(ocrpt_datasource));
 	s->name = ocrpt_mem_strdup(source_name);
@@ -127,8 +142,6 @@ DLL_EXPORT_SYM ocrpt_datasource *ocrpt_datasource_add(opencreport *o, const char
 	bool connected = input->connect ? input->connect(s, conn_params) : true;
 
 	if (!connected) {
-		ocrpt_err_printf("cannot connect to datasource '%s:%s'\n",
-			(s->input->names && s->input->names[0]) ? s->input->names[0] : "<unknown>", s->name);
 		ocrpt_strfree(s->name);
 		ocrpt_mem_free(s);
 		return NULL;

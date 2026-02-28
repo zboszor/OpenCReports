@@ -11,11 +11,17 @@
 //#include "test_common.h"
 
 int main(int argc, char **argv) {
+	if (!ocrpt_pandas_initialize()) {
+		fprintf(stderr, "Failed to register pandas datasource driver.\n");
+		return 0;
+	}
+
 	opencreport *o = ocrpt_init();
 
 	if (!ocrpt_parse_xml(o, "layout_ods_test.xml")) {
 		printf("XML parse error\n");
 		ocrpt_free(o);
+		ocrpt_pandas_deinitialize();
 		return 0;
 	}
 
@@ -26,6 +32,8 @@ int main(int argc, char **argv) {
 	ocrpt_spool(o);
 
 	ocrpt_free(o);
+
+	ocrpt_pandas_deinitialize();
 
 	return 0;
 }

@@ -339,6 +339,20 @@ ssize_t ocrpt_mpfr_strfmon(opencreport *o, char * __restrict s, size_t maxsize, 
  */
 bool ocrpt_input_register(const ocrpt_input * const input);
 /*
+ * Unregister an input driver
+ *
+ * Do not do this while there is an active report using this driver!!!
+ */
+void ocrpt_input_unregister(const ocrpt_input * const input);
+/*
+ * Initialize and register the optional Pandas spreadsheet datasource driver
+ */
+bool ocrpt_pandas_initialize(void);
+/*
+ * Unregister and de-initialize the Pandas spreadsheet datasource driver
+ */
+void ocrpt_pandas_deinitialize(void);
+/*
  * Get the input driver structure using its type name
  */
 const ocrpt_input * const ocrpt_input_get(const char *name);

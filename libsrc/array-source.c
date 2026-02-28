@@ -425,10 +425,8 @@ static ocrpt_query *ocrpt_csv_query_add(ocrpt_datasource *source,
 		return NULL;
 
 	char *real_filename = ocrpt_find_file(source->o, filename);
-	if (!real_filename) {
-		ocrpt_err_printf("cannot find file '%s'\n", filename);
+	if (!real_filename)
 		return NULL;
-	}
 
 	struct stat st;
 	struct csv_parser csv;
@@ -442,7 +440,6 @@ static ocrpt_query *ocrpt_csv_query_add(ocrpt_datasource *source,
 
 	if (stat(real_filename, &st) != 0) {
 		/* This cannot happen due to ocrpt_find_file() above. */
-		ocrpt_err_printf("error opening file '%s'\n", filename);
 		return NULL;
 	}
 
@@ -450,22 +447,18 @@ static ocrpt_query *ocrpt_csv_query_add(ocrpt_datasource *source,
 
 	ocrpt_mem_free(real_filename);
 
-	if (fd < 0) {
-		ocrpt_err_printf("error opening file '%s'\n", filename);
+	if (fd < 0)
 		return NULL;
-	}
 
 	buf = ocrpt_mem_malloc(st.st_size);
 	if (!buf) {
 		close(fd);
-		ocrpt_err_printf("out of memory\n");
 		return NULL;
 	}
 
 	if (read(fd, buf, st.st_size) != st.st_size) {
 		close(fd);
 		ocrpt_mem_free(buf);
-		ocrpt_err_printf("error reading file\n");
 		return NULL;
 	}
 
@@ -473,7 +466,6 @@ static ocrpt_query *ocrpt_csv_query_add(ocrpt_datasource *source,
 
 	if (csv_init(&csv, CSV_STRICT | CSV_REPALL_NL | CSV_STRICT_FINI | CSV_APPEND_NULL | CSV_EMPTY_IS_NULL) != 0) {
 		ocrpt_mem_free(buf);
-		ocrpt_err_printf("error initializing CSV parser\n");
 		return NULL;
 	}
 
@@ -489,7 +481,6 @@ static ocrpt_query *ocrpt_csv_query_add(ocrpt_datasource *source,
 		ocrpt_mem_free(buf);
 		csv_free(&csv);
 		ocrpt_file_query_free(&fq, true);
-		ocrpt_err_printf("parsing CSV file \"%s\" failed\n", filename);
 		return NULL;
 	}
 
@@ -500,7 +491,6 @@ static ocrpt_query *ocrpt_csv_query_add(ocrpt_datasource *source,
 	array = ocrpt_mem_malloc(fq.rows * fq.cols * sizeof(char *));
 	if (!array) {
 		ocrpt_file_query_free(&fq, true);
-		ocrpt_err_printf("out of memory\n");
 		return NULL;
 	}
 
@@ -757,10 +747,8 @@ static ocrpt_query *ocrpt_json_query_add(ocrpt_datasource *source,
 		return NULL;
 
 	char *real_filename = ocrpt_find_file(source->o, filename);
-	if (!real_filename) {
-		ocrpt_err_printf("cannot find file '%s'\n", filename);
+	if (!real_filename)
 		return NULL;
-	}
 
 	struct stat st;
 	char *buf;
@@ -772,31 +760,25 @@ static ocrpt_query *ocrpt_json_query_add(ocrpt_datasource *source,
 	ocrpt_list *rowptr;
 	int32_t fd, row;
 
-	if (stat(filename, &st) != 0) {
-		ocrpt_err_printf("error opening file '%s'\n", filename);
+	if (stat(filename, &st) != 0)
 		return NULL;
-	}
 
 	fd = open(real_filename, O_RDONLY);
 
 	ocrpt_mem_free(real_filename);
 
-	if (fd < 0) {
-		ocrpt_err_printf("error opening file '%s'\n", filename);
+	if (fd < 0)
 		return NULL;
-	}
 
 	buf = ocrpt_mem_malloc(st.st_size);
 	if (!buf) {
 		close(fd);
-		ocrpt_err_printf("out of memory\n");
 		return NULL;
 	}
 
 	if (read(fd, buf, st.st_size) != st.st_size) {
 		close(fd);
 		ocrpt_mem_free(buf);
-		ocrpt_err_printf("error reading file '%s'\n", filename);
 		return NULL;
 	}
 
@@ -822,7 +804,6 @@ static ocrpt_query *ocrpt_json_query_add(ocrpt_datasource *source,
 	array = ocrpt_mem_malloc(fq.rows * fq.cols * sizeof(char *));
 	if (!array) {
 		ocrpt_file_query_free(&fq, true);
-		ocrpt_err_printf("out of memory\n");
 		return NULL;
 	}
 
@@ -1152,10 +1133,8 @@ static ocrpt_query *ocrpt_xml_query_add(ocrpt_datasource *source,
 		return NULL;
 
 	char *real_filename = ocrpt_find_file(source->o, filename);
-	if (!real_filename) {
-		ocrpt_err_printf("cannot find file '%s'\n", filename);
+	if (!real_filename)
 		return NULL;
-	}
 
 	const char **array;
 	ocrpt_query *retval;
@@ -1212,7 +1191,6 @@ static ocrpt_query *ocrpt_xml_query_add(ocrpt_datasource *source,
 	array = ocrpt_mem_malloc((fq.rows + 1) * fq.cols * sizeof(char *));
 	if (!array) {
 		ocrpt_file_query_free(&fq, true);
-		ocrpt_err_printf("out of memory\n");
 		return NULL;
 	}
 

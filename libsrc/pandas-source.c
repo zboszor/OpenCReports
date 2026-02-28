@@ -7,6 +7,7 @@
 #include <config.h>
 
 #include <string.h>
+#include <pthread.h>
 
 #include "opencreport.h"
 #include "ocrpt-private.h"
@@ -100,10 +101,8 @@ static bool ocrpt_pandas_connect(ocrpt_datasource *source, const ocrpt_input_con
 		return false;
 
 	char *real_filename = ocrpt_find_file(source->o, filename);
-	if (!real_filename) {
-		ocrpt_err_printf("cannot find file '%s'\n", filename);
+	if (!real_filename)
 		return false;
-	}
 
 	PyObject *args = PyTuple_New(1);
 
@@ -589,9 +588,15 @@ const ocrpt_input ocrpt_pandas_input = {
 	.close = ocrpt_pandas_close
 };
 
+static pthread_mutex_t pandas_initializer_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 DLL_EXPORT_SYM bool ocrpt_pandas_initialize(void) {
-	if (pandas_initialized)
+	pthread_mutex_lock(&pandas_initializer_mutex);
+
+	if (pandas_initialized) {
+		pthread_mutex_unlock(&pandas_initializer_mutex);
 		return pandas_available;
+	}
 
 	Py_InitializeEx(0);
 
@@ -605,6 +610,7 @@ DLL_EXPORT_SYM bool ocrpt_pandas_initialize(void) {
 	if (!pandas_available) {
 		PyErr_Clear();
 		pandas_initialized = true;
+		pthread_mutex_unlock(&pandas_initializer_mutex);
 		return pandas_available;
 	}
 
@@ -616,6 +622,7 @@ DLL_EXPORT_SYM bool ocrpt_pandas_initialize(void) {
 	if (!pandas_available) {
 		PyErr_Clear();
 		pandas_initialized = true;
+		pthread_mutex_unlock(&pandas_initializer_mutex);
 		return pandas_available;
 	}
 
@@ -626,6 +633,7 @@ DLL_EXPORT_SYM bool ocrpt_pandas_initialize(void) {
 		PyErr_Clear();
 		Py_DecRef(pandas_script);
 		pandas_initialized = true;
+		pthread_mutex_unlock(&pandas_initializer_mutex);
 		return pandas_available;
 	}
 
@@ -641,13 +649,22 @@ DLL_EXPORT_SYM bool ocrpt_pandas_initialize(void) {
 	pandas_nrows_fn = PyObject_GetAttrString(pandas_module, "ocrpt_sheet_nrows");
 	pandas_row_fn = PyObject_GetAttrString(pandas_module, "ocrpt_sheet_row");
 
+	ocrpt_input_register(&ocrpt_pandas_input);
+
 	pandas_initialized = true;
+	pthread_mutex_unlock(&pandas_initializer_mutex);
 	return pandas_available;
 }
 
 DLL_EXPORT_SYM void ocrpt_pandas_deinitialize(void) {
-	if (!pandas_initialized || !pandas_available)
+	pthread_mutex_lock(&pandas_initializer_mutex);
+
+	if (!pandas_initialized || !pandas_available) {
+		pthread_mutex_unlock(&pandas_initializer_mutex);
 		return;
+	}
+
+	ocrpt_input_unregister(&ocrpt_pandas_input);
 
 	Py_DecRef(pandas_row_fn);
 	Py_DecRef(pandas_nrows_fn);
@@ -666,6 +683,17 @@ DLL_EXPORT_SYM void ocrpt_pandas_deinitialize(void) {
 
 	pandas_available = false;
 	pandas_initialized = false;
+
+	pthread_mutex_unlock(&pandas_initializer_mutex);
+}
+
+#else
+
+DLL_EXPORT_SYM bool ocrpt_pandas_initialize(void) {
+	return false;
+}
+
+DLL_EXPORT_SYM void ocrpt_pandas_deinitialize(void) {
 }
 
 #endif /* HAVE_LIBPYTHON */

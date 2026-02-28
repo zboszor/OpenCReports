@@ -6,11 +6,19 @@
 
 #include "php_opencreport.h"
 
+/* Whether we can use Pandas datasource */
+static bool opencreport_pandas = false;
+
 /* {{{ PHP_MINIT_FUNCTION */
 static PHP_MINIT_FUNCTION(opencreport)
 {
-	if (!opencreport_init())
+	/* Attempt to initialize the Python and Pandas usage */
+	opencreport_pandas = ocrpt_pandas_initialize();
+
+	if (!opencreport_init()) {
+		ocrpt_pandas_deinitialize();
 		return FAILURE;
+	}
 
 	register_opencreport_ce();
 	register_opencreport_ds_ce();
@@ -39,6 +47,7 @@ static PHP_MINIT_FUNCTION(opencreport)
 /* {{{ PHP_MSHUTDOWN_FUNCTION
  */
 static PHP_MSHUTDOWN_FUNCTION(opencreport) {
+	ocrpt_pandas_deinitialize();
 	return SUCCESS;
 }
 /* }}} */
@@ -65,6 +74,7 @@ static PHP_MINFO_FUNCTION(opencreport)
 	php_info_print_table_start();
 
 	php_info_print_table_row(2, "OpenCReport", "enabled");
+	php_info_print_table_row(2, "OpenCReport spreadsheet support via Python and Pandas", opencreport_pandas ? "enabled" : "disabled");
 	php_info_print_table_row(2, "OpenCReport module version", PHP_OPENCREPORT_VERSION);
 	php_info_print_table_row(2, "OpenCReport library version", ocrpt_version());
 

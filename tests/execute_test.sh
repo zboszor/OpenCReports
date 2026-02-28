@@ -41,7 +41,7 @@ else
 			OUTRET=$?
 			ERRDIFF=$(diff -durpN ${abs_srcdir}/expected/${TEST}${TESTSFX}.stderr${SFX} ${abs_builddir}/results/${TEST}${TESTSFX}.stderr 2>/dev/null)
 			ERRRET=$?
-			if [[ -z "$OUTDIFF" ]]; then
+			if [[ -z "$OUTDIFF" ]] && [[ -z "$ERRDIFF" ]]; then
 				FOUND=1
 				break
 			fi

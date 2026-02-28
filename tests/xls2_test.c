@@ -33,11 +33,17 @@ int main(int argc, char **argv) {
 	ocrpt_report *r;
 	struct rowdata rd = { .row = 0 };
 
+	if (!ocrpt_pandas_initialize()) {
+		fprintf(stderr, "Failed to register pandas datasource driver.\n");
+		return 0;
+	}
+
 	o = ocrpt_init();
 
 	if (!ocrpt_parse_xml(o, "xlsds.xml")) {
 		printf("XML parse error\n");
 		ocrpt_free(o);
+		ocrpt_pandas_deinitialize();
 		return 0;
 	}
 
@@ -45,6 +51,7 @@ int main(int argc, char **argv) {
 	if (!ds) {
 		fprintf(stderr, "Failed to add a pandas datasource.\n");
 		ocrpt_free(o);
+		ocrpt_pandas_deinitialize();
 		return 1;
 	}
 
@@ -54,6 +61,7 @@ int main(int argc, char **argv) {
 	if (!rd.q) {
 		fprintf(stderr, "Failed to add a spreadsheet query.\n");
 		ocrpt_free(o);
+		ocrpt_pandas_deinitialize();
 		return 1;
 	}
 
@@ -62,12 +70,15 @@ int main(int argc, char **argv) {
 	if (!ocrpt_report_add_new_row_cb(r, test_newrow_cb, &rd)) {
 		fprintf(stderr, "Failed to add new row callback.\n");
 		ocrpt_free(o);
+		ocrpt_pandas_deinitialize();
 		return  1;
 	}
 
 	ocrpt_execute(o);
 
 	ocrpt_free(o);
+
+	ocrpt_pandas_deinitialize();
 
 	return 0;
 }

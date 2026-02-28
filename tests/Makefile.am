@@ -133,6 +133,7 @@ PHP_TESTS = \
 	odbc5_test odbc6_test odbc7_test \
 	odbc_xml_test odbc_xml2_test odbc_xml3_test \
 	odbc_xml4_test \
+	$(PYTHON_TESTS) \
 	rownum_test \
 	part_test part_xml_test \
 	variable_expression_test variable_expression_xml_test \
@@ -309,6 +310,7 @@ PHP_LAYOUT_TESTS = \
 	layout_xml41_test \
 	layout_code41_test \
 	layout_xml42_test \
+	$(LAYOUT_PYTHON_TESTS) \
 	layout_barcode1_test \
 	layout_barcode1_code_test \
 	layout_xml_mods_test
