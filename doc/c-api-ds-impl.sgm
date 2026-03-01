@@ -16,6 +16,20 @@
 				<programlisting>bool
 ocrpt_input_register(const ocrpt_input * const input);</programlisting>
 			</para>
+			<para>
+				This function must be called before creating reports.
+			</para>
+		</sect2>
+		<sect2 id="inputunreg">
+			<title>Unregister a datasource input driver</title>
+			<para>
+				<programlisting>void
+ocrpt_input_unregister(const ocrpt_input * const input);</programlisting>
+			</para>
+			<para>
+				This function must only be called after the application
+				is done creating reports, i.e. when exiting.
+			</para>
 		</sect2>
 		<sect2 id="inputget">
 			<title>Get a datasource input driver</title>
@@ -23,6 +37,29 @@ ocrpt_input_register(const ocrpt_input * const input);</programlisting>
 				Get a datasource input driver using its name.
 				<programlisting>const ocrpt_input * const
 ocrpt_input_get(const char *name);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="pandasinit">
+			<title>Initialize and register the Python/Pandas based datasource input driver</title>
+			<para>
+				This function initializes the embedded Python subsystem
+				and if successful, registers the datasource under the names
+				<literal>pandas</literal> and <literal>spreadsheet</literal>.
+				<programlisting>bool
+ocrpt_pandas_initialize(void);</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="pandasdeinit">
+			<title>De-initialize and unregister the Python/Pandas based datasource input driver</title>
+			<para>
+				This function unregisters the datasource driver, and
+				de-initializes the Python subsystem.
+				<programlisting>void
+ocrpt_pandas_deinitialize(void);</programlisting>
+			</para>
+			<para>
+				This function must only be called after the application
+				is done creating reports, i.e. when exiting.
 			</para>
 		</sect2>
 	</sect1>
