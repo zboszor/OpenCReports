@@ -69,6 +69,6 @@ endif
 
 EXTRA_DIST = $(SGMLFILES)
 
-CLEANFILES = OpenCReports-A4.pdf OpenCReports-US.pdf html-stamp OpenCReports.html html/*.html
+CLEANFILES = *.fo *.pdf html-stamp *.html html/*.html
 
 endif
