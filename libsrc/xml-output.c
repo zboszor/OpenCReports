@@ -347,12 +347,17 @@ static void ocrpt_xml_finalize(opencreport *o) {
 
 	xmlChar *xmlbuf;
 	int bufsz;
+#if LIBXML_VERSION < 21500
 	int old_xmlIndentTreeOutput = xmlIndentTreeOutput;
 
 	xmlIndentTreeOutput = 1;
+#endif
+
 	xmlDocDumpFormatMemoryEnc(priv->doc, &xmlbuf, &bufsz, "utf-8", 1);
 
+#if LIBXML_VERSION < 21500
 	xmlIndentTreeOutput = old_xmlIndentTreeOutput;
+#endif
 
 	ocrpt_mem_string_append_len(o->output_buffer, (char *)xmlbuf, bufsz);
 
