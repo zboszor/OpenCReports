@@ -1,7 +1,7 @@
 /*
  * OpenCReports spreadsheet based data sources
  *
- * Copyright (C) 2019-2025 Zoltán Böszörményi <zboszor@gmail.com>
+ * Copyright (C) 2019-2026 Zoltán Böszörményi <zboszor@gmail.com>
  * See COPYING.LGPLv3 in the toplevel directory.
  */
 #include <config.h>
