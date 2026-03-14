@@ -1882,7 +1882,7 @@ DLL_EXPORT_SYM void ocrpt_set_output_parameter(opencreport *o, const char *param
 		ocrpt_string *meta;
 		ocrpt_string *html_meta = ocrpt_mem_string_new("", true);
 
-		char *meta0 = strstr(value, "<meta");
+		const char *meta0 = strstr(value, "<meta");
 		if (meta0) {
 			meta = ocrpt_mem_string_new(meta0 + 5, true);
 
