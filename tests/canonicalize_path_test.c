@@ -19,18 +19,8 @@ int main(int argc, char **argv) {
 		srcdir = getcwd(srcdir0, sizeof(srcdir0));
 	char *csrcdir = ocrpt_canonicalize_path(srcdir);
 	size_t slen = strlen(csrcdir);
-	char abs_builddir0[PATH_MAX];
-	char *abs_builddir = getenv("abs_builddir");
-	if (!abs_builddir || !*abs_builddir)
-		abs_builddir = getcwd(abs_builddir0, sizeof(abs_builddir0));
-	char *builddir = ocrpt_canonicalize_path(abs_builddir);
-	size_t blen = strlen(builddir);
 
 	ocrpt_string *s1 = ocrpt_mem_string_new_with_len(NULL, strlen(csrcdir) * 2);
-
-	/* Assume that the srcdir doesn't contain a symlink along its path */
-	if (strcmp(srcdir, csrcdir) == 0)
-		printf("srcdir equals canonical srcdir\n");
 
 	int i, len = strlen(csrcdir), slashes = 0;
 	for (i = 0; i < len; i++, s1->len++) {
@@ -78,10 +68,8 @@ int main(int argc, char **argv) {
 	ocrpt_mem_free(csrcdir);
 
 	s1c = ocrpt_canonicalize_path("images2/images2");
-	printf("Canonicalized path of 'images2/images2' relative to abs_builddir: '%s'\n", s1c + blen + 1);
+	printf("Canonicalized path of 'images2/images2' relative to abs_srcdir: '%s'\n", s1c + slen + 1);
 	ocrpt_mem_free(s1c);
-
-	ocrpt_mem_free(builddir);
 
 	return 0;
 }

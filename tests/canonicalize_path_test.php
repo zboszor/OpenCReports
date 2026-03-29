@@ -17,10 +17,6 @@ if (is_bool($builddir))
 $cbuilddir = OpenCReport::canonicalize_path($builddir);
 $blen = strlen($cbuilddir);
 
-/* Assume that the srcdir doesn't contain a symlink along its path */
-if (strcmp($srcdir, $csrcdir) == 0)
-	echo "srcdir equals canonical srcdir" . PHP_EOL;
-
 $cstr_a = explode("/", $csrcdir);
 
 $slashes = 2;
@@ -54,4 +50,4 @@ $s1c = OpenCReport::canonicalize_path($s1);
 echo "Bad recursive symlink, returned as is: ", substr($s1c, $slen + 1) . PHP_EOL;
 
 $s1c = OpenCReport::canonicalize_path("images2/images2");
-echo "Canonicalized path of 'images2/images2' relative to abs_builddir: '" . substr($s1c, $slen + 1) . "'" . PHP_EOL;
+echo "Canonicalized path of 'images2/images2' relative to abs_srcdir: '" . substr($s1c, $slen + 1) . "'" . PHP_EOL;
