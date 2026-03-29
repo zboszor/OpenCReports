@@ -1,22 +1,22 @@
 if ENABLE_DOCS
 
 SGMLFILES = \
-	OpenCReports.sgm \
-	introduction.sgm \
-	dsandqueries.sgm \
-	expressions.sgm \
-	functions.sgm \
-	variables.sgm \
-	breaks.sgm \
-	xmldescription.sgm \
-	formatting.sgm \
-	c-api-ref-high.sgm \
-	c-api-ref-low.sgm \
-	c-api-ds-impl.sgm \
-	php-api-reference.sgm \
-	examples.sgm \
-	license.sgm \
-	jadetex.cfg
+	$(builddir)/OpenCReports.sgm \
+	$(srcdir)/introduction.sgm \
+	$(srcdir)/dsandqueries.sgm \
+	$(srcdir)/expressions.sgm \
+	$(srcdir)/functions.sgm \
+	$(srcdir)/variables.sgm \
+	$(srcdir)/breaks.sgm \
+	$(srcdir)/xmldescription.sgm \
+	$(srcdir)/formatting.sgm \
+	$(srcdir)/c-api-ref-high.sgm \
+	$(srcdir)/c-api-ref-low.sgm \
+	$(srcdir)/c-api-ds-impl.sgm \
+	$(srcdir)/php-api-reference.sgm \
+	$(srcdir)/examples.sgm \
+	$(srcdir)/license.sgm \
+	$(srcdir)/jadetex.cfg
 
 PDF =
 if ENABLE_PDF_DOCS
@@ -28,13 +28,13 @@ HTML = OpenCReports.html html
 all: $(PDF) $(HTML)
 
 IMAGES = \
-	images/namedcolors.svg \
-	images/example1.png \
-	images/example3.png \
-	images/example4.png \
-	images/example5.png \
-	images/example6.png \
-	images/example7.png 
+	$(srcdir)/images/namedcolors.svg \
+	$(srcdir)/images/example1.png \
+	$(srcdir)/images/example3.png \
+	$(srcdir)/images/example4.png \
+	$(srcdir)/images/example5.png \
+	$(srcdir)/images/example6.png \
+	$(srcdir)/images/example7.png
 
 XMLINCLUDE = --path . --path $(srcdir)
 XSLTPROCFLAGS = --stringparam ocrpt.version '$(VERSION)'
