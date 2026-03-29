@@ -349,18 +349,18 @@ $(noinst_PROGRAMS): $(top_builddir)/libsrc/libopencreport.la
 all: $(noinst_PROGRAMS)
 
 basic-test: $(TESTS) execute_test.sh
-	$(foreach TEST,$(TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) $(srcdir)/execute_test.sh $(TEST) &&) true
 
 php-basic-test: execute_test.sh
-	$(foreach TEST,$(PHP_TESTS), abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) TESTSFX=.php ./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(PHP_TESTS), abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) TESTSFX=.php $(srcdir)/execute_test.sh $(TEST) &&) true
 
 if ENABLE_PDF_TESTS
 
 pdf-test: $(LAYOUT_TESTS) $(XLATE_DEPS) execute_layout_test.sh
-	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 1 &&) true
+	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) $(srcdir)/execute_layout_test.sh $(TEST) 1 &&) true
 
 php-pdf-test: $(XLATE_DEPS) execute_layout_test.sh
-	$(foreach TEST,$(PHP_LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) TESTSFX=.php ./execute_layout_test.sh $(TEST) &&) true
+	$(foreach TEST,$(PHP_LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) TESTSFX=.php $(srcdir)/execute_layout_test.sh $(TEST) &&) true
 
 else
 
@@ -369,19 +369,19 @@ else
 endif
 
 html-test: $(LAYOUT_TESTS) $(XLATE_DEPS) execute_layout_test.sh
-	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 2 &&) true
+	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) $(srcdir)/execute_layout_test.sh $(TEST) 2 &&) true
 
 txt-test: $(LAYOUT_TESTS) $(XLATE_DEPS) execute_layout_test.sh
-	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 3 &&) true
+	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) $(srcdir)/execute_layout_test.sh $(TEST) 3 &&) true
 
 csv-test: $(LAYOUT_TESTS) $(LAYOUT_CSV_TESTS) $(XLATE_DEPS) execute_layout_test.sh
-	$(foreach TEST,$(LAYOUT_TESTS) $(LAYOUT_CSV_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 4 &&) true
+	$(foreach TEST,$(LAYOUT_TESTS) $(LAYOUT_CSV_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) $(srcdir)/execute_layout_test.sh $(TEST) 4 &&) true
 
 xml-test: $(LAYOUT_TESTS) $(XLATE_DEPS) execute_layout_test.sh
-	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 5 &&) true
+	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) $(srcdir)/execute_layout_test.sh $(TEST) 5 &&) true
 
 json-test: $(LAYOUT_TESTS) $(XLATE_DEPS) execute_layout_test.sh
-	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_layout_test.sh $(TEST) 6 &&) true
+	$(foreach TEST,$(LAYOUT_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) $(srcdir)/execute_layout_test.sh $(TEST) 6 &&) true
 
 test: basic-test pdf-test html-test txt-test csv-test xml-test json-test
 
@@ -392,15 +392,15 @@ if ENABLE_PGSQL_TESTS
 PGSQL_SLOW_TEST = slow-test
 
 slow-test: $(SLOW_TESTS) execute_test.sh
-	$(foreach TEST,$(SLOW_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(SLOW_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) $(srcdir)/execute_test.sh $(TEST) &&) true
 
 php-slow-test: execute_test.sh
-	$(foreach TEST,$(SLOW_PHP_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) TESTSFX=.php ./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(SLOW_PHP_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) TESTSFX=.php $(srcdir)/execute_test.sh $(TEST) &&) true
 
 endif
 
 unstable-test: $(UNSTABLE_TESTS) execute_test.sh
-	$(foreach TEST,$(UNSTABLE_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) ./execute_test.sh $(TEST) &&) true
+	$(foreach TEST,$(UNSTABLE_TESTS),abs_builddir=$(abs_builddir) abs_srcdir=$(abs_srcdir) top_srcdir=$(top_srcdir) $(srcdir)/execute_test.sh $(TEST) &&) true
 
 all-test: test $(PGSQL_SLOW_TEST) unstable-test
 

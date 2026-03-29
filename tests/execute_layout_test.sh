@@ -48,7 +48,7 @@ top_srcdir=${top_srcdir:-$(dirname $(readlink -f "$0"))/..}
 
 export abs_srcdir abs_builddir
 
-if [[ ! -f ${TEST}${TESTSFX} ]]; then
+if [[ ! -f ${abs_builddir}/${TEST}${TESTSFX} ]] && [[ ! -f ${abs_srcdir}/${TEST}${TESTSFX} ]]; then
 	echo -e "[ \\033[1;31mERROR\\033[0;39m ] ${TEST}${TESTSFX} - does not exist"
 	exit 0
 fi
@@ -66,10 +66,11 @@ export ASAN_OPTIONS="log_path=${abs_builddir}/results/${TEST}${TESTSFX}.${SFX[$T
 export UBSAN_OPTIONS=print_stacktrace=true
 export LSAN_OPTIONS="suppressions=${top_srcdir}/ignore.supp"
 
+cd "$abs_srcdir"
 if [[ $TESTSFX == '.php' ]]; then
-	php "${TEST}${TESTSFX}" "${TYPE}" 2>"${abs_builddir}/results/${TEST}${TESTSFX}.${SFX[$TYPE]}.stderr" >"${abs_builddir}/results/${TEST}${TESTSFX}.${SFX[$TYPE]}"
+	php "${abs_srcdir}/${TEST}${TESTSFX}" "${TYPE}" 2>"${abs_builddir}/results/${TEST}${TESTSFX}.${SFX[$TYPE]}.stderr" >"${abs_builddir}/results/${TEST}${TESTSFX}.${SFX[$TYPE]}"
 else
-	"./${TEST}${TESTSFX}" "${TYPE}" 2>"${abs_builddir}/results/${TEST}${TESTSFX}.${SFX[$TYPE]}.stderr" >"${abs_builddir}/results/${TEST}${TESTSFX}.${SFX[$TYPE]}"
+	"${abs_builddir}/${TEST}${TESTSFX}" "${TYPE}" 2>"${abs_builddir}/results/${TEST}${TESTSFX}.${SFX[$TYPE]}.stderr" >"${abs_builddir}/results/${TEST}${TESTSFX}.${SFX[$TYPE]}"
 fi
 
 if [[ -f "${abs_srcdir}/expected/${TEST}${TESTSFX}.${SFX[$TYPE]}" ]]; then

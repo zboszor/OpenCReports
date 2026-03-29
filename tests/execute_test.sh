@@ -8,7 +8,7 @@ top_srcdir=${top_srcdir:-$(dirname $(readlink -f "$0"))/..}
 
 export abs_srcdir abs_builddir
 
-if [[ ! -f ${TEST}${TESTSFX} ]]; then
+if [[ ! -f ${abs_builddir}/${TEST}${TESTSFX} ]] && [[ ! -f ${abs_srcdir}/${TEST}${TESTSFX} ]]; then
 	echo -e "[ \\033[1;31mERROR\\033[0;39m ] ${TEST}${TESTSFX} - does not exist"
 	exit 0
 fi
@@ -21,10 +21,11 @@ rm -f ${abs_builddir}/results/${TEST}${TESTSFX}.stdout.*.png ${abs_builddir}/res
 export ASAN_OPTIONS="log_path=${abs_builddir}/results/${TEST}${TESTSFX}.asanout,fast_unwind_on_malloc=0"
 export UBSAN_OPTIONS=print_stacktrace=true
 export LSAN_OPTIONS="suppressions=${top_srcdir}/ignore.supp"
+cd "$abs_srcdir"
 if [[ $TESTSFX == '.php' ]]; then
-	php ${TEST}${TESTSFX} 2>${abs_builddir}/results/${TEST}${TESTSFX}.stderr >${abs_builddir}/results/${TEST}${TESTSFX}.stdout
+	php "${abs_srcdir}/${TEST}${TESTSFX}" 2>"${abs_builddir}/results/${TEST}${TESTSFX}.stderr" >"${abs_builddir}/results/${TEST}${TESTSFX}.stdout"
 else
-	./${TEST}${TESTSFX} 2>${abs_builddir}/results/${TEST}${TESTSFX}.stderr >${abs_builddir}/results/${TEST}${TESTSFX}.stdout
+	"${abs_builddir}/${TEST}${TESTSFX}" 2>"${abs_builddir}/results/${TEST}${TESTSFX}.stderr" >"${abs_builddir}/results/${TEST}${TESTSFX}.stdout"
 fi
 
 if [[ -f ${abs_srcdir}/expected/${TEST}${TESTSFX}.stdout ]]; then
