@@ -1004,6 +1004,7 @@ ocrpt_output *ocrpt_layout_report_header(ocrpt_report *r);
 ocrpt_output *ocrpt_layout_report_footer(ocrpt_report *r);
 ocrpt_output *ocrpt_layout_report_field_header(ocrpt_report *r);
 ocrpt_output *ocrpt_layout_report_field_details(ocrpt_report *r);
+ocrpt_output *ocrpt_layout_report_field_footer(ocrpt_report *r);
 
 ocrpt_output *ocrpt_break_get_header(ocrpt_break *br);
 ocrpt_output *ocrpt_break_get_footer(ocrpt_break *br);

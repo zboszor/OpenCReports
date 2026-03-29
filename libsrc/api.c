@@ -582,6 +582,19 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			/* TODO: Output Graph / Chart */
 		}
 
+		if (r->fieldfooter.output_list && !o->precalculate) {
+			double field_footer_pos = *page_position;
+			if (o->output_functions.start_output)
+				o->output_functions.start_output(o, p, pr, pd, r, NULL, &r->fieldfooter);
+			ocrpt_layout_output_evaluate(&r->fieldfooter);
+			ocrpt_layout_output_init(&r->fieldfooter);
+			ocrpt_layout_output_internal_preamble(o, p, pr, pd, r, &r->fieldfooter, pd->column_width, *page_indent, &field_footer_pos);
+			ocrpt_layout_output_internal(true, o, p, pr, pd, r, NULL, &r->fieldfooter, pd->column_width, *page_indent, &field_footer_pos);
+			if (o->output_functions.end_output)
+				o->output_functions.end_output(o, p, pr, pd, r, NULL, &r->fieldfooter);
+			*page_position = field_footer_pos;
+		}
+
 		ocrpt_layout_output_init(&r->reportfooter);
 		ocrpt_layout_output(o, p, pr, pd, r, NULL, &r->reportfooter, rows, newpage, page_indent, page_position, old_page_position);
 
@@ -1011,6 +1024,7 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 				ocrpt_layout_output_evaluate_expr_params(&r->reportfooter);
 				ocrpt_layout_output_evaluate_expr_params(&r->fieldheader);
 				ocrpt_layout_output_evaluate_expr_params(&r->fielddetails);
+				ocrpt_layout_output_evaluate_expr_params(&r->fieldfooter);
 
 				for (ocrpt_list *brl = r->breaks; brl; brl = brl->next) {
 					ocrpt_break *br = (ocrpt_break *)brl->data;
@@ -1231,6 +1245,11 @@ static void ocrpt_execute_parts(opencreport *o) {
 
 							if (r->height_valid)
 								r->remaining_height = r->height * (o->size_in_points ? 1.0 : (r->font_size_expr ? r->font_size : p->font_size));
+
+							r->field_footer_height = 0.0;
+							ocrpt_layout_output_init(&r->fieldfooter);
+							ocrpt_layout_output_internal_preamble(o, p, pr, pd, r, &r->fieldfooter, pd->column_width, page_indent, &r->field_footer_height);
+							ocrpt_layout_output_internal(false, o, p, pr, pd, r, NULL, &r->fieldfooter, pd->column_width, page_indent, &r->field_footer_height);
 
 							ocrpt_query_navigate_start(r->query);
 							if (r->query) {

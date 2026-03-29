@@ -205,6 +205,16 @@ foreach name : [
   'layout_barcode4_test',
   'layout_xml3_ver2_test',
   'layout_xml_mods_test',
+  'layout_code42_test',
+  'layout_code43_test',
+  'layout_xml44_test',
+  'layout_xml45_test',
+  'layout_code46_test',
+  'layout_code47_test',
+  'layout_xml46_test',
+  'layout_xml47_test',
+  'layout_xml48_test',
+  'layout_xml49_test',
   # -----------------------------------------------------------------
   # LAYOUT_CSV_TESTS
   # -----------------------------------------------------------------

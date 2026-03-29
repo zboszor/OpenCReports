@@ -820,6 +820,18 @@ PHP_METHOD(opencreport_report, field_details) {
 	out->output = ocrpt_layout_report_field_details(ro->r);
 }
 
+PHP_METHOD(opencreport_report, field_footer) {
+	zval *object = getThis();
+	php_opencreport_report_object *ro = Z_OPENCREPORT_REPORT_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	object_init_ex(return_value, opencreport_output_ce);
+	php_opencreport_output_object *out = Z_OPENCREPORT_OUTPUT_P(return_value);
+
+	out->output = ocrpt_layout_report_field_footer(ro->r);
+}
+
 #if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_get_next, 0, 0, OpenCReport\\Report, 1)
@@ -948,6 +960,9 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_field_details, 0, 0, OpenCReport\\Output, 1)
 ZEND_END_ARG_INFO()
 
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_report_field_footer, 0, 0, OpenCReport\\Output, 1)
+ZEND_END_ARG_INFO()
+
 #else
 
 #define arginfo_opencreport_report_get_next NULL
@@ -983,6 +998,7 @@ ZEND_END_ARG_INFO()
 #define arginfo_opencreport_report_footer NULL
 #define arginfo_opencreport_report_field_header NULL
 #define arginfo_opencreport_report_field_details NULL
+#define arginfo_opencreport_report_field_footer NULL
 
 #endif
 
@@ -1025,6 +1041,7 @@ static const zend_function_entry opencreport_report_class_methods[] = {
 	PHP_ME(opencreport_report, footer, arginfo_opencreport_report_footer, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_report, field_header, arginfo_opencreport_report_field_header, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_report, field_details, arginfo_opencreport_report_field_details, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_report, field_footer, arginfo_opencreport_report_field_footer, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_FE_END
 };
 

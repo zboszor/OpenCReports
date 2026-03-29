@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="120" cols="6" />
+	</Queries>
+	<Part fontSize="10">
+		<pr>
+			<pd>
+				<Report fontSize="12">
+					<PageHeader>
+						<Output>
+							<HorizontalLine size="1" color="'red'"/>
+							<Line>
+								<literal>Page header</literal>
+							</Line>
+							<HorizontalLine size="1" color="'red'"/>
+						</Output>
+					</PageHeader>
+
+					<PageFooter>
+						<Output>
+							<HorizontalLine size="1" color="'green'"/>
+							<Line>
+								<literal>Page footer</literal>
+							</Line>
+							<HorizontalLine size="1" color="'green'"/>
+						</Output>
+					</PageFooter>
+
+					<Detail>
+						<FieldHeaders>
+							<Output>
+								<HorizontalLine size="1" color="'black'"/>
+								<Line bgcolor="'0xe5e5e5'">
+									<literal width="4">ID</literal>
+									<literal width="1"/>
+									<literal width="20">Name</literal>
+									<literal width="1"/>
+									<literal width="10">Property</literal>
+									<literal width="1"/>
+									<literal width="6">Age</literal>
+									<literal width="1"/>
+									<literal width="5">Adult</literal>
+								</Line>
+								<HorizontalLine size="1" color="'black'"/>
+							</Output>
+						</FieldHeaders>
+
+						<FieldDetails>
+							<Output>
+								<Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+									<field value="id" width="4" align="'right'"/>
+									<literal width="1"/>
+									<field value="name" width="20"/>
+									<literal width="1"/>
+									<field value="property" width="10"/>
+									<literal width="1"/>
+									<field value="age" width="6" align="'right'"/>
+									<literal width="1"/>
+									<field value="adult ? 'yes' : 'no'" width="5" align="'center'"/>
+								</Line>
+							</Output>
+						</FieldDetails>
+
+						<FieldFooter>
+							<Output>
+								<HorizontalLine size="1" color="'black'"/>
+								<Line>
+									<literal>This is a field footer before the page ends.</literal>
+								</Line>
+								<HorizontalLine size="1" color="'black'"/>
+							</Output>
+						</FieldFooter>
+					</Detail>
+				</Report>
+			</pd>
+		</pr>
+	</Part>
+</OpenCReport>

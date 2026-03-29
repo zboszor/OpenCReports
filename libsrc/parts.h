@@ -36,6 +36,7 @@ struct ocrpt_report {
 	/* Temporaries */
 	double start_page_position;
 	double remaining_height;
+	double field_footer_height;
 
 	/* Output elements */
 	ocrpt_output nodata;
@@ -43,6 +44,7 @@ struct ocrpt_report {
 	ocrpt_output reportfooter;
 	ocrpt_output fieldheader;
 	ocrpt_output fielddetails;
+	ocrpt_output fieldfooter;
 
 	/* Parent structure */
 	opencreport *o;

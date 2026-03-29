@@ -254,7 +254,17 @@ LAYOUT_TESTS = \
 	layout_barcode3_test \
 	layout_barcode4_test \
 	layout_xml3_ver2_test \
-	layout_xml_mods_test
+	layout_xml_mods_test \
+	layout_code42_test \
+	layout_code43_test \
+	layout_xml44_test \
+	layout_xml45_test \
+	layout_code46_test \
+	layout_code47_test \
+	layout_xml46_test \
+	layout_xml47_test \
+	layout_xml48_test \
+	layout_xml49_test
 
 LAYOUT_CSV_TESTS = \
 	layout_xml17_csv1_test \
@@ -313,7 +323,17 @@ PHP_LAYOUT_TESTS = \
 	$(LAYOUT_PYTHON_TESTS) \
 	layout_barcode1_test \
 	layout_barcode1_code_test \
-	layout_xml_mods_test
+	layout_xml_mods_test \
+	layout_code42_test \
+	layout_code43_test \
+	layout_xml44_test \
+	layout_xml45_test \
+	layout_code46_test \
+	layout_code47_test \
+	layout_xml46_test \
+	layout_xml47_test \
+	layout_xml48_test \
+	layout_xml49_test
 
 if ENABLE_XLATE_TESTS
 

@@ -995,7 +995,7 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 }
 
 static inline void get_height_exceeded(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, double old_page_position, double new_page_position, bool *height_exceeded, bool *pd_height_exceeded, bool *r_height_exceeded) {
-	*height_exceeded = o->output_functions.supports_page_break && ((new_page_position + ((pd && pd->border_width_expr) ? pd->border_width : 0.0)) > (p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height));
+	*height_exceeded = o->output_functions.supports_page_break && ((new_page_position + ((pd && pd->border_width_expr) ? pd->border_width : 0.0)) > (p->paper_height - ocrpt_layout_bottom_margin(o, p) - p->page_footer_height - (r ? r->field_footer_height : 0.0)));
 	*pd_height_exceeded = o->output_functions.supports_pd_height &&pd && pd->height_expr && (new_page_position > (pd->start_page_position + pd->remaining_height));
 	*r_height_exceeded = o->output_functions.supports_report_height && r && r->height_valid && (r->remaining_height < (new_page_position - old_page_position));
 }
@@ -1227,6 +1227,18 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 				}
 			}
 
+			if (r && r->fieldfooter.output_list && !o->precalculate) {
+				double field_footer_pos = *page_position;
+				if (o->output_functions.start_output)
+					o->output_functions.start_output(o, p, pr, pd, r, br, &r->fieldfooter);
+				ocrpt_layout_output_evaluate(&r->fieldfooter);
+				ocrpt_layout_output_init(&r->fieldfooter);
+				ocrpt_layout_output_internal_preamble(o, p, pr, pd, r, &r->fieldfooter, pd ? pd->column_width : p->page_width, *page_indent, &field_footer_pos);
+				ocrpt_layout_output_internal(true, o, p, pr, pd, r, br, &r->fieldfooter, pd ? pd->column_width : p->page_width, *page_indent, &field_footer_pos);
+				if (o->output_functions.end_output)
+					o->output_functions.end_output(o, p, pr, pd, r, br, &r->fieldfooter);
+			}
+
 			if (!o->precalculate && p->pagefooter.output_list && o->output_functions.start_output)
 				o->output_functions.start_output(o, p, pr, pd, r, br, &p->pagefooter);
 
@@ -1329,6 +1341,9 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 			if (pd->height_expr && o->output_functions.supports_pd_height)
 				pd->remaining_height -= new_page_position - pd->start_page_position;
 
+			/* Save the last column's indent before resetting to column 0 */
+			double last_column_indent = *page_indent;
+
 			pd->current_column = 0;
 			*page_indent = pd->page_indent;
 			if (pd->border_width_expr)
@@ -1344,6 +1359,18 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 													pd->start_page_position + 0.5 * pd->border_width,
 													pd->real_width - pd->border_width,
 													pd->max_page_position - pd->start_page_position);
+
+			if (r && r->fieldfooter.output_list && !o->precalculate) {
+				double field_footer_pos = *old_page_position;
+				if (o->output_functions.start_output)
+					o->output_functions.start_output(o, p, pr, pd, r, br, &r->fieldfooter);
+				ocrpt_layout_output_evaluate(&r->fieldfooter);
+				ocrpt_layout_output_init(&r->fieldfooter);
+				ocrpt_layout_output_internal_preamble(o, p, pr, pd, r, &r->fieldfooter, pd ? pd->column_width : p->page_width, last_column_indent, &field_footer_pos);
+				ocrpt_layout_output_internal(true, o, p, pr, pd, r, br, &r->fieldfooter, pd ? pd->column_width : p->page_width, last_column_indent, &field_footer_pos);
+				if (o->output_functions.end_output)
+					o->output_functions.end_output(o, p, pr, pd, r, br, &r->fieldfooter);
+			}
 
 			if (!o->precalculate && p->pagefooter.output_list && o->output_functions.start_output)
 				o->output_functions.start_output(o, p, pr, pd, r, br, &p->pagefooter);
@@ -1371,6 +1398,17 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 			pd->max_page_position = 0.0;
 		} else if (pd && !pd->finished) {
+			if (r && r->fieldfooter.output_list && !o->precalculate) {
+				double field_footer_pos = *old_page_position;
+				if (o->output_functions.start_output)
+					o->output_functions.start_output(o, p, pr, pd, r, br, &r->fieldfooter);
+				ocrpt_layout_output_evaluate(&r->fieldfooter);
+				ocrpt_layout_output_init(&r->fieldfooter);
+				ocrpt_layout_output_internal_preamble(o, p, pr, pd, r, &r->fieldfooter, pd->column_width, *page_indent, &field_footer_pos);
+				ocrpt_layout_output_internal(true, o, p, pr, pd, r, br, &r->fieldfooter, pd->column_width, *page_indent, &field_footer_pos);
+				if (o->output_functions.end_output)
+					o->output_functions.end_output(o, p, pr, pd, r, br, &r->fieldfooter);
+			}
 			*page_indent += pd->column_width + (o->size_in_points ? 1.0 : 72.0) * pd->column_pad;
 			new_page_position = pd->start_page_position;
 			if (pd->border_width_expr)
@@ -1578,6 +1616,13 @@ DLL_EXPORT_SYM ocrpt_output *ocrpt_layout_report_field_details(ocrpt_report *r) 
 		return NULL;
 
 	return &r->fielddetails;
+}
+
+DLL_EXPORT_SYM ocrpt_output *ocrpt_layout_report_field_footer(ocrpt_report *r) {
+	if (!r)
+		return NULL;
+
+	return &r->fieldfooter;
 }
 
 DLL_EXPORT_SYM ocrpt_line *ocrpt_output_add_line(ocrpt_output *output) {

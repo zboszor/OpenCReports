@@ -2264,7 +2264,7 @@ SELECT * FROM some_table
 				<title>Detail</title>
 				<para>
 					This section describes the tabular details of the report.
-					There are two subsections in this node, both contain
+					There are three subsections in this node, all contain
 					an <xref linkend="outputnode"/>.
 					<programlisting>&lt;Report&gt;
     &lt;Detail&gt;
@@ -2278,6 +2278,11 @@ SELECT * FROM some_table
                 ...
             &lt;/Output&gt;
         &lt;/FieldDetail&gt;
+        &lt;FieldFooter&gt;
+            &lt;Output&gt;
+                ...
+            &lt;/Output&gt;
+        &lt;/FieldFooter&gt;
     &lt;/Detail&gt;
 &lt;/Part&gt;</programlisting>
 				</para>
@@ -2291,11 +2296,21 @@ SELECT * FROM some_table
 					produced by the report query.
 				</para>
 				<para>
-					Note that both <literal>&lt;FieldHeader&gt;</literal>
-					and <literal>&lt;FieldDetail&gt;</literal> are also
-					accepted with plural spelling for RLIB compatibiliy, i.e.
-					<literal>&lt;FieldHeaders&gt;</literal> and
-					<literal>&lt;FieldDetails&gt;</literal>, respectively.
+					<literal>&lt;FieldFooter&gt;</literal> is used
+					to show a footer at the bottom of each page (or column)
+					before the page footer. It is printed on every page break
+					and column break while there are data rows being processed.
+				</para>
+				<para>
+					Note that <literal>&lt;FieldHeader&gt;</literal>,
+					<literal>&lt;FieldDetail&gt;</literal> and
+					<literal>&lt;FieldFooter&gt;</literal> are also
+					accepted with plural spelling, i.e.
+					<literal>&lt;FieldHeaders&gt;</literal>,
+					<literal>&lt;FieldDetails&gt;</literal> and
+					<literal>&lt;FieldFooters&gt;</literal>, respectively.
+					The first two are for RLIB compatibiliy, the last one
+					is for completeness.
 				</para>
 			</sect3>
 			<sect3 id="nodatanode" xreflabel="NoData node">

@@ -215,11 +215,13 @@
 	height CDATA #IMPLIED
 	color CDATA #IMPLIED
 	bgcolor CDATA #IMPLIED >
-<!ELEMENT Detail ((FieldHeader|FieldHeaders)?, (FieldDetail|FieldDetails)?) >
+<!ELEMENT Detail ((FieldHeader|FieldHeaders)?, (FieldDetail|FieldDetails)?, (FieldFooter|FieldFooters)?) >
 <!ELEMENT FieldHeader (Output)* >
 <!ELEMENT FieldHeaders (Output)* >
 <!ELEMENT FieldDetail (Output)* >
 <!ELEMENT FieldDetails (Output)* >
+<!ELEMENT FieldFooter (Output)* >
+<!ELEMENT FieldFooters (Output)* >
 <!ELEMENT Graph (Plot+) >
 <!ATTLIST Graph
 	name CDATA #IMPLIED

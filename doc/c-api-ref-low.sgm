@@ -2183,8 +2183,9 @@ ocrpt_layout_part_page_footer_set_report(ocrpt_part *p,
 					<literal>&lt;NoData&gt;</literal>,
 					<literal>&lt;ReportHeader&gt;</literal>,
 					<literal>&lt;ReportFooter&gt;</literal>,
-					<literal>&lt;FieldHeader&gt;</literal> or
-					<literal>&lt;FieldDetail&gt;</literal>.
+					<literal>&lt;FieldHeader&gt;</literal>,
+					<literal>&lt;FieldDetail&gt;</literal> or
+					<literal>&lt;FieldFooter&gt;</literal>.
 					<programlisting>ocrpt_output *
 ocrpt_layout_report_nodata(ocrpt_report *r);
 
@@ -2198,7 +2199,10 @@ ocrpt_output *
 ocrpt_layout_report_field_header(ocrpt_report *r);
 
 ocrpt_output *
-ocrpt_layout_report_field_details(ocrpt_report *r);</programlisting>
+ocrpt_layout_report_field_details(ocrpt_report *r);
+
+ocrpt_output *
+ocrpt_layout_report_field_footer(ocrpt_report *r);</programlisting>
 				</para>
 				<sect4 id="reportlayoutiterator">
 					<title>Miscellaneous report layout and line element functions</title>

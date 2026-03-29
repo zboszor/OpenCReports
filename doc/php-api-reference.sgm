@@ -2475,6 +2475,7 @@ OpenCReport\Column::get_column_padding():
     public final footer(): OpenCReport\Output;
     public final field_header(): OpenCReport\Output;
     public final field_details(): OpenCReport\Output;
+    public final field_footer(): OpenCReport\Output;
 }</programlisting>
 		</para>
 		<sect2 id="phpreportgetnext">
@@ -2945,7 +2946,10 @@ public final
 OpenCReport\Report::field_header(): OpenCReport\Output;
 
 public final
-OpenCReport\Report::field_details(): OpenCReport\Output;</programlisting>
+OpenCReport\Report::field_details(): OpenCReport\Output;
+
+public final
+OpenCReport\Report::field_footer(): OpenCReport\Output;</programlisting>
 			</para>
 		</sect2>
 	</sect1>

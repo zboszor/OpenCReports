@@ -93,6 +93,8 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_part_column_new_report(ocrpt_part_column *pd)
 	r->fieldheader.r = r;
 	r->fielddetails.o = pd->o;
 	r->fielddetails.r = r;
+	r->fieldfooter.o = pd->o;
+	r->fieldfooter.r = r;
 
 	r->query_rownum = ocrpt_report_expr_parse(r, "r.lineno", NULL);
 
@@ -184,6 +186,7 @@ void ocrpt_report_free(ocrpt_report *r) {
 	ocrpt_output_free(r->o, &r->reportfooter, false);
 	ocrpt_output_free(r->o, &r->fieldheader, false);
 	ocrpt_output_free(r->o, &r->fielddetails, false);
+	ocrpt_output_free(r->o, &r->fieldfooter, false);
 	ocrpt_mem_free(r);
 }
 
