@@ -321,7 +321,8 @@ XLATE_DEPS = \
 	locale/hu_HU/LC_MESSAGES/translate_test.mo
 
 .po.mo:
-	$(MSGFMT) -o $@ $(srcdir)/$<
+	$(MKDIR_P) locale/hu_HU/LC_MESSAGES
+	$(MSGFMT) -o $@ $<
 
 LAYOUT_TESTS += \
 	layout_translate1_test \
