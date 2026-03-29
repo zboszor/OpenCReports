@@ -1,0 +1,42 @@
+option('maintainer_mode',
+  type: 'boolean',
+  value: false,
+  description: 'Enable maintainer mode (disables -Werror)',
+)
+
+option('old_pgsql',
+  type: 'boolean',
+  value: false,
+  description: 'Use old PostgreSQL client methods (PQexec, PQconnectdb)',
+)
+
+option('pgsql_cursor',
+  type: 'boolean',
+  value: true,
+  description: 'Use PostgreSQL cursor for queries by default',
+)
+
+option('odbcmanager',
+  type: 'combo',
+  choices: ['auto', 'unixodbc', 'iodbc', 'none'],
+  value: 'auto',
+  description: 'ODBC manager to use',
+)
+
+option('pandas_source',
+  type: 'boolean',
+  value: true,
+  description: 'Enable Python/Pandas datasource support',
+)
+
+option('enable_tests',
+  type: 'boolean',
+  value: false,
+  description: 'Enable building unit tests',
+)
+
+option('enable_documentation',
+  type: 'boolean',
+  value: true,
+  description: 'Enable building documentation',
+)
