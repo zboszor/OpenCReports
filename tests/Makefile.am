@@ -5,7 +5,7 @@ AM_CPPFLAGS = \
 
 AM_LDFLAGS = @DYNAMIC_LINK_FLAG@
 
-LIBS = $(top_builddir)/libsrc/libopencreport.la
+LIBS = $(top_builddir)/libsrc/libopencreport.la -lmpfr -lgmp
 
 $(top_builddir)/libsrc/libopencreport.la:
 	$(MAKE) -C $(top_builddir)/libsrc libopencreport.la
