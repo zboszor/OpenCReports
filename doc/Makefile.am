@@ -27,6 +27,8 @@ HTML = OpenCReports.html html
 
 all: $(PDF) $(HTML)
 
+html/*.html: html
+
 IMAGES = \
 	$(srcdir)/images/namedcolors.svg \
 	$(srcdir)/images/example1.png \
@@ -66,6 +68,11 @@ XSLTPROC_FO_FLAGS = --stringparam img.src.path '$(srcdir)/'
 	$(FOP) -fo $< -pdf $@
 
 endif
+
+doc_DATA = OpenCReports.html $(PDF)
+
+dochtmldir = $(docdir)/html
+dochtml_DATA = $(IMAGES) html/*.html
 
 EXTRA_DIST = $(SGMLFILES)
 
