@@ -6,6 +6,11 @@
 
 #include <config.h>
 
+#if HAVE_LIBPYTHON
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+#endif
+
 #include <assert.h>
 #include <inttypes.h>
 #include <limits.h>
@@ -51,12 +56,6 @@
 #include "csv-output.h"
 #include "xml-output.h"
 #include "json-output.h"
-
-/* This must be after #include <datasource.h> */
-#if HAVE_LIBPYTHON
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
-#endif
 
 #ifndef HAVE_GETRANDOM
 static ssize_t getrandom(void *buf, size_t buflen, unsigned int flags) {

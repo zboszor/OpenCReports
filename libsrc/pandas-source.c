@@ -6,6 +6,11 @@
  */
 #include <config.h>
 
+#if HAVE_LIBPYTHON
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+#endif
+
 #include <string.h>
 #include <pthread.h>
 
@@ -15,9 +20,6 @@
 
 #if HAVE_LIBPYTHON
 
-/* This must be after #include <datasource.h> */
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
 /* Python's header, unfortunately using a generic name. */
 #include <datetime.h>
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
