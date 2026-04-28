@@ -1240,7 +1240,14 @@ OpenCReport\QueryResult::column_result(long $index):
 	<sect1 id="phpexprclass" xreflabel="The OpenCReport\Expr class">
 		<title>The OpenCReport\Expr class</title>
 		<para>
-			<programlisting>class OpenCReport\Expr {
+			<programlisting>class OpenCReport {
+    public const VARREF_MVAR;
+    public const VARREF_RVAR;
+    public const VARREF_IDENT;
+    public const VARREF_VVAR;
+}
+
+class OpenCReport\Expr {
     public final free(): void;
 
     public final get_expr_string(): string;
@@ -1250,6 +1257,9 @@ OpenCReport\QueryResult::column_result(long $index):
     public final nodes(): long;
 
     public final resolve(): void;
+    public final resolve_from_query(OpenCReport\Query $query): void;
+    public final resolve_exclude(long $value): void;
+
     public final optimize(): void;
     public final eval():
                      ?OpenCReport\Result;
@@ -1334,8 +1344,17 @@ OpenCReport\Expr::nodes(): long;</programlisting>
 		<sect2 id="phpexprresolve">
 			<title>Resolve an expression</title>
 			<para>
+				See <xref linkend="resolveexpr"/>
 				<programlisting>public final
-OpenCReport\Expr::resolve(): void;</programlisting>
+OpenCReport\Expr::resolve(): void;
+
+public final
+OpenCReport\Expr::resolve_from_query(
+						 OpenCReport\Query $query): void;
+
+public final
+OpenCReport\Expr::resolve_exclude(
+						 long $value): void;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpexproptimize">

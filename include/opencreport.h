@@ -546,6 +546,18 @@ const char *ocrpt_expr_get_expr_string(ocrpt_expr *e);
  */
 void ocrpt_expr_resolve(ocrpt_expr *e);
 /*
+ * Resolve variable references in the expression
+ * using the specified query as the default.
+ * Passing NULL is equivalent to ocrpt_expr_resolve()
+ */
+void ocrpt_expr_resolve_from_query(ocrpt_expr *e, ocrpt_query *q);
+/*
+ * Resolve variables references in the expression
+ * using the mask for for excluded variable type classes.
+ * The bits in the mask are defined in enum ocrpt_varref_type.
+ */
+void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exclude_mask);
+/*
  * Optimize expression after parsing
  */
 void ocrpt_expr_optimize(ocrpt_expr *e);
@@ -705,7 +717,7 @@ ocrpt_var *ocrpt_variable_new_full(ocrpt_report *r,
  */
 ocrpt_var_type ocrpt_variable_get_type(ocrpt_var *v);
 /*
- * Get various variable subexpressions 
+ * Get various variable subexpressions
  */
 ocrpt_expr *ocrpt_variable_baseexpr(ocrpt_var *v);
 ocrpt_expr *ocrpt_variable_ignoreexpr(ocrpt_var *v);

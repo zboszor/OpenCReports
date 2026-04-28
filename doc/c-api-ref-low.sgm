@@ -844,12 +844,53 @@ ocrpt_expr_get_expr_string(ocrpt_expr *e);</programlisting>
 			<sect3 id="resolveexpr">
 				<title>Resolve expression references</title>
 				<para>
-					This function resolves variable (identifier)
-					references in the expression. This is needed
-					to bind query columns to expressions that
-					use them.
+					These function variants resolve variable
+					(query identifier) references in the expression.
+					This is needed to bind query columns to
+					expressions that use them.
+				</para>
+				<para>
+					This is the basic variant.
+					If the expression was created with
+					<literal>ocrpt_report_expr_parse</literal>,
+					then it will use the report's main query.
 					<programlisting>void
 ocrpt_expr_resolve(ocrpt_expr *e);</programlisting>
+				</para>
+				<para>
+					This variant specifies the main query
+					(and implicitly, its followers) that the
+					query identifiers are resolved from.
+					If the expression was created with
+					<literal>ocrpt_report_expr_parse</literal>,
+					then the report's main query will be used
+					as fallback to resolve query identifiers
+					without a domain, i.e. query name.
+					<programlisting>void
+ocrpt_expr_resolve_from_query(ocrpt_expr *e,
+                              ocrpt_expr *q);</programlisting>
+				</para>
+				<para>
+					This variant allows excluding (not resolving)
+					certain identifier types.
+					<literal>varref_exclude_mask</literal>
+					is a bitmask that contains the below
+					bits that are excluded from being resolved.
+					<programlisting>enum ocrpt_varref_type {
+    OCRPT_VARREF_MVAR  = (1 &lt;&lt; 0),
+    OCRPT_VARREF_RVAR  = (1 &lt;&lt; 1),
+    OCRPT_VARREF_IDENT = (1 &lt;&lt; 2),
+    OCRPT_VARREF_VVAR  = (1 &lt;&lt; 3)
+};
+
+void
+ocrpt_expr_resolve_exclude(ocrpt_expr *e,
+                           int32_t varref_exclude_mask);</programlisting>
+				</para>
+				<para>
+					Fully qualified query identifiers will be
+					resolved from their respective queries
+					regardless of the variant used.
 				</para>
 			</sect3>
 			<sect3 id="optimizeexpr">

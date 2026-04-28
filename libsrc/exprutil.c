@@ -856,6 +856,13 @@ DLL_EXPORT_SYM void ocrpt_expr_resolve(ocrpt_expr *e) {
 	ocrpt_expr_resolve_worker(e, NULL, e, NULL, 0, true, NULL);
 }
 
+DLL_EXPORT_SYM void ocrpt_expr_resolve_from_query(ocrpt_expr *e, ocrpt_query *q) {
+	if (!e)
+		return;
+
+	ocrpt_expr_resolve_worker(e, q, e, NULL, 0, true, NULL);
+}
+
 DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exclude_mask) {
 	if (!e)
 		return;
