@@ -64,11 +64,15 @@ struct ocrpt_expr {
 
 		struct {
 			const ocrpt_function *func;
-			ocrpt_query *q; /* set if func is rownum() */
 			ocrpt_expr **ops;
 			uint32_t n_ops;
 		};
 	};
+	/*
+	 * Query pointer for resolved identifiers.
+	 * It's also set if func is rownum().
+	 */
+	ocrpt_query *q;
 	/*
 	 * Set to a valid pointer if:
 	 * - func is brrownum("break"), or

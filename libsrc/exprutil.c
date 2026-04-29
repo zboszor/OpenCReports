@@ -561,21 +561,30 @@ static bool ocrpt_resolve_ident(ocrpt_expr *e, ocrpt_query *q) {
 					if (!e->result[j])
 						e->result[j] = &qr[j * cols + i].result;
 				found = true;
+				e->q = q;
 				break;
 			}
 		}
 	}
 
 	for (ql = q->followers; !found && ql; ql = ql->next) {
-		found = ocrpt_resolve_ident(e, (ocrpt_query *)ql->data);
-		if (found)
+		ocrpt_query *qf = (ocrpt_query *)ql->data;
+
+		found = ocrpt_resolve_ident(e, qf);
+		if (found) {
+			e->q = qf;
 			break;
+		}
 	}
 
 	for (ql = q->followers_n_to_1; !found && ql; ql = ql->next) {
-		found = ocrpt_resolve_ident(e, (ocrpt_query *)ql->data);
-		if (found)
+		ocrpt_query *qf = (ocrpt_query *)ql->data;
+
+		found = ocrpt_resolve_ident(e, qf);
+		if (found) {
+			e->q = qf;
 			break;
+		}
 	}
 
 	return found;
