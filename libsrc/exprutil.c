@@ -401,6 +401,71 @@ static void ocrpt_expr_optimize_worker(ocrpt_expr *e) {
 		 * Fully constant expression, precompute it.
 		 */
 		if (e->func) {
+			/*
+			 * Special case the built-in eval() function
+			 */
+			if (e->func->fname && !strcasecmp(e->func->fname, "eval") && e->n_ops == 1  && EXPR_VALID_STRING(e->ops[0])) {
+				bool builtin = false;
+				const ocrpt_function *f = ocrpt_function_get_internal(e->o, "eval", &builtin);
+
+				if (builtin && e->func == f) {
+					char *err = NULL;
+					ocrpt_expr *new_e;
+
+					if (e->r)
+						new_e = ocrpt_report_expr_parse(e->r, EXPR_STRING_VAL(e->ops[0]), &err);
+					else
+						new_e = ocrpt_expr_parse(e->o, EXPR_STRING_VAL(e->ops[0]), &err);
+
+					if (!new_e) {
+						ocrpt_expr_make_error_result(e, err);
+						ocrpt_strfree(err);
+					} else {
+						/*
+						 * Resolve the expression, potentially from the expression's
+						 * report's main query. We should not use
+						 * ocrpt_expr_resolve_from_query(new_e, e->q) here, because
+						 * an expression coming from the supplementary query must not
+						 * include references to the supplementary query itself.
+						 */
+						ocrpt_expr_resolve(new_e);
+
+						/*
+						 * Clean up the old ocrpt_expr structure before overwriting
+						 * with the newly parsed contents.
+						 */
+						ocrpt_mem_free(e->expr_string);
+						ocrpt_expr_free(e->ops[0]);
+						ocrpt_mem_free(e->ops);
+
+						*e = *new_e;
+
+						/* Clean up new_e contents, they are already saved. */
+						new_e->expr_string = NULL;
+						for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
+							new_e->result[i] = NULL;
+
+						switch (new_e->type) {
+						case OCRPT_EXPR_IDENT:
+							new_e->query = NULL;
+							new_e->name = NULL;
+							new_e->var = NULL;
+							break;
+						case OCRPT_EXPR:
+							new_e->ops = NULL;
+							new_e->n_ops = 0;
+							break;
+						default:
+							break;
+						}
+
+						ocrpt_expr_free(new_e);
+					}
+
+					goto again;
+				}
+			}
+
 			if (e->func->func && !e->func->dont_optimize) {
 				e->func->func(e, e->func->user_data);
 				for (i = 0; i < e->n_ops; i++)

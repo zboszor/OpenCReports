@@ -3977,7 +3977,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "dtosf",		ocrpt_dtosf,	NULL,	2,	false,	false,	false,	false },
 	{ "eq",			ocrpt_eq,	NULL,	2,	true,	false,	false,	false },
 	{ "error",		ocrpt_error,	NULL,	1,	false,	false,	false,	false },
-	{ "eval",		ocrpt_eval,	NULL,	1,	false,	false,	false,	true },
+	{ "eval",		ocrpt_eval,	NULL,	1,	false,	false,	false,	false },
 	{ "exp",		ocrpt_exp,	NULL,	1,	false,	false,	false,	false },
 	{ "exp10",		ocrpt_exp10,	NULL,	1,	false,	false,	false,	false },
 	{ "exp2",		ocrpt_exp2,	NULL,	1,	false,	false,	false,	false },
