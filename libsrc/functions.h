@@ -17,4 +17,6 @@ struct ocrpt_function {
 	bool dont_optimize:1;
 };
 
+const ocrpt_function *ocrpt_function_get_internal(opencreport *o, const char *fname, bool *builtin);
+
 #endif

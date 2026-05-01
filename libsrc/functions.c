@@ -1274,6 +1274,72 @@ OCRPT_STATIC_FUNCTION(ocrpt_error) {
 	}
 }
 
+OCRPT_STATIC_FUNCTION(ocrpt_eval) {
+	if (e->n_ops != 1 || !EXPR_RESULT(e->ops[0])) {
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+		return;
+	}
+
+	if (EXPR_TYPE(e->ops[0]) == OCRPT_RESULT_ERROR) {
+		ocrpt_expr_make_error_result(e, EXPR_STRING_VAL(e->ops[0]));
+		return;
+	}
+
+	if (EXPR_TYPE(e->ops[0]) != OCRPT_RESULT_STRING || EXPR_ISNULL(e->ops[0]) || !EXPR_STRING(e->ops[0])) {
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+		return;
+	}
+
+	const char *expr_str = EXPR_STRING_VAL(e->ops[0]);
+	char *err = NULL;
+	ocrpt_expr *sub;
+
+	if (e->r)
+		sub = ocrpt_report_expr_parse(e->r, expr_str, &err);
+	else
+		sub = ocrpt_expr_parse(e->o, expr_str, &err);
+
+	if (!sub || err) {
+		ocrpt_expr_make_error_result(e, err ? err : "parse error");
+		ocrpt_mem_free(err);
+		ocrpt_expr_free(sub);
+		return;
+	}
+	ocrpt_mem_free(err);
+
+	ocrpt_expr_resolve_worker(sub, NULL, sub, NULL, 0, false, NULL);
+	ocrpt_expr_eval(sub);
+
+	if (!EXPR_RESULT(sub)) {
+		ocrpt_expr_make_error_result(e, "eval failed");
+		ocrpt_expr_free(sub);
+		return;
+	}
+
+	switch (EXPR_TYPE(sub)) {
+	case OCRPT_RESULT_STRING:
+		ocrpt_expr_init_result(e, OCRPT_RESULT_STRING);
+		ocrpt_result_copy(EXPR_RESULT(e), EXPR_RESULT(sub));
+		break;
+	case OCRPT_RESULT_NUMBER:
+		ocrpt_expr_init_result(e, OCRPT_RESULT_NUMBER);
+		ocrpt_result_copy(EXPR_RESULT(e), EXPR_RESULT(sub));
+		break;
+	case OCRPT_RESULT_DATETIME:
+		ocrpt_expr_init_result(e, OCRPT_RESULT_DATETIME);
+		ocrpt_result_copy(EXPR_RESULT(e), EXPR_RESULT(sub));
+		break;
+	case OCRPT_RESULT_ERROR:
+		ocrpt_expr_make_error_result(e, EXPR_STRING_VAL(sub));
+		break;
+	default:
+		ocrpt_expr_make_error_result(e, "invalid operand(s)");
+		break;
+	}
+
+	ocrpt_expr_free(sub);
+}
+
 OCRPT_STATIC_FUNCTION(ocrpt_concat) {
 	ocrpt_string *string;
 	int32_t len;
@@ -3911,6 +3977,7 @@ static const ocrpt_function ocrpt_functions[] = {
 	{ "dtosf",		ocrpt_dtosf,	NULL,	2,	false,	false,	false,	false },
 	{ "eq",			ocrpt_eq,	NULL,	2,	true,	false,	false,	false },
 	{ "error",		ocrpt_error,	NULL,	1,	false,	false,	false,	false },
+	{ "eval",		ocrpt_eval,	NULL,	1,	false,	false,	false,	true },
 	{ "exp",		ocrpt_exp,	NULL,	1,	false,	false,	false,	false },
 	{ "exp10",		ocrpt_exp10,	NULL,	1,	false,	false,	false,	false },
 	{ "exp2",		ocrpt_exp2,	NULL,	1,	false,	false,	false,	false },
@@ -4051,15 +4118,25 @@ DLL_EXPORT_SYM bool ocrpt_function_add(opencreport *o, const char *fname,
 	return true;
 }
 
-DLL_EXPORT_SYM const ocrpt_function *ocrpt_function_get(opencreport *o, const char *fname) {
+
+const ocrpt_function *ocrpt_function_get_internal(opencreport *o, const char *fname, bool *builtin) {
 	if (!o || !fname)
 		return NULL;
 
 	if (o->functions) {
 		ocrpt_function **ret = bsearch(fname, o->functions, o->n_functions, sizeof(ocrpt_function *), funccmpind);
-		if (ret)
+		if (ret) {
+			if (builtin)
+				*builtin = false;
 			return *ret;
+		}
 	}
 
+	if (builtin)
+		*builtin = true;
 	return bsearch(fname, ocrpt_functions, n_ocrpt_functions, sizeof(ocrpt_function), funccmp);
+}
+
+DLL_EXPORT_SYM const ocrpt_function *ocrpt_function_get(opencreport *o, const char *fname) {
+	return ocrpt_function_get_internal(o, fname, NULL);
 }

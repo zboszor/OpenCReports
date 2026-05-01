@@ -281,20 +281,25 @@ exp:
 										/*
 										 * Only one argument is in arglist, we need to check
 										 * if the ident is a supported function name.
+										 * Try parseembeddedexpr first so that e.g. eval()
+										 * with a constant string argument is immediately
+										 * parsed at parse time and can be optimized later.
 										 */
-										const ocrpt_function *f = ocrpt_function_get(extra->o, $1->name->str);
-										if (f) {
-											$$ = makefuncexpr(yyscanner, $1, $4);
-										} else if (!($$ = parseembeddedexpr(yyscanner, $1, $4))) {
-											ocrpt_list *list = $4;
-											ocrpt_expr *paren = (ocrpt_expr *)list->data;
+										if (!($$ = parseembeddedexpr(yyscanner, $1, $4))) {
+											const ocrpt_function *f = ocrpt_function_get(extra->o, $1->name->str);
+											if (f) {
+												$$ = makefuncexpr(yyscanner, $1, $4);
+											} else {
+												ocrpt_list *list = $4;
+												ocrpt_expr *paren = (ocrpt_expr *)list->data;
 
-											paren->parenthesized = true;
+												paren->parenthesized = true;
 
-											list = ocrpt_list_prepend(list, $1);
-											extra->parsed_arglist = list;
+												list = ocrpt_list_prepend(list, $1);
+												extra->parsed_arglist = list;
 
-											$$ = newexpr(yyscanner, $2, list);
+												$$ = newexpr(yyscanner, $2, list);
+											}
 										}
 									}
 								} else if ($1->query || $1->dotprefixed) {
@@ -764,8 +769,9 @@ static ocrpt_expr *parseembeddedexpr(yyscan_t yyscanner, ocrpt_expr *func, ocrpt
 		return NULL;
 
 	/* It's an "eval" function but user-defined. */
-	const ocrpt_function *f = ocrpt_function_get(extra->o, fname);
-	if (f)
+	bool builtin = false;
+	const ocrpt_function *f = ocrpt_function_get_internal(extra->o, fname, &builtin);
+	if (f && !builtin)
 		return NULL;
 
 	/* Argument list is not a single argument */
