@@ -1,0 +1,113 @@
+Query columns for 'a':
+0: 'id'
+1: 'name'
+Query columns for 'constify':
+0: 'font_name'
+1: 'font_size'
+2: 'memo'
+3: 'expr'
+Row #1
+Query: 'constify':
+	Col #0: 'font_name': string value: Arial
+	Col #1: 'font_size': string value: NULL (converted to number: 10.000000)
+	Col #2: 'memo': string value: NULL (converted to number: 1.000000)
+	Col #3: 'expr': string value: 3 * id
+
+Expression: (string)Arial
+Expression: 10.000000
+Expression: 1.000000
+Expression: eval((string)3 * id)
+
+Row #2
+Query: 'constify':
+	Col #0: 'font_name': string value: Courier
+	Col #1: 'font_size': string value: NULL (converted to number: 12.000000)
+	Col #2: 'memo': string value: NULL (converted to number: 0.000000)
+	Col #3: 'expr': string value: id * 3
+
+Expression: (string)Courier
+Expression: 12.000000
+Expression: 0.000000
+Expression: eval((string)id * 3)
+
+Row #3
+Query: 'constify':
+	Col #0: 'font_name': string value: Times New Roman
+	Col #1: 'font_size': string value: NULL (converted to number: 11.000000)
+	Col #2: 'memo': string value: NULL (converted to number: 1.000000)
+	Col #3: 'expr': string value: name
+
+Expression: (string)Times New Roman
+Expression: 11.000000
+Expression: 1.000000
+Expression: eval((string)name)
+
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 1.000000)
+	Col #1: 'name': string value: George of the Jungle
+
+Constified expressions from row 1 of 'constify':
+Expression: (string)Arial
+Evaluated: (string)Arial
+Expression: 10.000000
+Evaluated: (number)10.000000
+Expression: 1.000000
+Evaluated: (number)1.000000
+Expression: eval((string)3 * id)
+Evaluated: (number)3.000000
+
+Constified expressions from row 2 of 'constify':
+Expression: (string)Courier
+Evaluated: (string)Courier
+Expression: 12.000000
+Evaluated: (number)12.000000
+Expression: 0.000000
+Evaluated: (number)0.000000
+Expression: eval((string)id * 3)
+Evaluated: (number)3.000000
+
+Constified expressions from row 3 of 'constify':
+Expression: (string)Times New Roman
+Evaluated: (string)Times New Roman
+Expression: 11.000000
+Evaluated: (number)11.000000
+Expression: 1.000000
+Evaluated: (number)1.000000
+Expression: eval((string)name)
+Evaluated: (string)George of the Jungle
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 2.000000)
+	Col #1: 'name': string value: Alice in Wonderland
+
+Constified expressions from row 1 of 'constify':
+Expression: (string)Arial
+Evaluated: (string)Arial
+Expression: 10.000000
+Evaluated: (number)10.000000
+Expression: 1.000000
+Evaluated: (number)1.000000
+Expression: eval((string)3 * id)
+Evaluated: (number)6.000000
+
+Constified expressions from row 2 of 'constify':
+Expression: (string)Courier
+Evaluated: (string)Courier
+Expression: 12.000000
+Evaluated: (number)12.000000
+Expression: 0.000000
+Evaluated: (number)0.000000
+Expression: eval((string)id * 3)
+Evaluated: (number)6.000000
+
+Constified expressions from row 3 of 'constify':
+Expression: (string)Times New Roman
+Evaluated: (string)Times New Roman
+Expression: 11.000000
+Evaluated: (number)11.000000
+Expression: 1.000000
+Evaluated: (number)1.000000
+Expression: eval((string)name)
+Evaluated: (string)Alice in Wonderland

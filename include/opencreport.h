@@ -558,6 +558,11 @@ void ocrpt_expr_resolve_from_query(ocrpt_expr *e, ocrpt_query *q);
  */
 void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exclude_mask);
 /*
+ * Constify expression identifier values from the specified query
+ * If called, it should be called before ocrpt_expr_optimize().
+ */
+void ocrpt_expr_constify(ocrpt_expr *e, ocrpt_query *constify_from);
+/*
  * Optimize expression after parsing
  */
 void ocrpt_expr_optimize(ocrpt_expr *e);

@@ -129,6 +129,7 @@ foreach name : [
   'r_lineno_test',
   'r_value_test',
   'r_self_crash_test',
+  'constify_test',
   # -----------------------------------------------------------------
   # LAYOUT_TESTS (PDF/HTML/TXT/CSV/XML/JSON output layout tests)
   # -----------------------------------------------------------------

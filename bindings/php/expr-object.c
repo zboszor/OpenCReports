@@ -82,6 +82,31 @@ PHP_METHOD(opencreport_expr, nodes) {
 	RETURN_LONG(ocrpt_expr_nodes(eo->e));
 }
 
+PHP_METHOD(opencreport_expr, constify) {
+	zval *object = getThis();
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
+
+	if (!eo->e) {
+		zend_throw_error(NULL, "OpenCReport\\Expr object was freed");
+		RETURN_THROWS();
+	}
+
+	zval *qobj;
+
+#if PHP_VERSION_ID >= 70000
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_OBJECT_OF_CLASS(qobj, opencreport_query_ce);
+	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &qobj, opencreport_query_ce) == FAILURE)
+		return;
+#endif
+
+	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(qobj);
+
+	ocrpt_expr_constify(eo->e, qo->q);
+}
+
 PHP_METHOD(opencreport_expr, optimize) {
 	zval *object = getThis();
 	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(object);
@@ -613,6 +638,10 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_nodes, 0, 0, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
+OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_constify, 0, 1, IS_VOID, 0)
+ZEND_ARG_OBJ_INFO(0, query, OpenCReport\\Query, 0)
+ZEND_END_ARG_INFO()
+
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_expr_optimize, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
@@ -705,6 +734,7 @@ ZEND_END_ARG_INFO()
 #define arginfo_opencreport_expr_get_expr_string NULL
 #define arginfo_opencreport_expr_print NULL
 #define arginfo_opencreport_expr_nodes NULL
+#define arginfo_opencreport_expr_constify NULL
 #define arginfo_opencreport_expr_optimize NULL
 #define arginfo_opencreport_expr_resolve NULL
 #define arginfo_opencreport_expr_resolve_from_query NULL
@@ -736,6 +766,7 @@ static const zend_function_entry opencreport_expr_class_methods[] = {
 	PHP_ME(opencreport_expr, get_expr_string, arginfo_opencreport_expr_get_expr_string, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, print, arginfo_opencreport_expr_print, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, nodes, arginfo_opencreport_expr_nodes, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_expr, constify, arginfo_opencreport_expr_constify, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, optimize, arginfo_opencreport_expr_optimize, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, resolve, arginfo_opencreport_expr_resolve, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_expr, resolve_from_query, arginfo_opencreport_expr_resolve_from_query, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)

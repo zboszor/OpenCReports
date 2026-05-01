@@ -110,7 +110,8 @@ TESTS = \
 	quoted_ident_test \
 	r_lineno_test \
 	r_value_test \
-	r_self_crash_test
+	r_self_crash_test \
+	constify_test
 
 PHP_TESTS = \
 	grammar_test expr_test function_test \
@@ -159,7 +160,8 @@ PHP_TESTS = \
 	canonicalize_path_test \
 	find_file_test \
 	color_test \
-	rlib_function_test
+	rlib_function_test \
+	constify_test
 
 if ENABLE_PGSQL_TESTS
 

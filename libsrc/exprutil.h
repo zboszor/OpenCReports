@@ -98,6 +98,7 @@ struct ocrpt_expr {
 	bool parenthesized:1;
 	bool dotprefixed:1;
 	bool delayed:1;
+	bool resolved:1;
 	bool iterative:1;
 	bool iterative_init:1;
 	bool iterative_start_with_init:1;

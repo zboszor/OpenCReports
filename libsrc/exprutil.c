@@ -537,7 +537,7 @@ DLL_EXPORT_SYM void ocrpt_expr_optimize(ocrpt_expr *e) {
 	ocrpt_expr_optimize_worker(e);
 }
 
-static bool ocrpt_resolve_ident(ocrpt_expr *e, ocrpt_query *q) {
+static bool ocrpt_resolve_ident(ocrpt_expr *e, ocrpt_query *q, bool set_query) {
 	ocrpt_query_result *qr = NULL;
 	ocrpt_list *ql;
 	int32_t cols, i;
@@ -557,11 +557,12 @@ static bool ocrpt_resolve_ident(ocrpt_expr *e, ocrpt_query *q) {
 
 		for (i = 0; i < cols; i++) {
 			if (!strcmp(e->name->str, qr[i].name)) {
-				for (int j = 0; j < OCRPT_EXPR_RESULTS; j++)
+				for (int j = 0; set_query && j < OCRPT_EXPR_RESULTS; j++)
 					if (!e->result[j])
 						e->result[j] = &qr[j * cols + i].result;
 				found = true;
-				e->q = q;
+				if (set_query)
+					e->q = q;
 				break;
 			}
 		}
@@ -570,9 +571,10 @@ static bool ocrpt_resolve_ident(ocrpt_expr *e, ocrpt_query *q) {
 	for (ql = q->followers; !found && ql; ql = ql->next) {
 		ocrpt_query *qf = (ocrpt_query *)ql->data;
 
-		found = ocrpt_resolve_ident(e, qf);
+		found = ocrpt_resolve_ident(e, qf, set_query);
 		if (found) {
-			e->q = qf;
+			if (set_query)
+				e->q = qf;
 			break;
 		}
 	}
@@ -580,9 +582,10 @@ static bool ocrpt_resolve_ident(ocrpt_expr *e, ocrpt_query *q) {
 	for (ql = q->followers_n_to_1; !found && ql; ql = ql->next) {
 		ocrpt_query *qf = (ocrpt_query *)ql->data;
 
-		found = ocrpt_resolve_ident(e, qf);
+		found = ocrpt_resolve_ident(e, qf, set_query);
 		if (found) {
-			e->q = qf;
+			if (set_query)
+				e->q = qf;
 			break;
 		}
 	}
@@ -830,12 +833,12 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *or
 			if (EXPR_RESULT(e) && EXPR_TYPE(e) != OCRPT_RESULT_ERROR)
 				break;
 			if (query)
-				found = ocrpt_resolve_ident(e, query);
+				found = ocrpt_resolve_ident(e, query, true);
 			else if (e->r && e->r->query)
-				found = ocrpt_resolve_ident(e, e->r->query);
+				found = ocrpt_resolve_ident(e, e->r->query, true);
 			else if (e->o->queries) {
 				for (ocrpt_list *ql = e->o->queries; !found && ql; ql = ql->next) {
-					found = ocrpt_resolve_ident(e, (ocrpt_query *)ql->data);
+					found = ocrpt_resolve_ident(e, (ocrpt_query *)ql->data, true);
 					if (found)
 						break;
 				}
@@ -863,6 +866,7 @@ DLL_EXPORT_SYM void ocrpt_expr_resolve(ocrpt_expr *e) {
 		return;
 
 	ocrpt_expr_resolve_worker(e, NULL, e, NULL, 0, true, NULL);
+	e->resolved = true;
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_resolve_from_query(ocrpt_expr *e, ocrpt_query *q) {
@@ -870,6 +874,7 @@ DLL_EXPORT_SYM void ocrpt_expr_resolve_from_query(ocrpt_expr *e, ocrpt_query *q)
 		return;
 
 	ocrpt_expr_resolve_worker(e, q, e, NULL, 0, true, NULL);
+	e->resolved = true;
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exclude_mask) {
@@ -877,6 +882,7 @@ DLL_EXPORT_SYM void ocrpt_expr_resolve_exclude(ocrpt_expr *e, int32_t varref_exc
 		return;
 
 	ocrpt_expr_resolve_worker(e, NULL, e, NULL, varref_exclude_mask, true, NULL);
+	e->resolved = true;
 }
 
 bool ocrpt_expr_reference_worker(ocrpt_expr *e, uint32_t varref_include_mask, uint32_t *varref_vartype_mask, ocrpt_list **var_list, bool indirect_vars) {
@@ -1134,6 +1140,61 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_get_result(ocrpt_expr *e) {
 		assert(e->delayed_result);
 		return e->delayed_result;
 	}
+}
+
+/*
+ * Constification from a query result will take the current result of
+ * the query and duplicates it in the expression as a constant result value.
+ *
+ * It's the caller's responsibility to iterate over a supplementary query,
+ * parse and optimize expressions (possibly mixing the report's main and
+ * supplementary queries) before calling this or the public API function
+ * on the expression.
+ */
+static void ocrpt_expr_constify_worker(ocrpt_expr *e, ocrpt_query *constify_from) {
+	int32_t i;
+
+	if (e->type == OCRPT_EXPR) {
+		for (i = 0; i < e->n_ops; i++)
+			ocrpt_expr_constify_worker(e->ops[i], constify_from);
+	} else if (e->type == OCRPT_EXPR_IDENT) {
+		bool found = ocrpt_resolve_ident(e, constify_from, false);
+
+		if (found) {
+			opencreport *o = e->o;
+			ocrpt_result *result = e->result[o->residx];
+
+			assert(!ocrpt_expr_get_result_owned(e, o->residx));
+
+			ocrpt_mem_string_free(e->query, true);
+			e->query = NULL;
+			ocrpt_mem_string_free(e->name, true);
+			e->name = NULL;
+			e->var = NULL;
+			e->q = NULL;
+
+			e->result[o->residx] = ocrpt_result_new(o);
+			ocrpt_result_copy(e->result[o->residx], result);
+			ocrpt_expr_set_result_owned(e, o->residx, true);
+
+			for (i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+				if (i == o->residx)
+					continue;
+
+				assert(!ocrpt_expr_get_result_owned(e, i));
+				e->result[i] = e->result[o->residx];
+			}
+
+			e->type = result->type;
+		}
+	}
+}
+
+DLL_EXPORT_SYM void ocrpt_expr_constify(ocrpt_expr *e, ocrpt_query *constify_from) {
+	if (!e || !e->resolved)
+		return;
+
+	ocrpt_expr_constify_worker(e, constify_from);
 }
 
 DLL_EXPORT_SYM int32_t ocrpt_expr_get_num_operands(ocrpt_expr *e) {

@@ -1260,6 +1260,8 @@ class OpenCReport\Expr {
     public final resolve_from_query(OpenCReport\Query $query): void;
     public final resolve_exclude(long $value): void;
 
+    public final constify(OpenCReport\Query $query): void;
+
     public final optimize(): void;
     public final eval():
                      ?OpenCReport\Result;
@@ -1355,6 +1357,13 @@ OpenCReport\Expr::resolve_from_query(
 public final
 OpenCReport\Expr::resolve_exclude(
 						 long $value): void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpexprconstify">
+			<title>Constify an expression from supplementary query data</title>
+			<para>
+				<programlisting>public final
+constify(OpenCReport\Query $query): void;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpexproptimize">

@@ -893,6 +893,26 @@ ocrpt_expr_resolve_exclude(ocrpt_expr *e,
 					regardless of the variant used.
 				</para>
 			</sect3>
+			<sect3 id="constifyexpr">
+				<title>Constify an expression from supplementary query data</title>
+				<para>
+					This function replaces the identifier references
+					to a supplementary query with the current data
+					from that query. Implicitly, the followers of the
+					specified query will also be used, in case the
+					expression references a follower.
+					<programlisting>void
+ocrpt_expr_constify(ocrpt_expr *e,
+                    ocrpt_query *constify_from);</programlisting>
+				</para>
+				<para>
+					This function should be used in accordance with
+					<literal>ocrpt_expr_resolve_from_query</literal>,
+					and before <literal>ocrpt_expr_optimize()</literal>.
+					See <xref linkend="resolveexpr"/> and
+					<xref linkend="optimizeexpr"/>.
+				</para>
+			</sect3>
 			<sect3 id="optimizeexpr">
 				<title>Optimize an expression</title>
 				<para>
