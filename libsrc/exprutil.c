@@ -404,32 +404,55 @@ static void ocrpt_expr_optimize_worker(ocrpt_expr *e) {
 			/*
 			 * Special case the built-in eval() function
 			 */
-			if (e->func->fname && !strcasecmp(e->func->fname, "eval") && e->n_ops == 1  && EXPR_VALID_STRING(e->ops[0])) {
+			if (e->func->fname && !strcasecmp(e->func->fname, "eval") && e->n_ops == 1) {
 				bool builtin = false;
 				const ocrpt_function *f = ocrpt_function_get_internal(e->o, "eval", &builtin);
 
 				if (builtin && e->func == f) {
-					char *err = NULL;
-					ocrpt_expr *new_e;
+					bool unresolved = false;
+					ocrpt_expr *new_e = NULL;
 
-					if (e->r)
-						new_e = ocrpt_report_expr_parse(e->r, EXPR_STRING_VAL(e->ops[0]), &err);
-					else
-						new_e = ocrpt_expr_parse(e->o, EXPR_STRING_VAL(e->ops[0]), &err);
-
-					if (!new_e) {
-						ocrpt_expr_make_error_result(e, err);
-						ocrpt_strfree(err);
-					} else {
+					if (EXPR_VALID_STRING(e->ops[0])) {
 						/*
-						 * Resolve the expression, potentially from the expression's
-						 * report's main query. We should not use
-						 * ocrpt_expr_resolve_from_query(new_e, e->q) here, because
-						 * an expression coming from the supplementary query must not
-						 * include references to the supplementary query itself.
+						 * If it's a string constant, try to parse it as an
+						 * expression with an implicit fallback to being a
+						 * string constant.
 						 */
-						ocrpt_expr_resolve(new_e);
+						if (e->r)
+							new_e = ocrpt_report_expr_parse(e->r, EXPR_STRING_VAL(e->ops[0]), NULL);
+						else
+							new_e = ocrpt_expr_parse(e->o, EXPR_STRING_VAL(e->ops[0]), NULL);
 
+						if (new_e) {
+							/*
+							 * Resolve the expression, potentially from the expression's
+							 * report's main query. We should not use
+							 * ocrpt_expr_resolve_from_query(new_e, e->q) or the equivalent
+							 * here, because an expression coming from the supplementary
+							 * query must not * include references to the supplementary
+							 * query itself. Also, the internal worker API allows discovering
+							 * whether the constant is unresolved, in which case the constant
+							 * must just be pulled up.
+							 *
+							 */
+							ocrpt_expr_resolve_worker(new_e, NULL, new_e, NULL, 0, false, &unresolved);
+						}
+					}
+
+					if (!new_e || unresolved) {
+						/* Plain constant, pull up from eval(). */
+						ocrpt_expr *op0 = e->ops[0];
+
+						/*
+						 * Clean up the old ocrpt_expr structure before overwriting
+						 * with the newly parsed contents.
+						 */
+						ocrpt_mem_free(e->expr_string);
+						ocrpt_mem_free(e->ops);
+
+						*e = *op0;
+						new_e = op0;
+					} else {
 						/*
 						 * Clean up the old ocrpt_expr structure before overwriting
 						 * with the newly parsed contents.
@@ -439,31 +462,31 @@ static void ocrpt_expr_optimize_worker(ocrpt_expr *e) {
 						ocrpt_mem_free(e->ops);
 
 						*e = *new_e;
-
-						/* Clean up new_e contents, they are already saved. */
-						new_e->expr_string = NULL;
-						for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
-							new_e->result[i] = NULL;
-
-						switch (new_e->type) {
-						case OCRPT_EXPR_IDENT:
-							new_e->query = NULL;
-							new_e->name = NULL;
-							new_e->var = NULL;
-							break;
-						case OCRPT_EXPR:
-							new_e->ops = NULL;
-							new_e->n_ops = 0;
-							break;
-						default:
-							break;
-						}
-
-						ocrpt_expr_free(new_e);
 					}
 
-					goto again;
+					/* Clean up new_e contents, they are already saved. */
+					new_e->expr_string = NULL;
+					for (i = 0; i < OCRPT_EXPR_RESULTS; i++)
+						new_e->result[i] = NULL;
+
+					switch (new_e->type) {
+					case OCRPT_EXPR_IDENT:
+						new_e->query = NULL;
+						new_e->name = NULL;
+						new_e->var = NULL;
+						break;
+					case OCRPT_EXPR:
+						new_e->ops = NULL;
+						new_e->n_ops = 0;
+						break;
+					default:
+						break;
+					}
+
+					ocrpt_expr_free(new_e);
 				}
+
+				goto again;
 			}
 
 			if (e->func->func && !e->func->dont_optimize) {
