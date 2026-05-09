@@ -605,6 +605,11 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 }
 
 static void ocrpt_execute_parts_resolve_all_reports(opencreport *o, ocrpt_part *p) {
+	if (o->precalculate) {
+		ocrpt_output_generate_lines(&p->pageheader);
+		ocrpt_output_generate_lines(&p->pagefooter);
+	}
+
 	for (ocrpt_list *row = p->rows; row; row = row->next) {
 		ocrpt_part_row *pr = (ocrpt_part_row *)row->data;
 		ocrpt_list *pdl;
@@ -614,6 +619,15 @@ static void ocrpt_execute_parts_resolve_all_reports(opencreport *o, ocrpt_part *
 
 			for (ocrpt_list *rl = pd->reports; rl; rl = rl->next) {
 				ocrpt_report *r = (ocrpt_report *)rl->data;
+
+				if (o->precalculate) {
+					ocrpt_output_generate_lines(&r->nodata);
+					ocrpt_output_generate_lines(&r->reportheader);
+					ocrpt_output_generate_lines(&r->reportfooter);
+					ocrpt_output_generate_lines(&r->fieldheader);
+					ocrpt_output_generate_lines(&r->fielddetails);
+					ocrpt_output_generate_lines(&r->fieldfooter);
+				}
 
 				ocrpt_query_navigate_start(r->query);
 

@@ -157,6 +157,53 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 		ocrpt_output_element *oe = (ocrpt_output_element *)l->data;
 
 		switch (oe->type) {
+		case OCRPT_OUTPUT_GENLINE:
+			if (free_subexprs) {
+				ocrpt_genline *gl = (ocrpt_genline *)oe;
+
+				ocrpt_expr_free(gl->element_type);
+
+				ocrpt_expr_free(gl->line_font_name);
+				ocrpt_expr_free(gl->line_font_size);
+				ocrpt_expr_free(gl->line_bold);
+				ocrpt_expr_free(gl->line_italic);
+				ocrpt_expr_free(gl->line_color);
+				ocrpt_expr_free(gl->line_bgcolor);
+				ocrpt_expr_free(gl->line_suppress);
+
+				ocrpt_expr_free(gl->value);
+				ocrpt_expr_free(gl->delayed);
+				ocrpt_expr_free(gl->suppress);
+				ocrpt_expr_free(gl->width);
+				ocrpt_expr_free(gl->height);
+				ocrpt_expr_free(gl->align);
+				ocrpt_expr_free(gl->color);
+				ocrpt_expr_free(gl->bgcolor);
+
+				ocrpt_expr_free(gl->font_name);
+				ocrpt_expr_free(gl->font_size);
+				ocrpt_expr_free(gl->bold);
+				ocrpt_expr_free(gl->italic);
+				ocrpt_expr_free(gl->format);
+				ocrpt_expr_free(gl->link);
+				ocrpt_expr_free(gl->translate);
+				ocrpt_expr_free(gl->memo);
+				ocrpt_expr_free(gl->hyphenate);
+				ocrpt_expr_free(gl->wrap_chars);
+				ocrpt_expr_free(gl->max_lines);
+
+				ocrpt_expr_free(gl->imgtype);
+				ocrpt_expr_free(gl->text_width);
+
+				ocrpt_expr_free(gl->bctype);
+			}
+
+			{
+				ocrpt_genline *gl = (ocrpt_genline *)oe;
+				oe = (ocrpt_output_element *)gl->line;
+				ocrpt_mem_free(gl);
+			}
+			/* fallthrough */
 		case OCRPT_OUTPUT_LINE:
 			for (ocrpt_list *l = ((ocrpt_line *)oe)->elements; l; l = l->next) {
 				ocrpt_text *le = (ocrpt_text *)l->data;

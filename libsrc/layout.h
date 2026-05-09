@@ -22,6 +22,7 @@
 enum ocrpt_output_type {
 	OCRPT_OUTPUT_UNSET,
 	OCRPT_OUTPUT_LINE,
+	OCRPT_OUTPUT_GENLINE,
 	OCRPT_OUTPUT_HLINE,
 	OCRPT_OUTPUT_IMAGE,
 	OCRPT_OUTPUT_IMAGEEND,
@@ -189,6 +190,74 @@ struct ocrpt_barcode {
 	size_t encoded_width;
 };
 
+struct ocrpt_genline {
+	ocrpt_output_element base;  /* type = OCRPT_OUTPUT_GENLINE */
+
+	ocrpt_output *output;
+
+	/*
+	 * The query (and implicitly, its followers) used by default
+	 * to resolve identifiers from and constify data from.
+	 */
+	ocrpt_query *query;
+
+	/* Dynamically built line. */
+	ocrpt_line *line;
+
+	/*
+	 * Expression that determines the element type per genline query row.
+	 * Evaluates to a string: "text", "image", or "barcode".
+	 */
+	ocrpt_expr *element_type;
+
+	/*
+	 * Line-level expressions
+	 * They are evaluated once per output row, like ocrpt_line.
+	 */
+	ocrpt_expr *line_font_name;
+	ocrpt_expr *line_font_size;
+	ocrpt_expr *line_bold;
+	ocrpt_expr *line_italic;
+	ocrpt_expr *line_color;
+	ocrpt_expr *line_bgcolor;
+	ocrpt_expr *line_suppress;
+
+	/*
+	 * Common template expressions, used by multiple element types.
+	 */
+	ocrpt_expr *value;
+	ocrpt_expr *delayed;
+	ocrpt_expr *suppress;
+	ocrpt_expr *width;
+	ocrpt_expr *height;
+	ocrpt_expr *align;
+	ocrpt_expr *color;
+	ocrpt_expr *bgcolor;
+
+	/* Text-specific template expressions */
+	ocrpt_expr *font_name;
+	ocrpt_expr *font_size;
+	ocrpt_expr *bold;
+	ocrpt_expr *italic;
+	ocrpt_expr *format;
+	ocrpt_expr *link;
+	ocrpt_expr *translate;
+	ocrpt_expr *memo;
+	ocrpt_expr *hyphenate;
+	ocrpt_expr *wrap_chars;
+	ocrpt_expr *max_lines;
+
+	/* Image-specific template expressions */
+	ocrpt_expr *imgtype;
+	ocrpt_expr *text_width;
+
+	/* Barcode-specific template expressions */
+	ocrpt_expr *bctype;
+
+	bool resolved;
+};
+typedef struct ocrpt_genline ocrpt_genline;
+
 void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output);
 void ocrpt_layout_output_resolve(ocrpt_output *output);
 void ocrpt_layout_output_evaluate(ocrpt_output *output);
@@ -241,6 +310,8 @@ static inline void ocrpt_layout_output_position_pop(ocrpt_output *output) {
 }
 
 ocrpt_expr *ocrpt_layout_expr_parse(opencreport *o, ocrpt_report *r, const char *expr, bool report, bool create_string);
+
+void ocrpt_output_generate_lines(ocrpt_output *output);
 
 void ocrpt_layout_compute_text(opencreport *o, ocrpt_text *le);
 

@@ -521,6 +521,16 @@ void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output) {
 		case OCRPT_OUTPUT_UNSET:
 			assert(0);
 			break;
+		case OCRPT_OUTPUT_GENLINE:
+			if (((ocrpt_genline *)oe)->resolved) {
+				ocrpt_genline *gl = (ocrpt_genline *)oe;
+				if (gl->line)
+					oe = (ocrpt_output_element *)(gl->line);
+				else
+					break;
+				} else
+					break;
+			/* fallthrough */
 		case OCRPT_OUTPUT_LINE: {
 			ocrpt_line *line = (ocrpt_line *)oe;
 
@@ -735,6 +745,16 @@ void ocrpt_layout_output_resolve(ocrpt_output *output) {
 		case OCRPT_OUTPUT_UNSET:
 			assert(0);
 			break;
+		case OCRPT_OUTPUT_GENLINE:
+			if (((ocrpt_genline *)oe)->resolved) {
+				ocrpt_genline *gl = (ocrpt_genline *)oe;
+				if (gl->line)
+					oe = (ocrpt_output_element *)(gl->line);
+				else
+					break;
+			} else
+				break;
+			/* fallthrough */
 		case OCRPT_OUTPUT_LINE:
 			ocrpt_layout_output_resolve_line((ocrpt_line *)oe);
 
@@ -811,6 +831,16 @@ void ocrpt_layout_output_evaluate(ocrpt_output *output) {
 		case OCRPT_OUTPUT_UNSET:
 			assert(0);
 			break;
+		case OCRPT_OUTPUT_GENLINE:
+			if (((ocrpt_genline *)oe)->resolved) {
+				ocrpt_genline *gl = (ocrpt_genline *)oe;
+				if (gl->line)
+					oe = (ocrpt_output_element *)(gl->line);
+				else
+					break;
+			} else
+				break;
+			/* fallthrough */
 		case OCRPT_OUTPUT_LINE: {
 			ocrpt_line *line = (ocrpt_line *)oe;
 
@@ -897,6 +927,16 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 		case OCRPT_OUTPUT_UNSET:
 			assert(0);
 			break;
+		case OCRPT_OUTPUT_GENLINE:
+			if (((ocrpt_genline *)oe)->resolved) {
+				ocrpt_genline *gl = (ocrpt_genline *)oe;
+				if (gl->line)
+					oe = (ocrpt_output_element *)(gl->line);
+				else
+					break;
+			} else
+				break;
+			/* fallthrough */
 		case OCRPT_OUTPUT_LINE:
 			l->suppress_line = false;
 			if (EXPR_VALID_NUMERIC(l->suppress)) {
@@ -1024,6 +1064,16 @@ bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 		case OCRPT_OUTPUT_UNSET:
 			assert(0);
 			break;
+		case OCRPT_OUTPUT_GENLINE:
+			if (((ocrpt_genline *)oe)->resolved) {
+				ocrpt_genline *gl = (ocrpt_genline *)oe;
+				if (gl->line)
+					oe = (ocrpt_output_element *)(gl->line);
+				else
+					break;
+			} else
+				break;
+			/* fallthrough */
 		case OCRPT_OUTPUT_LINE: {
 			ocrpt_line *l = (ocrpt_line *)oe;
 
@@ -1829,6 +1879,307 @@ DLL_EXPORT_SYM ocrpt_barcode *ocrpt_output_add_barcode(ocrpt_output *output) {
 
 	return barcode;
 }
+
+/*
+ * Wrap the original expression string in eval() in case it's
+ * a valid expression.
+ *
+ * Pass through if the expression string is a non-parseable string.
+ *
+ * The passed-in ocrpt_string is a temporary area, must be
+ * allocated and freed by the caller.
+ *
+ * Used by ocrpt_output_generate_lines() below.
+ */
+static const char *ocrpt_expr_string_wrap_eval(ocrpt_output *output, ocrpt_expr *e, ocrpt_string *str) {
+	if (!e)
+		return NULL;
+
+	str->len = 0;
+
+	ocrpt_expr *tmp = ocrpt_layout_expr_parse(output->o, output->r, e->expr_string, false, true);
+
+	if (EXPR_VALID_STRING(tmp))
+		ocrpt_mem_string_append_printf(str, "%s", e->expr_string);
+	else
+		ocrpt_mem_string_append_printf(str, "eval(%s)", e->expr_string);
+
+	ocrpt_expr_free(tmp);
+
+	return str->str;
+}
+
+void ocrpt_output_generate_lines(ocrpt_output *output) {
+	ocrpt_string *tmpstr = NULL;
+
+	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
+		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
+
+		switch (oe->type) {
+		case OCRPT_OUTPUT_GENLINE:
+			if (!((ocrpt_genline *)oe)->resolved) {
+				ocrpt_genline *gl = (ocrpt_genline *)oe;
+
+				if (!gl->query) {
+					gl->resolved = true;
+					break;
+				}
+
+				gl->line = ocrpt_output_line_new(output);
+				if (!gl->line) {
+					gl->resolved = true;
+					break;
+				}
+
+				/* element_type must not be constified. */
+				ocrpt_expr_resolve_from_query(gl->element_type, gl->query);
+				ocrpt_expr_optimize(gl->element_type);
+
+				ocrpt_line_set_font_name(gl->line, gl->line_font_name ? gl->line_font_name->expr_string : NULL);
+				ocrpt_line_set_font_size(gl->line, gl->line_font_size ? gl->line_font_size->expr_string : NULL);
+				ocrpt_line_set_bold(gl->line, gl->line_bold ? gl->line_bold->expr_string : NULL);
+				ocrpt_line_set_italic(gl->line, gl->line_italic ? gl->line_italic->expr_string : NULL);
+				ocrpt_line_set_suppress(gl->line, gl->line_suppress ? gl->line_suppress->expr_string : NULL);
+				ocrpt_line_set_color(gl->line, gl->line_color ? gl->line_color->expr_string : NULL);
+				ocrpt_line_set_bgcolor(gl->line, gl->line_bgcolor ? gl->line_bgcolor->expr_string : NULL);
+
+				if (!tmpstr)
+					tmpstr = ocrpt_mem_string_new_with_len(NULL, 1024);
+
+				ocrpt_query_navigate_start(gl->query);
+
+				while (ocrpt_query_navigate_next(gl->query)) {
+					ocrpt_expr *e;
+					bool is_text = false;
+					ocrpt_expr_eval(gl->element_type);
+
+					if (EXPR_VALID_STRING(gl->element_type)) {
+						ocrpt_string *element_type = EXPR_STRING(gl->element_type);
+
+						if (!strcasecmp(element_type->str, "image")) {
+							ocrpt_image *image = ocrpt_line_add_image(gl->line);
+
+							e = ocrpt_image_set_value(image, ocrpt_expr_string_wrap_eval(output, gl->value, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_image_set_suppress(image, ocrpt_expr_string_wrap_eval(output, gl->suppress, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_image_set_type(image, ocrpt_expr_string_wrap_eval(output, gl->imgtype, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_image_set_width(image, ocrpt_expr_string_wrap_eval(output, gl->width, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_image_set_height(image, ocrpt_expr_string_wrap_eval(output, gl->height, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_image_set_alignment(image, ocrpt_expr_string_wrap_eval(output, gl->align, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_image_set_bgcolor(image, ocrpt_expr_string_wrap_eval(output, gl->bgcolor, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_image_set_text_width(image, ocrpt_expr_string_wrap_eval(output, gl->text_width, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+						} else if (!strcasecmp(element_type->str, "barcode")) {
+							ocrpt_barcode *bc = ocrpt_line_add_barcode(gl->line);
+
+							e = ocrpt_barcode_set_value(bc, ocrpt_expr_string_wrap_eval(output, gl->value, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_barcode_set_value_delayed(bc, ocrpt_expr_string_wrap_eval(output, gl->delayed, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_barcode_set_suppress(bc, ocrpt_expr_string_wrap_eval(output, gl->suppress, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_barcode_set_type(bc, ocrpt_expr_string_wrap_eval(output, gl->bctype, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_barcode_set_width(bc, ocrpt_expr_string_wrap_eval(output, gl->width, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_barcode_set_height(bc, ocrpt_expr_string_wrap_eval(output, gl->height, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_barcode_set_color(bc, ocrpt_expr_string_wrap_eval(output, gl->color, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_barcode_set_bgcolor(bc, ocrpt_expr_string_wrap_eval(output, gl->bgcolor, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+						} else {
+							/* Treat everything else as text, i.e. <field> or <literal> */
+							is_text = true;
+						}
+					} else {
+						/* Fallback: treat bad values as text, i.e. <field> or <literal>  */
+						is_text = true;
+					}
+
+					if (is_text) {
+						ocrpt_text *text = ocrpt_line_add_text(gl->line);
+
+						e = ocrpt_text_set_value_expr(text, ocrpt_expr_string_wrap_eval(output, gl->value, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_value_delayed(text, ocrpt_expr_string_wrap_eval(output, gl->delayed, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_format(text, ocrpt_expr_string_wrap_eval(output, gl->format, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_translate(text, ocrpt_expr_string_wrap_eval(output, gl->translate, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_width(text, ocrpt_expr_string_wrap_eval(output, gl->width, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_alignment(text, ocrpt_expr_string_wrap_eval(output, gl->align, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_color(text, ocrpt_expr_string_wrap_eval(output, gl->color, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_bgcolor(text, ocrpt_expr_string_wrap_eval(output, gl->bgcolor, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_font_name(text, ocrpt_expr_string_wrap_eval(output, gl->font_name, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_font_size(text, ocrpt_expr_string_wrap_eval(output, gl->font_size, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_bold(text, ocrpt_expr_string_wrap_eval(output, gl->bold, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_italic(text, ocrpt_expr_string_wrap_eval(output, gl->italic, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_link(text, ocrpt_expr_string_wrap_eval(output, gl->link, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_memo(text, ocrpt_expr_string_wrap_eval(output, gl->memo, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_memo_hyphenate(text, ocrpt_expr_string_wrap_eval(output, gl->hyphenate, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_memo_wrap_chars(text, ocrpt_expr_string_wrap_eval(output, gl->wrap_chars, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_memo_max_lines(text, ocrpt_expr_string_wrap_eval(output, gl->max_lines, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+					}
+				}
+
+				gl->resolved = true;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	ocrpt_mem_string_free(tmpstr, true);
+}
+
+DLL_EXPORT_SYM ocrpt_genline *ocrpt_output_add_genline(ocrpt_output *output) {
+	if (!output || (output->o && output->o->executing))
+		return NULL;
+
+	ocrpt_genline *gl = ocrpt_mem_malloc(sizeof(ocrpt_genline));
+	memset(gl, 0, sizeof(ocrpt_genline));
+	gl->base.type = OCRPT_OUTPUT_GENLINE;
+	gl->output = output;
+	output->output_list = ocrpt_list_append(output->output_list, gl);
+
+	return gl;
+}
+
+#define SET_GENLINE_EXPR(exprname, report, create_string) { \
+	if (!gl || gl->base.type != OCRPT_OUTPUT_GENLINE || (gl->output->o && gl->output->o->executing)) \
+		return NULL; \
+	ocrpt_expr_free(gl->exprname); \
+	gl->exprname = expr_string ? ocrpt_layout_expr_parse(gl->output->o, gl->output->r, expr_string, report, create_string) : NULL; \
+	return gl->exprname; \
+}
+
+DLL_EXPORT_SYM void ocrpt_genline_set_query(ocrpt_genline *gl, ocrpt_query *query) {
+	if (!gl || gl->base.type != OCRPT_OUTPUT_GENLINE || (gl->output->o && gl->output->o->executing))
+		return;
+
+	gl->query = query;
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_element_type(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(element_type, true, true)
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_font_name(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_font_name, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_font_size(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_font_size, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_bold(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_bold, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_italic(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_italic, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_color(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_color, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_bgcolor(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_bgcolor, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_suppress(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_suppress, true, false)
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_value(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(value, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_delayed(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(delayed, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_suppress(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(suppress, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_width(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(width, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_height(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(height, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_align(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(align, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_color(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(color, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_bgcolor(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(bgcolor, true, true)
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_font_name(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(font_name, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_font_size(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(font_size, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_bold(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(bold, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_italic(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(italic, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_format(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(format, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_link(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(link, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_translate(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(translate, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_memo(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(memo, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_hyphenate(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(hyphenate, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_wrap_chars(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(wrap_chars, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_max_lines(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(max_lines, true, false)
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_image_type(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(imgtype, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_text_width(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(text_width, true, false)
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_barcode_type(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(bctype, true, true)
 
 static void ocrpt_text_set_rvalue_internal(ocrpt_text *text) {
 	if (text->format)

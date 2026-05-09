@@ -784,6 +784,124 @@ static void ocrpt_parse_output_barcode_node(opencreport *o, ocrpt_report *r, ocr
 	ocrpt_ignore_child_nodes(o, reader, -1, "Barcode");
 }
 
+static void ocrpt_parse_output_genline_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
+	ocrpt_genline *gl = ocrpt_output_add_genline(output);
+	if (!gl)
+		return;
+
+	xmlChar *query = NULL, *element_type = NULL;
+	xmlChar *line_font_name = NULL, *line_font_size = NULL, *line_bold = NULL, *line_italic = NULL;
+	xmlChar *line_suppress = NULL, *line_color = NULL, *line_bgcolor = NULL;
+	xmlChar *value = NULL, *delayed = NULL, *suppress = NULL;
+	xmlChar *width = NULL, *height = NULL, *align = NULL;
+	xmlChar *color = NULL, *bgcolor = NULL;
+	xmlChar *font_name = NULL, *font_size = NULL, *bold = NULL, *italic = NULL;
+	xmlChar *format = NULL, *link = NULL, *translate = NULL;
+	xmlChar *memo = NULL, *hyphenate = NULL, *wrap_chars = NULL, *max_lines = NULL;
+	xmlChar *imgtype = NULL, *text_width = NULL, *bctype = NULL;
+
+	ocrpt_query *q = NULL;
+
+	struct {
+		const char *attrs[3];
+		xmlChar **attrp;
+	} xmlattrs[] = {
+		{ { "query" }, &query },
+		{ { "element_type" }, &element_type },
+		{ { "line_font_name"  }, &line_font_name },
+		{ { "line_font_size" }, &line_font_size },
+		{ { "line_bold" }, &line_bold },
+		{ { "line_italic" }, &line_italic },
+		{ { "line_suppress" }, &line_suppress },
+		{ { "line_color", "line_colour" }, &line_color },
+		{ { "line_bgcolor", "line_bgcolour" }, &line_bgcolor },
+		{ { "value" }, &value },
+		{ { "delayed", "precalculate" }, &delayed },
+		{ { "suppress" }, &suppress },
+		{ { "width" }, &width },
+		{ { "height" }, &height },
+		{ { "align", "alignment" }, &align },
+		{ { "color", "colour" }, &color },
+		{ { "bgcolor", "bgcolour" }, &bgcolor },
+		{ { "font_name" }, &font_name },
+		{ { "font_size" }, &font_size },
+		{ { "bold" }, &bold },
+		{ { "italic", "italics" }, &italic },
+		{ { "format" }, &format },
+		{ { "link" }, &link },
+		{ { "translate" }, &translate },
+		{ { "memo" }, &memo },
+		{ { "hyphenate" }, &hyphenate },
+		{ { "wrap_chars" }, &wrap_chars },
+		{ { "max_lines" }, &max_lines },
+		{ { "imgtype" }, &imgtype },
+		{ { "text_width" }, &text_width },
+		{ { "bctype" }, &bctype },
+		{ { NULL }, NULL },
+	};
+	int32_t i, j;
+
+	for (i = 0; xmlattrs[i].attrp; i++) {
+		for (j = 0; xmlattrs[i].attrs[j]; j++) {
+			*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs[j]);
+			if (*xmlattrs[i].attrp)
+				break;
+		}
+	}
+
+	if (query) {
+		char *query_s;
+		ocrpt_expr *query_e;
+
+		get_string(o, query);
+		q = ocrpt_query_get(o, query_s);
+		ocrpt_expr_free(query_e);
+	}
+
+	ocrpt_genline_set_query(gl, q);
+
+	ocrpt_genline_set_element_type(gl, (char *)element_type);
+
+	ocrpt_genline_set_line_font_name(gl, (char *)line_font_name);
+	ocrpt_genline_set_line_font_size(gl, (char *)line_font_size);
+	ocrpt_genline_set_line_bold(gl, (char *)line_bold);
+	ocrpt_genline_set_line_italic(gl, (char *)line_italic);
+	ocrpt_genline_set_line_color(gl, (char *)line_color);
+	ocrpt_genline_set_line_bgcolor(gl, (char *)line_bgcolor);
+	ocrpt_genline_set_line_suppress(gl, (char *)line_suppress);
+
+	ocrpt_genline_set_value(gl, (char *)value);
+	ocrpt_genline_set_delayed(gl, (char *)delayed);
+	ocrpt_genline_set_suppress(gl, (char *)suppress);
+	ocrpt_genline_set_width(gl, (char *)width);
+	ocrpt_genline_set_height(gl, (char *)height);
+	ocrpt_genline_set_align(gl, (char *)align);
+	ocrpt_genline_set_color(gl, (char *)color);
+	ocrpt_genline_set_bgcolor(gl, (char *)bgcolor);
+
+	ocrpt_genline_set_font_name(gl, (char *)font_name);
+	ocrpt_genline_set_font_size(gl, (char *)font_size);
+	ocrpt_genline_set_bold(gl, (char *)bold);
+	ocrpt_genline_set_italic(gl, (char *)italic);
+	ocrpt_genline_set_format(gl, (char *)format);
+	ocrpt_genline_set_link(gl, (char *)link);
+	ocrpt_genline_set_translate(gl, (char *)translate);
+	ocrpt_genline_set_memo(gl, (char *)memo);
+	ocrpt_genline_set_hyphenate(gl, (char *)hyphenate);
+	ocrpt_genline_set_wrap_chars(gl, (char *)wrap_chars);
+	ocrpt_genline_set_max_lines(gl, (char *)max_lines);
+
+	ocrpt_genline_set_image_type(gl, (char *)imgtype);
+	ocrpt_genline_set_text_width(gl, (char *)text_width);
+
+	ocrpt_genline_set_barcode_type(gl, (char *)bctype);
+
+	for (i = 0; xmlattrs[i].attrp; i++)
+		xmlFree(*xmlattrs[i].attrp);
+
+	ocrpt_ignore_child_nodes(o, reader, -1, "GeneratedLine");
+}
+
 static void ocrpt_parse_output_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, xmlTextReaderPtr reader) {
 	xmlChar *suppress;
 	struct {
@@ -830,6 +948,8 @@ static void ocrpt_parse_output_node(opencreport *o, ocrpt_report *r, ocrpt_outpu
 				ocrpt_parse_output_imageend_node(o, r, output, reader);
 			else if (!strcmp((char *)name, "Barcode"))
 				ocrpt_parse_output_barcode_node(o, r, output, NULL, reader);
+			else if (!strcmp((char *)name, "GeneratedLine"))
+				ocrpt_parse_output_genline_node(o, r, output, reader);
 		}
 
 		xmlFree(name);

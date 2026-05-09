@@ -140,6 +140,9 @@ typedef struct ocrpt_image ocrpt_image;
 struct ocrpt_barcode;
 typedef struct ocrpt_barcode ocrpt_barcode;
 
+struct ocrpt_genline;
+typedef struct ocrpt_genline ocrpt_genline;
+
 struct ocrpt_paper {
 	char name[64];
 	double width;
@@ -1045,6 +1048,45 @@ ocrpt_expr *ocrpt_line_set_color(ocrpt_line *line, const char *expr_string);
 ocrpt_expr *ocrpt_line_get_color(ocrpt_line *line);
 ocrpt_expr *ocrpt_line_set_bgcolor(ocrpt_line *line, const char *expr_string);
 ocrpt_expr *ocrpt_line_get_bgcolor(ocrpt_line *line);
+
+ocrpt_genline *ocrpt_output_add_genline(ocrpt_output *output);
+
+void ocrpt_genline_set_query(ocrpt_genline *gl, ocrpt_query *query);
+
+ocrpt_expr *ocrpt_genline_set_element_type(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_line_font_name(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_line_font_size(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_line_bold(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_line_italic(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_line_color(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_line_bgcolor(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_line_suppress(ocrpt_genline *gl, const char *expr_string);
+
+ocrpt_expr *ocrpt_genline_set_value(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_delayed(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_suppress(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_width(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_height(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_align(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_color(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_bgcolor(ocrpt_genline *gl, const char *expr_string);
+
+ocrpt_expr *ocrpt_genline_set_font_name(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_font_size(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_bold(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_italic(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_format(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_link(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_translate(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_memo(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_hyphenate(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_wrap_chars(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_max_lines(ocrpt_genline *gl, const char *expr_string);
+
+ocrpt_expr *ocrpt_genline_set_image_type(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_text_width(ocrpt_genline *gl, const char *expr_string);
+
+ocrpt_expr *ocrpt_genline_set_barcode_type(ocrpt_genline *gl, const char *expr_string);
 
 ocrpt_text *ocrpt_line_add_text(ocrpt_line *line);
 
