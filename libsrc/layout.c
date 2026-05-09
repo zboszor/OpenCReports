@@ -1625,15 +1625,27 @@ DLL_EXPORT_SYM ocrpt_output *ocrpt_layout_report_field_footer(ocrpt_report *r) {
 	return &r->fieldfooter;
 }
 
+static ocrpt_line *ocrpt_output_line_new(ocrpt_output *output) {
+	ocrpt_line *line = ocrpt_mem_malloc(sizeof(ocrpt_line));
+
+	if (!line)
+		return NULL;
+
+	memset(line, 0, sizeof(ocrpt_line));
+	line->base.type = OCRPT_OUTPUT_LINE;
+	line->output = output;
+
+	return line;
+}
+
 DLL_EXPORT_SYM ocrpt_line *ocrpt_output_add_line(ocrpt_output *output) {
 	if (!output || (output->o && output->o->executing))
 		return NULL;
 
-	ocrpt_line *line = ocrpt_mem_malloc(sizeof(ocrpt_line));
-	memset(line, 0, sizeof(ocrpt_line));
-	line->base.type = OCRPT_OUTPUT_LINE;
-	line->output = output;
-	output->output_list = ocrpt_list_append(output->output_list, line);
+	ocrpt_line *line = ocrpt_output_line_new(output);
+
+	if (line)
+		output->output_list = ocrpt_list_append(output->output_list, line);
 
 	return line;
 }
