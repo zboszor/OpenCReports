@@ -709,7 +709,7 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *or
 	switch (e->type) {
 	case OCRPT_EXPR_MVAR:
 		if ((varref_exclude_mask & OCRPT_VARREF_MVAR) == 0) {
-			if (!e->result[0]) {
+			if (!e->resolved && !e->result[0]) {
 				ocrpt_result *result = ocrpt_find_mvariable(e->o, e->name->str);
 
 				if (!result)
@@ -726,11 +726,16 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *or
 					e->result[i] = result;
 					ocrpt_expr_set_result_owned(e, i, !i);
 				}
+
+				e->resolved = true;
 			}
 		}
 		break;
 	case OCRPT_EXPR_RVAR:
 		if ((varref_exclude_mask & OCRPT_VARREF_RVAR) == 0) {
+			if (e->resolved)
+				break;
+
 			if (strcmp(e->name->str, "self") == 0) {
 				/* Don't assert(var) here because unit tests use r.self to test basic behaviour. */
 				e->var = var;
@@ -879,12 +884,14 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *or
 				/* No such identifier, turn it into a string. */
 				ocrpt_expr_convert_to_string_const(e, "r", ".", e->name->str, warn);
 			}
+
+			e->resolved = true;
 		}
 
 		break;
 	case OCRPT_EXPR_VVAR:
 		if ((varref_exclude_mask & OCRPT_VARREF_VVAR) == 0) {
-			if (!e->var) {
+			if (!e->var && !e->resolved) {
 				ocrpt_list *ptr;
 
 				for (ptr = e->r ? e->r->variables : NULL; ptr; ptr = ptr->next) {
@@ -910,6 +917,8 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *or
 					/* No such identifier, turn it into a string. */
 					ocrpt_expr_convert_to_string_const(e, "v", ".", e->name->str, warn);
 				}
+
+				e->resolved = true;
 			}
 		}
 		break;
@@ -917,14 +926,19 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *or
 		if ((varref_exclude_mask & OCRPT_VARREF_IDENT) == 0) {
 			bool found = false;
 
-			/* Resolve the identifier ocrpt_query_result from the queries */
+			/*
+			 * Resolve the identifier ocrpt_query_result from the queries.
+			 * Do not attempt to resolve already resolved identifiers.
+			 */
+			if (e->resolved)
+				break;
 			if (EXPR_RESULT(e) && EXPR_TYPE(e) != OCRPT_RESULT_ERROR)
 				break;
 			if (query)
 				found = ocrpt_resolve_ident(e, query, true);
-			else if (e->r && e->r->query)
+			if (!found && e->r && e->r->query)
 				found = ocrpt_resolve_ident(e, e->r->query, true);
-			else if (e->o->queries) {
+			if (!found && e->o->queries) {
 				for (ocrpt_list *ql = e->o->queries; !found && ql; ql = ql->next) {
 					found = ocrpt_resolve_ident(e, (ocrpt_query *)ql->data, true);
 					if (found)
@@ -938,6 +952,8 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *or
 				/* No such identifier, turn it into a string. */
 				ocrpt_expr_convert_to_string_const(e, e->query ? e->query->str : "", (e->query || e->dotprefixed) ? "." : "", e->name->str, warn);
 			}
+
+			e->resolved = true;
 		}
 		break;
 	case OCRPT_EXPR:
@@ -1279,7 +1295,7 @@ static void ocrpt_expr_constify_worker(ocrpt_expr *e, ocrpt_query *constify_from
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_constify(ocrpt_expr *e, ocrpt_query *constify_from) {
-	if (!e || !e->resolved)
+	if (!e || !e->resolved || !constify_from)
 		return;
 
 	ocrpt_expr_constify_worker(e, constify_from);
