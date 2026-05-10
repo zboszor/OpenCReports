@@ -4,4 +4,5 @@ leak:FcCharSetAddChar
 leak:FcPatternObjectInsertElt
 leak:Py_InitializeFromConfig
 leak:PyImport_ImportModuleLevel
+leak:PyModule_ExecDef
 leak:arraydescr_richcompare
