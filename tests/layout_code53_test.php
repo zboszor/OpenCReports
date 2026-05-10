@@ -84,7 +84,7 @@ $gl->set_barcode_type("h.bctype");
 $gl->set_image_type("h.imgtype");
 $gl->set_width("h.width");
 $gl->set_height("h.height");
-$gl->set_align("h.align");
+$gl->set_alignment("h.align");
 $gl->set_suppress("h.suppress");
 
 $srcdir = getenv("abs_srcdir");

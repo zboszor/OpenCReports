@@ -219,7 +219,7 @@ $gl->set_element_type("h.element_type");
 $gl->set_bgcolor("'0xe5e5e5'");
 $gl->set_value("h.label");
 $gl->set_width("h.col_width");
-$gl->set_align("h.col_align");
+$gl->set_alignment("h.col_align");
 
 $hl = $out->add_hline();
 $hl->set_size("1");
@@ -234,7 +234,7 @@ $gl->set_query($qh);
 $gl->set_element_type("h.element_type");
 $gl->set_value("eval(h.value)");
 $gl->set_width("h.col_width");
-$gl->set_align("h.col_align");
+$gl->set_alignment("h.col_align");
 $gl->set_bgcolor("iif(a.age > 20,'0xffe0e0','white')");
 
 $o->set_output_format(OpenCReport::OUTPUT_PDF);

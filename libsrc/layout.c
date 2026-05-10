@@ -2213,7 +2213,7 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_delayed(ocrpt_genline *gl, const ch
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_suppress(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(suppress, true, false)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_width(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(width, true, false)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_height(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(height, true, false)
-DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_align(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(align, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_alignment(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(align, true, true)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_color(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(color, true, true)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_bgcolor(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(bgcolor, true, true)
 

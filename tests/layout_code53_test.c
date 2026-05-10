@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
 	ocrpt_genline_set_image_type(gl, "h.imgtype");
 	ocrpt_genline_set_width(gl, "h.width");
 	ocrpt_genline_set_height(gl, "h.height");
-	ocrpt_genline_set_align(gl, "h.align");
+	ocrpt_genline_set_alignment(gl, "h.align");
 	ocrpt_genline_set_suppress(gl, "h.suppress");
 
 	char srcdir0[PATH_MAX];

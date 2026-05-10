@@ -875,7 +875,7 @@ static void ocrpt_parse_output_genline_node(opencreport *o, ocrpt_report *r, ocr
 	ocrpt_genline_set_suppress(gl, (char *)suppress);
 	ocrpt_genline_set_width(gl, (char *)width);
 	ocrpt_genline_set_height(gl, (char *)height);
-	ocrpt_genline_set_align(gl, (char *)align);
+	ocrpt_genline_set_alignment(gl, (char *)align);
 	ocrpt_genline_set_color(gl, (char *)color);
 	ocrpt_genline_set_bgcolor(gl, (char *)bgcolor);
 

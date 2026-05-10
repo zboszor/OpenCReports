@@ -237,7 +237,7 @@ int main(int argc, char **argv) {
 	ocrpt_genline_set_bgcolor(gl, "'0xe5e5e5'");
 	ocrpt_genline_set_value(gl, "h.label");
 	ocrpt_genline_set_width(gl, "h.col_width");
-	ocrpt_genline_set_align(gl, "h.col_align");
+	ocrpt_genline_set_alignment(gl, "h.col_align");
 
 	hl = ocrpt_output_add_hline(out);
 	ocrpt_hline_set_size(hl, "1");
@@ -252,7 +252,7 @@ int main(int argc, char **argv) {
 	ocrpt_genline_set_element_type(gl, "h.element_type");
 	ocrpt_genline_set_value(gl, "eval(h.value)");
 	ocrpt_genline_set_width(gl, "h.col_width");
-	ocrpt_genline_set_align(gl, "h.col_align");
+	ocrpt_genline_set_alignment(gl, "h.col_align");
 	ocrpt_genline_set_bgcolor(gl, "iif(a.age > 20,'0xffe0e0','white')");
 
 	ocrpt_set_output_format(o, argc >= 2 ? atoi(argv[1]) : OCRPT_OUTPUT_PDF);
