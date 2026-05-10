@@ -200,6 +200,10 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 
 			{
 				ocrpt_genline *gl = (ocrpt_genline *)oe;
+
+				if (!gl->line)
+					break;
+
 				oe = (ocrpt_output_element *)gl->line;
 				ocrpt_mem_free(gl);
 			}
