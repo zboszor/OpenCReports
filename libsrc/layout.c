@@ -515,7 +515,8 @@ static void ocrpt_layout_imageend(bool draw, opencreport *o, ocrpt_part *p, ocrp
 void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output) {
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
-		ocrpt_barcode *lbc = (ocrpt_barcode *)ol->data;
+		ocrpt_line *line = (ocrpt_line *)oe;
+		ocrpt_barcode *lbc = (ocrpt_barcode *)oe;
 
 		switch (oe->type) {
 		case OCRPT_OUTPUT_UNSET:
@@ -524,16 +525,15 @@ void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output) {
 		case OCRPT_OUTPUT_GENLINE:
 			if (((ocrpt_genline *)oe)->resolved) {
 				ocrpt_genline *gl = (ocrpt_genline *)oe;
-				if (gl->line)
+				if (gl->line) {
 					oe = (ocrpt_output_element *)(gl->line);
-				else
-					break;
+					line = gl->line;
 				} else
 					break;
+			} else
+				break;
 			/* fallthrough */
 		case OCRPT_OUTPUT_LINE: {
-			ocrpt_line *line = (ocrpt_line *)oe;
-
 			for (ocrpt_list *l = line->elements; l; l = l->next) {
 				ocrpt_text *elem = (ocrpt_text *)l->data;
 				ocrpt_barcode *bc = (ocrpt_barcode *)l->data;
@@ -740,6 +740,7 @@ void ocrpt_layout_output_resolve(ocrpt_output *output) {
 
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
+		ocrpt_line *line = (ocrpt_line *)oe;
 
 		switch (oe->type) {
 		case OCRPT_OUTPUT_UNSET:
@@ -748,17 +749,18 @@ void ocrpt_layout_output_resolve(ocrpt_output *output) {
 		case OCRPT_OUTPUT_GENLINE:
 			if (((ocrpt_genline *)oe)->resolved) {
 				ocrpt_genline *gl = (ocrpt_genline *)oe;
-				if (gl->line)
+				if (gl->line) {
 					oe = (ocrpt_output_element *)(gl->line);
-				else
+					line = gl->line;
+				} else
 					break;
 			} else
 				break;
 			/* fallthrough */
 		case OCRPT_OUTPUT_LINE:
-			ocrpt_layout_output_resolve_line((ocrpt_line *)oe);
+			ocrpt_layout_output_resolve_line(line);
 
-			for (ocrpt_list *l = ((ocrpt_line *)oe)->elements; l; l = l->next) {
+			for (ocrpt_list *l = line->elements; l; l = l->next) {
 				ocrpt_output_element *le = (ocrpt_output_element *)l->data;
 
 				switch (le->le_type) {
@@ -826,6 +828,7 @@ static void ocrpt_layout_output_evaluate_barcode(ocrpt_barcode *bc) {
 void ocrpt_layout_output_evaluate(ocrpt_output *output) {
 	for (ocrpt_list *ol = output->output_list; ol; ol = ol->next) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)ol->data;
+		ocrpt_line *line = (ocrpt_line *)oe;
 
 		switch (oe->type) {
 		case OCRPT_OUTPUT_UNSET:
@@ -834,16 +837,15 @@ void ocrpt_layout_output_evaluate(ocrpt_output *output) {
 		case OCRPT_OUTPUT_GENLINE:
 			if (((ocrpt_genline *)oe)->resolved) {
 				ocrpt_genline *gl = (ocrpt_genline *)oe;
-				if (gl->line)
+				if (gl->line) {
 					oe = (ocrpt_output_element *)(gl->line);
-				else
+					line = gl->line;
+				} else
 					break;
 			} else
 				break;
 			/* fallthrough */
 		case OCRPT_OUTPUT_LINE: {
-			ocrpt_line *line = (ocrpt_line *)oe;
-
 			ocrpt_expr_eval(line->font_name);
 			ocrpt_expr_eval(line->font_size);
 			ocrpt_expr_eval(line->color);
@@ -930,9 +932,10 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 		case OCRPT_OUTPUT_GENLINE:
 			if (((ocrpt_genline *)oe)->resolved) {
 				ocrpt_genline *gl = (ocrpt_genline *)oe;
-				if (gl->line)
+				if (gl->line) {
 					oe = (ocrpt_output_element *)(gl->line);
-				else
+					l = gl->line;
+				} else
 					break;
 			} else
 				break;
@@ -1056,6 +1059,7 @@ bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 
 	for (; output->iter; output->iter = output->iter->next) {
 		ocrpt_output_element *oe = (ocrpt_output_element *)output->iter->data;
+		ocrpt_line *l = (ocrpt_line *)oe;
 		ocrpt_hline *hl = (ocrpt_hline *)oe;
 		ocrpt_image *img = (ocrpt_image *)oe;
 		ocrpt_barcode *bc = (ocrpt_barcode *)oe;
@@ -1067,16 +1071,15 @@ bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 		case OCRPT_OUTPUT_GENLINE:
 			if (((ocrpt_genline *)oe)->resolved) {
 				ocrpt_genline *gl = (ocrpt_genline *)oe;
-				if (gl->line)
+				if (gl->line) {
 					oe = (ocrpt_output_element *)(gl->line);
-				else
+					l = gl->line;
+				} else
 					break;
 			} else
 				break;
 			/* fallthrough */
 		case OCRPT_OUTPUT_LINE: {
-			ocrpt_line *l = (ocrpt_line *)oe;
-
 			if (l->suppress_line)
 				break;
 
