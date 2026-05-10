@@ -19,6 +19,7 @@
 #include "ocrpt-private.h"
 #include "listutil.h"
 #include "exprutil.h"
+#include "functions.h"
 #include "formatting.h"
 #include "variables.h"
 #include "datasource.h"
@@ -1935,10 +1936,22 @@ static const char *ocrpt_expr_string_wrap_eval(ocrpt_output *output, ocrpt_expr 
 
 	ocrpt_expr *tmp = ocrpt_layout_expr_parse(output->o, output->r, e->expr_string, false, true);
 
-	if (EXPR_VALID_STRING(tmp))
-		ocrpt_mem_string_append_printf(str, "%s", e->expr_string);
-	else
+	/*
+	 * Wrap the original expression string in eval() only when it parses to
+	 * a bare IDENT — that is the case where the supplementary query column
+	 * holds an expression string that should be re-parsed and evaluated
+	 * against the main query at runtime (e.g. h.value referring to "id").
+	 *
+	 * For string literals, function calls (including iif()), pre-existing
+	 * eval() invocations, and parser fallbacks to string constants, the
+	 * expression already produces the right value when evaluated directly,
+	 * so wrapping with eval() would re-parse the result string and break it
+	 * (e.g. "0xffe0e0" reinterpreted as a hex number).
+	 */
+	if (tmp && tmp->type == OCRPT_EXPR_IDENT)
 		ocrpt_mem_string_append_printf(str, "eval(%s)", e->expr_string);
+	else
+		ocrpt_mem_string_append_printf(str, "%s", e->expr_string);
 
 	ocrpt_expr_free(tmp);
 
