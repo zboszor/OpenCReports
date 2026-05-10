@@ -264,10 +264,18 @@ LAYOUT_TESTS = \
 	layout_xml45_test \
 	layout_code46_test \
 	layout_code47_test \
+	layout_code50_test \
+	layout_code51_test \
+	layout_code52_test \
+	layout_code53_test \
 	layout_xml46_test \
 	layout_xml47_test \
 	layout_xml48_test \
-	layout_xml49_test
+	layout_xml49_test \
+	layout_xml50_test \
+	layout_xml51_test \
+	layout_xml52_test \
+	layout_xml53_test
 
 LAYOUT_CSV_TESTS = \
 	layout_xml17_csv1_test \
@@ -333,10 +341,18 @@ PHP_LAYOUT_TESTS = \
 	layout_xml45_test \
 	layout_code46_test \
 	layout_code47_test \
+	layout_code50_test \
+	layout_code51_test \
+	layout_code52_test \
+	layout_code53_test \
 	layout_xml46_test \
 	layout_xml47_test \
 	layout_xml48_test \
-	layout_xml49_test
+	layout_xml49_test \
+	layout_xml50_test \
+	layout_xml51_test \
+	layout_xml52_test \
+	layout_xml53_test
 
 if ENABLE_XLATE_TESTS
 

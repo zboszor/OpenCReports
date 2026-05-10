@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="120" cols="6" />
+		<Query name="h" datasource="myarray" value="'header_array'" coltypes="'header_coltypes'" rows="5" cols="3" />
+	</Queries>
+	<Part fontSize="10">
+		<pr>
+			<pd>
+				<Report fontSize="12">
+					<PageHeader>
+						<Output>
+							<HorizontalLine size="1" color="'red'"/>
+							<Line>
+								<literal>Page header</literal>
+							</Line>
+							<HorizontalLine size="1" color="'red'"/>
+						</Output>
+					</PageHeader>
+
+					<PageFooter>
+						<Output>
+							<HorizontalLine size="1" color="'green'"/>
+							<Line>
+								<literal>Page footer</literal>
+							</Line>
+							<HorizontalLine size="1" color="'green'"/>
+						</Output>
+					</PageFooter>
+
+					<Detail>
+						<FieldHeaders>
+							<Output>
+								<HorizontalLine size="1" color="'black'"/>
+								<GeneratedLine query="'h'" element_type="h.element_type"
+								               bgcolor="'0xe5e5e5'"
+								               value="h.label" width="h.col_width"/>
+								<HorizontalLine size="1" color="'black'"/>
+							</Output>
+						</FieldHeaders>
+
+						<FieldDetails>
+							<Output>
+								<Line bgcolor="iif(r.detailcnt%2,'0xe5e5e5','white')">
+									<field value="id" width="4" align="'right'"/>
+									<literal width="1"/>
+									<field value="name" width="20"/>
+									<literal width="1"/>
+									<field value="property" width="10"/>
+									<literal width="1"/>
+									<field value="age" width="6" align="'right'"/>
+									<literal width="1"/>
+									<field value="adult ? 'yes' : 'no'" width="5" align="'center'"/>
+								</Line>
+							</Output>
+						</FieldDetails>
+					</Detail>
+				</Report>
+			</pd>
+		</pr>
+	</Part>
+</OpenCReport>

@@ -216,6 +216,9 @@ foreach name : [
   'layout_xml47_test',
   'layout_xml48_test',
   'layout_xml49_test',
+  'layout_xml50_test',
+  'layout_xml51_test',
+  'layout_xml52_test',
   # -----------------------------------------------------------------
   # LAYOUT_CSV_TESTS
   # -----------------------------------------------------------------

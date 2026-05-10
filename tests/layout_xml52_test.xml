@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="120" cols="6" />
+		<Query name="h" datasource="myarray" value="'header_array'" coltypes="'header_coltypes'" rows="9" cols="5" />
+	</Queries>
+	<Part fontSize="10">
+		<pr>
+			<pd detail_columns="2" column_pad="0.2">
+				<Report fontSize="12">
+					<PageHeader>
+						<Output>
+							<HorizontalLine size="1" color="'red'"/>
+							<Line>
+								<literal>Page header</literal>
+							</Line>
+							<HorizontalLine size="1" color="'red'"/>
+						</Output>
+					</PageHeader>
+
+					<PageFooter>
+						<Output>
+							<HorizontalLine size="1" color="'green'"/>
+							<Line>
+								<literal>Page footer</literal>
+							</Line>
+							<HorizontalLine size="1" color="'green'"/>
+						</Output>
+					</PageFooter>
+
+					<Detail>
+						<FieldHeaders>
+							<Output>
+								<HorizontalLine size="1" color="'black'"/>
+								<GeneratedLine query="'h'" element_type="h.element_type"
+								               bgcolor="'0xe5e5e5'"
+								               value="h.label" width="h.col_width"
+								               align="h.col_align"/>
+								<HorizontalLine size="1" color="'black'"/>
+							</Output>
+						</FieldHeaders>
+
+						<FieldDetails>
+							<Output>
+								<!--
+								  GeneratedLine in FieldDetails: column layout and value
+								  expression come from the 'h' side query.  The value
+								  expression h.value is an expression string that references
+								  a main-query column by name; eval() parses and evaluates
+								  it so the actual field data is displayed.  The per-element
+								  bgcolor uses a.age from the main query — demonstrating
+								  that both queries can be used for control elements.
+								-->
+								<GeneratedLine query="'h'" element_type="h.element_type"
+								               value="eval(h.value)" width="h.col_width"
+								               align="h.col_align"
+								               bgcolor="iif(a.age > 20,'0xffe0e0','white')"/>
+							</Output>
+						</FieldDetails>
+					</Detail>
+				</Report>
+			</pd>
+		</pr>
+	</Part>
+</OpenCReport>

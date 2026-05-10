@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'main_array'" coltypes="'main_coltypes'" rows="1" cols="1" />
+		<Query name="h" datasource="myarray" value="'gen_array'" coltypes="'gen_coltypes'" rows="12" cols="13" />
+	</Queries>
+	<Part paperType="A4" orientation="landscape">
+		<pr>
+			<pd>
+				<Report>
+					<Detail>
+						<FieldDetails>
+							<Output>
+								<!--
+								  GeneratedLine exercising all line-level and per-element
+								  features.  Line-level (genline_*) attributes apply to the
+								  whole built line just like ocrpt_line attributes.
+								  Per-element attributes come from the 'h' side query and
+								  are evaluated per GL query row via quasi-constants.
+								  Elements 3 and 9 are barcodes; 6 and 12 are images;
+								  the rest are text whose value equals its 1-based index.
+								  Alignment alternates left/right/center across all elements.
+								  Every fourth element (4, 8, 12) is suppressed.
+								-->
+								<GeneratedLine query="'h'" element_type="h.element_type"
+								               line_font_name="'Times New Roman'"
+								               line_font_size="14"
+								               line_bold="yes"
+								               line_italic="yes"
+								               value="h.value"
+								               bgcolor="h.bgcolor"
+								               color="h.color"
+								               font_name="h.font_name"
+								               bold="h.bold"
+								               italic="h.italic"
+								               bctype="h.bctype"
+								               type="h.imgtype"
+								               width="h.width"
+								               height="h.height"
+								               align="h.align"
+								               suppress="h.suppress"/>
+							</Output>
+						</FieldDetails>
+					</Detail>
+				</Report>
+			</pd>
+		</pr>
+	</Part>
+</OpenCReport>

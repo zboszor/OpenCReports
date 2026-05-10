@@ -1,0 +1,110 @@
+{
+    "part": {
+        "pr": {
+            "pd": {
+                "report": {
+                    "fielddetails": [
+                        {
+                            "type": "line",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "width": 35.361328125,
+                                    "font_point": 14.0,
+                                    "font_face": "Courier",
+                                    "bold": true,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "1"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 35.361328125,
+                                    "font_point": 14.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": true,
+                                    "italic": true,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "2"
+                                },
+                                {
+                                    "type": "barcode",
+                                    "width": 104.0,
+                                    "height": 50.0,
+                                    "bgcolor": "#ff0000",
+                                    "color": "#000000",
+                                    "value": "123456789012"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 35.361328125,
+                                    "font_point": 14.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": true,
+                                    "italic": false,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "5"
+                                },
+                                {
+                                    "type": "image",
+                                    "width": 117.87109375,
+                                    "file": "images/images/matplotlib.svg"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 35.361328125,
+                                    "font_point": 14.0,
+                                    "font_face": "Courier",
+                                    "bold": true,
+                                    "italic": true,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "7"
+                                },
+                                {
+                                    "type": "barcode",
+                                    "width": 104.0,
+                                    "height": 50.0,
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "value": "123456789012"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 35.361328125,
+                                    "font_point": 14.0,
+                                    "font_face": "Courier",
+                                    "bold": true,
+                                    "italic": false,
+                                    "align": "left",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "10"
+                                },
+                                {
+                                    "type": "text",
+                                    "width": 35.361328125,
+                                    "font_point": 14.0,
+                                    "font_face": "Times New Roman",
+                                    "bold": true,
+                                    "italic": true,
+                                    "align": "right",
+                                    "bgcolor": "#ffffff",
+                                    "color": "#000000",
+                                    "data": "11"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
