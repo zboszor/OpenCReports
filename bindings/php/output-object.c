@@ -74,6 +74,23 @@ PHP_METHOD(opencreport_output, get_suppress) {
 	eo->e = e;
 }
 
+PHP_METHOD(opencreport_output, add_genline) {
+	zval *object = getThis();
+	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
+	ocrpt_genline *gl;
+	php_opencreport_genline_object *glo;
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	gl = ocrpt_output_add_genline(oo->output);
+	if (!gl)
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_genline_ce);
+	glo = Z_OPENCREPORT_GENLINE_P(return_value);
+	glo->gl = gl;
+}
+
 PHP_METHOD(opencreport_output, add_line) {
 	zval *object = getThis();
 	php_opencreport_output_object *oo = Z_OPENCREPORT_OUTPUT_P(object);
@@ -178,6 +195,9 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_output_get_suppress, 0, 0, OpenCReport\\Expr, 1)
 ZEND_END_ARG_INFO()
 
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_output_add_genline, 0, 0, OpenCReport\\GenLine, 1)
+ZEND_END_ARG_INFO()
+
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_output_add_line, 0, 0, OpenCReport\\Line, 1)
 ZEND_END_ARG_INFO()
 
@@ -200,6 +220,7 @@ ZEND_END_ARG_INFO()
 
 #define arginfo_opencreport_output_set_suppress NULL
 #define arginfo_opencreport_output_get_suppress NULL
+#define arginfo_opencreport_output_add_genline NULL
 #define arginfo_opencreport_output_add_line NULL
 #define arginfo_opencreport_output_add_hline NULL
 #define arginfo_opencreport_output_add_image NULL
@@ -212,6 +233,7 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry opencreport_output_class_methods[] = {
 	PHP_ME(opencreport_output, set_suppress, arginfo_opencreport_output_set_suppress, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output, get_suppress, arginfo_opencreport_output_get_suppress, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_output, add_genline, arginfo_opencreport_output_add_genline, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output, add_line, arginfo_opencreport_output_add_line, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output, add_hline, arginfo_opencreport_output_add_hline, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output, add_image, arginfo_opencreport_output_add_image, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)

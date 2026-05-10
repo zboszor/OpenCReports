@@ -34,6 +34,7 @@ static PHP_MINIT_FUNCTION(opencreport)
 	register_opencreport_break_ce();
 	register_opencreport_output_ce();
 	register_opencreport_line_ce();
+	register_opencreport_genline_ce();
 	register_opencreport_hline_ce();
 	register_opencreport_image_ce();
 	register_opencreport_text_ce();

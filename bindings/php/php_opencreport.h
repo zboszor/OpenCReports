@@ -547,6 +547,30 @@ static inline php_opencreport_line_object *php_opencreport_line_from_obj(zend_ob
 #define Z_OPENCREPORT_LINE_P(zv) ((php_opencreport_line_object *)zend_object_store_get_object(zv TSRMLS_CC))
 #endif
 
+typedef struct _php_opencreport_genline_object {
+#if PHP_VERSION_ID < 70000
+	zend_object zo;
+#endif
+	ocrpt_genline *gl;
+#if PHP_VERSION_ID >= 70000
+	zend_object zo;
+#endif
+} php_opencreport_genline_object;
+
+static inline php_opencreport_genline_object *php_opencreport_genline_from_obj(zend_object *obj) {
+#if PHP_VERSION_ID >= 70000
+	return (php_opencreport_genline_object *)((char *)(obj) - XtOffsetOf(php_opencreport_genline_object, zo));
+#else
+	return (php_opencreport_genline_object *)obj;
+#endif
+}
+
+#if PHP_VERSION_ID >= 70000
+#define Z_OPENCREPORT_GENLINE_P(zv) php_opencreport_genline_from_obj(Z_OBJ_P((zv)))
+#else
+#define Z_OPENCREPORT_GENLINE_P(zv) ((php_opencreport_genline_object *)zend_object_store_get_object(zv TSRMLS_CC))
+#endif
+
 typedef struct _php_opencreport_hline_object {
 #if PHP_VERSION_ID < 70000
 	zend_object zo;
@@ -709,6 +733,7 @@ extern zend_class_entry *opencreport_variable_ce;
 extern zend_class_entry *opencreport_break_ce;
 extern zend_class_entry *opencreport_output_ce;
 extern zend_class_entry *opencreport_line_ce;
+extern zend_class_entry *opencreport_genline_ce;
 extern zend_class_entry *opencreport_hline_ce;
 extern zend_class_entry *opencreport_image_ce;
 extern zend_class_entry *opencreport_text_ce;
@@ -743,6 +768,7 @@ void register_opencreport_variable_ce(void);
 void register_opencreport_break_ce(void);
 void register_opencreport_output_ce(void);
 void register_opencreport_line_ce(void);
+void register_opencreport_genline_ce(void);
 void register_opencreport_hline_ce(void);
 void register_opencreport_image_ce(void);
 void register_opencreport_text_ce(void);
