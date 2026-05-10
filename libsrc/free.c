@@ -215,6 +215,7 @@ void ocrpt_output_free(opencreport *o, ocrpt_output *output, bool free_subexprs)
 					 */
 					if (free_subexprs) {
 						ocrpt_expr_free(le->value);
+						ocrpt_expr_free(le->suppress);
 						ocrpt_expr_free(le->format);
 						ocrpt_expr_free(le->width);
 						ocrpt_expr_free(le->align);

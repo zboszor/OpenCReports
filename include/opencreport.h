@@ -1093,6 +1093,8 @@ ocrpt_text *ocrpt_line_add_text(ocrpt_line *line);
 ocrpt_expr *ocrpt_text_set_value_string(ocrpt_text *text, const char *string);
 ocrpt_expr *ocrpt_text_set_value_expr(ocrpt_text *text, const char *expr_string);
 ocrpt_expr *ocrpt_text_get_value(ocrpt_text *text);
+ocrpt_expr *ocrpt_text_set_suppress(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_get_suppress(ocrpt_text *text);
 ocrpt_expr *ocrpt_text_set_value_delayed(ocrpt_text *text, const char *expr_string);
 ocrpt_expr *ocrpt_text_get_value_delayed(ocrpt_text *text);
 ocrpt_expr *ocrpt_text_set_format(ocrpt_text *text, const char *expr_string);

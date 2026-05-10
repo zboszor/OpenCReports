@@ -48,6 +48,7 @@ struct ocrpt_text {
 	struct ocrpt_output_element base;
 	ocrpt_output *output;
 	ocrpt_expr *value;
+	ocrpt_expr *suppress;
 	ocrpt_expr *delayed;
 	ocrpt_expr *memo_expr;
 	ocrpt_expr *hyphenate;
@@ -86,6 +87,7 @@ struct ocrpt_text {
 	PangoAlignment p_align;
 	int32_t memo_max_lines;
 	int32_t lines;
+	bool suppress_text:1;
 	bool bold_val:1;
 	bool italic_val:1;
 	bool memo:1;
