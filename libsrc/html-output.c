@@ -7,7 +7,9 @@
 #include <config.h>
 
 #include <ctype.h>
+#include <stdio.h>
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
 #include <utf8proc.h>
 
@@ -292,10 +294,67 @@ static void ocrpt_html_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 		le->pline = NULL;
 }
 
-static const char *ocrpt_html_truncate_file_prefix(html_private_data *priv, const char *filename) {
-	if (strncmp(filename, priv->cwd, priv->cwdlen) == 0)
-		return filename + priv->cwdlen + 1;
-	return filename;
+static void ocrpt_html_base64_encode(html_private_data *priv);
+
+/*
+ * Determine an HTML "data:" URI mime type for the image.
+ *
+ * Prefer the explicit imgtype expression when set (matching the
+ * documented values 'svg', 'png', 'jpg' / 'jpeg', 'gif').  Fall
+ * back on the file name suffix; default to image/png so the
+ * embedded data is at least labelled as a raster image rather
+ * than left without a type.
+ */
+static const char *ocrpt_html_image_mime_type(ocrpt_image *img) {
+	if (EXPR_VALID_STRING(img->imgtype)) {
+		const char *t = EXPR_STRING_VAL(img->imgtype);
+		if (!strcasecmp(t, "svg")) return "image/svg+xml";
+		if (!strcasecmp(t, "png")) return "image/png";
+		if (!strcasecmp(t, "jpeg") || !strcasecmp(t, "jpg")) return "image/jpeg";
+		if (!strcasecmp(t, "gif")) return "image/gif";
+	}
+
+	const char *name = img->img_file ? img->img_file->name : NULL;
+	if (name) {
+		size_t len = strlen(name);
+		if (len > 4) {
+			const char *ext4 = name + len - 4;
+			if (!strcasecmp(ext4, ".svg")) return "image/svg+xml";
+			if (!strcasecmp(ext4, ".png")) return "image/png";
+			if (!strcasecmp(ext4, ".jpg")) return "image/jpeg";
+			if (!strcasecmp(ext4, ".gif")) return "image/gif";
+		}
+		if (len > 5 && !strcasecmp(name + len - 5, ".jpeg"))
+			return "image/jpeg";
+	}
+
+	return "image/png";
+}
+
+/*
+ * Read the image file content into priv->png so that
+ * ocrpt_html_base64_encode() can produce the data: URI payload.
+ * Returns true on success.
+ */
+static bool ocrpt_html_load_image_file(html_private_data *priv, const char *filename) {
+	if (!filename)
+		return false;
+
+	FILE *f = fopen(filename, "rb");
+	if (!f)
+		return false;
+
+	priv->png->len = 0;
+
+	char buf[4096];
+	size_t n;
+	while ((n = fread(buf, 1, sizeof(buf), f)) > 0)
+		ocrpt_mem_string_append_len_binary(priv->png, buf, n);
+
+	int err = ferror(f);
+	fclose(f);
+
+	return err == 0 && priv->png->len > 0;
 }
 
 static void ocrpt_html_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_break *br, ocrpt_output *output, ocrpt_line *line, ocrpt_image *img, bool last, double page_width, double page_indent, double x, double y, double w, double h) {
@@ -304,6 +363,11 @@ static void ocrpt_html_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 
 	if (!img_file)
 		return;
+
+	const char *mime = ocrpt_html_image_mime_type(img);
+	bool have_data = ocrpt_html_load_image_file(priv, img_file->name);
+	if (have_data)
+		ocrpt_html_base64_encode(priv);
 
 	if (line) {
 		const char *al = "start";
@@ -324,22 +388,11 @@ static void ocrpt_html_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 											w, h, al, al, al,
 											ocrpt_common_color_value(img->bg.r), ocrpt_common_color_value(img->bg.g), ocrpt_common_color_value(img->bg.b));
 
-		if (!line->current_line) {
-			if (img->img_file->rsvg)
-				ocrpt_mem_string_append_printf(o->output_buffer,
-												"<svg style=\"width: auto; height: %.2lfpt; \">"
-												"<image width=\"auto\" height=\"%.2lfpt\" "
-													"href=\"%s\"/>"
-												"</svg>",
-												line->fontsz,
-												line->fontsz,
-												ocrpt_html_truncate_file_prefix(priv, img->img_file->name));
-			else
-				ocrpt_mem_string_append_printf(o->output_buffer,
-												"<img src=\"%s\" style=\"height: %.2lfpt; \">",
-												ocrpt_html_truncate_file_prefix(priv, img->img_file->name),
-												line->fontsz);
-		} else
+		if (!line->current_line && have_data)
+			ocrpt_mem_string_append_printf(o->output_buffer,
+											"<img src=\"data:%s;base64,%s\" style=\"height: %.2lfpt; \">",
+											mime, priv->pngbase64->str, h);
+		else
 			ocrpt_mem_string_append(o->output_buffer, "&nbsp;");
 
 		ocrpt_mem_string_append(o->output_buffer, "</span>");
@@ -349,18 +402,10 @@ static void ocrpt_html_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 		ocrpt_mem_string_append_printf(o->output_buffer,
 											"<!--image start section--><section style=\"clear: both; width: %.2lfpt; \">\n",
 											pd->real_width);
-		if (img->img_file->rsvg)
+		if (have_data)
 			ocrpt_mem_string_append_printf(o->output_buffer,
-											"<svg style=\"float: left; width: %.2lfpt; height: %.2lfpt; \">"
-											"<image width=\"%.2lfpt\" height=\"%.2lfpt\" preserveAspectRatio=\"none\" "
-												"href=\"%s\"/>"
-											"</svg>\n",
-											w, h, w, h,
-											ocrpt_html_truncate_file_prefix(priv, img->img_file->name));
-		else
-			ocrpt_mem_string_append_printf(o->output_buffer,
-											"<img src=\"%s\" style=\"float: left; width: %.2lfpt; height: %.2lfpt; \" alt=\"background image\">\n",
-											ocrpt_html_truncate_file_prefix(priv, img->img_file->name), w, h);
+											"<img src=\"data:%s;base64,%s\" style=\"float: left; width: %.2lfpt; height: %.2lfpt; \" alt=\"background image\">\n",
+											mime, priv->pngbase64->str, w, h);
 
 		priv->image_indent = w;
 		priv->image_height = h;
