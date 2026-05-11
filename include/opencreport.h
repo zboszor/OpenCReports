@@ -1059,6 +1059,7 @@ ocrpt_expr *ocrpt_genline_get_element_type(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_line_font_name(ocrpt_genline *gl, const char *expr_string);
 ocrpt_expr *ocrpt_genline_get_line_font_name(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_line_font_size(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_line_font_size(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_line_bold(ocrpt_genline *gl, const char *expr_string);
 ocrpt_expr *ocrpt_genline_get_line_bold(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_line_italic(ocrpt_genline *gl, const char *expr_string);
