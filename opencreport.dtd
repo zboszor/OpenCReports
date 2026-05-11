@@ -120,7 +120,7 @@
 <!ELEMENT PageHeader (Output)* >
 <!ELEMENT ReportFooter (Output)* >
 <!ELEMENT PageFooter (Output)* >
-<!ELEMENT Output (Line | HorizontalLine | Image | Barcode | ImageEnd)* >
+<!ELEMENT Output (Line | GeneratedLine | HorizontalLine | Image | Barcode | ImageEnd)* >
 <!ATTLIST Output
     suppress CDATA #IMPLIED >
 <!ELEMENT Line (field | literal | Image | Barcode)* >
@@ -215,6 +215,45 @@
 	height CDATA #IMPLIED
 	color CDATA #IMPLIED
 	bgcolor CDATA #IMPLIED >
+<!ELEMENT GeneratedLine EMPTY>
+<!ATTLIST GeneratedLine
+	element_type CDATA #REQUIRED
+	line_font_name CDATA #IMPLIED
+	line_font_size CDATA #IMPLIED
+	line_bold CDATA #IMPLIED
+	line_italic CDATA #IMPLIED
+	line_italics CDATA #IMPLIED
+	line_suppress CDATA #IMPLIED
+	line_color CDATA #IMPLIED
+	line_colour CDATA #IMPLIED
+	line_bgcolor CDATA #IMPLIED
+	line_bgcolour CDATA #IMPLIED
+	delayed CDATA #IMPLIED
+	precalculate CDATA #IMPLIED
+	suppress CDATA #IMPLIED
+	width CDATA #IMPLIED
+	height CDATA #IMPLIED
+	align CDATA #IMPLIED
+	alignment CDATA #IMPLIED
+	color CDATA #IMPLIED
+	colour CDATA #IMPLIED
+	bgcolor CDATA #IMPLIED
+	bgcolour CDATA #IMPLIED
+	font_name CDATA #IMPLIED
+	font_size CDATA #IMPLIED
+	bold CDATA #IMPLIED
+	italic CDATA #IMPLIED
+	italics CDATA #IMPLIED
+	format CDATA #IMPLIED
+	link CDATA #IMPLIED
+	translate CDATA #IMPLIED
+	memo CDATA #IMPLIED
+	hyphenate CDATA #IMPLIED
+	wrap_chars CDATA #IMPLIED
+	max_lines CDATA #IMPLIED
+	imgtype CDATA #IMPLIED
+	text_width CDATA #IMPLIED
+	bctype CDATA #IMPLIED >
 <!ELEMENT Detail ((FieldHeader|FieldHeaders)?, (FieldDetail|FieldDetails)?, (FieldFooter|FieldFooters)?) >
 <!ELEMENT FieldHeader (Output)* >
 <!ELEMENT FieldHeaders (Output)* >
