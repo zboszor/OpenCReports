@@ -1071,30 +1071,52 @@ ocrpt_expr *ocrpt_genline_set_line_suppress(ocrpt_genline *gl, const char *expr_
 ocrpt_expr *ocrpt_genline_get_line_suppress(ocrpt_genline *gl);
 
 ocrpt_expr *ocrpt_genline_set_value(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_value(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_value_delayed(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_value_delayed(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_suppress(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_suppress(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_width(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_width(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_height(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_height(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_alignment(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_alignment(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_color(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_color(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_bgcolor(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_bgcolor(ocrpt_genline *gl);
 
 ocrpt_expr *ocrpt_genline_set_font_name(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_font_name(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_font_size(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_font_size(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_bold(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_bold(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_italic(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_italic(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_format(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_format(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_link(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_link(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_translate(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_translate(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_memo(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_memo(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_hyphenate(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_hyphenate(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_wrap_chars(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_wrap_chars(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_max_lines(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_max_lines(ocrpt_genline *gl);
 
 ocrpt_expr *ocrpt_genline_set_image_type(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_image_type(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_text_width(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_text_width(ocrpt_genline *gl);
 
 ocrpt_expr *ocrpt_genline_set_barcode_type(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_barcode_type(ocrpt_genline *gl);
 
 ocrpt_text *ocrpt_line_add_text(ocrpt_line *line);
 
