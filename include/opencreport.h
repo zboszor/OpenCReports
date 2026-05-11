@@ -1052,15 +1052,23 @@ ocrpt_expr *ocrpt_line_get_bgcolor(ocrpt_line *line);
 ocrpt_genline *ocrpt_output_add_genline(ocrpt_output *output);
 
 void ocrpt_genline_set_query(ocrpt_genline *gl, ocrpt_query *query);
+ocrpt_query *ocrpt_genline_get_query(ocrpt_genline *gl);
 
 ocrpt_expr *ocrpt_genline_set_element_type(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_element_type(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_line_font_name(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_line_font_name(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_line_font_size(ocrpt_genline *gl, const char *expr_string);
 ocrpt_expr *ocrpt_genline_set_line_bold(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_line_bold(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_line_italic(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_line_italic(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_line_color(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_line_color(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_line_bgcolor(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_line_bgcolor(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_line_suppress(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_line_suppress(ocrpt_genline *gl);
 
 ocrpt_expr *ocrpt_genline_set_value(ocrpt_genline *gl, const char *expr_string);
 ocrpt_expr *ocrpt_genline_set_delayed(ocrpt_genline *gl, const char *expr_string);

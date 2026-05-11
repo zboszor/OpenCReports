@@ -2191,6 +2191,12 @@ DLL_EXPORT_SYM ocrpt_genline *ocrpt_output_add_genline(ocrpt_output *output) {
 	return gl->exprname; \
 }
 
+#define GET_GENLINE_EXPR(exprname) { \
+	if (!gl || gl->base.type != OCRPT_OUTPUT_GENLINE) \
+		return NULL; \
+	return gl->exprname; \
+}
+
 DLL_EXPORT_SYM void ocrpt_genline_set_query(ocrpt_genline *gl, ocrpt_query *query) {
 	if (!gl || gl->base.type != OCRPT_OUTPUT_GENLINE || (gl->output->o && gl->output->o->executing))
 		return;
@@ -2198,15 +2204,30 @@ DLL_EXPORT_SYM void ocrpt_genline_set_query(ocrpt_genline *gl, ocrpt_query *quer
 	gl->query = query;
 }
 
+DLL_EXPORT_SYM ocrpt_query *ocrpt_genline_get_query(ocrpt_genline *gl) {
+	if (!gl || gl->base.type != OCRPT_OUTPUT_GENLINE)
+		return NULL;
+
+	return gl->query;
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_element_type(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(element_type, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_get_element_type(ocrpt_genline *gl) GET_GENLINE_EXPR(element_type)
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_font_name(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_font_name, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_get_line_font_name(ocrpt_genline *gl) GET_GENLINE_EXPR(line_font_name)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_font_size(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_font_size, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_get_line_font_size(ocrpt_genline *gl) GET_GENLINE_EXPR(line_font_size)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_bold(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_bold, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_get_line_bold(ocrpt_genline *gl) GET_GENLINE_EXPR(line_bold)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_italic(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_italic, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_get_line_italic(ocrpt_genline *gl) GET_GENLINE_EXPR(line_italic)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_color(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_color, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_get_line_color(ocrpt_genline *gl) GET_GENLINE_EXPR(line_color)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_bgcolor(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_bgcolor, true, true)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_get_line_bgcolor(ocrpt_genline *gl) GET_GENLINE_EXPR(line_bgcolor)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_line_suppress(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(line_suppress, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_get_line_suppress(ocrpt_genline *gl) GET_GENLINE_EXPR(line_suppress)
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_value(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(value, true, true)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_delayed(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(delayed, true, false)
