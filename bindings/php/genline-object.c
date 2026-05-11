@@ -43,6 +43,20 @@ PHP_METHOD(opencreport_genline, method_name) { \
 	PHP_GENLINE_SET_BODY(c_func, glo->gl) \
 }
 
+/* Helper macro to define a get_* method that returns the stored Expr (or null). */
+#define GENLINE_GET_METHOD(method_name, c_func) \
+PHP_METHOD(opencreport_genline, method_name) { \
+	zval *object = getThis(); \
+	php_opencreport_genline_object *glo = Z_OPENCREPORT_GENLINE_P(object); \
+	ZEND_PARSE_PARAMETERS_NONE(); \
+	ocrpt_expr *e = c_func(glo->gl); \
+	if (!e) \
+		RETURN_NULL(); \
+	object_init_ex(return_value, opencreport_expr_ce); \
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value); \
+	eo->e = e; \
+}
+
 #if PHP_VERSION_ID >= 70000
 #define PHP_GENLINE_SET_BODY(c_func, glptr) \
 	zend_string *expr_string = NULL; \
@@ -88,6 +102,20 @@ PHP_METHOD(opencreport_genline, set_query) {
 	ocrpt_genline_set_query(glo->gl, qo->q);
 }
 
+PHP_METHOD(opencreport_genline, get_query) {
+	zval *object = getThis();
+	php_opencreport_genline_object *glo = Z_OPENCREPORT_GENLINE_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_query *q = ocrpt_genline_get_query(glo->gl);
+	if (!q)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_query_ce);
+	php_opencreport_query_object *qo = Z_OPENCREPORT_QUERY_P(return_value);
+	qo->q = q;
+}
+
 GENLINE_SET_METHOD(set_element_type, ocrpt_genline_set_element_type)
 GENLINE_SET_METHOD(set_line_font_name, ocrpt_genline_set_line_font_name)
 GENLINE_SET_METHOD(set_line_font_size, ocrpt_genline_set_line_font_size)
@@ -119,15 +147,53 @@ GENLINE_SET_METHOD(set_image_type, ocrpt_genline_set_image_type)
 GENLINE_SET_METHOD(set_text_width, ocrpt_genline_set_text_width)
 GENLINE_SET_METHOD(set_barcode_type, ocrpt_genline_set_barcode_type)
 
+GENLINE_GET_METHOD(get_element_type, ocrpt_genline_get_element_type)
+GENLINE_GET_METHOD(get_line_font_name, ocrpt_genline_get_line_font_name)
+GENLINE_GET_METHOD(get_line_font_size, ocrpt_genline_get_line_font_size)
+GENLINE_GET_METHOD(get_line_color, ocrpt_genline_get_line_color)
+GENLINE_GET_METHOD(get_line_bgcolor, ocrpt_genline_get_line_bgcolor)
+GENLINE_GET_METHOD(get_line_bold, ocrpt_genline_get_line_bold)
+GENLINE_GET_METHOD(get_line_italic, ocrpt_genline_get_line_italic)
+GENLINE_GET_METHOD(get_line_suppress, ocrpt_genline_get_line_suppress)
+GENLINE_GET_METHOD(get_value, ocrpt_genline_get_value)
+GENLINE_GET_METHOD(get_value_delayed, ocrpt_genline_get_value_delayed)
+GENLINE_GET_METHOD(get_suppress, ocrpt_genline_get_suppress)
+GENLINE_GET_METHOD(get_width, ocrpt_genline_get_width)
+GENLINE_GET_METHOD(get_height, ocrpt_genline_get_height)
+GENLINE_GET_METHOD(get_alignment, ocrpt_genline_get_alignment)
+GENLINE_GET_METHOD(get_color, ocrpt_genline_get_color)
+GENLINE_GET_METHOD(get_bgcolor, ocrpt_genline_get_bgcolor)
+GENLINE_GET_METHOD(get_font_name, ocrpt_genline_get_font_name)
+GENLINE_GET_METHOD(get_font_size, ocrpt_genline_get_font_size)
+GENLINE_GET_METHOD(get_bold, ocrpt_genline_get_bold)
+GENLINE_GET_METHOD(get_italic, ocrpt_genline_get_italic)
+GENLINE_GET_METHOD(get_format, ocrpt_genline_get_format)
+GENLINE_GET_METHOD(get_link, ocrpt_genline_get_link)
+GENLINE_GET_METHOD(get_translate, ocrpt_genline_get_translate)
+GENLINE_GET_METHOD(get_memo, ocrpt_genline_get_memo)
+GENLINE_GET_METHOD(get_hyphenate, ocrpt_genline_get_hyphenate)
+GENLINE_GET_METHOD(get_wrap_chars, ocrpt_genline_get_wrap_chars)
+GENLINE_GET_METHOD(get_max_lines, ocrpt_genline_get_max_lines)
+GENLINE_GET_METHOD(get_image_type, ocrpt_genline_get_image_type)
+GENLINE_GET_METHOD(get_text_width, ocrpt_genline_get_text_width)
+GENLINE_GET_METHOD(get_barcode_type, ocrpt_genline_get_barcode_type)
+
 #if PHP_VERSION_ID >= 70000
 
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_genline_set_query, 0, 1, IS_VOID, 0)
 ZEND_ARG_OBJ_INFO(0, query, OpenCReport\\Query, 0)
 ZEND_END_ARG_INFO()
 
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_genline_get_query, 0, 0, OpenCReport\\Query, 1)
+ZEND_END_ARG_INFO()
+
 #define GENLINE_ARGINFO_SET(method_name) \
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_genline_ ## method_name, 0, 1, OpenCReport\\Expr, 1) \
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1) \
+ZEND_END_ARG_INFO()
+
+#define GENLINE_ARGINFO_GET(method_name) \
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_genline_ ## method_name, 0, 0, OpenCReport\\Expr, 1) \
 ZEND_END_ARG_INFO()
 
 GENLINE_ARGINFO_SET(set_element_type)
@@ -161,9 +227,41 @@ GENLINE_ARGINFO_SET(set_image_type)
 GENLINE_ARGINFO_SET(set_text_width)
 GENLINE_ARGINFO_SET(set_barcode_type)
 
+GENLINE_ARGINFO_GET(get_element_type)
+GENLINE_ARGINFO_GET(get_line_font_name)
+GENLINE_ARGINFO_GET(get_line_font_size)
+GENLINE_ARGINFO_GET(get_line_color)
+GENLINE_ARGINFO_GET(get_line_bgcolor)
+GENLINE_ARGINFO_GET(get_line_bold)
+GENLINE_ARGINFO_GET(get_line_italic)
+GENLINE_ARGINFO_GET(get_line_suppress)
+GENLINE_ARGINFO_GET(get_value)
+GENLINE_ARGINFO_GET(get_value_delayed)
+GENLINE_ARGINFO_GET(get_suppress)
+GENLINE_ARGINFO_GET(get_width)
+GENLINE_ARGINFO_GET(get_height)
+GENLINE_ARGINFO_GET(get_alignment)
+GENLINE_ARGINFO_GET(get_color)
+GENLINE_ARGINFO_GET(get_bgcolor)
+GENLINE_ARGINFO_GET(get_font_name)
+GENLINE_ARGINFO_GET(get_font_size)
+GENLINE_ARGINFO_GET(get_bold)
+GENLINE_ARGINFO_GET(get_italic)
+GENLINE_ARGINFO_GET(get_format)
+GENLINE_ARGINFO_GET(get_link)
+GENLINE_ARGINFO_GET(get_translate)
+GENLINE_ARGINFO_GET(get_memo)
+GENLINE_ARGINFO_GET(get_hyphenate)
+GENLINE_ARGINFO_GET(get_wrap_chars)
+GENLINE_ARGINFO_GET(get_max_lines)
+GENLINE_ARGINFO_GET(get_image_type)
+GENLINE_ARGINFO_GET(get_text_width)
+GENLINE_ARGINFO_GET(get_barcode_type)
+
 #else
 
 #define arginfo_opencreport_genline_set_query NULL
+#define arginfo_opencreport_genline_get_query NULL
 #define arginfo_opencreport_genline_set_element_type NULL
 #define arginfo_opencreport_genline_set_line_font_name NULL
 #define arginfo_opencreport_genline_set_line_font_size NULL
@@ -194,6 +292,36 @@ GENLINE_ARGINFO_SET(set_barcode_type)
 #define arginfo_opencreport_genline_set_image_type NULL
 #define arginfo_opencreport_genline_set_text_width NULL
 #define arginfo_opencreport_genline_set_barcode_type NULL
+#define arginfo_opencreport_genline_get_element_type NULL
+#define arginfo_opencreport_genline_get_line_font_name NULL
+#define arginfo_opencreport_genline_get_line_font_size NULL
+#define arginfo_opencreport_genline_get_line_color NULL
+#define arginfo_opencreport_genline_get_line_bgcolor NULL
+#define arginfo_opencreport_genline_get_line_bold NULL
+#define arginfo_opencreport_genline_get_line_italic NULL
+#define arginfo_opencreport_genline_get_line_suppress NULL
+#define arginfo_opencreport_genline_get_value NULL
+#define arginfo_opencreport_genline_get_value_delayed NULL
+#define arginfo_opencreport_genline_get_suppress NULL
+#define arginfo_opencreport_genline_get_width NULL
+#define arginfo_opencreport_genline_get_height NULL
+#define arginfo_opencreport_genline_get_alignment NULL
+#define arginfo_opencreport_genline_get_color NULL
+#define arginfo_opencreport_genline_get_bgcolor NULL
+#define arginfo_opencreport_genline_get_font_name NULL
+#define arginfo_opencreport_genline_get_font_size NULL
+#define arginfo_opencreport_genline_get_bold NULL
+#define arginfo_opencreport_genline_get_italic NULL
+#define arginfo_opencreport_genline_get_format NULL
+#define arginfo_opencreport_genline_get_link NULL
+#define arginfo_opencreport_genline_get_translate NULL
+#define arginfo_opencreport_genline_get_memo NULL
+#define arginfo_opencreport_genline_get_hyphenate NULL
+#define arginfo_opencreport_genline_get_wrap_chars NULL
+#define arginfo_opencreport_genline_get_max_lines NULL
+#define arginfo_opencreport_genline_get_image_type NULL
+#define arginfo_opencreport_genline_get_text_width NULL
+#define arginfo_opencreport_genline_get_barcode_type NULL
 
 #endif
 
@@ -202,36 +330,67 @@ GENLINE_ARGINFO_SET(set_barcode_type)
 
 static const zend_function_entry opencreport_genline_class_methods[] = {
 	GENLINE_ME(set_query)
+	GENLINE_ME(get_query)
 	GENLINE_ME(set_element_type)
+	GENLINE_ME(get_element_type)
 	GENLINE_ME(set_line_font_name)
+	GENLINE_ME(get_line_font_name)
 	GENLINE_ME(set_line_font_size)
+	GENLINE_ME(get_line_font_size)
 	GENLINE_ME(set_line_color)
+	GENLINE_ME(get_line_color)
 	GENLINE_ME(set_line_bgcolor)
+	GENLINE_ME(get_line_bgcolor)
 	GENLINE_ME(set_line_bold)
+	GENLINE_ME(get_line_bold)
 	GENLINE_ME(set_line_italic)
+	GENLINE_ME(get_line_italic)
 	GENLINE_ME(set_line_suppress)
+	GENLINE_ME(get_line_suppress)
 	GENLINE_ME(set_value)
+	GENLINE_ME(get_value)
 	GENLINE_ME(set_value_delayed)
+	GENLINE_ME(get_value_delayed)
 	GENLINE_ME(set_suppress)
+	GENLINE_ME(get_suppress)
 	GENLINE_ME(set_width)
+	GENLINE_ME(get_width)
 	GENLINE_ME(set_height)
+	GENLINE_ME(get_height)
 	GENLINE_ME(set_alignment)
+	GENLINE_ME(get_alignment)
 	GENLINE_ME(set_color)
+	GENLINE_ME(get_color)
 	GENLINE_ME(set_bgcolor)
+	GENLINE_ME(get_bgcolor)
 	GENLINE_ME(set_font_name)
+	GENLINE_ME(get_font_name)
 	GENLINE_ME(set_font_size)
+	GENLINE_ME(get_font_size)
 	GENLINE_ME(set_bold)
+	GENLINE_ME(get_bold)
 	GENLINE_ME(set_italic)
+	GENLINE_ME(get_italic)
 	GENLINE_ME(set_format)
+	GENLINE_ME(get_format)
 	GENLINE_ME(set_link)
+	GENLINE_ME(get_link)
 	GENLINE_ME(set_translate)
+	GENLINE_ME(get_translate)
 	GENLINE_ME(set_memo)
+	GENLINE_ME(get_memo)
 	GENLINE_ME(set_hyphenate)
+	GENLINE_ME(get_hyphenate)
 	GENLINE_ME(set_wrap_chars)
+	GENLINE_ME(get_wrap_chars)
 	GENLINE_ME(set_max_lines)
+	GENLINE_ME(get_max_lines)
 	GENLINE_ME(set_image_type)
+	GENLINE_ME(get_image_type)
 	GENLINE_ME(set_text_width)
+	GENLINE_ME(get_text_width)
 	GENLINE_ME(set_barcode_type)
+	GENLINE_ME(get_barcode_type)
 	PHP_FE_END
 };
 
