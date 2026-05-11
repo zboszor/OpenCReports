@@ -811,7 +811,7 @@ static void ocrpt_parse_output_genline_node(opencreport *o, ocrpt_report *r, ocr
 		{ { "line_font_name"  }, &line_font_name },
 		{ { "line_font_size" }, &line_font_size },
 		{ { "line_bold" }, &line_bold },
-		{ { "line_italic" }, &line_italic },
+		{ { "line_italic", "line_italics" }, &line_italic },
 		{ { "line_suppress" }, &line_suppress },
 		{ { "line_color", "line_colour" }, &line_color },
 		{ { "line_bgcolor", "line_bgcolour" }, &line_bgcolor },
