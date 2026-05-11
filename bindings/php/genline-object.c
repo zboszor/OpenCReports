@@ -97,7 +97,7 @@ GENLINE_SET_METHOD(set_line_bold, ocrpt_genline_set_line_bold)
 GENLINE_SET_METHOD(set_line_italic, ocrpt_genline_set_line_italic)
 GENLINE_SET_METHOD(set_line_suppress, ocrpt_genline_set_line_suppress)
 GENLINE_SET_METHOD(set_value, ocrpt_genline_set_value)
-GENLINE_SET_METHOD(set_delayed, ocrpt_genline_set_delayed)
+GENLINE_SET_METHOD(set_value_delayed, ocrpt_genline_set_value_delayed)
 GENLINE_SET_METHOD(set_suppress, ocrpt_genline_set_suppress)
 GENLINE_SET_METHOD(set_width, ocrpt_genline_set_width)
 GENLINE_SET_METHOD(set_height, ocrpt_genline_set_height)
@@ -139,7 +139,7 @@ GENLINE_ARGINFO_SET(set_line_bold)
 GENLINE_ARGINFO_SET(set_line_italic)
 GENLINE_ARGINFO_SET(set_line_suppress)
 GENLINE_ARGINFO_SET(set_value)
-GENLINE_ARGINFO_SET(set_delayed)
+GENLINE_ARGINFO_SET(set_value_delayed)
 GENLINE_ARGINFO_SET(set_suppress)
 GENLINE_ARGINFO_SET(set_width)
 GENLINE_ARGINFO_SET(set_height)
@@ -173,7 +173,7 @@ GENLINE_ARGINFO_SET(set_barcode_type)
 #define arginfo_opencreport_genline_set_line_italic NULL
 #define arginfo_opencreport_genline_set_line_suppress NULL
 #define arginfo_opencreport_genline_set_value NULL
-#define arginfo_opencreport_genline_set_delayed NULL
+#define arginfo_opencreport_genline_set_value_delayed NULL
 #define arginfo_opencreport_genline_set_suppress NULL
 #define arginfo_opencreport_genline_set_width NULL
 #define arginfo_opencreport_genline_set_height NULL
@@ -211,7 +211,7 @@ static const zend_function_entry opencreport_genline_class_methods[] = {
 	GENLINE_ME(set_line_italic)
 	GENLINE_ME(set_line_suppress)
 	GENLINE_ME(set_value)
-	GENLINE_ME(set_delayed)
+	GENLINE_ME(set_value_delayed)
 	GENLINE_ME(set_suppress)
 	GENLINE_ME(set_width)
 	GENLINE_ME(set_height)

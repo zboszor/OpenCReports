@@ -1071,7 +1071,7 @@ ocrpt_expr *ocrpt_genline_set_line_suppress(ocrpt_genline *gl, const char *expr_
 ocrpt_expr *ocrpt_genline_get_line_suppress(ocrpt_genline *gl);
 
 ocrpt_expr *ocrpt_genline_set_value(ocrpt_genline *gl, const char *expr_string);
-ocrpt_expr *ocrpt_genline_set_delayed(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_set_value_delayed(ocrpt_genline *gl, const char *expr_string);
 ocrpt_expr *ocrpt_genline_set_suppress(ocrpt_genline *gl, const char *expr_string);
 ocrpt_expr *ocrpt_genline_set_width(ocrpt_genline *gl, const char *expr_string);
 ocrpt_expr *ocrpt_genline_set_height(ocrpt_genline *gl, const char *expr_string);

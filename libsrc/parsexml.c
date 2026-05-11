@@ -871,7 +871,7 @@ static void ocrpt_parse_output_genline_node(opencreport *o, ocrpt_report *r, ocr
 	ocrpt_genline_set_line_suppress(gl, (char *)line_suppress);
 
 	ocrpt_genline_set_value(gl, (char *)value);
-	ocrpt_genline_set_delayed(gl, (char *)delayed);
+	ocrpt_genline_set_value_delayed(gl, (char *)delayed);
 	ocrpt_genline_set_suppress(gl, (char *)suppress);
 	ocrpt_genline_set_width(gl, (char *)width);
 	ocrpt_genline_set_height(gl, (char *)height);
