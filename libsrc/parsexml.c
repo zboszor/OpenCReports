@@ -484,9 +484,11 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	ocrpt_text *elem = ocrpt_line_add_text(line);
 	int ret;
 
-	xmlChar *value = NULL, *delayed = NULL, *format = NULL, *width = NULL, *align = NULL;
+	xmlChar *value = NULL, *delayed = NULL, *suppress = NULL;
+	xmlChar *format = NULL, *width = NULL, *align = NULL;
 	xmlChar *color = NULL, *bgcolor = NULL, *font_name = NULL, *font_size = NULL;
-	xmlChar *bold = NULL, *italic = NULL, *link = NULL, *memo = NULL, *hyphenate = NULL, *memo_wrap_chars = NULL, *memo_max_lines = NULL;
+	xmlChar *bold = NULL, *italic = NULL, *link = NULL;
+	xmlChar *memo = NULL, *hyphenate = NULL, *memo_wrap_chars = NULL, *memo_max_lines = NULL;
 	xmlChar *translate = NULL;
 	struct {
 		char *attrs[3];
@@ -494,6 +496,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	} xmlattrs[] = {
 		{ { "value"}, &value },
 		{ { "delayed", "precalculate" }, &delayed },
+		{ { "suppress" }, &suppress },
 		{ { "format" }, &format },
 		{ { "width" }, &width },
 		{ { "align" }, &align },
@@ -548,9 +551,8 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	else
 		ocrpt_text_set_value_expr(elem, (char *)value);
 
-	if (delayed)
-		ocrpt_text_set_value_delayed(elem, (char *)delayed);
-
+	ocrpt_text_set_value_delayed(elem, (char *)delayed);
+	ocrpt_text_set_suppress(elem, (char *)suppress);
 	ocrpt_text_set_format(elem, (char *)format);
 	ocrpt_text_set_width(elem, (char *)width);
 	ocrpt_text_set_alignment(elem, (char *)align);
