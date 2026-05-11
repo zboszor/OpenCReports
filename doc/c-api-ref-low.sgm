@@ -2284,6 +2284,7 @@ ocrpt_layout_report_field_footer(ocrpt_report *r);</programlisting>
 						boolean function results, the abstract opaque
 						pointer type can be case to the actual output
 						element type: <literal>ocrpt_line *</literal>,
+						<literal>ocrpt_genline *</literal>
 						<literal>ocrpt_hline *</literal>,
 						<literal>ocrpt_image *</literal> or
 						<literal>ocrpt_barcode *</literal>.
@@ -2295,6 +2296,9 @@ ocrpt_output_element_get_next(ocrpt_output *output, ocrpt_list **iter);
 
 bool
 ocrpt_output_element_is_line(ocrpt_output_element *elem);
+
+bool
+ocrpt_output_element_is_genline(ocrpt_output_element *elem);
 
 bool
 ocrpt_output_element_is_hline(ocrpt_output_element *elem);
@@ -2389,7 +2393,7 @@ ocrpt_output_add_line(ocrpt_output *output);</programlisting>
 					on data derived from query columns.
 					See <xref linkend="expressions"/>.
 				</para>
-				<sect4 id="linesetfontname">
+				<sect4 id="linesetfontname" xreflabel="Set or get line font name">
 					<title>Set or get line font name</title>
 					<para>
 						Set the text line's font name from
@@ -2402,8 +2406,8 @@ ocrpt_expr *
 ocrpt_line_get_font_name(ocrpt_line *line);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="linesetfontsize">
-					<title>Set line font size</title>
+				<sect4 id="linesetfontsize" xreflabel="Set or get line font size">
+					<title>Set or get line font size</title>
 					<para>
 						Set the text line's font size from
 						an expression string.
@@ -2415,7 +2419,7 @@ ocrpt_expr *
 ocrpt_line_get_font_size(ocrpt_line *line);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="linesetbold">
+				<sect4 id="linesetbold" xreflabel="Set or get line bold value">
 					<title>Set or get line bold value</title>
 					<para>
 						Set the text line's bold value from
@@ -2428,7 +2432,7 @@ ocrpt_expr *
 ocrpt_line_get_bold(ocrpt_line *line);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="linesetitalic">
+				<sect4 id="linesetitalic" xreflabel="Set or get line italic value">
 					<title>Set or get line italic value</title>
 					<para>
 						Set the text line's italic value from
@@ -2441,7 +2445,7 @@ ocrpt_expr *
 ocrpt_line_get_italic(ocrpt_line *line);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="linesetsuppress">
+				<sect4 id="linesetsuppress" xreflabel="Set or get line suppression">
 					<title>Set or get line suppression</title>
 					<para>
 						Set the text line's suppression value from
@@ -2454,11 +2458,12 @@ ocrpt_expr *
 ocrpt_line_get_suppress(ocrpt_line *line);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="linessettextcolor">
-					<title>Set or get line text color</title>
+				<sect4 id="linesetcolor" xreflabel="Set or get line foreground color">
+					<title>Set or get line foreground color</title>
 					<para>
-						Set the text line's text color from
-						an expression string.
+						Set the text line's foreground color from
+						an expression string. It is used as the default
+						for text and barcode line elements.
 						<programlisting>ocrpt_expr *
 ocrpt_line_set_color(ocrpt_line *line,
                      const char *expr_string);
@@ -2467,7 +2472,7 @@ ocrpt_expr *
 ocrpt_line_get_color(ocrpt_line *line);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="linesetbgcolor">
+				<sect4 id="linesetbgcolor" xreflabel="Set or get line background color">
 					<title>Set or get line background color</title>
 					<para>
 						Set or get the text line's background color from
@@ -2507,7 +2512,7 @@ ocrpt_text_set_value_string(ocrpt_text *text,
                             const char *string);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetvalue">
+				<sect4 id="textsetvalue" xreflabel="Set or get text element value">
 					<title>Set or get text element value</title>
 					<para>
 						Set the text element's value from
@@ -2524,7 +2529,7 @@ ocrpt_text_set_value_expr(ocrpt_text *text,
 ocrpt_text_get_value(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetdelayed">
+				<sect4 id="textsetdelayed" xreflabel="Set or get text element value's delayed property">
 					<title>Set or get text element value's delayed property</title>
 					<para>
 						Set the text element value's delayed
@@ -2533,12 +2538,24 @@ ocrpt_text_get_value(ocrpt_text *text);</programlisting>
 ocrpt_text_set_value_delayed(ocrpt_text *text,
                              const char *expr_string);
 
-
 ocrpt_expr *
 ocrpt_text_get_value_delayed(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetformatstring">
+				<sect4 id="textsetsuppress" xreflabel="Set or get text element value's suppressed property">
+					<title>Set or get text element value's suppressed property</title>
+					<para>
+						Set the text element value's suppressed
+						property from an expression string.
+						<programlisting>ocrpt_expr *
+ocrpt_text_set_suppress(ocrpt_text *text,
+                        const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_suppress(ocrpt_text *text);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="textsetformatstring" xreflabel="Set or get text element format string">
 					<title>Set or get text element format string</title>
 					<para>
 						Set the text element's format string from
@@ -2551,7 +2568,7 @@ ocrpt_expr *
 ocrpt_text_get_format(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetxlate">
+				<sect4 id="textsetxlate" xreflabel="Set or get text element translation">
 					<title>Set or get text element translation</title>
 					<para>
 						Set the text element's translation from
@@ -2569,7 +2586,7 @@ ocrpt_text_get_translate(ocrpt_text *text);</programlisting>
 						value.
 					</para>
 				</sect4>
-				<sect4 id="textsetwidth">
+				<sect4 id="textsetwidth" xreflabel="Set or get text element field width">
 					<title>Set or get text element field width</title>
 					<para>
 						Set the text element's field width from
@@ -2582,7 +2599,7 @@ ocrpt_expr *
 ocrpt_text_get_width(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetalignment">
+				<sect4 id="textsetalignment" xreflabel="Set or get text element alignment">
 					<title>Set or get text element alignment</title>
 					<para>
 						Set the text element's alignment from
@@ -2602,7 +2619,7 @@ ocrpt_text_get_alignment(ocrpt_text *text);</programlisting>
 						accepted either as is, or as an expression.
 					</para>
 				</sect4>
-				<sect4 id="textsetcolor">
+				<sect4 id="textsetcolor" xreflabel="Set or get text element text color">
 					<title>Set or get text element text color</title>
 					<para>
 						Set the text element's text color from
@@ -2615,7 +2632,7 @@ ocrpt_expr *
 ocrpt_text_get_color(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetbgcolor">
+				<sect4 id="textsetbgcolor" xreflabel="Set or get text element background color">
 					<title>Set or get text element background color</title>
 					<para>
 						Set the text element's background color from
@@ -2628,7 +2645,7 @@ ocrpt_expr *
 ocrpt_text_get_bgcolor(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetfontname">
+				<sect4 id="textsetfontname" xreflabel="Set or get text element font name">
 					<title>Set or get text element font name</title>
 					<para>
 						Set the text element's font name from
@@ -2641,7 +2658,7 @@ ocrpt_expr *
 ocrpt_text_get_font_name(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetfontsize">
+				<sect4 id="textsetfontsize" xreflabel="Set or get text element font size">
 					<title>Set or get text element font size</title>
 					<para>
 						Set the text element's font size from
@@ -2654,7 +2671,7 @@ ocrpt_expr *
 ocrpt_text_get_font_size(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetbold">
+				<sect4 id="textsetbold" xreflabel="Set or get text element bold value">
 					<title>Set or get text element bold value</title>
 					<para>
 						Set the text element's bold value from
@@ -2667,7 +2684,7 @@ ocrpt_expr *
 ocrpt_text_get_bold(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetitalic">
+				<sect4 id="textsetitalic" xreflabel="Set or get text element italic value">
 					<title>Set or get text element italic value</title>
 					<para>
 						Set the text element's italic value from
@@ -2680,7 +2697,7 @@ ocrpt_expr *
 ocrpt_text_get_italic(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetlink">
+				<sect4 id="textsetlink" xreflabel="Set or get text element link URL">
 					<title>Set or get text element link URL</title>
 					<para>
 						Set the text element's link URL from
@@ -2693,7 +2710,7 @@ ocrpt_expr *
 ocrpt_text_get_link(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetmemo">
+				<sect4 id="textsetmemo" xreflabel="Set or get text element multiline property">
 					<title>Set or get text element multiline property</title>
 					<para>
 						Set the text element's multiline property
@@ -2707,7 +2724,7 @@ ocrpt_expr *
 ocrpt_text_get_memo(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetmemohyphenate">
+				<sect4 id="textsetmemohyphenate" xreflabel="Set or get text element &quot;hyphenate&quot; property">
 					<title>Set or get text element "hyphenate" property</title>
 					<para>
 						Set the text element's "hyphenate"
@@ -2730,7 +2747,7 @@ ocrpt_expr *
 ocrpt_text_get_memo_hyphenate(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetmemowrap">
+				<sect4 id="textsetmemowrap" xreflabel="Set or get text element &quot;wrap at characters&quot; property">
 					<title>Set or get text element "wrap at characters" property</title>
 					<para>
 						Set the text element's "wrap at characters"
@@ -2748,7 +2765,7 @@ ocrpt_expr *
 ocrpt_text_get_memo_wrap_chars(ocrpt_text *text);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="textsetmemolines">
+				<sect4 id="textsetmemolines" xreflabel="Set or get text element maximum lines">
 					<title>Set or get text element maximum lines</title>
 					<para>
 						Set the text element's maximum lines
@@ -2905,7 +2922,7 @@ ocrpt_line_add_barcode(ocrpt_line *line);</programlisting>
 			</sect3>
 			<sect3 id="barcodesettings">
 				<title>Barcode settings</title>
-				<sect4 id="barcodesetvalue">
+				<sect4 id="barcodesetvalue" xreflabel="Set or get barcode value">
 					<title>Set or get barcode value</title>
 					<para>
 						Set the barcode's value from
@@ -2935,7 +2952,7 @@ ocrpt_expr *
 ocrpt_barcode_get_value_delayed(ocrpt_barcode *bc);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="barcodesetsuppress">
+				<sect4 id="barcodesetsuppress" xreflabel="Set or get barcode suppression">
 					<title>Set or get barcode suppression</title>
 					<para>
 						Set the barcode's suppression value from
@@ -2953,7 +2970,7 @@ ocrpt_barcode_get_suppress(ocrpt_barcode *bc);</programlisting>
 						i.e. no suppression.
 					</para>
 				</sect4>
-				<sect4 id="barcodesettype">
+				<sect4 id="barcodesettype" xreflabel="Set or get barcode type">
 					<title>Set or get barcode type</title>
 					<para>
 						Set the barcode's type from
@@ -2994,7 +3011,7 @@ ocrpt_barcode_get_type(ocrpt_barcode *bc);</programlisting>
 						the barcode is not rendered.
 					</para>
 				</sect4>
-				<sect4 id="barcodesetwidth">
+				<sect4 id="barcodesetwidth" xreflabel="Set or get barcode width">
 					<title>Set or get barcode width</title>
 					<para>
 						Set the barcode's width from
@@ -3014,8 +3031,8 @@ ocrpt_barcode_get_width(ocrpt_barcode *bc);</programlisting>
 						set by <literal>&lt;Line&gt;</literal>.
 					</para>
 				</sect4>
-				<sect4 id="barcodesetheight">
-					<title>Set or get barcode width</title>
+				<sect4 id="barcodesetheight" xreflabel="Set or get barcode height">
+					<title>Set or get barcode height</title>
 					<para>
 						Set the barcode's height from
 						an expression string.
@@ -3038,7 +3055,7 @@ ocrpt_barcode_get_height(ocrpt_barcode *bc);</programlisting>
 						will appear (approximately) centered vertically.
 					</para>
 				</sect4>
-				<sect4 id="barcodesetcolor">
+				<sect4 id="barcodesetcolor" xreflabel="Set or get barcode line color">
 					<title>Set or get barcode line color</title>
 					<para>
 						Set the barcode's line color from
@@ -3051,7 +3068,7 @@ ocrpt_expr *
 ocrpt_barcode_get_color(ocrpt_barcode *bc);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="barcodesetbgcolor">
+				<sect4 id="barcodesetbgcolor" xreflabel="Set or get barcode background color">
 					<title>Set or get barcode background color</title>
 					<para>
 						Set the barcode's background color from
@@ -3088,7 +3105,7 @@ ocrpt_line_add_image(ocrpt_line *line);</programlisting>
 					on data derived from query columns.
 					See <xref linkend="expressions"/>.
 				</para>
-				<sect4 id="imagesetvalue">
+				<sect4 id="imagesetvalue" xreflabel="Set or get image value">
 					<title>Set or get image value</title>
 					<para>
 						Set the image's value (filename) from
@@ -3101,7 +3118,7 @@ ocrpt_expr *
 ocrpt_image_get_value(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="imagesetsuppress">
+				<sect4 id="imagesetsuppress" xreflabel="Set or get image suppression">
 					<title>Set or get image suppression</title>
 					<para>
 						Set the image's suppression from
@@ -3114,7 +3131,7 @@ ocrpt_expr *
 ocrpt_image_get_suppress(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="imagesettype">
+				<sect4 id="imagesettype" xreflabel="Set or get image type">
 					<title>Set or get image type</title>
 					<para>
 						Set the image's type from
@@ -3127,7 +3144,7 @@ ocrpt_expr *
 ocrpt_image_get_type(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="imagesetwidth">
+				<sect4 id="imagesetwidth" xreflabel="Set or get image width">
 					<title>Set or get image width</title>
 					<para>
 						Set the image's width from
@@ -3142,7 +3159,7 @@ ocrpt_expr *
 ocrpt_image_get_width(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="imagesetheight">
+				<sect4 id="imagesetheight" xreflabel="Set or get image height">
 					<title>Set or get image height</title>
 					<para>
 						Set the image's width from
@@ -3157,7 +3174,7 @@ ocrpt_expr *
 ocrpt_image_get_height(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="imagesetalignment">
+				<sect4 id="imagesetalignment" xreflabel="Set or get image alignment">
 					<title>Set or get image alignment</title>
 					<para>
 						Set the image's alignment from
@@ -3171,7 +3188,7 @@ ocrpt_expr *
 ocrpt_image_get_alignment(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="imagesetbgcolor">
+				<sect4 id="imagesetbgcolor" xreflabel="Set or get image background color">
 					<title>Set or get image background color</title>
 					<para>
 						Set the image's background color from
@@ -3184,10 +3201,10 @@ ocrpt_expr *
 ocrpt_image_get_bgcolor(ocrpt_image *image);</programlisting>
 					</para>
 				</sect4>
-				<sect4 id="imagessetfieldwidth">
-					<title>Set or get image field width</title>
+				<sect4 id="imagesettextwidth" xreflabel="Set or get image text width">
+					<title>Set or get image text width</title>
 					<para>
-						Set the image's field width from
+						Set or get the image's text width from
 						an expression string. Used when
 						the image is added to a text line.
 						<programlisting>ocrpt_expr *
@@ -3205,6 +3222,492 @@ ocrpt_image_get_text_width(ocrpt_image *image);</programlisting>
 					<programlisting>void
 ocrpt_output_add_image_end(ocrpt_output *output);</programlisting>
 				</para>
+			</sect3>
+			<sect3 id="outputaddgenline">
+				<title>Add a generated line to an output section</title>
+				<para>
+					Add a generated line to the output section.
+					A generated line iterates a side query and
+					builds an <literal>ocrpt_line</literal> on the fly,
+					contributing one element per query row.
+					<programlisting>ocrpt_genline *
+ocrpt_output_add_genline(ocrpt_output *output);</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="genlinesettings" xreflabel="Generated line settings">
+				<title>Generated line settings</title>
+				<para>
+					Note that settings in the part (page) header and
+					footer sections must be either fully constant
+					expressions, or mixed expressions with only constants
+					and identifiers referencing side query identififers.
+					Settings in other sections may depend
+					on data derived from report query columns,
+					mixed with side query identififers.
+					See <xref linkend="expressions"/>.
+				</para>
+				<para>
+					All setter functions accept a nullable
+					expression string. Setter and getter functions return an
+					<literal>ocrpt_expr *</literal> or <literal>NULL</literal>
+					on error.
+				</para>
+				<sect4 id="genlinesetquery" xreflabel="Set or get generated line query">
+					<title>Set or get generated line query</title>
+					<para>
+						Set or get the side query that drives the generated
+						line. Each row of this query produces one element in
+						the resulting line.
+						<programlisting>void
+ocrpt_genline_set_query(ocrpt_genline *gl,
+                        ocrpt_query *query);
+
+ocrpt_query *
+ocrpt_genline_get_query(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetelementtype" xreflabel="Set or get per-element type">
+					<title>Set or get per-element type</title>
+					<para>
+						Set or get the expression that returns the element
+						type per query row. Accepted string values are
+						<literal>text</literal>,
+						<literal>barcode</literal> and
+						<literal>image</literal>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_element_type(ocrpt_genline *gl,
+                               const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_element_type(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetlinefontname" xreflabel="Set or get line-level font name">
+					<title>Set or get line-level font name</title>
+					<para>
+						Set or get the font name for the whole generated
+						line. Equivalent to <xref linkend="linesetfontname"/>
+						on an <literal>ocrpt_line</literal>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_line_font_name(ocrpt_genline *gl,
+                                 const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_line_font_name(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetlinefontsize" xreflabel="Set or get line-level font size">
+					<title>Set or get line-level font size</title>
+					<para>
+						Set or get the font size for the whole generated line.
+						Equivalent to <xref linkend="linesetfontsize"/>
+						on an <literal>ocrpt_line</literal>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_line_font_size(ocrpt_genline *gl,
+                                 const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_line_font_size(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetlinebold" xreflabel="Set or get line-level bold">
+					<title>Set or get line-level bold</title>
+					<para>
+						Set or get the bold attribute for the whole
+						generated line.
+						Equivalent to <xref linkend="linesetbold"/>
+						on an <literal>ocrpt_line</literal>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_line_bold(ocrpt_genline *gl,
+                            const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_line_bold(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetlineitalic" xreflabel="Set or get line-level italic">
+					<title>Set or get line-level italic</title>
+					<para>
+						Set or get the italic attribute for the whole
+						generated line.
+						Equivalent to <xref linkend="linesetitalic"/>
+						on an <literal>ocrpt_line</literal>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_line_italic(ocrpt_genline *gl,
+                              const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_line_italic(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetlinecolor" xreflabel="Set or get line-level foreground color">
+					<title>Set or get line-level foreground color</title>
+					<para>
+						Set or get the foreground color for the whole
+						generated line. See <xref linkend="colorspec"/>.
+						Equivalent to <xref linkend="linesetcolor"/>
+						on an <literal>ocrpt_line</literal>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_line_color(ocrpt_genline *gl,
+                             const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_line_color(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetlinebgcolor" xreflabel="Set or get line-level background color">
+					<title>Set or get line-level background color</title>
+					<para>
+						Set or get the background color for the whole
+						generated line. See <xref linkend="colorspec"/>.
+						Equivalent to <xref linkend="linesetbgcolor"/>
+						on an <literal>ocrpt_line</literal>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_line_bgcolor(ocrpt_genline *gl,
+                               const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_line_bgcolor(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetlinesuppress" xreflabel="Set or get line-level suppress">
+					<title>Set or get line-level suppress</title>
+					<para>
+						Set or get the suppress property the whole
+						generated line.
+						Equivalent to <xref linkend="linesetsuppress"/>
+						on an <literal>ocrpt_line</literal>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_line_suppress(ocrpt_genline *gl,
+                                const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_line_suppress(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetvalue" xreflabel="Set or get per-element value">
+					<title>Set or get per-element value</title>
+					<para>
+						Set or get the expression that provides the value
+						for the current element per query row.
+						For text elements this is the displayed text;
+						for barcodes the barcode data; for images
+						the image file path.
+						See <xref linkend="textsetvalue"/>,
+						<xref linkend="barcodesetvalue"/> and
+						<xref linkend="imagesetvalue"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_value(ocrpt_genline *gl,
+                        const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_value(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetvaluedelayed" xreflabel="Set or get per-element delayed evaluation">
+					<title>Set or get per-element delayed evaluation</title>
+					<para>
+						Set or get the expression controlling delayed
+						evaluation of the per-element value for text
+						elements.
+						See <xref linkend="textsetdelayed"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_value_delayed(ocrpt_genline *gl,
+                                const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_value_delayed(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetsuppress" xreflabel="Set or get per-element suppress">
+					<title>Set or get per-element suppress</title>
+					<para>
+						Set or get the expression that suppresses the
+						current element.
+						See <xref linkend="textsetsuppress"/>,
+						<xref linkend="barcodesetsuppress"/> and
+						<xref linkend="imagesetsuppress"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_suppress(ocrpt_genline *gl,
+                           const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_suppress(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetwidth" xreflabel="Set or get per-element width">
+					<title>Set or get per-element width</title>
+					<para>
+						Set or get the width of the current element in
+						the current size unit.
+						For text elements this is the field width;
+						for images and barcodes it is the rendered width.
+						See <xref linkend="textsetwidth"/>,
+						<xref linkend="barcodesetwidth"/> and
+						<xref linkend="imagesetwidth"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_width(ocrpt_genline *gl,
+                        const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_width(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetheight" xreflabel="Set or get per-element height">
+					<title>Set or get per-element height</title>
+					<para>
+						Set or get the height of the current element.
+						Used for images and barcodes.
+						See <xref linkend="barcodesetheight"/> and
+						<xref linkend="imagesetheight"/>.
+						Note that there is no explicit field height
+						setting for text elements. That is implicitly
+						controlled by the font size settings.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_height(ocrpt_genline *gl,
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_height(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetalignment" xreflabel="Set or get per-element alignment">
+					<title>Set or get per-element alignment</title>
+					<para>
+						Set or get the alignment of the current element.
+						See <xref linkend="textsetalignment"/> and
+						<xref linkend="imagesetalignment"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_alignment(ocrpt_genline *gl,
+                            const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_alignment(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetcolor" xreflabel="Set or get per-element text color">
+					<title>Set or get per-element text color</title>
+					<para>
+						Set or get the text color for the current element.
+						See <xref linkend="colorspec"/>,
+						<xref linkend="textsetcolor"/> and
+						<xref linkend="barcodesetcolor"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_color(ocrpt_genline *gl,
+                        const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_color(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetbgcolor" xreflabel="Set or get per-element background color">
+					<title>Set or get per-element background color</title>
+					<para>
+						Set or get the background color for the current
+						element. See <xref linkend="colorspec"/>,
+						<xref linkend="textsetbgcolor"/>,
+						<xref linkend="barcodesetbgcolor"/> and
+						<xref linkend="imagesetbgcolor"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_bgcolor(ocrpt_genline *gl,
+                          const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_bgcolor(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetfontname" xreflabel="Set or get per-element font name">
+					<title>Set or get per-element font name</title>
+					<para>
+						Override the font name for the current
+						text element. Ignored for barcodes and images.
+						See <xref linkend="textsetfontname"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_font_name(ocrpt_genline *gl,
+                            const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_font_name(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetfontsize" xreflabel="Set or get per-element font size">
+					<title>Set or get per-element font size</title>
+					<para>
+						Override the font size for the current
+						text element. Ignored for barcodes and images.
+						See <xref linkend="textsetfontsize"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_font_size(ocrpt_genline *gl,
+                            const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_font_size(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetbold" xreflabel="Set or get per-element bold">
+					<title>Set or get per-element bold</title>
+					<para>
+						Override the bold attribute for the current
+						text element.
+						See <xref linkend="textsetbold"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_bold(ocrpt_genline *gl,
+                       const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_bold(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetitalic" xreflabel="Set or get per-element italic">
+					<title>Set or get per-element italic</title>
+					<para>
+						Override the italic attribute for the current
+						text element.
+						See <xref linkend="textsetitalic"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_italic(ocrpt_genline *gl,
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_italic(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetformat" xreflabel="Set or get per-element format string">
+					<title>Set or get per-element format string</title>
+					<para>
+						Set or get the format string for text elements.
+						See <xref linkend="textsetformatstring"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_format(ocrpt_genline *gl,
+                         const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_format(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetlink" xreflabel="Set or get per-element link URL">
+					<title>Set or get per-element link URL</title>
+					<para>
+						Set or get the hyperlink URL for text elements.
+						See <xref linkend="textsetlink"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_link(ocrpt_genline *gl,
+                       const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_link(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesettranslate" xreflabel="Set or get per-element translation">
+					<title>Set or get per-element translation</title>
+					<para>
+						Set or get translation for text elements.
+						See <xref linkend="textsetxlate"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_translate(ocrpt_genline *gl,
+                            const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_translate(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetmemo" xreflabel="Set or get per-element multi-line (memo) property">
+					<title>Set or get per-element multi-line (memo) property</title>
+					<para>
+						Set or get whether the text element is a multi-line
+						("memo") element.
+						See <xref linkend="textsetmemo"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_memo(ocrpt_genline *gl,
+                       const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_memo(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesethyphenate" xreflabel="Set or get per-element multi-line hyphenation">
+					<title>Set or get per-element multi-line hyphenation</title>
+					<para>
+						Set or get whether the text element uses hyphenation.
+						See <xref linkend="textsetmemohyphenate"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_hyphenate(ocrpt_genline *gl,
+                            const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_hyphenate(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetwrapchars" xreflabel="Set or get per-element multi-line wrapping mode">
+					<title>Set or get per-element multi-line wrapping mode</title>
+					<para>
+						Set or get whether the text element uses
+						character wrapping. When unset or set to
+						<literal>false</literal>, the text element
+						uses word wrapping.
+						See <xref linkend="textsetmemowrap"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_wrap_chars(ocrpt_genline *gl,
+                             const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_wrap_chars(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetmaxlines" xreflabel="Set or get per-element multi-line line limit">
+					<title>Set or get per-element multi-line line limit</title>
+					<para>
+						Set or get the multi-line text element's line limit.
+						See <xref linkend="textsetmemolines"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_max_lines(ocrpt_genline *gl,
+                            const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_max_lines(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetimagetype" xreflabel="Set or get per-element image type">
+					<title>Set or get per-element image type</title>
+					<para>
+						Set or get the image type for image elements.
+						See <xref linkend="imagesettype"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_image_type(ocrpt_genline *gl,
+                             const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_image_type(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesettextwidth" xreflabel="Set or get per-element text width">
+					<title>Set or get per-element text width</title>
+					<para>
+						Set or get the text width for text elements, used
+						for formatting within the element's field width.
+						See <xref linkend="imagesettextwidth"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_text_width(ocrpt_genline *gl,
+                             const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_text_width(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetbarcodetype" xreflabel="Set or get per-element barcode type">
+					<title>Set or get per-element barcode type</title>
+					<para>
+						Set or get the barcode type for barcode elements.
+						Accepted values include <literal>ean-13</literal>.
+						See <xref linkend="barcodesettype"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_barcode_type(ocrpt_genline *gl,
+                               const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_barcode_type(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
 			</sect3>
 		</sect2>
 		<sect2 id="callbackfuncs">

@@ -3252,6 +3252,17 @@ SELECT * FROM some_table
 &lt;/Output</programlisting>
 				</para>
 			</sect3>
+			<sect3 id="outpgenline">
+				<title>GeneratedLine</title>
+				<para>
+					A generated line whose elements are driven
+					by a side query.
+					See <xref linkend="generatedlinenode"/>.
+					<programlisting>&lt;Output&gt;
+    &lt;GeneratedLine query="..." element_type="..." ... /&gt;
+&lt;/Output</programlisting>
+				</para>
+			</sect3>
 		</sect2>
 	</sect1>
 	<sect1 id="linenode" xreflabel="Line node">
@@ -3417,6 +3428,271 @@ SELECT * FROM some_table
 					<programlisting>&lt;Line&gt;
     &lt;Barcode value="expression..." ... /&gt;
 &lt;/Line&gt;</programlisting>
+				</para>
+			</sect3>
+		</sect2>
+	</sect1>
+	<sect1 id="generatedlinenode" xreflabel="GeneratedLine node">
+		<title>GeneratedLine</title>
+		<para>
+			A generated line is a dynamic output element
+			that iterates a side query to build a
+			<literal>&lt;Line&gt;</literal> on the fly.
+			Each row of the side query contributes one
+			element (text, barcode or image) to the line.
+			<programlisting>&lt;Output&gt;
+    &lt;GeneratedLine query="..." element_type="..." ... /&gt;
+&lt;/Output&gt;</programlisting>
+		</para>
+		<para>
+			The <literal>GeneratedLine</literal> does not
+			have child nodes, only attributes.
+		</para>
+		<sect2 id="generatedlineatts">
+			<title>GeneratedLine attributes</title>
+			<para>
+				Note that <xref linkend="expressions"/> in attribute
+				settings below depend on the parent node context.
+				Some may only use constant expressions or query column
+				references from <xref linkend="independentqueries"/>.
+				Child nodes of <literal>&lt;Output&gt;</literal> nodes in
+				<literal>&lt;Report&gt;</literal> context may also
+				use report query column references.
+			</para>
+			<sect3 id="generatedlinequery">
+				<title>Query name</title>
+				<para>
+					The name of the side query that drives the
+					generated line. Each row of this query produces
+					one element in the resulting line.
+					<programlisting>&lt;GeneratedLine query="'h'"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlineelementtype">
+				<title>Element type</title>
+				<para>
+					An expression evaluated per query row that
+					returns the element type as a string.
+					Accepted values are
+					<literal>text</literal>,
+					<literal>barcode</literal> and
+					<literal>image</literal>.
+					Any other value (or an unset column) defaults
+					to <literal>text</literal>.
+					<programlisting>&lt;GeneratedLine element_type="h.element_type"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinegenlinefontname">
+				<title>Line-level font name</title>
+				<para>
+					Sets the font name for the whole generated
+					line, equivalent to the
+					<xref linkend="linefontname"/> attribute
+					of a <literal>&lt;Line&gt;</literal>.
+					<programlisting>&lt;GeneratedLine genline_font_name="'Times New Roman'"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinegenlinefontsize">
+				<title>Line-level font size</title>
+				<para>
+					Sets the font size for the whole generated
+					line, equivalent to the
+					<xref linkend="linefontsize"/> attribute
+					of a <literal>&lt;Line&gt;</literal>.
+					<programlisting>&lt;GeneratedLine genline_font_size="14"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinegenlinebold">
+				<title>Line-level bold</title>
+				<para>
+					Sets the bold attribute for the whole
+					generated line.
+					<programlisting>&lt;GeneratedLine genline_bold="yes"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinegenlineitalic">
+				<title>Line-level italic</title>
+				<para>
+					Sets the italic attribute for the whole
+					generated line.
+					<programlisting>&lt;GeneratedLine genline_italic="yes"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinegenlinecolor">
+				<title>Line-level text color</title>
+				<para>
+					Sets the text color for the whole generated
+					line. See <xref linkend="colorspec"/>.
+					<programlisting>&lt;GeneratedLine genline_color="'blue'"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinegenlinebgcolor">
+				<title>Line-level background color</title>
+				<para>
+					Sets the background color for the whole
+					generated line. See <xref linkend="colorspec"/>.
+					<programlisting>&lt;GeneratedLine genline_bgcolor="'white'"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinegenlinesuppress">
+				<title>Line-level suppress</title>
+				<para>
+					Suppresses the whole generated line.
+					<programlisting>&lt;GeneratedLine genline_suppress="yes"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinevalue">
+				<title>Per-element value</title>
+				<para>
+					An expression evaluated per query row
+					that provides the value for the current
+					element. For text elements this is the
+					displayed text; for barcodes the barcode
+					data; for images the image file path.
+					<programlisting>&lt;GeneratedLine value="h.value"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinefontname">
+				<title>Per-element font name</title>
+				<para>
+					Overrides the font name for the current
+					text element. Ignored for barcodes and images.
+					<programlisting>&lt;GeneratedLine font_name="h.font_name"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinefontsize">
+				<title>Per-element font size</title>
+				<para>
+					Overrides the font size for the current
+					text element. Ignored for barcodes and images.
+					<programlisting>&lt;GeneratedLine font_size="h.font_size"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinebold">
+				<title>Per-element bold</title>
+				<para>
+					Overrides the bold attribute for the current
+					text element.
+					<programlisting>&lt;GeneratedLine bold="h.bold"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlineitalic">
+				<title>Per-element italic</title>
+				<para>
+					Overrides the italic attribute for the current
+					text element.
+					<programlisting>&lt;GeneratedLine italic="h.italic"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinecolor">
+				<title>Per-element text color</title>
+				<para>
+					Sets the text color for the current element.
+					See <xref linkend="colorspec"/>.
+					<programlisting>&lt;GeneratedLine color="h.color"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinebgcolor">
+				<title>Per-element background color</title>
+				<para>
+					Sets the background color for the current element.
+					See <xref linkend="colorspec"/>.
+					<programlisting>&lt;GeneratedLine bgcolor="h.bgcolor"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinesuppress">
+				<title>Per-element suppress</title>
+				<para>
+					Suppresses the current element.
+					<programlisting>&lt;GeneratedLine suppress="h.suppress"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinewidth">
+				<title>Per-element width</title>
+				<para>
+					Sets the width of the current element in
+					the current size unit.
+					For text elements this is the field width;
+					for images and barcodes it is the rendered width.
+					<programlisting>&lt;GeneratedLine width="h.width"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlineheight">
+				<title>Per-element height</title>
+				<para>
+					Sets the height of the current element.
+					Used for images and barcodes.
+					<programlisting>&lt;GeneratedLine height="h.height"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinealign">
+				<title>Per-element alignment</title>
+				<para>
+					Sets the alignment of the current element.
+					Accepted values are <literal>left</literal>,
+					<literal>right</literal> and
+					<literal>center</literal>.
+					<programlisting>&lt;GeneratedLine align="h.align"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinedelayed">
+				<title>Per-element delayed evaluation</title>
+				<para>
+					Controls delayed evaluation for text elements.
+					<programlisting>&lt;GeneratedLine delayed="h.delayed"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlineformat">
+				<title>Per-element format string</title>
+				<para>
+					Sets the format string for text elements.
+					<programlisting>&lt;GeneratedLine format="h.format"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinelink">
+				<title>Per-element link URL</title>
+				<para>
+					Sets the hyperlink URL for text elements.
+					<programlisting>&lt;GeneratedLine link="h.link"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinetranslate">
+				<title>Per-element translation</title>
+				<para>
+					Controls translation for text elements.
+					<programlisting>&lt;GeneratedLine translate="h.translate"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlineusebroadcastbbox">
+				<title>Per-element use broadcast bounding-box</title>
+				<para>
+					Controls whether the element uses the
+					broadcast bounding box for layout.
+					<programlisting>&lt;GeneratedLine use_bb="h.use_bb"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlineimagetype">
+				<title>Per-element image type</title>
+				<para>
+					Sets the image type for image elements.
+					Accepted values include <literal>svg</literal>.
+					<programlisting>&lt;GeneratedLine type="h.imgtype"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinetextwidth">
+				<title>Per-element text width</title>
+				<para>
+					Sets the text width for text elements, used
+					for formatting within the element's field width.
+					<programlisting>&lt;GeneratedLine text_width="h.text_width"/&gt;</programlisting>
+				</para>
+			</sect3>
+			<sect3 id="generatedlinebarcodetype">
+				<title>Per-element barcode type</title>
+				<para>
+					Sets the barcode type for barcode elements.
+					Accepted values include <literal>ean-13</literal>.
+					<programlisting>&lt;GeneratedLine bctype="h.bctype"/&gt;</programlisting>
 				</para>
 			</sect3>
 		</sect2>

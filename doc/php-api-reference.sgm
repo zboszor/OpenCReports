@@ -804,7 +804,7 @@ OpenCReport::set_report_height_after_last(
                      ?OpenCReport\Expr;
 
 public final
-OpenCReport::set_report_height_after_last():
+OpenCReport::get_report_height_after_last():
                      ?OpenCReport\Expr;</programlisting>
 				</para>
 			</sect3>
@@ -1983,7 +1983,7 @@ OpenCReport\Part::set_suppress_pageheader_firstpage(
                      ?OpenCReport\Expr;
 
 public final
-OpenCReport\Part::set_suppress_pageheader_firstpage():
+OpenCReport\Part::get_suppress_pageheader_firstpage():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
@@ -2073,7 +2073,7 @@ OpenCReport\Part::page_footer_set_report(
                      ?string $expr_string = null):
                      ?OpenCReport\Expr;
 
-    public final set_layout():
+    public final get_layout():
                      ?OpenCReport\Expr;
 }</programlisting>
 		</para>
@@ -2149,7 +2149,7 @@ OpenCReport\Row::set_layout(
                      ?OpenCReport\Expr;
 
 public final
-OpenCReport\Row::set_layout():
+OpenCReport\Row::get_layout():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
@@ -3247,6 +3247,9 @@ OpenCReport\ReportBreak::footer(): OpenCReport\Output;</programlisting>
     public final add_line():
                      ?OpenCReport\Line;
 
+    public final add_genline():
+                     ?OpenCReport\GenLine;
+
     public final add_hline():
                      ?OpenCReport\HorizontalLine;
 
@@ -3293,6 +3296,20 @@ OpenCReport\Output::get_suppress():
 				<programlisting>public final
 OpenCReport\Output::add_line():
                      ?OpenCReport\Line;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpoutputaddgeneratedline">
+			<title>Add a generated line</title>
+			<para>
+				Add a generated line to the output section.
+				A generated line iterates a side query and
+				builds a line on the fly, producing one
+				element per query row.
+				For class methods of <literal>OpenCReport\GenLine</literal>,
+				see <xref linkend="phpgenlineclass"/>.
+				<programlisting>public final
+OpenCReport\Output::add_genline():
+                     ?OpenCReport\GenLine;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpoutputaddhline">
@@ -3514,7 +3531,7 @@ OpenCReport\Line::set_suppress(
                      ?OpenCReport\Expr;
 
 public final
-OpenCReport\Line::set_suppress():
+OpenCReport\Line::get_suppress():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
@@ -3586,6 +3603,624 @@ OpenCReport\Line::add_image():
 				<programlisting>public final
 OpenCReport\Line::get_first_element():
                      ?OpenCReport\LineElement;</programlisting>
+			</para>
+		</sect2>
+	</sect1>
+	<sect1 id="phpgenlineclass">
+		<title>The OpenCReport\GenLine class</title>
+		<para>
+			<programlisting>class OpenCReport\GenLine {
+    public final set_query(
+                     ?OpenCReport\Query $query = null): void;
+    public final get_query(): ?OpenCReport\Query;
+
+    public final set_element_type(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_element_type(): ?OpenCReport\Expr;
+
+    public final set_line_font_name(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_line_font_name(): ?OpenCReport\Expr;
+
+    public final set_line_font_size(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_line_font_size(): ?OpenCReport\Expr;
+
+    public final set_line_bold(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_line_bold(): ?OpenCReport\Expr;
+
+    public final set_line_italic(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_line_italic(): ?OpenCReport\Expr;
+
+    public final set_line_color(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_line_color(): ?OpenCReport\Expr;
+
+    public final set_line_bgcolor(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_line_bgcolor(): ?OpenCReport\Expr;
+
+    public final set_line_suppress(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_line_suppress(): ?OpenCReport\Expr;
+
+    public final set_value(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_value(): ?OpenCReport\Expr;
+
+    public final set_value_delayed(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_value_delayed(): ?OpenCReport\Expr;
+
+    public final set_suppress(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_suppress(): ?OpenCReport\Expr;
+
+    public final set_width(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_width(): ?OpenCReport\Expr;
+
+    public final set_height(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_height(): ?OpenCReport\Expr;
+
+    public final set_alignment(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_alignment(): ?OpenCReport\Expr;
+
+    public final set_color(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_color(): ?OpenCReport\Expr;
+
+    public final set_bgcolor(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_bgcolor(): ?OpenCReport\Expr;
+
+    public final set_font_name(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_font_name(): ?OpenCReport\Expr;
+
+    public final set_font_size(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_font_size(): ?OpenCReport\Expr;
+
+    public final set_bold(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_bold(): ?OpenCReport\Expr;
+
+    public final set_italic(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_italic(): ?OpenCReport\Expr;
+
+    public final set_format(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_format(): ?OpenCReport\Expr;
+
+    public final set_link(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_link(): ?OpenCReport\Expr;
+
+    public final set_translate(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_translate(): ?OpenCReport\Expr;
+
+    public final set_memo(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_memo(): ?OpenCReport\Expr;
+
+    public final set_hyphenate(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_hyphenate(): ?OpenCReport\Expr;
+
+    public final set_wrap_chars(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_wrap_chars(): ?OpenCReport\Expr;
+
+    public final set_max_lines(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_max_lines(): ?OpenCReport\Expr;
+
+    public final set_image_type(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_image_type(): ?OpenCReport\Expr;
+
+    public final set_text_width(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_text_width(): ?OpenCReport\Expr;
+
+    public final set_barcode_type(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_barcode_type(): ?OpenCReport\Expr;
+}</programlisting>
+		</para>
+		<sect2 id="phpgenlinequery">
+			<title>Set or get generated line query</title>
+			<para>
+				Set the side query that drives the generated line.
+				Each row of this query produces one element in
+				the resulting line.
+				<literal>get_query()</literal> returns the
+				previously set query, or <literal>null</literal>
+				when none was set.
+				<programlisting>public final
+OpenCReport\GenLine::set_query(
+                     ?OpenCReport\Query $query = null): void;
+public final
+OpenCReport\GenLine::get_query(): ?OpenCReport\Query;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlineelementtype">
+			<title>Set or get per-element type</title>
+			<para>
+				Set the expression that returns the element
+				type per query row. Accepted string values are
+				<literal>text</literal>,
+				<literal>barcode</literal> and
+				<literal>image</literal>.
+				Any other value (or <literal>null</literal>)
+				defaults to <literal>text</literal>.
+				<programlisting>public final
+OpenCReport\GenLine::set_element_type(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_element_type(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinelinefontname">
+			<title>Set or get line-level font name</title>
+			<para>
+				Set the font name for the whole generated line.
+				Equivalent to <xref linkend="phplinesetfontname"/>
+				on an <literal>OpenCReport\Line</literal>.
+				<programlisting>public final
+OpenCReport\GenLine::set_line_font_name(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_line_font_name(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinelinefontsize">
+			<title>Set or get line-level font size</title>
+			<para>
+				Set the font size for the whole generated line.
+				Equivalent to <xref linkend="phplinesetfontsize"/>
+				on an <literal>OpenCReport\Line</literal>.
+				<programlisting>public final
+OpenCReport\GenLine::set_line_font_size(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_line_font_size(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinelinebold">
+			<title>Set or get line-level bold</title>
+			<para>
+				Set the bold attribute for the whole
+				generated line.
+				Equivalent to <xref linkend="phplinesetbold"/>
+				on an <literal>OpenCReport\Line</literal>.
+				<programlisting>public final
+OpenCReport\GenLine::set_line_bold(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_line_bold(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinelineitalic">
+			<title>Set or get line-level italic</title>
+			<para>
+				Set the italic attribute for the whole
+				generated line.
+				Equivalent to <xref linkend="phplinesetitalic"/>
+				on an <literal>OpenCReport\Line</literal>.
+				<programlisting>public final
+OpenCReport\GenLine::set_line_italic(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_line_italic(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinelinecolor">
+			<title>Set or get line-level text color</title>
+			<para>
+				Set the text color for the whole generated line.
+				See <xref linkend="colorspec"/>.
+				Equivalent to <xref linkend="phplinesetcolor"/>
+				on an <literal>OpenCReport\Line</literal>.
+				<programlisting>public final
+OpenCReport\GenLine::set_line_color(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_line_color(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinelinebgcolor">
+			<title>Set or get line-level background color</title>
+			<para>
+				Set the background color for the whole generated line.
+				See <xref linkend="colorspec"/>.
+				Equivalent to <xref linkend="phplinesetbgcolor"/>
+				on an <literal>OpenCReport\Line</literal>.
+				<programlisting>public final
+OpenCReport\GenLine::set_line_bgcolor(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_line_bgcolor(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinelinesuppress">
+			<title>Set or get line-level suppress</title>
+			<para>
+				Suppress the whole generated line.
+				Equivalent to <xref linkend="phplinesetsuppress"/>
+				on an <literal>OpenCReport\Line</literal>.
+				<programlisting>public final
+OpenCReport\GenLine::set_line_suppress(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_line_suppress(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinevalue">
+			<title>Set or get per-element value</title>
+			<para>
+				Set the expression that provides the value
+				for the current element per query row.
+				For text elements this is the displayed text;
+				for barcodes the barcode data; for images
+				the image file path.
+				See <xref linkend="phptextsetvalueexpr"/>,
+				<xref linkend="phpbarcodesetvalue"/> and
+				<xref linkend="phpimagesetvalue"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_value(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_value(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinevaluedelayed">
+			<title>Set or get per-element delayed evaluation</title>
+			<para>
+				Control delayed evaluation of the per-element
+				value expression for text elements.
+				See <xref linkend="phptextsetvaluedelayed"/> and
+				<xref linkend="phpbarcodesetvaluedelayed"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_value_delayed(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_value_delayed(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinesuppress">
+			<title>Set or get per-element suppress</title>
+			<para>
+				Suppress the current element.
+				See <xref linkend="phpbarcodesetsuppress"/> and
+				<xref linkend="phpimagesetsuppress"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_suppress(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_suppress(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinewidth">
+			<title>Set or get per-element width</title>
+			<para>
+				Set the width of the current element in the
+				current size unit.
+				For text elements this is the field width;
+				for images and barcodes it is the rendered width.
+				See <xref linkend="phptextsetwidth"/>,
+				<xref linkend="phpbarcodesetwidth"/> and
+				<xref linkend="phpimagesetwidth"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_width(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_width(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlineheight">
+			<title>Set or get per-element height</title>
+			<para>
+				Set the height of the current element.
+				Used for images and barcodes.
+				See <xref linkend="phpbarcodesetheight"/> and
+				<xref linkend="phpimagesetheight"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_height(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_height(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinealignment">
+			<title>Set or get per-element alignment</title>
+			<para>
+				Set the alignment of the current element.
+				Accepted values are <literal>left</literal>,
+				<literal>right</literal> and
+				<literal>center</literal>.
+				See <xref linkend="phptextsetalign"/> and
+				<xref linkend="phpimagesetalignment"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_alignment(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_alignment(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinecolor">
+			<title>Set or get per-element text color</title>
+			<para>
+				Set the text color for the current element.
+				See <xref linkend="colorspec"/>,
+				<xref linkend="phptextsetcolor"/> and
+				<xref linkend="phpbarcodesetcolor"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_color(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_color(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinebgcolor">
+			<title>Set or get per-element background color</title>
+			<para>
+				Set the background color for the current element.
+				See <xref linkend="colorspec"/>,
+				<xref linkend="phptextsetbgcolor"/>,
+				<xref linkend="phpbarcodesetbgcolor"/> and
+				<xref linkend="phpimagesetbgcolor"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_bgcolor(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_bgcolor(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinefontname">
+			<title>Set or get per-element font name</title>
+			<para>
+				Override the font name for the current text
+				element. Ignored for barcodes and images.
+				See <xref linkend="phptextsetfontname"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_font_name(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_font_name(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinefontsize">
+			<title>Set or get per-element font size</title>
+			<para>
+				Override the font size for the current text
+				element. Ignored for barcodes and images.
+				See <xref linkend="phptextsetfontsize"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_font_size(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_font_size(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinebold">
+			<title>Set or get per-element bold</title>
+			<para>
+				Override the bold attribute for the current
+				text element.
+				See <xref linkend="phptextsetbold"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_bold(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_bold(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlineitalic">
+			<title>Set or get per-element italic</title>
+			<para>
+				Override the italic attribute for the current
+				text element.
+				See <xref linkend="phptextsetitalic"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_italic(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_italic(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlineformat">
+			<title>Set or get per-element format string</title>
+			<para>
+				Set the format string for text elements.
+				See <xref linkend="phptextsetformat"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_format(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_format(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinelink">
+			<title>Set or get per-element link URL</title>
+			<para>
+				Set the hyperlink URL for text elements.
+				See <xref linkend="phptextsetlink"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_link(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_link(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinetranslate">
+			<title>Set or get per-element translation</title>
+			<para>
+				Control translation for text elements.
+				See <xref linkend="phptextsetxlate"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_translate(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_translate(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinememo">
+			<title>Set or get per-element memo flag</title>
+			<para>
+				Mark the current text element as a multi-line
+				memo so its value is wrapped across multiple
+				lines instead of being clipped at the field width.
+				See <xref linkend="phptextsetmemo"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_memo(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_memo(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinehyphenate">
+			<title>Set or get per-element memo hyphenation</title>
+			<para>
+				Control hyphenation of memo text elements.
+				See <xref linkend="phptextsetmemohyphenate"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_hyphenate(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_hyphenate(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinewrapchars">
+			<title>Set or get per-element memo character wrapping</title>
+			<para>
+				Control whether memo text elements wrap at
+				character boundaries instead of word boundaries.
+				See <xref linkend="phptextsetmemowrap"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_wrap_chars(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_wrap_chars(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinemaxlines">
+			<title>Set or get per-element memo maximum lines</title>
+			<para>
+				Cap the number of lines a memo text element
+				may occupy.
+				See <xref linkend="phptextsetmemomaxlines"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_max_lines(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_max_lines(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlineimagetype">
+			<title>Set or get per-element image type</title>
+			<para>
+				Set the image type for image elements.
+				Accepted values include <literal>svg</literal>.
+				See <xref linkend="phpimagesettype"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_image_type(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_image_type(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinetextwidth">
+			<title>Set or get per-element text width</title>
+			<para>
+				Set the text width for text elements, used for
+				formatting within the element's field width.
+				See <xref linkend="phpimagesettextwidth"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_text_width(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_text_width(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlinebarcodetype">
+			<title>Set or get per-element barcode type</title>
+			<para>
+				Set the barcode type for barcode elements.
+				Accepted values include <literal>ean-13</literal>.
+				See <xref linkend="phpbarcodesettype"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_barcode_type(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_barcode_type(): ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 	</sect1>
@@ -4126,7 +4761,7 @@ OpenCReport\Text::get_value_delayed():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
-		<sect2 id="phptextsetformat">
+		<sect2 id="phptextsetformat" xreflabel="Set or get the format string for the field expression">
 			<title>Set or get the format string for the field expression</title>
 			<para>
 				Set the format string for the field expression.
@@ -4139,11 +4774,11 @@ OpenCReport\Text::set_format(
                      ?OpenCReport\Expr;
 
 public final
-OpenCReport\Text::set_format():
+OpenCReport\Text::get_format():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
-		<sect2 id="phptextsetxlate">
+		<sect2 id="phptextsetxlate" xreflabel="Set or get the translation flag for the field expression">
 			<title>Set or get the translation flag for the field expression</title>
 			<para>
 				Set the translation flag for the field expression.
@@ -4221,7 +4856,7 @@ OpenCReport\Text::get_bgcolor():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
-		<sect2 id="phptextsetfontname">
+		<sect2 id="phptextsetfontname" xreflabel="Set or get the field font name">
 			<title>Set or get the field font name</title>
 			<para>
 				Set the field font name.
@@ -4236,7 +4871,7 @@ OpenCReport\Text::get_font_name():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
-		<sect2 id="phptextsetfontsize">
+		<sect2 id="phptextsetfontsize" xreflabel="Set or get the field font size">
 			<title>Set or get the field font size</title>
 			<para>
 				Set the field font size.
@@ -4251,7 +4886,7 @@ OpenCReport\Text::get_font_size():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
-		<sect2 id="phptextsetbold">
+		<sect2 id="phptextsetbold" xreflabel="Set or get the field's bold flag">
 			<title>Set or get the field's bold flag</title>
 			<para>
 				Set the field's bold flag.
@@ -4266,7 +4901,7 @@ OpenCReport\Text::get_bold():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
-		<sect2 id="phptextsetitalic">
+		<sect2 id="phptextsetitalic" xreflabel="Set or get the field's italic flag">
 			<title>Set or get the field's italic flag</title>
 			<para>
 				Set the field's italic flag.
@@ -4281,7 +4916,7 @@ OpenCReport\Text::get_italic():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
-		<sect2 id="phptextsetlink">
+		<sect2 id="phptextsetlink" xreflabel="Set or get the field's link">
 			<title>Set or get the field's link</title>
 			<para>
 				Set the field's link URL.
@@ -4298,7 +4933,7 @@ OpenCReport\Text::get_link():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
-		<sect2 id="phptextsetmemo">
+		<sect2 id="phptextsetmemo" xreflabel="Set or get the field's memo flag">
 			<title>Set or get the field's memo flag</title>
 			<para>
 				Set the field's memo (multi-line text) flag.
@@ -4315,7 +4950,7 @@ OpenCReport\Text::get_memo():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
-		<sect2 id="phptextsetmemohyphenate">
+		<sect2 id="phptextsetmemohyphenate" xreflabel="Set or get the field's &quot;hyphenate&quot; flag">
 			<title>Set or get the field's "hyphenate" flag</title>
 			<para>
 				Set the field's "hyphenate" flag.
@@ -4338,7 +4973,7 @@ OpenCReport\Text::get_memo_hyphenate():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
-		<sect2 id="phptextsetmemowrap">
+		<sect2 id="phptextsetmemowrap" xreflabel="Set or get the field's &quot;wrap at characters&quot; flag">
 			<title>Set or get the field's "wrap at characters" flag</title>
 			<para>
 				Set the field's "wrap at characters" flag.
@@ -4359,7 +4994,7 @@ OpenCReport\Text::get_memo_wrap_chars():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
-		<sect2 id="phptextsetmemomaxlines">
+		<sect2 id="phptextsetmemomaxlines" xreflabel="Set or get the field's maximum number of lines">
 			<title>Set or get the field's maximum number of lines</title>
 			<para>
 				Set the field's maximum number of lines.
@@ -4609,6 +5244,8 @@ OpenCReport\Barcode::get_bgcolor():
 
     public final is_line(): bool;
 
+    public final is_genline(): bool;
+
     public final is_hline(): bool;
 
     public final is_image(): bool;
@@ -4617,6 +5254,9 @@ OpenCReport\Barcode::get_bgcolor():
 
     public final get_line():
                      ?OpenCReport\Line;
+
+    public final get_genline():
+                     ?OpenCReport\GenLine;
 
     public final get_hline():
                      ?OpenCReport\HorizontalLine;
