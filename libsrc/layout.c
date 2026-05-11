@@ -3062,6 +3062,10 @@ DLL_EXPORT_SYM bool ocrpt_output_element_is_line(ocrpt_output_element *elem) {
 	return (elem && elem->type == OCRPT_OUTPUT_LINE);
 }
 
+DLL_EXPORT_SYM bool ocrpt_output_element_is_genline(ocrpt_output_element *elem) {
+	return (elem && elem->type == OCRPT_OUTPUT_GENLINE);
+}
+
 DLL_EXPORT_SYM bool ocrpt_output_element_is_hline(ocrpt_output_element *elem) {
 	return (elem && elem->type == OCRPT_OUTPUT_HLINE);
 }

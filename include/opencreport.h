@@ -1214,6 +1214,7 @@ void ocrpt_output_add_image_end(ocrpt_output *output);
 ocrpt_output_element *ocrpt_output_element_get_next(ocrpt_output *output, ocrpt_list **list);
 
 bool ocrpt_output_element_is_line(ocrpt_output_element *elem);
+bool ocrpt_output_element_is_genline(ocrpt_output_element *elem);
 bool ocrpt_output_element_is_hline(ocrpt_output_element *elem);
 bool ocrpt_output_element_is_image(ocrpt_output_element *elem);
 bool ocrpt_output_element_is_barcode(ocrpt_output_element *elem);

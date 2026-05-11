@@ -65,6 +65,15 @@ PHP_METHOD(opencreport_output_element, is_line) {
 	RETURN_BOOL(ocrpt_output_element_is_line(oeo->elem));
 }
 
+PHP_METHOD(opencreport_output_element, is_genline) {
+	zval *object = getThis();
+	php_opencreport_output_element_object *oeo = Z_OPENCREPORT_OUTPUT_ELEMENT_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	RETURN_BOOL(ocrpt_output_element_is_genline(oeo->elem));
+}
+
 PHP_METHOD(opencreport_output_element, is_hline) {
 	zval *object = getThis();
 	php_opencreport_output_element_object *oeo = Z_OPENCREPORT_OUTPUT_ELEMENT_P(object);
@@ -104,6 +113,20 @@ PHP_METHOD(opencreport_output_element, get_line) {
 	object_init_ex(return_value, opencreport_line_ce);
 	php_opencreport_line_object *lo = Z_OPENCREPORT_LINE_P(return_value);
 	lo->line = (ocrpt_line *)oeo->elem;
+}
+
+PHP_METHOD(opencreport_output_element, get_genline) {
+	zval *object = getThis();
+	php_opencreport_output_element_object *oeo = Z_OPENCREPORT_OUTPUT_ELEMENT_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	if (!ocrpt_output_element_is_genline(oeo->elem))
+		RETURN_NULL();
+
+	object_init_ex(return_value, opencreport_genline_ce);
+	php_opencreport_genline_object *glo = Z_OPENCREPORT_GENLINE_P(return_value);
+	glo->gl = (ocrpt_genline *)oeo->elem;
 }
 
 PHP_METHOD(opencreport_output_element, get_hline) {
@@ -156,6 +179,9 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_output_element_is_line, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
+OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_output_element_is_genline, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_output_element_is_hline, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
@@ -166,6 +192,9 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_output_element_is_b
 ZEND_END_ARG_INFO()
 
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_output_element_get_line, 0, 0, OpenCReport\\Line, 1)
+ZEND_END_ARG_INFO()
+
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_output_element_get_genline, 0, 0, OpenCReport\\Line, 1)
 ZEND_END_ARG_INFO()
 
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_output_element_get_hline, 0, 0, OpenCReport\\HorizontalLine, 1)
@@ -181,6 +210,7 @@ ZEND_END_ARG_INFO()
 
 #define arginfo_opencreport_output_get_first_element NULL
 #define arginfo_opencreport_output_element_is_line NULL
+#define arginfo_opencreport_output_element_is_genline NULL
 #define arginfo_opencreport_output_element_is_hline NULL
 #define arginfo_opencreport_output_element_is_image NULL
 #define arginfo_opencreport_output_element_is_barcode NULL
@@ -194,10 +224,12 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry opencreport_output_element_class_methods[] = {
 	PHP_ME(opencreport_output_element, get_next, arginfo_opencreport_output_element_get_next, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output_element, is_line, arginfo_opencreport_output_element_is_line, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_output_element, is_genline, arginfo_opencreport_output_element_is_genline, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output_element, is_hline, arginfo_opencreport_output_element_is_hline, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output_element, is_image, arginfo_opencreport_output_element_is_image, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output_element, is_barcode, arginfo_opencreport_output_element_is_barcode, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output_element, get_line, arginfo_opencreport_output_element_get_line, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_output_element, get_line, arginfo_opencreport_output_element_get_genline, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output_element, get_hline, arginfo_opencreport_output_element_get_hline, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output_element, get_image, arginfo_opencreport_output_element_get_image, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output_element, get_barcode, arginfo_opencreport_output_element_get_barcode, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
