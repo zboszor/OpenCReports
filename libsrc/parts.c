@@ -101,6 +101,17 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_part_column_new_report(ocrpt_part_column *pd)
 	r->detailcnt = ocrpt_report_expr_parse(r, "r.self + 1", NULL);
 	ocrpt_expr_init_iterative_results(r->detailcnt, OCRPT_RESULT_NUMBER);
 
+	for (int32_t i = 0; i < OCRPT_EXPR_RESULTS; i++) {
+		ocrpt_result *res = ocrpt_result_new(pd->o);
+
+		res->type = OCRPT_RESULT_NUMBER;
+		mpfr_init2(res->number, pd->o->prec);
+		res->number_initialized = true;
+		mpfr_set_ui(res->number, 0, pd->o->rndmode);
+
+		r->matched[i] = res;
+	}
+
 	pd->reports = ocrpt_list_end_append(pd->reports, &pd->last_report, r);
 
 	for (ocrpt_list *cbl = r->o->report_added_callbacks; cbl; cbl = cbl->next) {
@@ -163,6 +174,20 @@ void ocrpt_parts_free(opencreport *o) {
 	ocrpt_list_free(parts);
 }
 
+void ocrpt_report_matched_values_free(ocrpt_report *r) {
+	for (ocrpt_list *l = r->matched_values; l; l = l->next) {
+		ocrpt_report_row_match *m = (ocrpt_report_row_match *)l->data;
+
+		ocrpt_result_free(m->result);
+		ocrpt_mem_free(m);
+	}
+
+	ocrpt_list_free(r->matched_values);
+
+	r->matched_values = NULL;
+	r->matched_values_last = NULL;
+}
+
 void ocrpt_report_free(ocrpt_report *r) {
 	ocrpt_variables_free(r);
 	ocrpt_breaks_free(r);
@@ -176,6 +201,9 @@ void ocrpt_report_free(ocrpt_report *r) {
 	r->executing = false;
 	r->exprs = r->exprs_last = NULL;
 	ocrpt_list_free(r->detailcnt_dependees);
+	for (int32_t i = 0; i < OCRPT_EXPR_RESULTS; i++)
+		ocrpt_result_free(r->matched[i]);
+	ocrpt_report_matched_values_free(r);
 	ocrpt_list_free_deep(r->start_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(r->done_callbacks, ocrpt_mem_free);
 	ocrpt_list_free_deep(r->newrow_callbacks, ocrpt_mem_free);

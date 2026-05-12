@@ -152,6 +152,12 @@ DLL_EXPORT_SYM opencreport *ocrpt_init(void) {
 	o->one->number_initialized = true;
 	mpfr_set_ui(o->one->number, 1, o->rndmode);
 
+	o->zero = ocrpt_result_new(o);
+	o->zero->type = OCRPT_RESULT_NUMBER;
+	mpfr_init2(o->zero->number, o->prec);
+	o->zero->number_initialized = true;
+	mpfr_set_ui(o->zero->number, 0, o->rndmode);
+
 	return o;
 }
 
@@ -256,6 +262,7 @@ DLL_EXPORT_SYM void ocrpt_free(opencreport *o) {
 	ocrpt_result_free(o->totpages);
 	ocrpt_result_free(o->rptformat);
 	ocrpt_result_free(o->one);
+	ocrpt_result_free(o->zero);
 
 	ocrpt_mem_string_free(o->output_buffer, true);
 	if (o->content_type)
@@ -389,6 +396,8 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 
 		ocrpt_expr_set_plain_iterative_to_null(r);
 
+		ocrpt_report_matched_values_free(r);
+
 		for (ocrpt_list *vl = r->variables; vl; vl = vl->next) {
 			ocrpt_var *v = (ocrpt_var *)vl->data;
 
@@ -402,10 +411,44 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 		while (have_row) {
 			ocrpt_list *brl;
 			bool last_row = !ocrpt_query_navigate_next(r->query);
+			ocrpt_report_row_match *row_match_ptr = NULL;
+			bool row_matched = false;
 
 			o->residx = ocrpt_expr_prev_residx(o->residx);
 
 			rows++;
+
+			/* Compute r.matched for the current row */
+			if (o->output_functions.get_current_page && o->output_functions.set_current_page) {
+				mpfr_set_ui(r->matched[o->residx]->number, 0, o->rndmode);
+				row_matched = false;
+
+				if (r->fielddetail_row_match) {
+					ocrpt_result *row_match_result = ocrpt_expr_eval(r->fielddetail_row_match);
+
+					ocrpt_list *ml;
+					for (ml = r->matched_values; ml; ml = ml->next) {
+						row_match_ptr = (ocrpt_report_row_match *)ml->data;
+
+						if (ocrpt_result_equals(row_match_result, row_match_ptr->result)) {
+							mpfr_set_ui(r->matched[o->residx]->number, 1, o->rndmode);
+							row_matched = true;
+							break;
+						}
+					}
+
+					if (!row_matched) {
+						ocrpt_report_row_match *m = ocrpt_mem_malloc(sizeof(ocrpt_report_row_match));
+
+						memset(m, 0, sizeof(ocrpt_report_row_match));
+						m->result = ocrpt_result_new(o);
+						ocrpt_result_copy(m->result, row_match_result);
+						m->page_position = *page_position;
+						m->page = o->output_functions.get_current_page(o);
+						r->matched_values = ocrpt_list_end_append(r->matched_values, &r->matched_values_last, m);
+					}
+				}
+			}
 
 			brl_start = NULL;
 			for (brl = r->breaks; brl; brl = brl->next) {
@@ -1031,6 +1074,9 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 					const ocrpt_string *fhprio = ocrpt_expr_get_string(r->fieldheader_priority_expr);
 					r->fieldheader_high_priority = fhprio && (strcasecmp(fhprio->str, "high") == 0);
 				}
+
+				ocrpt_expr_resolve_from_query(r->fielddetail_row_match, r->query);
+				ocrpt_expr_optimize(r->fielddetail_row_match);
 
 				ocrpt_layout_output_evaluate_expr_params(&r->nodata);
 				ocrpt_layout_output_evaluate_expr_params(&r->reportheader);

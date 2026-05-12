@@ -93,6 +93,34 @@ PHP_METHOD(opencreport_result, copy) {
 	ocrpt_result_copy(ro->r, src_ro->r);
 }
 
+PHP_METHOD(opencreport_result, equals) {
+	zval *object = getThis();
+	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(object);
+	zval *src_result;
+
+	if (!ro->r) {
+		zend_throw_error(NULL, "OpenCReport\\Result object was freed");
+		RETURN_THROWS();
+	}
+
+#if PHP_VERSION_ID >= 70000
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_OBJECT_OF_CLASS(src_result, opencreport_result_ce);
+	ZEND_PARSE_PARAMETERS_END();
+#else
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &src_result, opencreport_result_ce) == FAILURE)
+		return;
+#endif
+
+	php_opencreport_result_object *src_ro = Z_OPENCREPORT_RESULT_P(src_result);
+	if (!src_ro->r) {
+		zend_throw_error(NULL, "OpenCReport\\Result source object was freed");
+		RETURN_THROWS();
+	}
+
+	RETURN_BOOL(ocrpt_result_equals(ro->r, src_ro->r));
+}
+
 PHP_METHOD(opencreport_result, print) {
 	zval *object = getThis();
 	php_opencreport_result_object *ro = Z_OPENCREPORT_RESULT_P(object);
@@ -190,6 +218,10 @@ OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_result_copy, 0, 1, 
 ZEND_ARG_OBJ_INFO(0, src_result, OpenCReport\\Result, 0)
 ZEND_END_ARG_INFO()
 
+OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_result_equals, 0, 1, _IS_BOOL, 0)
+ZEND_ARG_OBJ_INFO(0, src_result, OpenCReport\\Result, 0)
+ZEND_END_ARG_INFO()
+
 OCRPT_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_opencreport_result_print, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
@@ -216,6 +248,7 @@ ZEND_END_ARG_INFO()
 
 #define arginfo_opencreport_result_free NULL
 #define arginfo_opencreport_result_copy NULL
+#define arginfo_opencreport_result_equals NULL
 #define arginfo_opencreport_result_print NULL
 #define arginfo_opencreport_result_get_type NULL
 #define arginfo_opencreport_result_is_null NULL
@@ -229,6 +262,7 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry opencreport_result_class_methods[] = {
 	PHP_ME(opencreport_result, free, arginfo_opencreport_result_free, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_result, copy, arginfo_opencreport_result_copy, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_result, equals, arginfo_opencreport_result_equals, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_result, print, arginfo_opencreport_result_print, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_result, get_type, arginfo_opencreport_result_get_type, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_result, is_null, arginfo_opencreport_result_is_null, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)

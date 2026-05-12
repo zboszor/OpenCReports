@@ -3072,6 +3072,21 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_get_fieldheader_priority(ocrpt_report *r
 	GET_REPORT_EXPR(fieldheader_priority_expr);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_set_fielddetail_row_match(ocrpt_report *r, const char *expr_string) {
+	if (!r || (r->o && r->o->executing))
+		return NULL; \
+
+	ocrpt_expr_free(r->fielddetail_row_match);
+
+	r->fielddetail_row_match = expr_string ? ocrpt_report_expr_parse(r, expr_string, NULL) : NULL;
+
+	return r->fielddetail_row_match;
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_report_get_fielddetail_row_match(ocrpt_report *r) {
+	GET_REPORT_EXPR(fielddetail_row_match);
+}
+
 DLL_EXPORT_SYM ocrpt_output_element *ocrpt_output_element_get_next(ocrpt_output *output, ocrpt_list **list) {
 	if (!output || !list)
 		return NULL;

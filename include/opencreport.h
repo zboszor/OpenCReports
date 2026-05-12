@@ -666,6 +666,10 @@ enum ocrpt_result_type ocrpt_result_get_type(ocrpt_result *result);
  */
 void ocrpt_result_copy(ocrpt_result *dst, ocrpt_result *src);
 /*
+ * Compare two result values for equality
+ */
+bool ocrpt_result_equals(ocrpt_result *r1, ocrpt_result *r2);
+/*
  * Print the result data. Good for unit testing.
  */
 void ocrpt_result_print(ocrpt_result *r);
@@ -1012,6 +1016,8 @@ ocrpt_expr *ocrpt_report_set_height(ocrpt_report *r, const char *expr_string);
 ocrpt_expr *ocrpt_report_get_height(ocrpt_report *r);
 ocrpt_expr *ocrpt_report_set_fieldheader_priority(ocrpt_report *r, const char *expr_string);
 ocrpt_expr *ocrpt_report_get_fieldheader_priority(ocrpt_report *r);
+ocrpt_expr *ocrpt_report_set_fielddetail_row_match(ocrpt_report *r, const char *expr_string);
+ocrpt_expr *ocrpt_report_get_fielddetail_row_match(ocrpt_report *r);
 
 void ocrpt_layout_part_page_header_set_report(ocrpt_part *p, ocrpt_report *r);
 ocrpt_output *ocrpt_layout_part_page_header(ocrpt_part *p);

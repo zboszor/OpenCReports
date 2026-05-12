@@ -1561,6 +1561,10 @@ OpenCReport\Expr::set_delayed(
                      OpenCReport\Result $src_result):
                      void;
 
+    public final equals(
+                     OpenCReport\Result $src_result):
+                     bool;
+
     public final print(): void;
 
     public final get_type(): long;
@@ -1590,6 +1594,16 @@ OpenCReport\Result::free(): void;</programlisting>
 				Used by unit tests.
 				<programlisting>public final
 OpenCReport\Result::copy(
+                     OpenCReport\Result $src_result):
+                     void;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpresultequals">
+			<title>Compare two result objects for equality</title>
+			<para>
+				Used by unit tests.
+				<programlisting>public final
+OpenCReport\Result::equals(
                      OpenCReport\Result $src_result):
                      void;</programlisting>
 			</para>
@@ -2498,6 +2512,13 @@ OpenCReport\Column::get_column_padding():
     public final get_fieldheader_priority():
                      ?OpenCReport\Expr;
 
+    public final set_fielddetail_row_match(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+
+    public final get_fielddetail_row_match():
+                     ?OpenCReport\Expr;
+
     public final nodata(): OpenCReport\Output;
     public final header(): OpenCReport\Output;
     public final footer(): OpenCReport\Output;
@@ -2937,7 +2958,7 @@ OpenCReport\Report::get_height():
 			</para>
 		</sect2>
 		<sect2 id="phpreportsetfhprio">
-			<title>Set or get the report's field header prioroty</title>
+			<title>Set or get the report's field header priority</title>
 			<para>
 				Set the report's field header priority.
 				See <xref linkend="reportfhpriority"/> for explanation.
@@ -2948,6 +2969,20 @@ OpenCReport\Report::set_fieldheader_priority(
 
 public final
 OpenCReport\Report::get_fieldheader_priority():
+                     ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportsetfdrowmatch">
+			<title>Set or get the report's field detail row matching expression</title>
+			<para>
+				See <xref linkend="reportsetfdmatch"/> for explanation.
+				<programlisting>public final
+OpenCReport\Report::set_fielddetail_row_match(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+
+public final
+OpenCReport\Report::get_fielddetail_row_match():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>

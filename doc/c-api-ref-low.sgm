@@ -1148,6 +1148,23 @@ ocrpt_result_copy(ocrpt_result *dst,
                   ocrpt_result *src);</programlisting>
 				</para>
 			</sect3>
+			<sect3 id="cmpexprresult">
+				<title>Compare two expression results for equality</title>
+				<para>
+					Compare two expression results for equality.
+					Both results must have been created for the same
+					<literal>opencreport</literal> structure,
+					either explicitly with <literal>ocrpt_result_new()</literal>
+					or implicitly with an expression parsed for
+					this <literal>opencreport</literal> structure
+					or a report structure owned by it. Returns
+					<literal>true</literal> if the two results are
+					equal, <literal>false</literal> otherwise.
+					<programlisting>bool
+ocrpt_result_cmp(ocrpt_result *r1,
+                  ocrpt_result *r2);</programlisting>
+				</para>
+			</sect3>
 			<sect3 id="printexprresult">
 				<title>Print an expression result</title>
 				<para>
@@ -2203,6 +2220,23 @@ ocrpt_report_set_fieldheader_priority(ocrpt_report *r,
 
 ocrpt_expr *
 ocrpt_report_get_fieldheader_priority(ocrpt_report *r);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="reportsetfdmatch" xreflabel="Set or get the report's field detail row matching expression">
+					<title>Set or get the report's field detail row matching expression</title>
+					<para>
+						The expression value for the current data row is
+						matched against values of previous rows.
+						When a match is found, an internal report variable
+						called <literal>r.matched</literal> is set to
+						<literal>1</literal>. If no match is found, this
+						internal variable is set to <literal>0</literal>.
+						<programlisting>ocrpt_expr *
+ocrpt_report_set_fielddetail_row_match(ocrpt_report *r,
+                                       const char *expr_string);
+
+ocrpt_expr *
+ocrpt_report_get_fielddetail_row_match(ocrpt_report *r);</programlisting>
 					</para>
 				</sect4>
 			</sect3>

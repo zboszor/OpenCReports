@@ -112,7 +112,8 @@ TESTS = \
 	r_value_test \
 	r_self_crash_test \
 	constify_test \
-	constify2_test
+	constify2_test \
+	matched_test
 
 PHP_TESTS = \
 	grammar_test expr_test function_test \

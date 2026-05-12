@@ -132,6 +132,7 @@ struct opencreport {
 	ocrpt_result *rptformat;
 	/* Helper for ocrpt_inc and ocrpt_dec */
 	ocrpt_result *one;
+	ocrpt_result *zero;
 
 	/* Locale specific data */
 	char *textdomain;

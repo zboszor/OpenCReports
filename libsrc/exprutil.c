@@ -878,6 +878,16 @@ void ocrpt_expr_resolve_worker(ocrpt_expr *e, ocrpt_query *query, ocrpt_expr *or
 						ocrpt_expr_set_result_owned(e, i, false);
 					}
 				}
+			} else if (strcmp(e->name->str, "matched") == 0) {
+				for (i = 0; i < OCRPT_EXPR_RESULTS; i++)  {
+					if (!e->result[i]) {
+						if (orig_e->r)
+							e->result[i] = orig_e->r->matched[i];
+						else
+							e->result[i] = orig_e->o->zero;
+						ocrpt_expr_set_result_owned(e, i, false);
+					}
+				}
 			} else {
 				if (unresolved)
 					*unresolved = true;
@@ -1351,6 +1361,40 @@ DLL_EXPORT_SYM ocrpt_result *ocrpt_expr_make_error_result(ocrpt_expr *e, const c
 	return result;
 }
 
+DLL_EXPORT_SYM bool ocrpt_result_equals(ocrpt_result *r1, ocrpt_result *r2) {
+	if (!r1 || !r2)
+		return false;
+
+	/* (SQL) NULLs compare as non-equal */
+	if (r1->isnull || r2->isnull)
+		return false;
+
+	/* Different types are obviously non-equal */
+	if (r1->type != r2->type)
+		return false;
+
+	/* Two subsequent errors compare as non-equal */
+	switch (r1->type) {
+	case OCRPT_RESULT_ERROR:
+		return false;
+	case OCRPT_RESULT_STRING:
+		return !strcmp(r1->string->str, r2->string->str);
+	case OCRPT_RESULT_NUMBER:
+		return !mpfr_cmp(r1->number, r2->number);
+	case OCRPT_RESULT_DATETIME:
+		if (r1->date_valid != r2->date_valid)
+			return false;
+		if (r1->time_valid != r2->time_valid)
+			return false;
+		if (r1->interval != r2->interval)
+			return false;
+		return !memcmp(&r1->datetime, &r2->datetime, sizeof(struct tm));
+	default:
+		ocrpt_err_printf("unknown result type %d\n", r1->type);
+		return false;
+	}
+}
+
 /*
  * Returns true if the two subsequent row data
  * in the expression are the same
@@ -1362,37 +1406,7 @@ DLL_EXPORT_SYM bool ocrpt_expr_cmp_results(ocrpt_expr *e) {
 	ocrpt_result *cur = EXPR_RESULT(e);
 	ocrpt_result *prev = EXPR_PREV_RESULT(e);
 
-	if (!cur || !prev)
-		return false;
-
-	/* (SQL) NULLs compare as non-equal */
-	if (cur->isnull || prev->isnull)
-		return false;
-
-	/* Different types are obviously non-equal */
-	if (cur->type != prev->type)
-		return false;
-
-	/* Two subsequent errors compare as non-equal */
-	switch (cur->type) {
-	case OCRPT_RESULT_ERROR:
-		return false;
-	case OCRPT_RESULT_STRING:
-		return !strcmp(cur->string->str, prev->string->str);
-	case OCRPT_RESULT_NUMBER:
-		return !mpfr_cmp(cur->number, prev->number);
-	case OCRPT_RESULT_DATETIME:
-		if (cur->date_valid != prev->date_valid)
-			return false;
-		if (cur->time_valid != prev->time_valid)
-			return false;
-		if (cur->interval != prev->interval)
-			return false;
-		return !memcmp(&cur->datetime, &prev->datetime, sizeof(struct tm));
-	default:
-		ocrpt_err_printf("unknown expression type %d\n", cur->type);
-		return false;
-	}
+	return ocrpt_result_equals(cur, prev);
 }
 
 DLL_EXPORT_SYM void ocrpt_expr_set_iterative_start_value(ocrpt_expr *e, bool start_with_init) {

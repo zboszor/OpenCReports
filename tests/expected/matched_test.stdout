@@ -1,0 +1,71 @@
+Row #0
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 1.000000)
+	Col #1: 'firstname': string value: Fred
+	Col #2: 'surname': string value: Flintstone
+	Col #3: 'age': string value: NULL (converted to number: 31.000000)
+	Col #4: 'male': string value: NULL (converted to number: 1.000000)
+
+Expression: r.'matched'
+Evaluated: (number)0.000000
+
+
+Row #1
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 2.000000)
+	Col #1: 'firstname': string value: Barney
+	Col #2: 'surname': string value: Rubble
+	Col #3: 'age': string value: NULL (converted to number: 29.000000)
+	Col #4: 'male': string value: NULL (converted to number: 1.000000)
+
+Expression: r.'matched'
+Evaluated: (number)0.000000
+
+
+Row #2
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 3.000000)
+	Col #1: 'firstname': string value: Bamm-Bamm
+	Col #2: 'surname': string value: Rubble
+	Col #3: 'age': string value: NULL (converted to number: 2.000000)
+	Col #4: 'male': string value: NULL (converted to number: 1.000000)
+
+Expression: r.'matched'
+Evaluated: (number)1.000000
+
+
+Row #3
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 4.000000)
+	Col #1: 'firstname': string value: Wilma
+	Col #2: 'surname': string value: Flintstone
+	Col #3: 'age': string value: NULL (converted to number: 28.000000)
+	Col #4: 'male': string value: NULL (converted to number: 0.000000)
+
+Expression: r.'matched'
+Evaluated: (number)1.000000
+
+
+Row #4
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 5.000000)
+	Col #1: 'firstname': string value: Betty
+	Col #2: 'surname': string value: Rubble
+	Col #3: 'age': string value: NULL (converted to number: 27.000000)
+	Col #4: 'male': string value: NULL (converted to number: 0.000000)
+
+Expression: r.'matched'
+Evaluated: (number)1.000000
+
+
+Row #5
+Query: 'a':
+	Col #0: 'id': string value: NULL (converted to number: 6.000000)
+	Col #1: 'firstname': string value: Pebbles
+	Col #2: 'surname': string value: Flintstone
+	Col #3: 'age': string value: NULL (converted to number: 0.500000)
+	Col #4: 'male': string value: NULL (converted to number: 0.000000)
+
+Expression: r.'matched'
+Evaluated: (number)1.000000
+

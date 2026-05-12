@@ -474,6 +474,20 @@ lekérdezés.oszlop_név</programlisting>
 						<xref linkend="variables"/>.
 					</para>
 				</sect4>
+				<sect4 id="matchedval">
+					<title>Data row matched</title>
+					<para>
+						<programlisting>r.matched</programlisting>
+						When the report has a field detail row matching
+						expression set, the expression is evaluated for
+						data rows in the report. If there was a previous
+						row with the current value of this expression,
+						the value of this variable is set to
+						<literal>1</literal>. Otherwise it's set to
+						<literal>0</literal>.
+						See <xref linkend="reportsetfdmatch"/>.
+					</para>
+				</sect4>
 				<sect4 id="outputformatname">
 					<title>Report output format value</title>
 					<para>

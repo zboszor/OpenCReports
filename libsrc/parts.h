@@ -27,6 +27,13 @@ struct ocrpt_cb_data {
 };
 typedef struct ocrpt_cb_data ocrpt_cb_data;
 
+struct ocrpt_report_row_match {
+	ocrpt_result *result;
+	double page_position;
+	void *page;
+};
+typedef struct ocrpt_report_row_match ocrpt_report_row_match;
+
 struct ocrpt_report {
 	const char *font_name;
 	double font_size;
@@ -55,6 +62,12 @@ struct ocrpt_report {
 	/* For r.detailcnt */
 	ocrpt_expr *detailcnt;
 	ocrpt_list *detailcnt_dependees;
+
+	/* For r.matched */
+	ocrpt_expr *fielddetail_row_match;
+	ocrpt_result *matched[OCRPT_EXPR_RESULTS];
+	ocrpt_list *matched_values; /* list of ocrpt_report_row_match */
+	ocrpt_list *matched_values_last;
 
 	/* Parent part */
 	ocrpt_part *part;
@@ -246,6 +259,7 @@ void ocrpt_report_evaluate_detailcnt_dependees(ocrpt_report *r);
 
 void ocrpt_part_free(struct ocrpt_part *p);
 void ocrpt_parts_free(opencreport *o);
+void ocrpt_report_matched_values_free(ocrpt_report *r);
 void ocrpt_report_free(ocrpt_report *r);
 
 #endif
