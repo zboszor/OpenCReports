@@ -150,6 +150,8 @@ struct ocrpt_part_column {
 
 	/* Parent structure */
 	opencreport *o;
+	ocrpt_part *p;
+	ocrpt_part_row *pr;
 
 	/* Parameter expressions */
 	ocrpt_expr *width_expr;
@@ -174,6 +176,7 @@ struct ocrpt_part_row {
 
 	/* Parent structure */
 	opencreport *o;
+	ocrpt_part *p;
 
 	/* Parameter expressions */
 	ocrpt_expr *layout_expr;

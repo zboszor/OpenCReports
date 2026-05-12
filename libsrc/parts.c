@@ -55,6 +55,7 @@ DLL_EXPORT_SYM ocrpt_part_row *ocrpt_part_new_row(ocrpt_part *p) {
 	ocrpt_part_row *pr = ocrpt_mem_malloc(sizeof(ocrpt_part_row));
 	memset(pr, 0, sizeof(ocrpt_part_row));
 	pr->o = p->o;
+	pr->p = p;
 	p->rows = ocrpt_list_end_append(p->rows, &p->row_last, pr);
 	return pr;
 }
@@ -66,6 +67,8 @@ DLL_EXPORT_SYM ocrpt_part_column *ocrpt_part_row_new_column(ocrpt_part_row *pr) 
 	ocrpt_part_column *pd = ocrpt_mem_malloc(sizeof(ocrpt_part_column));
 	memset(pd, 0, sizeof(ocrpt_part_column));
 	pd->o = pr->o;
+	pd->p = pr->p;
+	pd->pr = pr;
 	pd->detail_columns = 1;
 
 	pr->pd_list = ocrpt_list_end_append(pr->pd_list, &pr->pd_last, pd);
@@ -81,6 +84,9 @@ DLL_EXPORT_SYM ocrpt_report *ocrpt_part_column_new_report(ocrpt_part_column *pd)
 	memset(r, 0, sizeof(ocrpt_report));
 
 	r->o = pd->o;
+	r->p = pd->p;
+	r->pr = pd->pr;
+	r->pd = pd;
 	r->iterations = 1;
 	r->fieldheader_high_priority = true;
 	r->nodata.o = pd->o;
