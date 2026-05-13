@@ -30,6 +30,7 @@ typedef struct ocrpt_cb_data ocrpt_cb_data;
 struct ocrpt_report_row_match {
 	ocrpt_result *result;
 	double page_position;
+	double old_page_position;
 	void *page;
 };
 typedef struct ocrpt_report_row_match ocrpt_report_row_match;
