@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="7" cols="5" />
+	</Queries>
+	<Report>
+		<Detail>
+			<FieldHeaders>
+				<Output>
+					<Line>
+						<field value="'Name'" width="30" />
+						<literal width="1"/>
+						<field value="'Has match'" width="9" />
+					</Line>
+				</Output>
+			</FieldHeaders>
+			<FieldDetails matched="surname">
+				<Output>
+					<Line>
+						<field value="firstname + ' ' + surname" width="30" />
+						<literal width="1"/>
+						<field value="r.matched ? 'yes' : 'no'" width="9" align="r.matched ? 'left' : 'right'" />
+					</Line>
+				</Output>
+			</FieldDetails>
+		</Detail>
+	</Report>
+</OpenCReport>

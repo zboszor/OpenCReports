@@ -1,0 +1,8 @@
+Name                           Has match
+Fred Flintstone                       no
+Barney Rubble                         no
+Bamm-Bamm Rubble               yes      
+The Great Gazoo                       no
+Wilma Flintstone               yes      
+Betty Rubble                   yes      
+Pebbles Flintstone             yes      

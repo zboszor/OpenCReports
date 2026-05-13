@@ -276,7 +276,9 @@ LAYOUT_TESTS = \
 	layout_xml50_test \
 	layout_xml51_test \
 	layout_xml52_test \
-	layout_xml53_test
+	layout_xml53_test \
+	layout_matched_test \
+	layout_matched_overlay_test
 
 LAYOUT_CSV_TESTS = \
 	layout_xml17_csv1_test \
