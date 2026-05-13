@@ -419,34 +419,37 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 			rows++;
 
 			/* Compute r.matched for the current row */
-			if (o->output_functions.get_current_page && o->output_functions.set_current_page) {
+			row_matched = false;
+			if (r->fielddetail_row_match) {
+				ocrpt_result *row_match_result = ocrpt_expr_eval(r->fielddetail_row_match);
+				ocrpt_list *ml;
+
 				mpfr_set_ui(r->matched[o->residx]->number, 0, o->rndmode);
-				row_matched = false;
 
-				if (r->fielddetail_row_match) {
-					ocrpt_result *row_match_result = ocrpt_expr_eval(r->fielddetail_row_match);
+				for (ml = r->matched_values; ml; ml = ml->next) {
+					row_match_ptr = (ocrpt_report_row_match *)ml->data;
 
-					ocrpt_list *ml;
-					for (ml = r->matched_values; ml; ml = ml->next) {
-						row_match_ptr = (ocrpt_report_row_match *)ml->data;
-
-						if (ocrpt_result_equals(row_match_result, row_match_ptr->result)) {
-							mpfr_set_ui(r->matched[o->residx]->number, 1, o->rndmode);
-							row_matched = true;
-							break;
-						}
+					if (ocrpt_result_equals(row_match_result, row_match_ptr->result)) {
+						mpfr_set_ui(r->matched[o->residx]->number, 1, o->rndmode);
+						row_matched = true;
+						break;
 					}
+				}
 
-					if (!row_matched) {
-						ocrpt_report_row_match *m = ocrpt_mem_malloc(sizeof(ocrpt_report_row_match));
+				if (!row_matched) {
+					ocrpt_report_row_match *m = ocrpt_mem_malloc(sizeof(ocrpt_report_row_match));
 
-						memset(m, 0, sizeof(ocrpt_report_row_match));
-						m->result = ocrpt_result_new(o);
-						ocrpt_result_copy(m->result, row_match_result);
+					memset(m, 0, sizeof(ocrpt_report_row_match));
+					m->result = ocrpt_result_new(o);
+					ocrpt_result_copy(m->result, row_match_result);
+
+					if (r->overlay && o->output_functions.get_current_page && o->output_functions.set_current_page) {
 						m->page_position = *page_position;
-						m->page = o->output_functions.get_current_page(o);
-						r->matched_values = ocrpt_list_end_append(r->matched_values, &r->matched_values_last, m);
+						if (o->output_functions.get_current_page && o->output_functions.set_current_page)
+							m->page = o->output_functions.get_current_page(o);
 					}
+
+					r->matched_values = ocrpt_list_end_append(r->matched_values, &r->matched_values_last, m);
 				}
 			}
 
@@ -589,7 +592,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 
 				void *row_matched_current_page = NULL;
 				double row_matched_old_page_position = 0.0;
-				if (row_matched && o->output_functions.get_current_page && o->output_functions.set_current_page) {
+				if (row_matched && r->overlay && o->output_functions.get_current_page && o->output_functions.set_current_page) {
 					row_matched_current_page = o->output_functions.get_current_page(o);
 					row_matched_old_page_position = *page_position;
 
@@ -600,7 +603,7 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 				ocrpt_layout_output_init(&r->fielddetails);
 				ocrpt_layout_output(o, p, pr, pd, r, NULL, &r->fielddetails, rows, newpage, page_indent, page_position, old_page_position);
 
-				if (row_matched && o->output_functions.get_current_page && o->output_functions.set_current_page) {
+				if (row_matched && r->overlay && o->output_functions.get_current_page && o->output_functions.set_current_page) {
 					o->output_functions.set_current_page(o, row_matched_current_page);
 					*page_position = row_matched_old_page_position;
 				}
@@ -1093,6 +1096,11 @@ static void ocrpt_execute_parts_evaluate_global_params(opencreport *o, ocrpt_par
 
 				ocrpt_expr_resolve_from_query(r->fielddetail_row_match, r->query);
 				ocrpt_expr_optimize(r->fielddetail_row_match);
+
+				ocrpt_expr_resolve_nowarn(r->fielddetail_overlay);
+				ocrpt_expr_optimize(r->fielddetail_overlay);
+				if (r->fielddetail_overlay)
+					r->overlay = !!ocrpt_expr_get_long(r->fielddetail_overlay);
 
 				ocrpt_layout_output_evaluate_expr_params(&r->nodata);
 				ocrpt_layout_output_evaluate_expr_params(&r->reportheader);

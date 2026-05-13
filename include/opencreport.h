@@ -1019,6 +1019,8 @@ ocrpt_expr *ocrpt_report_set_fieldheader_priority(ocrpt_report *r, const char *e
 ocrpt_expr *ocrpt_report_get_fieldheader_priority(ocrpt_report *r);
 ocrpt_expr *ocrpt_report_set_fielddetail_row_match(ocrpt_report *r, const char *expr_string);
 ocrpt_expr *ocrpt_report_get_fielddetail_row_match(ocrpt_report *r);
+ocrpt_expr *ocrpt_report_set_fielddetail_overlay(ocrpt_report *r, const char *expr_string);
+ocrpt_expr *ocrpt_report_get_fielddetail_overlay(ocrpt_report *r);
 
 void ocrpt_layout_part_page_header_set_report(ocrpt_part *p, ocrpt_report *r);
 ocrpt_output *ocrpt_layout_part_page_header(ocrpt_part *p);

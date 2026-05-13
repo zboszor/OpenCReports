@@ -65,6 +65,7 @@ struct ocrpt_report {
 
 	/* For r.matched */
 	ocrpt_expr *fielddetail_row_match;
+	ocrpt_expr *fielddetail_overlay;
 	ocrpt_result *matched[OCRPT_EXPR_RESULTS];
 	ocrpt_list *matched_values; /* list of ocrpt_report_row_match */
 	ocrpt_list *matched_values_last;
@@ -128,6 +129,7 @@ struct ocrpt_report {
 	bool noquery_show_nodata:1;
 	bool rlib_compat:1;
 	bool height_valid:1;
+	bool overlay:1;
 };
 
 struct ocrpt_part_column {
