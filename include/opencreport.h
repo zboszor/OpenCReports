@@ -217,6 +217,7 @@ struct ocrpt_color {
 	double r;
 	double g;
 	double b;
+	double alpha;
 };
 typedef struct ocrpt_color ocrpt_color;
 

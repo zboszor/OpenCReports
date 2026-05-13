@@ -258,7 +258,7 @@ static void ocrpt_xml_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		}
 		xmlSetProp(data, BAD_CAST "align", BAD_CAST align);
 
-		ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
+		ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0, .alpha = 1.0 };
 		if (EXPR_VALID_STRING(le->bgcolor))
 			ocrpt_get_color(EXPR_STRING_VAL(le->bgcolor), &bgcolor, true);
 		else if (EXPR_VALID_STRING(l->bgcolor))
@@ -267,7 +267,7 @@ static void ocrpt_xml_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(bgcolor.r), ocrpt_common_color_value(bgcolor.g), ocrpt_common_color_value(bgcolor.b));
 		xmlSetProp(data, BAD_CAST "bgcolor", BAD_CAST priv->base.data->str);
 
-		ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
+		ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0, .alpha = 1.0 };
 		if (EXPR_VALID_STRING(le->color))
 			ocrpt_get_color(EXPR_STRING_VAL(le->color), &color, true);
 		else if (EXPR_VALID_STRING(l->color))
@@ -319,14 +319,14 @@ static void ocrpt_xml_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row
 		ocrpt_mem_string_append_printf(priv->base.data, "%.2lf", bc->barcode_height);
 		xmlSetProp(barc, BAD_CAST "height", BAD_CAST priv->base.data->str);
 
-		ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
+		ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0, .alpha = 1.0 };
 		if (EXPR_VALID_STRING(bc->bgcolor))
 			ocrpt_get_color(EXPR_STRING_VAL(bc->bgcolor), &bgcolor, true);
 		priv->base.data->len = 0;
 		ocrpt_mem_string_append_printf(priv->base.data, "#%02x%02x%02x", ocrpt_common_color_value(bgcolor.r), ocrpt_common_color_value(bgcolor.g), ocrpt_common_color_value(bgcolor.b));
 		xmlSetProp(barc, BAD_CAST "bgcolor", BAD_CAST priv->base.data->str);
 
-		ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
+		ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0, .alpha = 1.0 };
 		if (EXPR_VALID_STRING(bc->color))
 			ocrpt_get_color(EXPR_STRING_VAL(bc->color), &color, true);
 		priv->base.data->len = 0;

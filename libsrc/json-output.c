@@ -213,7 +213,7 @@ static void ocrpt_json_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	yajl_gen_string(priv->yajl_gen, (ystr)"align", 5);
 	yajl_gen_string(priv->yajl_gen, (ystr)align, strlen(align));
 
-	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
+	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0, .alpha = 1.0 };
 	if (EXPR_VALID_STRING(le->bgcolor))
 		ocrpt_get_color(EXPR_STRING_VAL(le->bgcolor), &bgcolor, true);
 	else if (EXPR_VALID_STRING(l->bgcolor))
@@ -224,7 +224,7 @@ static void ocrpt_json_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	yajl_gen_string(priv->yajl_gen, (ystr)"bgcolor", 7);
 	yajl_gen_string(priv->yajl_gen, (ystr)priv->base.data->str, priv->base.data->len);
 
-	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
+	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0, .alpha = 1.0 };
 	if (EXPR_VALID_STRING(le->color))
 		ocrpt_get_color(EXPR_STRING_VAL(le->color), &color, true);
 	else if (EXPR_VALID_STRING(l->color))
@@ -299,7 +299,7 @@ static void ocrpt_json_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 	yajl_gen_string(priv->yajl_gen, (ystr)"height", 6);
 	yajl_gen_double(priv->yajl_gen, bc->barcode_height);
 
-	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
+	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0, .alpha = 1.0 };
 	if (EXPR_VALID_STRING(bc->bgcolor))
 		ocrpt_get_color(EXPR_STRING_VAL(bc->bgcolor), &bgcolor, true);
 
@@ -308,7 +308,7 @@ static void ocrpt_json_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 	yajl_gen_string(priv->yajl_gen, (ystr)"bgcolor", 7);
 	yajl_gen_string(priv->yajl_gen, (ystr)priv->base.data->str, priv->base.data->len);
 
-	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
+	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0, .alpha = 1.0 };
 	if (EXPR_VALID_STRING(bc->color))
 		ocrpt_get_color(EXPR_STRING_VAL(bc->color), &color, true);
 	priv->base.data->len = 0;
@@ -384,7 +384,7 @@ static void ocrpt_json_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 	} else
 		length = page_width - indent;
 
-	ocrpt_color color;
+	ocrpt_color color = { 0.0, 0.0, 0.0, 1.0 };
 	char *color_name = NULL;
 
 	if (EXPR_VALID_STRING(hline->color))

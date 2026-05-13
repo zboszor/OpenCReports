@@ -141,7 +141,7 @@ static void ocrpt_html_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row 
 			indent = page_indent + (page_width - length) / 2.0;
 	}
 
-	ocrpt_color color;
+	ocrpt_color color = { 0.0, 0.0, 0.0, 1.0 };
 	char *color_name = NULL;
 
 	if (EXPR_VALID_STRING(hline->color))
@@ -228,8 +228,9 @@ static void ocrpt_html_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 									(text_fits || !pd) ? le->width_computed : pd->column_width - le->start);
 	} else if (ocrpt_list_length(l->elements) == 1) {
 		/*
-		 * This is (nr element == 1) is a best approximation
-		 * for 
+		 * When there is only a single element in the line and no width is
+		 * set, the best guess is that the element's alignment is applied
+		 * over the whole page width.
 		 */
 		ocrpt_mem_string_append_printf(o->output_buffer,
 									"width: %.2lfpt; ",
@@ -253,7 +254,7 @@ static void ocrpt_html_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 
 	ocrpt_mem_string_append_printf(o->output_buffer, "font-family: '%s'; font-size: %.2lfpt; ", le->font, le->fontsz);
 
-	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
+	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0, .alpha = 1.0 };
 	if (EXPR_VALID_STRING(le->bgcolor))
 		ocrpt_get_color(EXPR_STRING_VAL(le->bgcolor), &bgcolor, true);
 	else if (EXPR_VALID_STRING(l->bgcolor))
@@ -261,7 +262,7 @@ static void ocrpt_html_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 
 	ocrpt_mem_string_append_printf(o->output_buffer, "background-color: #%02x%02x%02x; ", ocrpt_common_color_value(bgcolor.r), ocrpt_common_color_value(bgcolor.g), ocrpt_common_color_value(bgcolor.b));
 
-	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
+	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0, .alpha = 1.0 };
 	if (EXPR_VALID_STRING(le->color))
 		ocrpt_get_color(EXPR_STRING_VAL(le->color), &color, true);
 	else if (EXPR_VALID_STRING(l->color))
@@ -478,8 +479,8 @@ static void ocrpt_html_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, bc->encoded_width - first_space + 20.0, bc->barcode_height);
 	cairo_t *cr = cairo_create(surface);
 
-	ocrpt_color bg = { 1.0, 1.0, 1.0 };
-	ocrpt_color fg = { 0.0, 0.0, 0.0 };
+	ocrpt_color bg = { 1.0, 1.0, 1.0, 1.0 };
+	ocrpt_color fg = { 0.0, 0.0, 0.0, 1.0 };
 
 	if (EXPR_VALID_STRING(bc->color))
 		ocrpt_get_color(EXPR_STRING_VAL(bc->color), &fg, false);
@@ -493,7 +494,7 @@ static void ocrpt_html_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 
 	cairo_save(cr);
 
-	cairo_set_source_rgb(cr, bg.r, bg.g, bg.b);
+	cairo_set_source_rgba(cr, bg.r, bg.g, bg.b, bg.alpha);
 	cairo_set_line_width(cr, 0.0);
 	cairo_rectangle(cr, 0, 0, bc->barcode_width - 1, bc->barcode_height - 1);
 	cairo_fill(cr);
@@ -515,7 +516,7 @@ static void ocrpt_html_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_ro
 			int32_t width = isdigit(e) ? e - '0' : e - 'a' + 1;
 
 			if (bar % 2) {
-				cairo_set_source_rgb(cr, fg.r, fg.g, fg.b);
+				cairo_set_source_rgba(cr, fg.r, fg.g, fg.b, fg.alpha);
 				cairo_set_line_width(cr, 0.0);
 				cairo_rectangle(cr, pos, 0.0, (double)width, bc->barcode_height - 1);
 				cairo_fill(cr);

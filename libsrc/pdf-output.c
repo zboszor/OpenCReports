@@ -89,7 +89,7 @@ static void ocrpt_pdf_draw_image(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 	 * The background filler is 0.2 points wider.
 	 * This way, there's no lines between the line elements or lines.
 	 */
-	cairo_set_source_rgb(priv->cr, img->bg.r, img->bg.g, img->bg.b);
+	cairo_set_source_rgba(priv->cr, img->bg.r, img->bg.g, img->bg.b, img->bg.alpha);
 	cairo_set_line_width(priv->cr, 0.0);
 	cairo_rectangle(priv->cr, x, y, w + (last ? 0.0 : 0.2), h + 0.2);
 	cairo_fill(priv->cr);
@@ -156,8 +156,8 @@ static void ocrpt_pdf_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row
 
 	cairo_save(priv->cr);
 
-	ocrpt_color bg = { 1.0, 1.0, 1.0 };
-	ocrpt_color fg = { 0.0, 0.0, 0.0 };
+	ocrpt_color bg = { 1.0, 1.0, 1.0, 1.0 };
+	ocrpt_color fg = { 0.0, 0.0, 0.0, 1.0 };
 
 	if (EXPR_VALID_STRING(bc->color))
 		ocrpt_get_color(EXPR_STRING_VAL(bc->color), &fg, false);
@@ -173,7 +173,7 @@ static void ocrpt_pdf_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row
 	 * The background filler is 0.2 points wider.
 	 * This way, there's no lines between the line elements or lines.
 	 */
-	cairo_set_source_rgb(priv->cr, bg.r, bg.g, bg.b);
+	cairo_set_source_rgba(priv->cr, bg.r, bg.g, bg.b, bg.alpha);
 	cairo_set_line_width(priv->cr, 0.0);
 	cairo_rectangle(priv->cr, x, y, w + (last ? 0.0 : 0.2), h + 0.2);
 	cairo_fill(priv->cr);
@@ -207,7 +207,7 @@ static void ocrpt_pdf_draw_barcode(opencreport *o, ocrpt_part *p, ocrpt_part_row
 			int32_t width = isdigit(e) ? e - '0' : e - 'a' + 1;
 
 			if (bar % 2) {
-				cairo_set_source_rgb(priv->cr, fg.r, fg.g, fg.b);
+				cairo_set_source_rgba(priv->cr, fg.r, fg.g, fg.b, fg.alpha);
 				cairo_set_line_width(priv->cr, 0.0);
 				cairo_rectangle(priv->cr, pos, 0.0, (double)width - INK_SPREADING_TOLERANCE, bc->barcode_height);
 				cairo_fill(priv->cr);
@@ -229,7 +229,7 @@ static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 
 	cairo_save(priv->cr);
 
-	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
+	ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0, .alpha = 1.0 };
 	if (EXPR_VALID_STRING(le->bgcolor))
 		ocrpt_get_color(EXPR_STRING_VAL(le->bgcolor), &bgcolor, true);
 	else if (EXPR_VALID_STRING(l->bgcolor))
@@ -242,7 +242,7 @@ static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 		rest_width = page_width - rest_start;
 	}
 
-	cairo_set_source_rgb(priv->cr, bgcolor.r, bgcolor.g, bgcolor.b);
+	cairo_set_source_rgba(priv->cr, bgcolor.r, bgcolor.g, bgcolor.b, bgcolor.alpha);
 	cairo_set_line_width(priv->cr, 0.0);
 	/*
 	 * The background filler is 0.2 points wider.
@@ -251,13 +251,13 @@ static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 	cairo_rectangle(priv->cr, page_indent + le->start, y, le->width_computed + (last ? 0.0 : 0.2), l->line_height + 0.2);
 	cairo_fill(priv->cr);
 
-	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0 };
+	ocrpt_color color = { .r = 0.0, .g = 0.0, .b = 0.0, .alpha = 1.0 };
 	if (EXPR_VALID_STRING(le->color))
 		ocrpt_get_color(EXPR_STRING_VAL(le->color), &color, true);
 	else if (EXPR_VALID_STRING(l->color))
 		ocrpt_get_color(EXPR_STRING_VAL(l->color), &color, true);
 
-	cairo_set_source_rgb(priv->cr, color.r, color.g, color.b);
+	cairo_set_source_rgba(priv->cr, color.r, color.g, color.b, color.alpha);
 
 	if (le->pline) {
 		if (le->use_bb) {
@@ -310,9 +310,9 @@ static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 	}
 
 	if (last && le->start + le->width_computed < page_width) {
-		ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0 };
+		ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0, .alpha = 1.0 };
 
-		cairo_set_source_rgb(priv->cr, bgcolor.r, bgcolor.g, bgcolor.b);
+		cairo_set_source_rgba(priv->cr, bgcolor.r, bgcolor.g, bgcolor.b, bgcolor.alpha);
 		cairo_set_line_width(priv->cr, 0.0);
 		/*
 		 * The background filler is 0.2 points wider.
@@ -377,7 +377,7 @@ static void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 			indent = page_indent + (page_width - length) / 2.0;
 	}
 
-	ocrpt_color color;
+	ocrpt_color color = { 0.0, 0.0, 0.0, 1.0 };
 	char *color_name = NULL;
 
 	ocrpt_cairo_create(o);
@@ -387,7 +387,7 @@ static void ocrpt_pdf_draw_hline(opencreport *o, ocrpt_part *p, ocrpt_part_row *
 
 	ocrpt_get_color(color_name, &color, false);
 
-	cairo_set_source_rgb(priv->cr, color.r, color.g, color.b);
+	cairo_set_source_rgba(priv->cr, color.r, color.g, color.b, color.alpha);
 	cairo_set_line_width(priv->cr, 0.0);
 	double wider = 0.0;
 	if (output->iter->next) {
@@ -404,7 +404,7 @@ static void ocrpt_pdf_draw_rectangle(opencreport *o, ocrpt_part *p, ocrpt_part_r
 
 	ocrpt_cairo_create(o);
 
-	cairo_set_source_rgb(priv->cr, color->r, color->g, color->b);
+	cairo_set_source_rgba(priv->cr, color->r, color->g, color->b, color->alpha);
 	cairo_set_line_width(priv->cr, line_width);
 	cairo_rectangle(priv->cr, x, y, width, height);
 	cairo_stroke(priv->cr);

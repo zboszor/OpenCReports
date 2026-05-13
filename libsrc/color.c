@@ -45,19 +45,29 @@ static int colorfindcmp(const void *key, const void *a) {
 	return strcasecmp(key, ((ocrpt_named_color *)a)->name);
 }
 
-/* We assume cname is 6 digits long. Callers should make sure. */
+/*
+ * We assume cname is 6 or 8 digits long.
+ * For colors with alpha, ARGB notation is used.
+ * Callers should make sure.
+ */
 static void ocrpt_parse_html_color(const char *cname, ocrpt_named_color *color) {
 	char *endptr = NULL;
 	long html = strtol(cname, &endptr, 16);
+	size_t len = endptr - cname;
 
 	if (*endptr == 0) {
 		color->c.r = (double)((html >> 16) & 0xff) / 255.0;
 		color->c.g = (double)((html >>  8) & 0xff) / 255.0;
 		color->c.b = (double)((html      ) & 0xff) / 255.0;
+		/* For RGB patterns, make sure the color is opaque. */
+		if (len <= 6)
+			html |= 0xff000000;
+		color->c.alpha = (double)((html >> 24) & 0xff) / 255.0;
 	} else {
 		color->c.r = 0.0;
 		color->c.g = 0.0;
 		color->c.b = 0.0;
+		color->c.alpha = 1.0;
 	}
 }
 
@@ -83,17 +93,19 @@ DLL_EXPORT_SYM void ocrpt_get_color(const char *cname, ocrpt_color *color, bool 
 	} else if (strncasecmp(cname, "0x", 2) == 0) {
 		ocrpt_parse_html_color(cname + 2, &nc);
 		*color = nc.c;
+	} else if (strcasecmp(cname, "transparent") == 0) {
+		/* Transparent white */
+		color->r = color->g = color->b = 1.0;
+		color->alpha = 0.0;
 	}  else {
 		ocrpt_named_color *c = bsearch(cname, &compat_color_names, compat_color_names_n, sizeof(ocrpt_named_color), colorfindcmp);
-
-		if (!c)
-			c = bsearch(bgcolor ? "White" : "Black", &compat_color_names, compat_color_names_n, sizeof(ocrpt_named_color), colorfindcmp);
 
 		if (c)
 			*color = (*c).c;
 		else {
-			memset(&nc.c, 0, sizeof(ocrpt_color));
-			*color = nc.c;
+			/* Fall back to opaque black or white */
+			color->r = color->g = color->b = (bgcolor ? 1.0 : 0.0);
+			color->alpha = 1.0;
 		}
 	}
 }
