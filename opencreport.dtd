@@ -144,6 +144,7 @@
 	format CDATA #IMPLIED
 	width CDATA #IMPLIED
 	align CDATA #IMPLIED
+	alignment CDATA #IMPLIED
 	color CDATA #IMPLIED
 	bgcolor CDATA #IMPLIED
 	fontName CDATA #IMPLIED
@@ -169,6 +170,7 @@
 	format CDATA #IMPLIED
 	width CDATA #IMPLIED
 	align CDATA #IMPLIED
+	alignment CDATA #IMPLIED
 	color CDATA #IMPLIED
 	bgcolor CDATA #IMPLIED
 	fontName CDATA #IMPLIED
@@ -189,6 +191,7 @@
 <!ATTLIST HorizontalLine
 	size CDATA #IMPLIED
 	align CDATA #IMPLIED
+	alignment CDATA #IMPLIED
 	indent CDATA #IMPLIED
 	length CDATA #IMPLIED
 	fontSize CDATA #IMPLIED
@@ -204,6 +207,7 @@
 	width CDATA #REQUIRED
 	height CDATA #REQUIRED
 	align CDATA #IMPLIED
+	alignment CDATA #IMPLIED
 	bgcolor CDATA #IMPLIED
 	text_width CDATA #REQUIRED
 	textWidth CDATA #REQUIRED >

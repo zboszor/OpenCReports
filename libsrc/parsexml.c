@@ -499,7 +499,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 		{ { "suppress" }, &suppress },
 		{ { "format" }, &format },
 		{ { "width" }, &width },
-		{ { "align" }, &align },
+		{ { "align", "alignment" }, &align },
 		{ { "color", "colour" }, &color },
 		{ { "bgcolor", "bgcolour" }, &bgcolor },
 		{ { "font_name", "fontName" }, &font_name },
@@ -654,7 +654,7 @@ static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt
 		xmlChar **attrp;
 	} xmlattrs[] = {
 		{ { "size" }, &size },
-		{ { "align" }, &align },
+		{ { "align", "alignment" }, &align },
 		{ { "indent" }, &indent },
 		{ { "length" }, &length },
 		{ { "font_size", "fontSize" }, &font_size },
@@ -698,7 +698,7 @@ static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt
 		{ { "type" }, &type },
 		{ { "width" }, &width },
 		{ { "height" }, &height },
-		{ { "align" }, &align },
+		{ { "align", "alignment" }, &align },
 		{ { "bgcolor" }, &bgcolor },
 		{ { "text_width", "textWidth" }, &text_width },
 		{ { NULL }, NULL },
