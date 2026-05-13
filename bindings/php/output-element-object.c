@@ -229,7 +229,7 @@ static const zend_function_entry opencreport_output_element_class_methods[] = {
 	PHP_ME(opencreport_output_element, is_image, arginfo_opencreport_output_element_is_image, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output_element, is_barcode, arginfo_opencreport_output_element_is_barcode, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output_element, get_line, arginfo_opencreport_output_element_get_line, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
-	PHP_ME(opencreport_output_element, get_line, arginfo_opencreport_output_element_get_genline, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_output_element, get_genline, arginfo_opencreport_output_element_get_genline, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output_element, get_hline, arginfo_opencreport_output_element_get_hline, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output_element, get_image, arginfo_opencreport_output_element_get_image, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_output_element, get_barcode, arginfo_opencreport_output_element_get_barcode, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
