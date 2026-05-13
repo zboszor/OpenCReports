@@ -4789,21 +4789,25 @@ SELECT * FROM some_table
 		<title>Color specification</title>
 		<para>
 			Colors may be specified by HTML notation.
-			This contains six hexadecimal digits, representing
-			RGB (red, green, blue) values between 0 and 255
-			for each color component, prefixed by the
-			<literal>#</literal> character.
+			This contains six or eight hexadecimal digits,
+			representing RGB (red, green, blue), or
+			ARGB (alpha, red, green, blue) values between
+			0 and 255 for each color component, prefixed by
+			the <literal>#</literal> character.
 			<programlisting>&lt;Line bgcolor="'#ffff00'" ... &gt;
-&lt;HorizontalLine color="'#ff00ff'" ... &gt;</programlisting>
+&lt;HorizontalLine color="'#ff00ff'" ... &gt;
+&lt;HorizontalLine color="'#8000ff00'" ... &gt;</programlisting>
 		</para>
 		<para>
 			Colors may also be specified by hexadecimal notation.
-			This contains six hexadecimal digits, representing
-			RGB (red, green, blue) values between 0 and 255
-			for each color component, prefixed by
+			This contains six or eight hexadecimal digits,
+			representing RGB (red, green, blue), or
+			ARGB (alpha, red, green, blue) values between
+			0 and 255 for each color component, prefixed by
 			<literal>0x</literal>.
 			<programlisting>&lt;Line bgcolor="'0xffff00'" ... &gt;
-&lt;HorizontalLine color="'0xff00ff'" ... &gt;</programlisting>
+&lt;HorizontalLine color="'0xff00ff'" ... &gt;
+&lt;HorizontalLine color="'0x8000ff00'" ... &gt;</programlisting>
 		</para>
 		<para>
 			Color names may also be specified by name.

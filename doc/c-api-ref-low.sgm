@@ -2239,6 +2239,26 @@ ocrpt_expr *
 ocrpt_report_get_fielddetail_row_match(ocrpt_report *r);</programlisting>
 					</para>
 				</sect4>
+				<sect4 id="reportsetfdoverlay" xreflabel="Set or get the report's field detail overlay">
+					<title>Set or get the report's field detail overlay</title>
+					<para>
+						The expression must be a constant boolean value.
+						When set to <literal>true</literal> or
+						<literal>yes</literal>, the field detail row matching
+						expression is set, and the current query row matches
+						a previous row according to the expression, then
+						the whole field detail layout section is overlaid
+						over the previously drawn section for the first row.
+						Without the field detail row matching expression set,
+						this setting does nothing.
+						<programlisting>ocrpt_expr *
+ocrpt_report_set_fielddetail_overlay(ocrpt_report *r,
+                                     const char *expr_string);
+
+ocrpt_expr *
+ocrpt_report_get_fielddetail_overlay(ocrpt_report *r);</programlisting>
+					</para>
+				</sect4>
 			</sect3>
 			<sect3 id="partgetlayoutsections">
 				<title>Get part layout sections</title>

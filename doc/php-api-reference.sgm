@@ -2519,6 +2519,13 @@ OpenCReport\Column::get_column_padding():
     public final get_fielddetail_row_match():
                      ?OpenCReport\Expr;
 
+    public final set_fielddetail_overlay(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+
+    public final get_fielddetail_overlay():
+                     ?OpenCReport\Expr;
+
     public final nodata(): OpenCReport\Output;
     public final header(): OpenCReport\Output;
     public final footer(): OpenCReport\Output;
@@ -2983,6 +2990,20 @@ OpenCReport\Report::set_fielddetail_row_match(
 
 public final
 OpenCReport\Report::get_fielddetail_row_match():
+                     ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpreportsetfdoverlay">
+			<title>Set or get the report's field detail overlay</title>
+			<para>
+				See <xref linkend="reportsetfdoverlay"/> for explanation.
+				<programlisting>public final
+OpenCReport\Report::set_fielddetail_overlay(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+
+public final
+OpenCReport\Report::get_fielddetail_overlay():
                      ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
