@@ -586,10 +586,26 @@ static unsigned int ocrpt_execute_one_report(opencreport *o, ocrpt_part *p, ocrp
 					ocrpt_layout_output_init(&r->fieldheader);
 					ocrpt_layout_output(o, p, pr, pd, r, NULL, &r->fieldheader, rows, newpage, page_indent, page_position, old_page_position);
 				}
+
+				void *row_matched_current_page = NULL;
+				double row_matched_old_page_position = 0.0;
+				if (row_matched && o->output_functions.get_current_page && o->output_functions.set_current_page) {
+					row_matched_current_page = o->output_functions.get_current_page(o);
+					row_matched_old_page_position = *page_position;
+
+					o->output_functions.set_current_page(o, row_match_ptr->page);
+					*page_position = row_match_ptr->page_position;
+				}
+
 				ocrpt_layout_output_init(&r->fielddetails);
 				ocrpt_layout_output(o, p, pr, pd, r, NULL, &r->fielddetails, rows, newpage, page_indent, page_position, old_page_position);
+
+				if (row_matched && o->output_functions.get_current_page && o->output_functions.set_current_page) {
+					o->output_functions.set_current_page(o, row_matched_current_page);
+					*page_position = row_matched_old_page_position;
+				}
 			} else {
-				/* TODO: Feed rows to Graph / Chart  */
+				/* TODO: Feed rows to Graph */
 			}
 
 			have_row = !last_row;
