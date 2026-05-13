@@ -2293,7 +2293,11 @@ SELECT * FROM some_table
 				<para>
 					<literal>&lt;FieldDetail&gt;</literal> is used
 					to show data that is derived from the current data row
-					produced by the report query.
+					produced by the report query. Two optional attributes
+					may be used for this section: <literal>matched</literal>
+					and <literal>overlay</literal>.
+					See <xref linkend="reportsetfdmatch"/> and
+					<xref linkend="reportsetfdoverlay"/> for their purpose.
 				</para>
 				<para>
 					<literal>&lt;FieldFooter&gt;</literal> is used

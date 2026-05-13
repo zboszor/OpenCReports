@@ -260,7 +260,13 @@
 <!ELEMENT FieldHeader (Output)* >
 <!ELEMENT FieldHeaders (Output)* >
 <!ELEMENT FieldDetail (Output)* >
+<!ATTLIST FieldDetail
+	matched CDATA #IMPLIED
+	overlay CDATA #IMPLIED >
 <!ELEMENT FieldDetails (Output)* >
+<!ATTLIST FieldDetails
+	matched CDATA #IMPLIED
+	overlay CDATA #IMPLIED >
 <!ELEMENT FieldFooter (Output)* >
 <!ELEMENT FieldFooters (Output)* >
 <!ELEMENT Graph (Plot+) >

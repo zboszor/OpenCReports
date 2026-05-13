@@ -1180,9 +1180,34 @@ static void ocrpt_parse_detail_node(opencreport *o, ocrpt_report *r, xmlTextRead
 		if (nodetype == XML_READER_TYPE_ELEMENT) {
 			if (!strcmp((char *)name, "FieldHeader") || !strcmp((char *)name, "FieldHeaders"))
 				ocrpt_parse_output_parent_node(o, r, (char *)name, &r->fieldheader, reader);
-			else if (!strcmp((char *)name, "FieldDetail") || !strcmp((char *)name, "FieldDetails"))
+			else if (!strcmp((char *)name, "FieldDetail") || !strcmp((char *)name, "FieldDetails")) {
+				xmlChar *matched, *overlay;
+				struct {
+					char *attrs[2];
+					xmlChar **attrp;
+				} xmlattrs[] = {
+					{ { "matched" }, &matched },
+					{ { "overlay" }, &overlay },
+					{ { NULL }, NULL },
+				};
+				int32_t i, j;
+
+				for (i = 0; xmlattrs[i].attrp; i++) {
+					for (j = 0; xmlattrs[i].attrs[j]; j++) {
+						*xmlattrs[i].attrp = xmlTextReaderGetAttribute(reader, (const xmlChar *)xmlattrs[i].attrs[j]);
+						if (*xmlattrs[i].attrp)
+							break;
+					}
+				}
+
+				ocrpt_report_set_fielddetail_row_match(r, (char *)matched);
+				ocrpt_report_set_fielddetail_overlay(r, (char *)overlay);
+
 				ocrpt_parse_output_parent_node(o, r, (char *)name, &r->fielddetails, reader);
-			else if (!strcmp((char *)name, "FieldFooter") || !strcmp((char *)name, "FieldFooters"))
+
+				for (i = 0; xmlattrs[i].attrp; i++)
+					xmlFree(*xmlattrs[i].attrp);
+			} else if (!strcmp((char *)name, "FieldFooter") || !strcmp((char *)name, "FieldFooters"))
 				ocrpt_parse_output_parent_node(o, r, (char *)name, &r->fieldfooter, reader);
 		}
 
