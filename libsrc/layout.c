@@ -837,6 +837,22 @@ static void ocrpt_layout_output_evaluate_hline(ocrpt_hline *hline) {
 	ocrpt_expr_eval(hline->color);
 }
 
+static void ocrpt_layout_output_evaluate_text(ocrpt_text *text) {
+	ocrpt_expr_eval(text->suppress);
+	ocrpt_expr_eval(text->value);
+	ocrpt_expr_eval(text->format);
+	ocrpt_expr_eval(text->width);
+	ocrpt_expr_eval(text->align);
+	ocrpt_expr_eval(text->color);
+	ocrpt_expr_eval(text->bgcolor);
+	ocrpt_expr_eval(text->font_name);
+	ocrpt_expr_eval(text->font_size);
+	ocrpt_expr_eval(text->bold);
+	ocrpt_expr_eval(text->italic);
+	ocrpt_expr_eval(text->link);
+	ocrpt_expr_eval(text->translate);
+}
+
 static void ocrpt_layout_output_evaluate_image(ocrpt_image *img) {
 	ocrpt_expr_eval(img->suppress);
 	ocrpt_expr_eval(img->value);
@@ -895,19 +911,7 @@ void ocrpt_layout_output_evaluate(ocrpt_output *output) {
 					assert(0);
 					break;
 				case OCRPT_OUTPUT_LE_TEXT:
-					ocrpt_expr_eval(elem->suppress);
-					ocrpt_expr_eval(elem->value);
-					ocrpt_expr_eval(elem->format);
-					ocrpt_expr_eval(elem->width);
-					ocrpt_expr_eval(elem->align);
-					ocrpt_expr_eval(elem->color);
-					ocrpt_expr_eval(elem->bgcolor);
-					ocrpt_expr_eval(elem->font_name);
-					ocrpt_expr_eval(elem->font_size);
-					ocrpt_expr_eval(elem->bold);
-					ocrpt_expr_eval(elem->italic);
-					ocrpt_expr_eval(elem->link);
-					ocrpt_expr_eval(elem->translate);
+					ocrpt_layout_output_evaluate_text((ocrpt_text *)elem);
 					break;
 				case OCRPT_OUTPUT_LE_IMAGE:
 					ocrpt_layout_output_evaluate_image((ocrpt_image *)elem);
