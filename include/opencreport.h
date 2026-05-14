@@ -1086,6 +1086,8 @@ ocrpt_expr *ocrpt_genline_set_value_delayed(ocrpt_genline *gl, const char *expr_
 ocrpt_expr *ocrpt_genline_get_value_delayed(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_suppress(ocrpt_genline *gl, const char *expr_string);
 ocrpt_expr *ocrpt_genline_get_suppress(ocrpt_genline *gl);
+ocrpt_expr *ocrpt_genline_set_indentation(ocrpt_genline *gl, const char *expr_string);
+ocrpt_expr *ocrpt_genline_get_indentation(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_width(ocrpt_genline *gl, const char *expr_string);
 ocrpt_expr *ocrpt_genline_get_width(ocrpt_genline *gl);
 ocrpt_expr *ocrpt_genline_set_height(ocrpt_genline *gl, const char *expr_string);
@@ -1141,6 +1143,8 @@ ocrpt_expr *ocrpt_text_set_format(ocrpt_text *text, const char *expr_string);
 ocrpt_expr *ocrpt_text_get_format(ocrpt_text *text);
 ocrpt_expr *ocrpt_text_set_translate(ocrpt_text *text, const char *expr_string);
 ocrpt_expr *ocrpt_text_get_translate(ocrpt_text *text);
+ocrpt_expr *ocrpt_text_set_indentation(ocrpt_text *text, const char *expr_string);
+ocrpt_expr *ocrpt_text_get_indentation(ocrpt_text *text);
 ocrpt_expr *ocrpt_text_set_width(ocrpt_text *text, const char *expr_string);
 ocrpt_expr *ocrpt_text_get_width(ocrpt_text *text);
 ocrpt_expr *ocrpt_text_set_alignment(ocrpt_text *text, const char *expr_string);
@@ -1194,6 +1198,8 @@ ocrpt_expr *ocrpt_image_set_suppress(ocrpt_image *image, const char *expr_string
 ocrpt_expr *ocrpt_image_get_suppress(ocrpt_image *image);
 ocrpt_expr *ocrpt_image_set_type(ocrpt_image *image, const char *expr_string);
 ocrpt_expr *ocrpt_image_get_type(ocrpt_image *image);
+ocrpt_expr *ocrpt_image_set_indentation(ocrpt_image *image, const char *expr_string);
+ocrpt_expr *ocrpt_image_get_indentation(ocrpt_image *image);
 ocrpt_expr *ocrpt_image_set_width(ocrpt_image *image, const char *expr_string);
 ocrpt_expr *ocrpt_image_get_width(ocrpt_image *image);
 ocrpt_expr *ocrpt_image_set_height(ocrpt_image *image, const char *expr_string);
@@ -1216,6 +1222,8 @@ ocrpt_expr *ocrpt_barcode_set_suppress(ocrpt_barcode *bc, const char *expr_strin
 ocrpt_expr *ocrpt_barcode_get_suppress(ocrpt_barcode *bc);
 ocrpt_expr *ocrpt_barcode_set_type(ocrpt_barcode *bc, const char *expr_string);
 ocrpt_expr *ocrpt_barcode_get_type(ocrpt_barcode *bc);
+ocrpt_expr *ocrpt_barcode_set_indentation(ocrpt_barcode *bc, const char *expr_string);
+ocrpt_expr *ocrpt_barcode_get_indentation(ocrpt_barcode *bc);
 ocrpt_expr *ocrpt_barcode_set_width(ocrpt_barcode *bc, const char *expr_string);
 ocrpt_expr *ocrpt_barcode_get_width(ocrpt_barcode *bc);
 ocrpt_expr *ocrpt_barcode_set_height(ocrpt_barcode *bc, const char *expr_string);

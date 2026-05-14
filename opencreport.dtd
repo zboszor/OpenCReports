@@ -142,6 +142,8 @@
 	precalculate CDATA #IMPLIED
 	suppress CDATA #IMPLIED
 	format CDATA #IMPLIED
+	indent CDATA #IMPLIED
+	indentation CDATA #IMPLIED
 	width CDATA #IMPLIED
 	align CDATA #IMPLIED
 	alignment CDATA #IMPLIED
@@ -168,6 +170,8 @@
 	precalculate CDATA #IMPLIED
 	suppress CDATA #IMPLIED
 	format CDATA #IMPLIED
+	indent CDATA #IMPLIED
+	indentation CDATA #IMPLIED
 	width CDATA #IMPLIED
 	align CDATA #IMPLIED
 	alignment CDATA #IMPLIED
@@ -193,6 +197,7 @@
 	align CDATA #IMPLIED
 	alignment CDATA #IMPLIED
 	indent CDATA #IMPLIED
+	indentation CDATA #IMPLIED
 	length CDATA #IMPLIED
 	fontSize CDATA #IMPLIED
 	font_size CDATA #IMPLIED
@@ -204,6 +209,8 @@
 	value CDATA #REQUIRED
 	suppress CDATA #IMPLIED
 	type CDATA #REQUIRED
+	indent CDATA #IMPLIED
+	indentation CDATA #IMPLIED
 	width CDATA #REQUIRED
 	height CDATA #REQUIRED
 	align CDATA #IMPLIED
@@ -237,6 +244,8 @@
 	delayed CDATA #IMPLIED
 	precalculate CDATA #IMPLIED
 	suppress CDATA #IMPLIED
+	indent CDATA #IMPLIED
+	indentation CDATA #IMPLIED
 	width CDATA #IMPLIED
 	height CDATA #IMPLIED
 	align CDATA #IMPLIED

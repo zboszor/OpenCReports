@@ -3611,6 +3611,20 @@ SELECT * FROM some_table
 					<programlisting>&lt;GeneratedLine suppress="h.suppress"/&gt;</programlisting>
 				</para>
 			</sect3>
+			<sect3 id="generatedlineindent">
+				<title>Per-element indentation</title>
+				<para>
+					Sets the indentation of the current element in
+					the current size unit. See
+					<xref linkend="textsetindent"/>,
+					<xref linkend="barcodesetindent"/> and
+					<xref linkend="imagesetindent"/>.
+					The attribute is accepted with two different spelling:
+					<programlisting>&lt;GeneratedLine indent="h.indent"/&gt;
+
+&lt;GeneratedLine indentation="h.indent"/&gt;</programlisting>
+				</para>
+			</sect3>
 			<sect3 id="generatedlinewidth">
 				<title>Per-element width</title>
 				<para>
@@ -3635,8 +3649,11 @@ SELECT * FROM some_table
 					Sets the alignment of the current element.
 					Accepted values are <literal>left</literal>,
 					<literal>right</literal> and
-					<literal>center</literal>.
-					<programlisting>&lt;GeneratedLine align="h.align"/&gt;</programlisting>
+					<literal>center</literal>. The attribute is
+					accepted with two different spelling.
+					<programlisting>&lt;GeneratedLine align="h.align"/&gt;
+
+&lt;GeneratedLine alignment="h.align"/&gt;</programlisting>
 				</para>
 			</sect3>
 			<sect3 id="generatedlinedelayed">
@@ -3909,6 +3926,34 @@ SELECT * FROM some_table
 					</para>
 				</sect4>
 			</sect3>
+			<sect3 id="textelemindent" xreflabel="Text element indentation">
+				<title>Indentation</title>
+				<para>
+					The field indentation. The attribute is accepted
+					with two different spelling:
+					<programlisting>&lt;field value="3" format="'%.2d'" indent="6" /&gt;
+
+&lt;field value="3" format="'%.2d'" indentation="6" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is unset, i.e. the element is rendered
+					adjacent to the right of the previous element.
+				</para>
+				<para>
+					If set, the indentation's unit depends on the
+					<xref linkend="sizeunit"/>. In this case the
+					element's horizontal position in the line is
+					changed to the specific value. It also influences
+					futher elements, as they are rendered adjacent
+					to the right of this one.
+				</para>
+				<para>
+					When the <xref linkend="sizeunit"/> is set to
+					<literal>rlib</literal>, the field indentation is
+					measured in number of characters. Otherwise,
+					it's points, i.e. 1/72th of an inch.
+				</para>
+			</sect3>
 			<sect3 id="textelemwidth" xreflabel="Text element width">
 				<title>Width</title>
 				<para>
@@ -3971,9 +4016,13 @@ SELECT * FROM some_table
 					It works in accordance with the
 					<xref linkend="textelemwidth"/>, i.e. the field's
 					formatted value (as text) is aligned inside the
-					specified field width.
+					specified field width. The attribute is accepted
+					with two different spelling.
 					<programlisting>&lt;field value="3" format="'%.2d'"
-       width="6" align="'center'" /&gt;</programlisting>
+       width="6" align="'center'" /&gt;
+
+&lt;field value="3" format="'%.2d'"
+       width="6" alignment="'center'" /&gt;</programlisting>
 				</para>
 				<para>
 					The alignment values may be
@@ -4460,6 +4509,36 @@ SELECT * FROM some_table
 					via <literal>librsvg</literal>.
 				</para>
 			</sect3>
+			<sect3 id="imageindent" xreflabel="Indentation">
+				<title>Indentation</title>
+				<para>
+					The image indentation. The attribute is accepted
+					with two different spelling:
+					<programlisting>&lt;Image value="'filename.jpg'"
+       width="100" indent="30" /&gt;
+
+&lt;Image value="'filename.jpg'"
+       width="100" indentation="30" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is unset, i.e. the element is rendered
+					adjacent to the right of the previous element.
+				</para>
+				<para>
+					If set, the indentation's unit depends on the
+					<xref linkend="sizeunit"/>. In this case the
+					element's horizontal position in the line is
+					changed to the specific value. It also influences
+					futher elements, as they are rendered adjacent
+					to the right of this one.
+				</para>
+				<para>
+					When the <xref linkend="sizeunit"/> is set to
+					<literal>rlib</literal>, the field indentation is
+					measured in number of characters. Otherwise,
+					it's points, i.e. 1/72th of an inch.
+				</para>
+			</sect3>
 			<sect3 id="imagewidth">
 				<title>Width</title>
 				<para>
@@ -4549,9 +4628,13 @@ SELECT * FROM some_table
 					be wider than the scaled image width. The image
 					then may be aligned. <literal>left</literal>,
 					<literal>right</literal> and <literal>center</literal>
-					are accepted.
+					are accepted. The attribute is accepted with
+					two different spelling.
 					<programlisting>&lt;Image value="'filename.jpg'"
-       align="'center'" /&gt;</programlisting>
+       align="'center'" /&gt;
+
+&lt;Image value="'filename.jpg'"
+       alignment="'center'" /&gt;</programlisting>
 				</para>
 				<para>
 					Default is left alignment.
@@ -4699,6 +4782,36 @@ SELECT * FROM some_table
 					<literal>value</literal> is invalid
 					for any of the above listed types,
 					the barcode is not rendered.
+				</para>
+			</sect3>
+			<sect3 id="barcodeindent" xreflabel="Indentation">
+				<title>Indentation</title>
+				<para>
+					The barcode indentation. The attribute is accepted
+					with two different spelling:
+					<programlisting>&lt;Barcode value="'...'"
+         width="6" indent="30" /&gt;
+
+&lt;Barcode value="'...'"
+         width="6" indentation="30" /&gt;</programlisting>
+				</para>
+				<para>
+					Default is unset, i.e. the element is rendered
+					adjacent to the right of the previous element.
+				</para>
+				<para>
+					If set, the indentation's unit depends on the
+					<xref linkend="sizeunit"/>. In this case the
+					element's horizontal position in the line is
+					changed to the specific value. It also influences
+					futher elements, as they are rendered adjacent
+					to the right of this one.
+				</para>
+				<para>
+					When the <xref linkend="sizeunit"/> is set to
+					<literal>rlib</literal>, the field indentation is
+					measured in number of characters. Otherwise,
+					it's points, i.e. 1/72th of an inch.
 				</para>
 			</sect3>
 			<sect3 id="barcodewidth" xreflabel="Barcode element width">

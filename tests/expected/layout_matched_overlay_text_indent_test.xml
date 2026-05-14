@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ocrpt>
+  <part>
+    <table>
+      <tr>
+        <td width="566.48">
+          <report>
+            <field_headers>
+              <output>
+                <line>
+                  <data width="108.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Family name</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Husband</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Wife</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#000000">Child</data>
+                </line>
+              </output>
+            </field_headers>
+            <field_details>
+              <output>
+                <line>
+                  <data width="108.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffff00" color="#0000ff">Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#8080ff" color="#000000">Fred</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="108.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffff00" color="#0000ff">Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#8080ff" color="#000000">Barney</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="108.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#ffffff">Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#8080ff" color="#000000">Bamm-Bamm</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="108.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffff00" color="#0000ff">Gazoo</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#8080ff" color="#000000">The Great</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="108.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#ffffff">Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ff8080" color="#000000">Wilma</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="108.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#ffffff">Rubble</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ff8080" color="#000000">Betty</data>
+                </line>
+              </output>
+            </field_details>
+            <field_details>
+              <output>
+                <line>
+                  <data width="108.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="left" bgcolor="#ffffff" color="#ffffff">Flintstone</data>
+                  <data width="72.00" font_point="12.00" font_face="Courier" bold="0" italics="0" align="center" bgcolor="#ff8080" color="#000000">Pebbles</data>
+                </line>
+              </output>
+            </field_details>
+          </report>
+        </td>
+      </tr>
+    </table>
+  </part>
+</ocrpt>

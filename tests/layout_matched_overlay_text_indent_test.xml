@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenCReport SYSTEM "opencreport.dtd">
+<OpenCReport>
+	<Datasources>
+		<Datasource name="myarray" type="'array'" />
+	</Datasources>
+	<Queries>
+		<Query name="a" datasource="myarray" value="'array'" coltypes="'coltypes'" rows="7" cols="6" />
+	</Queries>
+	<Report>
+		<Detail>
+			<FieldHeaders>
+				<Output>
+					<Line>
+						<field value="'Family name'" width="15" />
+						<literal width="1"/>
+						<field value="'Husband'" width="10" />
+						<literal width="1"/>
+						<field value="'Wife'" width="10" />
+						<literal width="1"/>
+						<field value="'Child'" width="10" />
+					</Line>
+				</Output>
+			</FieldHeaders>
+			<FieldDetails matched="surname" overlay="yes">
+				<Output>
+					<Line>
+						<field value="surname" width="15" color="r.matched ? 'transparent' : 'blue'" bgcolor="r.matched ? 'transparent' : 'yellow'" />
+						<literal width="1"/>
+						<field value="firstname" width="10" align="'center'" indent="indent" bgcolor="male ? '#8080ff' : '#ff8080'" />
+					</Line>
+				</Output>
+			</FieldDetails>
+		</Detail>
+	</Report>
+</OpenCReport>

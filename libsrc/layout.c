@@ -108,6 +108,20 @@ void ocrpt_layout_compute_text(opencreport *o, ocrpt_text *le) {
 	assert(rstring);
 }
 
+static void ocrpt_layout_line_get_next_start(opencreport *o, ocrpt_line *line, ocrpt_expr *elem_indent, double *next_start) {
+	if (EXPR_VALID_NUMERIC(elem_indent)) {
+		double tmp = mpfr_get_d(EXPR_NUMERIC(elem_indent), EXPR_RNDMODE(elem_indent));
+
+		if (tmp < 0)
+			return;
+
+		if (!o->size_in_points)
+			tmp *= line->font_width;
+
+		*next_start = tmp;
+	}
+}
+
 static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrpt_part_column *pd, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, double page_width, double *page_position) {
 	double next_start;
 	double max_barcode_height;
@@ -134,6 +148,7 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 
 			ocrpt_layout_compute_text(o, elem);
 
+			ocrpt_layout_line_get_next_start(o, line, elem->indent, &next_start);
 			elem->start = next_start;
 
 			if (o->output_functions.get_text_sizes)
@@ -152,12 +167,13 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 			output->has_memo = output->has_memo || (elem->memo && (elem->lines > 1));
 			break;
 		case OCRPT_OUTPUT_LE_IMAGE:
-			img->start = next_start;
-
 			ocrpt_layout_image_setup(o, p, pr, pd, r, output, line, img, page_width, img->start, page_position);
 
 			if (img->suppress_image)
 				break;
+
+			ocrpt_layout_line_get_next_start(o, line, img->indent, &next_start);
+			img->start = next_start;
 
 			if (EXPR_VALID_NUMERIC(img->text_width))
 				img->image_text_width = mpfr_get_d(EXPR_NUMERIC(img->text_width), EXPR_RNDMODE(img->text_width));
@@ -173,12 +189,13 @@ static void ocrpt_layout_line_get_text_sizes(opencreport *o, ocrpt_part *p, ocrp
 
 			break;
 		case OCRPT_OUTPUT_LE_BARCODE:
-			bc->start = next_start;
-
 			if (EXPR_VALID_NUMERIC(bc->suppress) && !!mpfr_get_si(EXPR_NUMERIC(bc->suppress), EXPR_RNDMODE(bc->suppress))) {
 				bc->suppress_bc = true;
 				break;
 			}
+
+			ocrpt_layout_line_get_next_start(o, line, bc->indent, &next_start);
+			bc->start = next_start;
 
 			if (EXPR_VALID_NUMERIC(bc->height))
 				bc->barcode_height = mpfr_get_d(EXPR_NUMERIC(bc->height), EXPR_RNDMODE(bc->height));
@@ -684,6 +701,9 @@ static void ocrpt_layout_output_resolve_text(ocrpt_text *elem) {
 	ocrpt_expr_resolve(elem->format);
 	ocrpt_expr_optimize(elem->format);
 
+	ocrpt_expr_resolve(elem->indent);
+	ocrpt_expr_optimize(elem->indent);
+
 	ocrpt_expr_resolve(elem->width);
 	ocrpt_expr_optimize(elem->width);
 
@@ -725,6 +745,9 @@ static void ocrpt_layout_output_resolve_image(ocrpt_image *img) {
 	ocrpt_expr_resolve(img->imgtype);
 	ocrpt_expr_optimize(img->imgtype);
 
+	ocrpt_expr_resolve(img->indent);
+	ocrpt_expr_optimize(img->indent);
+
 	ocrpt_expr_resolve(img->width);
 	ocrpt_expr_optimize(img->width);
 
@@ -752,6 +775,9 @@ static void ocrpt_layout_output_resolve_barcode(ocrpt_barcode *bc) {
 
 	ocrpt_expr_resolve(bc->bctype);
 	ocrpt_expr_optimize(bc->bctype);
+
+	ocrpt_expr_resolve(bc->indent);
+	ocrpt_expr_optimize(bc->indent);
 
 	ocrpt_expr_resolve(bc->width);
 	ocrpt_expr_optimize(bc->width);
@@ -841,6 +867,7 @@ static void ocrpt_layout_output_evaluate_text(ocrpt_text *text) {
 	ocrpt_expr_eval(text->suppress);
 	ocrpt_expr_eval(text->value);
 	ocrpt_expr_eval(text->format);
+	ocrpt_expr_eval(text->indent);
 	ocrpt_expr_eval(text->width);
 	ocrpt_expr_eval(text->align);
 	ocrpt_expr_eval(text->color);
@@ -857,6 +884,7 @@ static void ocrpt_layout_output_evaluate_image(ocrpt_image *img) {
 	ocrpt_expr_eval(img->suppress);
 	ocrpt_expr_eval(img->value);
 	ocrpt_expr_eval(img->imgtype);
+	ocrpt_expr_eval(img->indent);
 	ocrpt_expr_eval(img->width);
 	ocrpt_expr_eval(img->height);
 	ocrpt_expr_eval(img->align);
@@ -868,6 +896,7 @@ static void ocrpt_layout_output_evaluate_barcode(ocrpt_barcode *bc) {
 	ocrpt_expr_eval(bc->suppress);
 	ocrpt_expr_eval(bc->value);
 	ocrpt_expr_eval(bc->bctype);
+	ocrpt_expr_eval(bc->indent);
 	ocrpt_expr_eval(bc->width);
 	ocrpt_expr_eval(bc->height);
 	ocrpt_expr_eval(bc->color);
@@ -1854,6 +1883,14 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_get_type(ocrpt_image *image) {
 	GET_IMAGE_EXPR(imgtype);
 }
 
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_indentation(ocrpt_image *image, const char *expr_string) {
+	SET_IMAGE_EXPR(indent, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_get_indentation(ocrpt_image *image) {
+	GET_IMAGE_EXPR(indent);
+}
+
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_image_set_width(ocrpt_image *image, const char *expr_string) {
 	SET_IMAGE_EXPR(width, true, false);
 }
@@ -2024,6 +2061,10 @@ void ocrpt_output_generate_lines(ocrpt_output *output) {
 							ocrpt_expr_resolve_from_query(e, gl->query);
 							ocrpt_expr_constify(e, gl->query);
 
+							e = ocrpt_image_set_indentation(image, ocrpt_expr_string_wrap_eval(output, gl->indent, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
 							e = ocrpt_image_set_width(image, ocrpt_expr_string_wrap_eval(output, gl->width, tmpstr));
 							ocrpt_expr_resolve_from_query(e, gl->query);
 							ocrpt_expr_constify(e, gl->query);
@@ -2059,6 +2100,10 @@ void ocrpt_output_generate_lines(ocrpt_output *output) {
 							ocrpt_expr_constify(e, gl->query);
 
 							e = ocrpt_barcode_set_type(bc, ocrpt_expr_string_wrap_eval(output, gl->bctype, tmpstr));
+							ocrpt_expr_resolve_from_query(e, gl->query);
+							ocrpt_expr_constify(e, gl->query);
+
+							e = ocrpt_barcode_set_indentation(bc, ocrpt_expr_string_wrap_eval(output, gl->indent, tmpstr));
 							ocrpt_expr_resolve_from_query(e, gl->query);
 							ocrpt_expr_constify(e, gl->query);
 
@@ -2106,6 +2151,10 @@ void ocrpt_output_generate_lines(ocrpt_output *output) {
 						ocrpt_expr_constify(e, gl->query);
 
 						e = ocrpt_text_set_translate(text, ocrpt_expr_string_wrap_eval(output, gl->translate, tmpstr));
+						ocrpt_expr_resolve_from_query(e, gl->query);
+						ocrpt_expr_constify(e, gl->query);
+
+						e = ocrpt_text_set_indentation(text, ocrpt_expr_string_wrap_eval(output, gl->indent, tmpstr));
 						ocrpt_expr_resolve_from_query(e, gl->query);
 						ocrpt_expr_constify(e, gl->query);
 
@@ -2239,6 +2288,8 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_value_delayed(ocrpt_genline *gl, co
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_get_value_delayed(ocrpt_genline *gl) GET_GENLINE_EXPR(delayed)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_suppress(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(suppress, true, false)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_get_suppress(ocrpt_genline *gl) GET_GENLINE_EXPR(suppress)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_indentation(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(indent, true, false)
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_get_indentation(ocrpt_genline *gl) GET_GENLINE_EXPR(indent)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_width(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(width, true, false)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_get_width(ocrpt_genline *gl) GET_GENLINE_EXPR(width)
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_genline_set_height(ocrpt_genline *gl, const char *expr_string) SET_GENLINE_EXPR(height, true, false)
@@ -2367,6 +2418,14 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_translate(ocrpt_text *text, const char
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_translate(ocrpt_text *text) {
 	GET_TEXT_EXPR(translate);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_indentation(ocrpt_text *text, const char *expr_string) {
+	SET_TEXT_EXPR(indent, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_get_indentation(ocrpt_text *text) {
+	GET_TEXT_EXPR(indent);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_text_set_width(ocrpt_text *text, const char *expr_string) {
@@ -2529,6 +2588,14 @@ DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_type(ocrpt_barcode *bc, const char 
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_get_type(ocrpt_barcode *bc) {
 	GET_BARCODE_EXPR(bctype);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_indentation(ocrpt_barcode *bc, const char *expr_string) {
+	SET_BARCODE_EXPR(indent, true, false);
+}
+
+DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_get_indentation(ocrpt_barcode *bc) {
+	GET_BARCODE_EXPR(indent);
 }
 
 DLL_EXPORT_SYM ocrpt_expr *ocrpt_barcode_set_width(ocrpt_barcode *bc, const char *expr_string) {

@@ -55,6 +55,7 @@ struct ocrpt_text {
 	ocrpt_expr *wrap_chars;
 	ocrpt_expr *max_lines;
 	ocrpt_expr *format;
+	ocrpt_expr *indent;
 	ocrpt_expr *width;
 	ocrpt_expr *align;
 	ocrpt_expr *color;
@@ -160,6 +161,7 @@ struct ocrpt_image {
 	ocrpt_expr *suppress;
 	ocrpt_expr *value; /* name of the image file */
 	ocrpt_expr *imgtype; /* 'png', 'jpg', 'raster', or 'svg' */
+	ocrpt_expr *indent;
 	ocrpt_expr *width;
 	ocrpt_expr *height;
 	ocrpt_expr *align;
@@ -183,6 +185,7 @@ struct ocrpt_barcode {
 	ocrpt_expr *delayed;
 	ocrpt_expr *suppress;
 	ocrpt_expr *bctype; /* 'upc-a', 'upc-e', 'ean-13', 'ean-8', 'code39', 'code128b', 'code128c', 'code128' */
+	ocrpt_expr *indent;
 	ocrpt_expr *width;
 	ocrpt_expr *height;
 	ocrpt_expr *color;
@@ -230,6 +233,7 @@ struct ocrpt_genline {
 	ocrpt_expr *value;
 	ocrpt_expr *delayed;
 	ocrpt_expr *suppress;
+	ocrpt_expr *indent;
 	ocrpt_expr *width;
 	ocrpt_expr *height;
 	ocrpt_expr *align;

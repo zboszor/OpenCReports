@@ -127,6 +127,7 @@ GENLINE_SET_METHOD(set_line_suppress, ocrpt_genline_set_line_suppress)
 GENLINE_SET_METHOD(set_value, ocrpt_genline_set_value)
 GENLINE_SET_METHOD(set_value_delayed, ocrpt_genline_set_value_delayed)
 GENLINE_SET_METHOD(set_suppress, ocrpt_genline_set_suppress)
+GENLINE_SET_METHOD(set_indentation, ocrpt_genline_set_indentation)
 GENLINE_SET_METHOD(set_width, ocrpt_genline_set_width)
 GENLINE_SET_METHOD(set_height, ocrpt_genline_set_height)
 GENLINE_SET_METHOD(set_alignment, ocrpt_genline_set_alignment)
@@ -158,6 +159,7 @@ GENLINE_GET_METHOD(get_line_suppress, ocrpt_genline_get_line_suppress)
 GENLINE_GET_METHOD(get_value, ocrpt_genline_get_value)
 GENLINE_GET_METHOD(get_value_delayed, ocrpt_genline_get_value_delayed)
 GENLINE_GET_METHOD(get_suppress, ocrpt_genline_get_suppress)
+GENLINE_GET_METHOD(get_indentation, ocrpt_genline_get_indentation)
 GENLINE_GET_METHOD(get_width, ocrpt_genline_get_width)
 GENLINE_GET_METHOD(get_height, ocrpt_genline_get_height)
 GENLINE_GET_METHOD(get_alignment, ocrpt_genline_get_alignment)
@@ -207,6 +209,7 @@ GENLINE_ARGINFO_SET(set_line_suppress)
 GENLINE_ARGINFO_SET(set_value)
 GENLINE_ARGINFO_SET(set_value_delayed)
 GENLINE_ARGINFO_SET(set_suppress)
+GENLINE_ARGINFO_SET(set_indentation)
 GENLINE_ARGINFO_SET(set_width)
 GENLINE_ARGINFO_SET(set_height)
 GENLINE_ARGINFO_SET(set_alignment)
@@ -238,6 +241,7 @@ GENLINE_ARGINFO_GET(get_line_suppress)
 GENLINE_ARGINFO_GET(get_value)
 GENLINE_ARGINFO_GET(get_value_delayed)
 GENLINE_ARGINFO_GET(get_suppress)
+GENLINE_ARGINFO_GET(get_indentation)
 GENLINE_ARGINFO_GET(get_width)
 GENLINE_ARGINFO_GET(get_height)
 GENLINE_ARGINFO_GET(get_alignment)
@@ -273,6 +277,7 @@ GENLINE_ARGINFO_GET(get_barcode_type)
 #define arginfo_opencreport_genline_set_value NULL
 #define arginfo_opencreport_genline_set_value_delayed NULL
 #define arginfo_opencreport_genline_set_suppress NULL
+#define arginfo_opencreport_genline_set_indentation NULL
 #define arginfo_opencreport_genline_set_width NULL
 #define arginfo_opencreport_genline_set_height NULL
 #define arginfo_opencreport_genline_set_alignment NULL
@@ -303,6 +308,7 @@ GENLINE_ARGINFO_GET(get_barcode_type)
 #define arginfo_opencreport_genline_get_value NULL
 #define arginfo_opencreport_genline_get_value_delayed NULL
 #define arginfo_opencreport_genline_get_suppress NULL
+#define arginfo_opencreport_genline_get_indentation NULL
 #define arginfo_opencreport_genline_get_width NULL
 #define arginfo_opencreport_genline_get_height NULL
 #define arginfo_opencreport_genline_get_alignment NULL
@@ -353,6 +359,8 @@ static const zend_function_entry opencreport_genline_class_methods[] = {
 	GENLINE_ME(get_value_delayed)
 	GENLINE_ME(set_suppress)
 	GENLINE_ME(get_suppress)
+	GENLINE_ME(set_indentation)
+	GENLINE_ME(get_indentation)
 	GENLINE_ME(set_width)
 	GENLINE_ME(get_width)
 	GENLINE_ME(set_height)

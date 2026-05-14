@@ -278,7 +278,8 @@ LAYOUT_TESTS = \
 	layout_xml52_test \
 	layout_xml53_test \
 	layout_matched_test \
-	layout_matched_overlay_test
+	layout_matched_overlay_test \
+	layout_matched_overlay_text_indent_test
 
 LAYOUT_CSV_TESTS = \
 	layout_xml17_csv1_test \

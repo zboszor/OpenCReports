@@ -3725,6 +3725,11 @@ OpenCReport\Line::get_first_element():
                      ?OpenCReport\Expr;
     public final get_suppress(): ?OpenCReport\Expr;
 
+    public final set_indentation(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+    public final get_indentation(): ??OpenCReport\Expr;
+
     public final set_width(
                      ?string $expr_string = null):
                      ?OpenCReport\Expr;
@@ -4003,6 +4008,22 @@ OpenCReport\GenLine::set_suppress(
                      ?OpenCReport\Expr;
 public final
 OpenCReport\GenLine::get_suppress(): ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpgenlineindent">
+			<title>Set or get per-element indentation</title>
+			<para>
+				Set the indentation of the current element in the
+				current size unit.
+				See <xref linkend="phptextsetindent"/>,
+				<xref linkend="phpbarcodesetindent"/> and
+				<xref linkend="phpimagesetindent"/>.
+				<programlisting>public final
+OpenCReport\GenLine::set_indentation(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\GenLine::get_indentation(): ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpgenlinewidth">
@@ -4471,6 +4492,13 @@ OpenCReport\HorizontalLine::get_color():
     public final get_type():
                      ?OpenCReport\Expr;
 
+    public final set_indentation(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+
+    public final get_indentation():
+                     ?OpenCReport\Expr;
+
     public final set_width(
                      ?string $expr_string = null):
                      ?OpenCReport\Expr;
@@ -4556,6 +4584,19 @@ OpenCReport\Image::set_type(
 public final
 OpenCReport\Image::get_type():
                      ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phpimagesetindent">
+			<title>Set or get the image indentation</title>
+			<para>
+				Set the indentation of the element in the
+				current size unit.
+				<programlisting>public final
+OpenCReport\Image::set_indentation(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\Image::get_indentation(): ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpimagesetwidth">
@@ -4850,6 +4891,19 @@ OpenCReport\Text::set_translate(
 public final
 OpenCReport\Text::get_translate():
                      ?OpenCReport\Expr;</programlisting>
+			</para>
+		</sect2>
+		<sect2 id="phptextsetindent">
+			<title>Set or get the field indentation</title>
+			<para>
+				Set the indentation of the field in the
+				current size unit.
+				<programlisting>public final
+OpenCReport\Text::set_indentation(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\Text::get_indentation(): ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phptextsetwidth">
@@ -5225,6 +5279,19 @@ OpenCReport\Barcode::get_type():
 				<literal>value</literal> is invalid
 				for any of the above listed types,
 				the barcode is not rendered.
+			</para>
+		</sect2>
+		<sect2 id="phpbarcodesetindent">
+			<title>Set or get the barcode indentation</title>
+			<para>
+				Set the indentation of the barcode in the
+				current size unit.
+				<programlisting>public final
+OpenCReport\Barcode::set_indentation(
+                     ?string $expr_string = null):
+                     ?OpenCReport\Expr;
+public final
+OpenCReport\Barcode::get_indentation(): ?OpenCReport\Expr;</programlisting>
 			</para>
 		</sect2>
 		<sect2 id="phpbarcodesetwidth">

@@ -216,6 +216,45 @@ PHP_METHOD(opencreport_text, get_translate) {
 	eo->e = e;
 }
 
+PHP_METHOD(opencreport_text, set_indentation) {
+	zval *object = getThis();
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+#if PHP_VERSION_ID >= 70000
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
+
+	ocrpt_expr *e = ocrpt_text_set_indentation(to->text, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
+}
+
+PHP_METHOD(opencreport_text, get_indentation) {
+	zval *object = getThis();
+	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_expr *e = ocrpt_text_get_indentation(to->text);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
+}
+
 PHP_METHOD(opencreport_text, set_width) {
 	zval *object = getThis();
 	php_opencreport_text_object *to = Z_OPENCREPORT_TEXT_P(object);
@@ -757,6 +796,13 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_get_translate, 0, 0, OpenCReport\\Expr, 1)
 ZEND_END_ARG_INFO()
 
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_indentation, 0, 1, OpenCReport\\Expr, 1)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_get_indentation, 0, 0, OpenCReport\\Expr, 1)
+ZEND_END_ARG_INFO()
+
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_text_set_width, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
@@ -859,6 +905,8 @@ ZEND_END_ARG_INFO()
 #define arginfo_opencreport_text_get_format NULL
 #define arginfo_opencreport_text_set_translate NULL
 #define arginfo_opencreport_text_get_translate NULL
+#define arginfo_opencreport_text_set_indentation NULL
+#define arginfo_opencreport_text_get_indentation NULL
 #define arginfo_opencreport_text_set_width NULL
 #define arginfo_opencreport_text_get_width NULL
 #define arginfo_opencreport_text_set_alignment NULL
@@ -898,6 +946,8 @@ static const zend_function_entry opencreport_text_class_methods[] = {
 	PHP_ME(opencreport_text, get_format, arginfo_opencreport_text_get_format, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_text, set_translate, arginfo_opencreport_text_set_translate, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_text, get_translate, arginfo_opencreport_text_get_translate, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, set_indentation, arginfo_opencreport_text_set_indentation, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_text, get_indentation, arginfo_opencreport_text_get_indentation, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_text, set_width, arginfo_opencreport_text_set_width, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_text, get_width, arginfo_opencreport_text_get_width, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_text, set_alignment, arginfo_opencreport_text_set_alignment, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)

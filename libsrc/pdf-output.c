@@ -310,7 +310,7 @@ static void ocrpt_pdf_draw_text(opencreport *o, ocrpt_part *p, ocrpt_part_row *p
 	}
 
 	if (last && le->start + le->width_computed < page_width) {
-		ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0, .alpha = 1.0 };
+		ocrpt_color bgcolor = { .r = 1.0, .g = 1.0, .b = 1.0, .alpha = ((r && r->overlay) || EXPR_VALID_NUMERIC(le->indent) ? 0.0 : 1.0) };
 
 		cairo_set_source_rgba(priv->cr, bgcolor.r, bgcolor.g, bgcolor.b, bgcolor.alpha);
 		cairo_set_line_width(priv->cr, 0.0);

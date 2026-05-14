@@ -485,7 +485,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	int ret;
 
 	xmlChar *value = NULL, *delayed = NULL, *suppress = NULL;
-	xmlChar *format = NULL, *width = NULL, *align = NULL;
+	xmlChar *format = NULL, *indent = NULL, *width = NULL, *align = NULL;
 	xmlChar *color = NULL, *bgcolor = NULL, *font_name = NULL, *font_size = NULL;
 	xmlChar *bold = NULL, *italic = NULL, *link = NULL;
 	xmlChar *memo = NULL, *hyphenate = NULL, *memo_wrap_chars = NULL, *memo_max_lines = NULL;
@@ -498,6 +498,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 		{ { "delayed", "precalculate" }, &delayed },
 		{ { "suppress" }, &suppress },
 		{ { "format" }, &format },
+		{ { "indent", "indentation" }, &indent },
 		{ { "width" }, &width },
 		{ { "align", "alignment" }, &align },
 		{ { "color", "colour" }, &color },
@@ -554,6 +555,7 @@ static void ocrpt_parse_output_line_element_node(opencreport *o, ocrpt_report *r
 	ocrpt_text_set_value_delayed(elem, (char *)delayed);
 	ocrpt_text_set_suppress(elem, (char *)suppress);
 	ocrpt_text_set_format(elem, (char *)format);
+	ocrpt_text_set_indentation(elem, (char *)indent);
 	ocrpt_text_set_width(elem, (char *)width);
 	ocrpt_text_set_alignment(elem, (char *)align);
 	ocrpt_text_set_color(elem, (char *)color);
@@ -655,7 +657,7 @@ static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt
 	} xmlattrs[] = {
 		{ { "size" }, &size },
 		{ { "align", "alignment" }, &align },
-		{ { "indent" }, &indent },
+		{ { "indent", "indentation" }, &indent },
 		{ { "length" }, &length },
 		{ { "font_size", "fontSize" }, &font_size },
 		{ { "suppress" }, &suppress },
@@ -688,7 +690,9 @@ static void ocrpt_parse_output_hline_node(opencreport *o, ocrpt_report *r, ocrpt
 
 static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, xmlTextReaderPtr reader) {
 	ocrpt_image *img;
-	xmlChar *value = NULL, *suppress = NULL, *type = NULL, *width = NULL, *height = NULL, *align = NULL, *bgcolor = NULL, *text_width = NULL;
+	xmlChar *value = NULL, *suppress = NULL, *type = NULL;
+	xmlChar *indent = NULL, *width = NULL, *height = NULL, *align = NULL;
+	xmlChar *bgcolor = NULL, *text_width = NULL;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
@@ -696,6 +700,7 @@ static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt
 		{ { "value" }, &value },
 		{ { "suppress" }, &suppress },
 		{ { "type" }, &type },
+		{ { "indent", "indentation" }, &indent },
 		{ { "width" }, &width },
 		{ { "height" }, &height },
 		{ { "align", "alignment" }, &align },
@@ -721,6 +726,7 @@ static void ocrpt_parse_output_image_node(opencreport *o, ocrpt_report *r, ocrpt
 	ocrpt_image_set_value(img, (char *)value);
 	ocrpt_image_set_suppress(img, (char *)suppress);
 	ocrpt_image_set_type(img, (char *)type);
+	ocrpt_image_set_indentation(img, (char *)indent);
 	ocrpt_image_set_width(img, (char *)width);
 	ocrpt_image_set_height(img, (char *)height);
 	ocrpt_image_set_alignment(img, (char *)align);
@@ -741,7 +747,9 @@ static void ocrpt_parse_output_imageend_node(opencreport *o, ocrpt_report *r, oc
 
 static void ocrpt_parse_output_barcode_node(opencreport *o, ocrpt_report *r, ocrpt_output *output, ocrpt_line *line, xmlTextReaderPtr reader) {
 	ocrpt_barcode *bc;
-	xmlChar *value = NULL, *delayed = NULL, *suppress = NULL, *type = NULL, *width = NULL, *height = NULL, *color = NULL, *bgcolor = NULL;
+	xmlChar *value = NULL, *delayed = NULL, *suppress = NULL, *type = NULL;
+	xmlChar *indent = NULL, *width = NULL, *height = NULL, *color = NULL;
+	xmlChar *bgcolor = NULL;
 	struct {
 		char *attrs[3];
 		xmlChar **attrp;
@@ -750,6 +758,7 @@ static void ocrpt_parse_output_barcode_node(opencreport *o, ocrpt_report *r, ocr
 		{ { "delayed", "precalculate" }, &delayed },
 		{ { "suppress" }, &suppress },
 		{ { "type" }, &type },
+		{ { "indent", "indentation" }, &indent },
 		{ { "width" }, &width },
 		{ { "height" }, &height },
 		{ { "color" }, &color },
@@ -775,6 +784,7 @@ static void ocrpt_parse_output_barcode_node(opencreport *o, ocrpt_report *r, ocr
 	ocrpt_barcode_set_value_delayed(bc, (char *)delayed);
 	ocrpt_barcode_set_suppress(bc, (char *)suppress);
 	ocrpt_barcode_set_type(bc, (char *)type);
+	ocrpt_barcode_set_indentation(bc, (char *)indent);
 	ocrpt_barcode_set_width(bc, (char *)width);
 	ocrpt_barcode_set_height(bc, (char *)height);
 	ocrpt_barcode_set_color(bc, (char *)color);
@@ -795,7 +805,7 @@ static void ocrpt_parse_output_genline_node(opencreport *o, ocrpt_report *r, ocr
 	xmlChar *line_font_name = NULL, *line_font_size = NULL, *line_bold = NULL, *line_italic = NULL;
 	xmlChar *line_suppress = NULL, *line_color = NULL, *line_bgcolor = NULL;
 	xmlChar *value = NULL, *delayed = NULL, *suppress = NULL;
-	xmlChar *width = NULL, *height = NULL, *align = NULL;
+	xmlChar *indent = NULL, *width = NULL, *height = NULL, *align = NULL;
 	xmlChar *color = NULL, *bgcolor = NULL;
 	xmlChar *font_name = NULL, *font_size = NULL, *bold = NULL, *italic = NULL;
 	xmlChar *format = NULL, *link = NULL, *translate = NULL;
@@ -820,6 +830,7 @@ static void ocrpt_parse_output_genline_node(opencreport *o, ocrpt_report *r, ocr
 		{ { "value" }, &value },
 		{ { "delayed", "precalculate" }, &delayed },
 		{ { "suppress" }, &suppress },
+		{ { "indent", "indentation" }, &indent },
 		{ { "width" }, &width },
 		{ { "height" }, &height },
 		{ { "align", "alignment" }, &align },
@@ -875,6 +886,7 @@ static void ocrpt_parse_output_genline_node(opencreport *o, ocrpt_report *r, ocr
 	ocrpt_genline_set_value(gl, (char *)value);
 	ocrpt_genline_set_value_delayed(gl, (char *)delayed);
 	ocrpt_genline_set_suppress(gl, (char *)suppress);
+	ocrpt_genline_set_indentation(gl, (char *)indent);
 	ocrpt_genline_set_width(gl, (char *)width);
 	ocrpt_genline_set_height(gl, (char *)height);
 	ocrpt_genline_set_alignment(gl, (char *)align);

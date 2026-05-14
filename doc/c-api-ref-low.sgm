@@ -2640,6 +2640,34 @@ ocrpt_text_get_translate(ocrpt_text *text);</programlisting>
 						value.
 					</para>
 				</sect4>
+				<sect4 id="textsetindent" xreflabel="Set or get text element indentation">
+					<title>Set or get text element indentation</title>
+					<para>
+						Set the text element's indentation from
+						an expression string. The expression must
+						evaluate to a numeric value. If negative,
+						the value is clamped to zero. Indentation
+						controls the horizontal placement of the
+						element in the line.
+						<programlisting>ocrpt_expr *
+ocrpt_text_set_indentation(ocrpt_text *text,
+                           const char *expr_string);
+
+ocrpt_expr *
+ocrpt_text_get_indentation(ocrpt_text *text);</programlisting>
+					</para>
+					<para>
+						The indentation is set according to
+						<xref linkend="sizeunit"/>,
+						either in points (1/72th inch) or
+						in (monospace) font width units
+						set by <literal>&lt;Line&gt;</literal>.
+						The indentation set for this element
+						also influences the placement of
+						subsequent elements, i.e. they are
+						adjacent to the right of this element.
+					</para>
+				</sect4>
 				<sect4 id="textsetwidth" xreflabel="Set or get text element field width">
 					<title>Set or get text element field width</title>
 					<para>
@@ -3065,6 +3093,35 @@ ocrpt_barcode_get_type(ocrpt_barcode *bc);</programlisting>
 						the barcode is not rendered.
 					</para>
 				</sect4>
+				<sect4 id="barcodesetindent" xreflabel="Set or get barcode indentation">
+					<title>Set or get barcode indentation</title>
+					<para>
+						Set the barcode's indentation from
+						an expression string when used as a
+						line element. The expression must
+						evaluate to a numeric value. If negative,
+						the value is clamped to zero. Indentation
+						controls the horizontal placement of the
+						element in the line.
+						<programlisting>ocrpt_expr *
+ocrpt_barcode_set_indentation(ocrpt_barcode *bc,
+                              const char *expr_string);
+
+ocrpt_expr *
+ocrpt_barcode_get_indentation(ocrpt_barcode *bc);</programlisting>
+					</para>
+					<para>
+						The indentation is set according to
+						<xref linkend="sizeunit"/>,
+						either in points (1/72th inch) or
+						in (monospace) font width units
+						set by <literal>&lt;Line&gt;</literal>.
+						The indentation set for this element
+						also influences the placement of
+						subsequent elements, i.e. they are
+						adjacent to the right of this element.
+					</para>
+				</sect4>
 				<sect4 id="barcodesetwidth" xreflabel="Set or get barcode width">
 					<title>Set or get barcode width</title>
 					<para>
@@ -3196,6 +3253,34 @@ ocrpt_image_set_type(ocrpt_image *image,
 
 ocrpt_expr *
 ocrpt_image_get_type(ocrpt_image *image);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="imagesetindent" xreflabel="Set or get image indentation">
+					<title>Set or get image indentation</title>
+					<para>
+						Set the image's indentation from
+						an expression string. The expression must
+						evaluate to a numeric value. If negative,
+						the value is clamped to zero. Indentation
+						controls the horizontal placement of the
+						element in the line.
+						<programlisting>ocrpt_expr *
+ocrpt_image_set_indentation(ocrpt_image *image,
+                            const char *expr_string);
+
+ocrpt_expr *
+ocrpt_image_get_indentation(ocrpt_image *image);</programlisting>
+					</para>
+					<para>
+						The indentation is set according to
+						<xref linkend="sizeunit"/>,
+						either in points (1/72th inch) or
+						in (monospace) font width units
+						set by <literal>&lt;Line&gt;</literal>.
+						The indentation set for this element
+						also influences the placement of
+						subsequent elements, i.e. they are
+						adjacent to the right of this element.
 					</para>
 				</sect4>
 				<sect4 id="imagesetwidth" xreflabel="Set or get image width">
@@ -3487,6 +3572,35 @@ ocrpt_genline_set_suppress(ocrpt_genline *gl,
 
 ocrpt_expr *
 ocrpt_genline_get_suppress(ocrpt_genline *gl);</programlisting>
+					</para>
+				</sect4>
+				<sect4 id="genlinesetindent" xreflabel="Set or get per-element indentation">
+					<title>Set or get per-element indentation</title>
+					<para>
+						Set or get the indentation of the current
+						element in the current size unit.
+						For text elements this is the field width;
+						for images and barcodes it is the rendered width.
+						See <xref linkend="textsetindent"/>,
+						<xref linkend="barcodesetindent"/> and
+						<xref linkend="imagesetindent"/>.
+						<programlisting>ocrpt_expr *
+ocrpt_genline_set_indentation(ocrpt_genline *gl,
+                              const char *expr_string);
+
+ocrpt_expr *
+ocrpt_genline_get_indentation(ocrpt_genline *gl);</programlisting>
+					</para>
+					<para>
+						As indicated above, the indentation is set
+						according to <xref linkend="sizeunit"/>,
+						either in points (1/72th inch) or
+						in (monospace) font width units
+						set by <literal>&lt;GeneratedLine&gt;</literal>.
+						The indentation set for this element
+						also influences the placement of
+						subsequent elements, i.e. they are
+						adjacent to the right of this element.
 					</para>
 				</sect4>
 				<sect4 id="genlinesetwidth" xreflabel="Set or get per-element width">

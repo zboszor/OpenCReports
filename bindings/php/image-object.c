@@ -152,6 +152,45 @@ PHP_METHOD(opencreport_image, get_type) {
 	eo->e = e;
 }
 
+PHP_METHOD(opencreport_image, set_indentation) {
+	zval *object = getThis();
+	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+#if PHP_VERSION_ID >= 70000
+	zend_string *expr_string = NULL;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR_EX(expr_string, 1, 0);
+	ZEND_PARSE_PARAMETERS_END();
+#else
+	char *expr_string = NULL;
+	int expr_string_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &expr_string, &expr_string_len) == FAILURE)
+		return;
+#endif
+
+	ocrpt_expr *e = ocrpt_image_set_indentation(imo->image, expr_string ? ZSTR_VAL(expr_string) : NULL);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
+}
+
+PHP_METHOD(opencreport_image, get_indentation) {
+	zval *object = getThis();
+	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
+
+	ZEND_PARSE_PARAMETERS_NONE();
+
+	ocrpt_expr *e = ocrpt_image_get_indentation(imo->image);
+	if (!e)
+		RETURN_NULL();
+	object_init_ex(return_value, opencreport_expr_ce);
+	php_opencreport_expr_object *eo = Z_OPENCREPORT_EXPR_P(return_value);
+	eo->e = e;
+}
+
 PHP_METHOD(opencreport_image, set_width) {
 	zval *object = getThis();
 	php_opencreport_image_object *imo = Z_OPENCREPORT_IMAGE_P(object);
@@ -370,6 +409,13 @@ ZEND_END_ARG_INFO()
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_image_get_type, 0, 0, OpenCReport\\Expr, 1)
 ZEND_END_ARG_INFO()
 
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_image_set_indentation, 0, 1, OpenCReport\\Expr, 1)
+ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_image_get_indentation, 0, 0, OpenCReport\\Expr, 1)
+ZEND_END_ARG_INFO()
+
 OCRPT_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_opencreport_image_set_width, 0, 1, OpenCReport\\Expr, 1)
 ZEND_ARG_TYPE_INFO(0, expr_string, IS_STRING, 1)
 ZEND_END_ARG_INFO()
@@ -413,6 +459,8 @@ ZEND_END_ARG_INFO()
 #define arginfo_opencreport_image_get_suppress NULL
 #define arginfo_opencreport_image_set_type NULL
 #define arginfo_opencreport_image_get_type NULL
+#define arginfo_opencreport_image_set_indentation NULL
+#define arginfo_opencreport_image_get_indentation NULL
 #define arginfo_opencreport_image_set_width NULL
 #define arginfo_opencreport_image_get_width NULL
 #define arginfo_opencreport_image_set_height NULL
@@ -433,6 +481,8 @@ static const zend_function_entry opencreport_image_class_methods[] = {
 	PHP_ME(opencreport_image, get_suppress, arginfo_opencreport_image_get_suppress, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_image, set_type, arginfo_opencreport_image_set_type, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_image, get_type, arginfo_opencreport_image_get_type, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_image, set_indentation, arginfo_opencreport_image_set_indentation, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
+	PHP_ME(opencreport_image, get_indentation, arginfo_opencreport_image_get_indentation, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_image, set_width, arginfo_opencreport_image_set_width, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_image, get_width, arginfo_opencreport_image_get_width, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
 	PHP_ME(opencreport_image, set_height, arginfo_opencreport_image_set_height, ZEND_ACC_PUBLIC | ZEND_ACC_FINAL)
