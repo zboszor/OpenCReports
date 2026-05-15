@@ -15,6 +15,7 @@
 #include <librsvg/rsvg.h>
 #include <pango/pangocairo.h>
 
+#include "fallthrough.h"
 #include "opencreport.h"
 #include "ocrpt-private.h"
 #include "listutil.h"
@@ -578,7 +579,8 @@ void ocrpt_layout_output_evaluate_expr_params(ocrpt_output *output) {
 					break;
 			} else
 				break;
-			/* fallthrough */
+			/* fall through */
+			FALLTHROUGH;
 		case OCRPT_OUTPUT_LINE: {
 			for (ocrpt_list *l = line->elements; l; l = l->next) {
 				ocrpt_text *elem = (ocrpt_text *)l->data;
@@ -814,7 +816,8 @@ void ocrpt_layout_output_resolve(ocrpt_output *output) {
 					break;
 			} else
 				break;
-			/* fallthrough */
+			/* fall through */
+			FALLTHROUGH;
 		case OCRPT_OUTPUT_LINE:
 			ocrpt_layout_output_resolve_line(line);
 
@@ -922,7 +925,8 @@ void ocrpt_layout_output_evaluate(ocrpt_output *output) {
 					break;
 			} else
 				break;
-			/* fallthrough */
+			/* fall through */
+			FALLTHROUGH;
 		case OCRPT_OUTPUT_LINE: {
 			ocrpt_expr_eval(line->font_name);
 			ocrpt_expr_eval(line->font_size);
@@ -1006,7 +1010,8 @@ void ocrpt_layout_output_internal_preamble(opencreport *o, ocrpt_part *p, ocrpt_
 					break;
 			} else
 				break;
-			/* fallthrough */
+			/* fall through */
+			FALLTHROUGH;
 		case OCRPT_OUTPUT_LINE:
 			l->suppress_line = false;
 			if (EXPR_VALID_NUMERIC(l->suppress)) {
@@ -1145,7 +1150,8 @@ bool ocrpt_layout_output_internal(bool draw, opencreport *o, ocrpt_part *p, ocrp
 					break;
 			} else
 				break;
-			/* fallthrough */
+			/* fall through */
+			FALLTHROUGH;
 		case OCRPT_OUTPUT_LINE: {
 			if (l->suppress_line)
 				break;
