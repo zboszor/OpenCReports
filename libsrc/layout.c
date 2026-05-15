@@ -1985,7 +1985,7 @@ static const char *ocrpt_expr_string_wrap_eval(ocrpt_output *output, ocrpt_expr 
 
 	/*
 	 * Wrap the original expression string in eval() only when it parses to
-	 * a bare IDENT — that is the case where the supplementary query column
+	 * a bare IDENT - that is the case where the supplementary query column
 	 * holds an expression string that should be re-parsed and evaluated
 	 * against the main query at runtime (e.g. h.value referring to "id").
 	 *

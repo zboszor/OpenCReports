@@ -1,8 +1,4 @@
 Family name     Husband    Wife       Child     
-Flintstone         Fred   
-Rubble            Barney  
-Rubble          Bamm-Bamm 
+Flintstone         Fred      Wilma     Pebbles  
+Rubble            Barney     Betty    Bamm-Bamm 
 Gazoo           The Great 
-Flintstone        Wilma   
-Rubble            Betty   
-Flintstone       Pebbles  
