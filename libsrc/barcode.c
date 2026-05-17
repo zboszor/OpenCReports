@@ -446,9 +446,9 @@ static void ocrpt_barcode_ean_encode(opencreport *o, ocrpt_barcode *bc, ocrpt_st
 		extralen = 1;
 	} else if (is_upce) {
 		char *e_to_a = ocrpt_barcode_upc_e_to_a(barcode->str, len);
-		char *a_to_e = ocrpt_barcode_upc_a_to_e(e_to_a, strlen(e_to_a));
-
 		assert(e_to_a != NULL);
+
+		char *a_to_e = ocrpt_barcode_upc_a_to_e(e_to_a, strlen(e_to_a));
 		assert(a_to_e != NULL);
 
 		strcpy(text, a_to_e);
@@ -943,7 +943,7 @@ static bool ocrpt_barcode_code128_verify(ocrpt_string *barcode) {
  * of the document
  */
 
-#define NEED_CODE_A(c) ((c) < 32 || (c) == 0x80) 
+#define NEED_CODE_A(c) ((c) < 32 || (c) == 0x80)
 #define NEED_CODE_B(c) ((c) >= 96 && (c) < 128)
 
 static int ocrpt_barcode_code128a_or_b(const char *barcode, size_t len) {
@@ -1082,7 +1082,7 @@ static ocrpt_string *ocrpt_barcode_code128_make_array(ocrpt_barcode *bc, ocrpt_s
 				rlen--;
 			}
 			break;
-		}		
+		}
 	}
 
 	/* add the checksum */
