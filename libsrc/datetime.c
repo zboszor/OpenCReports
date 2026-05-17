@@ -37,6 +37,9 @@ bool ocrpt_parse_datetime(opencreport *o, const char *time_string, int ts_len, o
 	bool time_pm = false;
 
 	final_time_string = malloc(ts_len + 10);
+	if (!final_time_string)
+		goto end_error;
+
 	memset(final_time_string, 0, ts_len + 10);
 	fts_last = final_time_string;
 
