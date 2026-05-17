@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <utf8proc.h>
 
@@ -341,16 +342,22 @@ static bool ocrpt_html_load_image_file(html_private_data *priv, const char *file
 	if (!filename)
 		return false;
 
+	struct stat st;
+
+	if (stat(filename, &st) != 0)
+		return false;
+
 	FILE *f = fopen(filename, "rb");
 	if (!f)
 		return false;
 
+	ocrpt_mem_string_resize(priv->png, st.st_size + 1);
 	priv->png->len = 0;
 
-	char buf[4096];
-	size_t n;
-	while ((n = fread(buf, 1, sizeof(buf), f)) > 0)
-		ocrpt_mem_string_append_len_binary(priv->png, buf, n);
+	size_t n = fread(priv->png->str, 1, st.st_size, f);
+
+	priv->png->len = n;
+	priv->png->str[priv->png->len] = 0;
 
 	int err = ferror(f);
 	fclose(f);
