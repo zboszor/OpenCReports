@@ -1381,7 +1381,7 @@ void ocrpt_layout_output(opencreport *o, ocrpt_part *p, ocrpt_part_row *pr, ocrp
 
 		ocrpt_layout_output_headers_after_add_new_page(o, p, pr, pd, r, br, rows, newpage, page_indent, page_position, old_page_position);
 
-		if (!pr->start_page && !r->current_iteration) {
+		if (pr && r && !pr->start_page && !r->current_iteration) {
 			if (o->output_functions.get_current_page)
 				pr->start_page = o->output_functions.get_current_page(o);
 			pr->start_page_position = *page_position;
