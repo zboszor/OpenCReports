@@ -49,6 +49,7 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/strfmon.c,v 1.14 2003/03/20 08:18:55 ach
 #include <langinfo.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <mpfr.h>
@@ -209,7 +210,7 @@ DLL_EXPORT_SYM ssize_t ocrpt_mpfr_strfmon(opencreport *o, char * __restrict s, s
 			/* Do we have enough space to put number with
 			 * required width ?
 			 */
-			if (dst + width >= s + maxsize)
+			if ((intptr_t)dst + width >= (intptr_t)s + maxsize)
 				goto e2big_error;
 		}
 
@@ -303,9 +304,9 @@ DLL_EXPORT_SYM ssize_t ocrpt_mpfr_strfmon(opencreport *o, char * __restrict s, s
 		 *
 		 * = 0 - parentheses enclose the quantity and the
 		 *	 $currency_symbol
-		 * = 1 - the sign string precedes the quantity and the 
+		 * = 1 - the sign string precedes the quantity and the
 		 *       $currency_symbol
-		 * = 2 - the sign string succeeds the quantity and the 
+		 * = 2 - the sign string succeeds the quantity and the
 		 *       $currency_symbol
 		 * = 3 - the sign string precedes the $currency_symbol
 		 * = 4 - the sign string succeeds the $currency_symbol
